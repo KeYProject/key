@@ -10,7 +10,6 @@ import org.key_project.keyide.ui.Activator;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
-
 /**
  * <p>
  * Provides the images of the Symbolic Execution Debugger based on KeY.
@@ -22,7 +21,7 @@ import org.key_project.util.eclipse.BundleUtil;
  * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public final class KeYImages {
-
+   // TODO: Document constants of KeYImages
    public static final String FOLDER = "org.key_project.keyide.ui.images.folder";
    public static final String FOLDER_PROVED = "org.key_project.keyide.ui.images.folderProved";
    public static final String NODE = "org.key_project.keyide.ui.images.node";
@@ -32,9 +31,7 @@ public final class KeYImages {
     * Forbid instances.
     */
    private KeYImages(){
-      
    }
-
 
    /**
     * Returns the {@link Image} for the given key. The caller is <b>not</b> responsible for the destruction.
@@ -123,6 +120,4 @@ public final class KeYImages {
         });
       }
    }
-
-
 }

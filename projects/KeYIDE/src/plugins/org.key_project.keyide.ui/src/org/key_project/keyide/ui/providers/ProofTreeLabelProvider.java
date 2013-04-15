@@ -13,7 +13,6 @@ import org.key_project.keyide.ui.util.KeYImages;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -29,7 +28,6 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing, Martin Hentschel
  */
 public class ProofTreeLabelProvider extends LabelProvider {
-   
    private Viewer viewer;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    private Proof proof;
@@ -85,8 +83,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }      
    };
    
-   
-   
    /**
     * The AutoModeListener
     */
@@ -125,7 +121,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * Iterates over the complete tree and collects leaf branch folders because their label has to change if the branch was closed.
     * @param e - {@link ProofEvent}
     */
-   protected void updateLeafs(ProofEvent e) {
+   protected void updateLeafs(ProofEvent e) { // TODO: Should this method not be called also when a rule is applied manually? Or in general an event thrown? If not remove proofTreeListener
       final List<Object> possibleChangedLeaves = new LinkedList<Object>();
       proof.breadthFirstSearch(proof.root(), new ProofVisitor() { // TODO: Implement event Goal removed in the future in KeY to remove this iteration with a direct backward iteration from the closed leaf node on which the goal was removed.
          @Override
@@ -150,7 +146,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
          });
       }
    }
-
    
    /**
     * {@inheritDoc}
@@ -165,7 +160,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
          environment.getMediator().removeAutoModeListener(autoModeListener);
       }
    }
-   
 
    /**
     * {@inheritDoc}
@@ -198,75 +192,30 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
    }
    
-   
-   /**
-    * 
-    * @param e - {@link ProofTreeEvent}
-    */
-   protected void updateNodes(final ProofTreeEvent e) {
-      // Collect changed objects in event
-      final List<Object> changedParents = new LinkedList<Object>();
-      if (e.getGoals() != null) {
-         boolean multipleGoals = e.getGoals().size() >= 2;
-         for (Goal goal : e.getGoals()) {
-            Node node = goal.node();
-            if (!multipleGoals && node.parent() != null
-                  && node.getNodeInfo().getBranchLabel() != null) {
-               // Add also parent node to changed objects because in case of
-               // OneStepSimplification the number of applied rules is shown as
-               // branch label on it
-               changedParents.add(goal.node().parent());
-            }
-            changedParents.add(node);
-            BranchFolder bf = nodeToBranchMapping.get(node);
-            if (bf != null) {
-               changedParents.add(bf);
-            }
-         }
-      }
-      // Inform viewer about changed objects to update texts and images
-      if (!changedParents.isEmpty() && !viewer.getControl().isDisposed()) {
-         viewer.getControl().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!viewer.getControl().isDisposed()) {
-                  fireLabelProviderChanged(new LabelProviderChangedEvent(
-                        ProofTreeLabelProvider.this, changedParents.toArray()));
-               }
-            }
-         });
-      }
-   }
-
-   
    /**
     * {@inheritDoc}
     */
    @Override
    public Image getImage(Object element) {
-      final Image FOLDER_IMAGE = KeYImages.getImage("org.key_project.keyide.ui.images.folder");
-      final Image FOLDER_PROVED_IMAGE = KeYImages.getImage("org.key_project.keyide.ui.images.folderProved");
-      final Image NODE_IMAGE = KeYImages.getImage("org.key_project.keyide.ui.images.node");
-      final Image NODE_PROVED_IMAGE = KeYImages.getImage("org.key_project.keyide.ui.images.nodeProved");
-      
-      if(element instanceof Node){
+      if (element instanceof Node){
          Node node = (Node)element;
-         if(node.parent()!=null&&!node.root()){     
-            if(node.name().equals("Closed goal")){
-               return NODE_PROVED_IMAGE;
-            }
-            return NODE_IMAGE;
-         }
-      }
-      if(element instanceof BranchFolder){
-         if(((BranchFolder)element).isClosed()){
-            return FOLDER_PROVED_IMAGE;
+         if (node.isClosed()) {
+            return KeYImages.getImage(KeYImages.NODE_PROVED);
          }
          else {
-            return FOLDER_IMAGE;
+            return KeYImages.getImage(KeYImages.NODE);
          }
       }
-      return NODE_IMAGE;
-   }
-      
+      else if (element instanceof BranchFolder){
+         if (((BranchFolder)element).isClosed()){
+            return KeYImages.getImage(KeYImages.FOLDER_PROVED);
+         }
+         else {
+            return KeYImages.getImage(KeYImages.FOLDER);
+         }
+      }
+      else {
+         return super.getImage(element); // Unknown element
+      }
+   }      
 }

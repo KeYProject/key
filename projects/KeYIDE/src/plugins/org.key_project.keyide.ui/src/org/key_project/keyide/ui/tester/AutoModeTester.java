@@ -12,9 +12,19 @@ import de.uka.ilkd.key.ui.ConsoleUserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class AutoModeTester extends PropertyTester {
-   
+   /**
+    * The namespace of this {@link PropertyTester}.
+    */
    public static final String PROPERTY_NAMESPACE = "org.key_project.keyide.ui.AutoModeTester";
+   
+   /**
+    * The name of the start property.
+    */
    public static final String PROPERTY_START = "start";
+   
+   /**
+    * The name of the stop property.
+    */
    public static final String PROPERTY_STOP = "stop";
    
    /**
@@ -25,15 +35,15 @@ public class AutoModeTester extends PropertyTester {
                        final String property, 
                        final Object[] args, 
                        final Object expectedValue) {
-      if(receiver instanceof KeYEditor){
+      if (receiver instanceof KeYEditor){
          //initialize values
          KeYEditor editor = (KeYEditor) receiver;
          ConsoleUserInterface userInterface = editor.getKeYEnvironment().getUi();
          //Set button states
-         if(PROPERTY_START.equals(property)) {
+         if (PROPERTY_START.equals(property)) {
             return !userInterface.isAutoMode();
          }
-         if(PROPERTY_STOP.equals(property)) {
+         if (PROPERTY_STOP.equals(property)) {
             return userInterface.isAutoMode();
          }
       }

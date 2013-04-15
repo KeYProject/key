@@ -44,6 +44,5 @@ public class BranchFolder {
     */
    public boolean isClosed() {
       return child.isClosed();
-   }
-      
+   }      
 }

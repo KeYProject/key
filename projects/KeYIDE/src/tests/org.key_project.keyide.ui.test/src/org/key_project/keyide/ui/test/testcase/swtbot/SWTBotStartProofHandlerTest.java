@@ -21,7 +21,7 @@ import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartProofHandler;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.keyide.ui.test.Activator;
-import org.key_project.keyide.ui.visualization.KeYIDEPreferences;
+import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 

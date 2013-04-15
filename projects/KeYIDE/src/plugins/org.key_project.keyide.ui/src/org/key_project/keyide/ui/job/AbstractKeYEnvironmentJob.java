@@ -10,7 +10,6 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * @author Martin Hentschel
  */
 public abstract class AbstractKeYEnvironmentJob extends Job {
-   
    /**
     * Constructor
     * @param name The name of this job.

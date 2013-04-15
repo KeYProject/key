@@ -15,29 +15,23 @@ import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.keyide.ui.test.Activator;
-import org.key_project.keyide.ui.util.TreeViewerIterator;
+import org.key_project.keyide.ui.test.util.TreeViewerIterator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+//TODO Document class OutlineContentAndLabelProviderTest
 public class OutlineContentAndLabelProviderTest extends TestCase {
-   // TODO Comments
    /**
     * Creates a proof and the viewer of the proof for the tests.
     * @throws Exception
@@ -52,7 +46,7 @@ public class OutlineContentAndLabelProviderTest extends TestCase {
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
       KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, null, null);
-      IProgramMethod pm = searchProgramMethod(environment.getServices(), "PayCard", "isValid");
+      IProgramMethod pm = TestUtilsUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
       Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
@@ -132,30 +126,5 @@ public class OutlineContentAndLabelProviderTest extends TestCase {
          }
       }
       else assertFalse(viewerIter.hasNext());
-   }
-   
-   
-   /**
-    * Searches a {@link IProgramMethod} in the given {@link Services}.
-    * @param services The {@link Services} to search in.
-    * @param containerTypeName The name of the type which contains the method.
-    * @param methodFullName The method name to search.
-    * @return The first found {@link IProgramMethod} in the type.
-    */
-   protected static IProgramMethod searchProgramMethod(Services services, 
-                                                      String containerTypeName, 
-                                                      final String methodFullName) {
-      JavaInfo javaInfo = services.getJavaInfo();
-      KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
-      assertNotNull(containerKJT);
-      ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-      IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
-         @Override
-         public boolean select(IProgramMethod element) {
-            return methodFullName.equals(element.getFullName());
-         }
-      });
-      assertNotNull(pm);
-      return pm;
    }
 }

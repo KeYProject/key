@@ -12,6 +12,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 
@@ -23,7 +24,6 @@ import de.uka.ilkd.key.proof.Proof;
  */
 @SuppressWarnings({ "restriction" })
 public class StartProofHandler extends AbstractSaveExecutionHandler {
-
    /** 
     * {@inheritDoc}
     */
@@ -31,7 +31,7 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
    protected Object doExecute(final ExecutionEvent event) throws Exception {
        ISelection selection = HandlerUtil.getCurrentSelection(event);
        if (selection instanceof IStructuredSelection) {
-           Object[] elements = ((IStructuredSelection)selection).toArray();
+           Object[] elements = SWTUtil.toArray(selection);
            for (Object element : elements) {
                if (element instanceof IMethod) {
                    KeYIDEUtil.openProofEditor((IMethod)element);

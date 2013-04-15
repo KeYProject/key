@@ -14,12 +14,27 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class TacletCommandContributionItem extends CommandContributionItem {
+   // TODO: Document missing members of class TacletCommandContributionItem
 
    private TacletApp app;
    
    private KeYMediator mediator;
    
    private PosInSequent pos;
+   
+   /**
+    * The constructor with the additional parameters.
+    * @param contributionParameters - the {@link CommandContributionItemParameter}.
+    * @param app - the {@link TacletApp}.
+    * @param mediator - the {@link KeYMediator}.
+    * @param pos - the {@link PosInSequent}.
+    */
+   public TacletCommandContributionItem(CommandContributionItemParameter contributionParameters, TacletApp app, KeYMediator mediator, PosInSequent pos) {
+      super(contributionParameters);
+      this.app = app;
+      this.mediator = mediator;
+      this.pos = pos;
+   }
    
    public TacletApp getTacletApp(){
       return app;
@@ -32,21 +47,4 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    public PosInSequent getPosInSequent(){
       return pos;
    }
-   
-   
-   /**
-    * The constructor with the additional parameters.
-    * @param contributionParameters - the {@link CommandContributionItemParameter}.
-    * @param app - the {@link TacletApp}.
-    * @param mediator - the {@link KeYMediator}.
-    * @param pos - the {@link PosInSequent}.
-    */
-   public TacletCommandContributionItem(
-         CommandContributionItemParameter contributionParameters, TacletApp app, KeYMediator mediator, PosInSequent pos) {
-      super(contributionParameters);
-      this.app = app;
-      this.mediator = mediator;
-      this.pos = pos;
-   }
-
 }

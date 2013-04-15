@@ -360,7 +360,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.key_project.keyide.ui.visualization.KeYIDEPreferencesInitializer">
+            class="org.key_project.keyide.ui.util.KeYIDEPreferencesInitializer">
       </initializer>
    </extension>
    <extension
@@ -385,20 +385,6 @@
             name="Strategy Properties"
             restorable="true">
       </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.editorActions">
-      <editorContribution
-            id="org.key_project.keyide.ui.editor.contribution"
-            targetID="org.key_project.keyide.ui.editor">
-         <action
-               class="org.key_project.keyide.ui.editor.actions.StartAutoProof"
-               id="org.key_project.keyide.ui.editor.actions.startautoproof"
-               label="Start Proof"
-               style="push"
-               tooltip="Start the automated proof.">
-         </action>
-      </editorContribution>
    </extension>
    <extension
          point="org.eclipse.help.contexts">

@@ -32,11 +32,14 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class ProofTreeContentOutlinePage extends ContentOutlinePage {
-   
+   // TODO: Document members of ProofTreeContentOutlinePage
    private Proof proof;
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
+
+   private LazyProofTreeContentProvider contentProvider;
    
+   private ProofTreeLabelProvider labelProvider;
    
    /**
     * {@link KeYSelectionListener} to sync the KeYSelection with the treeselection.
@@ -64,10 +67,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
          handleAutoModeStopped(e);
       }
    };
-   
-   private LazyProofTreeContentProvider contentProvider;
-   
-   private ProofTreeLabelProvider labelProvider;
    
    /**
     * Constructor.

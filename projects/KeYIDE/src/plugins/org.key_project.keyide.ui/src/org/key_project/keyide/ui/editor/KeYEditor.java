@@ -21,13 +21,13 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
+import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -48,16 +48,16 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
    private Node showNode; 
    
-   private ProofSourceViewerDecorator textViewer;
+   private ProofSourceViewerDecorator textViewer; // TODO: Rename, into proofDecorator. And also its getter
   
 //   private boolean dirtyFlag = false;
    
 //   private File savedFile;
    
-   public ProofSourceViewerDecorator getTextViewer() {
+   public ProofSourceViewerDecorator getTextViewer() { // TODO Change order: attributes, constructors, methods, getter/setters (linke in UML) 
       return textViewer;
    }
-   
+
 //   private void setDirtyFlag(boolean dirtyFlag){
 //      this.dirtyFlag = dirtyFlag;
 //      firePropertyChange(PROP_DIRTY);
@@ -116,6 +116,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
       @Override
       public void mouseMove(MouseEvent e) {
+         // TODO: Refactor functionality into KeYEditor#handleMouseMoved(MouseEvent) which is called here
          if (showNode.getAppliedRuleApp() == null){
             textViewer.setBackgroundColorForHover();
          }
@@ -127,6 +128,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    protected void doSetInput(IEditorInput input) throws CoreException {
       if(input instanceof ProofEditorInput){
          super.doSetInput(input);
+      }
+      else {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input: " + input));
       }
 //      else if(input instanceof FileEditorInput){
 //         FileEditorInput fileInput = (FileEditorInput) input;
@@ -170,6 +174,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       
       @Override
       public void selectedProofChanged(final KeYSelectionEvent e) {
+         // TODO: Refactor functionality into KeYEditor#handleSelectedProofChanged(KeYSelectionEvent) which is called here
          getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -183,6 +188,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       
       @Override
       public void selectedNodeChanged(final KeYSelectionEvent e) {
+         // TODO: Refactor functionality into KeYEditor#handleSelectedNodeChanged(KeYSelectionEvent) which is called here
          getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -190,7 +196,6 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
                   setShowNode(e.getSource().getSelectedNode());
                   if(showNode.getAppliedRuleApp() != null){
                      PosInOccurrence posInOcc = showNode.getAppliedRuleApp().posInOccurrence();
-                     PosInSequent pos = PosInSequent.createCfmaPos(posInOcc);
                      textViewer.setGreenBackground(posInOcc);
                   }
                }
@@ -284,7 +289,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
 
    
-   public Node getShowNode() {
+   public Node getShowNode() { // TODO: Document method getShowNode()
       return showNode;
    }
 
@@ -303,7 +308,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
     * of the {@link ConsoleUserInterface} provided via {@link #getKeYEnvironment()}.
     */
-   private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() {
+   private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() { // TODO: Move to the top of the class, order is attributes, constructors, methods like in UML
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
          AutoModeTester.updateProperties();
@@ -328,7 +333,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       ISourceViewer sourceViewer = getSourceViewer();
       textViewer = new ProofSourceViewerDecorator(sourceViewer);
-//      getProof().addProofTreeListener(proofTreeListener);
+//      getProof().addProofTreeListener(proofTreeListener); // Is this line irrelevant? Remove it from source code!
       sourceViewer.setEditable(false);
       sourceViewer.getTextWidget().addMouseMoveListener(mouseMoveListener);
       if (this.getShowNode() != null) {
@@ -347,7 +352,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    public void dispose() {
       getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       getKeYEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
-//      getProof().removeProofTreeListener(proofTreeListener);
+//      getProof().removeProofTreeListener(proofTreeListener); // Is this line irrelevant? Remove it from source code!
       outline.dispose();
       super.dispose();
    }

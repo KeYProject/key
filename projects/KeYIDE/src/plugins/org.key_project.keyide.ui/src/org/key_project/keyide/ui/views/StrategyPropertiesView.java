@@ -4,16 +4,16 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.keyide.ui.composite.StrategyPropertiesScrolledForm;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.keyide.ui.providers.StrategyContentProvider;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 
 import de.uka.ilkd.key.proof.Proof;
 
-// TODO: Document this class
+// TODO: Document class StrategyPropertiesView
 public class StrategyPropertiesView extends AbstractViewBasedView {
 
-   private StrategyContentProvider form;
+   private StrategyPropertiesScrolledForm form;
    
    private Proof proof;
    
@@ -28,7 +28,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
 
    @Override
    public void createPartControl(Composite parent) {
-      form = new StrategyContentProvider(parent);
+      form = new StrategyPropertiesScrolledForm(parent);
       form.setProof(proof);
    }
 

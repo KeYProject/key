@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.PlatformObject;
 
 
 /**
@@ -12,8 +13,7 @@ import org.eclipse.core.runtime.IPath;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-//TODO: Rename class, maybe into ProofStorage
-public class ProofStorage implements IStorage {
+public class ProofStorage extends PlatformObject implements IStorage {
    
    private String proofString;
    private String name;
@@ -27,14 +27,6 @@ public class ProofStorage implements IStorage {
    public ProofStorage(String input, String name){
       this.proofString=input;
       this.name=name;
-   }
-
-   /** 
-    * {@inheritDoc}
-    */
-   @Override
-   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
-      return null;
    }
 
    /** 
@@ -67,13 +59,5 @@ public class ProofStorage implements IStorage {
    @Override
    public boolean isReadOnly() {
       return true;
-   }
-   
-   public void setProofString(String proofString){
-      this.proofString = proofString;      
-   }
-
-   public void setName(String name) {
-      this.name = name;
    }
 }

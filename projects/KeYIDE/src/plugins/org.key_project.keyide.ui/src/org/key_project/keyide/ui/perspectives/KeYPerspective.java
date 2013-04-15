@@ -6,7 +6,6 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 import de.uka.ilkd.key.proof.Proof;
 
-
 /**
  * This class defines the layout of the KeY-View.
  * This view should be used whenever a {@link Proof} is started or a KeY-associated file is opened.
@@ -14,7 +13,6 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class KeYPerspective implements IPerspectiveFactory {
-
    /**
     * The ID of this perspective.
     */
@@ -46,5 +44,4 @@ public class KeYPerspective implements IPerspectiveFactory {
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
       layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
    }
-
 }

@@ -82,13 +82,20 @@ import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -1201,5 +1208,29 @@ public class TestUtilsUtil {
          log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
          return this;
       }
+   }
+   
+   /**
+    * Searches a {@link IProgramMethod} in the given {@link Services}.
+    * @param services The {@link Services} to search in.
+    * @param containerTypeName The name of the type which contains the method.
+    * @param methodFullName The method name to search.
+    * @return The first found {@link IProgramMethod} in the type.
+    */
+   public static IProgramMethod searchProgramMethod(Services services, 
+                                                    String containerTypeName, 
+                                                    final String methodFullName) {
+      JavaInfo javaInfo = services.getJavaInfo();
+      KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
+      assertNotNull(containerKJT);
+      ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+      IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+         @Override
+         public boolean select(IProgramMethod element) {
+            return methodFullName.equals(element.getFullName());
+         }
+      });
+      assertNotNull(pm);
+      return pm;
    }
 }

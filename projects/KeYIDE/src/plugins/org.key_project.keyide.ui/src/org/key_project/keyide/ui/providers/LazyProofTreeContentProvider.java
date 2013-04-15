@@ -1,6 +1,5 @@
 package org.key_project.keyide.ui.providers;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.Display;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
@@ -37,19 +35,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * Flag which indicates that the viewer is currently refreshed when the auto mode has stopped.
     */
    private boolean refreshAfterAutoModeStopped = false;
-
-   /**
-    * The Constructor
-    * @param viewer - the {@link TreeViewer}
-    * @param environment - the {@link KeYEnvironment}
-    * @param proof - the {@link Proof}
-    */
-   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
-      this.viewer=viewer;
-      this.proof = proof;
-      this.environment = environment;
-   }
-   
    
    /**
     * The AutoModeListener
@@ -57,8 +42,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    private AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStopped(ProofEvent e) {
+         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleAutoModeStopped(MouseEvent) which is called here
          viewer.getControl().getDisplay().asyncExec(new Runnable() {
-            
             /**
              * {@inheritDoc}
              */
@@ -109,9 +94,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofPruned(final ProofTreeEvent e) {
+         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofPruned(MouseEvent) which is called here
          if(!environment.getMediator().autoMode()){
             viewer.getControl().getDisplay().asyncExec(new Runnable() {
-               
                @Override
                public void run() {
                   prune(e.getNode());
@@ -153,17 +138,15 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofExpanded(final ProofTreeEvent e) {
+         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofExpanded(MouseEvent) which is called here
          if(!environment.getMediator().autoMode()){
             viewer.getControl().getDisplay().asyncExec(new Runnable() {
-               
                @Override
                public void run() {
                   viewer.refresh(); // TODO: Update viewer directly, will increase performance?
-
                }
             });
          }
-         
       }
       
       /**
@@ -173,7 +156,19 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       public void proofClosed(final ProofTreeEvent e) {
       }
    };
-   
+
+
+   /**
+    * The Constructor
+    * @param viewer - the {@link TreeViewer}
+    * @param environment - the {@link KeYEnvironment}
+    * @param proof - the {@link Proof}
+    */
+   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
+      this.viewer=viewer;
+      this.proof = proof;
+      this.environment = environment;
+   }
 
    /**
     * {@inheritDoc}
@@ -196,7 +191,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
           }
        }
    }
-   
    
    /**
     * {@inheritDoc}
@@ -238,18 +232,17 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     */
    @Override
    public void updateChildCount(Object element, int currentChildCount) {
-      if(element instanceof Proof){
+      if (element instanceof Proof){
          Proof proof = (Proof) element;
          Node branchNode = proof.root();
          int childCount = getBranchFolderChildCount(branchNode);
          int folderCount = getFolderCountInBranch(proof);
          viewer.setChildCount(element, childCount + folderCount);
       }
-      if(element instanceof Node){
-         viewer.setChildCount(element, 0); // TODO: Set real number of children, maybe this explains why refresh must be called twice when the auto mode stopps
-         //should already be the right number of children because treeNodes shouldnt have any children.
+      if (element instanceof Node){
+         viewer.setChildCount(element, 0);
       }
-      if(element instanceof BranchFolder) {
+      if (element instanceof BranchFolder) {
          BranchFolder branchFolder = (BranchFolder) element;
          Node branchNode = branchFolder.getChild();
          int childCount = getBranchFolderChildCount(branchNode);
@@ -280,14 +273,14 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    
    private void prune(Node node){
       ISelection selection = viewer.getSelection(); // TODO: Content provider should do nothing with selection, find another way, maybe just use the node as element?
-      if(selection instanceof TreeSelection){
+      if (selection instanceof TreeSelection){
          TreeSelection treeSelection = (TreeSelection) selection;
          Object element = treeSelection.getFirstElement();
-         if(element instanceof BranchFolder){
+         if (element instanceof BranchFolder){
             BranchFolder branchFolder = (BranchFolder) element;
             viewer.refresh(branchFolder);
          }
-         else if(element instanceof Node){
+         else if (element instanceof Node){
             Node branchNode = getBranchNode((Node) element);
             BranchFolder branchFolder = branchFolders.get(branchNode);
             viewer.refresh(branchFolder);

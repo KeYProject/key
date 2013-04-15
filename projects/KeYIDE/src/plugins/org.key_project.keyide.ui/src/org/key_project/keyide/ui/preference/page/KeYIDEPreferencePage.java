@@ -5,11 +5,10 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.key_project.keyide.ui.visualization.KeYIDEPreferences;
+import org.key_project.keyide.ui.util.KeYIDEPreferences;
 
-public class KeYIDEPreferencePage extends FieldEditorPreferencePage implements
-      IWorkbenchPreferencePage {
-
+// TODO: Document class KeYIDEPreferencePage
+public class KeYIDEPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
    /**
     * Constructor
     */
@@ -33,5 +32,4 @@ public class KeYIDEPreferencePage extends FieldEditorPreferencePage implements
       RadioGroupFieldEditor switchToStateVisualizationPerspectiveEditor = new RadioGroupFieldEditor(KeYIDEPreferences.SWITCH_TO_KEY_PERSPECTIVE, "Open the associated perspective when a KeY proof is requested", 3, new String[][] {{"Always", MessageDialogWithToggle.ALWAYS}, {"Prompt", MessageDialogWithToggle.PROMPT}, {"Never", MessageDialogWithToggle.NEVER}}, getFieldEditorParent(), true);
       addField(switchToStateVisualizationPerspectiveEditor);
    }
-
 }

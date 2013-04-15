@@ -2,12 +2,11 @@ package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 
-import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -17,24 +16,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class ProofEditorInput implements IStorageEditorInput{
-   
-   /**
-    * Gives the {@link Proof} of this {@link ProofEditorInput}.
-    * @return The {@link Proof} of this {@link ProofEditorInput}.
-    */
-   public Proof getProof() {
-      return proof;
-   }
-
-   /**
-    * Gives the {@link KeYEnvironment} of this {@link ProofEditorInput}.
-    * @return The {@link KeYEnvironment} of this {@link ProofEditorInput}.
-    */
-   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
-      return environment;
-   }
-
+public class ProofEditorInput extends PlatformObject implements IStorageEditorInput {
    private IStorage storage;
    
    private Proof proof;
@@ -59,11 +41,6 @@ public class ProofEditorInput implements IStorageEditorInput{
    @Override
    public boolean exists() {
       return true;
-   }
-   
-   public void setData(Node node){
-       ((ProofStorage)storage).setProofString(NonGoalInfoView.computeText(environment.getMediator(), node));
-       ((ProofStorage)storage).setName(proof.name() + " - " + node.serialNr() + ":" + node.name());
    }
 
    /** 
@@ -102,16 +79,23 @@ public class ProofEditorInput implements IStorageEditorInput{
     * {@inheritDoc}
     */
    @Override
-   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
-      return null;
-   }
-
-   /** 
-    * {@inheritDoc}
-    */
-   @Override
    public IStorage getStorage() throws CoreException {
       return storage;
    }
+   
+   /**
+    * Gives the {@link Proof} of this {@link ProofEditorInput}.
+    * @return The {@link Proof} of this {@link ProofEditorInput}.
+    */
+   public Proof getProof() {
+      return proof;
+   }
 
+   /**
+    * Gives the {@link KeYEnvironment} of this {@link ProofEditorInput}.
+    * @return The {@link KeYEnvironment} of this {@link ProofEditorInput}.
+    */
+   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+      return environment;
+   }
 }

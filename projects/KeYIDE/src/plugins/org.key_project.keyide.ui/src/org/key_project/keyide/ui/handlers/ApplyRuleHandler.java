@@ -4,10 +4,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
-import org.key_project.keyide.ui.util.KeYIDEUtil;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -19,7 +16,6 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class ApplyRuleHandler extends AbstractHandler {
-   
    /**
     * {@inheritDoc}
     */
