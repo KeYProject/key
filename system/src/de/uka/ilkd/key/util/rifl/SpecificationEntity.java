@@ -6,7 +6,8 @@ public abstract class SpecificationEntity {
     public final String inClass;
     
     private SpecificationEntity (String p, String c) {
-        inPackage = p; inClass = c;
+        inPackage = (p == null)? "" : p;
+        inClass = c;
     }
 
     public static class Field extends SpecificationEntity {
