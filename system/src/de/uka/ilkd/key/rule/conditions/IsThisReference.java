@@ -39,17 +39,23 @@ public final class IsThisReference extends VariableConditionAdapter {
         assert var.sort() == ProgramSVSort.VARIABLE;
     }
     
+
     public boolean isNegated(){
 	return negated;
     }
-        
+
+      
     @Override
     public boolean check(SchemaVariable var, 
 	    		 SVSubstitute instCandidate,
 	    		 SVInstantiations instMap, 
 	    		 Services services) {
-        boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
-        return negated ? !isThisRef  : isThisRef;
+        if(var != this.var) {
+          return true;
+        }
+//        boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
+        boolean isThisRef = instCandidate instanceof ThisReference;
+        return negated ? !isThisRef : isThisRef;
     }
     
     
