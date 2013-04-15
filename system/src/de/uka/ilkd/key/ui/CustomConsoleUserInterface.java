@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.ui;
 
+import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
@@ -62,6 +66,20 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
    public void taskFinished(TaskFinishedInfo info) {
       if(isVerbose()) {
          System.out.println("CustomConsoleUserInterface.taskFinished()");
+      }
+      // Update selected node in KeYMediator. This is copied code from WindowUserInterface and should be refactored in the future
+      if (info.getSource() instanceof ApplyStrategy) {
+         resetStatus(this);
+         ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+
+         Proof proof = info.getProof();
+         if (!proof.closed()) {
+            Goal g = result.nonCloseableGoal();
+            if (g == null) {
+               g = proof.openGoals().head();
+            }
+            getMediator().goalChosen(g);
+         }
       }
    }
 }

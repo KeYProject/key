@@ -12,7 +12,6 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.test.testcase.swtbot.AbstractSWTBotPropertyTabTest;
 import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
 import org.key_project.sed.ui.visualization.test.Activator;
@@ -76,7 +75,7 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
       TestUtilsUtil.closeWelcomeView(bot);
       // Open properties view
       TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
-      SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+      SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
       // Create project
       IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("AbstractSWTBotGraphitiPropertyTabTest_doInDiagramEditorTest");
       if (!project.exists()) {
