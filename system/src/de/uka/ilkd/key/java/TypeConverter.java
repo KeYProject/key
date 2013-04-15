@@ -205,7 +205,7 @@ public final class TypeConverter {
     private Term convertReferencePrefix(ReferencePrefix prefix, 
 					ExecutionContext ec) {
 	Debug.out("typeconverter: (prefix, class)", prefix, 
-		  (prefix != null ? prefix.getClass() : null));		
+		  (prefix != null ? prefix.getClass() : null));
 	if (prefix instanceof FieldReference) {
 	    return convertVariableReference((FieldReference) prefix, ec);
 	} else if (prefix instanceof MetaClassReference) {

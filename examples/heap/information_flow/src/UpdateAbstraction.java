@@ -203,7 +203,7 @@ class UpdateAbstraction {
 	
 	//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering loop
 	/*@ loop_invariant l2 >= 0;
-	  @ assignable l2, \singleton(l2Dep), h, \singleton(hDep), \singleton(pcDep);
+	  @ assignable l2, \singleton(UpdateAbstraction.l2Dep), h, \singleton(UpdateAbstraction.hDep), \singleton(UpdateAbstraction.pcDep);
 	  @*/
 	while(h < 0) {
 	    //@ set UpdateAbstraction.l2Dep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.l2Dep); //assignment
