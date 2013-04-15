@@ -29,6 +29,11 @@ class RIFLHandler extends DefaultHandler {
  
     }
     
+    
+    public SpecificationContainer getSpecification() {
+        return null; // TODO
+    }
+    
     // XXX follows format suggested by Matthias Perner et al.
 
     @Override

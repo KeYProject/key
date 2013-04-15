@@ -9,6 +9,9 @@ public abstract class SpecificationEntity {
         inPackage = (p == null)? "" : p;
         inClass = c;
     }
+    
+    public abstract String qualifiedName ();
+    public abstract boolean equals(Object o);
 
     public static class Field extends SpecificationEntity {
         
@@ -27,15 +30,23 @@ public abstract class SpecificationEntity {
                         && name.equals(((Field) o).name));
             } else return false;
         }
+
+        @Override
+        public String qualifiedName() {
+            return inPackage+"."+inClass+"#"+name;
+        }
     }
     
     public static class ReturnValue extends SpecificationEntity {
         
         public final String methodName;
+        public final String[] paramTypes;
         
         ReturnValue (String m, String p, String c) {
             super(p,c);
-            methodName = m;
+            int i = m.indexOf('(');
+            methodName = m.substring(0, i);
+            paramTypes = m.substring(i,m.lastIndexOf(')')).split(",");
         }
         
         @Override
@@ -43,19 +54,34 @@ public abstract class SpecificationEntity {
             if (o instanceof ReturnValue){
                 return (inPackage.equals(((ReturnValue) o).inPackage)
                         && inClass.equals(((ReturnValue) o).inClass)
-                        && methodName.equals(((ReturnValue) o).methodName));
+                        && methodName.equals(((ReturnValue) o).methodName)
+                        && paramTypes.equals(((ReturnValue) o).paramTypes));
             } else return false;
+        }
+
+        @Override
+        public String qualifiedName() {
+            StringBuffer sb = new StringBuffer(inPackage+"."+inClass+"#"+methodName+"(");
+            for (String p: paramTypes) {
+                sb.append(p);
+                sb.append(',');
+            }
+            sb.deleteCharAt(sb.length());
+            return sb.toString();
         }
     }
     
     public static class Parameter extends SpecificationEntity {
 
         public final String methodName;
+        public final String[] paramTypes;
         public final int position;
         
         Parameter (int pos, String m, String p, String c) {
             super(p,c);
-            methodName = m;
+            int i = m.indexOf('(');
+            methodName = m.substring(0, i);
+            paramTypes = m.substring(i,m.lastIndexOf(')')).split(",");
             position = pos;
         }
         
@@ -65,8 +91,20 @@ public abstract class SpecificationEntity {
                 return (inPackage.equals(((Parameter) o).inPackage)
                         && inClass.equals(((Parameter) o).inClass)
                         && methodName.equals(((Parameter) o).methodName)
+                        && paramTypes.equals(((Parameter) o).paramTypes)
                         && position == ((Parameter)o).position);
             } return false;
+        }
+
+        @Override
+        public String qualifiedName() {
+            StringBuffer sb = new StringBuffer(inPackage+"."+inClass+"#"+methodName+"(");
+            for (String p: paramTypes) {
+                sb.append(p);
+                sb.append(',');
+            }
+            sb.deleteCharAt(sb.length());
+            return sb.toString();
         }
     }
 

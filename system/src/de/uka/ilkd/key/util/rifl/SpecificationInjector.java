@@ -9,9 +9,11 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 public class SpecificationInjector extends SourceVisitor {
+    
+    private final SpecificationContainer sc;
 
-    public SpecificationInjector() {
-        // TODO Auto-generated constructor stub
+    public SpecificationInjector(SpecificationContainer sc) {
+        this.sc = sc;
     }
     
     //////////////////////////////////////////////////////////////
@@ -32,11 +34,17 @@ public class SpecificationInjector extends SourceVisitor {
     public void visitInterfaceDeclaration (InterfaceDeclaration id) {
         accessChildren(id);
     }
+    
+    // Implementation warning: change elements only after traversal
 
     @Override
     public void visitMethodDeclaration (MethodDeclaration md) {
-        addComment(md,"/* test */");
-        // do not go down anymore
+        JMLWriter writer = new JMLWriter(md);
+        if (sc.returnValue(md) != null)
+            writer.addResultToRespects();
+        // XXX go on here
+                
+        addComment(md,writer.getSpecification());
     }
     
     
@@ -84,6 +92,8 @@ public class SpecificationInjector extends SourceVisitor {
             respects = new ArrayList<String>();
         }
         
+        // TODO allow more respects clauses
+        
         void addToRespects(de.uka.ilkd.key.util.rifl.SpecificationEntity.Field f){
             respects.add(f.toString());
         }
@@ -94,7 +104,7 @@ public class SpecificationInjector extends SourceVisitor {
         
         String getSpecification() {
             // start JML
-            StringBuffer sb = new StringBuffer("// JML* comment created by KeY RIFL Transformer.\n");
+            StringBuffer sb = new StringBuffer("\n\n// JML* comment created by KeY RIFL Transformer.\n");
             sb.append(JML_START);
 
             // respects clause

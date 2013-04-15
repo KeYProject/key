@@ -2,7 +2,6 @@ package de.uka.ilkd.key.util.rifl;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -97,22 +96,24 @@ public class RIFLTransformer {
         }
     }
     
-    private void readRIFL (String fileName) throws IOException, SAXException {
+    private SpecificationContainer readRIFL (String fileName) throws IOException, SAXException {
         // TODO: validate input file
         xmlReader.parse(convertToFileURL(fileName));
+        return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    private void transform(String riflFilename, String javaSource, String savePath) throws IOException, SAXException, ParserException {
+    private void transform(String riflFilename, String javaSource, String savePath) 
+            throws IOException, SAXException, ParserException {
 
         // step 1: parse RIFL file
-        readRIFL(riflFilename);
+        SpecificationContainer sc = readRIFL(riflFilename);
 
         // step 2: parse Java source
         readJava(javaSource);
 
         // step 3: inject specifications
         for (CompilationUnit cu: javaCUs) {
-            SpecificationInjector si = new SpecificationInjector();
+            SpecificationInjector si = new SpecificationInjector(sc);
             cu.accept(si);
         }
 
