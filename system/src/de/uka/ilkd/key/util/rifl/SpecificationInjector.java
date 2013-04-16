@@ -12,6 +12,8 @@ import recoder.list.generic.ASTList;
 
 /** Writes JML* translation of RIFL specifications to Java files.
  * This is a manipulating Recoder source visitor.
+ * Implementation warning: manipulating the AST before traversing it
+ * may have unexpected results.
  * @author bruns
  */
 public class SpecificationInjector extends SourceVisitor {
@@ -41,15 +43,22 @@ public class SpecificationInjector extends SourceVisitor {
     public void visitInterfaceDeclaration (InterfaceDeclaration id) {
         accessChildren(id);
     }
-    
-    // Implementation warning: change elements only after traversal
 
     @Override
     public void visitMethodDeclaration (MethodDeclaration md) {
-        JMLFactory factory = new JMLFactory(md);
+        JMLFactory factory = new JMLFactory();
         
+        // add return value
         factory.addResultToRespects(sc.returnValue(md));
-        // XXX go on here
+
+        // add parameters
+        for (int i= 0; i < md.getParameterDeclarationCount(); i++) {
+            ParameterDeclaration pd = md.getParameterDeclarationAt(i);
+            factory.addToRespects(
+                    pd.getVariableSpecification().getName(),sc.parameter(md, i));
+        }
+        
+        // add fields (TODO)
                 
         addComment(md,factory.getSpecification());
     }
@@ -82,21 +91,31 @@ public class SpecificationInjector extends SourceVisitor {
     }
     
     /** Produces JML* respects clauses.
+     * Clauses are internally labeled with keys (resulting from security domains
+     * in RIFL), which are discarded in the final output.
      * @author bruns
      */
     private static class JMLFactory {
         
+        private static final String DEFAULT_INDENTATION = "  ";
         private static final String DEFAULT_KEY = "";
         private static final String RESULT = "\\result";
         private static final String RESPECTS = "respects";
         private static final String JML_END = "@*/";
         private static final String JML_START = "/*@ ";
         
-        private final JavaProgramElement se;
+        private final String indentation;
         private final Map<String,List<String>> respects = new HashMap<String, List<String>>();
         
-        JMLFactory (JavaProgramElement se) {
-            this.se = se;
+        JMLFactory () {
+            indentation = DEFAULT_INDENTATION;
+        }
+        
+        JMLFactory (int indent) {
+            StringBuffer sb = new StringBuffer();
+            for (int i= 0; i<indent; i++)
+                sb.append(' ');
+            indentation = sb.toString();
         }
         
         private void put (String key, String value) {
@@ -111,10 +130,15 @@ public class SpecificationInjector extends SourceVisitor {
         
         // TODO allow more respects clauses
         
-        void addToRespects(de.uka.ilkd.key.util.rifl.SpecificationEntity.Field f){
-            put(DEFAULT_KEY, RESULT);
+        void addToRespects(String name, String key){
+            put(key, name);
         }
         
+        void addToRespects(String name){
+            put(DEFAULT_KEY, name);
+        }
+        
+        /** Adds \result to a respects clause labeled by key. */
         void addResultToRespects(String key){
             put(key, RESULT);
         }
@@ -126,12 +150,13 @@ public class SpecificationInjector extends SourceVisitor {
         /** Gets a formatted JML comment.*/
         String getSpecification() {
             // start JML
-            StringBuffer sb = new StringBuffer();
+            StringBuffer sb = new StringBuffer(indentation);
             sb.append(JML_START+"\n");
 
             // respects clauses
             for (List<String> oneRespect: respects.values()) {
-                indent(sb);
+                sb.append(indentation);
+                sb.append(DEFAULT_INDENTATION);
                 sb.append("@ ");
                 sb.append(RESPECTS);
                 for (String elem: oneRespect) {
@@ -144,13 +169,10 @@ public class SpecificationInjector extends SourceVisitor {
             }
             
             // close JML
-            indent(sb);
+            sb.append(indentation);
+            sb.append(DEFAULT_INDENTATION);
             sb.append(JML_END);
             return sb.toString();
-        }
-        
-        private void indent (StringBuffer sb) {
-            sb.append("  ");
         }
     }
     

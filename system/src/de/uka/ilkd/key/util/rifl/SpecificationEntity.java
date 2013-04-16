@@ -9,20 +9,34 @@ public abstract class SpecificationEntity {
     public final String inClass;
     
     private SpecificationEntity (String p, String c) {
-        inPackage = (p == null)? "" : p;
-        inClass = c;
+        inPackage = (p == null)? "" : p.intern();
+        inClass = c.intern();
+    }
+    
+    @Override
+    public String toString() {
+        return qualifiedName();
     }
     
     public abstract String qualifiedName ();
+    
+    @Override
     public abstract boolean equals(Object o);
+    
+    @Override
+    public abstract int hashCode();
+    
+    ////////////////////////////////////////////////////
+    // implementations
+    ////////////////////////////////////////////////////
 
-    public static class Field extends SpecificationEntity {
+    public static final class Field extends SpecificationEntity {
         
         public final String name;
         
         Field (String n, String p, String c) {
             super(p,c);
-            name = n;
+            name = n.intern();
         }
         
         @Override
@@ -38,9 +52,14 @@ public abstract class SpecificationEntity {
         public String qualifiedName() {
             return inPackage+"."+inClass+"#"+name;
         }
+
+        @Override
+        public int hashCode() {
+            return 3976*(inPackage+inClass).hashCode() + name.hashCode();  
+        }
     }
     
-    public static class ReturnValue extends SpecificationEntity {
+    public static final class ReturnValue extends SpecificationEntity {
         
         public final String methodName;
         public final String[] paramTypes;
@@ -48,8 +67,14 @@ public abstract class SpecificationEntity {
         ReturnValue (String m, String p, String c) {
             super(p,c);
             int i = m.indexOf('(');
-            methodName = m.substring(0, i);
+            methodName = m.substring(0, i).intern();
             paramTypes = m.substring(i,m.lastIndexOf(')')).split(",");
+        }
+        
+        ReturnValue (String m, String[] pt, String p, String c) {
+            super(p,c);
+            methodName = m;
+            paramTypes = pt;
         }
         
         @Override
@@ -72,9 +97,15 @@ public abstract class SpecificationEntity {
             sb.deleteCharAt(sb.length());
             return sb.toString();
         }
+
+        @Override
+        public int hashCode() {
+            return 3722 * (inPackage+inClass).hashCode()
+                    + 76 * methodName.hashCode() + paramTypes.hashCode();
+        }
     }
     
-    public static class Parameter extends SpecificationEntity {
+    public static final class Parameter extends SpecificationEntity {
 
         public final String methodName;
         public final String[] paramTypes;
@@ -83,9 +114,16 @@ public abstract class SpecificationEntity {
         Parameter (int pos, String m, String p, String c) {
             super(p,c);
             int i = m.indexOf('(');
-            methodName = m.substring(0, i);
+            methodName = m.substring(0, i).intern();
             paramTypes = m.substring(i,m.lastIndexOf(')')).split(",");
             position = pos;
+        }
+        
+        Parameter(int pos, String m, String[] pt, String p, String c){
+            super(p,c);
+            position = pos;
+            methodName = m;
+            paramTypes = pt;
         }
         
         @Override
@@ -108,6 +146,13 @@ public abstract class SpecificationEntity {
             }
             sb.deleteCharAt(sb.length());
             return sb.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            return 3668 * (inPackage+inClass).hashCode()
+                    + 46 * (methodName.hashCode() + paramTypes.hashCode())
+                    + position;
         }
     }
 

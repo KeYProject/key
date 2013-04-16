@@ -17,6 +17,8 @@ import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
  */
 class RIFLHandler extends DefaultHandler {
     
+    private final static String DEFAULT_CATEGORY = "Spider Pig";
+    private final static String DEFAULT_DOMAIN = "low";
     
     private final Map<SpecificationEntity,String> sources2categories =
             new HashMap<SpecificationEntity,String>();
@@ -27,16 +29,21 @@ class RIFLHandler extends DefaultHandler {
     
     
     private Map<SpecificationEntity,String> tmpMap = null;
-    private String category = null;
+    private String category = DEFAULT_CATEGORY;
     
     
     public RIFLHandler() {
- 
+        categories2domains.put(DEFAULT_CATEGORY, DEFAULT_DOMAIN);
     }
     
     
     public SpecificationContainer getSpecification() {
-        return null; // TODO
+        // drop categories, merge sources and sinks
+        Map<SpecificationEntity,String> tmp =
+                new HashMap<SpecificationEntity,String>();
+        
+        // TODO
+        return null;
     }
     
     // XXX follows format suggested by Matthias Perner et al.
@@ -57,6 +64,11 @@ class RIFLHandler extends DefaultHandler {
         default:
         }
     }
+    
+    @Override
+    public void endDocument () {
+        // TODO: consistency validation
+    }
 
     private void putReturn(Attributes attributes) {
         final String methodName = attributes.getValue(0);
@@ -76,7 +88,7 @@ class RIFLHandler extends DefaultHandler {
 
     private void putField(Attributes attributes) {
         SpecificationEntity se = 
-                new ReturnValue(attributes.getValue(0),attributes.getValue(2),attributes.getValue(1));
+                new Field(attributes.getValue(0),attributes.getValue(2),attributes.getValue(1));
         tmpMap.put(se, category);
     }
 
