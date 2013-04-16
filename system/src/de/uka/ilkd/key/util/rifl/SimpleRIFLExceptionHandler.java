@@ -4,8 +4,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-public class SimpleRIFLExceptionHandler extends Object implements
-        KeYExceptionHandler {
+/** Simple exception handler which just writes to standard output. 
+ * @author bruns 
+ */
+public class SimpleRIFLExceptionHandler implements KeYExceptionHandler {
     
     static final SimpleRIFLExceptionHandler INSTANCE = 
             new SimpleRIFLExceptionHandler();

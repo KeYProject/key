@@ -10,6 +10,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
 
+/** XML content handler for the RIFL language.
+ * Produces a RIFL {@link SpecificationContainer}.
+ * May throw obscure exceptions on non-wellformed XML documents.
+ * @author bruns
+ */
 class RIFLHandler extends DefaultHandler {
     
     
@@ -54,8 +59,11 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void putReturn(Attributes attributes) {
+        final String methodName = attributes.getValue(0);
+        final String packageName = attributes.getValue(2);
+        final String className = attributes.getValue(1);
         SpecificationEntity se = 
-                new ReturnValue(attributes.getValue(0),attributes.getValue(2),attributes.getValue(1));
+                new ReturnValue(methodName,packageName,className);
         tmpMap.put(se, category);
     }
 

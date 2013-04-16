@@ -1,13 +1,19 @@
 package de.uka.ilkd.key.util.rifl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+/** Writes JML* translation of RIFL specifications to Java files.
+ * This is a manipulating Recoder source visitor.
+ * @author bruns
+ */
 public class SpecificationInjector extends SourceVisitor {
     
     private final SpecificationContainer sc;
@@ -23,6 +29,7 @@ public class SpecificationInjector extends SourceVisitor {
     @Override
     public void visitCompilationUnit (CompilationUnit cu) {
         accessChildren(cu);
+        addComment(cu,"\n// JML* comment created by KeY RIFL Transformer.\n");
     }
 
     @Override
@@ -39,12 +46,12 @@ public class SpecificationInjector extends SourceVisitor {
 
     @Override
     public void visitMethodDeclaration (MethodDeclaration md) {
-        JMLWriter writer = new JMLWriter(md);
-        if (sc.returnValue(md) != null)
-            writer.addResultToRespects();
+        JMLFactory factory = new JMLFactory(md);
+        
+        factory.addResultToRespects(sc.returnValue(md));
         // XXX go on here
                 
-        addComment(md,writer.getSpecification());
+        addComment(md,factory.getSpecification());
     }
     
     
@@ -74,43 +81,60 @@ public class SpecificationInjector extends SourceVisitor {
         se.setComments(commentList);
     }
     
-    private static class JMLWriter {
+    /** Produces JML* respects clauses.
+     * @author bruns
+     */
+    private static class JMLFactory {
         
+        private static final String DEFAULT_KEY = "";
         private static final String RESULT = "\\result";
         private static final String RESPECTS = "respects";
         private static final String JML_END = "@*/";
         private static final String JML_START = "/*@ ";
         
-        private JavaProgramElement se;
-        private List<String> respects = new ArrayList<String>();
+        private final JavaProgramElement se;
+        private final Map<String,List<String>> respects = new HashMap<String, List<String>>();
         
-        JMLWriter (JavaProgramElement se) {
+        JMLFactory (JavaProgramElement se) {
             this.se = se;
         }
         
-        void clear () {
-            respects = new ArrayList<String>();
+        private void put (String key, String value) {
+            if (key == null) return;
+            List<String> target = respects.get(key);
+            if (target == null) {
+                target = new ArrayList<String>();
+                respects.put(key, target);
+            }
+            target.add(value);
         }
         
         // TODO allow more respects clauses
         
         void addToRespects(de.uka.ilkd.key.util.rifl.SpecificationEntity.Field f){
-            respects.add(f.toString());
+            put(DEFAULT_KEY, RESULT);
+        }
+        
+        void addResultToRespects(String key){
+            put(key, RESULT);
         }
         
         void addResultToRespects(){
-            respects.add(RESULT);
+            put(DEFAULT_KEY, RESULT);
         }
         
+        /** Gets a formatted JML comment.*/
         String getSpecification() {
             // start JML
-            StringBuffer sb = new StringBuffer("\n\n// JML* comment created by KeY RIFL Transformer.\n");
-            sb.append(JML_START);
+            StringBuffer sb = new StringBuffer();
+            sb.append(JML_START+"\n");
 
-            // respects clause
-            if (!respects.isEmpty()) {
+            // respects clauses
+            for (List<String> oneRespect: respects.values()) {
+                indent(sb);
+                sb.append("@ ");
                 sb.append(RESPECTS);
-                for (String elem: respects) {
+                for (String elem: oneRespect) {
                     sb.append(" ");
                     sb.append(elem);
                     sb.append(",");

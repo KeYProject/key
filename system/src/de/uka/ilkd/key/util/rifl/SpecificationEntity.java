@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.util.rifl;
 
+/** Program elements which may be named as sources or sinks in RIFL.
+ * @author bruns
+ */
 public abstract class SpecificationEntity {
 
     public final String inPackage;

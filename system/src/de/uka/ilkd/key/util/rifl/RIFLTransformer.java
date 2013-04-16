@@ -22,7 +22,13 @@ import recoder.java.JavaProgramFactory;
 
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-
+/** Facet class for interpreting RIFL specifications.
+ * The Requirements for Information Flow Language (RIFL) is a tool-independent
+ * specification language developed in the RS3 project.
+ * Method <code>transform</code> reads a RIFL file and Java sources and
+ * writes JML* information flow specifications to the original Java files.
+ * @author bruns
+ */
 public class RIFLTransformer {
 
     private static final JavaProgramFactory jpf =
