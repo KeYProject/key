@@ -50,7 +50,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            return inPackage+"."+inClass+"#"+name;
+            return (inPackage == ""? "": inPackage+".")+inClass+"#"+name;
         }
 
         @Override
@@ -68,7 +68,7 @@ public abstract class SpecificationEntity {
             super(p,c);
             int i = m.indexOf('(');
             methodName = m.substring(0, i).intern();
-            paramTypes = m.substring(i,m.lastIndexOf(')')).split(",");
+            paramTypes = m.substring(i+1,m.lastIndexOf(')')).split(",");
         }
         
         ReturnValue (String m, String[] pt, String p, String c) {
@@ -89,7 +89,10 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            StringBuffer sb = new StringBuffer(inPackage+"."+inClass+"#"+methodName+"(");
+            StringBuffer sb = new StringBuffer();
+            if (!"".equals(inPackage))
+                sb.append(inPackage+".");
+            sb.append(inClass+"#"+methodName+"(");
             for (String p: paramTypes) {
                 sb.append(p);
                 sb.append(',');
@@ -115,7 +118,7 @@ public abstract class SpecificationEntity {
             super(p,c);
             int i = m.indexOf('(');
             methodName = m.substring(0, i).intern();
-            paramTypes = m.substring(i,m.lastIndexOf(')')).split(",");
+            paramTypes = m.substring(i+1,m.lastIndexOf(')')).split(",");
             position = pos;
         }
         
@@ -139,7 +142,10 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            StringBuffer sb = new StringBuffer(inPackage+"."+inClass+"#"+methodName+"(");
+            StringBuffer sb = new StringBuffer();
+            if (!"".equals(inPackage))
+                sb.append(inPackage+".");
+            sb.append(inClass+"#"+methodName+"(");
             for (String p: paramTypes) {
                 sb.append(p);
                 sb.append(',');

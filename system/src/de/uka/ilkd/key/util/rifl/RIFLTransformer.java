@@ -15,6 +15,7 @@ import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
+import recoder.CrossReferenceServiceConfiguration;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.java.CompilationUnit;
@@ -84,7 +85,7 @@ public class RIFLTransformer {
         xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new RIFLHandler());
         xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
-        jpf.initialize(new DefaultServiceConfiguration());
+        jpf.initialize(new CrossReferenceServiceConfiguration());
         assert jpf.getServiceConfiguration() != null;
     }
     
@@ -99,6 +100,7 @@ public class RIFLTransformer {
             Reader fr = new BufferedReader(new FileReader(javaFile));
             cu = jpf.parseCompilationUnit(fr);
             javaCUs.add(cu);
+            jpf.getServiceConfiguration().getChangeHistory().updateModel();
         }
     }
     

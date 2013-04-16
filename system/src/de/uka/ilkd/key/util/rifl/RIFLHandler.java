@@ -9,6 +9,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
+import static de.uka.ilkd.key.util.MiscTools.apply;
 
 /** XML content handler for the RIFL language.
  * Produces a RIFL {@link SpecificationContainer}.
@@ -39,11 +40,11 @@ class RIFLHandler extends DefaultHandler {
     
     public SpecificationContainer getSpecification() {
         // drop categories, merge sources and sinks
-        Map<SpecificationEntity,String> tmp =
+        final Map<SpecificationEntity,String> tmp =
                 new HashMap<SpecificationEntity,String>();
-        
-        // TODO
-        return null;
+        tmp.putAll(apply(sources2categories,categories2domains));
+        tmp.putAll(apply(sinks2categories,categories2domains));
+        return new DefaultSpecificationContainer(tmp);
     }
     
     // XXX follows format suggested by Matthias Perner et al.
