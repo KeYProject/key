@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -67,7 +66,7 @@ public class ChoiceSelector extends JDialog {
     /** the JList with the choices for one category */
     private JList choiceList;
     private JTextArea explanationArea;
-    private Properties explanationMap;
+    private static Properties explanationMap;
 
     /** creates a new ChoiceSelector, using the <code>ChoiceSettings</code>
      * from <code>settings</code> */
@@ -236,10 +235,21 @@ public class ChoiceSelector extends JDialog {
 	explanationArea.setCaretPosition(0);
     }
 
-    private String getExplanation(String selection) {
+    /**
+     * <p>
+     * Returns the explanation for the given category.
+     * </p>
+     * <p>
+     * This method should be public and static because it is independent
+     * from the {@link JDialog} and it is also used by the eclipse projects.
+     * </p>
+     * @param category The category for which the explanation is requested.
+     * @return The explanation for the given category.
+     */
+    public static String getExplanation(String category) {
         if(explanationMap == null) {
             explanationMap = new Properties();
-            InputStream is = getClass().getResourceAsStream(EXPLANATIONS_RESOURCE);
+            InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
             try {
                 if (is == null) {
                     throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
@@ -251,9 +261,9 @@ public class ChoiceSelector extends JDialog {
             }
         }
         
-        String result = explanationMap.getProperty(selection);
+        String result = explanationMap.getProperty(category);
         if(result == null) {
-            result = "No explanation for " + selection + " available.";
+            result = "No explanation for " + category + " available.";
         }
         
         return result;

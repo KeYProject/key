@@ -16,6 +16,7 @@ import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -31,6 +32,7 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 import org.key_project.util.eclipse.swt.viewer.FileSelectionValidator;
@@ -409,4 +411,27 @@ public final class WorkbenchUtil {
           return false;
        }
     }
+
+   /**
+    * Re-Evaluates all specified {@code PropertyTester}.  
+    * @param properties The properties to re-evaluate.
+    */
+   public static void updatePropertyTesters(final String... properties) {
+      if (properties != null) {
+         Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               IWorkbenchWindow window = getActiveWorkbenchWindow();
+               if (window != null) {
+                  IEvaluationService service = (IEvaluationService)window.getService(IEvaluationService.class);
+                  if (service != null) {
+                     for (String property : properties) {
+                        service.requestEvaluation(property);
+                     }
+                  }
+               }
+            }
+         });
+      }
+   }
 }
