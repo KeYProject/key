@@ -36,18 +36,20 @@ import recoder.java.JavaProgramFactory;
 
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-/** Facet class for interpreting RIFL specifications.
- * The Requirements for Information Flow Language (RIFL) is a tool-independent
- * specification language developed in the RS3 project.
- * Method <code>transform</code> reads a RIFL file and Java sources and
- * writes JML* information flow specifications to the original Java files.
+/**
+ * Facet class for interpreting RIFL specifications. The Requirements for
+ * Information Flow Language (RIFL) is a tool-independent specification language
+ * developed in the RS3 project. Method <code>transform</code> reads a RIFL file
+ * and Java sources and writes JML* information flow specifications to the
+ * original Java files.
+ * 
  * @author bruns
  */
 public class RIFLTransformer {
 
-    private static final JavaProgramFactory jpf =
-            de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
-    
+    private static final JavaProgramFactory jpf = de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory
+            .getInstance();
+
     private static String convertToFileURL(String filename) {
         String path = new File(filename).getAbsolutePath();
         if (File.separatorChar != '/') {
@@ -59,98 +61,101 @@ public class RIFLTransformer {
         }
         return "file:" + path;
     }
-    
-    
-    /** Entry point for the stand-alone RIFL to JML* tool.
+
+    /**
+     * Entry point for the stand-alone RIFL to JML* tool.
      */
     public static void main(String[] args) {
         final String riflFilename = "/tmp/test.xml";
         final String javaFilename = "/tmp/Test.java";
         final String targetFilename = "/tmp/TestNew.java";
-        RIFLTransformer.transform(riflFilename, javaFilename, targetFilename, SimpleRIFLExceptionHandler.INSTANCE);
+        RIFLTransformer.transform(riflFilename, javaFilename, targetFilename,
+                SimpleRIFLExceptionHandler.INSTANCE);
     }
 
-    public static void transform (String riflFilename, String javaSource, String savePath, KeYExceptionHandler kexh) {
+    public static void transform(String riflFilename, String javaSource,
+            String savePath, KeYExceptionHandler kexh) {
         RIFLTransformer rt = null;
         try {
             rt = new RIFLTransformer();
             rt.transform(riflFilename, javaSource, savePath);
-        } catch (ParserConfigurationException e) {
+        } catch (final ParserConfigurationException e) {
             kexh.reportException(e);
-        } catch (SAXException e) {
+        } catch (final SAXException e) {
             kexh.reportException(e);
-        } catch (ParserException e) {
+        } catch (final ParserException e) {
             kexh.reportException(e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             kexh.reportException(e);
-            
+
         }
     }
 
     private final XMLReader xmlReader;
-    private List<CompilationUnit> javaCUs = new ArrayList<CompilationUnit>();
+    private final List<CompilationUnit> javaCUs = new ArrayList<CompilationUnit>();
 
-    
-    private RIFLTransformer() throws ParserConfigurationException, SAXException {   
-        SAXParserFactory spf = SAXParserFactory.newInstance();
+    private RIFLTransformer() throws ParserConfigurationException, SAXException {
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
-        SAXParser saxParser = spf.newSAXParser();
+        final SAXParser saxParser = spf.newSAXParser();
         xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new RIFLHandler());
         xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
         jpf.initialize(new CrossReferenceServiceConfiguration());
         assert jpf.getServiceConfiguration() != null;
     }
-    
+
     private void readJava(String source) throws IOException, ParserException {
         // TODO: collect all Java files from directory
         final Collection<String> javaFiles = new ArrayList<String>();
         javaFiles.add(source);
-        
+
         // parse
-        for (String javaFile: javaFiles) {
+        for (final String javaFile : javaFiles) {
             final CompilationUnit cu;
-            Reader fr = new BufferedReader(new FileReader(javaFile));
+            final Reader fr = new BufferedReader(new FileReader(javaFile));
             cu = jpf.parseCompilationUnit(fr);
             javaCUs.add(cu);
             jpf.getServiceConfiguration().getChangeHistory().updateModel();
         }
     }
-    
-    private SpecificationContainer readRIFL (String fileName) throws IOException, SAXException {
+
+    private SpecificationContainer readRIFL(String fileName)
+            throws IOException, SAXException {
         // TODO: validate input file
         xmlReader.parse(convertToFileURL(fileName));
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    private void transform(String riflFilename, String javaSource, String savePath) 
-            throws IOException, SAXException, ParserException {
+    private void transform(String riflFilename, String javaSource,
+            String savePath) throws IOException, SAXException, ParserException {
 
         // step 1: parse RIFL file
-        SpecificationContainer sc = readRIFL(riflFilename);
+        final SpecificationContainer sc = readRIFL(riflFilename);
 
         // step 2: parse Java source
         readJava(javaSource);
 
         // step 3: inject specifications
-        for (CompilationUnit cu: javaCUs) {
-            SpecificationInjector si = new SpecificationInjector(sc);
+        for (final CompilationUnit cu : javaCUs) {
+            final SpecificationInjector si = new SpecificationInjector(sc);
             cu.accept(si);
         }
 
         // step 4: write modified Java files
-        writeJavaFile(savePath,javaCUs.get(0));
+        writeJavaFile(savePath, javaCUs.get(0));
     }
-    
+
     /** Writes a single Java file. */
-    private void writeJavaFile (String target, CompilationUnit cu) throws IOException {
+    private void writeJavaFile(String target, CompilationUnit cu)
+            throws IOException {
         FileWriter writer = null;
         try {
             writer = new FileWriter(target);
             final String source = cu.toSource();
             System.out.println(source);
             writer.append(source);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw e;
         } finally {
             writer.close();

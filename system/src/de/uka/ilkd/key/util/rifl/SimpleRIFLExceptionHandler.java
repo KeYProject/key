@@ -17,24 +17,23 @@ import java.util.List;
 
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
-/** Simple exception handler which just writes to standard output. 
- * @author bruns 
+/**
+ * Simple exception handler which just writes to standard output.
+ * 
+ * @author bruns
  */
 public class SimpleRIFLExceptionHandler implements KeYExceptionHandler {
-    
-    static final SimpleRIFLExceptionHandler INSTANCE = 
-            new SimpleRIFLExceptionHandler();
+
+    static final SimpleRIFLExceptionHandler INSTANCE = new SimpleRIFLExceptionHandler();
 
     private SimpleRIFLExceptionHandler() {
         // TODO Auto-generated constructor stub
     }
 
     @Override
-    public void reportException(Throwable e) {
-        System.out.println(e.toString());
-        if (e.getCause() != null) {
-            reportException(e.getCause());
-        }
+    public void clear() {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -44,9 +43,11 @@ public class SimpleRIFLExceptionHandler implements KeYExceptionHandler {
     }
 
     @Override
-    public void clear() {
-        // TODO Auto-generated method stub
-
+    public void reportException(Throwable e) {
+        System.out.println(e.toString());
+        if (e.getCause() != null) {
+            reportException(e.getCause());
+        }
     }
 
 }
