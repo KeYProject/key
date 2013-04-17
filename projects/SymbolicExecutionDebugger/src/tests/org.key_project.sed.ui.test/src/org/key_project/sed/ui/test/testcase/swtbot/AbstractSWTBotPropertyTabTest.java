@@ -43,7 +43,7 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
          debugTree = debugView.bot().tree();
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Get properties view
-         final SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+         SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
          // Make sure that all nodes to test are loaded and that the automatic selection set to the debug target by the Debug API is done.
          selectDebugTarget(debugTree);
          selectThread(debugTree);

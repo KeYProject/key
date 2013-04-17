@@ -48,6 +48,7 @@ import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -56,6 +57,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -78,14 +80,22 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
+import org.key_project.util.test.util.internal.ContextMenuHelper;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -248,12 +258,11 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Selects the project explorer view and the defined path.
-    * @param bot The {@link SWTBotTree} to find the package explorer view.
-    * @param toSelects The path to select.
-    * @return The selected element.
+    * Returns the project explorer view or its JDT version package explorer.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The found {@link SWTBotView}.
     */
-   public static SWTBotTreeItem selectInProjectExplorer(SWTWorkbenchBot bot, String... toSelects) {
+   public static SWTBotView getProjectExplorer(SWTWorkbenchBot bot) {
       SWTBotView viewBot = null;
       try {
          viewBot = bot.viewByTitle("Package Explorer");
@@ -263,6 +272,17 @@ public class TestUtilsUtil {
          viewBot = bot.viewByTitle("Project Explorer");
          viewBot.show();
       }
+      return viewBot;
+   }
+   
+   /**
+    * Selects the project explorer view and the defined path.
+    * @param bot The {@link SWTBotTree} to find the package explorer view.
+    * @param toSelects The path to select.
+    * @return The selected element.
+    */
+   public static SWTBotTreeItem selectInProjectExplorer(SWTWorkbenchBot bot, String... toSelects) {
+      SWTBotView viewBot = getProjectExplorer(bot);
       return selectInTree(viewBot.bot().tree(), toSelects);
    }
 
@@ -1010,6 +1030,59 @@ public class TestUtilsUtil {
          }
       });
    }
+
+   /**
+    * Returns the {@link SWTBotView} for the properties view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getPropertiesView(SWTWorkbenchBot bot) {
+      return bot.viewById(IPageLayout.ID_PROP_SHEET);
+   }
+
+   /**
+    * Returns the {@link SWTBotView} for the outline view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getOutlineView(SWTWorkbenchBot bot) {
+      return bot.viewById(IPageLayout.ID_OUTLINE);
+   }
+
+   /**
+    * Closes the given editor thread save.
+    * @param editor The {@link IEditorPart} to close.
+    * @param save Save changes?
+    */
+   public static void closeEditor(final IEditorPart editor, final boolean save) {
+      if (editor != null) {
+         Shell shell = editor.getEditorSite().getShell();
+         if (!shell.isDisposed()) {
+            shell.getDisplay().syncExec(new Runnable() {
+               @Override
+               public void run() {
+                  WorkbenchUtil.closeEditor(editor, save);
+               }
+            });
+         }
+      }
+   }
+   
+   /**
+    * <p>
+    * Performs a click on a menu item of the context menu of the given {@link AbstractSWTBot}.
+    * </p>
+    * <p>
+    * This utility method solves some SWTBot issues on context menu like missing
+    * support for structured context menus and widget is disposed exceptions o
+    * items provided to context menus via extension points.
+    * </p>
+    * @param bot The {@link AbstractSWTBot} to execute a context menu click on it.
+    * @param texts The path to the context menu item to click on.
+    */
+   public static void clickContextMenu(AbstractSWTBot<?> bot, String... texts) {
+      ContextMenuHelper.clickContextMenu(bot, texts);
+   }
    
    /**
     * Waits until the selection of the given {@link SWTBotTree} contains the given element. 
@@ -1135,5 +1208,29 @@ public class TestUtilsUtil {
          log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
          return this;
       }
+   }
+   
+   /**
+    * Searches a {@link IProgramMethod} in the given {@link Services}.
+    * @param services The {@link Services} to search in.
+    * @param containerTypeName The name of the type which contains the method.
+    * @param methodFullName The method name to search.
+    * @return The first found {@link IProgramMethod} in the type.
+    */
+   public static IProgramMethod searchProgramMethod(Services services, 
+                                                    String containerTypeName, 
+                                                    final String methodFullName) {
+      JavaInfo javaInfo = services.getJavaInfo();
+      KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
+      assertNotNull(containerKJT);
+      ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+      IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+         @Override
+         public boolean select(IProgramMethod element) {
+            return methodFullName.equals(element.getFullName());
+         }
+      });
+      assertNotNull(pm);
+      return pm;
    }
 }

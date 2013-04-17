@@ -15,6 +15,9 @@
    <feature url="features/org.key_project.monkey.feature_1.0.0.qualifier.jar" id="org.key_project.monkey.feature" version="1.0.0.qualifier">
       <category name="org.key_project.category.verification"/>
    </feature>
+   <feature url="features/org.key_project.keyide.feature_1.0.0.qualifier.jar" id="org.key_project.keyide.feature" version="1.0.0.qualifier">
+      <category name="org.key_project.category.verification"/>
+   </feature>
    <category-def name="org.key_project.category.verification" label="Verification">
       <description>
          Provides tools for verification.

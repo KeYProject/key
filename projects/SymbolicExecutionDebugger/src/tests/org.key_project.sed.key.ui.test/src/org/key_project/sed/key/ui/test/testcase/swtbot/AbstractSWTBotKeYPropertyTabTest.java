@@ -15,6 +15,7 @@ import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Provides the basic functionality to test KeY specific property tabs.
@@ -35,7 +36,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             resume(bot, item, target);
             // Get properties view
-            SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+            SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
             // Select first thread
             selectThread(debugTree);
             SWTBotTabbedPropertyList tabs = SWTBotTabbedPropertyList.tabbedPropertyList(propertiesView.bot());

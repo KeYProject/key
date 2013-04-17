@@ -755,9 +755,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param methodFullName The method name to search.
     * @return The first found {@link IProgramMethod} in the type.
     */
-   protected static IProgramMethod searchProgramMethod(Services services, 
-                                                      String containerTypeName, 
-                                                      final String methodFullName) {
+   public static IProgramMethod searchProgramMethod(Services services, 
+                                                    String containerTypeName, 
+                                                    final String methodFullName) {
       JavaInfo javaInfo = services.getJavaInfo();
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
