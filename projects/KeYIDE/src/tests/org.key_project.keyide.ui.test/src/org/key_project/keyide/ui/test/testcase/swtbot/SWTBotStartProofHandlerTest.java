@@ -68,7 +68,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
