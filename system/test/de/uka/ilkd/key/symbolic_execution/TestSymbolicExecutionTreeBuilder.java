@@ -239,6 +239,23 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
+    * Tests example: examples/_testcase/set/emptyBlockTest
+    */
+   public void testEmptyBlockTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/emptyBlockTest/test/EmptyBlockTest.java", 
+             "EmptyBlockTest", 
+             "emptyBlocks", 
+             "examples/_testcase/set/emptyBlockTest/oracle/EmptyBlockTest.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/useOperationContractExceptionalNoPreconditionWithNullCheckTest
     */
    public void testUseOperationContractExceptionalNoPreconditionWithNullCheckTest() throws Exception {

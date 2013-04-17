@@ -39,6 +39,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -966,7 +967,9 @@ public final class SymbolicExecutionUtil {
       return ruleApp != null && // Do not handle the open goal node which has no applied rule
              posInfo != null && 
              posInfo.getEndPosition() != Position.UNDEFINED &&
-             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+             posInfo.getEndPosition().getLine() >= 0 &&  // Filter out statements where source code is missing.
+             !(statement instanceof EmptyStatement) && // Filter out empty statements
+             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // FIlter out empty blocks
    }
    
    /**
