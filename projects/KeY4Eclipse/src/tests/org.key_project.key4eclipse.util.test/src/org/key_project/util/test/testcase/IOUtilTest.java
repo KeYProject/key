@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.testcase;
 
 import java.io.BufferedReader;
@@ -31,6 +44,25 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class IOUtilTest extends TestCase {
+   /**
+    * Tests {@link IOUtil#getFileExtension(File)}
+    */
+   @Test
+   public void testGetFileExtension() {
+      assertNull(IOUtil.getFileExtension(null));
+      assertNull(IOUtil.getFileExtension(new File("")));
+      assertNull(IOUtil.getFileExtension(new File("hello")));
+      assertNull(IOUtil.getFileExtension(new File("path", "hello")));
+      assertEquals("java", IOUtil.getFileExtension(new File("hello.java")));
+      assertEquals("java", IOUtil.getFileExtension(new File("path", "hello.java")));
+      assertEquals("java", IOUtil.getFileExtension(new File(".java")));
+      assertEquals("java", IOUtil.getFileExtension(new File("path", ".java")));
+      assertEquals("", IOUtil.getFileExtension(new File(".")));
+      assertEquals("", IOUtil.getFileExtension(new File("path", ".")));
+      assertEquals("", IOUtil.getFileExtension(new File("hello.")));
+      assertEquals("", IOUtil.getFileExtension(new File("path", "hello.")));
+   }
+   
    /**
     * Tests {@link IOUtil#getHomeDirectory()}.
     */
