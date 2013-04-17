@@ -519,8 +519,8 @@ public class SymbolicExecutionTreeBuilder {
                                                                           Node node, 
                                                                           SourceElement statement) {
       AbstractExecutionNode result = null;
-      // Make sure that a statement (SourceElement) is available.
-      if (statement != null) {
+      // Make sure that a statement (SourceElement) is available and the RuleApp should not be ignored.
+      if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
          // Get position information
          PositionInfo posInfo = statement.getPositionInfo();
          // Determine the node representation and create it if one is available

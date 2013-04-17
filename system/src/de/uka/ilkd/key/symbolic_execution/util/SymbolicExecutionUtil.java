@@ -1030,7 +1030,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
     */
    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
-      if (node != null) {
+      if (node != null && !isRuleAppToIgnore(ruleApp)) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
@@ -1065,6 +1065,16 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Checks if the given {@link RuleApp} should be ignored or
+    * checked for possible symbolic execution tree node representation.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} ignore {@link RuleApp}, {@code false} check if the {@link RuleApp} represents a symbolic execution tree node. 
+    */
+   public static boolean isRuleAppToIgnore(RuleApp ruleApp) {
+      return "unusedLabel".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
    /**
     * Checks if the currently executed code is in an implicit method
     * ({@link IProgramMethod#isImplicit()} is {@code true}).
