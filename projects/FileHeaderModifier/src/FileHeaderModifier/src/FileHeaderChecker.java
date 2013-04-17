@@ -17,8 +17,8 @@ public class FileHeaderChecker {
    public static void main(String[] args) {
       try {
          // Define settings
-         File workingDir = new File("D:\\Forschung\\GIT\\KeY_Master\\projects");
-         File newHeaderFile = new File("data/NewHeader.txt");
+         File workingDir = new File("D:\\Forschung\\GIT\\KeY_Master\\system");
+         File newHeaderFile = new File("data/KeyHeader.txt");
          FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
@@ -40,14 +40,22 @@ public class FileHeaderChecker {
          FileHeaderModifier.listFiles(workingDir, filter, filesToModify);
          // Read headers
          String newHeader = IOUtil.readFrom(newHeaderFile).trim();
-         // Modify files and write result to output directory
-         for (File oldFile : filesToModify) {
+         // List files without header
+         List<File> foundFiles = new LinkedList<File>();
+         for (File file : filesToModify) {
             // Check if content starts with header
-            String content = IOUtil.readFrom(oldFile).trim();
+            String content = IOUtil.readFrom(file).trim();
             if (!content.startsWith(newHeader)) {
-               System.out.println("Missing Header: " + oldFile);
+               foundFiles.add(file);
             }
          }
+         // Print found files
+         for (File file : foundFiles) {
+            System.out.println("Missing Header: " + file);
+         }
+         // Print number of found files
+         System.out.println();
+         System.out.println(foundFiles.size() + " files found.");
       }
       catch (Exception e) {
          e.printStackTrace();
