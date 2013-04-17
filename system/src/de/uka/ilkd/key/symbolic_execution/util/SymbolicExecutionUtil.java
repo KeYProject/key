@@ -1552,6 +1552,8 @@ public final class SymbolicExecutionUtil {
         return computeContractRuleAppBranchCondition(parent, node, simplify);
       }
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+         // Use Branch: Invariant + !LoopCondition
+         // Preserves Branch: Invariant + LoopCondition
          return TermBuilder.DF.tt(); // TODO: Implement real branch condition of loop invariants!
       }
       else {
