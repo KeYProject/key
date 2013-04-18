@@ -1168,7 +1168,10 @@ final class JMLTranslator {
 
                     try {
                         Term resultTerm = TB.func(function, args, null);
-                        final KeYJavaType type = services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                        final KeYJavaType type = 
+                                services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort() ?
+                                        services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT) :
+                                services.getJavaInfo().getKeYJavaType(resultTerm.sort());
                         SLExpression result = type==null? new SLExpression(resultTerm) : new SLExpression(resultTerm,type);
                         return result;
                     } catch (TermCreationException ex) {
