@@ -46,7 +46,8 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     /**
-     * This path is also accessed by the Eclipse integration of KeY.
+     * This path is also accessed by the Eclipse integration of KeY
+     * to find the right examples.
      */
     public static final String EXAMPLES_PATH =  
 		    "examples" + File.separator + "firstTouch";

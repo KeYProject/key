@@ -35,6 +35,8 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.osgi.framework.Bundle;
 
+import de.uka.ilkd.key.gui.ExampleChooser;
+
 /**
  * Contains tests for {@link KeYExampleUtil}.
  * @author Martin Hentschel
@@ -70,7 +72,7 @@ public class KeYExampleUtilTest extends TestCase {
         // Get value
         String localExampleDir = KeYExampleUtil.getLocalExampleDirectory();
         // Compare value
-        assertEquals(getLocalPropertyValue("key.rep") + File.separator + "examples" + File.separator + "heap", localExampleDir);
+        assertEquals(getLocalPropertyValue("key.rep") + File.separator + ExampleChooser.EXAMPLES_PATH, localExampleDir);
     }
     
     /**
