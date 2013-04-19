@@ -38,12 +38,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
+import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -51,6 +54,7 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
@@ -1184,6 +1188,16 @@ public class TestUtilsUtil {
    }
    
    /**
+    * Performs a click on the given {@link SWTBotRadio} to change the
+    * selected radio {@link Button} without any additional events.
+    * @param radio The {@link SWTBotRadio} to click on.
+    */
+   public static void clickDirectly(SWTBotRadio radio) {
+      assertNotNull(radio);
+      new SWTBotSimpleRadio(radio.widget).click();
+   }
+   
+   /**
     * Utility method used in {@link TestUtilsUtil#clickDirectly(SWTBotButton)}
     * to perform a direct click without other events.
     * @author Martin Hentschel
@@ -1209,6 +1223,80 @@ public class TestUtilsUtil {
          return this;
       }
    }
+   
+   /**
+    * Utility class used in {@link TestUtilsUtil#clickDirectly(SWTBotRadio)}
+    * to change the selected radio {@link Button} without any additional events.
+    * @author Martin Hentschel
+    */
+   private static final class SWTBotSimpleRadio extends SWTBotRadio {
+      /** 
+       * Constructor.
+       * @param radio The radio {@link Button}.
+       * @throws WidgetNotFoundException Occurred Exception
+       */
+      public SWTBotSimpleRadio(Button radio) throws WidgetNotFoundException {
+         super(radio);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public SWTBotRadio click() {
+         if (isSelected()) {
+            log.debug(MessageFormat.format("Widget {0} is already selected, not clicking again.", this)); //$NON-NLS-1$
+            return this;
+         }
+         waitForEnabled();
+
+         log.debug(MessageFormat.format("Clicking on {0}", this)); //$NON-NLS-1$
+
+         final SWTBotSimpleRadio otherSelectedButton = otherSelectedButton();
+
+         if (otherSelectedButton != null) {
+            asyncExec(new VoidResult() {
+               public void run() {
+                  otherSelectedButton.widget.setSelection(false);
+               }
+            });
+         }
+
+         asyncExec(new VoidResult() {
+            public void run() {
+               widget.setSelection(true);
+            }
+         });
+         notify(SWT.Selection);
+         log.debug(MessageFormat.format("Clicked on {0}", this)); //$NON-NLS-1$
+         return this;
+      }
+      
+      /**
+       * Copied code from {@link SWTBotRadio#otherSelectedButton()}.
+       */
+      private SWTBotSimpleRadio otherSelectedButton() {
+         Button button = syncExec(new WidgetResult<Button>() {
+            public Button run() {
+               if (hasStyle(widget.getParent(), SWT.NO_RADIO_GROUP))
+                  return null;
+               Widget[] siblings = SWTUtils.siblings(widget);
+               for (Widget widget : siblings) {
+                  if ((widget instanceof Button) && hasStyle(widget, SWT.RADIO))
+                     if (((Button) widget).getSelection())
+                        return (Button) widget;
+               }
+               return null;
+            }
+         });
+
+         if (button != null)
+            return new SWTBotSimpleRadio(button);
+         return null;
+      }
+      
+   }
+
    
    /**
     * Searches a {@link IProgramMethod} in the given {@link Services}.
