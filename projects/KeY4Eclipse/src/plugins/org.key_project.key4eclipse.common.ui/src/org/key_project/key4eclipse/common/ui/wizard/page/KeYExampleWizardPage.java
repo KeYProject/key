@@ -82,10 +82,12 @@ public class KeYExampleWizardPage extends WizardPage {
       }
       // Description
       Group descriptionGroup = new Group(root, SWT.NONE);
-      descriptionGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
+      GridData descriptionGroupData = new GridData(GridData.FILL_BOTH);
+      descriptionGroupData.widthHint = 400;
+      descriptionGroup.setLayoutData(descriptionGroupData);
       descriptionGroup.setText("Description");
       descriptionGroup.setLayout(new FillLayout());
-      descriptionText = new Text(descriptionGroup, SWT.BORDER | SWT.V_SCROLL);
+      descriptionText = new Text(descriptionGroup, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI | SWT.WRAP);
       descriptionText.setEditable(false);
       setControl(root);
       updatePageCompletedAndShownDescription();
