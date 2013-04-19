@@ -532,7 +532,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                     " " + getTarget().getFullName();
         else
             return "Loop Invariant " + getLoop().getStartPosition().getLine() +
-                    " " + Math.abs(loop.hashCode());
+                    " " + Math.abs(getLoop().hashCode());
     }
 
     @Override

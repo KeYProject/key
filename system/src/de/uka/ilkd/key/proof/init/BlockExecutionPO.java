@@ -192,7 +192,7 @@ public class BlockExecutionPO extends AbstractOperationPO
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("Non-interference contract", contract.getName());
+        properties.setProperty("Non-interference contract", contract.getUniqueName());
     }
 
 

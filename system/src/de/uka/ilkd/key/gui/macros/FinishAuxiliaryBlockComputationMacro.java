@@ -95,9 +95,7 @@ public class FinishAuxiliaryBlockComputationMacro
                                          Services services) {
         Name tacletName =
                 MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
-                                            contract.getName() + " " +
-                                            contract.getBlock().getStartPosition().getLine() +
-                                            " in " + contract.getTarget().getFullName());
+                                            contract.getUniqueName());
         i++;
 
         // create find term

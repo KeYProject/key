@@ -82,9 +82,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
                                          Services services) {
         Name tacletName =
                 MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
-                                            loopInv.getName() + " " +
-                                            loopInv.getLoop().getStartPosition().getLine() +
-                                            " in " + loopInv.getTarget().getFullName());
+                                            loopInv.getUniqueName());
         i++;
 
         // create find term

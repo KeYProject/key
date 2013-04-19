@@ -160,7 +160,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("Non-interference contract", loopInvariant.getName());
+        properties.setProperty("Non-interference contract", loopInvariant.getUniqueName());
     }
 
 
