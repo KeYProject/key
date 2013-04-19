@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.java;
 
 import java.awt.image.BufferedImage;
@@ -44,6 +57,32 @@ public final class IOUtil {
       String path = System.getProperty("user.home");
       if (path != null) {
          return new File(path);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the file extension of the given {@link File} if available.
+    * @param file The file to extract it extension.
+    * @return The file extension or {@code null} if not available.
+    */
+   public static String getFileExtension(File file) {
+      if (file != null) {
+         String name = file.getName();
+         if (name != null) {
+            int dotIndex = name.lastIndexOf(".");
+            if (dotIndex >= 0) {
+               return name.substring(dotIndex + 1);
+            }
+            else {
+               return null;
+            }
+         }
+         else {
+            return null;
+         }
       }
       else {
          return null;

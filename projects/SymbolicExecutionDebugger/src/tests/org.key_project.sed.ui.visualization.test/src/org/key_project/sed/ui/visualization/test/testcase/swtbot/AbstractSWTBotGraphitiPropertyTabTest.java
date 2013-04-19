@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.test.testcase.swtbot;
 
 import org.eclipse.core.resources.IProject;
@@ -12,7 +25,6 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.test.testcase.swtbot.AbstractSWTBotPropertyTabTest;
 import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
 import org.key_project.sed.ui.visualization.test.Activator;
@@ -76,7 +88,7 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
       TestUtilsUtil.closeWelcomeView(bot);
       // Open properties view
       TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
-      SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+      SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
       // Create project
       IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("AbstractSWTBotGraphitiPropertyTabTest_doInDiagramEditorTest");
       if (!project.exists()) {

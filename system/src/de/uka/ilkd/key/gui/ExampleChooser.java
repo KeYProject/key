@@ -47,8 +47,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
-    
-    private static final String EXAMPLES_PATH =  
+    /**
+     * This path is also accessed by the Eclipse integration of KeY
+     * to find the right examples.
+     */
+    public static final String EXAMPLES_PATH =  
 		    "examples" + File.separator + "firstTouch";
     private static final long serialVersionUID = -4405666868752394532L;
     /**
