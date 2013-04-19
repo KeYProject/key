@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -136,16 +137,35 @@ public class ResourceUtil {
 
    /**
     * <p>
-    * Copies the given {@link File} into the specified {@link IContainer}.
+    * Copies the given {@link File}s into the specified {@link IContainer}.
     * </p>
     * <p>
     * <b>Attention: </b> Existing files will be overwritten!
     * </p>
     * @param target The {@link IContainer} to copy to.
+    * @param opener An optional {@link IFileOpener} which can be used to modify the content of files during the copy process.
     * @param source The {@link File} to copy.
     * @throws CoreException Occurred Exception.
     */
-   public static void copyIntoWorkspace(IContainer target, File... source) throws CoreException {
+   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, Collection<File> source) throws CoreException {
+      if (source != null) {
+         copyIntoWorkspace(target, opener, source.toArray(new File[source.size()]));
+      }
+   }
+
+   /**
+    * <p>
+    * Copies the given {@link File}s into the specified {@link IContainer}.
+    * </p>
+    * <p>
+    * <b>Attention: </b> Existing files will be overwritten!
+    * </p>
+    * @param target The {@link IContainer} to copy to.
+    * @param opener An optional {@link IFileOpener} which can be used to modify the content of files during the copy process.
+    * @param source The {@link File} to copy.
+    * @throws CoreException Occurred Exception.
+    */
+   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File... source) throws CoreException {
       try {
          if (source != null) {
             if (target == null) {
@@ -154,18 +174,21 @@ public class ResourceUtil {
             if (!target.exists()) {
                throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Target \"" + target + "\" does not exist.", null));
             }
+            if (opener == null) {
+               opener = new DefaultFileOpener();
+            }
             for (File file : source) {
                if (file != null) {
                   if (file.isFile()) {
                      IFile targetFile = target.getFile(new Path(file.getName()));
-                     createFile(targetFile, new FileInputStream(file), null);
+                     createFile(targetFile, opener.open(file), null);
                   }
                   else {
                      IFolder targetFolder = target.getFolder(new Path(file.getName()));
                      if (!targetFolder.exists()) {
                         targetFolder.create(true, true, null);
                      }
-                     copyIntoWorkspace(targetFolder, file.listFiles());
+                     copyIntoWorkspace(targetFolder, opener, file.listFiles());
                   }
                }
             }
@@ -173,6 +196,34 @@ public class ResourceUtil {
       }
       catch (IOException e) {
          throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+      }
+   }
+   
+   /**
+    * Instances of this class are used to open an {@link InputStream} of a {@link File}.
+    * @author Martin Hentschel
+    */
+   public static interface IFileOpener {
+      /**
+       * Opens the {@link InputStream} for the given {@link File}.
+       * @param file The {@link File} to open.
+       * @return The {@link InputStream} for the given {@link File}.
+       * @throws IOException Occurred Exception.
+       */
+      public InputStream open(File file) throws IOException;
+   }
+   
+   /**
+    * Default implementation of {@link IFileOpener}.
+    * @author Martin Hentschel
+    */
+   public static class DefaultFileOpener implements IFileOpener {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public InputStream open(File file) throws IOException {
+         return new FileInputStream(file);
       }
    }
 

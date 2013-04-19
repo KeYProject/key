@@ -126,6 +126,21 @@ public final class IOUtil {
    }
 
    /**
+    * Reads the complete content from the {@link File}.
+    * @param file The {@link File} to read from.
+    * @return The read content or {@code null} if the {@link File} is {@code null} or not an existing file.
+    * @throws IOException Occurred Exception.
+    */
+   public static String readFrom(File file) throws IOException {
+      if (file != null && file.isFile()) {
+         return readFrom(new FileInputStream(file));
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
     * Reads the complete content from the {@link InputStream} and closes it.
     * @param in The {@link InputStream} to read from and to close.
     * @return The read content or {@code null} if the {@link InputStream} is {@code null}.
@@ -488,5 +503,59 @@ public final class IOUtil {
          throw new IOException("Can't create temp directory, reason is unknown.");
       }
       return tempFile;
+   }
+   
+   /**
+    * Searches recursive in the given {@link File} all {@link File}s accepted
+    * by the given {@link IFilter}.
+    * @param file The {@link File} to start search in.
+    * @param filter An optional {@link IFilter} used to accept files. Without a filter all {@link File}s are accepted.
+    * @return The accepted {@link File}s.
+    * @throws IOException Occurred Exception
+    */
+   public static List<File> search(File file, final IFilter<File> filter) throws IOException {
+      final List<File> result = new LinkedList<File>();
+      if (file != null) {
+         visit(file, new IFileVisitor() {
+            @Override
+            public void visit(File visitedFile) {
+               if (filter == null || filter.select(visitedFile)) {
+                  result.add(visitedFile);
+               }
+            }
+         });
+      }
+      return result;
+   }
+   
+   /**
+    * Visits recursive all files and folders.
+    * @param file The {@link File} to start in.
+    * @param visitor The {@link IFileVisitor} which does something with the visited files
+    * @throws IOException Occurred Exception
+    */
+   public static void visit(File file, IFileVisitor visitor) throws IOException {
+      if (file != null && visitor != null) {
+         visitor.visit(file);
+         File[] children = file.listFiles();
+         if (children != null) {
+            for (File child : children) {
+               visit(child, visitor);
+            }
+         }
+      }
+   }
+   
+   /**
+    * A visitor which does something with {@link File}s.
+    * @author Martin Hentschel
+    */
+   public static interface IFileVisitor {
+      /**
+       * Do something with the visited {@link File}.
+       * @param file The visited {@link File}.
+       * @throws IOException Occurred Exception
+       */
+      public void visit(File file) throws IOException;
    }
 }

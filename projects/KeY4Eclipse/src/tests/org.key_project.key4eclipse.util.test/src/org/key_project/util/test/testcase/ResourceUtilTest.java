@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import junit.framework.TestCase;
 
@@ -27,6 +28,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.ResourceUtil.IFileOpener;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
@@ -63,7 +65,7 @@ public class ResourceUtilTest extends TestCase {
          IOUtil.writeTo(new FileOutputStream(new File(subSubDir, "SubSubFileB.txt")), "SubSubFileB.txt");
          // Test null target
          try {
-            ResourceUtil.copyIntoWorkspace(null, tempDir);
+            ResourceUtil.copyIntoWorkspace(null, null, tempDir);
             fail("Exception expected");
          }
          catch (Exception e) {
@@ -71,19 +73,19 @@ public class ResourceUtilTest extends TestCase {
          }
          // Test not existing target
          try {
-            ResourceUtil.copyIntoWorkspace(notExistingFolder, tempDir);
+            ResourceUtil.copyIntoWorkspace(notExistingFolder, null, tempDir);
             fail("Exception expected");
          }
          catch (Exception e) {
             assertEquals("Target \"" + notExistingFolder + "\" does not exist.", e.getMessage());
          }
          // Test null source
-         ResourceUtil.copyIntoWorkspace(project, (File[])null);
-         ResourceUtil.copyIntoWorkspace(project, (File)null);
+         ResourceUtil.copyIntoWorkspace(project, null, (File[])null);
+         ResourceUtil.copyIntoWorkspace(project, null, (File)null);
          assertEquals(1, project.members().length); // .project file
          assertTrue(projectFile.exists());
          // Copy initial content
-         ResourceUtil.copyIntoWorkspace(project, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, null, tempDir.listFiles());
          assertEquals(4, project.members().length);
          assertTrue(projectFile.exists());
          IFolder targetEmptyFolder = project.getFolder("emptyFolder");
@@ -111,7 +113,7 @@ public class ResourceUtilTest extends TestCase {
          newSubDir.mkdirs();
          IOUtil.writeTo(new FileOutputStream(new File(newSubDir, "NewSubFile.txt")), "NewSubFile.txt");
          // Add new content
-         ResourceUtil.copyIntoWorkspace(project, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, null, tempDir.listFiles());
          assertEquals(7, project.members().length);
          assertTrue(projectFile.exists());
          assertTrue(targetEmptyFolder.exists());
@@ -140,7 +142,7 @@ public class ResourceUtilTest extends TestCase {
          IOUtil.writeTo(new FileOutputStream(new File(newSubDir, "NewSubFile.txt")), "NewSubFile-Changed.txt");
          IOUtil.writeTo(new FileOutputStream(new File(tempDir, "Text.txt")), "Text-Changed.txt");
          // Replace some files
-         ResourceUtil.copyIntoWorkspace(project, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, null, tempDir.listFiles());
          assertEquals(7, project.members().length);
          assertTrue(projectFile.exists());
          assertTrue(targetEmptyFolder.exists());
@@ -159,8 +161,37 @@ public class ResourceUtilTest extends TestCase {
          assertTrue(targetNewSubDir.exists());
          assertEquals(1, targetNewSubDir.members().length);
          assertEquals("NewSubFile-Changed.txt", ResourceUtil.readFrom(targetNewSubFile));
+         // Replace some files with a custom opener
+         IFileOpener opener = new IFileOpener() {
+            @Override
+            public InputStream open(File file) throws IOException {
+               String content = IOUtil.readFrom(file);
+               content += "-Modified";
+               return new ByteArrayInputStream(content.getBytes());
+            }
+         };
+         ResourceUtil.copyIntoWorkspace(project, opener, tempDir.listFiles());
+         assertEquals(7, project.members().length);
+         assertTrue(projectFile.exists());
+         assertTrue(targetEmptyFolder.exists());
+         assertEquals(0, targetEmptyFolder.members().length);
+         assertEquals("Text-Changed.txt-Modified", ResourceUtil.readFrom(targetText));
+         assertTrue(targetSubDir.exists());
+         assertEquals(2, targetSubDir.members().length);
+         assertEquals("SubFile.txt", ResourceUtil.readFrom(targetSubFile));
+         assertTrue(targetSubSubDir.exists());
+         assertEquals(2, targetSubSubDir.members().length);
+         assertEquals("SubSubFileA.txt", ResourceUtil.readFrom(targetSubSubFileA));
+         assertEquals("SubSubFileB.txt", ResourceUtil.readFrom(targetSubSubFileB));
+         assertTrue(targetNewEmptyFolder.exists());
+         assertEquals(0, targetNewEmptyFolder.members().length);
+         assertEquals("NewText.txt-Modified", ResourceUtil.readFrom(targetNewText));
+         assertTrue(targetNewSubDir.exists());
+         assertEquals(1, targetNewSubDir.members().length);
+         assertEquals("NewSubFile-Changed.txt-Modified", ResourceUtil.readFrom(targetNewSubFile));
       }
       finally {
+         System.out.println(tempDir);
          IOUtil.delete(tempDir);
       }
    }
