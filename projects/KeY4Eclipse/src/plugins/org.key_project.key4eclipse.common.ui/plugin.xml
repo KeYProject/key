@@ -39,5 +39,22 @@
             name="Taclet Options">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.key_project.key4eclipse.common.ui.example.category"
+            name="KeY"
+            parentCategory="org.eclipse.ui.Examples">
+      </category>
+      <wizard
+            category="org.eclipse.ui.Examples/org.key_project.key4eclipse.common.ui.example.category"
+            class="org.key_project.key4eclipse.common.ui.wizard.KeYExampleNewWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+            icon="icons/logo16.gif"
+            id="org.key_project.key4eclipse.common.ui.KeYExampleNewWizard"
+            name="KeY Example"
+            project="true">
+      </wizard>
+   </extension>
 
 </plugin>
