@@ -885,11 +885,13 @@ public abstract class ProgramSVSort extends AbstractSort {
 				      Services services) {
 	    if(pe instanceof MethodReference) {
 		MethodReference mr = (MethodReference)pe;
-		Name localname = mr.getProgramElementName();
+		// FIX to bug #1223 (according to CS)
+		/*
 		if (mr.getReferencePrefix() instanceof SuperReference ||
 		    mr.getReferencePrefix() instanceof TypeReference) {
 		    return false;
 		}
+		*/
 		if (mr.getReferencePrefix() != null && 
 		    NONSIMPLEEXPRESSION.canStandFor
 		    (mr.getReferencePrefix(), services)) {
