@@ -221,6 +221,8 @@ public class ContractFactory {
                                  ImmutableList<Term>,
                                  ImmutableList<Term>>> respects,
             boolean toBeSaved) {
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
         final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
         final ImmutableList<Term> params = tb.var(progVars.paramVars);
         final Term result = progVars.resultVar != null ? tb.var(
@@ -229,7 +231,7 @@ public class ContractFactory {
         return new InformationFlowContractImpl(
                 INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
                 modality, requires, measuredBy, modifies, hasMod, self, params,
-                result, exc, accessible, respects, toBeSaved);
+                result, exc, atPre, accessible, respects, toBeSaved);
     }
 
     @Override

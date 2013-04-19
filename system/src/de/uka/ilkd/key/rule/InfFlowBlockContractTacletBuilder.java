@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -86,6 +87,10 @@ public final class InfFlowBlockContractTacletBuilder
                 services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
+        InformationFlowContract c =
+                services.getSpecificationRepository().getInfFlowContract(blockContract.getTarget());
+        assert c instanceof InformationFlowContract;
+        c.addSchemaVariables(contAppData.termList.append(contAppData2.termList));
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,

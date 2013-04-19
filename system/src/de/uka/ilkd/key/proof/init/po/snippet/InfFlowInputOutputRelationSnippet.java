@@ -66,17 +66,17 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                                          !poVars2.localOuts.isEmpty() ?
                                                                  poVars2.localIns :
                                                                      ImmutableSLList.<Term>nil(),
-                                                                     poVars2.result,
-                                                                     poVars2.resultAtPost,
-                                                                     poVars2.exception,
-                                                                     poVars2.exceptionAtPost,
-                                                                     poVars2.heap,
-                                                                     poVars2.heapAtPre,
-                                                                     poVars2.heapAtPost,
-                                                                     poVars2.mbyAtPre,
-                                                                     poVars2.postfix,
-                                                                     d.tb.getServices(),
-                                                                     poVars2.local);
+                                                         poVars2.result,
+                                                         poVars2.resultAtPost,
+                                                         poVars2.exception,
+                                                         poVars2.exceptionAtPost,
+                                                         poVars2.heap,
+                                                         poVars2.heapAtPre,
+                                                         poVars2.heapAtPost,
+                                                         poVars2.mbyAtPre,
+                                                         poVars2.postfix,
+                                                         d.tb.getServices(),
+                                                         poVars2.local);
         Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, p2);
         // the respects-sequents evaluated in the post-state
         Term[] pv = new Term[] {poVars1.heap,

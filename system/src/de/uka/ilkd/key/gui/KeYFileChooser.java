@@ -88,9 +88,10 @@ public class KeYFileChooser {
     }
 
     public Pair<Boolean, Pair<File, Boolean>> showSaveDialog(Component parent, String defaultName) {
-        resetFile = (defaultName != null) ?
-                new File(fileChooser.getSelectedFile().getParent(), defaultName):
-                    fileChooser.getSelectedFile();
+        File file = fileChooser.getSelectedFile();
+        String recDir = file != null ?
+                file.getParent() : fileChooser.getCurrentDirectory().toString();
+        resetFile = (defaultName != null) ? new File(recDir, defaultName): file;
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
 
@@ -101,8 +102,8 @@ public class KeYFileChooser {
         if (newDir) {
             dir.mkdir();
         }
-        File newFile = new File(proofDir, resetFile.getName());
-        fileChooser.setSelectedFile(newFile);
+        file = new File(proofDir, resetFile.getName());
+        fileChooser.setSelectedFile(file);
         fileChooser.updateUI(); // Might prevent empty filename suggestion?
 	int result = fileChooser.showSaveDialog(parent);
 

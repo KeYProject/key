@@ -52,17 +52,17 @@ public abstract class TacletApp implements RuleApp {
     private final Taclet taclet;
 
     /**
-     * contains the instantiations of the schemavarioables of the Taclet
+     * contains the instantiations of the schema variables of the Taclet
      */
     protected final SVInstantiations instantiations;
 
     /**
-     * choosen instantiations for the if sequent formulas
+     * chosen instantiations for the if sequent formulas
      */
     protected final ImmutableList<IfFormulaInstantiation> ifInstantiations;
 
     /**
-     * set of schemavariables that appear in the Taclet and need to be
+     * set of schema variables that appear in the Taclet and need to be
      * instantiated but are not instantiated yet. This means SchemaVariables in
      * addrule-sections have to be ignored
      */
@@ -70,7 +70,7 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * the instantiations of the following SVs must not be changed; they must
-     * not be instantiated with metavariables either
+     * not be instantiated with meta variables either
      */
     protected ImmutableSet<SchemaVariable> fixedVars = DefaultImmutableSet.<SchemaVariable>nil();
 

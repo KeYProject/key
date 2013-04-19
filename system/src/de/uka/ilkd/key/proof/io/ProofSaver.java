@@ -43,9 +43,11 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
@@ -59,6 +61,7 @@ import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -116,7 +119,9 @@ public class ProofSaver {
       
       try {
           ps = new PrintWriter(out, true);
-          printer = createLogicPrinter(proof.getServices(), false);
+          Services services = proof.getServices();
+          SpecificationRepository specRepos = services.getSpecificationRepository();
+          printer = createLogicPrinter(services, false);
           
           //settings
           ps.println(writeSettings(proof.getSettings()));
@@ -127,10 +132,15 @@ public class ProofSaver {
           ps.print(header);
 
           //\problem or \proofObligation
-          ProofOblInput po = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+          ProofOblInput po = specRepos.getProofOblInput(proof);
           if(po instanceof IPersistablePO) {
               Properties properties = new Properties();
               ((IPersistablePO)po).fillSaveProperties(properties);
+              if (po instanceof InfFlowRelatedPO) {
+                  InformationFlowContract c = specRepos
+                          .getInfFlowContract(((InfFlowRelatedPO)po).getContract().getTarget());
+                  ps.print(c.printTaclets(services));
+              }
               StringWriter writer = new StringWriter();
               try {
                  properties.store(writer, "Proof Obligation Settings");

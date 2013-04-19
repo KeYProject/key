@@ -158,17 +158,17 @@ public final class QueryAxiom extends ClassAxiom {
 		= TB.elementary(services, heapLDT.getHeap(), TB.var(heapSV));
 	update = target.isStatic() 
 	         ? update 
-                 : TB.parallel(update, 
+                 : TB.parallel(update,
                 	       TB.elementary(services, 
                 		       	     selfProgSV, 
                 		       	     TB.var(selfSV)));
 	for(int i = 0; i < paramSVs.length; i++) {
-	    update = TB.parallel(update, 
+	    update = TB.parallel(update,
 		                 TB.elementary(services, 
 		                	       paramProgSVs[i], 
 		                	       TB.var(paramSVs[i])));
 	}
-	final Term post = TB.imp(TB.reachableValue(services, 
+	final Term post = TB.imp(TB.reachableValue(services,
 						   TB.var(resultProgSV), 
 						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
@@ -180,9 +180,9 @@ public final class QueryAxiom extends ClassAxiom {
 		                	       .toArray(
 		                      new KeYJavaType[target.getNumParams()]));	
 	final IProgramMethod targetImpl 
-		= services.getJavaInfo().getProgramMethod(kjt, 
+		= services.getJavaInfo().getProgramMethod(kjt,
 							  target.getName(), 
-							  sig, 
+							  sig,
 							  kjt);
 	final MethodBodyStatement mbs
 		= new MethodBodyStatement(targetImpl,

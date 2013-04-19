@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
@@ -139,13 +140,27 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         return getContract().getName();
     }
 
+    public void addTaclet(Taclet taclet) {
+        SpecificationRepository specRepos = services.getSpecificationRepository();
+        InformationFlowContract c = specRepos.getInfFlowContract(loopInvariant.getTarget());
+        assert c instanceof InformationFlowContract;
+        c.addTaclet(taclet, services);
+    }
+
+    public String printTaclets() {
+        SpecificationRepository specRepos = services.getSpecificationRepository();
+        InformationFlowContract c = specRepos.getInfFlowContract(loopInvariant.getTarget());
+        assert c instanceof InformationFlowContract;
+        return c.printTaclets(services);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("loop_invariant", loopInvariant.getName());
+        properties.setProperty("Non-interference contract", loopInvariant.getName());
     }
 
 
@@ -159,12 +174,12 @@ public class LoopInvExecutionPO extends AbstractOperationPO
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig,
                                              Properties properties) throws IOException {
-        String loopInvName = properties.getProperty("loop_invariant");
+        String loopInvName = properties.getProperty("Non-interference contract");
         SpecificationRepository specs =
                 initConfig.getServices().getSpecificationRepository();
         final LoopInvariant loopInv = specs.getLoopInvariantByName(loopInvName);
         if (loopInv == null) {
-            throw new RuntimeException("Loop Invariant not found: " + loopInvName);
+            throw new RuntimeException("Contract not found: " + loopInvName);
         } else {
             ProofOblInput po = new InfFlowContractPO(initConfig, null);
             return new LoadedPOContainer(po, 0);

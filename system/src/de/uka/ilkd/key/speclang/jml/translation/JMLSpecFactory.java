@@ -106,6 +106,7 @@ public class JMLSpecFactory {
                                                          clauses.accessible,
                                                          clauses.respects,
                                                          false);
+                services.getSpecificationRepository().addInfFlowContract(pm, symbData);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(TB.tt())) {
                 InformationFlowContract symbData =
@@ -120,6 +121,7 @@ public class JMLSpecFactory {
                                                          clauses.accessible,
                                                          clauses.respects,
                                                          false);
+                services.getSpecificationRepository().addInfFlowContract(pm, symbData);
                 symbDatas = symbDatas.add(symbData);
             } else {
                 InformationFlowContract symbData1 =
@@ -135,6 +137,7 @@ public class JMLSpecFactory {
                                                          clauses.accessible,
                                                          clauses.respects,
                                                          false);
+                services.getSpecificationRepository().addInfFlowContract(pm, symbData1);
                 InformationFlowContract symbData2 =
                         cf.createInformationFlowContract(pm.getContainerType(), pm,
                                                          pm.getContainerType(),
@@ -147,6 +150,7 @@ public class JMLSpecFactory {
                                                          clauses.accessible,
                                                          clauses.respects,
                                                          false);
+                services.getSpecificationRepository().addInfFlowContract(pm, symbData2);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
             }
         }

@@ -46,10 +46,12 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -319,12 +321,21 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new IFProofObligationVars(instantiationVars, infFlowData.services, true);
         ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
+        Services services = infFlowData.services;
+        SpecificationRepository specRepos = infFlowData.services.getSpecificationRepository();
+        InformationFlowContract c = specRepos.getInfFlowContract(inv.getTarget());
+        assert c instanceof InformationFlowContract;
+
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, infFlowData.services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        for (Term t: post.subs()) {
+            c.addSymbol(t.op());
+        }
+
         final Term finalTerm = TB.imp(selfComposedExec, post);
 
         Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
@@ -336,11 +347,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            c.addTaclet(t, services);
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            c.addTaclet(t, services);
         }
         
         return infFlowGoal;
@@ -667,7 +680,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term guardTerm = TB.var(guardVar);
             final Term selfTerm = inst.selfTerm;
             inst.inv.setGuard(guardTerm, services);
-            services.getSpecificationRepository().addLoopInvariant(inst.inv);
+            SpecificationRepository specRepos = services.getSpecificationRepository();
+            specRepos.addLoopInvariant(inst.inv);
 
             final Term heapAtPre =
                     TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
@@ -702,6 +716,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                     ifInvariantBuilder.buildContractApplPredTerm(true);
             final Taclet informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet(true);
+            InformationFlowContract c = specRepos.getInfFlowContract(inst.inv.getTarget());
+            assert c instanceof InformationFlowContract;
+            c.addTaclet(informationFlowInvariantApp, services);
 
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
                                           selfTerm, selfAtPost,

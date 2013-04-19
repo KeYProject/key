@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
@@ -171,6 +172,19 @@ public class BlockExecutionPO extends AbstractOperationPO
         return context;
     }
 
+    public void addTaclet(Taclet taclet) {
+        SpecificationRepository specRepos = services.getSpecificationRepository();
+        InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
+        assert c instanceof InformationFlowContract;
+        c.addTaclet(taclet, services);
+    }
+
+    public String printTaclets() {
+        SpecificationRepository specRepos = services.getSpecificationRepository();
+        InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
+        assert c instanceof InformationFlowContract;
+        return c.printTaclets(services);
+    }
 
     /**
      * {@inheritDoc}
@@ -178,7 +192,7 @@ public class BlockExecutionPO extends AbstractOperationPO
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+        properties.setProperty("Non-interference contract", contract.getName());
     }
 
 
@@ -192,7 +206,7 @@ public class BlockExecutionPO extends AbstractOperationPO
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig,
                                              Properties properties) throws IOException {
-        String contractName = properties.getProperty("contract");
+        String contractName = properties.getProperty("Non-interference contract");
         SpecificationRepository specs =
                 initConfig.getServices().getSpecificationRepository();
         final Contract contract = specs.getContractByName(contractName);

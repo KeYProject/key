@@ -10,11 +10,15 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Triple;
 
 
@@ -67,7 +71,9 @@ public interface InformationFlowContract extends Contract {
      * @return used exception-variable
      */
     public Term getExc();
-    
+
+    public Term getAtPre();
+
 
     public boolean isReadOnlyContract();
 
@@ -126,6 +132,20 @@ public interface InformationFlowContract extends Contract {
     
     
     public boolean equals(Contract c);
+
+
+    public void addPredicate(Function pred);
+
+    public void addSymbol(Named symb);
+
+    public void addSymbols(ImmutableList<Term> terms);
+
+    public void addSchemaVariables(ImmutableList<Term> terms);
+
+    public void addTaclet(Taclet taclet, Services services);
+
+
+    public String printTaclets(Services services);
 
 
     /**

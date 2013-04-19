@@ -84,9 +84,13 @@ public final class InfFlowMethodContractTacletBuilder
                                    ProofObligationVars contAppData2,
                                    Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
-                getInfromFlowContracts(methodContract.getTarget(), services);
+                getInformFlowContracts(methodContract.getTarget(), services);
         ImmutableList<Term> contractsApplications =
                 ImmutableSLList.<Term>nil();
+        InformationFlowContract c =
+                services.getSpecificationRepository().getInfFlowContract(methodContract.getTarget());
+        assert c instanceof InformationFlowContract;
+        c.addSchemaVariables(contAppData.termList.append(contAppData2.termList));
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
@@ -95,11 +99,12 @@ public final class InfFlowMethodContractTacletBuilder
                     contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
+
         return and(contractsApplications);
     }
 
 
-    private ImmutableSet<InformationFlowContract> getInfromFlowContracts(IProgramMethod pm,
+    private ImmutableSet<InformationFlowContract> getInformFlowContracts(IProgramMethod pm,
                                                                          Services services) {
         ImmutableSet<Contract> contracts =
                 services.getSpecificationRepository().getContracts(pm.getContainerType(), pm);

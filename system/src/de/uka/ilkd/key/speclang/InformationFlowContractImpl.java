@@ -9,20 +9,30 @@
 //
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.taclettranslation.lemma.UserDefinedSymbols;
 import de.uka.ilkd.key.util.Triple;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +59,27 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final ImmutableList<Term> origParams;
     private final Term origResult;
     private final Term origExc;
+    private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
     private final ImmutableList<Triple<ImmutableList<Term>,
                                        ImmutableList<Term>,
                                        ImmutableList<Term>>> origRespects;
+
+    private ImmutableSet<Sort> ifTacletSorts
+        = DefaultImmutableSet.<Sort>nil();
+
+    private ImmutableSet<Function> ifTacletFunctions
+        = DefaultImmutableSet.<Function>nil();
+
+    private ImmutableSet<SchemaVariable> ifTacletSchemaVariables
+        = DefaultImmutableSet.<SchemaVariable>nil();
+
+    private ImmutableSet<Function> ifTacletPredicates
+        = DefaultImmutableSet.<Function>nil();
+
+    private ImmutableSet<NoPosTacletApp> ifTaclets
+        = DefaultImmutableSet.<NoPosTacletApp>nil();
 
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -81,6 +107,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           ImmutableList<Term> params,
                                           Term result,
                                           Term exc,
+                                          Term heapAtPre,
                                           Term dep,
                                           ImmutableList<Triple<ImmutableList<Term>,
                                                                ImmutableList<Term>,
@@ -121,6 +148,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.origParams = params;
         this.origResult = result;
         this.origExc = exc;
+        this.origAtPre = heapAtPre;
         this.id = id;
         this.modality = modality;
         this.hasRealModifiesClause  = hasRealMod;
@@ -143,13 +171,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        ImmutableList<Term> params,
                                        Term result,
                                        Term exc,
+                                       Term heapAtPre,
                                        Term dep,
                                        ImmutableList<Triple<ImmutableList<Term>,
                                                             ImmutableList<Term>,
                                                             ImmutableList<Term>>> respects,
                                        boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
-             hasRealMod, self, params, result, exc, dep, respects,
+             hasRealMod, self, params, result, exc, heapAtPre, dep, respects,
              toBeSaved, INVALID_ID);
     }
 
@@ -160,7 +189,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
              bc.getModality(), bc.getPre(services), null, bc.getMod(services),
              bc.hasModifiesClause(), bc.getVariablesAsTerms().self,
              ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
-             bc.getVariablesAsTerms().exception, null, bc.getRespects(),
+             bc.getVariablesAsTerms().exception, TB.var(bc.getVariables()
+                     .combineRemembranceVariables().get(services.getTypeConverter()
+                             .getHeapLDT().getHeap())), null, bc.getRespects(),
              false, bc.getBlock().getStartPosition().getLine());
     }
     
@@ -171,8 +202,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
              Modality.BOX, li.getInvariant(services), null, li.getModifies(),
              (li.getModifies() != TB.strictlyNothing()), li.getInternalSelfTerm(),
              ImmutableSLList.<Term>nil(), null,
-             TB.var(TB.excVar(services, li.getTarget(), true)), null,
-             li.getRespects(services), false, li.getLoop().getStartPosition().getLine());
+             TB.var(TB.excVar(services, li.getTarget(), true)),
+             li.getInternalAtPres().get(services.getTypeConverter().getHeapLDT().getHeap()),
+             null, li.getRespects(services), false, li.getLoop().getStartPosition().getLine());
     }
 
 
@@ -267,7 +299,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public Term getExc() {
         return origExc;
     }
-    
+
+
+    @Override
+    public Term getAtPre() {
+        return origAtPre;
+    }
+
 
     @Override
     public boolean isReadOnlyContract() {
@@ -466,7 +504,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origDep, origRespects,
+                                               origAtPre, origDep, origRespects,
                                                toBeSaved, newId);
     }
 
@@ -481,7 +519,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origDep, origRespects,
+                                               origAtPre, origDep, origRespects,
                                                toBeSaved, id);
     }
 
@@ -493,7 +531,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origDep, origRespects,
+                                               origAtPre, origDep, origRespects,
                                                toBeSaved, id);
     }
 
@@ -505,7 +543,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origDep, origRespects,
+                                               origAtPre, origDep, origRespects,
                                                toBeSaved, id);
     }
 
@@ -517,7 +555,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, modifies,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origDep, origRespects,
+                                               origAtPre, origDep, origRespects,
                                                toBeSaved, id);
     }
 
@@ -568,6 +606,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                    ? origResult.equals(ifc.getResult())
                    : ifc.getResult() == null)
                && origExc.equals(ifc.getExc())
+               && origAtPre.equals(ifc.getAtPre())
                && id == ifc.id()
                && toBeSaved == ifc.toBeSaved()
                && origDep.equals(ifc.getDep())
@@ -587,6 +626,104 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         throw new UnsupportedOperationException("Operation not supported.");
     }
 
+    public void addPredicate(Function pred) {
+        assert pred != null;
+        if (!ifTacletPredicates.contains(pred)) {
+            ifTacletPredicates = ifTacletPredicates.add(pred);
+        }
+    }
+
+    public void addSymbol(Named symb) {
+        assert symb != null;
+        if (symb instanceof Sort &&
+                !ifTacletSorts.contains((Sort)symb)) {
+            ifTacletSorts = ifTacletSorts.add((Sort)symb);
+        }
+        if (symb instanceof Function &&
+                !ifTacletFunctions.contains((Function)symb)) {
+            ifTacletFunctions = ifTacletFunctions.add((Function)symb);
+        }
+        if (symb instanceof SchemaVariable &&
+                !ifTacletSchemaVariables.contains((SchemaVariable)symb)) {
+            ifTacletSchemaVariables = ifTacletSchemaVariables.add((SchemaVariable)symb);
+        }
+        if (symb instanceof SortedOperator &&
+                !ifTacletSorts.contains(((SortedOperator)symb).sort())) {
+            ifTacletSorts = ifTacletSorts.add(((SortedOperator)symb).sort());
+        }
+    }
+
+    public void addSymbols(ImmutableList<Term> terms) {
+        for (Term t: terms) {
+            addSymbol(t.op());
+        }
+    }
+
+    private void addSchemaVariable(SchemaVariable var) {
+        assert var != null;
+        if (!ifTacletSchemaVariables.contains(var)) {
+            ifTacletSchemaVariables = ifTacletSchemaVariables.add(var);
+        }
+    }
+
+    public void addSchemaVariables(ImmutableList<Term> terms) {
+        for (Term t: terms) {
+            addSchemaVariable((SchemaVariable)t.op());
+        }
+    }
+
+    private ImmutableSet<Sort> getSorts() {
+        return ifTacletSorts;
+    }
+
+    private ImmutableSet<Function> getPredicates() {
+        return ifTacletPredicates;
+    }
+
+    private ImmutableSet<Function> getFunctions() {
+        return ifTacletFunctions;
+    }
+
+    private ImmutableSet<SchemaVariable> getSchemaVariables() {
+        return ifTacletSchemaVariables;
+    }
+
+    public void addTaclet(Taclet taclet, Services services) {
+        assert taclet != null;
+        if (!getTaclets().contains(taclet)) {
+            NoPosTacletApp app = NoPosTacletApp
+                    .createFixedNoPosTacletApp(taclet,
+                                               SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                                               services);
+            ifTaclets = ifTaclets.add(app);
+        }
+    }
+
+    private ImmutableSet<Taclet> getTaclets() {
+        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+        for (NoPosTacletApp t: ifTaclets) {
+            res = res.add(t.taclet());
+        }
+        return res;
+    }
+
+    @Override
+    public String printTaclets(Services services) { // TODO: Might need some improvement
+        UserDefinedSymbols symbols = new UserDefinedSymbols(new NamespaceSet(), getTaclets());
+        for (Sort s: getSorts()) {
+            symbols.addSort(s);
+        }
+        for (Function p: getPredicates()) {
+            symbols.addPredicate(p);
+        }
+        for (Function f: getFunctions()) {
+            symbols.addFunction(f);
+        }
+        for (SchemaVariable var: getSchemaVariables()) {
+            symbols.addSchemaVariable(var);
+        }
+        return symbols.createHeader(services);
+    }
 
     @Override
     public String getPlainText(Services services) {

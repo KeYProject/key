@@ -57,10 +57,12 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -799,6 +801,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                     ifContractBuilder.buildContractApplPredTerm(false);
             Taclet informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet(false);
+            SpecificationRepository specRepos = services.getSpecificationRepository();
+            InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
+            assert c instanceof InformationFlowContract;
+            c.addTaclet(informationFlowContractApp, services);
+            c.addPredicate((Function) contractApplPredTerm.op());
 
             // add term and taclet to post goal
             postGoal.addFormula(new SequentFormula(contractApplPredTerm),

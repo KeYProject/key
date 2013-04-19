@@ -1029,8 +1029,8 @@ public final class MainWindow extends JFrame  {
         
         updateGoalView("Current Goal", sequentView);
     }
-    
-    
+
+
     /** saves a proof */
     public void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
@@ -1048,7 +1048,7 @@ public final class MainWindow extends JFrame  {
                     ("Saving Proof failed.\n Error: " + errorMsg));
         }
     }
-    
+
     /**
      * brings window in front and request focus
      */
@@ -1057,7 +1057,7 @@ public final class MainWindow extends JFrame  {
         setVisible(true);
         requestFocus();
     }
-    
+
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
         Runnable guiUpdater = new Runnable() {
             public void run() {
@@ -1072,13 +1072,13 @@ public final class MainWindow extends JFrame  {
 
         GuiUtilities.invokeAndWait(guiUpdater);
     }
-    
+
     private Proof setUpNewProof(Proof proof) {
         getMediator().setProof(proof);
         return proof;
     }
-    
-    
+
+
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.
      */
@@ -1095,10 +1095,10 @@ public final class MainWindow extends JFrame  {
 //            statusLine.setProgressBarMaximum(maximum);
 //        }
 //    }
-    
+
     /** invoked if a frame that wants modal access is opened */
     class MainGUIListener implements GUIListener {
-        
+
         private void enableMenuBar(JMenuBar m, boolean b) {
             for (int i = 0; i < m.getMenuCount(); i++) {
                 JMenu menu = m.getMenu(i);
@@ -1108,9 +1108,9 @@ public final class MainWindow extends JFrame  {
                 }
             }
         }
-        
+
         private Set<Component> doNotReenable;
-        
+
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
 	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
@@ -1131,7 +1131,7 @@ public final class MainWindow extends JFrame  {
 		cs[i].setEnabled(false);
 	    }
 	}
-        
+
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             //assert doNotReenable != null : "toolbar enabled w/o prior disable";
@@ -1152,7 +1152,7 @@ public final class MainWindow extends JFrame  {
             
             doNotReenable = null;
         }
-        
+
         public void modalDialogOpened(GUIEvent e) {
             
             if (e.getSource() instanceof ApplyTacletDialog) {
@@ -1169,7 +1169,7 @@ public final class MainWindow extends JFrame  {
                 MainWindow.this.setEnabled(false);
             }
         }
-        
+
         /** invoked if a frame that wants modal access is closed */
         public void modalDialogClosed(GUIEvent e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
@@ -1186,20 +1186,20 @@ public final class MainWindow extends JFrame  {
                 MainWindow.this.setEnabled(true);
             }
         }
-        
+
         public void shutDown(GUIEvent e) {
             MainWindow.this.notify(new ExitKeYEvent());
             MainWindow.this.setVisible(false);
         }
-        
+
     }
-    
+
     /**
      * set to true if the view of the current goal should not be updated
      */
     private boolean disableCurrentGoalView = false;
 
-   
+
 
     private synchronized void setProofNodeDisplay() {
         // FIXME
@@ -1223,19 +1223,19 @@ public final class MainWindow extends JFrame  {
             }
         }
     }
-    
-    class MainProofListener implements AutoModeListener, KeYSelectionListener,
-    	SettingsListener {	
-        
+
+    class MainProofListener implements
+                AutoModeListener, KeYSelectionListener, SettingsListener {
+
         Proof proof = null;
-        
-        
+
+
         /** focused node has changed */
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
             if (getMediator().autoMode()) return;
             setProofNodeDisplay();	    
         }
-        
+
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */ 
@@ -1257,7 +1257,7 @@ public final class MainWindow extends JFrame  {
            
             makePrettyView();
         }
-        
+
         /**
          * invoked if automatic execution has started
          */
@@ -1267,7 +1267,7 @@ public final class MainWindow extends JFrame  {
             getMediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
         }
-        
+
         /**
          * invoked if automatic execution has stopped
          */
@@ -1282,7 +1282,7 @@ public final class MainWindow extends JFrame  {
             setProofNodeDisplay();
             getMediator().addKeYSelectionListener(proofListener);
         }
-        
+
         /** invoked when the strategy of a proof has been changed */
         public synchronized void settingsChanged ( GUIEvent e ) {
             if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
@@ -1290,7 +1290,7 @@ public final class MainWindow extends JFrame  {
             }         
         }        
     }        
-    
+
     /** displays some status information */
     void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
         String message;       
@@ -1309,11 +1309,11 @@ public final class MainWindow extends JFrame  {
             setStatusLine ( message );
         }                              
     }
-    
+
     void displayResults(String message){
             setStatusLine(message);
     }
-    
+
 //    /**
 //     * called when the batch mode has been finished 
 //     * @param result the Object encapsulating informtation about the result, e.g.

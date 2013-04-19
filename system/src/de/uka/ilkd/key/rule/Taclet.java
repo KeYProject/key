@@ -857,7 +857,7 @@ public abstract class Taclet implements Rule, Named {
 
         if ( ! ( o instanceof Taclet ) ){
 	    return false;
-	}	
+	}
 	      
 	final Taclet t2 = (Taclet)o;
 

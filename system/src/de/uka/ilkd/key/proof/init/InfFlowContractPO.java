@@ -60,6 +60,9 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        InformationFlowContract c = specRepos.getInfFlowContract(getProgramMethod());
+        assert c instanceof InformationFlowContract;
+
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
@@ -68,6 +71,10 @@ public class InfFlowContractPO extends AbstractOperationPO
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        for (Term t: post.subs()) {
+            c.addSymbol(t.op());
+        }
+
         // register final term, taclets and collect class axioms
         assignPOTerms(TB.imp(selfComposedExec, post));
         collectClassAxioms(contract.getKJT());
@@ -81,6 +88,7 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+            c.addTaclet(t, services);
         }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
@@ -90,39 +98,9 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+            c.addTaclet(t, services);
         }
     }
-
-    /*
-    //@Override
-    public Term buildProblem(LoopInvariant loopInv, ProofObligationVars appData, Services services)
-    throws ProofInputException {
-        IFProofObligationVars ifVars = new IFProofObligationVars(appData, services);
-        // create proof obligation
-        InfFlowPOSnippetFactory f =
-            POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
-                                               ifVars.c2, services);
-        Term selfComposedExec =
-            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        
-        // create and add split-post and remove-post taclets
-        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-        final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
-        for (final Taclet t : splitPostTaclets) {
-            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
-            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-        }
-        final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
-        final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
-        for (final Taclet t : removePostTaclets) {
-            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
-            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-        }
-        
-        Term poTerms = TB.imp(selfComposedExec, post);
-        return poTerms;
-    }*/
 
 
     @Override
@@ -200,14 +178,13 @@ public class InfFlowContractPO extends AbstractOperationPO
         return ifVars;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+        properties.setProperty("Non-interference contract", contract.getName());
     }
 
 
@@ -221,7 +198,7 @@ public class InfFlowContractPO extends AbstractOperationPO
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig,
                                              Properties properties) throws IOException {
-        String contractName = properties.getProperty("contract");
+        String contractName = properties.getProperty("Non-interference contract");
         SpecificationRepository specs =
                 initConfig.getServices().getSpecificationRepository();
         final Contract contract = specs.getContractByName(contractName);
@@ -234,119 +211,6 @@ public class InfFlowContractPO extends AbstractOperationPO
     }
 
 
-//    protected Term buildAbbreviationTaclet(Term replaceWithTerm,
-//                                           Name funcName,
-//                                           IFProofObligationVars vs) {
-//        ImmutableList<ProgramVariable> progVars = collectProgramVaribles(vs);
-//        ImmutableList<Sort> sorts = collectVaribleSorts(progVars);
-//        Term[] terms = collectVariableTerms(progVars);
-//
-//        Function func =
-//                new Function(funcName, Sort.FORMULA,
-//                             sorts.toArray(new Sort[sorts.size()]));
-//        register(func);
-//
-//        TacletGenerator TG = TacletGenerator.getInstance();
-//        Name tacletName = MiscTools.toValidTacletName(funcName.toString()
-//                                                      + "_axiom");
-//        Term findTerm = TB.func(func, terms);
-//        Name ruleSetName = new Name("useHiddenAxiom");
-//        RuleSet ruleSet = (RuleSet) services.getNamespaces().lookup(ruleSetName);
-//        Taclet t = TG.generateRewriteTaclet(tacletName, findTerm,
-//                                            replaceWithTerm, progVars,
-//                                            ruleSet, services);
-//        register(t);
-//        return findTerm;
-//    }
-//    private ImmutableList<ProgramVariable> collectProgramVaribles(
-//            IFProofObligationVars vs) {
-//        ImmutableList<ProgramVariable> progVars =
-//                ImmutableSLList.<ProgramVariable>nil();
-//        progVars = progVars.append(vs.c1.selfVar);
-//        progVars = progVars.append(vs.c1.heapAtPreVar);
-//        progVars = progVars.append(vs.c1.heapAtPostVar);
-//        if (vs.c1.resultVar != null) {
-//            progVars = progVars.append(vs.c1.resultVar);
-//        }
-//        progVars = progVars.append(vs.c1.paramVars);
-//        progVars = progVars.append(vs.c2.selfVar);
-//        progVars = progVars.append(vs.c2.heapAtPreVar);
-//        progVars = progVars.append(vs.c2.heapAtPostVar);
-//        if (vs.c2.resultVar != null) {
-//            progVars = progVars.append(vs.c2.resultVar);
-//        }
-//        progVars = progVars.append(vs.c2.paramVars);
-//        return progVars;
-//    }
-//    private ImmutableList<Sort> collectVaribleSorts(
-//            ImmutableList<ProgramVariable> progVars) {
-//        ImmutableList<Sort> sorts =
-//                ImmutableSLList.<Sort>nil();
-//        for (ProgramVariable progVar : progVars) {
-//            sorts = sorts.append(progVar.getKeYJavaType().getSort());
-//        }
-//        return sorts;
-//    }
-//    private Term[] collectVariableTerms(ImmutableList<ProgramVariable> progVars) {
-//        Term[] terms = new Term[progVars.size()];
-//        int i = 0;
-//        for (ProgramVariable progVar : progVars) {
-//            terms[i] = TB.var(progVar);
-//            i++;
-//        }
-//        return terms;
-//    }
-//
-//    
-//    private void register(Taclet axiomTaclet) {
-//        assert axiomTaclet != null : "Proof obligation generation generated null taclet.";
-//        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(axiomTaclet));
-//        initConfig.getProofEnv().registerRule(axiomTaclet,
-//                                              AxiomJustification.INSTANCE);
-//    }
-//    public static Term buildContractApplication(
-//            LoopInvariant targetContracts,
-//            LoopInvariantApplicationData contAppData,
-//            LoopInvariantApplicationData contAppData2,
-//            Services services) {
-//        ProofObligationVars targetC1 =
-//                new ProofObligationVars((ProgramMethod) target.obs,
-//                                        target.kjt,
-//                                        contAppData.self,
-//                                        contAppData.self,
-//                                        contAppData.params,
-//                                        contAppData.result,
-//                                        contAppData.result,
-//                                        contAppData.heapAtPre,
-//                                        contAppData.heapAtPre,
-//                                        contAppData.heapAtPost, false,
-//                                        "", services, false);
-//        ProofObligationVars targetC2 =
-//                new ProofObligationVars((ProgramMethod) target.obs,
-//                                        target.kjt,
-//                                        contAppData2.self,
-//                                        contAppData2.self,
-//                                        contAppData2.params,
-//                                        contAppData2.result,
-//                                        contAppData2.result,
-//                                        contAppData2.heapAtPre,
-//                                        contAppData2.heapAtPre,
-//                                        contAppData2.heapAtPost, false,
-//                                        "", services, false);
-//        final IFProofObligationVars targetVs =
-//                new IFProofObligationVars(targetC1, targetC2,
-//                                          cont.getTarget(), cont.getKJT(),
-//                                          null, null);
-//
-//        Term preCond1 = cont.getPre(contAppData.heapAtPre, contAppData.self,
-//                contAppData.params, null, services);
-//        Term preCond2 = cont.getPre(contAppData2.heapAtPre,
-//                contAppData2.self, contAppData2.params, null,
-//                services);
-//
-//        Term inOutRelations = buildInputOutputRelations(cont, targetVs, services);
-//        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
-//    }
     /**
      * Prepare program and location variables.
      * <p/>

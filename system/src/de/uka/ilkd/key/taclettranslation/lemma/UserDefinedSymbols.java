@@ -30,7 +30,7 @@ public class UserDefinedSymbols {
                 public int compare(Named o1, Named o2) {
                         return o1.name().compareTo(o2.name());
                 }
-                
+
         }
         final UserDefinedSymbols parent;
         final Set<Named> usedExtraFunctions = new TreeSet<Named>(
@@ -46,7 +46,7 @@ public class UserDefinedSymbols {
         final ImmutableSet<Taclet> axioms;
         private final NamespaceSet referenceNamespaces;
         private String ruleHeader = null;
-      
+
 
         public UserDefinedSymbols(NamespaceSet referenceNamespaces,
                         ImmutableSet<Taclet> axioms) {
@@ -162,12 +162,12 @@ public class UserDefinedSymbols {
         }
         
         private StringBuffer createHeaderFor(Taclet taclet, Services services){
-                NotationInfo info = new NotationInfo();
-                StringBackend backend = new StringBackend(80);
-              LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
-              printer.printTaclet(taclet);
-           
-              return new StringBuffer(backend.getString()+";");
+            NotationInfo info = new NotationInfo();
+            StringBackend backend = new StringBackend(80);
+            LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
+            printer.printTaclet(taclet);
+
+            return new StringBuffer(backend.getString()+";");
         }
 
 

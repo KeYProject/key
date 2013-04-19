@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public class FinishAuxiliaryBlockComputationMacro
         extends AbstractFinishAuxiliaryComputationMacro {
 
-    static int i = 0;
+    private static int i = 0;
 
     @Override
     public boolean canApplyTo(KeYMediator mediator,
@@ -78,9 +78,9 @@ public class FinishAuxiliaryBlockComputationMacro
 
 
         // create and register resulting taclets
-        Term result = calculateResultingTerm(proof, ifVars,
-                                             services);
+        Term result = calculateResultingTerm(proof, ifVars, services);
         Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
+        po.addTaclet(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 

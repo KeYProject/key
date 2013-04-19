@@ -63,6 +63,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
@@ -115,6 +116,8 @@ public final class SpecificationRepository {
 		= new LinkedHashMap<IObserverFunction,IObserverFunction>();
     private final Map<IObserverFunction,ImmutableSet<Taclet>> unlimitedToLimitTaclets
 		= new LinkedHashMap<IObserverFunction,ImmutableSet<Taclet>>();
+    private final Map<String, InformationFlowContract> ifContractsByTarget
+                = new LinkedHashMap<String, InformationFlowContract>();
     private final Services services;
     
     private final Map<String, Integer> contractCounters
@@ -1262,5 +1265,16 @@ public final class SpecificationRepository {
 	    result = obs;
 	}
 	return result;
+    }
+
+    public void addInfFlowContract(IProgramMethod pm, InformationFlowContract contract) {
+        assert pm != null;
+        assert contract != null;
+        ifContractsByTarget.put(pm.getFullName(), contract);
+    }
+    // TODO: Not sure if these two methods are needed
+    public InformationFlowContract getInfFlowContract(IProgramMethod pm) {
+        assert pm != null;
+        return ifContractsByTarget.get(pm.getFullName());
     }
 }
