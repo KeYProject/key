@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
@@ -1516,14 +1529,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
-   }
-
-   /**
     * This method should be called before the auto mode is started in
     * context of symbolic execution. The method sets {@link StrategyProperties}
     * of the auto mode which are not supported in context of symbolic execution
@@ -1881,5 +1886,13 @@ public final class SymbolicExecutionUtil {
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
+   }
+   
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
    }
 }

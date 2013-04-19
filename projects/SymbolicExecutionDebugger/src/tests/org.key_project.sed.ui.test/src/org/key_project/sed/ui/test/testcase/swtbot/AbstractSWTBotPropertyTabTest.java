@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.test.testcase.swtbot;
 
 import junit.framework.TestCase;
@@ -43,7 +56,7 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
          debugTree = debugView.bot().tree();
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Get properties view
-         final SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+         SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
          // Make sure that all nodes to test are loaded and that the automatic selection set to the debug target by the Debug API is done.
          selectDebugTarget(debugTree);
          selectThread(debugTree);

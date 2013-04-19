@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.testcase;
 
 import java.util.Collection;
@@ -13,12 +26,105 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IFilterWithException;
 
 /**
  * Tests for {@link CollectionUtil}.
  * @author Martin Hentschel
  */
 public class CollectionUtilTest extends TestCase {
+   /**
+    * Tests for {@link CollectionUtil#searchAndRemoveWithException(Iterable, org.key_project.util.java.IFilterWithException)}.
+    */
+   @Test
+   public void testSearchAndRemoveWithException() throws Throwable {
+       List<String> collection = CollectionUtil.toList("A", "B", "C", "D");
+       try {
+         CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+             @Override
+             public boolean select(String element) throws Exception {
+                throw new Exception("Exception in select.");
+             }
+          });
+          fail("Exception expected");
+       }
+       catch (Exception e) {
+          assertEquals("Exception in select.", e.getMessage());
+       }
+       assertEquals(collection, CollectionUtil.toList("A", "B", "C", "D"));
+       assertEquals("A", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
+       assertNull("A", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
+       assertEquals("B", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "B".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList("C", "D"));
+       assertNull("B", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList("C", "D"));
+       assertEquals("C", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "C".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList("D"));
+       assertNull("C", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList("D"));
+       assertEquals("D", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "D".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList());
+       assertNull("D", CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList());
+       assertNull(CollectionUtil.searchAndRemoveWithException(collection, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList());
+       assertNull(CollectionUtil.searchAndRemoveWithException(collection, null));
+       assertNull(CollectionUtil.searchAndRemoveWithException(null, new IFilterWithException<String, Exception>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+       assertEquals(collection, CollectionUtil.toList());
+   }
+   
    /**
     * Tests for {@link CollectionUtil#searchAndRemove(Iterable, IFilter)}.
     */
@@ -31,54 +137,63 @@ public class CollectionUtilTest extends TestCase {
              return "A".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
        assertNull("A", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "A".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
        assertEquals("B", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "B".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList("C", "D"));
        assertNull("B", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "A".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList("C", "D"));
        assertEquals("C", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "C".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList("D"));
        assertNull("C", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "A".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList("D"));
        assertEquals("D", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "D".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList());
        assertNull("D", CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "A".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList());
        assertNull(CollectionUtil.searchAndRemove(collection, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "E".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList());
        assertNull(CollectionUtil.searchAndRemove(collection, null));
        assertNull(CollectionUtil.searchAndRemove(null, new IFilter<String>() {
           @Override
@@ -86,6 +201,7 @@ public class CollectionUtilTest extends TestCase {
              return "E".equals(element);
           }
        }));
+       assertEquals(collection, CollectionUtil.toList());
    }
    
    /**

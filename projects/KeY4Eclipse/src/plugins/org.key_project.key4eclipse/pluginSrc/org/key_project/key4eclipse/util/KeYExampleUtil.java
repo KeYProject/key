@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.util;
 
 import java.io.File;
@@ -16,6 +29,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.key_project.key4eclipse.Activator;
 import org.osgi.framework.Bundle;
+
+import de.uka.ilkd.key.gui.ExampleChooser;
 
 /**
  * Provides static methods to work with the KeY examples in the Eclipse
@@ -43,7 +58,7 @@ public class KeYExampleUtil {
      */
     public static String getLocalExampleDirectory() {
         String localKeyHome = getLocalKeYHomeDirectory();
-        return localKeyHome != null ? localKeyHome + File.separator + "examples" + File.separator + "heap" : null;
+        return localKeyHome != null ? localKeyHome + File.separator + ExampleChooser.EXAMPLES_PATH : null;
     }
 
     /**

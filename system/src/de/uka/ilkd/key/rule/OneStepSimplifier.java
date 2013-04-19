@@ -191,20 +191,22 @@ public final class OneStepSimplifier implements BuiltInRule,
      * the goals' taclet indices.
      */
     private void shutdownIndices() {
-	if(lastProof != null) {
-	    for(Goal g : lastProof.openGoals()) {
-		for(NoPosTacletApp app : appsTakenOver) {
-		    g.ruleAppIndex().addNoPosTacletApp(app);
-		}
-		g.getRuleAppManager().clearCache();
-		g.ruleAppIndex().clearIndexes();		
-	    }
-	    applicabilityCache.clear();
-	    lastProof = null;
-	    appsTakenOver = null;
-	    indices = null;
-	    notSimplifiableCaches = null;
-	}
+        if (lastProof != null) {
+            if (!lastProof.isDisposed()) {
+                for(Goal g : lastProof.openGoals()) {
+                    for(NoPosTacletApp app : appsTakenOver) {
+                        g.ruleAppIndex().addNoPosTacletApp(app);
+                    }
+                    g.getRuleAppManager().clearCache();
+                    g.ruleAppIndex().clearIndexes();    
+                }
+            }
+            applicabilityCache.clear();
+            lastProof = null;
+            appsTakenOver = null;
+            indices = null;
+            notSimplifiableCaches = null;
+        }
     }
     
     

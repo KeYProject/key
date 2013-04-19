@@ -26,10 +26,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -49,8 +45,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
-    
-    private static final String EXAMPLES_PATH =  
+    /**
+     * This path is also accessed by the Eclipse integration of KeY
+     * to find the right examples.
+     */
+    public static final String EXAMPLES_PATH =  
 		    "examples" + File.separator + "firstTouch";
     private static final long serialVersionUID = -4405666868752394532L;
     private static final String KEY_FILE_NAME = "project.key";
