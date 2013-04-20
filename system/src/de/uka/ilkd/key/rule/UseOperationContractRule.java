@@ -55,6 +55,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -62,7 +63,6 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -802,10 +802,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             Taclet informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet(false);
             SpecificationRepository specRepos = services.getSpecificationRepository();
-            InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
-            assert c instanceof InformationFlowContract;
-            c.addTaclet(informationFlowContractApp, services);
-            c.addPredicate((Function) contractApplPredTerm.op());
+            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(contract.getTarget());
+            s.addTaclet(informationFlowContractApp, services);
+            s.addPredicate((Function) contractApplPredTerm.op());
 
             // add term and taclet to post goal
             postGoal.addFormula(new SequentFormula(contractApplPredTerm),
@@ -873,234 +872,6 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-/*
-    *//**
-     * Store pre- / poststate of the method invocation and generate information
-     * flow taclet.
-     *//*
-    // add exception var
-    private Term storePrePostInPredAndGenInfoFlowTaclet(final FunctionalOperationContract contract,
-                                                        final Instantiation inst,
-                                                        final AnonUpdateData anonUpdateData,
-                                                        final Term contractSelf,
-                                                        final Term contractResult,
-                                                        final Term exceptionVar,
-                                                        final Goal goal,
-                                                        final Services services) {
-        ProofObligationVars appData =
-                new ProofObligationVars(contractSelf, null, inst.actualParams,
-                                        contractResult, null, exceptionVar,
-                                        null, null,
-                                        anonUpdateData.methodHeapAtPre,
-                                        anonUpdateData.methodHeap, "", services);
-        BasicPOSnippetFactory f =
-                POSnippetFactory.getBasicFactory(contract, appData, services);
-        final Term contractApplPredTerm =
-                f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
-        final Term updatedContractApplPredTerm =
-                TB.apply(inst.u, contractApplPredTerm);
-
-        final Function contApplPred = (Function)contractApplPredTerm.op();
-        final Taclet informationFlowContractApp =
-                genInfFlowContractApplTaclet(contract, contApplPred, inst.pm,
-                                             services);
-        goal.addTaclet(informationFlowContractApp,
-                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        return updatedContractApplPredTerm;
-    }
-
-    
-    private Function generateContApplPredicate(IProgramMethod pm,
-                                               Services services) {
-        String nameString =
-                MiscTools.toValidTacletName(pm.getContainerType().getFullName()
-                + "::" + pm.getFullName() + "__RELATES").toString();
-        final Name name = new Name(nameString);
-        Function pred = (Function) services.getNamespaces().functions().lookup(
-                name);
-        if (pred == null) {
-            // Arguments: params, heapAtPre, exception, heapAtPost
-            int length = pm.getParamTypes().size() + 3;
-            if (!pm.isStatic()) {
-                // Arguments: + self
-                length++;
-            }
-            if (!pm.isVoid() && !pm.isConstructor()) {
-                // Arguments: + result
-                length++;
-            }
-            Sort[] predArgSorts =
-                    new Sort[length];
-
-            int i = 0;
-            if (!pm.isStatic()) {
-                // type of self
-                predArgSorts[i++] = pm.getContainerType().getSort();
-            }
-            // types of params
-            for (KeYJavaType t : pm.getParamTypes()) {
-                predArgSorts[i++] = t.getSort();
-            }
-            // type of heapAtPre
-            predArgSorts[i++] = TB.getBaseHeap(services).sort();
-            if (!pm.isVoid() && !pm.isConstructor()) {
-                // type of result
-                predArgSorts[i++] = pm.getReturnType().getSort();
-            }
-            // type of exception
-            predArgSorts[i++] = services.getJavaInfo().getTypeByClassName(
-                    "java.lang.Exception").getSort();
-            // type of heapAtPost
-            predArgSorts[i++] = TB.getBaseHeap(services).sort();
-
-            pred = new Function(name, Sort.FORMULA, predArgSorts);
-            services.getNamespaces().functions().addSafely(pred);
-        }
-        return pred;
-
-    
-    private ProofObligationVars generateApplicationDataSVs(Function pred,
-                                                           String schemaPrefix,
-                                                           IProgramMethod pm,
-                                                           Services services) {
-        Sort[] predArgSorts = new Sort[pred.argSorts().size()];
-        pred.argSorts().toArray(predArgSorts);
-        ImmutableList<Term> paramsSVs = ImmutableSLList.<Term>nil();
-
-        int i = 0;
-        Term selfAtPreSV;
-        if (!pm.isStatic()) {
-            selfAtPreSV = createTermSV(schemaPrefix + "_self",
-                                       predArgSorts[i], services);
-            i++;
-        } else {
-            selfAtPreSV = null;
-        }
-        int j = 0;
-        for (KeYJavaType t : pm.getParamTypes()) {
-            predArgSorts[i] = t.getSort();
-            paramsSVs =
-                    paramsSVs.append(createTermSV(schemaPrefix + "_param_" +
-                                                  (j + 1), predArgSorts[i],
-                                                  services));
-            i++;
-            j++;
-        }
-        Term heapAtPreSV = createTermSV(schemaPrefix + "_heapAtPre",
-                                        predArgSorts[i], services);
-        i++;
-        Term resSV = null;
-        if (!pm.isVoid() && !pm.isConstructor()) {
-            resSV = createTermSV(schemaPrefix + "_res", predArgSorts[i],
-                                 services);
-            i++;
-        }
-        Term exceptionSV = createTermSV(schemaPrefix + "_exception",
-                                        predArgSorts[i], services);
-        i++;
-        Term heapAtPostSV = createTermSV(schemaPrefix + "_heapAtPost",
-                                         predArgSorts[i], services);
-        i++;
-
-        return new ProofObligationVars(selfAtPreSV, selfAtPreSV, paramsSVs, resSV,
-                                       resSV, exceptionSV, exceptionSV, heapAtPreSV,
-                                       heapAtPreSV, heapAtPostSV, "", services);
-    }
-    
-    
-    private Taclet genInfFlowContractApplTaclet(FunctionalOperationContract contract,
-                                                Function contractApplPred,
-                                                IProgramMethod pm,
-                                                Services services) {
-        Name tacletName =
-                MiscTools.toValidTacletName("Use information flow contract for "
-                + pm.getFullName());
-
-        ProofObligationVars schemaDataFind = generateApplicationDataSVs(
-                contractApplPred, "find", pm, services);
-        ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
-                contractApplPred, "assumes", pm, services);
-        BasicPOSnippetFactory fFind =
-                POSnippetFactory.getBasicFactory(contract, schemaDataFind, services);
-        BasicPOSnippetFactory fAssumes =
-                POSnippetFactory.getBasicFactory(contract, schemaDataAssumes, services);
-        Term schemaFind =
-                  fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
-        Term schemaAssumes =
-                fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
-
-        ImmutableSet<InformationFlowContract> ifContracts =
-                getInfromFlowContracts(pm, services);
-        Term schemaContApps =
-                buildContractApplications(ifContracts, schemaDataFind,
-                                          schemaDataAssumes, services);
-        
-        //create sequents
-        Sequent assumesSeq = Sequent.createAnteSequent(
-                new Semisequent(new SequentFormula(schemaAssumes)));
-        Sequent axiomSeq = Sequent.createAnteSequent(
-                new Semisequent(new SequentFormula(schemaContApps)));
-        
-        //create taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(tacletName);
-        tacletBuilder.setFind(schemaFind);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
-        tacletBuilder.setIfSequent(assumesSeq);
-        RewriteTacletGoalTemplate goal =
-                new RewriteTacletGoalTemplate(axiomSeq,
-                                              ImmutableSLList.<Taclet>nil(),
-                                              schemaFind);
-        tacletBuilder.addTacletGoalTemplate(goal);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
-        tacletBuilder.setSurviveSmbExec(true);
-        return tacletBuilder.getTaclet();
-    }
-    
-    
-    private ImmutableSet<InformationFlowContract> getInfromFlowContracts(
-            IProgramMethod pm,
-            Services services) {
-        ImmutableSet<Contract> contracts =
-                services.getSpecificationRepository().getContracts(
-                pm.getContainerType(), pm);
-        ImmutableSet<InformationFlowContract> ifContracts =
-                DefaultImmutableSet.<InformationFlowContract>nil();
-        for(Contract c : contracts) {
-            if (c instanceof InformationFlowContract) {
-                ifContracts = ifContracts.add((InformationFlowContract)c);
-            }
-        }
-        return ifContracts;
-    }
-
-
-    private Term createTermSV(String svName,
-                              Sort predArgSort,
-                              Services services) {
-        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
-        return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
-    }
-        
-
-    public Term buildContractApplications(
-            ImmutableSet<InformationFlowContract> targetContracts,
-            ProofObligationVars contAppData,
-            ProofObligationVars contAppData2,
-            Services services) {
-        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
-        for (InformationFlowContract cont : targetContracts) {
-            InfFlowPOSnippetFactory f =
-                    POSnippetFactory.getInfFlowFactory(cont, contAppData,
-                                                       contAppData2, services);
-            contractsApplications = contractsApplications.append(
-                    f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
-        }
-        return TB.and(contractsApplications);
-    }
-*/
-
-    
     //-------------------------------------------------------------------------
     //inner classes
     //-------------------------------------------------------------------------

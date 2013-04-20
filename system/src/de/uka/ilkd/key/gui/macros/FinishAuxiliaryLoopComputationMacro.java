@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -68,7 +69,12 @@ public class FinishAuxiliaryLoopComputationMacro extends
         // create and register resulting taclets
         Term result = calculateResultingTerm(proof, ifVars, services);
         Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifVars, services);
-        po.addTaclet(rwTaclet);
+        InfFlowProofSymbols s = services.getSpecificationRepository()
+                        .getInfFlowProofSymbols(loopInv.getTarget());
+        s.addTaclet(rwTaclet, services);
+        s.addTerm(result);
+        s.addTerms(ifVars.c1.termList.append(ifVars.c2.termList
+                .append(ifVars.symbExecVars.termList)));
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 

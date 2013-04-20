@@ -16,7 +16,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
@@ -61,6 +60,8 @@ public class BlockExecutionPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
+
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
@@ -80,6 +81,8 @@ public class BlockExecutionPO extends AbstractOperationPO
         // final symbolic execution term
         Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
                                             TB.not(TB.and(pre, symExec)));
+        s.addTerm(symExec);
+        s.addSymbols(services.getNamespaces().programVariables().elements());
 
         // register final term
         assignPOTerms(finalTerm);
@@ -170,20 +173,6 @@ public class BlockExecutionPO extends AbstractOperationPO
 
     public ExecutionContext getExecutionContext() {
         return context;
-    }
-
-    public void addTaclet(Taclet taclet) {
-        SpecificationRepository specRepos = services.getSpecificationRepository();
-        InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
-        assert c instanceof InformationFlowContract;
-        c.addTaclet(taclet, services);
-    }
-
-    public String printTaclets() {
-        SpecificationRepository specRepos = services.getSpecificationRepository();
-        InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
-        assert c instanceof InformationFlowContract;
-        return c.printTaclets(services);
     }
 
     /**

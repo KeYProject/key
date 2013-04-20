@@ -119,12 +119,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         return tb.apply(update, programTerm);
     }
 
-    private JavaBlock buildJavaBlock(
-            BasicSnippetData d,
-            ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar,
-            ProgramVariable resultVar,
-            ProgramVariable exceptionVar) {
+    private JavaBlock buildJavaBlock(BasicSnippetData d,
+                                     ImmutableList<LocationVariable> formalParVars,
+                                     ProgramVariable selfVar,
+                                     ProgramVariable resultVar,
+                                     ProgramVariable exceptionVar) {
         IObserverFunction targetMethod =
                 (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod)) {

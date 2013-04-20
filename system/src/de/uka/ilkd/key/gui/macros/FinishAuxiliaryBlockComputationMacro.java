@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
@@ -80,7 +81,12 @@ public class FinishAuxiliaryBlockComputationMacro
         // create and register resulting taclets
         Term result = calculateResultingTerm(proof, ifVars, services);
         Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
-        po.addTaclet(rwTaclet);
+        InfFlowProofSymbols s = services.getSpecificationRepository()
+                        .getInfFlowProofSymbols(contract.getTarget());
+        s.addTaclet(rwTaclet, services);
+        s.addTerms(ifVars.c1.termList.append(ifVars.c2.termList
+                .append(ifVars.symbExecVars.termList)));
+        s.addTerm(result);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 

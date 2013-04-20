@@ -262,7 +262,7 @@ public class UserDefinedSymbols {
                                      if(sortParent !=    Sort.ANY){
                                              res += sortParent.name()+", ";
                                              extendsAtLeastOneSort = true;
-                                     }                                    
+                                     }
                              }
                              if(extendsAtLeastOneSort){
                                      int index = res.lastIndexOf(", ");
@@ -271,7 +271,7 @@ public class UserDefinedSymbols {
                              }
                         }
                         result.append(";\n");
-                }                
+                }
         }
         
         private void createHeaderForFunctions(StringBuffer result){
@@ -284,7 +284,7 @@ public class UserDefinedSymbols {
                         result.append(symbol.name());
                         result.append(createSignature(op));
                         result.append(";\n");
-                }                
+                }
         }
         
         private void createHeaderForPredicates(StringBuffer result){
@@ -296,7 +296,7 @@ public class UserDefinedSymbols {
                         result.append(symbol.name());
                         result.append(createSignature(op));
                         result.append(";\n");
-                }                
+                }
         }
         
         private void createHeaderForSchemaVariables(StringBuffer result){
@@ -311,7 +311,7 @@ public class UserDefinedSymbols {
                         result.append(sv.sort().name()+" ");
                         result.append(symbol.name());
                         result.append(";\n");
-                }                
+                }
         }
         
         private String createSignature(Function op){

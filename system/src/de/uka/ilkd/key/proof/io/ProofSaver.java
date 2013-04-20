@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -61,7 +62,6 @@ import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -133,14 +133,10 @@ public class ProofSaver {
 
           //\problem or \proofObligation
           ProofOblInput po = specRepos.getProofOblInput(proof);
-          if(po instanceof IPersistablePO) {
+          if(po instanceof IPersistablePO &&
+                  !(po instanceof InfFlowRelatedPO)) {
               Properties properties = new Properties();
               ((IPersistablePO)po).fillSaveProperties(properties);
-              if (po instanceof InfFlowRelatedPO) {
-                  InformationFlowContract c = specRepos
-                          .getInfFlowContract(((InfFlowRelatedPO)po).getContract().getTarget());
-                  ps.print(c.printTaclets(services));
-              }
               StringWriter writer = new StringWriter();
               try {
                  properties.store(writer, "Proof Obligation Settings");
@@ -150,6 +146,13 @@ public class ProofSaver {
                 writer.close();
               }
           } else {
+              if (po instanceof InfFlowRelatedPO) {
+                  Properties properties = new Properties();
+                  ((IPersistablePO)po).fillSaveProperties(properties);
+                  InfFlowProofSymbols s = specRepos
+                          .getInfFlowProofSymbols(((InfFlowRelatedPO)po).getContract().getTarget());
+                  ps.print(s.printProofSymbols());
+              }
               Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");
               printer.printSemisequent(problemSeq.succedent());

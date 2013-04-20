@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -63,16 +63,15 @@ public class FinishAuxiliaryComputationMacro
         Services services = initiatingProof.getServices();
         SpecificationRepository specRepos = services.getSpecificationRepository();
         InfFlowContractPO ifPO = (InfFlowContractPO) specRepos.getPOForProof(initiatingProof);
-        InformationFlowContract c = specRepos.getInfFlowContract(ifPO.getContract().getTarget());
-        assert c instanceof InformationFlowContract;
+        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(ifPO.getContract().getTarget());
 
         // create and register resulting taclets
         Term result = calculateResultingTerm(proof, ifPO.getIFVars(), services);
         Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
-        c.addTaclet(rwTaclet, services);
-        c.addSymbols(ifPO.getIFVars().c1.termList.append(ifPO.getIFVars().c2.termList
+        s.addTaclet(rwTaclet, services);
+        s.addTerms(ifPO.getIFVars().c1.termList.append(ifPO.getIFVars().c2.termList
                 .append(ifPO.getIFVars().symbExecVars.termList)));
-        //ifPO.addPredicate((Function)result.op());
+        s.addTerm(result);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 

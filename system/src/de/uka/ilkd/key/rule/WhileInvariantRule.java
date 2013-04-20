@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -51,7 +52,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -323,8 +323,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         Services services = infFlowData.services;
         SpecificationRepository specRepos = infFlowData.services.getSpecificationRepository();
-        InformationFlowContract c = specRepos.getInfFlowContract(inv.getTarget());
-        assert c instanceof InformationFlowContract;
+        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(inv.getTarget());
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
@@ -332,9 +331,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        for (Term t: post.subs()) {
-            c.addSymbol(t.op());
-        }
+        s.addTerm(selfComposedExec);
+        s.addTerm(post);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
 
@@ -347,13 +345,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            c.addTaclet(t, services);
+            s.addTaclet(t, services);
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            c.addTaclet(t, services);
+            s.addTaclet(t, services);
         }
         
         return infFlowGoal;
@@ -618,10 +616,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                 reachableOut, 
                 variantNonNeg}));
 
-        /*Term postAssumption 
-        =  TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
-                TB.and(anonAssumption,TB.apply(anonUpdate, uAnonInv)));*/
-
         final WhileInvRule wir
         = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
         SVInstantiations svInst
@@ -716,9 +710,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                     ifInvariantBuilder.buildContractApplPredTerm(true);
             final Taclet informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet(true);
-            InformationFlowContract c = specRepos.getInfFlowContract(inst.inv.getTarget());
-            assert c instanceof InformationFlowContract;
-            c.addTaclet(informationFlowInvariantApp, services);
+            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(inst.inv.getTarget());
+            s.addTaclet(informationFlowInvariantApp, services);
 
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
                                           selfTerm, selfAtPost,

@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -63,7 +64,6 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
@@ -116,8 +116,8 @@ public final class SpecificationRepository {
 		= new LinkedHashMap<IObserverFunction,IObserverFunction>();
     private final Map<IObserverFunction,ImmutableSet<Taclet>> unlimitedToLimitTaclets
 		= new LinkedHashMap<IObserverFunction,ImmutableSet<Taclet>>();
-    private final Map<String, InformationFlowContract> ifContractsByTarget
-                = new LinkedHashMap<String, InformationFlowContract>();
+    private final Map<String, InfFlowProofSymbols> ifSymbolsByTarget
+                = new LinkedHashMap<String, InfFlowProofSymbols>();
     private final Services services;
     
     private final Map<String, Integer> contractCounters
@@ -1267,14 +1267,14 @@ public final class SpecificationRepository {
 	return result;
     }
 
-    public void addInfFlowContract(IProgramMethod pm, InformationFlowContract contract) {
+    public void addInfFlowProofSymbols(IProgramMethod pm) {
         assert pm != null;
-        assert contract != null;
-        ifContractsByTarget.put(pm.getFullName(), contract);
+        ifSymbolsByTarget.put(pm.getFullName(), new InfFlowProofSymbols());
     }
-    // TODO: Not sure if these two methods are needed
-    public InformationFlowContract getInfFlowContract(IProgramMethod pm) {
+
+
+    public InfFlowProofSymbols getInfFlowProofSymbols(IProgramMethod pm) {
         assert pm != null;
-        return ifContractsByTarget.get(pm.getFullName());
+        return ifSymbolsByTarget.get(pm.getFullName());
     }
 }

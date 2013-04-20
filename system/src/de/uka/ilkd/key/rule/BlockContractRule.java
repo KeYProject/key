@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -47,7 +48,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -337,9 +337,8 @@ public class BlockContractRule implements BuiltInRule {
                     ifContractBuilder.buildContractApplTaclet(true);
 
             SpecificationRepository specRepos = services.getSpecificationRepository();
-            InformationFlowContract c = specRepos.getInfFlowContract(contract.getTarget());
-            assert c instanceof InformationFlowContract;
-            c.addTaclet(informationFlowContractApp, services);
+            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(contract.getTarget());
+            s.addTaclet(informationFlowContractApp, services);
 
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
@@ -379,6 +378,9 @@ public class BlockContractRule implements BuiltInRule {
             Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
+            s.addTerm(post);
+            s.addTerms(ifVars.c1.termList.append(ifVars.c2.termList
+                            .append(ifVars.symbExecVars.termList)));
 
             Goal infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
@@ -388,13 +390,13 @@ public class BlockContractRule implements BuiltInRule {
             final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                c.addTaclet(t, services);
+                s.addTaclet(t, services);
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
             final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                c.addTaclet(t, services);
+                s.addTaclet(t, services);
             }
 
             return new InfFlowValidityData(infFlowAssumptions,

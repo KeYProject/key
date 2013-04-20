@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
+import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.io.IOException;
@@ -56,12 +57,12 @@ public class InfFlowContractPO extends AbstractOperationPO
                                         false, contract == null);
         assert (symbExecVars.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services, contract == null);
+        specRepos.addInfFlowProofSymbols(pm);
     }
 
     @Override
     public void readProblem() throws ProofInputException {
-        InformationFlowContract c = specRepos.getInfFlowContract(getProgramMethod());
-        assert c instanceof InformationFlowContract;
+        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
@@ -71,13 +72,18 @@ public class InfFlowContractPO extends AbstractOperationPO
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        for (Term t: post.subs()) {
-            c.addSymbol(t.op());
-        }
+        s.addTerm(post);
+        s.addSymbols(services.getNamespaces().programVariables().elements());
 
         // register final term, taclets and collect class axioms
         assignPOTerms(TB.imp(selfComposedExec, post));
         collectClassAxioms(contract.getKJT());
+
+        for (NoPosTacletApp t: taclets) {
+            if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
+                s.addTaclet(t.taclet(), services);
+            }
+        }
 
         // create and add split-post and remove-post taclets
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
@@ -88,7 +94,7 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            c.addTaclet(t, services);
+            s.addTaclet(t, services);
         }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
@@ -98,7 +104,7 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            c.addTaclet(t, services);
+            s.addTaclet(t, services);
         }
     }
 

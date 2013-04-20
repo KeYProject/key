@@ -13,11 +13,11 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -75,10 +75,9 @@ public final class InfFlowLoopInvariantTacletBuilder
         LoopInvariant ifContract =
                 services.getSpecificationRepository().getLoopInvariant(loopinvariant.getLoop());
 
-        InformationFlowContract c =
-                services.getSpecificationRepository().getInfFlowContract(loopinvariant.getTarget());
-        assert c instanceof InformationFlowContract;
-        c.addSchemaVariables(contAppData.termList.append(contAppData2.termList));
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(loopinvariant.getTarget());
+        s.addTerms(contAppData.termList.append(contAppData2.termList));
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,

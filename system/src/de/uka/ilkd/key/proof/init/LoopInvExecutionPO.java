@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
@@ -62,6 +61,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
+
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
@@ -81,6 +82,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // final symbolic execution term
         Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
                                             TB.not(TB.and(inv, symExec)));
+        s.addTerm(symExec);
+        s.addSymbols(services.getNamespaces().programVariables().elements());
 
         // register final term
         assignPOTerms(finalTerm);
@@ -138,20 +141,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     @Override
     protected String buildPOName(boolean transactionFlag) {
         return getContract().getName();
-    }
-
-    public void addTaclet(Taclet taclet) {
-        SpecificationRepository specRepos = services.getSpecificationRepository();
-        InformationFlowContract c = specRepos.getInfFlowContract(loopInvariant.getTarget());
-        assert c instanceof InformationFlowContract;
-        c.addTaclet(taclet, services);
-    }
-
-    public String printTaclets() {
-        SpecificationRepository specRepos = services.getSpecificationRepository();
-        InformationFlowContract c = specRepos.getInfFlowContract(loopInvariant.getTarget());
-        assert c instanceof InformationFlowContract;
-        return c.printTaclets(services);
     }
 
     /**
