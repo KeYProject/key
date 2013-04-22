@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
@@ -39,6 +52,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -977,7 +991,9 @@ public final class SymbolicExecutionUtil {
       return ruleApp != null && // Do not handle the open goal node which has no applied rule
              posInfo != null && 
              posInfo.getEndPosition() != Position.UNDEFINED &&
-             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+             posInfo.getEndPosition().getLine() >= 0 &&  // Filter out statements where source code is missing.
+             !(statement instanceof EmptyStatement) && // Filter out empty statements
+             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // FIlter out empty blocks
    }
    
    /**
@@ -1327,7 +1343,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
     */
    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
-      if (node != null && hasSymbolicExecutionLabel(ruleApp)) {
+      if (node != null && !isRuleAppToIgnore(ruleApp) && hasSymbolicExecutionLabel(ruleApp)) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
@@ -1365,6 +1381,16 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Checks if the given {@link RuleApp} should be ignored or
+    * checked for possible symbolic execution tree node representation.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} ignore {@link RuleApp}, {@code false} check if the {@link RuleApp} represents a symbolic execution tree node. 
+    */
+   public static boolean isRuleAppToIgnore(RuleApp ruleApp) {
+      return "unusedLabel".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
    /**
     * Checks if the currently executed code is in an implicit method
     * ({@link IProgramMethod#isImplicit()} is {@code true}).

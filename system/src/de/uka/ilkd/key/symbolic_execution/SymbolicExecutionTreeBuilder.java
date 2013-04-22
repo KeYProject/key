@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Deque;
@@ -640,7 +653,7 @@ public class SymbolicExecutionTreeBuilder {
       AbstractExecutionNode result = null;
       // Make sure that a statement (SourceElement) is available.
       if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
-         if (statement != null) {
+         if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
             // Get position information
             PositionInfo posInfo = statement.getPositionInfo();
             // Determine the node representation and create it if one is available

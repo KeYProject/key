@@ -30,7 +30,7 @@
                                                                                     <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                                        <statement name="return res_1*2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                                           <methodReturn name="&lt;return of Magic42.compute(xValue);&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of Magic42.compute(xValue);&gt;">
-                                                                                             <termination name="&lt;end&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" exceptionalTermination="false">
+                                                                                             <termination name="&lt;end&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
                                                                                              </termination>
                                                                                           </methodReturn>
                                                                                        </statement>
@@ -84,7 +84,7 @@
                                                                                     <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                                        <statement name="return res*2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                                           <methodReturn name="&lt;return of Magic42.compute(xValue);&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of Magic42.compute(xValue);&gt;">
-                                                                                             <termination name="&lt;end&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" exceptionalTermination="false">
+                                                                                             <termination name="&lt;end&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
                                                                                              </termination>
                                                                                           </methodReturn>
                                                                                        </statement>

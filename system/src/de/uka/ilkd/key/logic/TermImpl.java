@@ -14,8 +14,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -97,11 +95,10 @@ class TermImpl implements Term {
            containsJavaBlockRecursive = true;
         }
         else {
-           Iterator<Term> subIter = subs.iterator();
-           while (!containsJavaBlockRecursive && subIter.hasNext()) {
-              Term next = subIter.next();
-              if (next.isContainsJavaBlockRecursive()) {
+	  for (int i = 0; i<subs.size(); i++) {
+              if (subs.get(i).isContainsJavaBlockRecursive()) {
                  containsJavaBlockRecursive = true;
+		 return;
               }
            }
         }

@@ -1,4 +1,3 @@
-
 public enum MyEnum {
 	A(null),
 	B(A),

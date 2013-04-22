@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.test.util;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +59,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -230,24 +242,6 @@ public final class TestSedCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
-   }
-
-   /**
-    * Returns the {@link SWTBotView} for the properties view.
-    * @param bot The {@link SWTWorkbenchBot} to use.
-    * @return The {@link SWTBotView}.
-    */
-   public static SWTBotView getPropertiesView(SWTWorkbenchBot bot) {
-      return bot.viewById(IPageLayout.ID_PROP_SHEET);
-   }
-
-   /**
-    * Returns the {@link SWTBotView} for the outline view.
-    * @param bot The {@link SWTWorkbenchBot} to use.
-    * @return The {@link SWTBotView}.
-    */
-   public static SWTBotView getOutlineView(SWTWorkbenchBot bot) {
-      return bot.viewById(IPageLayout.ID_OUTLINE);
    }
 
    /**
