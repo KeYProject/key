@@ -27,19 +27,20 @@ public class GeneralSettings implements Settings, Cloneable {
 
 
     private static final String TACLET_FILTER = "[General]StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY 
+    private static final String DND_DIRECTION_SENSITIVE_KEY
         = "[General]DnDDirectionSensitive";
-    private static final String ONE_STEP_SIMPLIFICATION_KEY 
-    	= "[General]OneStepSimplification";    
+    private static final String ONE_STEP_SIMPLIFICATION_KEY
+        = "[General]OneStepSimplification";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String USE_OCL_KEY = "[General]UseOCL";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
+    private static final String SEPARATE_PROOF_FOLDER = "[General]SeparateProofFolder";
     
     /** if true then JML/OCL specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
      */
     public static boolean disableSpecs = false;
-    
+
     /** minimize interaction is on by default */
     private boolean tacletFilter = true;
 
@@ -48,12 +49,15 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
-    
+
     /** is one-step simplification enabled */
     private boolean oneStepSimplification = true;
-    
+
     /** launches the rightclick the macro menu. on by default. */
     private boolean rightClickMacros = true;
+
+    /** proofs are stored in a separate proof (sub) folder. */
+    private boolean separateProofFolder = false;
 
     /** JML is active by default */
     private boolean useJML = true;
@@ -87,7 +91,11 @@ public class GeneralSettings implements Settings, Cloneable {
     public boolean isRightClickMacro() {
         return rightClickMacros;
     }
-    
+
+    public boolean storesInSeparateProofFolder() {
+        return separateProofFolder;
+    }
+
     public boolean useJML() {
         return useJML && !disableSpecs;
     }
@@ -121,7 +129,8 @@ public class GeneralSettings implements Settings, Cloneable {
 	    fireSettingsChanged();
 	}
     }
-    
+
+
     public void setRightClickMacros(boolean b) {
         if(this.rightClickMacros != b) {
             rightClickMacros = b;
@@ -129,7 +138,15 @@ public class GeneralSettings implements Settings, Cloneable {
         }
     }
 
-    
+
+    public void setSeparateProofFolder(boolean b) {
+        if(this.separateProofFolder != b) {
+            separateProofFolder = b;
+            fireSettingsChanged();
+        }
+    }
+
+
     public void setUseJML(boolean b) {
         if (useJML != b) {
             useJML = b;
@@ -146,7 +163,7 @@ public class GeneralSettings implements Settings, Cloneable {
     }
 
 
-    
+
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
@@ -156,31 +173,36 @@ public class GeneralSettings implements Settings, Cloneable {
 	if (val != null) {
 	    tacletFilter = Boolean.valueOf(val).booleanValue();
 	}
-    
+
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
             dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
-        }         
-        
+        }
+
         val = props.getProperty(ONE_STEP_SIMPLIFICATION_KEY);
         if (val != null) {
             oneStepSimplification = Boolean.valueOf(val).booleanValue();
         }
-        
+
         val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
-        if(val != null) {
+        if (val != null) {
             rightClickMacros = Boolean.valueOf(val).booleanValue();
         }
-        
+
+        val = props.getProperty(SEPARATE_PROOF_FOLDER);
+        if (val != null) {
+            separateProofFolder = Boolean.valueOf(val).booleanValue();
+        }
+
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
-        }         
-        
+        }
+
         val = props.getProperty(USE_OCL_KEY);
         if (val != null) {
             useOCL = Boolean.valueOf(val).booleanValue();
-        }                 
+        }
     }
 
 
@@ -194,6 +216,7 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
+        props.setProperty(SEPARATE_PROOF_FOLDER, "" + separateProofFolder);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(USE_OCL_KEY, "" + useOCL);
     }

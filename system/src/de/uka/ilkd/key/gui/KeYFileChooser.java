@@ -20,6 +20,7 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
 
 public class KeYFileChooser {
@@ -95,10 +96,14 @@ public class KeYFileChooser {
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
 
-        final String proofDir = resetFile.getParent().endsWith(PROOF_SUBDIRECTORY) ?
+        boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
+                         .getGeneralSettings().storesInSeparateProofFolder();
+
+        String proofDir =
+                !proofFolderActive || resetFile.getParent().endsWith(PROOF_SUBDIRECTORY) ?
                 resetFile.getParent() : resetFile.getParent().concat(PROOF_SUBDIRECTORY);
         final File dir = new File(proofDir);
-        boolean newDir = !dir.exists();
+        boolean newDir = !proofFolderActive && !dir.exists();
         if (newDir) {
             dir.mkdir();
         }

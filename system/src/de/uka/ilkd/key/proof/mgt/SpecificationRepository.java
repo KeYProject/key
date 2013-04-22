@@ -1275,6 +1275,11 @@ public final class SpecificationRepository {
 
     public InfFlowProofSymbols getInfFlowProofSymbols(IProgramMethod pm) {
         assert pm != null;
-        return ifSymbolsByTarget.get(pm.getFullName());
+        InfFlowProofSymbols result = ifSymbolsByTarget.get(pm.getFullName());
+        if (result == null) {
+            result = new InfFlowProofSymbols();
+            ifSymbolsByTarget.put(pm.getFullName(), result);
+        }
+        return result;
     }
 }

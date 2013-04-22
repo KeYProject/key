@@ -663,8 +663,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
 
-        if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
+        boolean loadedInfFlow =
+                services.getProof().getSettings()
+                .getStrategySettings().getActiveStrategyProperties()
+                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+
+        if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) &&
             inst.inv.getRespects(services) != null) {
             
             assert anonUpdateDatas.size() == 1 : "information flow " +

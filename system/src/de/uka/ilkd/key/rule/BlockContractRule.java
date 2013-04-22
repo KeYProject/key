@@ -49,6 +49,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -273,8 +274,14 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
+        boolean loadedInfFlow =
+                services.getProof().getSettings()
+                .getStrategySettings().getActiveStrategyProperties()
+                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+
+        if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) || loadedInfFlow) &&
             contract.hasModifiesClause() &&
             contract.getRespects() != null) {
             // prepare information flow analysis

@@ -27,6 +27,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -62,6 +63,7 @@ import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -121,18 +123,27 @@ public class ProofSaver {
           ps = new PrintWriter(out, true);
           Services services = proof.getServices();
           SpecificationRepository specRepos = services.getSpecificationRepository();
+          ProofOblInput po = specRepos.getProofOblInput(proof);
           printer = createLogicPrinter(services, false);
-          
+
           //settings
+          if (po instanceof InfFlowRelatedPO) {
+              StrategySettings strategySettings =
+                      proof.getSettings().getStrategySettings();
+              StrategyProperties strategyProperties =
+                      strategySettings.getActiveStrategyProperties();
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_TRUE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
+          }
           ps.println(writeSettings(proof.getSettings()));
-          
+
           //declarations of symbols, sorts
           String header = proof.header();
           header = makePathsRelative(header);
           ps.print(header);
 
           //\problem or \proofObligation
-          ProofOblInput po = specRepos.getProofOblInput(proof);
           if(po instanceof IPersistablePO &&
                   !(po instanceof InfFlowRelatedPO)) {
               Properties properties = new Properties();
