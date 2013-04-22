@@ -44,9 +44,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                generateContApplPredicate(nameString, poVars.termList, d.tb);
        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(pm);
        s.addPredicate(contApplPred);
-       //s.addTerms(poVars.termList);
+       s.addTerms(poVars.termList);
        Term term = instantiateContApplPredicate(contApplPred, poVars, d.tb);
-       //s.addTerm(term);
+       s.addTerm(term);
 
        return term;
    }

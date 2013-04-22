@@ -162,7 +162,7 @@ class BasicSnippetData {
                                         invariant.getGuard(),
                                         localInTerms, heap, localOutTerms,
                                         services, true);
-        s.addTerms(origVars.localIns.append(origVars.localOuts));
+        s.addTerms(origVars.termList);
     }
     
     
@@ -231,7 +231,7 @@ class BasicSnippetData {
                 new ProofObligationVars(vars.self, localInTerms, localOutTerms,
                                         vars.result, vars.exception, heapTerm,
                                         services, true);
-        s.addTerms(origVars.localIns.append(origVars.localOuts));
+        s.addTerms(origVars.termList);
     }
 
 

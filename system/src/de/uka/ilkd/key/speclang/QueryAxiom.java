@@ -197,10 +197,10 @@ public final class QueryAxiom extends ClassAxiom {
 	if(target.isStatic()) {
 	    ifSeq = null;
 	} else {
-	    final Term ifFormula 
+	    final Term ifFormula
 	    	= TB.exactInstance(services, kjt.getSort(), TB.var(selfSV));
 	    final SequentFormula ifCf = new SequentFormula(ifFormula);
-	    final Semisequent ifSemiSeq 
+	    final Semisequent ifSemiSeq
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
 	}

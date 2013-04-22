@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -49,6 +50,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
+        s.addTerms(poVars.termList);
         registerFactoryMethods();
     }
     
@@ -57,6 +61,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               Services services) {
         this.data = new BasicSnippetData(invariant, services);
         this.poVars = poVars;
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(invariant.getTarget());
+        s.addTerms(poVars.termList);
         registerFactoryMethods();
     }
     
@@ -67,6 +74,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               Services services) {
         this.data = new BasicSnippetData(invariant, context, services);
         this.poVars = poVars;
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(invariant.getTarget());
+        s.addTerms(poVars.termList);
         registerFactoryMethods();
     }
 
@@ -76,6 +86,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
+        s.addTerms(poVars.termList);
         registerFactoryMethods();
     }
 
@@ -85,6 +98,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
+        s.addTerms(poVars.termList);
         registerFactoryMethods();
     }
 
@@ -95,6 +111,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars = poVars;
+        InfFlowProofSymbols s =
+                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
+        s.addTerms(poVars.termList);
         registerFactoryMethods();
     }
 

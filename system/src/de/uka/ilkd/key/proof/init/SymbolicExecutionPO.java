@@ -70,7 +70,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         // symbolic execution
         Term symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
-        //s.addSymbols(services.getNamespaces().programVariables().elements());
+        s.addSymbols(services.getNamespaces().programVariables().elements());
         s.addTerm(symExec);
 
         // final symbolic execution term

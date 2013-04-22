@@ -171,7 +171,7 @@ public final class SortDependingFunction extends Function {
 	assert !(sort instanceof ProgramSVSort);
 	assert sort != AbstractTermTransformer.METASORT;
 	
-	SortDependingFunction result 
+	SortDependingFunction result
 		= (SortDependingFunction) 
 		      services.getNamespaces()
 	                      .lookup(instantiateName(getKind(), 
