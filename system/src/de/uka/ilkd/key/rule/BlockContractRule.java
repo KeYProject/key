@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
@@ -748,9 +749,10 @@ public class BlockContractRule implements BuiltInRule {
 
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable) {
             if (placeholderVariable != null) {
-                String newName = TB.newName(services, placeholderVariable.name().toString());
+                Name newName = new Name(TB.newName(services, placeholderVariable.name().toString()));
+                newName = VariableNameProposer.DEFAULT.getNewName(services, newName);
                 LocationVariable newVariable =
-                        new LocationVariable(new ProgramElementName(newName),
+                        new LocationVariable(new ProgramElementName(newName.toString()),
                                              placeholderVariable.getKeYJavaType());
                 goal.addProgramVariable(newVariable);
                 return newVariable;
