@@ -78,6 +78,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 
+        saveAuxiliaryProof();
+
         // close auxiliary computation proof
         mediator.getUI().removeProof(proof);
     }

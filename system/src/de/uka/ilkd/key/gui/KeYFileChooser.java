@@ -100,10 +100,10 @@ public class KeYFileChooser {
                          .getGeneralSettings().storesInSeparateProofFolder();
 
         String proofDir =
-                !proofFolderActive || resetFile.getParent().endsWith(PROOF_SUBDIRECTORY) ?
+                (!proofFolderActive || resetFile.getParent().endsWith(PROOF_SUBDIRECTORY)) ?
                 resetFile.getParent() : resetFile.getParent().concat(PROOF_SUBDIRECTORY);
         final File dir = new File(proofDir);
-        boolean newDir = !proofFolderActive && !dir.exists();
+        boolean newDir = proofFolderActive && !dir.exists();
         if (newDir) {
             dir.mkdir();
         }
