@@ -19,6 +19,7 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTes
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   // TODO: Add SWTBotAutoModeHandlerTest.class and all other new SWTBot test classes in the future!
    SWTBotStartProofHandlerTest.class
 })
 public class SWTBotAllKeYIDEUITests {

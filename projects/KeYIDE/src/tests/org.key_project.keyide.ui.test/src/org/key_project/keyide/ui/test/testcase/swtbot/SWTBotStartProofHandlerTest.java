@@ -1,7 +1,5 @@
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withText;
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withTextIgnoringCase;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFolder;
@@ -9,12 +7,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -57,7 +53,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -115,7 +111,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -175,7 +171,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -221,6 +217,8 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       }, "OK", KeYEditor.EDITOR_ID);
    }
    
+   
+   // TODO: Refactor testPerspective*ChangedPreferences tests into class SWTBotKeYIDEPreferencePageTest
    /**
     * Tests the perspective is always changed functionality by changing the value under "Window->Preferences->General->Perspectives->KeY Preferences"
     * @throws InterruptedException 
@@ -265,9 +263,9 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       SWTBotPreferences.TIMEOUT = originalTimeout * 4;
       // Backup original switch perspective preference and set preference to test.
       String originalSwitchPerspectivePreference = KeYIDEPreferences.getSwitchToKeyPerspective();
-      KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT); // TODO: Set it to a value which does not match the value to test. Otherwise you test nothing in case you click on prompt
       // Backup current perspective
-      IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
+      IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective(); // TODO: Not required, remove this line and later functionality
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       try {
          // Close welcome view if available
@@ -276,8 +274,8 @@ public class SWTBotStartProofHandlerTest extends TestCase {
          TestUtilsUtil.clickDirectly(preferencePage.bot().radio(radioButton));
          preferencePage.bot().button("OK").click();
          // tests if KeY Preference is set
-         assertTrue(radioButton.equalsIgnoreCase(KeYIDEPreferences.getSwitchToKeyPerspective()));
-         }
+         assertTrue(radioButton.equalsIgnoreCase(KeYIDEPreferences.getSwitchToKeyPerspective())); // TODO: This is not nice, because maybe we like to change the UI or to support different languages or the eclipse API might change. Instead make sure that the value is one of {@link MessageDialogWithToggle#ALWAYS}, {@link MessageDialogWithToggle#PROMPT} or {@link MessageDialogWithToggle#NEVER}. You can pass the expected value as parameter to this method
+      }
       finally {
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
@@ -300,13 +298,14 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
       }, "OK", "always", KeYEditor.EDITOR_ID);
    }
    
+   // TODO: testSetPerspectiveChangedPreferences* What does these tests do? Do they set change the preference? Where is it tested that KeYIDEPreference.getSwitchToKeyPerspective() has changed as expected?
    /**
     * Tests starting of a proof via the context menu of a method ({@link IMethod}) in the outline view, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always".
@@ -364,7 +363,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -429,7 +428,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -496,7 +495,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -561,7 +560,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             // Select method "charge(int) : boolean" in text editor
             SWTBotEditor editor = bot.editorByTitle(editorPart.getTitle());
             SWTBotStyledText styledText = editor.bot().styledText();
-            styledText.selectRange(103, 27, 7);
+            styledText.selectRange(54, 18, 6);
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
          }
@@ -644,11 +643,18 @@ public class SWTBotStartProofHandlerTest extends TestCase {
     * @throws CoreException
     * @throws InterruptedException
     */
-   protected void doStartProofWithoutSwitchToPerspectiveDialogTest(String projectName, IStartProofTestRunnable startProofRunnable, String contractButton, String switchToPerspective, String expectedEditor) throws CoreException, InterruptedException{
+   protected void doStartProofWithoutSwitchToPerspectiveDialogTest(String projectName, 
+                                                                   IStartProofTestRunnable startProofRunnable, 
+                                                                   String contractButton, 
+                                                                   String switchToPerspective, // TODO: Use as parameter MessageDialogWithToggle.ALWAYS, MessageDialogWithToggle.PROMPT or MessageDialogWithToggle.NEVER instead of local Strings. 
+                                                                   String expectedEditor) throws CoreException, InterruptedException {
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);
       assertTrue(!projectName.isEmpty());
+      assertTrue(MessageDialogWithToggle.ALWAYS.equals(switchToPerspective) || 
+                 MessageDialogWithToggle.PROMPT.equals(switchToPerspective) || 
+                 MessageDialogWithToggle.NEVER.equals(switchToPerspective));
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;

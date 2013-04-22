@@ -32,6 +32,9 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
 
 //TODO Document class OutlineContentAndLabelProviderTest
 public class OutlineContentAndLabelProviderTest extends TestCase {
+   // TODO: Write test cases which makes sure that the shown content is updated when some rules are applied via auto mode (With and without new branches) 
+   // TODO: Write test cases which makes sure that the shown conten tis updated when a rule is applied manually (with and without new branches)
+   
    /**
     * Creates a proof and the viewer of the proof for the tests.
     * @throws Exception
