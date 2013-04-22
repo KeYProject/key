@@ -1,0 +1,564 @@
+\settings {
+"#Proof-Settings-Config-File
+#Mon Apr 22 15:47:32 CEST 2013
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on , assertions-assertions\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , runtimeExceptions-runtimeExceptions\\:ban
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_OFF
+"
+}
+
+\javaSource "../../../../../Key-Beispiele/InfFlowBlockContract";
+
+
+
+\sorts{
+Update;
+boolean;
+Field;
+Formula;
+java.lang.Exception\extends java.lang.Throwable;
+int;
+BlockExample\extends java.lang.Object;
+Heap;
+}
+
+\predicates{
+EXECUTION_OF_LOOP_at_line_186_in_block_while_secure_750642318_WITH_INV(Heap,BlockExample,boolean,int,int,Heap,BlockExample,boolean,int,int);
+RELATED_BY_LOOP_at_line_186_in_block_while_secure_750642318(Heap,BlockExample,boolean,int,int,Heap,BlockExample,boolean,int,int);
+EXECUTION_OF_block_while_secure_750642318_WITH_PRE(Heap,BlockExample,int,java.lang.Exception,int,Heap,BlockExample,java.lang.Exception);
+}
+
+\functions{
+boolean FALSE;
+boolean TRUE;
+Heap heap_After_LOOP_0;
+int mbyAtPre_0;
+int int::select(Heap,java.lang.Object,Field);
+Field BlockExample::$low;
+int mbyAtPre_0_B;
+int mbyAtPre_0_A;
+}
+
+\programVariables{
+int _l_0_After_B;
+int l1_1_After_B;
+boolean b_0_After_B;
+BlockExample self_0_After_LOOP_B;
+Heap heap_After_LOOP_0_B;
+int _l_0_Before_B;
+int l1_1_Before_B;
+boolean b_0_Before_B;
+BlockExample self_0_B_0;
+Heap heap_Before_LOOP_B_0;
+int _l_0_After_A;
+int l1_1_After_A;
+boolean b_0_After_A;
+BlockExample self_0_After_LOOP_A;
+Heap heap_After_LOOP_0_A;
+int _l_0_Before_A;
+int l1_1_Before_A;
+boolean b_0_Before_A;
+BlockExample self_0_A_0;
+Heap heap_Before_LOOP_A_0;
+int _l_0_After;
+int l1_1_After;
+boolean b_0_After;
+BlockExample self_0_After_LOOP;
+int _l_0_Before;
+int l1_1_Before;
+boolean b_0_Before;
+Heap heap_Before_LOOP;
+int l1_1;
+boolean b_0;
+int _l_0;
+Heap heapAtPost_0;
+BlockExample self_A;
+int _l_Before_A;
+BlockExample self_B;
+int _l_Before_B;
+Heap heap_A;
+Heap heap_B;
+int l1;
+java.lang.Exception excAtPost;
+int l1_After_B;
+BlockExample self_0;
+int l1_After_A;
+BlockExample self_A_0;
+BlockExample selfAtPost_B;
+BlockExample selfAtPost_A;
+boolean b_After_B;
+boolean b_After_A;
+BlockExample self_After_LOOP_A;
+java.lang.Exception exc_0;
+BlockExample selfAtPost_0;
+BlockExample self_After_LOOP_B;
+int _l_After_B;
+int _l_After_A;
+Heap heap_After_LOOP_B;
+Heap heap_After_LOOP_A;
+int l1_Before_B;
+int l1_After;
+java.lang.Exception exc;
+int l1_Before_A;
+java.lang.Exception exc_B;
+java.lang.Exception exc_A;
+Heap heapAtPost;
+boolean b_After;
+int _l;
+BlockExample self;
+java.lang.Exception excAtPost_0;
+int _l_Before;
+int l_0;
+Heap savedHeap;
+boolean b_Before_B;
+boolean b_Before_A;
+int l1_Before;
+int _l_After;
+BlockExample self_B_0;
+BlockExample self_After_LOOP;
+boolean b;
+int l_B;
+int l_A;
+Heap heap_Before_LOOP_B;
+int l;
+BlockExample selfAtPost;
+Heap heap_Before_LOOP_A;
+boolean b_Before;
+Heap heap_Before_LOOP;
+java.lang.Exception excAtPost_B;
+Heap heapAtPost_B;
+Heap heapAtPost_A;
+java.lang.Exception excAtPost_A;
+java.lang.Exception exc;
+int l;
+BlockExample self;
+Heap heap;
+java.lang.Exception excAtPost_0_B;
+BlockExample selfAtPost_0_B;
+Heap heapAtPost_0_B;
+java.lang.Exception exc_0_B;
+int l_0_B;
+BlockExample self_0_B;
+Heap heap_B_0;
+java.lang.Exception excAtPost_0_A;
+BlockExample selfAtPost_0_A;
+Heap heapAtPost_0_A;
+java.lang.Exception exc_0_A;
+int l_0_A;
+BlockExample self_0_A;
+Heap heap_A_0;
+}
+
+\rules{
+
+Class_invariant_axiom_for_BlockExample {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term BlockExample sv_self;
+  \schemaVar \skolemFormula sk;
+  
+  \assumes (BlockExample::exactInstance(sv_self) = TRUE ==>  )
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \varcond (
+     \new( sk, \dependingOn(sv_self) ),
+     \new( sk, \dependingOn(sv_heap) )
+  )
+  "Use Axiom": \replacewith ( true ) ;
+  "Show Axiom Satisfiability":
+    \replacewith ( sk )
+    \add ( ==> (true <-> true) | (false <-> true) )
+  
+  \heuristics ( split, classAxiom )
+};
+
+Split_post_0 {
+  
+  \find (
+      int::select(heapAtPost_0_A, selfAtPost_0_A, BlockExample::$low)
+    = int::select(heapAtPost_0_B, selfAtPost_0_B, BlockExample::$low)
+  )
+  \succedentPolarity
+  \replacewith (
+      int::select(heapAtPost_0_A, selfAtPost_0_A, BlockExample::$low)
+    = int::select(heapAtPost_0_B, selfAtPost_0_B, BlockExample::$low)
+  )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Remove_post_0 {
+  
+  \find (
+      int::select(heapAtPost_0_A, selfAtPost_0_A, BlockExample::$low)
+    = int::select(heapAtPost_0_B, selfAtPost_0_B, BlockExample::$low)
+  )
+  \succedentPolarity
+  \replacewith ( false )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Use_information_flow_contract_for_Loop_Invariant_186_block_while_secure_750642318 {
+  \schemaVar \term int assumes_l1_1_After#21;
+  \schemaVar \term int assumes_l1_1_Before#18;
+  \schemaVar \term BlockExample find_self_0#6;
+  \schemaVar \term Heap assumes_heap_Before_LOOP#24;
+  \schemaVar \term boolean assumes_b_0_After#23;
+  \schemaVar \term boolean assumes_b_0_Before#20;
+  \schemaVar \term int find_l1_1_Before#8;
+  \schemaVar \term boolean find_b_0_After#13;
+  \schemaVar \term Heap find_heap_Before_LOOP#14;
+  \schemaVar \term boolean find_b_0_Before#10;
+  \schemaVar \term BlockExample assumes_self_0_After_LOOP#17;
+  \schemaVar \term int find__l_0_Before#9;
+  \schemaVar \term int assumes__l_0_After#22;
+  \schemaVar \term BlockExample find_self_0_After_LOOP#7;
+  \schemaVar \term Heap assumes_heap_After_LOOP_0#25;
+  \schemaVar \term int assumes__l_0_Before#19;
+  \schemaVar \term Heap find_heap_After_LOOP_0#15;
+  \schemaVar \term BlockExample assumes_self_0#16;
+  \schemaVar \term int find__l_0_After#12;
+  \schemaVar \term int find_l1_1_After#11;
+  
+  \assumes ( RELATED_BY_LOOP_at_line_186_in_block_while_secure_750642318(assumes_heap_Before_LOOP#24,
+                                                                         assumes_self_0#16,
+                                                                         assumes_b_0_Before#20,
+                                                                         assumes_l1_1_Before#18,
+                                                                         assumes__l_0_Before#19,
+                                                                         assumes_heap_After_LOOP_0#25,
+                                                                         assumes_self_0_After_LOOP#17,
+                                                                         assumes_b_0_After#23,
+                                                                         assumes_l1_1_After#21,
+                                                                         assumes__l_0_After#22)
+            ==>
+             
+  )
+  \find (
+    RELATED_BY_LOOP_at_line_186_in_block_while_secure_750642318(find_heap_Before_LOOP#14,
+                                                                find_self_0#6,
+                                                                find_b_0_Before#10,
+                                                                find_l1_1_Before#8,
+                                                                find__l_0_Before#9,
+                                                                find_heap_After_LOOP_0#15,
+                                                                find_self_0_After_LOOP#7,
+                                                                find_b_0_After#13,
+                                                                find_l1_1_After#11,
+                                                                find__l_0_After#12)
+  )
+  \antecedentPolarity
+  \replacewith (
+    RELATED_BY_LOOP_at_line_186_in_block_while_secure_750642318(find_heap_Before_LOOP#14,
+                                                                find_self_0#6,
+                                                                find_b_0_Before#10,
+                                                                find_l1_1_Before#8,
+                                                                find__l_0_Before#9,
+                                                                find_heap_After_LOOP_0#15,
+                                                                find_self_0_After_LOOP#7,
+                                                                find_b_0_After#13,
+                                                                find_l1_1_After#11,
+                                                                find__l_0_After#12)
+  )
+  \add (      geq(find__l_0_After#12, Z(0(#)))
+            & geq(assumes__l_0_After#22, Z(0(#)))
+         ->   find_l1_1_Before#8 = assumes_l1_1_Before#18
+            & find__l_0_Before#9 = assumes__l_0_Before#19
+            & find_b_0_Before#10 = assumes_b_0_Before#20
+         ->   find_l1_1_After#11 = assumes_l1_1_After#21
+            & find__l_0_After#12 = assumes__l_0_After#22
+            & find_b_0_After#13 = assumes_b_0_After#23
+        ==>
+         
+  )
+  \heuristics ( information_flow_contract_appl )
+};
+}
+
+\problem {
+{heap:=heap_Before_LOOP}
+  !(  wellFormed(heap_Before_LOOP)
+    & !self_0 = null
+    &   boolean::select(heap,
+                        self_0,
+                        java.lang.Object::<created>)
+      = TRUE
+    & any::exactInstance(self_0) = TRUE
+    & (  inInt(l1_1_Before)
+       & inInt(_l_0_Before)
+       & inInt(l1_1_After)
+       & inInt(_l_0_After))
+    & geq(_l_0_After, Z(0(#)))
+    & {l1_1:=l1_1_Before || _l_0:=_l_0_Before}
+        (  (   \[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;
+                   }
+                 }\] b_0 = TRUE
+            -> \<{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {
+                     _l_0--;
+                     l1_1++;
+                   }
+                 }\> (  self_0_After_LOOP = self_0
+                      & \[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;
+                            }
+                          }\] b_0_After = b_0
+                      & l1_1_After = l1_1
+                      & _l_0_After = _l_0
+                      & heap_After_LOOP_0 = heap))
+         & (   \[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;
+                   }
+                 }\] b_0 = FALSE
+            ->   self_0_After_LOOP = self_0
+               & \[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;
+                     }
+                   }\] b_0_After = b_0
+               & l1_1_After = l1_1
+               & _l_0_After = _l_0
+               & heap_After_LOOP_0 = heap)))
+
+}
+
+\proof {
+(keyLog "0" (keyUser "christoph" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "456")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1"))
+(rule "notRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "3"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "variableDeclarationAssign" (formula "5") (term "1,0"))
+(rule "variableDeclarationAssign" (formula "5") (term "1,0,0,0,0,1,1"))
+(rule "variableDeclarationAssign" (formula "6") (term "1,0"))
+(rule "variableDeclarationAssign" (formula "6") (term "1,1,0,0,0,1"))
+(rule "variableDeclaration" (formula "5") (term "1,0"))
+(rule "variableDeclaration" (formula "5") (term "1,0,0,0,0,1,1"))
+(rule "variableDeclaration" (formula "6") (term "1,0"))
+(rule "variableDeclaration" (formula "6") (term "1,1,0,0,0,1"))
+(rule "eqSymm" (formula "6") (term "1,1"))
+(rule "eqSymm" (formula "6") (term "1,0,1"))
+(rule "eqSymm" (formula "6") (term "1,0,0,1"))
+(rule "postdecrement" (formula "5") (term "1,1"))
+(rule "impLeft" (formula "6"))
+(branch "Case 1"
+   (rule "greater_than_comparison_simple" (formula "6") (term "1"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "inEqSimp_gtToGeq" (formula "6") (term "0,0,1,0"))
+   (rule "times_zero_1" (formula "6") (term "1,0,0,0,0,1,0"))
+   (rule "add_zero_right" (formula "6") (term "0,0,0,0,1,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "6") (term "0,0,1,0"))
+   (rule "mul_literals" (formula "6") (term "1,0,0,1,0"))
+   (rule "methodCallEmpty" (formula "6") (term "1"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "emptyModality" (formula "6") (term "1"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "notRight" (formula "6"))
+   (rule "impLeft" (formula "6"))
+   (branch "Case 1"
+      (rule "greater_than_comparison_simple" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "inEqSimp_gtToGeq" (formula "6") (term "0,0,1,0"))
+      (rule "times_zero_1" (formula "6") (term "1,0,0,0,0,1,0"))
+      (rule "add_zero_right" (formula "6") (term "0,0,0,0,1,0"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "6") (term "0,0,1,0"))
+      (rule "mul_literals" (formula "6") (term "1,0,0,1,0"))
+      (rule "replace_known_left" (formula "6") (term "0,0,1,0") (ifseqformula "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "methodCallEmpty" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "emptyModality" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "closeTrue" (formula "6"))
+   )
+   (branch "Case 2"
+      (rule "compound_subtraction_1" (formula "6") (term "1") (inst "#v=x"))
+      (rule "variableDeclarationAssign" (formula "6") (term "1"))
+      (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_2"))
+      (rule "widening_identity_cast_5" (formula "6") (term "1"))
+      (rule "assignment" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "assignmentSubtractionInt" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "translateJavaSubInt" (formula "6") (term "0,1,0"))
+      (rule "polySimp_elimSub" (formula "6") (term "0,1,0"))
+      (rule "mul_literals" (formula "6") (term "1,0,1,0"))
+      (rule "polySimp_addComm0" (formula "6") (term "0,1,0"))
+      (rule "postincrement" (formula "6") (term "1"))
+      (rule "compound_int_cast_expression" (formula "6") (term "1") (inst "#v=x"))
+      (rule "variableDeclarationAssign" (formula "6") (term "1"))
+      (rule "variableDeclaration" (formula "6") (term "1") (newnames "x_3"))
+      (rule "remove_parentheses_right" (formula "6") (term "1"))
+      (rule "assignmentAdditionInt" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "translateJavaAddInt" (formula "6") (term "0,1,0"))
+      (rule "polySimp_addComm0" (formula "6") (term "0,1,0"))
+      (rule "widening_identity_cast_5" (formula "6") (term "1"))
+      (rule "assignment" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "methodCallEmpty" (formula "6") (term "1"))
+      (rule "emptyModality" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "eqSymm" (formula "10"))
+      (rule "polySimp_homoEq" (formula "9"))
+      (rule "polySimp_homoEq" (formula "8"))
+      (rule "polySimp_addComm1" (formula "9") (term "0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0"))
+      (rule "applyEq" (formula "7") (term "0,0,0") (ifseqformula "10"))
+      (rule "applyEq" (formula "2") (term "0") (ifseqformula "10"))
+      (rule "applyEq" (formula "3") (term "0,0") (ifseqformula "10"))
+      (rule "polySimp_sepPosMonomial" (formula "9"))
+      (rule "polySimp_mulComm0" (formula "9") (term "1"))
+      (rule "polySimp_rightDist" (formula "9") (term "1"))
+      (rule "mul_literals" (formula "9") (term "0,1"))
+      (rule "polySimp_mulLiterals" (formula "9") (term "1,1"))
+      (rule "polySimp_elimOne" (formula "9") (term "1,1"))
+      (rule "applyEq" (formula "1") (term "0") (ifseqformula "9"))
+      (rule "inEqSimp_homoInEq1" (formula "1"))
+      (rule "polySimp_mulComm0" (formula "1") (term "1,0"))
+      (rule "polySimp_rightDist" (formula "1") (term "1,0"))
+      (rule "mul_literals" (formula "1") (term "0,1,0"))
+      (rule "polySimp_addAssoc" (formula "1") (term "0"))
+      (rule "add_literals" (formula "1") (term "0,0"))
+      (rule "add_zero_left" (formula "1") (term "0"))
+      (rule "applyEq" (formula "7") (term "1,0,1,0") (ifseqformula "9"))
+      (rule "polySimp_addAssoc" (formula "7") (term "0,1,0"))
+      (rule "add_literals" (formula "7") (term "0,0,1,0"))
+      (rule "add_zero_left" (formula "7") (term "0,1,0"))
+      (rule "polySimp_sepPosMonomial" (formula "8"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1"))
+      (rule "polySimp_rightDist" (formula "8") (term "1"))
+      (rule "mul_literals" (formula "8") (term "0,1"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "1,1"))
+      (rule "polySimp_elimOne" (formula "8") (term "1,1"))
+      (rule "inEqSimp_invertInEq0" (formula "1"))
+      (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+      (rule "times_zero_2" (formula "1") (term "1"))
+      (rule "polySimp_elimOne" (formula "1") (term "0"))
+      (rule "greater_than_comparison_simple" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "inEqSimp_gtToGeq" (formula "6") (term "0,0,1,0"))
+      (rule "times_zero_1" (formula "6") (term "1,0,0,0,0,1,0"))
+      (rule "add_zero_right" (formula "6") (term "0,0,0,0,1,0"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "6") (term "0,0,1,0"))
+      (rule "mul_literals" (formula "6") (term "1,0,0,1,0"))
+      (rule "methodCallEmpty" (formula "6") (term "1"))
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "emptyModality" (formula "6") (term "1"))
+      (opengoal "{heap:=heap_Before_LOOP}   !(  wellFormed(heap_Before_LOOP)     & !self_0 = null     &   boolean::select(heap,                         self_0,                         java.lang.Object::<created>)       = TRUE     & any::exactInstance(self_0) = TRUE     & (  inInt(l1_1_Before)        & inInt(_l_0_Before)        & inInt(l1_1_After)        & inInt(_l_0_After))     & geq(_l_0_After, Z(0(#)))     & {l1_1:=l1_1_Before || _l_0:=_l_0_Before}         (  (   \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                    }                  }\\] b_0 = TRUE             -> \\<{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {                      _l_0--;                      l1_1++;                    }                  }\\> (  self_0_After_LOOP = self_0                       & \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                             }                           }\\] b_0_After = b_0                       & l1_1_After = l1_1                       & _l_0_After = _l_0                       & heap_After_LOOP_0 = heap))          & (   \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                    }                  }\\] b_0 = FALSE             ->   self_0_After_LOOP = self_0                & \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                      }                    }\\] b_0_After = b_0                & l1_1_After = l1_1                & _l_0_After = _l_0                & heap_After_LOOP_0 = heap))) ")
+   )
+)
+(branch "Case 2"
+   (rule "andLeft" (formula "6"))
+   (rule "andLeft" (formula "6"))
+   (rule "andLeft" (formula "6"))
+   (rule "andLeft" (formula "6"))
+   (rule "applyEq" (formula "5") (term "0,1,1,0,1") (ifseqformula "9"))
+   (rule "applyEq" (formula "5") (term "0,1,0,0") (ifseqformula "9"))
+   (rule "applyEq" (formula "2") (term "0,0") (ifseqformula "10"))
+   (rule "applyEq" (formula "1") (term "0") (ifseqformula "10"))
+   (rule "applyEq" (formula "7") (term "0,0,0") (ifseqformula "10"))
+   (rule "applyEq" (formula "7") (term "0,1,0") (ifseqformula "9"))
+   (rule "applyEq" (formula "5") (term "0,0,0,1") (ifseqformula "10"))
+   (rule "applyEq" (formula "5") (term "0,0,1,0,1") (ifseqformula "8"))
+   (rule "applyEq" (formula "5") (term "0,0,0,0") (ifseqformula "10"))
+   (rule "greater_than_comparison_simple" (formula "7") (term "1"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "inEqSimp_gtToGeq" (formula "7") (term "0,0,1,0"))
+   (rule "times_zero_1" (formula "7") (term "1,0,0,0,0,1,0"))
+   (rule "add_zero_right" (formula "7") (term "0,0,0,0,1,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "7") (term "0,0,1,0"))
+   (rule "mul_literals" (formula "7") (term "1,0,0,1,0"))
+   (rule "methodCallEmpty" (formula "7") (term "1"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "emptyModality" (formula "7") (term "1"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "eqSymm" (formula "7"))
+   (rule "impLeft" (formula "5"))
+   (branch
+      (rule "greater_than_comparison_simple" (formula "10") (term "1"))
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "inEqSimp_gtToGeq" (formula "10") (term "0,0,1,0"))
+      (rule "times_zero_1" (formula "10") (term "1,0,0,0,0,1,0"))
+      (rule "add_zero_right" (formula "10") (term "0,0,0,0,1,0"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "10") (term "0,0,1,0"))
+      (rule "mul_literals" (formula "10") (term "1,0,0,1,0"))
+      (rule "applyEq" (formula "10") (term "0,1,0") (ifseqformula "6"))
+      (rule "methodCallEmpty" (formula "10") (term "1"))
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "emptyModality" (formula "10") (term "1"))
+      (opengoal "{heap:=heap_Before_LOOP}   !(  wellFormed(heap_Before_LOOP)     & !self_0 = null     &   boolean::select(heap,                         self_0,                         java.lang.Object::<created>)       = TRUE     & any::exactInstance(self_0) = TRUE     & (  inInt(l1_1_Before)        & inInt(_l_0_Before)        & inInt(l1_1_After)        & inInt(_l_0_After))     & geq(_l_0_After, Z(0(#)))     & {l1_1:=l1_1_Before || _l_0:=_l_0_Before}         (  (   \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                    }                  }\\] b_0 = TRUE             -> \\<{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {                      _l_0--;                      l1_1++;                    }                  }\\> (  self_0_After_LOOP = self_0                       & \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                             }                           }\\] b_0_After = b_0                       & l1_1_After = l1_1                       & _l_0_After = _l_0                       & heap_After_LOOP_0 = heap))          & (   \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                    }                  }\\] b_0 = FALSE             ->   self_0_After_LOOP = self_0                & \\[{method-frame(source=block_while_secure(int)@BlockExample,this=self_0): {boolean b_0 = _l_0>0;                      }                    }\\] b_0_After = b_0                & l1_1_After = l1_1                & _l_0_After = _l_0                & heap_After_LOOP_0 = heap))) ")
+   )
+   (branch
+      (rule "compound_subtraction_1" (formula "5") (term "1") (inst "#v=x"))
+      (rule "variableDeclarationAssign" (formula "5") (term "1"))
+      (rule "variableDeclaration" (formula "5") (term "1") (newnames "x"))
+      (rule "widening_identity_cast_5" (formula "5") (term "1"))
+      (rule "assignment" (formula "5") (term "1"))
+      (builtin "One Step Simplification" (formula "5"))
+      (rule "assignmentSubtractionInt" (formula "5") (term "1"))
+      (builtin "One Step Simplification" (formula "5"))
+      (rule "translateJavaSubInt" (formula "5") (term "0,1,0"))
+      (rule "polySimp_elimSub" (formula "5") (term "0,1,0"))
+      (rule "mul_literals" (formula "5") (term "1,0,1,0"))
+      (rule "polySimp_addComm0" (formula "5") (term "0,1,0"))
+      (rule "postincrement" (formula "5") (term "1"))
+      (rule "compound_int_cast_expression" (formula "5") (term "1") (inst "#v=x"))
+      (rule "variableDeclarationAssign" (formula "5") (term "1"))
+      (rule "variableDeclaration" (formula "5") (term "1") (newnames "x_1"))
+      (rule "remove_parentheses_right" (formula "5") (term "1"))
+      (rule "assignmentAdditionInt" (formula "5") (term "1"))
+      (builtin "One Step Simplification" (formula "5"))
+      (rule "translateJavaAddInt" (formula "5") (term "0,1,0"))
+      (rule "polySimp_addComm0" (formula "5") (term "0,1,0"))
+      (rule "widening_identity_cast_5" (formula "5") (term "1"))
+      (rule "assignment" (formula "5") (term "1"))
+      (builtin "One Step Simplification" (formula "5"))
+      (rule "methodCallEmpty" (formula "5") (term "1"))
+      (rule "emptyModality" (formula "5") (term "1"))
+      (builtin "One Step Simplification" (formula "5") (ifInst ""  (formula "6")))
+      (rule "andLeft" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "polySimp_homoEq" (formula "7"))
+      (rule "polySimp_homoEq" (formula "6"))
+      (rule "polySimp_pullOutFactor1b" (formula "7") (term "0"))
+      (rule "add_literals" (formula "7") (term "1,1,0"))
+      (rule "times_zero_1" (formula "7") (term "1,0"))
+      (rule "add_zero_right" (formula "7") (term "0"))
+      (rule "equal_literals" (formula "7"))
+      (rule "closeFalse" (formula "7"))
+   )
+)
+)
+
+}

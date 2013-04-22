@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
@@ -145,10 +146,11 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
-            final String anonFuncName 
-            = TB.newName(services, pv.name().toString());
+            Name anonFuncName
+            = new Name(TB.newName(services, pv.name().toString()));
+            anonFuncName = VariableNameProposer.DEFAULT.getNewName(services, anonFuncName);
             final Function anonFunc 
-            = new Function(new Name(anonFuncName), pv.sort(), true);
+            = new Function(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
             if(anonUpdate == null) {
@@ -171,7 +173,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         assert loop_inv != null;
 
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
+	Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
+        loopHeapName = VariableNameProposer.DEFAULT.getNewName(services, loopHeapName);
         final Function loopHeapFunc = new Function(loopHeapName,
                                              heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
@@ -500,8 +503,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                 : TB.tt();
 
         //prepare guard
-        final ProgramElementName guardVarName
-        = new ProgramElementName(TB.newName(services, "b"));
+        ProgramElementName guardVarName =
+                new ProgramElementName(TB.newName(services, "b"));
+        guardVarName = new ProgramElementName(VariableNameProposer.DEFAULT.getNewName(services, guardVarName).toString());
         final LocationVariable guardVar = new LocationVariable(guardVarName, 
                 booleanKJT);
         services.getNamespaces().programVariables().addSafely(guardVar);        
