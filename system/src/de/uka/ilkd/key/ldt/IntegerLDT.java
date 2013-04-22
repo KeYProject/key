@@ -63,8 +63,8 @@ public final class IntegerLDT extends LDT {
     private final Function mod;
     private final Function bsum;
     private final Function bprod;
-    private final Function min;
-    private final Function max;
+//    private final Function min; // handled by the \ifEx operator
+//    private final Function max;
     private final Function jdiv;
     private final Function jmod;
     private final Function unaryMinusJint;
@@ -164,8 +164,6 @@ public final class IntegerLDT extends LDT {
         mod                 = addFunction(services, "mod");
         bsum                = addFunction(services, "bsum");
         bprod               = addFunction(services, "bprod");
-        min                 = addFunction(services, "min");
-        max                 = addFunction(services, "max");
         jdiv                = addFunction(services, "jdiv");
         jmod                = addFunction(services, "jmod");                  
         unaryMinusJint      = addFunction(services, "unaryMinusJint");
@@ -328,14 +326,6 @@ public final class IntegerLDT extends LDT {
     
     public Function getBprod() {
     return bprod;
-    }
-    
-    public Function getMin() {
-        return min;
-    }
-    
-    public Function getMax() {
-        return max;
     }
     
     public Function getLessThan() {
