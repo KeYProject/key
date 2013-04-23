@@ -13,10 +13,18 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.List;
+import java.util.Vector;
+
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -26,6 +34,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.util.ISEDConstants;
 
 /**
  * Provides a basic implementation of {@link ISEDDebugTarget}.
@@ -34,6 +43,10 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
+   
+   
+   protected Vector<Integer> breakpointLineVector;
+   
    /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */
@@ -69,8 +82,11 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
     */
    public AbstractSEDDebugTarget(ILaunch launch) {
-      super(null);
+      super(null);DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
+      breakpointLineVector = new Vector<Integer>();
       this.launch = launch;
+      addBreakpoints();
+      
    }
    
    /**
@@ -142,7 +158,8 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public boolean supportsBreakpoint(IBreakpoint breakpoint) {
-      return false;
+      
+      return true;
    }
 
    /**
@@ -223,15 +240,31 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    /**
     * {@inheritDoc}
     */
+   @SuppressWarnings("static-access")
    @Override
    public void breakpointAdded(IBreakpoint breakpoint) {
+      try {
+         breakpointLineVector.add((Integer) breakpoint.getMarker().getAttribute(breakpoint.getMarker().LINE_NUMBER));
+      }
+      catch (CoreException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
 
    /**
     * {@inheritDoc}
     */
+   @SuppressWarnings("static-access")
    @Override
    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+      try {
+         breakpointLineVector.remove((Integer) breakpoint.getMarker().getAttribute(breakpoint.getMarker().LINE_NUMBER));
+      }
+      catch (CoreException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
 
    /**
@@ -308,6 +341,33 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
       }
       catch (DebugException e) {
          return e.getMessage();
+      }
+   }
+   
+   @SuppressWarnings("static-access")
+   private void addBreakpoints(){
+      
+      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();
+      
+      for(int i = 0; i < breakpoints.length; i++){
+         try {
+            List programList = getLaunch().getLaunchConfiguration().getAttribute("org.eclipse.debug.core.MAPPED_RESOURCE_PATHS", (List)null);
+            String program = (String) programList.get(0);
+            if(program!=null){
+               IMarker marker= breakpoints[i].getMarker();
+               if(marker!=null){
+                  IPath p = new Path(program);
+                  if(marker.getResource().getFullPath().equals(p)){
+                     breakpointLineVector.add((Integer) breakpoints[i].getMarker().getAttribute(breakpoints[i].getMarker().LINE_NUMBER));
+                     
+                  }
+               }
+            }
+         }
+         catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
       }
    }
 }

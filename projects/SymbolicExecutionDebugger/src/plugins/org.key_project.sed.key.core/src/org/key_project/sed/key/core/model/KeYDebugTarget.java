@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -50,6 +51,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Martin Hentschel
  */
 public class KeYDebugTarget extends SEDMemoryDebugTarget {
+  
    /**
     * The used model identifier.
     */
@@ -186,6 +188,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
+      stopCondition.addChildren(new BreakpointStopCondition(breakpointLineVector));
       if (stepOver) {
          stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       }
