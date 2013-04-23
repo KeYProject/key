@@ -32,10 +32,12 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -987,7 +989,48 @@ public class Proof implements Named {
         stats += "Automode Time: "+MiscTools.formatTime(time);
         return stats;
     }
+    
+    public Map<String,String> fullStatistics() {
+        Map<String,String> res = new HashMap<String,String>();
+        res.put("Nodes", ""+countNodes());
+        res.put("Branches", ""+countBranches());
+        res.put("Interactive Steps", ""+computeInteractiveSteps(root()));
+        final long time = getAutoModeTime();
+        res.put("Automode Time", MiscTools.formatTime(time));
+        res.put("Automode Time (ms)",""+time);
+        
+        final int[] x = statisticsHelper(root());
+        res.put("One-step Simplifier apps", ""+x[0]);
+        res.put("SMT applications", ""+x[1]);
+        res.put("Dependency Contract apps", ""+x[2]);
+        res.put("Operation Contract apps", ""+x[3]);
+        res.put("Loop invariant apps", ""+x[4]);
+        
+        return res;
+    }
 
+    /** Retrieve a bulk of information on the proof tree. 
+     * @return [OSS apps, SMT apps, DepContract apps, Contract apps, Inv apps]
+     */
+    private static int[] statisticsHelper(Node node) {
+        final int arraySize = 5;
+        int[] res = new int[arraySize];
+        for (Node child: node){
+           final int[] childRes = statisticsHelper(child);
+           for (int i= 0; i < arraySize; i++)
+               res[i] += childRes[i];
+        }
+        
+        final Rule rule = node.getAppliedRuleApp().rule();
+        
+        if (rule instanceof de.uka.ilkd.key.rule.OneStepSimplifier) res[0]++;
+        else if (rule instanceof de.uka.ilkd.key.smt.RuleAppSMT.SMTRule) res[1]++;
+        else if (rule instanceof de.uka.ilkd.key.rule.UseDependencyContractRule) res[2]++;
+        else if (rule instanceof de.uka.ilkd.key.rule.UseOperationContractRule) res[3]++;
+        else if (rule instanceof de.uka.ilkd.key.rule.WhileInvariantRule) res[4]++;
+        
+        return res;
+    }
 
     // helper
     private static int computeInteractiveSteps(Node node) {
