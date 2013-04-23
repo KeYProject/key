@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core;bundle-version="3.6.2",
  org.eclipse.jdt.ui;bundle-version="3.6.2",
  org.key_project.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse.common.ui;bundle-version="1.0.0",
  de.hentschel.visualdbc.dbcmodel;bundle-version="1.0.0",
  de.hentschel.visualdbc.dataSource.key;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy

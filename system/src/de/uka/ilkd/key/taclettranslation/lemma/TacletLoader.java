@@ -164,8 +164,7 @@ public abstract class TacletLoader {
                 
                
                 private InitConfig createInitConfig(InitConfig reference) {
-                        InitConfig newConfig = reference.copy();
-
+                    InitConfig newConfig = reference.deepCopy();
                         newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
                         newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
                        
@@ -182,7 +181,7 @@ public abstract class TacletLoader {
 
                         keyFile.setInitConfig(config);
                         try{
-                                keyFile.readRulesAndProblem();
+                            keyFile.readRulesAndProblem();
                         }catch(Throwable e){
                                 throw new RuntimeException(e);
                         }

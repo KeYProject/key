@@ -52,6 +52,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -979,7 +980,9 @@ public final class SymbolicExecutionUtil {
       return ruleApp != null && // Do not handle the open goal node which has no applied rule
              posInfo != null && 
              posInfo.getEndPosition() != Position.UNDEFINED &&
-             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+             posInfo.getEndPosition().getLine() >= 0 &&  // Filter out statements where source code is missing.
+             !(statement instanceof EmptyStatement) && // Filter out empty statements
+             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // FIlter out empty blocks
    }
    
    /**
@@ -1043,7 +1046,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
     */
    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
-      if (node != null) {
+      if (node != null && !isRuleAppToIgnore(ruleApp)) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
@@ -1078,6 +1081,16 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Checks if the given {@link RuleApp} should be ignored or
+    * checked for possible symbolic execution tree node representation.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} ignore {@link RuleApp}, {@code false} check if the {@link RuleApp} represents a symbolic execution tree node. 
+    */
+   public static boolean isRuleAppToIgnore(RuleApp ruleApp) {
+      return "unusedLabel".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
    /**
     * Checks if the currently executed code is in an implicit method
     * ({@link IProgramMethod#isImplicit()} is {@code true}).
