@@ -49,7 +49,10 @@ public final class OneStepSimplifier implements BuiltInRule,
     
     public final class Protocol extends ArrayList<RuleApp> { }
     
-    // TODO: Remove the singleton instance or make the rule state less to allow parallelization of site proofs started via a ProofStarter which is currently not possible thanks to ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
+    // TODO: Remove the singleton instance or make the rule 
+    // state less to allow parallelization of site proofs started
+    // via a ProofStarter which is currently not possible thanks to 
+    // ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
     public static final OneStepSimplifier INSTANCE 
                                             = new OneStepSimplifier();
     
