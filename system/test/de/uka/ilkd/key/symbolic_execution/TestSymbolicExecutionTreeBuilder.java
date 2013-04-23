@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -143,6 +156,23 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
+    * Tests example: examples/_testcase/set/useOperationContractAllBranchesOpenTest
+    */
+   public void testUseOperationContractAllBranchesOpenTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useOperationContractAllBranchesOpenTest/test/UseOperationContractAllBranchesOpenTest.java", 
+             "UseOperationContractAllBranchesOpenTest", 
+             "main", 
+             "examples/_testcase/set/useOperationContractAllBranchesOpenTest/oracle/UseOperationContractAllBranchesOpenTest.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/identicalTermsDuringProof
     */
    public void testIdenticalTermsDuringProof() throws Exception {
@@ -188,19 +218,53 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/useOperationContractAllBranchesOpenTest
+    * Tests example: examples/_testcase/set/labelTest
     */
-   public void testUseOperationContractAllBranchesOpenTest() throws Exception {
+   public void testLabelTest_doubled() throws Exception {
       doTest(keyRepDirectory, 
-             "examples/_testcase/set/useOperationContractAllBranchesOpenTest/test/UseOperationContractAllBranchesOpenTest.java", 
-             "UseOperationContractAllBranchesOpenTest", 
-             "main", 
-             "examples/_testcase/set/useOperationContractAllBranchesOpenTest/oracle/UseOperationContractAllBranchesOpenTest.xml",
+             "examples/_testcase/set/labelTest/test/LabelTest.java", 
+             "LabelTest", 
+             "doubled", 
+             "examples/_testcase/set/labelTest/oracle/LabelTest_doubled.xml",
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true,
+             false,
+             false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/labelTest
+    */
+   public void testLabelTest_lost() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/labelTest/test/LabelTest.java", 
+             "LabelTest", 
+             "lost", 
+             "examples/_testcase/set/labelTest/oracle/LabelTest_lost.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/emptyBlockTest
+    */
+   public void testEmptyBlockTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/emptyBlockTest/test/EmptyBlockTest.java", 
+             "EmptyBlockTest", 
+             "emptyBlocks", 
+             "examples/_testcase/set/emptyBlockTest/oracle/EmptyBlockTest.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
              false);
    }
    
