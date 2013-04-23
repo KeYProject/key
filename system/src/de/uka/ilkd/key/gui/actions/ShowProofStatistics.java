@@ -14,13 +14,11 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 public class ShowProofStatistics extends MainWindowAction {
@@ -46,10 +44,8 @@ public class ShowProofStatistics extends MainWindowAction {
                     "If you wish to see the statistics "
                     + "for a proof you have to load one first"));
         } else {
-	    String stats = proof.statistics();
+	    final String stats = proof.statistics();
 
-	    int interactiveSteps = computeInteractiveSteps(proof.root());                  
-	    stats += "Interactive Steps: " +interactiveSteps;
 
 	    JOptionPane.showMessageDialog(mainWindow, 
 		    stats,
@@ -57,18 +53,5 @@ public class ShowProofStatistics extends MainWindowAction {
 	}
     }
     
-    // helper
-    private static int computeInteractiveSteps(Node node) {
-        int steps = 0;
-        final Iterator<Node> it = node.childrenIterator();
-        while (it.hasNext()) {
-          steps += computeInteractiveSteps(it.next());
-        }
-        
-        if (node.getNodeInfo().getInteractiveRuleApplication()) {
-            steps++;
-        }
-        return steps;
-    }
 
 }

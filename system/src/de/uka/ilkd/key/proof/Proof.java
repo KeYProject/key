@@ -35,6 +35,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -95,7 +96,7 @@ public class Proof implements Named {
 
     /** 
      * when load and save a proof with different versions of key this vector
-     * fills up with Strings containing the prcs versions.
+     * fills up with Strings containing the GIT versions.
      */
     public Vector<String> keyVersionLog;
    
@@ -972,15 +973,35 @@ public class Proof implements Named {
      * retrieves number of branches
      */
     public int countBranches() {
-	return root.countBranches();
+        return root.countBranches();
     }
 
-    
+
     public String statistics() {
-	return "Nodes:"  + countNodes() + "\n" +
-	    "Branches: " + countBranches() + "\n";
+        String stats = "Nodes: "  + countNodes() + "\n";
+        stats += "Branches: " + countBranches() + "\n";
+        int interactiveSteps = computeInteractiveSteps(root());
+        stats += "Interactive Steps: " +interactiveSteps +"\n";
+        long time = getAutoModeTime();
+        // use milliseconds for small values, seconds otherwise
+        stats += "Automode Time: "+MiscTools.formatTime(time);
+        return stats;
     }
 
+
+    // helper
+    private static int computeInteractiveSteps(Node node) {
+        int steps = 0;
+        final Iterator<Node> it = node.childrenIterator();
+        while (it.hasNext()) {
+            steps += computeInteractiveSteps(it.next());
+        }
+
+        if (node.getNodeInfo().getInteractiveRuleApplication()) {
+            steps++;
+        }
+        return steps;
+    }
     
     /** toString */
     public String toString() {
