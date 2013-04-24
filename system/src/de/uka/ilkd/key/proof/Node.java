@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class Node {
+public class Node implements Iterable<Node> {
     /** the proof the node belongs to */
     private Proof               proof;
 
@@ -529,7 +529,15 @@ public class Node {
     public int siblingNr() {
         return siblingNr;
     }
-   
+
+
+    /** Iterator over children.
+     * Use <code>leavesIterator()</code> if you need to iterate over leaves instead.
+     */
+    @Override
+    public Iterator<Node> iterator() {
+        return childrenIterator();
+    }    
 
     // inner iterator class 
     public static class NodeIterator implements Iterator<Node> {
@@ -565,5 +573,5 @@ public class Node {
 
     public int getUniqueTacletNr() {
         return getIntroducedRulesCount();
-    }    
+    }
  }

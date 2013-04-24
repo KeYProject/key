@@ -146,6 +146,22 @@ public final class MiscTools {
         }
         return result;
     }
+    
+    /** Return time information (in milliseconds)
+     * in human-readable format.
+     */
+    public static String formatTime (long ms) {
+        if (ms < 10000) return ""+ms+"ms";
+        else {
+            final long sec = ms/1000;
+            if (sec < 360) return ""+(sec)+"."+((ms/100)%10)+"s";
+            else {
+                final long min = sec/60;
+                return ""+min+"min";
+            }
+        }
+        
+    }
 
     // =======================================================
     // Methods operating on Collections
