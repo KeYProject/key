@@ -994,7 +994,8 @@ public class Proof implements Named {
         final long time = getAutoModeTime();
         res.add(new Pair<String, String>("Automode time", MiscTools.formatTime(time)));
         if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
-        res.add(new Pair<String, String>("Avg. time per step", ""+(time/nodes)+"ms"));
+        final String avgTime = ""+(time/nodes)+"."+((time*10/nodes)%10);
+        res.add(new Pair<String, String>("Avg. time per step", ""+avgTime+"ms"));
         
         res.add(new Pair<String, String>("Rule applications",""));
         res.add(new Pair<String, String>("One-step Simplifier apps", ""+x[0]));
