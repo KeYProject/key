@@ -782,7 +782,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow)  {
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) ||
+            (po == null && loadedInfFlow))  {
             // prepare information flow analysis
             assert anonUpdateDatas.size() == 1 : "information flow extension " +
                                                  "is at the moment not " +

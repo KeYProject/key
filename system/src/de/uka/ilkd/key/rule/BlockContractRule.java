@@ -279,9 +279,13 @@ public class BlockContractRule implements BuiltInRule {
                 .getStrategySettings().getActiveStrategyProperties()
                 .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+        final ContractPO po
+        = services.getSpecificationRepository()
+                  .getPOForProof(goal.proof());
 
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) || loadedInfFlow) &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) ||
+            (po == null && loadedInfFlow)) &&
             contract.hasModifiesClause() &&
             contract.getRespects() != null) {
             // prepare information flow analysis

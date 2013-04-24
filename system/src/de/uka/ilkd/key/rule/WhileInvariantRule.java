@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
@@ -668,9 +669,13 @@ public final class WhileInvariantRule implements BuiltInRule {
                 .getStrategySettings().getActiveStrategyProperties()
                 .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+        final ContractPO po
+        = services.getSpecificationRepository()
+                  .getPOForProof(goal.proof());
 
         if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) ||
+            (po == null && loadedInfFlow)) &&
             inst.inv.getRespects(services) != null) {
             
             assert anonUpdateDatas.size() == 1 : "information flow " +
