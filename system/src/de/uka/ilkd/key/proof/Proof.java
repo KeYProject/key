@@ -31,8 +31,12 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -978,72 +982,62 @@ public class Proof implements Named {
         return root.countBranches();
     }
 
-
-    public String statistics() {
-        String stats = "Nodes: "  + countNodes() + "\n";
-        stats += "Branches: " + countBranches() + "\n";
-        int interactiveSteps = computeInteractiveSteps(root());
-        stats += "Interactive Steps: " +interactiveSteps +"\n";
-        long time = getAutoModeTime();
-        // use milliseconds for small values, seconds otherwise
-        stats += "Automode Time: "+MiscTools.formatTime(time);
-        return stats;
-    }
     
-    public Map<String,String> fullStatistics() {
-        Map<String,String> res = new HashMap<String,String>();
-        res.put("Nodes", ""+countNodes());
-        res.put("Branches", ""+countBranches());
-        res.put("Interactive Steps", ""+computeInteractiveSteps(root()));
-        final long time = getAutoModeTime();
-        res.put("Automode Time", MiscTools.formatTime(time));
-        res.put("Automode Time (ms)",""+time);
-        
+    public List<Pair<String,String>> statistics() {
+        List<Pair<String,String>> res = new ArrayList<Pair<String,String>>();
         final int[] x = statisticsHelper(root());
-        res.put("One-step Simplifier apps", ""+x[0]);
-        res.put("SMT applications", ""+x[1]);
-        res.put("Dependency Contract apps", ""+x[2]);
-        res.put("Operation Contract apps", ""+x[3]);
-        res.put("Loop invariant apps", ""+x[4]);
+        final int nodes = countNodes();
+        
+        res.add(new Pair<String, String>("Nodes", ""+nodes));
+        res.add(new Pair<String, String>("Branches", ""+countBranches()));
+        res.add(new Pair<String, String>("Interactive steps", ""+x[5]));
+        final long time = getAutoModeTime();
+        res.add(new Pair<String, String>("Automode time", MiscTools.formatTime(time)));
+        if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
+        res.add(new Pair<String, String>("Avg. time per step", ""+(time/nodes)+"ms"));
+        
+        res.add(new Pair<String, String>("Rule applications",""));
+        res.add(new Pair<String, String>("One-step Simplifier apps", ""+x[0]));
+        res.add(new Pair<String, String>("SMT solver apps", ""+x[1]));
+        res.add(new Pair<String, String>("Dependency Contract apps", ""+x[2]));
+        res.add(new Pair<String, String>("Operation Contract apps", ""+x[3]));
+        res.add(new Pair<String, String>("Loop invariant apps", ""+x[4]));
+        res.add(new Pair<String, String>("Total rule apps", ""+(nodes+x[6])));
         
         return res;
     }
 
     /** Retrieve a bulk of information on the proof tree. 
-     * @return [OSS apps, SMT apps, DepContract apps, Contract apps, Inv apps]
+     * @return [OSS apps, SMT apps, DepContract apps, Contract apps, Inv apps, interactive steps, OSS enclosed rule apps]
      */
     private static int[] statisticsHelper(Node node) {
-        final int arraySize = 5;
+        final int arraySize = 7;
         int[] res = new int[arraySize];
         for (Node child: node){
            final int[] childRes = statisticsHelper(child);
            for (int i= 0; i < arraySize; i++)
                res[i] += childRes[i];
         }
-        
-        final Rule rule = node.getAppliedRuleApp().rule();
-        
-        if (rule instanceof de.uka.ilkd.key.rule.OneStepSimplifier) res[0]++;
-        else if (rule instanceof de.uka.ilkd.key.smt.RuleAppSMT.SMTRule) res[1]++;
-        else if (rule instanceof de.uka.ilkd.key.rule.UseDependencyContractRule) res[2]++;
-        else if (rule instanceof de.uka.ilkd.key.rule.UseOperationContractRule) res[3]++;
-        else if (rule instanceof de.uka.ilkd.key.rule.WhileInvariantRule) res[4]++;
-        
-        return res;
-    }
-
-    // helper
-    private static int computeInteractiveSteps(Node node) {
-        int steps = 0;
-        final Iterator<Node> it = node.childrenIterator();
-        while (it.hasNext()) {
-            steps += computeInteractiveSteps(it.next());
-        }
 
         if (node.getNodeInfo().getInteractiveRuleApplication()) {
-            steps++;
+            res[5]++;
         }
-        return steps;
+
+        final RuleApp ruleApp = node.getAppliedRuleApp();
+        if (ruleApp != null) {
+
+            if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                res[0]++;
+                final Protocol protocol = ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                if (protocol != null) res[6] += protocol.size()-1;
+            }
+            else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) res[1]++;
+            else if (ruleApp instanceof UseDependencyContractApp) res[2]++;
+            else if (ruleApp instanceof ContractRuleApp) res[3]++;
+            else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) res[4]++;
+        }
+        
+        return res;
     }
     
     /** toString */

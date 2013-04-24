@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Pair;
 
 public class ShowProofStatistics extends MainWindowAction {
 
@@ -38,20 +39,27 @@ public class ShowProofStatistics extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-	final Proof proof = getMediator().getSelectedProof();
+        final Proof proof = getMediator().getSelectedProof();
         if(proof == null) {
             mainWindow.notify(new GeneralInformationEvent("No statistics available.",
                     "If you wish to see the statistics "
-                    + "for a proof you have to load one first"));
+                            + "for a proof you have to load one first"));
         } else {
-	    final String stats = proof.statistics();
+
+            final int openGoals = proof.openGoals().size();
+            String stats = (openGoals > 0)? ""+openGoals+" open goals.": "Closed.";
+            stats += "\n\n";
+            for (Pair<String,String> x: proof.statistics()) {
+                if ("".equals(x.second)) stats +="\n";
+                stats += x.first+": "+ x.second+"\n";
+            }
 
 
-	    JOptionPane.showMessageDialog(mainWindow, 
-		    stats,
-		    "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
-	}
+            JOptionPane.showMessageDialog(mainWindow, 
+                    stats,
+                    "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
-    
+
 
 }
