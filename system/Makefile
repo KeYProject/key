@@ -69,7 +69,7 @@ ifneq "$(GIT)" ""
    ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
      KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
      KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-     KEY_VERSION_SHORT:=1.7.$(KEY_VERSION_SHORT)
+     KEY_VERSION_SHORT:=2.1.$(KEY_VERSION_SHORT)
    endif
 endif
 

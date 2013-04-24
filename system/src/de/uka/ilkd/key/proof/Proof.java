@@ -31,10 +31,17 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -95,7 +102,7 @@ public class Proof implements Named {
 
     /** 
      * when load and save a proof with different versions of key this vector
-     * fills up with Strings containing the prcs versions.
+     * fills up with Strings containing the GIT versions.
      */
     public Vector<String> keyVersionLog;
    
@@ -978,15 +985,66 @@ public class Proof implements Named {
      * retrieves number of branches
      */
     public int countBranches() {
-	return root.countBranches();
+        return root.countBranches();
     }
 
     
-    public String statistics() {
-	return "Nodes:"  + countNodes() + "\n" +
-	    "Branches: " + countBranches() + "\n";
+    public List<Pair<String,String>> statistics() {
+        List<Pair<String,String>> res = new ArrayList<Pair<String,String>>();
+        final int[] x = statisticsHelper(root());
+        final int nodes = countNodes();
+        
+        res.add(new Pair<String, String>("Nodes", ""+nodes));
+        res.add(new Pair<String, String>("Branches", ""+countBranches()));
+        res.add(new Pair<String, String>("Interactive steps", ""+x[5]));
+        final long time = getAutoModeTime();
+        res.add(new Pair<String, String>("Automode time", MiscTools.formatTime(time)));
+        if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
+        res.add(new Pair<String, String>("Avg. time per step", ""+(time/nodes)+"ms"));
+        
+        res.add(new Pair<String, String>("Rule applications",""));
+        res.add(new Pair<String, String>("One-step Simplifier apps", ""+x[0]));
+        res.add(new Pair<String, String>("SMT solver apps", ""+x[1]));
+        res.add(new Pair<String, String>("Dependency Contract apps", ""+x[2]));
+        res.add(new Pair<String, String>("Operation Contract apps", ""+x[3]));
+        res.add(new Pair<String, String>("Loop invariant apps", ""+x[4]));
+        res.add(new Pair<String, String>("Total rule apps", ""+(nodes+x[6])));
+        
+        return res;
     }
 
+    /** Retrieve a bulk of information on the proof tree. 
+     * @return [OSS apps, SMT apps, DepContract apps, Contract apps, Inv apps, interactive steps, OSS enclosed rule apps]
+     */
+    private static int[] statisticsHelper(Node node) {
+        final int arraySize = 7;
+        int[] res = new int[arraySize];
+        for (Node child: node){
+           final int[] childRes = statisticsHelper(child);
+           for (int i= 0; i < arraySize; i++)
+               res[i] += childRes[i];
+        }
+
+        if (node.getNodeInfo().getInteractiveRuleApplication()) {
+            res[5]++;
+        }
+
+        final RuleApp ruleApp = node.getAppliedRuleApp();
+        if (ruleApp != null) {
+
+            if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                res[0]++;
+                final Protocol protocol = ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                if (protocol != null) res[6] += protocol.size()-1;
+            }
+            else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) res[1]++;
+            else if (ruleApp instanceof UseDependencyContractApp) res[2]++;
+            else if (ruleApp instanceof ContractRuleApp) res[3]++;
+            else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) res[4]++;
+        }
+        
+        return res;
+    }
     
     /** toString */
     public String toString() {

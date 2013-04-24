@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Displays a JOptionPane informing about a closed proof
@@ -44,7 +45,12 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
         if (pcne instanceof ProofClosedNotificationEvent) {
             Proof proof = ((ProofClosedNotificationEvent)pcne).getProof();
             if (proof != null) {
-                setMessage("Proved.\nStatistics:\n"+proof.statistics());
+                String statistics = "";
+                for (Pair<String, String> x: proof.statistics()) {
+                    if ("".equals(x.second)) statistics += "\n";
+                    statistics += x.first+": "+ x.second+"\n";
+                }
+                setMessage("Proved.\n\nStatistics:\n"+statistics);
             }
         } else {
             setMessage("Proof Closed. No statistics available.");
