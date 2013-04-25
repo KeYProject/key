@@ -1,0 +1,35 @@
+\documentclass[a4paper]{article}
+
+\newcommand\KeY{Ke\kern-.1emY}
+
+\title{\KeY\ Performance Test Report}
+\author{Daniel Bruns}
+
+\begin{document}
+
+Explanation of test series
+\begin{itemize}
+  \item Inc: increase just one field 
+  \item Inc2: alternatively increase two fields
+  \item Contract: use an operation contract with
+		concrete frame
+  \item Model field: use an operation contract
+		with an abstract frame stored in
+		a model field (static depends clause)
+\end{itemize}
+
+\subsection{Basic Computation Time Growth}
+Computation time grows at least quadratically in the
+size of the input program.
+In \texttt{Inc}, the number of proof steps grows
+exactly linear, but computation times grows (effectively) linear in the number of proof steps.
+
+\begin{tabular}{|l|l|l|l|l|} \hline
+Test & Heap & Seq & Steps & Time \\ \hline
+\texttt{Inc}& $\Theta(1)$ & $\Theta(1)$ & $\Theta(n)$ & $\Omega(n^2)$ \\
+\texttt{Inc2} & $\Theta(1)$ & $\Theta(1)$ & $\Theta(n)$ & $\Omega(n^2)$ \\
+\texttt{Contract} & $\Theta(1)$ & $\Theta(n)$ 
+	& $\Omega(n^2)$ & $\Omega(n^4)$ \\
+\texttt{ModelField} & $\Omega(2^n)$ & ? & ? & ? \\
+\end{tabular}
+\end{document}
