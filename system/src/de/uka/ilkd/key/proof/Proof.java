@@ -41,7 +41,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -1024,7 +1024,7 @@ public class Proof implements Named {
         res.add(new Pair<String, String>("Branches", ""+countBranches()));
         res.add(new Pair<String, String>("Interactive steps", ""+interactive));
         final long time = getAutoModeTime();
-        res.add(new Pair<String, String>("Automode time", MiscTools.formatTime(time)));
+        res.add(new Pair<String, String>("Automode time", EnhancedStringBuffer.formatTime(time).toString()));
         if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
         final String avgTime = ""+(time/nodes)+"."+((time*10/nodes)%10);
         res.add(new Pair<String, String>("Avg. time per step", ""+avgTime+"ms"));
