@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
@@ -985,7 +986,7 @@ public class Proof implements Named {
     
     public List<Pair<String,String>> statistics() {
         List<Pair<String,String>> res = new ArrayList<Pair<String,String>>();
-        final int[] x = statisticsHelper(root());
+        final int[] x = statisticsHelper();
         final int nodes = countNodes();
         
         res.add(new Pair<String, String>("Nodes", ""+nodes));
@@ -1010,36 +1011,37 @@ public class Proof implements Named {
     /** Retrieve a bulk of information on the proof tree. 
      * @return [OSS apps, SMT apps, DepContract apps, Contract apps, Inv apps, interactive steps, OSS enclosed rule apps]
      */
-    private static int[] statisticsHelper(Node node) {
+    private int[] statisticsHelper() {
         final int arraySize = 7;
         int[] res = new int[arraySize];
-        for (Node child: node){
-           final int[] childRes = statisticsHelper(child);
-           for (int i= 0; i < arraySize; i++)
-               res[i] += childRes[i];
-        }
 
-        if (node.getNodeInfo().getInteractiveRuleApplication()) {
-            res[5]++;
-        }
+        NodeIterator it = root().subtreeIterator();
 
-        final RuleApp ruleApp = node.getAppliedRuleApp();
-        if (ruleApp != null) {
+        while (it.hasNext()) {
+            final Node node = it.next();
 
-            if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
-                res[0]++;
-                final Protocol protocol = ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
-                if (protocol != null) res[6] += protocol.size()-1;
+            if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                res[5]++;
             }
-            else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) res[1]++;
-            else if (ruleApp instanceof UseDependencyContractApp) res[2]++;
-            else if (ruleApp instanceof ContractRuleApp) res[3]++;
-            else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) res[4]++;
+
+            final RuleApp ruleApp = node.getAppliedRuleApp();
+            if (ruleApp != null) {
+
+                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                    res[0]++;
+                    final Protocol protocol = ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                    if (protocol != null) res[6] += protocol.size()-1;
+                }
+                else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) res[1]++;
+                else if (ruleApp instanceof UseDependencyContractApp) res[2]++;
+                else if (ruleApp instanceof ContractRuleApp) res[3]++;
+                else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) res[4]++;
+            }
         }
-        
+
         return res;
     }
-    
+
     /** toString */
     public String toString() {
 	StringBuffer result = new StringBuffer();
