@@ -27,17 +27,17 @@ public class InfFlowProofSymbols {
     private ImmutableSet<Sort> sorts
             = DefaultImmutableSet.<Sort>nil();
 
-    private ImmutableSet<Function> functions
+    private ImmutableSet<Function> predicates
             = DefaultImmutableSet.<Function>nil();
 
-    private ImmutableSet<SchemaVariable> schemaVariables
-            = DefaultImmutableSet.<SchemaVariable>nil();
+    private ImmutableSet<Function> functions
+            = DefaultImmutableSet.<Function>nil();
 
     private ImmutableSet<ProgramVariable> programVariables
             = DefaultImmutableSet.<ProgramVariable>nil();
 
-    private ImmutableSet<Function> predicates
-            = DefaultImmutableSet.<Function>nil();
+    private ImmutableSet<SchemaVariable> schemaVariables
+            = DefaultImmutableSet.<SchemaVariable>nil();
 
     private ImmutableSet<Taclet> taclets
             = DefaultImmutableSet.<Taclet>nil();
@@ -47,11 +47,18 @@ public class InfFlowProofSymbols {
 
     private void addTerm(Term t) {
         if (!t.subs().isEmpty()) {
-            for (Term s: t.subs()) {
+            for (final Term s: t.subs()) {
                 addTerm(s);
             }
         }
         add(t.op());
+    }
+
+    private void addTaclet(Taclet t) {
+        assert t != null;
+        if (!taclets.contains(t)) {
+            taclets = taclets.add(t);
+        }
     }
 
     private void addSort(Sort s) {
@@ -92,38 +99,38 @@ public class InfFlowProofSymbols {
     public void add(Object symb) {
         assert symb != null;
         if (symb instanceof Term) {
-            Term t = (Term)symb;
+            final Term t = (Term)symb;
             addTerm(t);
         }
-        if (symb instanceof Taclet) {
-            Taclet t = (Taclet)symb;
-            addTaclet(t);
-        }
         if (symb instanceof Sort) {
-            Sort s = (Sort)symb;
+            final Sort s = (Sort)symb;
             addSort(s);
         }
+        if (symb instanceof SortedOperator) {
+            final SortedOperator s = (SortedOperator)symb;
+            addSort(s.sort());
+        }
         if (symb instanceof Function) {
-            Function f = (Function)symb;
+            final Function f = (Function)symb;
             addFunction(f);
         }
-        if (symb instanceof SchemaVariable) {
-            SchemaVariable sv = (SchemaVariable)symb;
-            addSchemaVariable(sv);
-        }
         if (symb instanceof ProgramVariable) {
-            ProgramVariable pv = (ProgramVariable)symb;
+            final ProgramVariable pv = (ProgramVariable)symb;
             addProgramVariable(pv);
         }
-        if (symb instanceof SortedOperator) {
-            SortedOperator s = (SortedOperator)symb;
-            addSort(s.sort());
+        if (symb instanceof SchemaVariable) {
+            final SchemaVariable sv = (SchemaVariable)symb;
+            addSchemaVariable(sv);
+        }
+        if (symb instanceof Taclet) {
+            final Taclet t = (Taclet)symb;
+            addTaclet(t);
         }
     }
 
     public void add(ImmutableList<?> symbs) {
         assert symbs != null;
-        for (Object symb: symbs) {
+        for (final Object symb: symbs) {
             add(symb);
         }
     }
@@ -134,7 +141,7 @@ public class InfFlowProofSymbols {
 
     private LinkedList<Sort> ensureRightOrderOfSorts(ImmutableSet<Sort> s){
         LinkedList<TreeSet<Sort>> sortContainers = new LinkedList<TreeSet<Sort>>();
-        for (Sort sort: s) {
+        for (final Sort sort: s) {
             boolean added = false;
             for (TreeSet<Sort> container : sortContainers) {
                 if (container.add(sort)) {
@@ -160,7 +167,7 @@ public class InfFlowProofSymbols {
             }
         }
         LinkedList<Sort> sorts = new LinkedList<Sort>();
-        for (TreeSet<Sort> container : sortContainers) {
+        for (final TreeSet<Sort> container : sortContainers) {
             sorts.addAll(container);
         }
         return sorts;
@@ -182,16 +189,9 @@ public class InfFlowProofSymbols {
         return schemaVariables;
     }
 
-    private void addTaclet(Taclet t) {
-        assert t != null;
-        if (!taclets.contains(t)) {
-            taclets = taclets.add(t);
-        }
-    }
-
     private ImmutableSet<Taclet> getTaclets() {
         ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-        for (Taclet t: taclets) {
+        for (final Taclet t: taclets) {
             res = res.add(t);
         }
         return res;
@@ -204,20 +204,20 @@ public class InfFlowProofSymbols {
 
         StringBuffer result = new StringBuffer();
         result.append("\n\n\\sorts{\n");
-        LinkedList<Sort> sorts = ensureRightOrderOfSorts(getSorts());
-        for (Sort sort: sorts) {
+        final LinkedList<Sort> sorts = ensureRightOrderOfSorts(getSorts());
+        for (final Sort sort: sorts) {
             result.append(sort.name());
             if (!sort.extendsSorts().isEmpty()) {
                 String res = "\\extends ";
                 boolean extendsAtLeastOneSort = false;
-                for (Sort sortParent : sort.extendsSorts()) {
+                for (final Sort sortParent : sort.extendsSorts()) {
                     if (sortParent != Sort.ANY) {
                         res += sortParent.name() + ", ";
                         extendsAtLeastOneSort = true;
                     }
                 }
                 if (extendsAtLeastOneSort) {
-                    int index = res.lastIndexOf(", ");
+                    final int index = res.lastIndexOf(", ");
                     res = res.substring(0,index == -1 ? res.length() : index);
                     result.append(res);
                 }
@@ -234,7 +234,7 @@ public class InfFlowProofSymbols {
 
         StringBuffer result = new StringBuffer();
         result.append("}\n\n\\predicates{\n");
-        for (Function pred: getPredicates()) {
+        for (final Function pred: getPredicates()) {
             result.append(pred.name());
             String s = "";
             for (int i = 0; i < pred.arity(); i++) {
@@ -255,7 +255,7 @@ public class InfFlowProofSymbols {
 
         StringBuffer result = new StringBuffer();
         result.append("}\n\n\\functions{\n");
-        for (Function f: getFunctions()) {
+        for (final Function f: getFunctions()) {
             result.append(f.sort().name() + " ");
             result.append(f.name());
             String s = "";
@@ -277,7 +277,7 @@ public class InfFlowProofSymbols {
 
         StringBuffer result = new StringBuffer();
         result.append("}\n\n\\programVariables{\n");
-        for (ProgramVariable pv: getProgramVariables()) {
+        for (final ProgramVariable pv: getProgramVariables()) {
             result.append(pv.sort().name() + " ");
             result.append(pv.name());
             result.append(";\n");
@@ -294,8 +294,8 @@ public class InfFlowProofSymbols {
 
         StringBuffer result = new StringBuffer();
         result.append("\\schemaVariables{\n");
-        for (SchemaVariable sv: getSchemaVariables()) {
-            String prefix = sv instanceof FormulaSV ? "\\formula " :
+        for (final SchemaVariable sv: getSchemaVariables()) {
+            final String prefix = sv instanceof FormulaSV ? "\\formula " :
                 sv instanceof TermSV? "\\term " : "\\variables ";
             result.append(prefix);
             result.append(sv.sort().name() + " ");
@@ -317,14 +317,14 @@ public class InfFlowProofSymbols {
         StringBuffer buffer = new StringBuffer();
 
         buffer.append("\\rules{");
-        for (Taclet taclet : getTaclets()) {
+        for (final Taclet taclet : getTaclets()) {
             buffer.append("\n\n");
 
             info = new NotationInfo();
             backend = new StringBackend(80);
             printer = new LogicPrinter(new ProgramPrinter(),info, backend,null,true);
             printer.printTaclet(taclet);
-            StringBuffer t = new StringBuffer(backend.getString()+";");
+            final StringBuffer t = new StringBuffer(backend.getString()+";");
             buffer.append(t);
         }
         buffer.append("\n}");

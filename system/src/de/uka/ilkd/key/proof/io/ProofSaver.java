@@ -49,7 +49,6 @@ import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
@@ -77,9 +76,9 @@ public class ProofSaver {
    final protected String filename;
    final protected Proof proof;
    final protected String internalVersion;
-   
+
    LogicPrinter printer;
-   
+
    public ProofSaver(Proof proof, String filename, String internalVersion) {
       //this.main = main;
       //this.mediator = main.mediator();
@@ -110,25 +109,24 @@ public class ProofSaver {
    public String writeSettings(ProofSettings ps){
     	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
    }
-   
+
    public String save() throws IOException {
       return save(new FileOutputStream(filename));
    }
-   
+
    public String save(OutputStream out) throws IOException {
       String errorMsg = null;
       PrintWriter ps = null;
       
       try {
           ps = new PrintWriter(out, true);
-          Services services = proof.getServices();
-          SpecificationRepository specRepos = services.getSpecificationRepository();
-          ProofOblInput po = specRepos.getProofOblInput(proof);
-          printer = createLogicPrinter(services, false);
+          final ProofOblInput po =
+                  proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+          printer = createLogicPrinter(proof.getServices(), false);
 
           //settings
-          StrategySettings strategySettings = proof.getSettings().getStrategySettings();
-          StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
+          final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
+          final StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
           if (po instanceof InfFlowRelatedPO) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
@@ -168,7 +166,7 @@ public class ProofSaver {
                   ((IPersistablePO)po).fillSaveProperties(properties);
                   ps.print(InfFlowContractPO.printSymbols());
               }
-              Sequent problemSeq = proof.root().sequent();
+              final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");
               printer.printSemisequent(problemSeq.succedent());
               ps.println(printer.result());
@@ -205,8 +203,7 @@ public class ProofSaver {
       }	  
       return errorMsg; // null if success
    }
-   
- 
+
 
    /** Searches in the header for absolute paths to Java files and tries to replace them
     * by paths relative to the proof file to be saved.
@@ -303,7 +300,7 @@ public class ProofSaver {
          userInteraction2Proof(node, tree);
          tree.append(")\n");
       }      
-        
+
       if (appliedRuleApp instanceof IBuiltInRuleApp) {
         tree.append(prefix); 
       	tree.append("(builtin \"");
@@ -321,10 +318,10 @@ public class ProofSaver {
                             proof.env().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
-            
+
             assert ruleJusti instanceof RuleJustificationBySpec : 
                 "Please consult bug #1111 if this fails.";
-            
+
             RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
             tree.append(" (contract \"");
             tree.append(ruleJustiBySpec.getSpec().getName());
@@ -337,7 +334,7 @@ public class ProofSaver {
 
 
    private StringBuffer collectProof(Node node, String prefix, 
-                                     StringBuffer tree) {       
+                                     StringBuffer tree) {
 
       printSingleNode(node, prefix, tree);
       Iterator<Node> childrenIt = null;
@@ -347,7 +344,6 @@ public class ProofSaver {
           node = childrenIt.next();
           printSingleNode(node, prefix, tree);
       }
-
 
       if (node.childrenCount() == 0) return tree;
 
@@ -373,7 +369,7 @@ public class ProofSaver {
       return tree;
    }
 
-  
+
    private void userInteraction2Proof(Node node, StringBuffer tree) {
        if (node.getNodeInfo().getInteractiveRuleApplication()) 
            tree.append(" (userinteraction)");
@@ -394,7 +390,6 @@ public class ProofSaver {
                 posInTerm2Proof(pos.posInTerm());
     }
 
-   
 
    public String posInTerm2Proof(PosInTerm pos) {
       if (pos == PosInTerm.TOP_LEVEL) return "";
@@ -404,8 +399,6 @@ public class ProofSaver {
       s = s + "\")";
       return s;
    }
-   
-   
 
 
    public String getInteresting(SVInstantiations inst) {
@@ -445,7 +438,7 @@ public class ProofSaver {
       
       return s;
    }
-   
+
 
    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
       String s ="";
@@ -468,8 +461,8 @@ public class ProofSaver {
       
         return s;
     }
-   
-   
+
+
    public String builtinRuleIfInsts(Node node, 
 	   			    ImmutableList<PosInOccurrence> ifInsts) {
        String s = "";

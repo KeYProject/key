@@ -15,9 +15,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
@@ -73,19 +71,19 @@ public class BlockExecutionPO extends AbstractOperationPO
         final Term pre = TB.and(freePre, contractPre);
 
         // symbolic execution
-        Term symExec =
+        final Term symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
 
         // final symbolic execution term
-        Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
-                                            TB.not(TB.and(pre, symExec)));
+        final Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
+                                                  TB.not(TB.and(pre, symExec)));
 
         // register final term
         assignPOTerms(finalTerm);
 
         // add class axioms
-        Proof initiatingProof = initiatingGoal.proof();
-        AbstractOperationPO initatingPO =
+        final Proof initiatingProof = initiatingGoal.proof();
+        final AbstractOperationPO initatingPO =
                 (AbstractOperationPO) services.getSpecificationRepository()
                                                     .getPOForProof(initiatingProof);
         taclets = initatingPO.getInitialTaclets();
@@ -96,7 +94,7 @@ public class BlockExecutionPO extends AbstractOperationPO
         if (!(po instanceof BlockExecutionPO)) {
             return false;
         }
-        BlockExecutionPO cPO = (BlockExecutionPO) po;
+        final BlockExecutionPO cPO = (BlockExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -178,29 +176,6 @@ public class BlockExecutionPO extends AbstractOperationPO
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
         properties.setProperty("Non-interference contract", contract.getUniqueName());
-    }
-
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * <p/>
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig,
-                                             Properties properties) throws IOException {
-        String contractName = properties.getProperty("Non-interference contract");
-        SpecificationRepository specs =
-                initConfig.getServices().getSpecificationRepository();
-        final Contract contract = specs.getContractByName(contractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + contractName);
-        } else {
-            ProofOblInput po = new InfFlowContractPO(initConfig, null);
-            return new LoadedPOContainer(po, 0);
-        }
     }
 
 

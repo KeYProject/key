@@ -13,13 +13,11 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import java.io.IOException;
@@ -54,7 +52,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         this.contract = contract;
 
         // generate proof obligation variables
-        IProgramMethod pm = contract.getTarget();
+        final IProgramMethod pm = contract.getTarget();
         symbExecVars =
                 new ProofObligationVars(pm, contract.getKJT(), services,
                                         false, contract == null);
@@ -68,17 +66,17 @@ public class InfFlowContractPO extends AbstractOperationPO
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
-        Term selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        Term post =
+        final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        Term finalTerm = TB.imp(selfComposedExec, post);
+        final Term finalTerm = TB.imp(selfComposedExec, post);
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
         collectClassAxioms(contract.getKJT());
 
-        for (NoPosTacletApp t: taclets) {
+        for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
                 addSymbol(t.taclet());
             }
@@ -111,7 +109,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         if (!(po instanceof InfFlowContractPO)) {
             return false;
         }
-        InfFlowContractPO cPO = (InfFlowContractPO) po;
+        final InfFlowContractPO cPO = (InfFlowContractPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -191,28 +189,6 @@ public class InfFlowContractPO extends AbstractOperationPO
     }
 
 
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * <p/>
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig,
-                                             Properties properties) throws IOException {
-        String contractName = properties.getProperty("Non-interference contract");
-        SpecificationRepository specs =
-                initConfig.getServices().getSpecificationRepository();
-        final Contract contract = specs.getContractByName(contractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + contractName);
-        } else {
-            ProofOblInput po = contract.createProofObl(initConfig);
-            return new LoadedPOContainer(po, 0);
-        }
-    }
-
     private static InfFlowProofSymbols symbols() {
         if (ifSymbols == null) {
             ifSymbols = new InfFlowProofSymbols();
@@ -275,11 +251,11 @@ public class InfFlowContractPO extends AbstractOperationPO
 
 
         private void linkSymbExecVarsToCopies(ProofObligationVars symbExecVars) {
-            Iterator<Term> c1It = c1.termList.iterator();
-            Iterator<Term> c2It = c2.termList.iterator();
-            for (Term symbTerm : symbExecVars.termList) {
-                Term c1Term = c1It.next();
-                Term c2Term = c2It.next();
+            final Iterator<Term> c1It = c1.termList.iterator();
+            final Iterator<Term> c2It = c2.termList.iterator();
+            for (final Term symbTerm : symbExecVars.termList) {
+                final Term c1Term = c1It.next();
+                final Term c2Term = c2It.next();
                 if (symbTerm != null) {
                     map1.put(symbTerm, c1Term);
                     map2.put(symbTerm, c2Term);
