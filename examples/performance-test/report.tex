@@ -1,5 +1,8 @@
 \documentclass[a4paper]{article}
 
+\usepackage{tikz}
+\usepackage{amssymb}
+
 \newcommand\KeY{Ke\kern-.1emY}
 
 \title{\KeY\ Performance Test Report}
@@ -7,7 +10,9 @@
 
 \begin{document}
 
-Explanation of test series
+\maketitle
+
+\section{Test Series}
 \begin{itemize}
   \item Inc: increase just one field 
   \item Inc2: alternatively increase two fields
@@ -18,12 +23,91 @@ Explanation of test series
 		a model field (static depends clause)
 \end{itemize}
 
+\section{Empirical Results}
 \subsection{Basic Computation Time Growth}
 Computation time grows at least quadratically in the
 size of the input program.
 In \texttt{Inc}, the number of proof steps grows
 exactly linear, but computation times grows (effectively) linear in the number of proof steps.
 
+Proof size vs.\ computation time (in seconds):\\
+\begin{tikzpicture}
+  % grid, labels
+  \draw[->] (0,-1) -- (7,-1);
+  \draw[->] (0,-1) -- (0,4.5);
+  \foreach \x in {0,1,2,3,4,5,6} {
+    \draw (\x,-1) -- (\x,-1.1);
+    \node at (\x,-1.5) {$10^{\x}$};
+  }
+  \foreach \y in {-1,0,1,2,3,4} {
+    \draw (0,\y) -- (-.1,\y);
+    \node at (-.5,\y) {$10^{\y}$};
+  }
+
+  % data
+  \node at (2.33,-.22) {$\bullet$};
+  \node at (2.59,-.52) {$\bullet$};
+  \node at (3.24,.26) {$\bullet$};
+  \node at (3.54,.61) {$\bullet$};
+  \node at (4.23,1.6) {$\bullet$};
+  \node at (4.53,2.03) {$\bullet$};
+  \node at (4.83,2.67) {$\bullet$};
+  \node at (5,3.16) {$\bullet$};
+  \node at (5.23,3.662) {$\bullet$};
+
+  \node at (3.143,1.503) {\textcolor{blue}{$\diamond$}};
+
+  % extrapolate linear vector
+  \draw[color=red] (2.7,-.8) -- (5.4,3.6);
+\end{tikzpicture}
+
+Comparison values: TPTP PUZ031 (\textcolor{blue}{$\diamond$})
+
+\subsection{Comparison of Framing Techniques}
+
+\begin{itemize}
+  \item footprint is a model field (static dependency) 
+	[\textcolor{green}{$\bullet$}]
+  \item footprint is a ghost field (dynamic dependency)
+	[\textcolor{blue}{$\ast$}]
+  \item footprint is a model field (dynamic dependency)
+	[\textcolor{red}{$\diamond$}]
+\end{itemize}
+
+Problem size (statements) vs.\ time (seconds):\\
+\begin{tikzpicture}
+  % grid, labels
+  \draw[->] (0,-1) -- (10.5,-1);
+  \draw[->] (0,-1) -- (0,4);
+  \foreach \x in {1,2,3,4,5,6,7,8,9,10} {
+    \draw (\x,-1) -- (\x,-1.1);
+    \node at (\x,-1.5) {${\x}$};
+  }
+  \foreach \y in {-1,0,1,2,3} {
+    \draw (0,\y) -- (-.1,\y);
+    \node at (-.5,\y) {$10^{\y}$};
+  }
+
+  % data
+  \node at (1,.119) {\textcolor{red}{$\diamond$}};
+  \node at (2,.034) {\textcolor{red}{$\diamond$}};
+  \node at (4,.99) {\textcolor{red}{$\diamond$}};
+
+  \node at (1,-.107) {\textcolor{green}{$\bullet$}};
+  \node at (2,-.206) {\textcolor{green}{$\bullet$}};
+  \node at (4,.131) {\textcolor{green}{$\bullet$}};
+  \node at (8,1.661) {\textcolor{green}{$\bullet$}};
+  \node at (10,2.847) {\textcolor{green}{$\bullet$}};
+
+  \node at (1,.027) {\textcolor{blue}{$\ast$}};
+  \node at (2,-.111) {\textcolor{blue}{$\ast$}};
+  \node at (4,.001) {\textcolor{blue}{$\ast$}};
+  \node at (8,1.32) {\textcolor{blue}{$\ast$}};
+  \node at (10,2.12) {\textcolor{blue}{$\ast$}};
+\end{tikzpicture}
+
+
+\section{Overall Complexity}
 \begin{tabular}{|l|l|l|l|l|} \hline
 Test & Heap & Seq & Steps & Time \\ \hline
 \texttt{Inc}& $\Theta(1)$ & $\Theta(1)$ & $\Theta(n)$ & $\Omega(n^2)$ \\
@@ -31,5 +115,6 @@ Test & Heap & Seq & Steps & Time \\ \hline
 \texttt{Contract} & $\Theta(1)$ & $\Theta(n)$ 
 	& $\Omega(n^2)$ & $\Omega(n^4)$ \\
 \texttt{ModelField} & $\Omega(2^n)$ & ? & ? & ? \\
+\hline
 \end{tabular}
 \end{document}
