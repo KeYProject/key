@@ -1022,11 +1022,14 @@ public class Proof implements Named {
             }
         }
         
-        res.add(new Pair<String, String>("Nodes", ""+nodes));
-        res.add(new Pair<String, String>("Branches", ""+branches));
+        final String nodeString = EnhancedStringBuffer.format(nodes).toString();
+        res.add(new Pair<String, String>("Nodes", nodeString));
+        res.add(new Pair<String, String>("Branches", 
+                EnhancedStringBuffer.format(branches).toString()));
         res.add(new Pair<String, String>("Interactive steps", ""+interactive));
         final long time = getAutoModeTime();
-        res.add(new Pair<String, String>("Automode time", EnhancedStringBuffer.formatTime(time).toString()));
+        res.add(new Pair<String, String>("Automode time", 
+                EnhancedStringBuffer.formatTime(time).toString()));
         if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
         final String avgTime = ""+(time/nodes)+"."+((time*10/nodes)%10);
         res.add(new Pair<String, String>("Avg. time per step", ""+avgTime+"ms"));
@@ -1037,7 +1040,8 @@ public class Proof implements Named {
         res.add(new Pair<String, String>("Dependency Contract apps", ""+dep));
         res.add(new Pair<String, String>("Operation Contract apps", ""+contr));
         res.add(new Pair<String, String>("Loop invariant apps", ""+inv));
-        res.add(new Pair<String, String>("Total rule apps", ""+(nodes+ossCaptured)));
+        res.add(new Pair<String, String>("Total rule apps", 
+                EnhancedStringBuffer.format(nodes+ossCaptured).toString()));
         
         return res;
     }

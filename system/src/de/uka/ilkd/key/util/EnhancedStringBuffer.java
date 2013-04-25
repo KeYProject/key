@@ -26,16 +26,21 @@ public class EnhancedStringBuffer
         sb = new StringBuffer();
     }
     
+    public EnhancedStringBuffer(int capacity){
+        sb = new StringBuffer(capacity);
+    }
+    
     public EnhancedStringBuffer(StringBuffer buffer) {
         sb = buffer;
     }
     
-    public EnhancedStringBuffer(String proto){
+    public EnhancedStringBuffer(CharSequence proto){
         sb = new StringBuffer(proto);
     }
     
     public EnhancedStringBuffer(char singleton){
-        sb = new StringBuffer(singleton);
+        sb = new StringBuffer();
+        sb.append(singleton);
     }
     
     public EnhancedStringBuffer append (CharSequence s) {
@@ -57,6 +62,10 @@ public class EnhancedStringBuffer
         return sb.charAt(pos);
     }
     
+    public int length () {
+        return sb.length();
+    }
+    
     public EnhancedStringBuffer prepend (CharSequence s) {
         StringBuffer tmp = sb;
         sb = new StringBuffer(s);
@@ -66,7 +75,8 @@ public class EnhancedStringBuffer
     
     public EnhancedStringBuffer prepend (char c) {
         StringBuffer tmp = sb;
-        sb = new StringBuffer(c);
+        sb = new StringBuffer();
+        sb.append(c);
         sb.append(tmp);
         return this;
     }
@@ -113,7 +123,7 @@ public class EnhancedStringBuffer
             res.prepend(tmp.charAt(i));
             if ((tmp.length()-1-i)%3==2) res.prepend(',');
         }
-        if (res.charAt(0)==',') res.deleteCharAt(0);
+        if (res.length() > 0 && res.charAt(0)==',') res.deleteCharAt(0);
         return res;
     }
     
