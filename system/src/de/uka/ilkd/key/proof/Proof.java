@@ -989,6 +989,7 @@ public class Proof implements Named {
         final NodeIterator it = root().subtreeIterator();
         
         int nodes = 0;
+        int branches = 1;
         int interactive = 0;
         int oss = 0;
         int ossCaptured = 0;
@@ -1000,6 +1001,7 @@ public class Proof implements Named {
         while (it.hasNext()) {
             nodes++;
             final Node node = it.next();
+            branches += node.childrenCount()-1;
 
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 interactive++;
@@ -1021,7 +1023,7 @@ public class Proof implements Named {
         }
         
         res.add(new Pair<String, String>("Nodes", ""+nodes));
-        res.add(new Pair<String, String>("Branches", ""+countBranches()));
+        res.add(new Pair<String, String>("Branches", ""+branches));
         res.add(new Pair<String, String>("Interactive steps", ""+interactive));
         final long time = getAutoModeTime();
         res.add(new Pair<String, String>("Automode time", EnhancedStringBuffer.formatTime(time).toString()));
