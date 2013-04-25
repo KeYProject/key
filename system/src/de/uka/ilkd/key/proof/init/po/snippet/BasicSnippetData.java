@@ -53,7 +53,7 @@ class BasicSnippetData {
     private final EnumMap<Key, Object> contractContents =
             new EnumMap<Key, Object>(Key.class) {
 
-                private static final long serialVersionUID = 1L;
+                private static final long serialVersionUID = -8548805965130100236L;
 
                 @Override
                 public Object put(Key key,

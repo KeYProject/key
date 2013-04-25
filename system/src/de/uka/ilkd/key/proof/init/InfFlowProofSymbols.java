@@ -55,14 +55,12 @@ public class InfFlowProofSymbols {
     }
 
     private void addTaclet(Taclet t) {
-        assert t != null;
         if (!taclets.contains(t)) {
             taclets = taclets.add(t);
         }
     }
 
     private void addSort(Sort s) {
-        assert s != null;
         if (!(s instanceof NullSort) &&
                 !sorts.contains(s)) {
             sorts = sorts.add(s);
@@ -70,7 +68,6 @@ public class InfFlowProofSymbols {
     }
 
     private void addFunction(Function f) {
-        assert f != null;
         if (!functions.contains(f) &&
                 !predicates.contains(f)) {
             if (f.name().toString().startsWith("RELATED_BY") ||
@@ -83,14 +80,12 @@ public class InfFlowProofSymbols {
     }
 
     private void addSchemaVariable(SchemaVariable sv) {
-        assert sv != null;
         if (!schemaVariables.contains(sv)) {
             schemaVariables = schemaVariables.add(sv);
         }
     }
 
     private void addProgramVariable(ProgramVariable pv) {
-        assert pv != null;
         if (!programVariables.contains(pv)) {
             programVariables = programVariables.add(pv);
         }
