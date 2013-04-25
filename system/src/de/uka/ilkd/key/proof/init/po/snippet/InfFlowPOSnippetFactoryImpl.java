@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -38,11 +38,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
                                 Services services) {
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
-        s.addTerms(vars1.termList);
-        s.addTerms(vars2.termList);
-
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
@@ -54,11 +49,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
                                 Services services) {
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
-        s.addTerms(vars1.termList);
-        s.addTerms(vars2.termList);
-
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
@@ -69,11 +59,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
                                 Services services) {
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(invariant.getTarget());
-        s.addTerms(vars1.termList);
-        s.addTerms(vars2.termList);
-
         this.data = new BasicSnippetData(invariant, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
@@ -85,11 +70,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                                 ProofObligationVars vars2,
                                 ExecutionContext context,
                                 Services services) {
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(invariant.getTarget());
-        s.addTerms(vars1.termList);
-        s.addTerms(vars2.termList);
-
         this.data = new BasicSnippetData(invariant, context, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
@@ -131,7 +111,12 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                 throw new UnsupportedOperationException("Unknown factory " +
                          "method for snippet \"" + snippet.name() + ".");
             }
-            return m.produce(data, poVars1, poVars2);
+            Term result = m.produce(data, poVars1, poVars2);
+            InfFlowContractPO.addSymbol(result);
+            InfFlowContractPO.addSymbols(poVars1.termList);
+            InfFlowContractPO.addSymbols(poVars2.termList);
+            InfFlowContractPO.addSymbols(data.origVars.termList);
+            return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " +
                      "snippet \"" + snippet.name() + "threw " +

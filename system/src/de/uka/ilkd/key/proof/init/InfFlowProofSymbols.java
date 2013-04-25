@@ -7,8 +7,6 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
@@ -21,32 +19,39 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
 public class InfFlowProofSymbols {
 
     private ImmutableSet<Sort> sorts
-        = DefaultImmutableSet.<Sort>nil();
+            = DefaultImmutableSet.<Sort>nil();
 
     private ImmutableSet<Function> functions
-        = DefaultImmutableSet.<Function>nil();
+            = DefaultImmutableSet.<Function>nil();
 
     private ImmutableSet<SchemaVariable> schemaVariables
-        = DefaultImmutableSet.<SchemaVariable>nil();
+            = DefaultImmutableSet.<SchemaVariable>nil();
 
     private ImmutableSet<ProgramVariable> programVariables
-    = DefaultImmutableSet.<ProgramVariable>nil();
+            = DefaultImmutableSet.<ProgramVariable>nil();
 
     private ImmutableSet<Function> predicates
-        = DefaultImmutableSet.<Function>nil();
+            = DefaultImmutableSet.<Function>nil();
 
-    private ImmutableSet<NoPosTacletApp> taclets
-        = DefaultImmutableSet.<NoPosTacletApp>nil();
+    private ImmutableSet<Taclet> taclets
+            = DefaultImmutableSet.<Taclet>nil();
 
     public InfFlowProofSymbols() {
+    }
+
+    private void addTerm(Term t) {
+        if (!t.subs().isEmpty()) {
+            for (Term s: t.subs()) {
+                addTerm(s);
+            }
+        }
+        add(t.op());
     }
 
     private void addSort(Sort s) {
@@ -61,7 +66,12 @@ public class InfFlowProofSymbols {
         assert f != null;
         if (!functions.contains(f) &&
                 !predicates.contains(f)) {
-            functions = functions.add(f);
+            if (f.name().toString().startsWith("RELATED_BY") ||
+                    f.name().toString().startsWith("EXECUTION_OF")) {
+                predicates = predicates.add(f);
+            } else {
+                functions = functions.add(f);
+            }
         }
     }
 
@@ -79,15 +89,16 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void addPredicate(Function p) {
-        assert p != null;
-        if (!predicates.contains(p)) {
-            predicates = predicates.add(p);
-        }
-    }
-
-    private void addSymbol(Named symb) {
+    public void add(Object symb) {
         assert symb != null;
+        if (symb instanceof Term) {
+            Term t = (Term)symb;
+            addTerm(t);
+        }
+        if (symb instanceof Taclet) {
+            Taclet t = (Taclet)symb;
+            addTaclet(t);
+        }
         if (symb instanceof Sort) {
             Sort s = (Sort)symb;
             addSort(s);
@@ -110,24 +121,10 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void addSymbols(ImmutableList<Named> ss) {
-        for (Named s: ss) {
-            addSymbol(s);
-        }
-    }
-
-    public void addTerm(Term t) {
-        if (!t.subs().isEmpty()) {
-            for (Term s: t.subs()) {
-                addTerm(s);
-            }
-        }
-        addSymbol(t.op());
-    }
-
-    public void addTerms(ImmutableList<Term> ts) {
-        for (Term t: ts) {
-            addTerm(t);
+    public void add(ImmutableList<?> symbs) {
+        assert symbs != null;
+        for (Object symb: symbs) {
+            add(symb);
         }
     }
 
@@ -185,21 +182,17 @@ public class InfFlowProofSymbols {
         return schemaVariables;
     }
 
-    public void addTaclet(Taclet t, Services services) {
+    private void addTaclet(Taclet t) {
         assert t != null;
-        if (!getTaclets().contains(t)) {
-            NoPosTacletApp app = NoPosTacletApp
-                    .createFixedNoPosTacletApp(t,
-                                               SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                                               services);
-            taclets = taclets.add(app);
+        if (!taclets.contains(t)) {
+            taclets = taclets.add(t);
         }
     }
 
     private ImmutableSet<Taclet> getTaclets() {
         ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-        for (NoPosTacletApp t: taclets) {
-            res = res.add(t.taclet());
+        for (Taclet t: taclets) {
+            res = res.add(t);
         }
         return res;
     }
@@ -293,6 +286,7 @@ public class InfFlowProofSymbols {
         return result.toString();
     }
 
+    @SuppressWarnings("unused")
     private String printSchemaVariables() {
         if (getSchemaVariables().isEmpty()) {
             return "";
@@ -343,7 +337,7 @@ public class InfFlowProofSymbols {
         return buffer.toString();
     }
 
-    public String printProofSymbols() { // TODO: Might need some improvement
+    public String printProofSymbols() {
         StringBuffer result = new StringBuffer();
 
         result.append(printSorts());

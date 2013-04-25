@@ -16,7 +16,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -88,9 +87,6 @@ public final class InfFlowMethodContractTacletBuilder
                 getInformFlowContracts(methodContract.getTarget(), services);
         ImmutableList<Term> contractsApplications =
                 ImmutableSLList.<Term>nil();
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(methodContract.getTarget());
-        s.addTerms(contAppData.termList.append(contAppData2.termList));
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,

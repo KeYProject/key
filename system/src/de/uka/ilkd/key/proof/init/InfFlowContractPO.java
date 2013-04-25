@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,10 +44,13 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     private final IFProofObligationVars ifVars;
 
+    private static InfFlowProofSymbols ifSymbols;
+
 
     public InfFlowContractPO(InitConfig initConfig,
                              InformationFlowContract contract) {
         super(initConfig, contract.getName());
+        ifSymbols = new InfFlowProofSymbols();
         this.contract = contract;
 
         // generate proof obligation variables
@@ -56,13 +60,10 @@ public class InfFlowContractPO extends AbstractOperationPO
                                         false, contract == null);
         assert (symbExecVars.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services, contract == null);
-        specRepos.addInfFlowProofSymbols(pm);
     }
 
     @Override
     public void readProblem() throws ProofInputException {
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
-
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
@@ -71,17 +72,15 @@ public class InfFlowContractPO extends AbstractOperationPO
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        s.addTerm(selfComposedExec);
-        s.addTerm(post);
-        s.addSymbols(services.getNamespaces().programVariables().elements());
+        Term finalTerm = TB.imp(selfComposedExec, post);
 
         // register final term, taclets and collect class axioms
-        assignPOTerms(TB.imp(selfComposedExec, post));
+        assignPOTerms(finalTerm);
         collectClassAxioms(contract.getKJT());
 
         for (NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                s.addTaclet(t.taclet(), services);
+                addSymbol(t.taclet());
             }
         }
 
@@ -94,7 +93,6 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            s.addTaclet(t, services);
         }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
@@ -104,7 +102,6 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            s.addTaclet(t, services);
         }
     }
 
@@ -216,6 +213,26 @@ public class InfFlowContractPO extends AbstractOperationPO
         }
     }
 
+    private static InfFlowProofSymbols symbols() {
+        if (ifSymbols == null) {
+            ifSymbols = new InfFlowProofSymbols();
+        }
+        return ifSymbols;
+    }
+
+    public static void addSymbol(Object o) {
+        assert o != null;
+        symbols().add(o);
+    }
+
+    public static void addSymbols(ImmutableList<?> os) {
+        assert os != null;
+        symbols().add(os);
+    }
+
+    public static String printSymbols() {
+        return symbols().printProofSymbols();
+    }
 
     /**
      * Prepare program and location variables.
@@ -244,6 +261,9 @@ public class InfFlowContractPO extends AbstractOperationPO
             this.c1 = c1;
             this.c2 = c2;
             this.symbExecVars = symbExecVars;
+            addSymbols(c1.termList);
+            addSymbols(c2.termList);
+            addSymbols(symbExecVars.termList);
 
             map1 = new HashMap<Term, Term>();
             map2 = new HashMap<Term, Term>();

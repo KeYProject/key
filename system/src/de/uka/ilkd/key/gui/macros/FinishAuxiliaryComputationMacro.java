@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
@@ -63,15 +62,11 @@ public class FinishAuxiliaryComputationMacro
         Services services = initiatingProof.getServices();
         SpecificationRepository specRepos = services.getSpecificationRepository();
         InfFlowContractPO ifPO = (InfFlowContractPO) specRepos.getPOForProof(initiatingProof);
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(ifPO.getContract().getTarget());
 
         // create and register resulting taclets
         Term result = calculateResultingTerm(proof, ifPO.getIFVars(), services);
         Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
-        s.addTaclet(rwTaclet, services);
-        s.addTerms(ifPO.getIFVars().c1.termList.append(ifPO.getIFVars().c2.termList
-                .append(ifPO.getIFVars().symbExecVars.termList)));
-        s.addTerm(result);
+        InfFlowContractPO.addSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 

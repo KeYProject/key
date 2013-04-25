@@ -44,8 +44,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         }        
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
         
-        final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
-        return prog;
+        return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
 
     private Term buildProgramTerm(BasicSnippetData d,

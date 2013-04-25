@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -279,15 +278,9 @@ public class BlockContractRule implements BuiltInRule {
                 .getStrategySettings().getActiveStrategyProperties()
                 .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-        final ContractPO po
-        = services.getSpecificationRepository()
-                  .getPOForProof(goal.proof());
-
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) ||
-            (po == null && loadedInfFlow)) &&
-            contract.hasModifiesClause() &&
-            contract.getRespects() != null) {
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) || loadedInfFlow) &&
+            contract.hasModifiesClause() && contract.getRespects() != null) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +
@@ -348,10 +341,6 @@ public class BlockContractRule implements BuiltInRule {
             Taclet informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet(true);
 
-            SpecificationRepository specRepos = services.getSpecificationRepository();
-            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(contract.getTarget());
-            s.addTaclet(informationFlowContractApp, services);
-
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
                                                       localInTerms, newLocalIns,
@@ -390,9 +379,6 @@ public class BlockContractRule implements BuiltInRule {
             Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
-            s.addTerm(post);
-            s.addTerms(ifVars.c1.termList.append(ifVars.c2.termList
-                            .append(ifVars.symbExecVars.termList)));
 
             Goal infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
@@ -402,13 +388,11 @@ public class BlockContractRule implements BuiltInRule {
             final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                s.addTaclet(t, services);
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
             final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                s.addTaclet(t, services);
             }
 
             return new InfFlowValidityData(infFlowAssumptions,
@@ -760,9 +744,11 @@ public class BlockContractRule implements BuiltInRule {
 
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable) {
             if (placeholderVariable != null) {
-                Name newName = new Name(TB.newName(services, placeholderVariable.name().toString()));
-                newName = VariableNameProposer.DEFAULT.getNewName(services, newName);
-                LocationVariable newVariable =
+                final Name newName
+                = VariableNameProposer.DEFAULT
+                    .getNewName(services,
+                            new Name(TB.newName(services, placeholderVariable.name().toString())));
+                final LocationVariable newVariable =
                         new LocationVariable(new ProgramElementName(newName.toString()),
                                              placeholderVariable.getKeYJavaType());
                 goal.addProgramVariable(newVariable);

@@ -1266,20 +1266,4 @@ public final class SpecificationRepository {
 	}
 	return result;
     }
-
-    public void addInfFlowProofSymbols(IProgramMethod pm) {
-        assert pm != null;
-        ifSymbolsByTarget.put(pm.getFullName(), new InfFlowProofSymbols());
-    }
-
-
-    public InfFlowProofSymbols getInfFlowProofSymbols(IProgramMethod pm) {
-        assert pm != null;
-        InfFlowProofSymbols result = ifSymbolsByTarget.get(pm.getFullName());
-        if (result == null) {
-            result = new InfFlowProofSymbols();
-            ifSymbolsByTarget.put(pm.getFullName(), result);
-        }
-        return result;
-    }
 }

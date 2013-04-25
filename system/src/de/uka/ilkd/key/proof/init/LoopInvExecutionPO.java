@@ -61,8 +61,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
-
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
@@ -82,8 +80,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // final symbolic execution term
         Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
                                             TB.not(TB.and(inv, symExec)));
-        s.addTerm(symExec);
-        s.addSymbols(services.getNamespaces().programVariables().elements());
 
         // register final term
         assignPOTerms(finalTerm);

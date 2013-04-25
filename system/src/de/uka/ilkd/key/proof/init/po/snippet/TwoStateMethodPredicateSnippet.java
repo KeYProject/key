@@ -14,9 +14,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 
@@ -34,7 +33,6 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        IObserverFunction targetMethod =
                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
        final IProgramMethod pm = (IProgramMethod) targetMethod;
-       final SpecificationRepository specRepos = d.tb.getServices().getSpecificationRepository();
        StatementBlock targetBlock =
                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
        LoopInvariant loopInv =
@@ -42,13 +40,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        String nameString = generatePredicateName(pm, targetBlock, loopInv);
        final Function contApplPred =
                generateContApplPredicate(nameString, poVars.termList, d.tb);
-       InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(pm);
-       s.addPredicate(contApplPred);
-       s.addTerms(poVars.termList);
-       Term term = instantiateContApplPredicate(contApplPred, poVars, d.tb);
-       s.addTerm(term);
+       InfFlowContractPO.addSymbol(contApplPred);
 
-       return term;
+       return instantiateContApplPredicate(contApplPred, poVars, d.tb);
    }
 
 

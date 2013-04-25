@@ -43,8 +43,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -147,11 +145,10 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
-            Name anonFuncName
-            = new Name(TB.newName(services, pv.name().toString()));
-            anonFuncName = VariableNameProposer.DEFAULT.getNewName(services, anonFuncName);
-            final Function anonFunc 
-            = new Function(anonFuncName, pv.sort(), true);
+            final Name anonFuncName
+            = VariableNameProposer.DEFAULT
+                .getNewName(services, new Name(TB.newName(services, pv.name().toString())));
+            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
             if(anonUpdate == null) {
@@ -174,10 +171,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         assert loop_inv != null;
 
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
-        loopHeapName = VariableNameProposer.DEFAULT.getNewName(services, loopHeapName);
+        final Name loopHeapName
+        = VariableNameProposer.DEFAULT
+            .getNewName(services, new Name(TB.newName(services, heap+"_After_LOOP")));
         final Function loopHeapFunc = new Function(loopHeapName,
-                                             heapLDT.targetSort(), true);
+                                                   heapLDT.targetSort(),
+                                                   true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
         final Term loopHeap = TB.func(loopHeapFunc);
         
@@ -325,18 +324,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new IFProofObligationVars(instantiationVars, infFlowData.services, true);
         ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
-        Services services = infFlowData.services;
-        SpecificationRepository specRepos = infFlowData.services.getSpecificationRepository();
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(inv.getTarget());
-
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, infFlowData.services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        s.addTerm(selfComposedExec);
-        s.addTerm(post);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
 
@@ -349,13 +342,11 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            s.addTaclet(t, services);
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            s.addTaclet(t, services);
         }
         
         return infFlowGoal;
@@ -504,11 +495,11 @@ public final class WhileInvariantRule implements BuiltInRule {
                 : TB.tt();
 
         //prepare guard
-        ProgramElementName guardVarName =
-                new ProgramElementName(TB.newName(services, "b"));
-        guardVarName = new ProgramElementName(VariableNameProposer.DEFAULT.getNewName(services, guardVarName).toString());
-        final LocationVariable guardVar = new LocationVariable(guardVarName, 
-                booleanKJT);
+        final String guardVarName
+        = VariableNameProposer.DEFAULT
+            .getNewName(services, new ProgramElementName(TB.newName(services, "b"))).toString();
+        final LocationVariable guardVar =
+                new LocationVariable(new ProgramElementName(guardVarName), booleanKJT);
         services.getNamespaces().programVariables().addSafely(guardVar);        
         final VariableSpecification guardVarSpec 
         = new VariableSpecification(guardVar, 
@@ -551,11 +542,15 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         for(ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName 
-            = TB.newName(services, pv.name().toString() + "Before_" + inst.inv.getName());
-            final LocationVariable pvBeforeLoop 
-            = new LocationVariable(new ProgramElementName(pvBeforeLoopName), 
-                    pv.getKeYJavaType());
+            final ProgramElementName pvBeforeLoopName 
+            = new ProgramElementName(TB.newName(services, pv.name().toString() +
+                                     "Before_" + inst.inv.getName()));
+            LocationVariable pvBeforeLoop =
+                    new LocationVariable(pvBeforeLoopName, pv.getKeYJavaType());
+            final VariableNamer vn = services.getVariableNamer();
+            pvBeforeLoop =
+                    (LocationVariable) vn.rename(pvBeforeLoop, goal,
+                                                 ruleApp.posInOccurrence());
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
             beforeLoopUpdate = TB.parallel(beforeLoopUpdate,
                                            TB.elementary(services,
@@ -589,7 +584,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-          if(TB.strictlyNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+          if (TB.strictlyNothing().equals(m) &&
+                  heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
             }else{
                 fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
@@ -664,18 +660,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
 
-        boolean loadedInfFlow =
+        final boolean loadedInfFlow =
                 services.getProof().getSettings()
                 .getStrategySettings().getActiveStrategyProperties()
                 .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-        final ContractPO po
-        = services.getSpecificationRepository()
-                  .getPOForProof(goal.proof());
-
         if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) ||
-            (po == null && loadedInfFlow)) &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) &&
             inst.inv.getRespects(services) != null) {
             
             assert anonUpdateDatas.size() == 1 : "information flow " +
@@ -725,8 +716,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                     ifInvariantBuilder.buildContractApplPredTerm(true);
             final Taclet informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet(true);
-            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(inst.inv.getTarget());
-            s.addTaclet(informationFlowInvariantApp, services);
 
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
                                           selfTerm, selfAtPost,

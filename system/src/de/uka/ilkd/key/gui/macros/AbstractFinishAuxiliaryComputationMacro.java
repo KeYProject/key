@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -79,6 +80,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
+        InfFlowContractPO.addSymbol(composedStates);
         return composedStates;
 //        return TB.and(TB.or(goalFormulas1), TB.or(goalFormulas2));
     }

@@ -13,7 +13,6 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -74,10 +73,6 @@ public final class InfFlowLoopInvariantTacletBuilder
                                    Services services) {
         LoopInvariant ifContract =
                 services.getSpecificationRepository().getLoopInvariant(loopinvariant.getLoop());
-
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(loopinvariant.getTarget());
-        s.addTerms(contAppData.termList.append(contAppData2.termList));
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,

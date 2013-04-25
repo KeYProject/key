@@ -44,7 +44,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -91,7 +91,7 @@ public class ProofSaver {
 
    public StringBuffer writeLog(Proof p){
     StringBuffer logstr=new StringBuffer();
-    //Advance the Logentries
+    //Advance the Log entries
     if(p.userLog==null)
         p.userLog = new Vector<String>();
     if(p.keyVersionLog==null)
@@ -127,16 +127,22 @@ public class ProofSaver {
           printer = createLogicPrinter(services, false);
 
           //settings
+          StrategySettings strategySettings = proof.getSettings().getStrategySettings();
+          StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
           if (po instanceof InfFlowRelatedPO) {
-              StrategySettings strategySettings =
-                      proof.getSettings().getStrategySettings();
-              StrategyProperties strategyProperties =
-                      strategySettings.getActiveStrategyProperties();
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
+          } else {
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_FALSE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
           }
           ps.println(writeSettings(proof.getSettings()));
+
+          strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                 StrategyProperties.INF_FLOW_CHECK_FALSE);
+          strategySettings.setActiveStrategyProperties(strategyProperties);
 
           //declarations of symbols, sorts
           String header = proof.header();
@@ -160,9 +166,7 @@ public class ProofSaver {
               if (po instanceof InfFlowRelatedPO) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
-                  InfFlowProofSymbols s = specRepos
-                          .getInfFlowProofSymbols(((InfFlowRelatedPO)po).getContract().getTarget());
-                  ps.print(s.printProofSymbols());
+                  ps.print(InfFlowContractPO.printSymbols());
               }
               Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");

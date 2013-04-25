@@ -618,23 +618,6 @@ public class ProofObligationVars {
         return paramVars;
     }
 
-    private static ImmutableList<Term> buildLocalIns(Services services,
-                                                     String postfix,
-                                                     IProgramMethod pm) {
-        ImmutableList<Term> paramVars =
-                TB.var(TB.paramVars(services, "_Before" + postfix, pm, true));
-        register(ops(paramVars, ProgramVariable.class), services);
-        return paramVars;
-    }
-
-    private static ImmutableList<Term> buildLocalOuts(Services services,
-                                                      String postfix,
-                                                      IProgramMethod pm) {
-        ImmutableList<Term> paramVars =
-                TB.var(TB.paramVars(services, "_After" + postfix, pm, true));
-        register(ops(paramVars, ProgramVariable.class), services);
-        return paramVars;
-    }
 
     private static Term buildResultVar(IProgramMethod pm,
                                        Services services,
@@ -661,37 +644,6 @@ public class ProofObligationVars {
         return resultAtPostVar;
     }
 
-    private static Term buildAtPreVar(Term varTerm,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TB.newName(services, varTerm.toString() + "AtPre");
-        LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPreVar, services);
-        Term varAtPre = TB.var(varAtPreVar);
-        return varAtPre;
-    }
-
-    private static Term buildAtPostVar(Term varTerm,
-                                       Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TB.newName(services, varTerm.toString() + "AtPost");
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TB.var(varAtPostVar);
-        return varAtPost;
-    }
 
     private static Term buildHeapVar(String postfix,
                                      Services services) {

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -106,6 +107,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
         }
+        InfFlowContractPO.addSymbol(contractApplPredTerm);
         return contractApplPredTerm;
     }
 
@@ -113,7 +115,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Taclet buildContractApplTaclet(boolean local) {
         ProofObligationVars appData = getProofObligationVars(local);
-        return genInfFlowContractApplTaclet(appData, services, local);
+        Taclet result = genInfFlowContractApplTaclet(appData, services, local);
+        InfFlowContractPO.addSymbol(result);
+        return result;
     }
 
 
