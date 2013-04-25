@@ -66,17 +66,17 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     protected Term calculateResultingTerm(Proof proof,
                                           IFProofObligationVars ifVars,
                                           Services services) {
-        Term[] goalFormulas1 =
+        final Term[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.map1,
                                proof.openGoals(), services);
-        Term[] goalFormulas2 =
+        final Term[] goalFormulas2 =
                 buildExecution(ifVars.c2, ifVars.map2,
                                proof.openGoals(), services);
 
         Term composedStates = TB.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
             for (int j = i; j < goalFormulas2.length; j++) {
-                Term composedState = TB.and(goalFormulas1[i], goalFormulas2[j]);
+                final Term composedState = TB.and(goalFormulas1[i], goalFormulas2[j]);
                 composedStates = TB.or(composedStates, composedState);
             }
         }
@@ -127,11 +127,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Map<ProgramVariable, ProgramVariable> extractProgamVarReplaceMap(
-            Map<Term, Term> replaceMap) {
+    private Map<ProgramVariable, ProgramVariable>
+                        extractProgamVarReplaceMap(Map<Term, Term> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 new HashMap<ProgramVariable, ProgramVariable>();
-        for (Term t : replaceMap.keySet()) {
+        for (final Term t : replaceMap.keySet()) {
             if (t.op() instanceof ProgramVariable) {
                 progVarReplaceMap.put((ProgramVariable) t.op(),
                                       (ProgramVariable) replaceMap.get(t).op());
@@ -144,7 +144,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     private void insertBoundVarsIntoNotReplaceMap(Term term,
                                                   Map<Operator, Boolean> notReplaceMap) {
         if (term.boundVars() != null) {
-            for (QuantifiableVariable bv : term.boundVars()) {
+            for (final QuantifiableVariable bv : term.boundVars()) {
                 notReplaceMap.put(bv, Boolean.TRUE);
             }
         }
@@ -173,50 +173,50 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             return replaceMap.get(term);
         } else if (term.op() instanceof ParsableVariable) {
             assert term.subs().isEmpty();
-            ParsableVariable pv = (ParsableVariable) term.op();
-            Name newName =
+            final ParsableVariable pv = (ParsableVariable) term.op();
+            final Name newName =
                     VariableNameProposer.DEFAULT.getNewName(services,
                                                             new Name(pv.name() +
                                                                      postfix));
-            Operator renamedPv = pv.rename(newName);
+            final Operator renamedPv = pv.rename(newName);
             services.getNamespaces().programVariables().addSafely(renamedPv);
-            Term pvTerm = TermFactory.DEFAULT.createTerm(renamedPv);
+            final Term pvTerm = TermFactory.DEFAULT.createTerm(renamedPv);
             replaceMap.put(term, pvTerm);
             return pvTerm;
 
         } else if (term.op() instanceof Function &&
                    ((Function) term.op()).isSkolemConstant()) {
-            Function f = (Function) term.op();
-            Name newName =
+            final Function f = (Function) term.op();
+            final Name newName =
                     VariableNameProposer.DEFAULT.getNewName(services,
                                                             new Name(f.name() +
                                                                      postfix));
-            Function renamedF = f.rename(newName);
+            final Function renamedF = f.rename(newName);
             services.getNamespaces().functions().addSafely(renamedF);
-            Term fTerm =
+            final Term fTerm =
                     TermFactory.DEFAULT.createTerm(renamedF);
             replaceMap.put(term, fTerm);
             return fTerm;
         } else if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate u = (ElementaryUpdate) term.op();
-            Term lhsTerm = TB.var(u.lhs());
-            Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm,
-                                                            replaceMap,
-                                                            notReplaceMap,
-                                                            postfix,
-                                                            services);
-            Term[] renamedSubs =
+            final ElementaryUpdate u = (ElementaryUpdate) term.op();
+            final Term lhsTerm = TB.var(u.lhs());
+            final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm,
+                                                                  replaceMap,
+                                                                  notReplaceMap,
+                                                                  postfix,
+                                                                  services);
+            final Term[] renamedSubs =
                     renameSubs(term, replaceMap, notReplaceMap, postfix, services);
-            ElementaryUpdate renamedU =
+            final ElementaryUpdate renamedU =
                     ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
-            Term uTerm = TermFactory.DEFAULT.createTerm(renamedU, renamedSubs);
+            final Term uTerm = TermFactory.DEFAULT.createTerm(renamedU, renamedSubs);
             replaceMap.put(term, uTerm);
             return uTerm;
         } else {
             insertBoundVarsIntoNotReplaceMap(term, notReplaceMap);
-            Term[] renamedSubs =
+            final Term[] renamedSubs =
                     renameSubs(term, replaceMap, notReplaceMap, postfix, services);
-            Term renamedTerm =
+            final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
                                                    term.boundVars(),
                                                    term.javaBlock());
@@ -226,14 +226,12 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private JavaBlock renameJavaBlock(
-            Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
-            Term term,
-            Services services) {
-        ProgVarReplaceVisitor paramRepl =
+    private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
+                                      Term term, Services services) {
+        final ProgVarReplaceVisitor paramRepl =
                 new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
         paramRepl.start();
-        JavaBlock renamedJavaBlock =
+        final JavaBlock renamedJavaBlock =
                 JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
         return renamedJavaBlock;
     }
@@ -242,7 +240,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     private Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
         Term[] result = new Term[symbExecGoals.size()];
         int i = 0;
-        for (Goal symbExecGoal : symbExecGoals) {
+        for (final Goal symbExecGoal : symbExecGoals) {
             result[i] = buildFormulaFromGoal(symbExecGoal);
             i++;
         }
@@ -252,10 +250,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     private Term buildFormulaFromGoal(Goal symbExecGoal) {
         Term result = TB.tt();
-        for (SequentFormula f : symbExecGoal.sequent().antecedent()) {
+        for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
             result = TB.and(result, f.formula());
         }
-        for (SequentFormula f : symbExecGoal.sequent().succedent()) {
+        for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
             result = TB.and(result, TB.not(f.formula()));
         }
         return result;
@@ -283,11 +281,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                    Map<Operator, Boolean> notReplaceMap,
                                                    String postfix,
                                                    Services services) {
-        Term temp = renameFormulasWithoutPrograms(term, replaceMap,
-                                                  notReplaceMap,
-                                                  postfix,
-                                                  services);
-        Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
+        final Term temp = renameFormulasWithoutPrograms(term, replaceMap,
+                                                        notReplaceMap,
+                                                        postfix,
+                                                        services);
+        final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 extractProgamVarReplaceMap(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap, notReplaceMap,
                                         postfix, services);
@@ -300,14 +298,14 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                             String postfix,
                                             Services services) {
         if (term != null) {
-            JavaBlock renamedJavaBlock =
+            final JavaBlock renamedJavaBlock =
                     renameJavaBlock(progVarReplaceMap, term, services);
-            Term[] appliedSubs =
+            final Term[] appliedSubs =
                     applyProgramRenamingsToSubs(term, progVarReplaceMap,
                                                 notReplaceMap, postfix,
                                                 services);
 
-            Term renamedTerm =
+            final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), appliedSubs,
                                                    term.boundVars(),
                                                    renamedJavaBlock);
@@ -340,12 +338,12 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     void addContractApplicationTaclets(Goal initiatingGoal,
                                        Proof symbExecProof) {
-        ImmutableList<Goal> openGoals = symbExecProof.openGoals();
-        for (Goal openGoal : openGoals) {
-            ImmutableSet<NoPosTacletApp> ruleApps =
+        final ImmutableList<Goal> openGoals = symbExecProof.openGoals();
+        for (final Goal openGoal : openGoals) {
+            final ImmutableSet<NoPosTacletApp> ruleApps =
                     openGoal.indexOfTaclets().allNoPosTacletApps();
-            for (NoPosTacletApp ruleApp : ruleApps) {
-                Taclet t = ruleApp.taclet();
+            for (final NoPosTacletApp ruleApp : ruleApps) {
+                final Taclet t = ruleApp.taclet();
                 if (t.getSurviveSymbExec()) {
                     initiatingGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
                 }
@@ -364,14 +362,14 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                             .name()
                                             .toString()).toString();
 
-        Pair<Boolean, Pair<File, Boolean>> res =
+        final Pair<Boolean, Pair<File, Boolean>> res =
                 jFC.showSaveDialog(mainWindow, defaultName + ".proof");
-        boolean saved = res.first;
-        boolean newDir = res.second.second;
+        final boolean saved = res.first;
+        final boolean newDir = res.second.second;
         if (saved) {
             mainWindow.saveProof(jFC.getSelectedFile());
         } else if (newDir) {
-            File dir = res.second.first;
+            final File dir = res.second.first;
             if (!dir.delete()) {
                 dir.deleteOnExit();
             }

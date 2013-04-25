@@ -59,7 +59,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                    new Sort[termList.size()];
 
            int i = 0;
-           for (Term arg : termList) {
+           for (final Term arg : termList) {
                argSorts[i] = arg.sort();
                i++;
            }
@@ -74,12 +74,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
    private Term instantiateContApplPredicate(Function pred,
                                              ProofObligationVars appData,
                                              TermBuilder.Serviced tb) {
-       Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+       final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
        pred.argSorts().toArray(predArgSorts);
        Term[] predArgs = new Term[predArgSorts.length];
 
        int i = 0;
-       for (Term arg : appData.termList) {
+       for (final Term arg : appData.termList) {
            predArgs[i] = arg;
            i++;
        }

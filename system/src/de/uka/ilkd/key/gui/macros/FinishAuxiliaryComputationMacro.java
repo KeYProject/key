@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -39,9 +38,9 @@ public class FinishAuxiliaryComputationMacro
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
-        Proof proof = mediator.getSelectedProof();
-        Services services = proof.getServices();
-        ContractPO poForProof =
+        final Proof proof = mediator.getSelectedProof();
+        final Services services = proof.getServices();
+        final ContractPO poForProof =
                 services.getSpecificationRepository().getPOForProof(proof);
         return poForProof instanceof SymbolicExecutionPO;
     }
@@ -50,22 +49,21 @@ public class FinishAuxiliaryComputationMacro
     @Override
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc) {
-        Proof proof = mediator.getSelectedProof();
-        ContractPO poForProof =
+        final Proof proof = mediator.getSelectedProof();
+        final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof SymbolicExecutionPO)) {
             return;
         }
-        SymbolicExecutionPO po = (SymbolicExecutionPO) poForProof;
-        Goal initiatingGoal = po.getInitiatingGoal();
-        Proof initiatingProof = initiatingGoal.proof();
-        Services services = initiatingProof.getServices();
-        SpecificationRepository specRepos = services.getSpecificationRepository();
-        InfFlowContractPO ifPO = (InfFlowContractPO) specRepos.getPOForProof(initiatingProof);
+        final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
+        final Proof initiatingProof = initiatingGoal.proof();
+        final Services services = initiatingProof.getServices();
+        final InfFlowContractPO ifPO =
+                (InfFlowContractPO) services.getSpecificationRepository().getPOForProof(initiatingProof);
 
         // create and register resulting taclets
-        Term result = calculateResultingTerm(proof, ifPO.getIFVars(), services);
-        Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
+        final Term result = calculateResultingTerm(proof, ifPO.getIFVars(), services);
+        final Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
         InfFlowContractPO.addSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
@@ -80,26 +78,26 @@ public class FinishAuxiliaryComputationMacro
     private Taclet generateRewriteTaclet(Term replacewith,
                                          InfFlowContractPO infPO,
                                          Services services) {
-        Name tacletName =
+        final Name tacletName =
                 MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
                                             infPO.getContract().getTarget().getFullName());
         i++;
 
         // create find term
-        IFProofObligationVars ifVars = infPO.getIFVars();
+        final IFProofObligationVars ifVars = infPO.getIFVars();
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(infPO.getContract(),
                                                    ifVars.c1, ifVars.c2,
                                                    services);
-        Term find =
+        final Term find =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         //create taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(find);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
-        RewriteTacletGoalTemplate goal =
+        final RewriteTacletGoalTemplate goal =
                 new RewriteTacletGoalTemplate(replacewith);
         tacletBuilder.addTacletGoalTemplate(goal);
         tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));

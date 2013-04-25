@@ -21,7 +21,7 @@ class MethodCallWithPreconditionPredicateSnippet
     String generatePredicateName(IProgramMethod pm,
                                  StatementBlock block,
                                  LoopInvariant loopInv) {
-        String nameString =
+        final String nameString =
                 MiscTools.toValidTacletName("EXECUTION_OF_" + pm.getFullName() +
                                             "_WITH_PRE").toString();
         return nameString;
