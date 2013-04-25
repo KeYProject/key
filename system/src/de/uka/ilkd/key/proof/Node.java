@@ -310,6 +310,21 @@ public class Node implements Iterable<Node> {
     public NodeIterator childrenIterator() {
 	return new NodeIterator(children.iterator());
     }
+    
+    private Collection<Node> subtree () {
+        Collection<Node> res = new ArrayList<Node>();
+        res.add(this);
+        for (Node child: this) {
+            res.addAll(child.subtree());
+        }
+        return res;
+    }
+
+    /** returns an iterator for all nodes in the subtree.
+     */
+    public NodeIterator subtreeIterator () {
+        return new NodeIterator(subtree().iterator());
+    }
 
     /** returns number of children */
     public int childrenCount() {
@@ -554,7 +569,7 @@ public class Node implements Iterable<Node> {
 
     // inner iterator class 
     public static class NodeIterator implements Iterator<Node> {
-	private Iterator<Node> it;
+	protected Iterator<Node> it;
 	
 	NodeIterator(Iterator<Node> it) {
 	    this.it=it;
