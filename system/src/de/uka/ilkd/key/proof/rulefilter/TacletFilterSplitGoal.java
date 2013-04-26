@@ -12,16 +12,19 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.rulefilter;
 
-import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 
-/**
- * Interface for objects that represent sets of rules, and which can be used
- * to distinguish different kinds of rules.
- */
-public interface RuleFilter {
-    
-    boolean filter ( Rule rule );
+public class TacletFilterSplitGoal extends TacletFilter {
+	
+	public final static TacletFilterSplitGoal INSTANCE = new TacletFilterSplitGoal ();
+	
+	private TacletFilterSplitGoal () {
+	}
+
+	protected boolean filter(Taclet taclet) {
+		return taclet.goalTemplates().size() > 1;
+	}
 
 }

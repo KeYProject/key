@@ -12,20 +12,25 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.Taclet;
+package de.uka.ilkd.key.proof.rulefilter;
 
-public class TacletFilterCloseGoal extends TacletFilter {
-	
-	public final static TacletFilterCloseGoal INSTANCE = 
-            new TacletFilterCloseGoal ();
-	
-	private TacletFilterCloseGoal () {
-	}
+import java.util.HashSet;
 
-	protected boolean filter(Taclet taclet) {
-		return taclet.goalTemplates().size() == 0;
-	}
+import de.uka.ilkd.key.rule.Rule;
 
+/**
+ * Rule filter that selects taclets which are members of a given explicit set 
+ */
+public class SetRuleFilter implements RuleFilter {
+
+    private HashSet<Rule> set = new HashSet<Rule> ();
+
+    public void addRuleToSet ( Rule rule ) {
+    	set.add(rule);
+    }
+
+    public boolean filter( Rule rule ) {
+        return set.contains ( rule );
+    }
 }

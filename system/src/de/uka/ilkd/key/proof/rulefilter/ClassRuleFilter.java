@@ -12,26 +12,24 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.rulefilter;
 
-import de.uka.ilkd.key.rule.Taclet;
+
+import de.uka.ilkd.key.rule.Rule;
 
 /**
- * Filter that selects taclets that belong to at least one
- * rule set, i.e. taclets that can be applied automatically.
+ * Rule filter that selects taclets which are of a specific class 
  */
-public class AnyRuleSetTacletFilter extends TacletFilter {
+public class ClassRuleFilter implements RuleFilter {
 
-    private AnyRuleSetTacletFilter () {
+    private final Class<?> c;
+    
+    public ClassRuleFilter(Class<?> c) {
+	this.c = c;
     }
+    
 
-    /**
-     * @return true iff <code>taclet</code> should be included in the
-     * result
-     */
-    public boolean filter ( Taclet taclet ) {
-	return !taclet.getRuleSets ().isEmpty();
+    public boolean filter( Rule rule ) {
+        return c.isAssignableFrom(rule.getClass());
     }
-
-    public final static TacletFilter INSTANCE = new AnyRuleSetTacletFilter ();
 }
