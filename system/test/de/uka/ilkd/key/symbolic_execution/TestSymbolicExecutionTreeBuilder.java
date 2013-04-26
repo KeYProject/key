@@ -85,6 +85,52 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testLoopBodyBranchClosed() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed/test/LoopBodyBranchClosed.java", 
+             "LoopBodyBranchClosed", 
+             "deadBody", 
+             null,
+             "examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed/oracle/LoopBodyBranchClosed.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testLoopUsageBranchClosed() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed/test/LoopUsageBranchClosed.java", 
+             "LoopUsageBranchClosed", 
+             "deadCodeAfterLoop", 
+             null,
+             "examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed/oracle/LoopUsageBranchClosed.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/nestedLoopsWithContinue
     * </p>
     * <p>
