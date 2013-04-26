@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 
 public class ProblemLoaderException extends Exception {
