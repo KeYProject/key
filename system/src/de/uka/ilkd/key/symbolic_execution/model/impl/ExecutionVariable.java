@@ -165,7 +165,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          if (lengthValue != null) {
             siteProofCondition = TermBuilder.DF.and(siteProofCondition, lengthValue.getCondition());
          }
-         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); 
+         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
       }
       else {
          sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());

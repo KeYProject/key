@@ -81,6 +81,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -356,12 +358,14 @@ public final class SymbolicExecutionUtil {
     * @param node The original {@link Node} which provides the sequent to extract from.
     * @param additionalConditions Additional conditions to add to the antecedent.
     * @param term The new succedent term.
+    * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
                                                                       Term additionalConditions,
-                                                                      Term term) {
+                                                                      Term term,
+                                                                      boolean keepUpdates) {
       // Make sure that correct parameters are given
       assert node != null;
       assert term != null;
@@ -370,7 +374,9 @@ public final class SymbolicExecutionUtil {
       // Create formula which contains the value interested in.
       Term newTerm = TermBuilder.DF.func(newPredicate, term);
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm);
+      Sequent sequentToProve = keepUpdates ?
+                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm) :
+                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, null);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -480,9 +486,10 @@ public final class SymbolicExecutionUtil {
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
-      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
-      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
-      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF); // Query Treatment: Off
+      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT); // Method Treatment: Contract
+      sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); // Loop Treatment: Invariant
+      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON); // Dependency Contracts: On
+      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON); // Query Treatment: On
       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits 
       starter.setStrategy(sp);
@@ -1578,15 +1585,13 @@ public final class SymbolicExecutionUtil {
         return computeContractRuleAppBranchCondition(parent, node, simplify);
       }
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-         // Use Branch: Invariant + !LoopCondition
-         // Preserves Branch: Invariant + LoopCondition
-         return TermBuilder.DF.tt(); // TODO: Implement real branch condition of loop invariants!
+         return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify);
       }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\"."); 
       }
    }
-   
+
    /**
     * <p>
     * Computes the branch condition of the given {@link Node} which was constructed by a {@link ContractRuleApp}.
@@ -1699,6 +1704,85 @@ public final class SymbolicExecutionUtil {
             // No preconditions available, branchcondition is true
             return TermBuilder.DF.tt();
          }
+      }
+   }
+   
+   /**
+    * <p>
+    * Computes the branch condition of the given {@link Node} which was constructed by a {@link LoopInvariantBuiltInRuleApp}.
+    * </p>
+    * <p>
+    * The branch conditions are:
+    * <ul>
+    *    <li>Preserves Branch: Invariant + LoopCondition</li>
+    *    <li>Use Branch: Invariant + !LoopCondition</li>
+    * </ul>
+    * </p>
+    * @param parent The parent {@link Node} of the given one.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent, 
+                                                                         Node node, 
+                                                                         boolean simplify) throws ProofInputException {
+      // Make sure that a computation is possible
+      if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
+         throw new ProofInputException("Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
+      }
+      // Make sure that branch is supported
+      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      if (childIndex == 1 || childIndex == 2) { // Body Preserves Invariant or Use Case
+         LoopInvariantBuiltInRuleApp app = (LoopInvariantBuiltInRuleApp)parent.getAppliedRuleApp();
+         // Compute invariant (last antecedent formula of the use branch)
+         Services services = parent.proof().getServices();
+         Node useNode = parent.child(2);
+         Semisequent antecedent = useNode.sequent().antecedent();
+         Term invTerm = antecedent.get(antecedent.size() - 1).formula();
+         // Extract loop condition from child
+         Term loopConditionModalityTerm = posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
+         loopConditionModalityTerm = TermBuilder.DF.goBelowUpdates(loopConditionModalityTerm);
+         if (childIndex == 1) { // Body Preserves Invariant
+            if (loopConditionModalityTerm.op() != Junctor.IMP) {
+               throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+            }
+            loopConditionModalityTerm = loopConditionModalityTerm.sub(0);
+         }
+         else { // Use Case
+            if (loopConditionModalityTerm.op() != Modality.BOX) {
+               throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+            }
+            Term sub = loopConditionModalityTerm.sub(0);
+            if (sub.op() != Junctor.IMP) {
+               throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+            }
+            loopConditionModalityTerm = TermBuilder.DF.box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
+         }
+         if (loopConditionModalityTerm.op() != Modality.BOX ||
+             loopConditionModalityTerm.sub(0).op() != Equality.EQUALS ||
+             !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable) ||
+             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ? TermBuilder.DF.TRUE(services) : TermBuilder.DF.FALSE(services))) {
+            throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+         }
+         // Execute modality in a side proof to convert the JavaBlock of the modality into a Term
+         SiteProofVariableValueInput input = createExtractTermSequent(services, parent, null, loopConditionModalityTerm, false);
+         ApplyStrategyInfo info = startSideProof(parent.proof(), input.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+         ImmutableList<Term> results = ImmutableSLList.<Term>nil();
+         for (Goal goal : info.getProof().openGoals()) {
+            Term goalTerm = extractOperatorValue(goal, input.getOperator());
+            results = results.append(goalTerm);
+         }
+         Term loopCondition = TermBuilder.DF.or(results);
+         Term branchCondition = TermBuilder.DF.and(loopCondition, invTerm);
+         // Simplify result if requested
+         if (simplify) {
+            branchCondition = simplify(node.proof(), branchCondition);
+         }
+         return branchCondition;
+      }
+      else {
+         throw new ProofInputException("Branch condition of initially valid check is not supported."); 
       }
    }
 
@@ -2045,7 +2129,13 @@ public final class SymbolicExecutionUtil {
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates) {
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(updates, newSuccedent);
+      Term newSuccedentToProve;
+      if (updates != null) {
+         newSuccedentToProve = TermBuilder.DF.applySequential(updates, newSuccedent);
+      }
+      else {
+         newSuccedentToProve = newSuccedent;
+      }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
