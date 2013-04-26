@@ -41,7 +41,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
      * Displays a JOptionPane informing the user about a closed proof.
      * If available some statistics are displayed as well.
      */
-    public boolean execute(NotificationEvent pcne) {               
+    public synchronized boolean execute(NotificationEvent pcne) {               
         if (pcne instanceof ProofClosedNotificationEvent) {
             Proof proof = ((ProofClosedNotificationEvent)pcne).getProof();
             if (proof != null) {
