@@ -693,7 +693,7 @@ public class InvariantConfigurator {
                         setOK(varErrors,varCols,DEFAULT);
 
                     }
-                } catch (ParserException e) {
+                } catch (Exception e) {
                     setError(varErrors,varCols,DEFAULT,e.getMessage());
                 }
 
