@@ -71,7 +71,7 @@ public class Node implements Iterable<Node> {
 
     public Node(Proof proof) {
 	this.proof = proof;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);        
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();        
         nodeInfo = new NodeInfo(this);
     }
 
@@ -80,7 +80,7 @@ public class Node implements Iterable<Node> {
     public Node(Proof proof, Sequent seq) {
 	this ( proof );
 	this.seq=seq;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
     }
 
 
@@ -94,7 +94,7 @@ public class Node implements Iterable<Node> {
 	this.seq=seq;	
 	this.parent=parent;
 	if (children!=null) {this.children=children;}
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
