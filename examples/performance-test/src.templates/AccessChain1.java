@@ -1,5 +1,5 @@
 class AccessChain1 {
-  AccessChain a;
+  AccessChain1 a;
   int x;
   int y;
 

@@ -1,6 +1,5 @@
 class Inc {
   int x;
-  int y;
 
 
   //@ requires x > 0;
@@ -8,10 +7,5 @@ class Inc {
   void foo () {
     x++;
   }
-
-
-  //@ ensures true;
-  //@ assignable y;
-  void bar () ;
 
 }
