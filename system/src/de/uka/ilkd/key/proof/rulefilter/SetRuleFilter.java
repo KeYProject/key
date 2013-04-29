@@ -12,24 +12,25 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
 
+package de.uka.ilkd.key.proof.rulefilter;
+
+import java.util.HashSet;
 
 import de.uka.ilkd.key.rule.Rule;
 
 /**
- * Rule filter that selects taclets which are of a specific class 
+ * Rule filter that selects taclets which are members of a given explicit set 
  */
-public class ClassRuleFilter implements RuleFilter {
+public class SetRuleFilter implements RuleFilter {
 
-    private final Class<?> c;
-    
-    public ClassRuleFilter(Class<?> c) {
-	this.c = c;
+    private HashSet<Rule> set = new HashSet<Rule> ();
+
+    public void addRuleToSet ( Rule rule ) {
+    	set.add(rule);
     }
-    
 
     public boolean filter( Rule rule ) {
-        return c.isAssignableFrom(rule.getClass());
+        return set.contains ( rule );
     }
 }
