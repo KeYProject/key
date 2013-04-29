@@ -71,6 +71,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -1295,9 +1296,9 @@ public final class SymbolicExecutionUtil {
     * <p>
     * The branch conditions are:
     * <ul>
-    *    <li>Post:    (pre1 | .. | preN)</li>
-    *    <li>ExcPost: (excPre1 | ... | excPreM)</li>
-    *    <li>Pre:     !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
+    *    <li>Post:    caller != null & (pre1 | .. | preN)</li>
+    *    <li>ExcPost: caller != null & (excPre1 | ... | excPreM)</li>
+    *    <li>Pre:     caller != null & !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
     *    <li>NPE:     caller = null</li>
     * </ul>
     * </p>
@@ -1349,24 +1350,92 @@ public final class SymbolicExecutionUtil {
       }
       Term exceptionDefinition = definitions.sub(0);
       // Collect all implications for normal or exceptional preconditions
+      Term result;
       Term implications = workingTerm.sub(1);
       ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
       if (!implicationTerms.isEmpty()) {
-         // Implications find, return their conditions as branchconditions
+         // Implications find, return their conditions as branch condition
          ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
          for (Term implication : implicationTerms) {
             condtionTerms = condtionTerms.append(implication.sub(0));
          }
-         
-         Term result = TermBuilder.DF.or(condtionTerms);
-         if (simplify) {
-            workingTerm = simplify(node.proof(), result);
-         }
-         return result;
+         result = TermBuilder.DF.or(condtionTerms);
       }
       else {
-         // No preconditions available, branchcondition is true
-         return TermBuilder.DF.tt();
+         // No preconditions available, branch condition is true
+         result = TermBuilder.DF.tt();
+      }
+      // Add caller not null to condition
+      if (parent.childrenCount() == 4) {
+         Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
+         callerNotNullTerm = TermBuilder.DF.goBelowUpdates(callerNotNullTerm);
+         if (callerNotNullTerm.op() != Junctor.NOT) {
+            throw new ProofInputException("Not operation expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
+            throw new ProofInputException("Equals operation expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
+            throw new ProofInputException("ProgramVariable expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(), parent.proof().getServices())) {
+            throw new ProofInputException("Null expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         result = TermBuilder.DF.and(callerNotNullTerm, result);
+      }
+      if (simplify) {
+         result = simplify(node.proof(), result);
+      }
+      return result;
+   }
+
+   /**
+    * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Node}
+    * in the {@link Node} to apply on.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyOn The new {@link Node} to apply the {@link PosInOccurrence} on.
+    * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence pio, Node toApplyOn) {
+      if (original != null && toApplyOn != null) {
+         return posInOccurrenceInOtherNode(original.sequent(), pio, toApplyOn.sequent());
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Sequent}
+    * in the {@link Sequent} to apply on.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence} on.
+    * @return The {@link Term} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio, Sequent toApplyOn) {
+      if (original != null && pio != null && toApplyOn != null) {
+         // Search index of formula in original sequent
+         SequentFormula originalSF = pio.constrainedFormula();
+         boolean antecendet = pio.isInAntec();
+         int index;
+         if (antecendet) {
+            index = original.antecedent().indexOf(originalSF);
+         }
+         else {
+            index = original.succedent().indexOf(originalSF);
+         }
+         if (index >= 0) {
+            SequentFormula toApplyOnSF = (antecendet ? toApplyOn.antecedent() : toApplyOn.succedent()).get(index);
+            return toApplyOnSF.formula().subAt(pio.posInTerm());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
 
