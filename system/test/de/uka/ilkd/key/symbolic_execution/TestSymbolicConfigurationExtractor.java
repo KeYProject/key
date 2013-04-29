@@ -826,6 +826,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertEquals(expected.getValueString(), current.getValueString());
          assertEquals(expected.getTypeString(), current.getTypeString());
+         assertEquals(expected.getConditionString(), current.getConditionString());
       }
       else {
          assertNull(current);
@@ -863,6 +864,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertObject(expected.getTarget(), current.getTarget(), false);
+         assertEquals(expected.getConditionString(), current.getConditionString());
       }
       else {
          assertNull(current);
