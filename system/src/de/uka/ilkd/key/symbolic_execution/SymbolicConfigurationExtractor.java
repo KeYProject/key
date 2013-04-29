@@ -959,7 +959,7 @@ public class SymbolicConfigurationExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(node, currentConfigurations, configurationIndex, currentLocationTerm, currentLocations, null, computeCurrentStateName());
+      return getConfiguration(node, currentConfigurations, configurationIndex, currentLocationTerm, currentLocations, pathCondition, computeCurrentStateName());
    }
    
    /**
