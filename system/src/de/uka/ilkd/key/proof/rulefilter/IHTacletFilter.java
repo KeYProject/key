@@ -12,7 +12,7 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.rulefilter;
 
 import java.util.HashMap;
 

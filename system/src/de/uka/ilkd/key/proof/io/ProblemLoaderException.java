@@ -9,19 +9,25 @@
 //
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-// 
+//
+
+package de.uka.ilkd.key.proof.io;
 
 
-package de.uka.ilkd.key.proof;
+public class ProblemLoaderException extends Exception {
+   /**
+    * Generated UID.
+    */
+   private static final long serialVersionUID = 8158433017422914206L;
 
-import de.uka.ilkd.key.rule.Rule;
+   private DefaultProblemLoader origin;
+   
+   public ProblemLoaderException(DefaultProblemLoader origin, Throwable cause) {
+      super(cause.getMessage(), cause);
+      this.origin = origin;
+   }
 
-/**
- * Interface for objects that represent sets of rules, and which can be used
- * to distinguish different kinds of rules.
- */
-public interface RuleFilter {
-    
-    boolean filter ( Rule rule );
-
+   public DefaultProblemLoader getOrigin() {
+      return origin;
+   }
 }

@@ -12,7 +12,7 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,7 +23,8 @@ import java.util.Iterator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 
 public class ProofSaverLatex extends ProofSaver {
