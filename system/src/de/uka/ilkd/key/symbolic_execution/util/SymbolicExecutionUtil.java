@@ -75,8 +75,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -1907,5 +1909,26 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isChoiceSettingInitialised() {
       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
+   }
+   
+   /**
+    * Checks if the given {@link Operator} is a heap.
+    * @param op The {@link Operator} to check.
+    * @param heapLDT The {@link HeapLDT} which provides the available heaps.
+    * @return {@code true} {@link Operator} is heap, {@code false} {@link Operator} is something else.
+    */
+   public static boolean isHeap(Operator op, HeapLDT heapLDT) {
+      if (op instanceof SortedOperator) {
+         final Sort opSort = ((SortedOperator) op).sort();
+         return JavaUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
+            @Override
+            public boolean select(LocationVariable element) {
+               return opSort == element.sort();
+            }
+         }) != null;
+      }
+      else {
+         return false;
+      }
    }
 }

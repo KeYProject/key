@@ -610,7 +610,9 @@ public class SymbolicConfigurationExtractor {
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
-         if (heapLDT.getHeap() != term.op() && !isImplicitProgramVariable(var) && !objectsToIgnore.contains(term)) {
+         if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && 
+             !isImplicitProgramVariable(var) && 
+             !objectsToIgnore.contains(term)) {
             toFill.add(new ExtractLocationParameter(var, true));
          }
       }
@@ -660,7 +662,7 @@ public class SymbolicConfigurationExtractor {
          }
       }
    }
-   
+
    /**
     * <p>
     * Computes for each location (value/association of an object) used in the 
@@ -748,12 +750,15 @@ public class SymbolicConfigurationExtractor {
             collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
          }
          else if (eu.lhs() instanceof ProgramVariable) {
+            final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
             ProgramVariable var = (ProgramVariable)eu.lhs();
-            if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(TermBuilder.DF.var(var))) {
-               locationsToFill.add(new ExtractLocationParameter(var, true));
-            }
-            if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
-               updateValueObjectsToFill.add(updateTerm.sub(0));
+            if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
+               if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(TermBuilder.DF.var(var))) {
+                  locationsToFill.add(new ExtractLocationParameter(var, true));
+               }
+               if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
+                  updateValueObjectsToFill.add(updateTerm.sub(0));
+               }
             }
          }
          else {
