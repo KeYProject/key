@@ -18,10 +18,21 @@
   \item Inc2: alternatively increase two fields
   \item Contract: use an operation contract with
 		concrete frame
+  \item GhostFrame: use an operation contract
+		with an abstract frame stored in
+		a ghost field
   \item Model field: use an operation contract
 		with an abstract frame stored in
 		a model field (static depends clause)
+  \item Dynamic: use an operation contract
+		with an abstract frame stored in
+		a model field (self-framing depends clause)
+  \item AccessChain: same as Contract, but assign field
+	$\mathit{this}.(a.)^nx$
 \end{itemize}
+
+All figures of proof steps count One-Step-Simplifier applications
+as only one step.
 
 \section{Empirical Results}
 \subsection{Basic Computation Time Growth}
@@ -63,7 +74,19 @@ Proof size vs.\ computation time (in seconds):\\
 
 Comparison values: TPTP PUZ031 (\textcolor{blue}{$\diamond$})
 
+\subsection{Large Sequences}
+Large sequences (i.e., containing many formulae/terms) seem to slow
+down \KeY\ significantly.
+
 \subsection{Comparison of Framing Techniques}
+Reasoning about location sets is one of the major sources of effort.
+Static framing leads to a linear sequent size growth
+(containing information about different heaps).
+
+In abstract framing large heap terms occur.
+They appear when simplifying a select on an anonymized heap,
+introducing if-then-else statements.
+This leads to an exponential growth of heap terms.
 
 \begin{itemize}
   \item footprint is a model field (static dependency) 
@@ -106,6 +129,58 @@ Problem size (statements) vs.\ time (seconds):\\
   \node at (10,2.12) {\textcolor{blue}{$\ast$}};
 \end{tikzpicture}
 
+\subsection{Depth of select-Terms}
+Length access chains (e.g., $\mathit{this.next.next.next}$)
+contributes to exponential growth of prover time.
+
+\subsection{Comparison of \KeY\ Versions}
+on contract benchmark (static frame)
+
+\begin{itemize}
+  \item Release 1.6.5 (\textcolor{green}{$\bullet$})
+  \item Release 2.0.0 (\textcolor{red}{$\diamond$})
+  \item Development branch \texttt{schebenHeapTermSimplification}
+		(\textcolor{blue}{$\ast$})
+\end{itemize}
+
+\begin{tikzpicture}
+  % grid, labels
+  \draw[->] (-.5,-1) -- (9,-1);
+  \draw[->] (-.5,-1) -- (-.5,4.5);
+  \foreach \x in {0,1,2,3} {
+    \draw (2.5*\x,-1) -- (2.5*\x,-1.1);
+    \node at (2.5*\x,-1.5) {$10^{\x}$};
+  }
+  \foreach \y in {-1,0,1,2,3,4} {
+    \draw (-.5,\y) -- (-.6,\y);
+    \node at (-1,\y) {$10^{\y}$};
+  }
+
+  % data
+  \node at (0,-.155) {\textcolor{green}{$\bullet$}};
+  \node at (2.5*0.3,-.523) {\textcolor{green}{$\bullet$}};
+  \node at (2.5*1,-.155) {\textcolor{green}{$\bullet$}};
+  \node at (2.5*1.3,-.097) {\textcolor{green}{$\bullet$}};
+  \node at (2.5*1.6,.462) {\textcolor{green}{$\bullet$}};
+  \node at (2.5*2,.724) {\textcolor{green}{$\bullet$}};
+  \node at (2.5*2.3,1.318) {\textcolor{green}{$\bullet$}};
+
+  \node at (2.5*0.3,-1) {\textcolor{red}{$\diamond$}};
+  \node at (2.5*1,-.046) {\textcolor{red}{$\diamond$}};
+  \node at (2.5*1.3,.544) {\textcolor{red}{$\diamond$}};
+  \node at (2.5*1.6,1.387) {\textcolor{red}{$\diamond$}};
+  \node at (2.5*2,2.58) {\textcolor{red}{$\diamond$}};
+  \node at (2.5*2.3,3.745) {\textcolor{red}{$\diamond$}};
+
+  \node at (0,-.009) {\textcolor{blue}{$\ast$}};
+  \node at (2.5*0.3,-.216) {\textcolor{blue}{$\ast$}};
+  \node at (2.5*1,.128) {\textcolor{blue}{$\ast$}};
+  \node at (2.5*1.3,.551) {\textcolor{blue}{$\ast$}};
+  \node at (2.5*1.6,1.125) {\textcolor{blue}{$\ast$}};
+  \node at (2.5*2,2.082) {\textcolor{blue}{$\ast$}};
+  \node at (2.5*2.3,3.011) {\textcolor{blue}{$\ast$}};
+\end{tikzpicture}
+
 
 \section{Overall Complexity}
 \begin{tabular}{|l|l|l|l|l|} \hline
@@ -117,4 +192,14 @@ Test & Heap & Seq & Steps & Time \\ \hline
 \texttt{ModelField} & $\Omega(2^n)$ & ? & ? & ? \\
 \hline
 \end{tabular}
+
+\section{Solution Suggestions}
+
+\paragraph{Flat heap terms.}
+ad heap term growth:
+	add taclets to store equalities instead of contructing large terms
+	(on branch \texttt{schebenHeapTermSimplification}
+
+Works well on large instances of Contract (see above):
+ nearly linear growth in logarithmical scale
 \end{document}
