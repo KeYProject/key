@@ -9,11 +9,30 @@ class GhostFrame {
   //@ ensures x > 0;
   void foo () {
     x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
   }
 
 
   //@ ensures \disjoint(footprint,\singleton(x));
   //@ assignable footprint;
-  void bar () ;
+  void bar () {};
 
 }

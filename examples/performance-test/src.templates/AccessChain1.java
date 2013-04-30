@@ -1,5 +1,5 @@
 class AccessChain1 {
-  AccessChain a;
+  AccessChain1 a;
   int x;
   int y;
 
@@ -14,6 +14,6 @@ class AccessChain1 {
 
   //@ ensures true;
   //@ assignable y;
-  void bar () ;
+  void bar () {};
 
 }

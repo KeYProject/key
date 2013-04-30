@@ -10,11 +10,30 @@ class Modelfield {
   //@ ensures x > 0;
   void foo () {
     x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
   }
 
 
   //@ ensures true;
   //@ assignable footprint;
-  void bar () ;
+  void bar () {};
 
 }

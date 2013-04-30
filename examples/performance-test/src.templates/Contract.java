@@ -12,6 +12,6 @@ class Contract {
 
   //@ ensures true;
   //@ assignable y;
-  void bar () ;
+  void bar () {};
 
 }

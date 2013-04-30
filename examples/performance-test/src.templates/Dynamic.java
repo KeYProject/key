@@ -10,11 +10,18 @@ class Dynamic {
   //@ ensures x > 0;
   void foo () {
     x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
+    x++; bar();
   }
 
 
   //@ ensures \new_elems_fresh(footprint);
   //@ assignable footprint;
-  void bar () ;
+  void bar () {};
 
 }

@@ -12,6 +12,6 @@ class Inc2 {
 
   //@ ensures true;
   //@ assignable y;
-  void bar () ;
+  void bar () {};
 
 }
