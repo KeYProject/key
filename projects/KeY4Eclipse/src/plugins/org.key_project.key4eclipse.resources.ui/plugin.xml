@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.key_project.key4eclipse.resources.ui.KeYProjectWizard"
+         name="KeYProjectWizard"
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="org.key_project.key4eclipse.resources.ui.KeYCategory"
+            class="org.key_project.key4eclipse.resources.ui.wizard.KeYProjectWizard"
+            icon="icons/projectIcon.gif"
+            id="org.key_project.key4eclipse.resources.ui.keyprojectwizard"
+            name="KeY Project"
+            project="true">
+      </wizard>
+      <category
+            id="org.key_project.key4eclipse.resources.ui.KeYCategory"
+            name="KeY">
+      </category>
+   </extension>
+
+</plugin>

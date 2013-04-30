@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.key_project.key4eclipse.resources.KeYProjectNature"
+         name="KeYProjectNature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.key_project.key4eclipse.resources.KeYProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         id="org.key_project.key4eclipse.resources.KeYProjectBuilder"
+         name="KeYProjectBuilder"
+         point="org.eclipse.core.resources.builders">
+      <builder>
+         <run
+               class="org.key_project.key4eclipse.resources.KeYProjectBuilder">
+         </run></builder>
+   </extension>
+
+</plugin>
