@@ -187,7 +187,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      stopCondition.addChildren(new BreakpointStopCondition(breakpointLineMap));
+      stopCondition.addChildren(new BreakpointStopCondition(breakpointMap));
       if (stepOver) {
          stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       }

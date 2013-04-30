@@ -43,7 +43,7 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
    
    
-   protected Map<IPath, Vector<JavaLineBreakpoint>> breakpointLineMap;
+   protected Map<JavaLineBreakpoint, Integer> breakpointMap;
    
    /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
@@ -81,7 +81,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    public AbstractSEDDebugTarget(ILaunch launch) {
       super(null);DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
-      breakpointLineMap = new HashMap<IPath, Vector<JavaLineBreakpoint>>();
+      breakpointMap = new HashMap<JavaLineBreakpoint, Integer>();
       this.launch = launch;
       addBreakpoints();
       
@@ -242,15 +242,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    public void breakpointAdded(IBreakpoint breakpoint) {
       if(breakpoint instanceof JavaLineBreakpoint){
          JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-         Vector<JavaLineBreakpoint> breakpoints = breakpointLineMap.get(breakpoint.getMarker().getResource().getLocation());
-         if(breakpoints!=null){
-            breakpoints.add(lineBreakpoint);
-            breakpointLineMap.put(lineBreakpoint.getMarker().getResource().getLocation(),breakpoints);
-         }else{
-            breakpoints = new Vector<JavaLineBreakpoint>();
-            breakpoints.add(lineBreakpoint);
-            breakpointLineMap.put(lineBreakpoint.getMarker().getResource().getLocation(),breakpoints);
-         }
+         breakpointMap.put(lineBreakpoint, 0);
       }
    }
 
@@ -261,13 +253,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
       if(breakpoint instanceof JavaLineBreakpoint){
          JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-         Vector<JavaLineBreakpoint> breakpoints = breakpointLineMap.get(lineBreakpoint.getMarker().getResource().getLocation());
-         if(breakpoints.size()==1){
-            breakpointLineMap.remove(lineBreakpoint.getMarker().getResource().getLocation());
-         }else{
-            breakpoints.remove(lineBreakpoint);
-            breakpointLineMap.put(lineBreakpoint.getMarker().getResource().getLocation(),breakpoints);
-         }
+         breakpointMap.remove(lineBreakpoint);
       }
 
    }
@@ -350,33 +336,10 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    }
    
 
-   private void addBreakpoints(){
-      
-      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();
-      
+   private void addBreakpoints(){      
+      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
       for(int i = 0; i < breakpoints.length; i++){
          breakpointAdded(breakpoints[i]);
-         
-         
-         
-//         try {
-//            List<?> programList = getLaunch().getLaunchConfiguration().getAttribute("org.eclipse.debug.core.MAPPED_RESOURCE_PATHS", (List<?>)null);
-//            String program = (String) programList.get(0);
-//            if(program!=null){
-//               IMarker marker= breakpoints[i].getMarker();
-//               if(marker!=null){
-//                  IPath p = new Path(program);
-//                  if(marker.getResource().getFullPath().equals(p)){
-//                     breakpointLineVector.add((Integer) breakpoints[i].getMarker().getAttribute(breakpoints[i].getMarker().LINE_NUMBER));
-//                     
-//                  }
-//               }
-//            }
-//         }
-//         catch (CoreException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//         }
       }
    }
 }

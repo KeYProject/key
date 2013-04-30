@@ -1,31 +1,38 @@
 package org.key_project.sed.key.core.model;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
+import org.key_project.sed.core.util.LogUtil;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.operator.ComparativeOperator;
+import de.uka.ilkd.key.java.expression.operator.Equals;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
 
 @SuppressWarnings("restriction")
 public class BreakpointStopCondition implements IStopCondition {
 
-   private Map<IPath, Vector<JavaLineBreakpoint>> breakpointLineMap;
+   private Map<JavaLineBreakpoint, Integer> breakpointMap;
 
-   public BreakpointStopCondition(
-         Map<IPath, Vector<JavaLineBreakpoint>> breakpointLineMap) {
-      this.breakpointLineMap = breakpointLineMap;
+   public BreakpointStopCondition(Map<JavaLineBreakpoint, Integer> breakpointMap) {
+      this.breakpointMap = breakpointMap;
    }
 
    @Override
@@ -63,31 +70,46 @@ public class BreakpointStopCondition implements IStopCondition {
                                                // current goal node
          if (activeStatement != null && activeStatement.getEndPosition().getLine() != -1) {
             IPath path = new Path(activeStatement.getPositionInfo().getParentClass());
-            Vector<JavaLineBreakpoint> breakpointsForClass = breakpointLineMap.get(path);
             int line = activeStatement.getEndPosition().getLine();
-            if (breakpointsForClass != null) {
-               boolean stopConditon = classHasBreakpointInLine(breakpointsForClass, line);
-               return stopConditon;
-            }
+            
+//            
+//            ComparativeOperator expr = new Equals(new IntLiteral(5), new IntLiteral(5));
+//            EvaluateArgs evaluator = new EvaluateArgs(expr);
+//            ProgramVariable pv= evaluator.evaluate(expr, new ArrayList(), proof.env().getInitialServices(), null);
+//            
+            
+            return shouldStopInLine(line, path);
          }
       }
       return false;
    }
 
-   private boolean classHasBreakpointInLine(
-         Vector<JavaLineBreakpoint> breakpointsForClass, int line) {
-      Iterator<JavaLineBreakpoint> itr = breakpointsForClass.iterator();
-      while (itr.hasNext()) {
-         JavaLineBreakpoint breakpoint = itr.next();
+   private boolean shouldStopInLine(int line, IPath path) {
+      for(Map.Entry<JavaLineBreakpoint, Integer> entry : breakpointMap.entrySet()) {
          try {
-            if (breakpoint.getLineNumber() == line) {
-               return breakpoint.isEnabled();
+            if (entry.getKey().getLineNumber() == line && path.equals(entry.getKey().getMarker().getResource().getLocation())) {
+               return hitcountExceeded(entry.getKey(), entry.getValue());
             }
          }
          catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LogUtil.getLogger().logError(e);
          }
+      }
+      return false;
+   }
+
+   private boolean hitcountExceeded(JavaLineBreakpoint breakpoint, int hitted) throws CoreException {
+      if (!(breakpoint.getHitCount() == -1)) {
+         if (breakpoint.getHitCount() == hitted + 1) {
+            breakpointMap.put(breakpoint, 0);
+            return breakpoint.isEnabled();
+         }
+         else {
+            breakpointMap.put(breakpoint, hitted + 1);
+         }
+      }
+      else {
+         return breakpoint.isEnabled();
       }
       return false;
    }
