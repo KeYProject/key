@@ -41,10 +41,88 @@ import de.uka.ilkd.key.proof.ProblemLoaderException;
  * @author Niklas Bunzel
  */
 public class SWTBotAutoModeHandlerTest extends TestCase {
-   // TODO: Write test in which the proof is still open after execution. You can use method "chargeAndRecord(int) : void" instead of "isValid() : boolean"
    
    /**
-    * Tests starting the auto mode.
+    * Tests starting the auto mode. Proof is still open after the auto mode.
+    * @throws CoreException
+    * @throws ProblemLoaderException 
+    */
+   @Test
+   public void testStartAutoMode_proofOpen() throws CoreException, InterruptedException, ProblemLoaderException {
+      String projectName = "SWTBotStartAutoModeHandlerTest_testStartAutoMode_proofOpen";
+      IStartProofTestRunnable startProofRunnable = new IStartProofTestRunnable() {
+         @Override
+         public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
+            // Select method "chargeAndRecord(int) : void" in project explorer
+            SWTBotView projectView = TestUtilsUtil.getProjectExplorer(bot);
+            SWTBotTree projectTree = projectView.bot().tree();
+            TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
+            // Start proof via context menu
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+         }
+      };
+      // Store original SWTBot timeout and increase it
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      SWTBotPreferences.TIMEOUT = originalTimeout * 5;
+      // Backup original switch perspective preference and set preference to test.
+      String originalSwitchPerspectivePreference = KeYIDEPreferences.getSwitchToKeyPerspective();
+      KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      // Backup current perspective
+      IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
+      final SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      try {
+         // Close welcome view if available
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+         IFolder src = project.getProject().getFolder("src");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
+         // Open PayCard.java
+         IEditorPart editorPart = TestUtilsUtil.openEditor(src.getFile("PayCard.java"));
+         // Start proof
+         startProofRunnable.startProof(projectName, bot, editorPart);
+         // Switch to KeY perspective
+         SWTBotShell switchShell = bot.shell("Confirm Perspective Switch");
+         switchShell.bot().button("Yes").click();
+         assertEquals(KeYPerspective.PERSPECTIVE_ID, TestUtilsUtil.getActivePerspective().getId());
+         // Select first operation contract and start proof
+         SWTBotShell contractShell = bot.shell("Select Contract for Proof in KeY");
+         contractShell.bot().table().select(0);
+         contractShell.bot().button("OK").click();
+         // Make sure that the KeY proof editor is opened and that the proof is not closed
+         final SWTBotEditor editor = bot.activeEditor();
+         assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
+         assertTrue(editor.getReference().getEditor(true) instanceof KeYEditor);
+         KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
+         assertNotNull(keyEditor.getProof());
+         assertFalse(keyEditor.getProof().closed());
+         
+         //check that the auto mode is available
+         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is disabled
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         //start auto mode
+         bot.toolbarButtonWithTooltip("Start Auto Mode").click();
+         
+         //check that auto mode is not available while auto mode is running
+         assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is enabled
+         assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         // Make sure that the proof is not closed
+         keyEditor.getKeYEnvironment().getUi().waitWhileAutoMode();
+         assertFalse(keyEditor.getProof().closed());
+         // Make sure that start is enabled and stop is disabled
+         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled()); 
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+      }
+      finally {
+         doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
+      }
+   }
+   
+   /**
+    * Tests starting the auto mode. Proof is closed after the auto mode.
+    * @throws CoreException
     * @throws ProblemLoaderException 
     */
    @Test
@@ -53,7 +131,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
       IStartProofTestRunnable startProofRunnable = new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Select method "chargeAndRecord(int) : void" in project explorer
+            // Select method "isValid() : void" in project explorer
             SWTBotView projectView = TestUtilsUtil.getProjectExplorer(bot);
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "isValid() : boolean");
@@ -112,7 +190,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          keyEditor.getKeYEnvironment().getUi().waitWhileAutoMode();
          assertTrue(keyEditor.getProof().closed());
          // Make sure that start/stop are both disabled
-         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled()); // TODO: Change the behavior of KeY-IDE: If auto mode is closed both buttons should be disabled. Test this new behavior here
+         assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled()); 
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
@@ -120,10 +198,15 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
       }
    }
    
-   // TODO: Write test (testStopAutoMode()) which starts the auto mode, then stops it and starts it again => proof closed() 
+   /**
+    * 
+    * @throws CoreException
+    * @throws InterruptedException
+    * @throws ProblemLoaderException
+    */
    @Test
-   public void testStopAutoMode() throws CoreException, InterruptedException, ProblemLoaderException{
-      String projectName = "SWTBotStopAutoModeHandlerTest_testStartAutoMode";
+   public void testStopAutoMode_RestartAutoMode() throws CoreException, InterruptedException, ProblemLoaderException{
+      String projectName = "SWTBotStopAutoModeHandlerTest_testStopAutoMode_RestartAutoMode";
       IStartProofTestRunnable startProofRunnable = new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -166,29 +249,110 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          // Make sure that the KeY proof editor is opened
          final SWTBotEditor editor = bot.activeEditor();
          assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
-         
-         Display.getDefault().asyncExec(new Runnable() { // TODO: SWTBot ensures thread save access to UI controls. You don't need the runnables. You can't use asynchronus runnables in tests because the failed result (thrown exception) is treated by SWT Thread and not by the Test thread. Have a look into testStartAutoMode()
-            @Override
-            public void run() {
-                //check that the auto mode is available
-                  assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
-                  //stop auto mode is disabled
-                  assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
-                  //start auto mode
-                  bot.toolbarButtonWithTooltip("Start Auto Mode").click();
-                  //check that auto mode is not available while auto mode is running
-                  assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
-                  //stop auto mode is enabled
-                  assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         assertTrue(editor.getReference().getEditor(true) instanceof KeYEditor);
+         KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
+         //check that the auto mode is available
+         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is disabled
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         //start auto mode
+         bot.toolbarButtonWithTooltip("Start Auto Mode").click();
+         //check that auto mode is not available while auto mode is running
+         assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is enabled
+         assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+              
+         //stop auto mode
+         bot.toolbarButtonWithTooltip("Stop Auto Mode").click();
+         //check that auto mode is available again
+         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is disabled
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         // Make sure that the proof is still open (not closed)
+         assertFalse(keyEditor.getProof().closed());
+         //restart auto mode
+         bot.toolbarButtonWithTooltip("Start Auto Mode").click();
+         //check that auto mode is not available while auto mode is running
+         assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is enabled
+         assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+
+         //make sure proof is closed
+         keyEditor.getKeYEnvironment().getUi().waitWhileAutoMode();
+         assertTrue(keyEditor.getProof().closed());
+         //check that the start and stop buttons are both disabled
+         assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+
+      }
+      finally {
+         doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
+      }
+   }
+
+   
+   @Test
+   public void testStopAutoMode() throws CoreException, InterruptedException, ProblemLoaderException{
+      String projectName = "SWTBotStopAutoModeHandlerTest_testStopAutoMode";
+      IStartProofTestRunnable startProofRunnable = new IStartProofTestRunnable() {
+         @Override
+         public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
+            // Select method "chargeAndRecord(int) : void" in project explorer
+            SWTBotView projectView = TestUtilsUtil.getProjectExplorer(bot);
+            SWTBotTree projectTree = projectView.bot().tree();
+            TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
+            // Start proof via context menu
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+         }
+      };
+      // Store original SWTBot timeout and increase it
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      SWTBotPreferences.TIMEOUT = originalTimeout * 5;
+      // Backup original switch perspective preference and set preference to test.
+      String originalSwitchPerspectivePreference = KeYIDEPreferences.getSwitchToKeyPerspective();
+      KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      // Backup current perspective
+      IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
+      final SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      try {
+         // Close welcome view if available
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+         IFolder src = project.getProject().getFolder("src");
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
+         // Open PayCard.java
+         IEditorPart editorPart = TestUtilsUtil.openEditor(src.getFile("PayCard.java"));
+         // Start proof
+         startProofRunnable.startProof(projectName, bot, editorPart);
+         // Switch to KeY perspective
+         SWTBotShell switchShell = bot.shell("Confirm Perspective Switch");
+         switchShell.bot().button("Yes").click();
+         assertEquals(KeYPerspective.PERSPECTIVE_ID, TestUtilsUtil.getActivePerspective().getId());
+         // Select first operation contract and start proof
+         SWTBotShell contractShell = bot.shell("Select Contract for Proof in KeY");
+         contractShell.bot().table().select(0);
+         contractShell.bot().button("OK").click();
+         // Make sure that the KeY proof editor is opened
+         final SWTBotEditor editor = bot.activeEditor();
+         assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
+         //check that the auto mode is available
+         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is disabled
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         //start auto mode
+         bot.toolbarButtonWithTooltip("Start Auto Mode").click();
+         //check that auto mode is not available while auto mode is running
+         assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is enabled
+         assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
                   
-                  //stop auto mode
-                  bot.toolbarButtonWithTooltip("Stop Auto Mode").click();
-                  //check that auto mode is available again
-                  assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
-                  //stop auto mode is disabled
-                  assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
-            }
-         });
+         //stop auto mode
+         bot.toolbarButtonWithTooltip("Stop Auto Mode").click();
+         //check that auto mode is available again
+         assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
+         //stop auto mode is disabled
+         assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          // TODO: Make sure that the proof is still open (not closed)
          
       }
