@@ -285,19 +285,24 @@ public class SymbolicConfigurationExtractor {
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
             // Instantiate proof in which equivalent classes of symbolic objects in path conditions are computed
             ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
-            // Apply cut rules to compute equivalent classes
-            applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
-            // Finish proof automatically
-            SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
-            // Compute the available instance configurations via the opened goals of the equivalent proof.
-            appliedCutsPerConfiguration = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
-            // Create predicate required for state computation
-            initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
-            currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
-            // Create configuration maps which are filled lazily
-            initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-            currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-            configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+            try {
+               // Apply cut rules to compute equivalent classes
+               applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
+               // Finish proof automatically
+               SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
+               // Compute the available instance configurations via the opened goals of the equivalent proof.
+               appliedCutsPerConfiguration = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
+               // Create predicate required for state computation
+               initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
+               currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
+               // Create configuration maps which are filled lazily
+               initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+            }
+            finally {
+               equivalentClassesProofStarter.getProof().dispose();
+            }
          }
       }
    }
@@ -1071,25 +1076,30 @@ public class SymbolicConfigurationExtractor {
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, configurationCondition, configurationTerm, newUpdates);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_NORMAL);
-         // Extract values and objects from result predicate and store them in variable value pairs
-         Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
-         int goalCount = info.getProof().openGoals().size();
-         for (Goal goal : info.getProof().openGoals()) {
-            Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, configurationTerm.op());
-            for (ExtractLocationParameter param : locations) {
-               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
-               ExecutionVariableValuePair pair;
-               if (param.isArrayIndex()) {
-                  pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
+         try {
+            // Extract values and objects from result predicate and store them in variable value pairs
+            Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
+            int goalCount = info.getProof().openGoals().size();
+            for (Goal goal : info.getProof().openGoals()) {
+               Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, configurationTerm.op());
+               for (ExtractLocationParameter param : locations) {
+                  Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
+                  ExecutionVariableValuePair pair;
+                  if (param.isArrayIndex()) {
+                     pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
+                  }
+                  else {
+                     pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
+                  }
+                  pairs.add(pair);
                }
-               else {
-                  pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
-               }
-               pairs.add(pair);
             }
+            // Create symbolic configuration
+            return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
          }
-         // Create symbolic configuration
-         return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
+         finally {
+            info.getProof().dispose();
+         }
       }
       else {
          // Create empty symbolic configuration

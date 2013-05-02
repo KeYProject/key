@@ -154,19 +154,24 @@ public final class SymbolicExecutionUtil {
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
       // Return created sequent and the used predicate to identify the value interested in.
       ApplyStrategyInfo info = startSideProof(parentProof, sequentToProve);
-      // The simplified formula is the conjunction of all open goals
-      ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
-      if (openGoals.isEmpty()) {
-         return TermBuilder.DF.tt();
-      }
-      else {
-         ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
-         for (Goal goal : openGoals) {
-            Term goalImplication = sequentToImplication(goal.sequent());
-            goalImplication = TermBuilder.DF.not(goalImplication);
-            goalImplications = goalImplications.append(goalImplication);
+      try {
+         // The simplified formula is the conjunction of all open goals
+         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+         if (openGoals.isEmpty()) {
+            return TermBuilder.DF.tt();
          }
-         return TermBuilder.DF.not(TermBuilder.DF.or(goalImplications));
+         else {
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
+            for (Goal goal : openGoals) {
+               Term goalImplication = sequentToImplication(goal.sequent());
+               goalImplication = TermBuilder.DF.not(goalImplication);
+               goalImplications = goalImplications.append(goalImplication);
+            }
+            return TermBuilder.DF.not(TermBuilder.DF.or(goalImplications));
+         }
+      }
+      finally {
+         info.getProof().dispose();
       }
    }
    
@@ -1530,7 +1535,9 @@ public final class SymbolicExecutionUtil {
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
             replaceTerm = TermBuilder.DF.equals(replaceTerm, ((PosTacletApp)app).posInOccurrence().subTerm());
             replaceTerm = TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), replaceTerm);
-            newAntecedents = newAntecedents.append(replaceTerm);
+            if (!newAntecedents.contains(replaceTerm)) {
+               newAntecedents = newAntecedents.append(replaceTerm);
+            }
             // Replace old with new lists
             antecedents = newAntecedents;
             succedents = newSuccedents;
@@ -1547,19 +1554,15 @@ public final class SymbolicExecutionUtil {
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Simplify branch condition if required
-         if (simplify) {
-            // Append update context because otherwise the formula is evaluated in wrong state
-            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
-            // Execute simplification
-            result = SymbolicExecutionUtil.simplify(node.proof(), result);
-         }
-         else {
-            result = leftAndRight;
-         }
+         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
       }
       else {
          // No update context, just use the implication as branch condition
          result = leftAndRight;
+      }
+      // Execute simplification if requested
+      if (simplify) {
+         result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }
       return result;
    }
@@ -1683,7 +1686,12 @@ public final class SymbolicExecutionUtil {
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent, nullExpected ? isNull : isNotNull);
       // Execute proof in the current thread
       ApplyStrategyInfo info = startSideProof(node.proof(), sequentToProve, StrategyProperties.SPLITTING_NORMAL);
-      return !info.getProof().openEnabledGoals().isEmpty();
+      try {
+         return !info.getProof().openEnabledGoals().isEmpty();
+      }
+      finally {
+         info.getProof().dispose();
+      }
    }
    
    /**
