@@ -68,6 +68,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
+    
+    static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
+        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
+        res.addRequires(assertStm);
+        res.addEnsures(assertStm);
+        res.addAssignable(new PositionedString("assignable \\strictly_nothing;",assertStm.fileName,assertStm.pos));
+        return res;
+    }
 
 
     public void addName(PositionedString n) {
