@@ -136,9 +136,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
-            final Name anonFuncName
-            = VariableNameProposer.DEFAULT
-                .getNewName(services, new Name(TB.newName(services, pv.name().toString())));
+            final Name anonFuncName =
+                    VariableNameProposer.DEFAULT.getNewName(services,
+                            new Name(TB.newName(services, pv.name().toString())));
             final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
@@ -157,16 +157,23 @@ public final class WhileInvariantRule implements BuiltInRule {
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    Services services) {
+        final boolean loadedInfFlow = services.getProof().getSettings()
+                                        .getStrategySettings().getActiveStrategyProperties()
+                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name loopHeapName
-        = VariableNameProposer.DEFAULT
-            .getNewName(services, new Name(TB.newName(services, heap+"_After_LOOP")));
-        final Function loopHeapFunc = new Function(loopHeapName,
-                                                   heapLDT.targetSort(),
-                                                   true);
-        services.getNamespaces().functions().addSafely(loopHeapFunc);
+	final Function loopHeapFunc;
+	if (loadedInfFlow) {
+	    loopHeapFunc =
+	            (Function) services.getNamespaces().functions().lookup(heap+"_After_LOOP_0");
+	} else {
+	    final Name loopHeapName =
+	            VariableNameProposer.DEFAULT.getNewName(services,
+	                    new Name(TB.newName(services, heap+"_After_LOOP")));
+	    loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
+	    services.getNamespaces().functions().addSafely(loopHeapFunc);
+	}
         final Term loopHeap = TB.func(loopHeapFunc);
-        
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_LOOP"));
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -293,7 +300,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Goal buildInfFlowValidityGoal(Goal goal, LoopInvariant inv,
                                           InfFlowData infFlowData,
                                           RuleApp ruleApp,                                          
-                                          Goal infFlowGoal) {        
+                                          Goal infFlowGoal) {
         // generate proof obligation variables
         final ProofObligationVars instantiationVars =
                 new ProofObligationVars(infFlowData.selfTerm,
@@ -418,7 +425,10 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
-
+        final boolean loadedInfFlow = services.getProof().getSettings()
+                                        .getStrategySettings().getActiveStrategyProperties()
+                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
@@ -478,14 +488,18 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term variantPO = dia ?
                 TB.and(variantNonNeg, TB.lt(variant, TB.var(variantPV), services))
                 : TB.tt();
-
         //prepare guard
-        final String guardVarName
-        = VariableNameProposer.DEFAULT
-            .getNewName(services, new ProgramElementName(TB.newName(services, "b"))).toString();
-        final LocationVariable guardVar =
-                new LocationVariable(new ProgramElementName(guardVarName), booleanKJT);
-        services.getNamespaces().programVariables().addSafely(guardVar);        
+        final LocationVariable guardVar;
+        if (loadedInfFlow) {
+            guardVar =
+                    (LocationVariable) services.getNamespaces().programVariables().lookup("b_0");
+        } else {
+            final String guardVarName =
+                    VariableNameProposer.DEFAULT.getNewName(services,
+                            new ProgramElementName(TB.newName(services, "b"))).toString();
+            guardVar = new LocationVariable(new ProgramElementName(guardVarName), booleanKJT);
+            services.getNamespaces().programVariables().addSafely(guardVar);
+        }
         final VariableSpecification guardVarSpec 
         = new VariableSpecification(guardVar, 
                 inst.loop.getGuardExpression(), 
@@ -636,10 +650,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
 
-        final boolean loadedInfFlow = services.getProof().getSettings()
-                                        .getStrategySettings().getActiveStrategyProperties()
-                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) &&
             inst.inv.getRespects(services) != null) {

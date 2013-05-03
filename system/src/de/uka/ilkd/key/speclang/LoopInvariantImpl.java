@@ -428,22 +428,36 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public void setGuard(Term guardTerm, Services services) {
-        assert this.guard == null;
+        Term oldGuard = null;
+        if (this.guard != null) {
+            oldGuard = this.guard;
+        }
         this.guard = guardTerm;
         
         ImmutableList<Triple<ImmutableList<Term>,
                              ImmutableList<Term>,
                              ImmutableList<Term>>> respects = getRespects(services);
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         originalRespects.remove(baseHeap);
-        respects =
-                respects.tail()
-                    .prepend(new Triple<ImmutableList<Term>,
-                                        ImmutableList<Term>,
-                                        ImmutableList<Term>>
-                    (respects.head().first.append(guardTerm),
-                     respects.head().second,
-                     respects.head().third));
+        if (oldGuard != null) {
+            respects =
+                    respects.tail()
+                        .prepend(new Triple<ImmutableList<Term>,
+                                            ImmutableList<Term>,
+                                            ImmutableList<Term>>
+                        (respects.head().first.removeFirst(oldGuard).append(guardTerm),
+                         respects.head().second,
+                         respects.head().third));
+        } else {
+            respects =
+                    respects.tail()
+                        .prepend(new Triple<ImmutableList<Term>,
+                                            ImmutableList<Term>,
+                                            ImmutableList<Term>>
+                        (respects.head().first.append(guardTerm),
+                         respects.head().second,
+                         respects.head().third));
+        }
         originalRespects.put(baseHeap, respects);
     }
 

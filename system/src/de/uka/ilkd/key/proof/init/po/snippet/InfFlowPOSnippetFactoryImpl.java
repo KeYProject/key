@@ -113,9 +113,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
             }
             Term result = m.produce(data, poVars1, poVars2);
             InfFlowContractPO.addSymbol(result);
-            InfFlowContractPO.addSymbols(poVars1.termList);
-            InfFlowContractPO.addSymbols(poVars2.termList);
-            InfFlowContractPO.addSymbols(data.origVars.termList);
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " +

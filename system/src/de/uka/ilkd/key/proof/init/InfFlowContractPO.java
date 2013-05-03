@@ -201,7 +201,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         symbols().add(o);
     }
 
-    public static void addSymbols(ImmutableList<?> os) {
+    private static void addSymbols(ImmutableList<?> os) {
         assert os != null;
         symbols().add(os);
     }
@@ -237,9 +237,6 @@ public class InfFlowContractPO extends AbstractOperationPO
             this.c1 = c1;
             this.c2 = c2;
             this.symbExecVars = symbExecVars;
-            addSymbols(c1.termList);
-            addSymbols(c2.termList);
-            addSymbols(symbExecVars.termList);
 
             map1 = new HashMap<Term, Term>();
             map2 = new HashMap<Term, Term>();
