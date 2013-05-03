@@ -23,7 +23,7 @@ import org.key_project.key4eclipse.util.KeYExampleUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;

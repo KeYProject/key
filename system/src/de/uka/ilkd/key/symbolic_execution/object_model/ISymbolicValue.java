@@ -83,4 +83,30 @@ public interface ISymbolicValue {
     * @return The type of the value as human readable string.
     */
    public String getTypeString();
+   
+   /**
+    * <p>
+    * Returns the optional condition under which this value is valid.
+    * </p>
+    * <p>
+    * The condition should be {@code null} by default. Only in rare cases,
+    * e.g. path condition is not strong enough to describe the path completely, 
+    * is a condition is provided.
+    * </p>
+    * @return The optional condition under which this value is valid.
+    */
+   public Term getCondition();
+   
+   /**
+    * <p>
+    * Returns the optional condition under which this value is valid as human readable {@link String}.
+    * </p>
+    * <p>
+    * The condition should be {@code null} by default. Only in rare cases,
+    * e.g. path condition is not strong enough to describe the path completely, 
+    * is a condition is provided.
+    * </p>
+    * @return The optional condition under which this value is valid as human readable {@link String}.
+    */
+   public String getConditionString();
 }
