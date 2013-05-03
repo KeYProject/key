@@ -1082,8 +1082,8 @@ public class SymbolicConfigurationExtractor {
             int goalCount = info.getProof().openGoals().size();
             for (Goal goal : info.getProof().openGoals()) {
                Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, configurationTerm.op());
+               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
                for (ExtractLocationParameter param : locations) {
-                  Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
                   ExecutionVariableValuePair pair;
                   if (param.isArrayIndex()) {
                      pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
@@ -1770,6 +1770,7 @@ public class SymbolicConfigurationExtractor {
             ExecutionVariableValuePair other = (ExecutionVariableValuePair)obj;
             return isArrayIndex() ? getArrayIndex() == other.getArrayIndex() : getProgramVariable().equals(other.getProgramVariable()) &&
                    getParent() != null ? getParent().equals(other.getParent()) : other.getParent() == null &&
+                   getCondition() != null ? getCondition().equals(other.getCondition()) : other.getCondition() == null &&
                    getValue().equals(other.getValue());
          }
          else {
@@ -1785,6 +1786,7 @@ public class SymbolicConfigurationExtractor {
          int result = 17;
          result = 31 * result + (isArrayIndex() ? getArrayIndex() : getProgramVariable().hashCode());
          result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
+         result = 31 * result + (getCondition() != null ? getCondition().hashCode() : 0);
          result = 31 * result + getValue().hashCode();
          return result;
       }

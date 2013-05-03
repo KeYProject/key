@@ -113,6 +113,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -603,6 +604,19 @@ public final class SymbolicExecutionUtil {
          }
       }
       return heapUpdate;
+   }
+   
+   /**
+    * Checks if it is right now possible to compute the variables of the given {@link IExecutionStateNode}
+    * via {@link IExecutionStateNode#getVariables()}. 
+    * @param node The {@link IExecutionStateNode} to check.
+    * @return {@code true} right now it is possible to compute variables, {@code false} it is not possible to compute variables.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static boolean canComputeVariables(IExecutionStateNode<?> node) throws ProofInputException {
+      return node != null && 
+             !node.isDisposed() &&
+             !TermBuilder.DF.ff().equals(node.getPathCondition());
    }
    
    /**
@@ -1339,7 +1353,8 @@ public final class SymbolicExecutionUtil {
       Semisequent antecedent = node.sequent().antecedent();
       SequentFormula sf = antecedent.get(antecedent.size() - 1);
       Term workingTerm = sf.formula();
-      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+      Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
+      workingTerm = updatesAndTerm.second;
       if (workingTerm.op() != Junctor.AND) {
          throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
       }
@@ -1365,6 +1380,8 @@ public final class SymbolicExecutionUtil {
             condtionTerms = condtionTerms.append(implication.sub(0));
          }
          result = TermBuilder.DF.or(condtionTerms);
+         // Add updates
+         result = TermBuilder.DF.applyParallel(updatesAndTerm.first, result);
       }
       else {
          // No preconditions available, branch condition is true

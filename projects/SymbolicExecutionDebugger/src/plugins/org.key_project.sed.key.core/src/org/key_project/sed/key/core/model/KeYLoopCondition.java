@@ -26,6 +26,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDLoopCondition} for the symbolic execution debugger (SED)
@@ -209,9 +210,14 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return !executionNode.isDisposed() && 
-             super.hasVariables() && 
-             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 
    /**
