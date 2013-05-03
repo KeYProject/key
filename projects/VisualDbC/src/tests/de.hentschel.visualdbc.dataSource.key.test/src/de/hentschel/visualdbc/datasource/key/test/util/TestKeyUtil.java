@@ -482,7 +482,7 @@ public final class TestKeyUtil {
                                                                "balance >= 0 & self.<inv>", 
                                                                "self.balance = balance\n" +
                                                                "&   self.transactionId\n" +
-                                                               "  = int::select(heapAtPre, null, transactionCounter)\n" +
+                                                               "  = heapAtPre[" + logRecordFullqualifiedName + ".transactionCounter]\n" +
                                                                "& self.<inv>\n" +
                                                                "& exc = null", 
                                                                "mod[heap]:           {(self, empty)} \\cup {(self, balance)}\n" +
@@ -573,9 +573,7 @@ public final class TestKeyUtil {
                                                                "& (amount >  0 & self.<inv>)", 
                                                                "!result = TRUE\n" +
                                                                "& (    self.unsuccessfulOperations\n" +
-                                                               "     = javaAddInt(int::select(heapAtPre,\n" +
-                                                               "                              self,\n" +
-                                                               "                              unsuccessfulOperations),\n" +
+                                                               "     = javaAddInt(heapAtPre[self.unsuccessfulOperations],\n" +
                                                                "                  1)\n" +
                                                                "   & self.<inv>)\n" +
                                                                "& exc = null", 
@@ -588,8 +586,7 @@ public final class TestKeyUtil {
                                                                "& (amount >  0 & self.<inv>)", 
                                                                "result = TRUE\n" +
                                                                "& (    self.balance\n" +
-                                                               "     = javaAddInt(amount,\n" +
-                                                               "                  int::select(heapAtPre, self, balance))\n" +
+                                                               "     = javaAddInt(amount, heapAtPre[self.balance])\n" +
                                                                "   & self.<inv>)\n" +
                                                                "& exc = null", 
                                                                "mod[heap]: {(self, balance)}", 
@@ -603,7 +600,7 @@ public final class TestKeyUtil {
       addOperationObligations(chargeAndRecord, true, true, true);
       MemoryOperationContract car = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "chargeAndRecord(int)", operationContractIDs[4], "normal_behavior"), 
                                                                 "amount >  0 & self.<inv>", 
-                                                                "self.balance >= int::select(heapAtPre, self, balance)\n" +
+                                                                "self.balance >= heapAtPre[self.balance]\n" +
                                                                 "& self.<inv>\n" +
                                                                 "& exc = null", 
                                                                 "mod[heap]: allLocs \\setMinus freshLocs(heap)", 
@@ -661,15 +658,10 @@ public final class TestKeyUtil {
       addOperationObligations(addRecord, true, true, true);
       MemoryOperationContract ar1 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedLogFileClass, qualifiedLogFileClass, "addRecord(int)", operationContractIds[0], "normal_behavior"),
                                                                 "balance >= 0 & self.<inv>", 
-                                                                "\\if (!  javaAddInt(int::select(heapAtPre,\n" +
-                                                                "                                 self,\n" +
-                                                                "                                 currentRecord),\n" +
-                                                                "                     1)\n" +
+                                                                "\\if (!  javaAddInt(heapAtPre[self.currentRecord], 1)\n" +
                                                                 "        = " + qualifiedLogFileClass + ".logFileSize)\n" +
                                                                 "      \\then (  self.currentRecord\n" +
-                                                                "             = javaAddInt(int::select(heapAtPre,\n" +
-                                                                "                                      self,\n" +
-                                                                "                                      currentRecord),\n" +
+                                                                "             = javaAddInt(heapAtPre[self.currentRecord],\n" +
                                                                 "                          1))\n" +
                                                                 "      \\else (self.currentRecord = 0)\n" +
                                                                 "& (    self.logArray[self.currentRecord].balance\n" +

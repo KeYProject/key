@@ -228,12 +228,17 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Create proof environment for symbolic execution
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, startPosition, endPosition, false, false, false);
-      // Extract and test try content
-      String tryContent = getTryContent(env.getProof());
-      assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
-      // Resume
-      resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
-      // Test save and reload of the proof
-      assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
+      try {
+         // Extract and test try content
+         String tryContent = getTryContent(env.getProof());
+         assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
+         // Resume
+         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
+         // Test save and reload of the proof
+         assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
+      }
+      finally {
+         env.dispose();
+      }
    }
 }

@@ -75,17 +75,22 @@ public class KeYUtilTest extends TestCase {
       assertEquals("run", run.getElementName());
       // Open project in KeY
       KeYEnvironment<?> environment = KeYEnvironment.load(ResourceUtil.getLocation(project.getResource()), null, null);
-      JavaInfo javaInfo = environment.getJavaInfo();
-      // Test conversion of doSomething
-      IProgramMethod pm = KeYUtil.getProgramMethod(doSomething, javaInfo);
-      assertNotNull(pm);
-      assertEquals("doSomething", pm.getFullName());
-      assertEquals("JDTMethodToKeYProgramMethodTest", pm.getContainerType().getFullName());
-      // Test conversion of run
-      pm = KeYUtil.getProgramMethod(run, javaInfo);
-      assertNotNull(pm);
-      assertEquals("run", pm.getFullName());
-      assertEquals("JDTMethodToKeYProgramMethodTest.InnerClass", pm.getContainerType().getFullName());
+      try {
+         JavaInfo javaInfo = environment.getJavaInfo();
+         // Test conversion of doSomething
+         IProgramMethod pm = KeYUtil.getProgramMethod(doSomething, javaInfo);
+         assertNotNull(pm);
+         assertEquals("doSomething", pm.getFullName());
+         assertEquals("JDTMethodToKeYProgramMethodTest", pm.getContainerType().getFullName());
+         // Test conversion of run
+         pm = KeYUtil.getProgramMethod(run, javaInfo);
+         assertNotNull(pm);
+         assertEquals("run", pm.getFullName());
+         assertEquals("JDTMethodToKeYProgramMethodTest.InnerClass", pm.getContainerType().getFullName());
+      }
+      finally {
+         environment.dispose();
+      }
    }
    
    /**

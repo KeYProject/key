@@ -313,6 +313,10 @@ public class JMLSpecFactory {
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            if(heap == savedHeap && textualSpecCase.getAssignable(heap.name().toString()).isEmpty()) {
              clauses.assignables.put(heap, null);
+           } else if (clauses.strictlyPure) {
+               final ImmutableList<PositionedString> assignableNothing = ImmutableSLList.<PositionedString>nil().append(new PositionedString("assignable \\nothing;"));
+               clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+                       progVars.paramVars,assignableNothing));
            }else{
              clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
