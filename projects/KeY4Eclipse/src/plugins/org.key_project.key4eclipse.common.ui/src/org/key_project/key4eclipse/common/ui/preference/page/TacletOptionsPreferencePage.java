@@ -74,9 +74,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
       KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(getExampleProof(), null, null);
-      if (env.getLoadedProof() != null) {
-         env.getLoadedProof().dispose();
-      }
+      env.dispose();
    }
    
    /**

@@ -48,10 +48,15 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       String oraclePathInBaseDirFile = "examples/_testcase/set/magic42/oracle/Magic42.xml";
       // Create proof environment for symbolic execution
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false);
-      // Resume
-      resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
-      // Do test steps
-      doParallelSiteProofTest(env);
+      try {
+         // Resume
+         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
+         // Do test steps
+         doParallelSiteProofTest(env);
+      }
+      finally {
+         env.dispose();
+      }
    }
    
    /**
@@ -62,8 +67,13 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, false, false, false);
-      // Do test steps
-      doParallelSiteProofTest(env);
+      try {
+         // Do test steps
+         doParallelSiteProofTest(env);
+      }
+      finally {
+         env.dispose();
+      }
    }
    
    /**

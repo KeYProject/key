@@ -992,20 +992,28 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
       tempFile.deleteOnExit();
+      Proof reloadedProof = null;
+      SymbolicExecutionTreeBuilder reloadedBuilder = null;
       try {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof
          env.getUi().loadProblem(tempFile);
          waitForAutoMode(env.getUi());
-         Proof reloadedProof = env.getUi().getMediator().getProof();
+         reloadedProof = env.getUi().getMediator().getProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
-         SymbolicExecutionTreeBuilder reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
+         reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
          reloadedBuilder.analyse();
          assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
       }
       finally {
+         if (reloadedBuilder != null) {
+            reloadedBuilder.dispose();
+         }
+         if (reloadedProof != null) {
+            reloadedProof.dispose();
+         }
          if (tempFile != null) {
             tempFile.delete();
          }
