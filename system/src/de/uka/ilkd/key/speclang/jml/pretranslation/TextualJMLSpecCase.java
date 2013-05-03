@@ -71,6 +71,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     
     static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
         final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
+        res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
         res.addRequires(assertStm);
         res.addEnsures(assertStm);
         res.addAssignable(new PositionedString("assignable \\strictly_nothing;",assertStm.fileName,assertStm.pos));
