@@ -7,7 +7,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.key_project.key4eclipse.resources.KeYProjectNature">
+               class="org.key_project.key4eclipse.resources.nature.KeYProjectNature">
          </run>
       </runtime>
    </extension>
@@ -17,7 +17,7 @@
          point="org.eclipse.core.resources.builders">
       <builder>
          <run
-               class="org.key_project.key4eclipse.resources.KeYProjectBuilder">
+               class="org.key_project.key4eclipse.resources.builder.KeYProjectBuilder">
          </run></builder>
    </extension>
 

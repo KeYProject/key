@@ -1,18 +1,28 @@
-package org.key_project.key4eclipse.resources;
+package org.key_project.key4eclipse.resources.builder;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.tools.JavaFileObject;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -27,6 +37,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.PackageFragment;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -41,11 +53,13 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 
 
+@SuppressWarnings("restriction")
 public class KeYProjectBuilder extends IncrementalProjectBuilder {
 
    public KeYProjectBuilder() {
@@ -57,10 +71,6 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       if(delta != null){
          if(delta.getKind() == (IResourceDelta.CHANGED)){
             LinkedList<IMethod> methods = collectAllMethods(delta);
-            for(IMethod meth : methods){
-               System.out.println(meth.getElementName());
-            }
-            
             if(!methods.isEmpty()){
                runProofs(methods);
             }
@@ -74,7 +84,12 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    
    
    
-   
+   /**
+    * Collects all {@link IMethod} of the given {@link IResourceDelta}s {@link IProject}.
+    * @param delta - the {@link IResourceDelta} for which the {@link IMethod}s will be collected.
+    * @return the {@link LinkedList<IMethod>} that contains the collected {@link IMethod}s.
+    * @throws JavaModelException - possible Exception form the {@link JavaProject}s {@link PackageFragment}.
+    */
    private LinkedList<IMethod> collectAllMethods(IResourceDelta delta) throws JavaModelException{
       IProject project = delta.getResource().getProject();
       IJavaProject javaProject = JavaCore.create(project);
@@ -96,9 +111,15 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          }
       }
       return methods;
-
    }
    
+   
+   /**
+    * Iterates over the given {@link LinkedList<IMethod>}. For each {@link IMethod} the {@link OperationContract}s are collected. 
+    * When a {@link Proof} for the current {@link OperationContract} already exists it will be loaded and the AutoMode will be started.
+    * If the {@link Proof} doesn't exists  it will be instantiated and then the AutoMode will be started. When the AutoMode is done, the {@link Proof} will be saved in a local directory.
+    * @param methods - the {@link LinkedList<IMehod>} with the {@link IMetod}s for which the {@link Proof}s should run.
+    */
    private void runProofs(LinkedList<IMethod> methods){
       for(IMethod method : methods){
          try{
@@ -125,15 +146,18 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
                ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);
                //if proof does not exist, create it. else load it and run the automode.
                IFile file = createProofIFile(input.name(), folderPath);
+               Proof finalProof = null;
                if(!file.exists()){
-                  System.out.println("NEW PROOF");
+//                  System.out.println("NEW PROOF");
                   Proof proof = environment.createProof(input);
-                  System.out.println("Proof: " + proof.name());
+//                  System.out.println("Proof: " + proof.name());
                   environment.getUi().startAndWaitForAutoMode(proof);
                   saveProofToProofFolder(proof, folderPath);
+                  finalProof = proof;
+                  
                }
                else{
-                  System.out.println("PROOF EXISTS");
+//                  System.out.println("PROOF EXISTS");
                   final File proofFile = file.getLocation().toFile();
                   KeYFile keyFile = new KeYFile(null,  proofFile, null);
                   try{
@@ -143,16 +167,18 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
                      final List<File> keyFileClassPaths = keyFile.readClassPath();
                      environment = KeYEnvironment.load(proofFile, keyFileClassPaths, keyFileBoot);
                      Proof proof = environment.getLoadedProof();
-                     System.out.println("Proof: " + proof.name());
+//                     System.out.println("Proof: " + proof.name());
                      if(!proof.closed()){
                         environment.getUi().startAndWaitForAutoMode(proof);
                      saveProofToProofFolder(proof, folderPath);
                      }
+                     finalProof = proof;
                   }
                   catch (ProofInputException e) {
                      LogUtil.getLogger().createErrorStatus(e);
                   }
                }
+               setMarker(finalProof, method );               
             }
          }
          catch (Exception e) {
@@ -161,6 +187,12 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       }      
    }
    
+   
+   /**
+    * Replaces invalid characters in the given {@link String} with '_' and returns a vaild {@link String}.
+    * @param str - the {@link String} to be made valid.
+    * @return the valid {@link String}
+    */
    //In Util stecken
    private String makePathValid(String str){
       String tmp;
@@ -176,7 +208,16 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       return str;
    }
    
+   
+   /**
+    * Creates a {@link IFolder} for the {@link Proof}s of the given {@link IMethod}. The folder is named after the classname of the {@link IMethod}.
+    * The classfolder will be a subfolder of the mainfolder "Proofs". This folder will be created if it doesn't exists.
+    * @param method
+    * @return
+    * @throws CoreException
+    */
    private IPath createProofFolder(IMethod method) throws CoreException{
+      //TODO: Test if javaProject==null.
       IPath projectPath = method.getJavaProject().getPath();
       IPath proofMainFolderPath = projectPath.append("Proofs");
       IFolder proofMainFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofMainFolderPath);
@@ -192,6 +233,13 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       return proofClassFolderPath;
    }
    
+   
+   /**
+    * Creates the {@link IFile} for the {@link Proof} that will be stored.
+    * @param name - the name for the {@link IFile}.
+    * @param path - the path for the {@link IFile}.
+    * @return - the {@link IFile}.
+    */
    private IFile createProofIFile(String name, IPath path){
       if(path != null && name != null){
          name = makePathValid(name);
@@ -202,7 +250,15 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       }
       else return null;
    }
+
    
+   /**
+    * 
+    * @param proof
+    * @param path
+    * @throws CoreException
+    * @throws IOException
+    */
    private void saveProofToProofFolder(Proof proof, IPath path) throws CoreException, IOException{ 
       if(proof.name().toString() != null){
          IFile file = createProofIFile(proof.name().toString(), path);
@@ -228,6 +284,14 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       }
    }
    
+   
+   /**
+    * Collects all {@link FunctionalOperationContract}s of the given {@link IMethod}.
+    * @param method - the given {@link Method}.
+    * @param environment - the {@link KeYEnvironment} for this {@link IMethod}.
+    * @return - An {@link ImmutableSet<FunctionOperationContract>} that holds all {@link FunctionalOperationContract}s found for the given {@link IMethod}.
+    * @throws ProofInputException
+    */
    public ImmutableSet<FunctionalOperationContract> searchContractsForMethod(IMethod method, KeYEnvironment<CustomConsoleUserInterface> environment) throws ProofInputException {
       if (method != null && method.exists()) {
             if(environment.getInitConfig() != null){
@@ -240,6 +304,64 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             }
       }
       return null;
+   }
+   
+
+   private void setMarker(Proof proof, IMethod method) throws CoreException{
+      //get File from Method
+      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+      IPath methodPath = method.getPath();
+      IFile file = workspaceRoot.getFile(methodPath);
+      //set marker
+      if(proof.closed()){
+         IMarker marker = file.createMarker("org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker");
+         if(marker.exists()){
+               marker.setAttribute(IMarker.MESSAGE, "Proof closed");
+               marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberforMethod(method, file));
+         }
+      }
+      
+      else{
+         IMarker marker = file.createMarker("org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker");
+         if(marker.exists()){
+               marker.setAttribute(IMarker.MESSAGE, "Proof not closed");
+               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+               marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberforMethod(method, file));
+         }   
+      }
+   }
+
+   
+   private int getLineNumberforMethod(IMethod method, IFile file) throws JavaModelException{
+      String str = method.getSource();
+      try{
+         FileInputStream fs = new FileInputStream(file.getLocation().toFile());
+         
+         BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+         
+         StringBuilder sb = new StringBuilder();
+         String ls = System.getProperty("line.separator");
+         String line = null;
+         while ((line = br.readLine()) != null){
+            sb.append(line);
+            sb.append(ls);
+         }
+         String fullstr = sb.toString();
+         int lineCount = 1;
+         while(!fullstr.startsWith(str)){
+            if(fullstr.startsWith(System.getProperty("line.separator"))){
+               lineCount++;
+            }
+            fullstr = fullstr.substring(1, fullstr.length());
+         }
+         return lineCount;
+      } catch (FileNotFoundException e){
+         LogUtil.getLogger().createErrorStatus(e);
+      } catch (IOException ioE){
+         LogUtil.getLogger().createErrorStatus(ioE);
+      }
+      
+      return -1;
    }
 
 }

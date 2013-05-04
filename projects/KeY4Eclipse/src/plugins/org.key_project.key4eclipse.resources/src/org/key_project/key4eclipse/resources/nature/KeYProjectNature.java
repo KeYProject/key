@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.resources;
+package org.key_project.key4eclipse.resources.nature;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -12,7 +12,6 @@ public class KeYProjectNature implements IProjectNature  {
 
    @Override
    public void configure() throws CoreException {
-      System.out.println("Nature: configure()");
       IProjectDescription desc = project.getDescription();
       //get the description of the project basically .project file information
       ICommand[] commands = desc.getBuildSpec();
@@ -30,9 +29,6 @@ public class KeYProjectNature implements IProjectNature  {
       newCommands[newCommands.length - 1] = command;
       desc.setBuildSpec(newCommands);
       project.setDescription(desc, null); // write to .project file
-      for(int i = 0; i<project.getDescription().getBuildSpec().length;i++){
-         System.out.println(i + ": " + project.getDescription().getBuildSpec()[i].getBuilderName());
-      }
    }
       
    @Override
@@ -51,7 +47,6 @@ public class KeYProjectNature implements IProjectNature  {
 
    @Override
    public void setProject(IProject project) {
-      System.out.println("Nature: setProject");
       // TODO Auto-generated method stub
       this.project = project;
    }

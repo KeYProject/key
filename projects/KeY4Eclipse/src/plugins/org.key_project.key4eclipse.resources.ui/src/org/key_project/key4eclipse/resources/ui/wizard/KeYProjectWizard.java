@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.key_project.key4eclipse.resources.ui.wizard;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -30,7 +33,6 @@ public class KeYProjectWizard extends JavaProjectWizard{
       try {
          Object obj = ObjectUtil.get(this, "fFirstPage");
          if(obj instanceof WizardPage){
-            System.out.println("setTitle");
             ((WizardPage)obj).setDescription("Create a KeY Project");
          }
          else{
@@ -54,5 +56,27 @@ public class KeYProjectWizard extends JavaProjectWizard{
          LogUtil.getLogger().logError(e);
       }
       
+   }
+   
+   @Override
+   public boolean performFinish(){
+      boolean res = super.performFinish();
+      if(res){
+         final IProject project = getCreatedElement().getJavaProject().getProject();
+         try {
+            IProjectDescription description = project.getDescription();
+            String[] natures = description.getNatureIds();
+            String[] newNatures = new String[natures.length + 1];
+            System.arraycopy(natures,0,newNatures,0,natures.length);
+            newNatures[natures.length] = "org.key_project.key4eclipse.resources.KeYProjectNature";
+            description.setNatureIds(newNatures);
+            project.setDescription(description,null);
+         }
+         catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+      return res;
    }
 }
