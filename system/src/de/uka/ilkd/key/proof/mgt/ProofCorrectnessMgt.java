@@ -198,12 +198,14 @@ public final class ProofCorrectnessMgt {
 	//mark open proofs as open, all others as presumably closed 
 	ImmutableSet<Proof> presumablyClosed = DefaultImmutableSet.nil();
 	for(Proof p : all) {
-	    if(p.openGoals().size() > 0) {
-		p.mgt().proofStatus = ProofStatus.OPEN;
-	    } else {
-		p.mgt().proofStatus = ProofStatus.CLOSED;
-		presumablyClosed = presumablyClosed.add(p);
-	    }
+	   if (!p.isDisposed()) {
+	       if(p.openGoals().size() > 0) {
+	          p.mgt().proofStatus = ProofStatus.OPEN;
+	       } else {
+	          p.mgt().proofStatus = ProofStatus.CLOSED;
+	          presumablyClosed = presumablyClosed.add(p);
+	       }
+	   }
 	}
 	
 	//revert status of all "presumably closed" proofs for which at least one

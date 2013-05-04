@@ -18,15 +18,15 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {

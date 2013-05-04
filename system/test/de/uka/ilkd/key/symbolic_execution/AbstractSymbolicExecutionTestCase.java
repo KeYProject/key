@@ -47,12 +47,12 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -1005,20 +1005,28 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
       tempFile.deleteOnExit();
+      Proof reloadedProof = null;
+      SymbolicExecutionTreeBuilder reloadedBuilder = null;
       try {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof
          env.getUi().loadProblem(tempFile);
          waitForAutoMode(env.getUi());
-         Proof reloadedProof = env.getUi().getMediator().getProof();
+         reloadedProof = env.getUi().getMediator().getProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
-         SymbolicExecutionTreeBuilder reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
+         reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
          reloadedBuilder.analyse();
          assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
       }
       finally {
+         if (reloadedBuilder != null) {
+            reloadedBuilder.dispose();
+         }
+         if (reloadedProof != null) {
+            reloadedProof.dispose();
+         }
          if (tempFile != null) {
             tempFile.delete();
          }

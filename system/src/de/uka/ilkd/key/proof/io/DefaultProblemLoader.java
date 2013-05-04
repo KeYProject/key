@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -24,6 +24,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
@@ -32,9 +33,6 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
-import de.uka.ilkd.key.proof.io.EnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;

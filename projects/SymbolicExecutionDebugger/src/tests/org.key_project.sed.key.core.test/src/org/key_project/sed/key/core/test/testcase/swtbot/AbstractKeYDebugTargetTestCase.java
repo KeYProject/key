@@ -55,6 +55,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -627,7 +628,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, false);
+            Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, false);
+            proof.dispose();
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);

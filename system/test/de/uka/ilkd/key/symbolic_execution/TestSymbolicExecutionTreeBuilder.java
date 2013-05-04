@@ -23,8 +23,8 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -550,33 +550,38 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                             false,
                                                                             false,
                                                                             false);
-      // Find both statements "mid = y;".
-      IExecutionStartNode startNode = env.getBuilder().getStartNode();
-      IExecutionMethodCall methodCall = (IExecutionMethodCall)startNode.getChildren()[0];
-      IExecutionStatement intMidZ = (IExecutionStatement)methodCall.getChildren()[0];
-      IExecutionBranchNode ifYZ = (IExecutionBranchNode)intMidZ.getChildren()[0];
-      IExecutionBranchCondition notXY = (IExecutionBranchCondition)ifYZ.getChildren()[0];
-      IExecutionBranchNode ifXZ = (IExecutionBranchNode)notXY.getChildren()[0];
-      IExecutionBranchCondition not1X = (IExecutionBranchCondition)ifXZ.getChildren()[0];
-      IExecutionStatement midThenBranch = (IExecutionStatement)not1X.getChildren()[0];
-      IExecutionBranchCondition not1Y = (IExecutionBranchCondition)ifYZ.getChildren()[1];
-      IExecutionStatement midElseBranch = (IExecutionStatement)not1Y.getChildren()[0];
-      // Make sure that both statements "mid = y;" have the correct position info.
-      assertNotSame(midThenBranch, midElseBranch);
-      assertNotSame(midThenBranch.getActiveStatement(), midElseBranch.getActiveStatement());
-      PositionInfo thenPosition = midThenBranch.getActivePositionInfo();
-      PositionInfo elsePosition = midElseBranch.getActivePositionInfo();
-      assertNotSame(thenPosition, elsePosition);
-      assertNotSame(PositionInfo.UNDEFINED, thenPosition);
-      assertNotSame(PositionInfo.UNDEFINED, elsePosition);
-      assertEquals(6, thenPosition.getStartPosition().getLine());
-      assertEquals(21, thenPosition.getStartPosition().getColumn());
-      assertEquals(6, thenPosition.getEndPosition().getLine());
-      assertEquals(24, thenPosition.getEndPosition().getColumn());
-      assertEquals(9, elsePosition.getStartPosition().getLine());
-      assertEquals(17, elsePosition.getStartPosition().getColumn());
-      assertEquals(9, elsePosition.getEndPosition().getLine());
-      assertEquals(20, elsePosition.getEndPosition().getColumn());
+      try {
+         // Find both statements "mid = y;".
+         IExecutionStartNode startNode = env.getBuilder().getStartNode();
+         IExecutionMethodCall methodCall = (IExecutionMethodCall)startNode.getChildren()[0];
+         IExecutionStatement intMidZ = (IExecutionStatement)methodCall.getChildren()[0];
+         IExecutionBranchNode ifYZ = (IExecutionBranchNode)intMidZ.getChildren()[0];
+         IExecutionBranchCondition notXY = (IExecutionBranchCondition)ifYZ.getChildren()[0];
+         IExecutionBranchNode ifXZ = (IExecutionBranchNode)notXY.getChildren()[0];
+         IExecutionBranchCondition not1X = (IExecutionBranchCondition)ifXZ.getChildren()[0];
+         IExecutionStatement midThenBranch = (IExecutionStatement)not1X.getChildren()[0];
+         IExecutionBranchCondition not1Y = (IExecutionBranchCondition)ifYZ.getChildren()[1];
+         IExecutionStatement midElseBranch = (IExecutionStatement)not1Y.getChildren()[0];
+         // Make sure that both statements "mid = y;" have the correct position info.
+         assertNotSame(midThenBranch, midElseBranch);
+         assertNotSame(midThenBranch.getActiveStatement(), midElseBranch.getActiveStatement());
+         PositionInfo thenPosition = midThenBranch.getActivePositionInfo();
+         PositionInfo elsePosition = midElseBranch.getActivePositionInfo();
+         assertNotSame(thenPosition, elsePosition);
+         assertNotSame(PositionInfo.UNDEFINED, thenPosition);
+         assertNotSame(PositionInfo.UNDEFINED, elsePosition);
+         assertEquals(6, thenPosition.getStartPosition().getLine());
+         assertEquals(21, thenPosition.getStartPosition().getColumn());
+         assertEquals(6, thenPosition.getEndPosition().getLine());
+         assertEquals(24, thenPosition.getEndPosition().getColumn());
+         assertEquals(9, elsePosition.getStartPosition().getLine());
+         assertEquals(17, elsePosition.getStartPosition().getColumn());
+         assertEquals(9, elsePosition.getEndPosition().getLine());
+         assertEquals(20, elsePosition.getEndPosition().getColumn());
+      }
+      finally {
+         env.dispose();
+      }
    }
    
    /**
@@ -853,18 +858,18 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/variablesUnknownTest
     */
    public void testVariablesUnknownTest() throws Exception {
-      doTest(keyRepDirectory, 
-             "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
-             "UnknownTest", 
-             "main", 
-             null,
-             "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
-             true,
-             false,
-             ALL_IN_ONE_RUN,
-             false,
-             false,
-             false);
+      doTestAndDispose(keyRepDirectory, 
+                       "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
+                       "UnknownTest", 
+                       "main", 
+                       null,
+                       "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
+                       true,
+                       false,
+                       ALL_IN_ONE_RUN,
+                       false,
+                       false,
+                       false);
    }
    
    /**
@@ -979,72 +984,72 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/variablesArrayTest
     */
    public void testVariablesArrayTest() throws Exception {
-      doTest(keyRepDirectory, 
-             "examples/_testcase/set/variablesArrayTest/test/VariablesArrayTest.java", 
-             "VariablesArrayTest", 
-             "main", 
-             null,
-             "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
-             true,
-             false,
-             ALL_IN_ONE_RUN,
-             false,
-             false,
-             false);
+      doTestAndDispose(keyRepDirectory, 
+                       "examples/_testcase/set/variablesArrayTest/test/VariablesArrayTest.java", 
+                       "VariablesArrayTest", 
+                       "main", 
+                       null,
+                       "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
+                       true,
+                       false,
+                       ALL_IN_ONE_RUN,
+                       false,
+                       false,
+                       false);
    }
    
    /**
     * Tests example: examples/_testcase/set/variablesInstanceVariableTest
     */
    public void testVariablesInstanceVariableTest() throws Exception {
-      doTest(keyRepDirectory, 
-             "examples/_testcase/set/variablesInstanceVariableTest/test/VariablesInstanceVariableTest.java", 
-             "VariablesInstanceVariableTest", 
-             "main", 
-             null,
-             "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
-             true,
-             false,
-             ALL_IN_ONE_RUN,
-             false,
-             false,
-             false);
+      doTestAndDispose(keyRepDirectory, 
+                       "examples/_testcase/set/variablesInstanceVariableTest/test/VariablesInstanceVariableTest.java", 
+                       "VariablesInstanceVariableTest", 
+                       "main", 
+                       null,
+                       "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
+                       true,
+                       false,
+                       ALL_IN_ONE_RUN,
+                       false,
+                       false,
+                       false);
    }
    
    /**
     * Tests example: examples/_testcase/set/variablesLocalTest
     */
    public void testVariablesLocalTest() throws Exception {
-      doTest(keyRepDirectory, 
-             "examples/_testcase/set/variablesLocalTest/test/VariablesLocalTest.java", 
-             "VariablesLocalTest", 
-             "main", 
-             null,
-             "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
-             true,
-             false,
-             ALL_IN_ONE_RUN,
-             false,
-             false,
-             false);
+      doTestAndDispose(keyRepDirectory, 
+                       "examples/_testcase/set/variablesLocalTest/test/VariablesLocalTest.java", 
+                       "VariablesLocalTest", 
+                       "main", 
+                       null,
+                       "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
+                       true,
+                       false,
+                       ALL_IN_ONE_RUN,
+                       false,
+                       false,
+                       false);
    }
    
    /**
     * Tests example: examples/_testcase/set/variablesStaticTest
     */
    public void testVariablesStaticTest() throws Exception {
-      doTest(keyRepDirectory, 
-             "examples/_testcase/set/variablesStaticTest/test/VariablesStaticTest.java", 
-             "VariablesStaticTest", 
-             "main", 
-             null,
-             "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
-             true,
-             false,
-             ALL_IN_ONE_RUN,
-             false,
-             false,
-             false);
+      doTestAndDispose(keyRepDirectory, 
+                       "examples/_testcase/set/variablesStaticTest/test/VariablesStaticTest.java", 
+                       "VariablesStaticTest", 
+                       "main", 
+                       null,
+                       "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
+                       true,
+                       false,
+                       ALL_IN_ONE_RUN,
+                       false,
+                       false,
+                       false);
    }
    
    /**
@@ -1471,18 +1476,18 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * </p>
     */
    public void testRecursiveFibonacci_LONG_RUNNING_TEST() throws Exception {
-      doTest(keyRepDirectory, 
-             "examples/_testcase/set/recursiveFibonacci/test/RecursiveFibonacci.java", 
-             "RecursiveFibonacci", 
-             "fibonacci10", 
-             null,
-             "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
-             false,
-             false,
-             ALL_IN_ONE_RUN,
-             false,
-             false,
-             false);
+      doTestAndDispose(keyRepDirectory, 
+                       "examples/_testcase/set/recursiveFibonacci/test/RecursiveFibonacci.java", 
+                       "RecursiveFibonacci", 
+                       "fibonacci10", 
+                       null,
+                       "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
+                       false,
+                       false,
+                       ALL_IN_ONE_RUN,
+                       false,
+                       false,
+                       false);
    }
    
    /**
@@ -1726,20 +1731,59 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          boolean useLoopInvariants) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
-         doTest(baseDir, 
-                javaPathInBaseDir, 
-                containerTypeName, 
-                methodFullName, 
-                precondition,
-                oraclePathInBaseDirFile, 
-                includeVariables, 
-                includeCallStack,
-                maximalNumberOfExecutedSetNodesPerRun[i],
-                mergeBranchConditions,
-                useOperationContracts,
-                useLoopInvariants);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doTest(baseDir, 
+                                                                               javaPathInBaseDir, 
+                                                                               containerTypeName, 
+                                                                               methodFullName, 
+                                                                               precondition,
+                                                                               oraclePathInBaseDirFile, 
+                                                                               includeVariables, 
+                                                                               includeCallStack,
+                                                                               maximalNumberOfExecutedSetNodesPerRun[i],
+                                                                               mergeBranchConditions,
+                                                                               useOperationContracts,
+                                                                               useLoopInvariants);
+         env.dispose();
       }
    }
+   
+   /**
+    * Executes {@link #doTest(File, String, String, String, String, boolean, boolean, int, boolean, boolean, boolean)} and disposes the created {@link SymbolicExecutionEnvironment}. 
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The java class to test.
+    * @param methodFullName The method to test.
+    * @param precondition An optional precondition to use.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected void doTestAndDispose(File baseDir,
+                                   String javaPathInBaseDir,
+                                   String containerTypeName,
+                                   final String methodFullName,
+                                   String precondition,
+                                   String oraclePathInBaseDirFile,
+                                   boolean includeVariables,
+                                   boolean includeCallStack,
+                                   int maximalNumberOfExecutedSetNodes,
+                                   boolean mergeBranchConditions,
+                                   boolean useOperationContracts,
+                                   boolean useLoopInvariants) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeVariables, includeCallStack, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants);
+      env.dispose();
+   }
+
    
    /**
     * Executes a test with the following steps:
@@ -1798,7 +1842,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants);
+            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants);
+            env.dispose();
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);

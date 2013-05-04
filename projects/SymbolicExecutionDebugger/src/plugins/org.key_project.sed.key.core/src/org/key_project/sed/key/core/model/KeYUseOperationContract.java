@@ -29,6 +29,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDUseOperationContract} for the symbolic execution debugger (SED)
@@ -225,9 +226,14 @@ public class KeYUseOperationContract extends AbstractSEDUseOperationContract imp
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return !executionNode.isDisposed() && 
-             super.hasVariables() && 
-             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 
    /**

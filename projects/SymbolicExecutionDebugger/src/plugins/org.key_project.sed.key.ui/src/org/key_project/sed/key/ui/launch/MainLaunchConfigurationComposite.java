@@ -606,11 +606,12 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                    IRunnableWithProgressAndResult<InitConfig> run = new AbstractRunnableWithProgressAndResult<InitConfig>() {
                        @Override
                        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                           KeYEnvironment<?> environment = null;
                            try {
                               SWTUtil.checkCanceled(monitor);
                               monitor.beginTask("Receiving contracts.", IProgressMonitor.UNKNOWN);
                               SWTUtil.checkCanceled(monitor);
-                              KeYEnvironment<?> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+                              environment = KeYEnvironment.load(location, classPaths, bootClassPath);
                               SWTUtil.checkCanceled(monitor);
                               setResult(environment.getInitConfig());
                               monitor.done();
@@ -620,6 +621,11 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                            }
                            catch (Exception e) {
                               throw new InvocationTargetException(e, e.getMessage());
+                           }
+                           finally {
+                              if (environment != null) {
+                                 environment.dispose();
+                              }
                            }
                        }
                    };
