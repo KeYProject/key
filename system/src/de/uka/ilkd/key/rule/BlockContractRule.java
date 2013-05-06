@@ -361,9 +361,9 @@ public class BlockContractRule implements BuiltInRule {
                 InfFlowContractPO.newSymbols(
                         services.getProof().env().getInitConfig().activatedTaclets());
             }
-            Taclet informationFlowContractApp = !loadedInfFlow ?
-                    ifContractBuilder.buildContractApplTaclet(true)
-                    : ifContractBuilder.loadContractApplTaclet();
+            Taclet informationFlowContractApp = loadedInfFlow ?
+                    ifContractBuilder.loadContractApplTaclet()
+                    : ifContractBuilder.buildContractApplTaclet(true);
 
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
@@ -579,8 +579,8 @@ public class BlockContractRule implements BuiltInRule {
     Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
                                                   boolean loaded, Services services) {
         Term selfComposedExec = loaded ?
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION)
-                : loadFindTerm(contract, services);
+                loadFindTerm(contract, services)
+                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
