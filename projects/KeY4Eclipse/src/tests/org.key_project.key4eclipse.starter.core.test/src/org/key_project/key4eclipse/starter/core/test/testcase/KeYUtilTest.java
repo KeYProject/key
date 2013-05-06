@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.starter.core.test.testcase;
 
 import java.io.IOException;
@@ -62,17 +75,22 @@ public class KeYUtilTest extends TestCase {
       assertEquals("run", run.getElementName());
       // Open project in KeY
       KeYEnvironment<?> environment = KeYEnvironment.load(ResourceUtil.getLocation(project.getResource()), null, null);
-      JavaInfo javaInfo = environment.getJavaInfo();
-      // Test conversion of doSomething
-      IProgramMethod pm = KeYUtil.getProgramMethod(doSomething, javaInfo);
-      assertNotNull(pm);
-      assertEquals("doSomething", pm.getFullName());
-      assertEquals("JDTMethodToKeYProgramMethodTest", pm.getContainerType().getFullName());
-      // Test conversion of run
-      pm = KeYUtil.getProgramMethod(run, javaInfo);
-      assertNotNull(pm);
-      assertEquals("run", pm.getFullName());
-      assertEquals("JDTMethodToKeYProgramMethodTest.InnerClass", pm.getContainerType().getFullName());
+      try {
+         JavaInfo javaInfo = environment.getJavaInfo();
+         // Test conversion of doSomething
+         IProgramMethod pm = KeYUtil.getProgramMethod(doSomething, javaInfo);
+         assertNotNull(pm);
+         assertEquals("doSomething", pm.getFullName());
+         assertEquals("JDTMethodToKeYProgramMethodTest", pm.getContainerType().getFullName());
+         // Test conversion of run
+         pm = KeYUtil.getProgramMethod(run, javaInfo);
+         assertNotNull(pm);
+         assertEquals("run", pm.getFullName());
+         assertEquals("JDTMethodToKeYProgramMethodTest.InnerClass", pm.getContainerType().getFullName());
+      }
+      finally {
+         environment.dispose();
+      }
    }
    
    /**

@@ -30,6 +30,8 @@ import javax.swing.ImageIcon;
 
 public class KeYResourceManager {
 
+    private static final String DEFAULT_VERSION = "x.z.y";
+
     /** the unique instance */
     private static final KeYResourceManager instance 
 	= new KeYResourceManager();
@@ -63,10 +65,10 @@ public class KeYResourceManager {
 		}
 	    } catch (IOException ioe) {
 		// who cares it is just a version number
-		result = "x.z.y";
+		result = DEFAULT_VERSION;
 	    }
 	} else {
-	    result = "x.z.y";
+	    result = DEFAULT_VERSION;
 	}
 	return result.trim();
     }

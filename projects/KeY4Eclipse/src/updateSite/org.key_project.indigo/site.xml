@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description name="KeY Indigo Updates" url="http://www.key-project.org/download/releases/2.0/indigo">
-      This update site provides the KeY 2.0 based Eclipse projects for the Eclipse Indigo release.
+   <description name="KeY Indigo Updates" url="http://www.key-project.org/download/releases/eclipse/indigo">
+      This update site provides the currently released KeY based Eclipse projects for the Eclipse Indigo release.
    </description>
    <feature url="features/org.key_project.key4eclipse.starter.feature_1.0.0.qualifier.jar" id="org.key_project.key4eclipse.starter.feature" version="1.0.0.qualifier">
       <category name="org.key_project.category.verification"/>
@@ -13,6 +13,9 @@
       <category name="org.key_project.category.visualization"/>
    </feature>
    <feature url="features/org.key_project.monkey.feature_1.0.0.qualifier.jar" id="org.key_project.monkey.feature" version="1.0.0.qualifier">
+      <category name="org.key_project.category.verification"/>
+   </feature>
+   <feature url="features/org.key_project.keyide.feature_1.0.0.qualifier.jar" id="org.key_project.keyide.feature" version="1.0.0.qualifier">
       <category name="org.key_project.category.verification"/>
    </feature>
    <category-def name="org.key_project.category.verification" label="Verification">

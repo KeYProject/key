@@ -286,8 +286,6 @@ public class Main {
 
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
-        } else {
-            System.out.println("Running in normal mode ...");
         }
 
         if (Debug.ENABLE_ASSERTION) {
