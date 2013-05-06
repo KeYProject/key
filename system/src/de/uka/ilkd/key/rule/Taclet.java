@@ -372,8 +372,7 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services) {
 	Debug.out("Start Matching rule: ", name);
-	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
-		 services);	
+	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, services);
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
@@ -424,7 +423,7 @@ public abstract class Taclet implements Rule, Named {
 		    // match(x) is not a variable, but the
 		    // corresponding template variable is bound
 		    // or declared non free (so it has to be
-		    // matched to a variable) 		
+		    // matched to a variable)
 		    return null; // FAILED
 		}
 	    }
@@ -433,12 +432,12 @@ public abstract class Taclet implements Rule, Named {
 	// check generic conditions
 	for (final VariableCondition vc : variableConditions) {
 	    matchCond = vc.check(var, instantiationCandidate, matchCond, services);	    
-	    if (matchCond == null) {	     
+	    if (matchCond == null) {
 		return null; // FAILED
 	    }
 	}
 
-	return matchCond;	
+	return matchCond;
     }
 
 
@@ -614,7 +613,7 @@ public abstract class Taclet implements Rule, Named {
 	
 	//match java blocks:
 	matchCond = matchJavaBlock(term, template, matchCond, services);
-	if (matchCond == null) { 
+	if (matchCond == null) {
 	    Debug.out("FAILED. 9: Java Blocks not matching");
 	    return null;  //FAILED
 	}
@@ -622,7 +621,7 @@ public abstract class Taclet implements Rule, Named {
 	//match bound variables:
 	matchCond = matchBoundVariables(term, template, matchCond, 
 					services);
-	if (matchCond == null) { 
+	if (matchCond == null) {
 	    Debug.out("FAILED. 10: Bound Vars");
 	    return null;  //FAILED
 	}
@@ -634,7 +633,7 @@ public abstract class Taclet implements Rule, Named {
 		    		  false,
 				  matchCond, 
 				  services);
-	    if (matchCond == null) {		      
+	    if (matchCond == null) {
 	        return null; //FAILED
 	    } 
 	}	

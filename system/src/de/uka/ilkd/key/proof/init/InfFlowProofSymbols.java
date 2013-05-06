@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
@@ -42,9 +43,29 @@ public class InfFlowProofSymbols {
     private ImmutableSet<Taclet> taclets
             = DefaultImmutableSet.<Taclet>nil();
 
+    private static final ImmutableSet<String> tacletPrefixes
+            = DefaultImmutableSet.<String>nil().add("unfold_computed_formula")
+                                               .add("Class_invariant_axiom")
+                                               .add("Use_information_flow_contract")
+                                               .add("Split_post")
+                                               .add("Remove_post");
+
     public InfFlowProofSymbols() {
     }
 
+    public InfFlowProofSymbols(ImmutableSet<Taclet> taclets) {
+        this();
+        String name = null;
+        for (Taclet t: taclets) {
+            name = t.name().toString();
+            if (t instanceof RewriteTaclet)
+            for (String s: tacletPrefixes) {
+                if (name.startsWith(s)) {
+                    add(t);
+                }
+            }
+        }
+    }
     private void addTerm(Term t) {
         if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
@@ -184,7 +205,7 @@ public class InfFlowProofSymbols {
         return schemaVariables;
     }
 
-    private ImmutableSet<Taclet> getTaclets() {
+    public ImmutableSet<Taclet> getTaclets() {
         ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
         for (final Taclet t: taclets) {
             res = res.add(t);

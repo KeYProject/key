@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 
 /**
@@ -102,10 +103,21 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
     // TODO: add exception var
     public Term buildContractApplPredTerm(boolean local) {
+        boolean loadedInfFlow =
+                services.getProof().getSettings()
+                .getStrategySettings().getActiveStrategyProperties()
+                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+
         ProofObligationVars appData = getProofObligationVars(local);
-        Term contractApplPredTerm = getContractApplPred(appData);
+        Term contractApplPredTerm = loadedInfFlow ?
+                loadContractApplPred() : getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
+        }
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
         }
         InfFlowContractPO.addSymbol(contractApplPredTerm);
         return contractApplPredTerm;
@@ -115,10 +127,17 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Taclet buildContractApplTaclet(boolean local) {
         ProofObligationVars appData = getProofObligationVars(local);
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
         Taclet result = genInfFlowContractApplTaclet(appData, services, local);
         InfFlowContractPO.addSymbol(result);
         return result;
     }
+
+
+    abstract Taclet loadContractApplTaclet();
 
 
     abstract Name generateName();
@@ -141,6 +160,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     abstract Term getContractApplPred(ProofObligationVars appData);
+
+
+    abstract Term loadContractApplPred();
 
 
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,

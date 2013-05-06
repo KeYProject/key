@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
@@ -160,6 +161,24 @@ public class BlockContractRule implements BuiltInRule {
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
+    }
+
+    private Term loadFindTerm(BlockContract contract, Services services) {
+        Taclet res = null;
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
+        for (int j = 0; j < 10000; j++) {
+            String prefix =
+                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
+                                                contract.getNamePrefix()).toString();
+            res = InfFlowContractPO.getTaclet(prefix);
+            if (res != null)
+                return ((FindTaclet)res).find();
+        }
+        assert false; // This should not happen
+        return null;
     }
 
     private static ImmutableSet<BlockContract>
@@ -338,8 +357,13 @@ public class BlockContractRule implements BuiltInRule {
             // and associated taclet
             final Term contractApplTerm =
                     ifContractBuilder.buildContractApplPredTerm(true);
-            Taclet informationFlowContractApp =
-                    ifContractBuilder.buildContractApplTaclet(true);
+            if (!InfFlowContractPO.hasSymbols()) {
+                InfFlowContractPO.newSymbols(
+                        services.getProof().env().getInitConfig().activatedTaclets());
+            }
+            Taclet informationFlowContractApp = !loadedInfFlow ?
+                    ifContractBuilder.buildContractApplTaclet(true)
+                    : ifContractBuilder.loadContractApplTaclet();
 
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
@@ -376,7 +400,8 @@ public class BlockContractRule implements BuiltInRule {
             InfFlowPOSnippetFactory infFlowFactory =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
-            Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory);
+            Pair<Sequent, Term> seqPostPair =
+                    buildBodyPreservesSequent(infFlowFactory, contract, loadedInfFlow, services);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
 
@@ -551,13 +576,16 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f) {
-        Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
+                                                  boolean loaded, Services services) {
+        Term selfComposedExec = loaded ?
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION)
+                : loadFindTerm(contract, services);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
+        Sequent seq =
+                Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
 
         return new Pair<Sequent, Term> (seq, post);
     }

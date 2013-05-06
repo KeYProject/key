@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Triple;
 
@@ -547,6 +548,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
         else
             return "Loop Invariant " + getLoop().getStartPosition().getLine() +
                     " " + Math.abs(getLoop().hashCode());
+    }
+
+    @Override
+    public String getNamePrefix() {
+        if (getTarget() != null)
+            return "Loop Invariant " + getLoop().getStartPosition().getLine() +
+                    " " + ((ProgramMethod) getTarget()).getNamePrefix();
+        else
+            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " ";
     }
 
     @Override

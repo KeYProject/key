@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -297,10 +298,29 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
+    private Term loadFindTerm(LoopInvariant loopInv, Services services) {
+            Taclet res = null;
+            if (!InfFlowContractPO.hasSymbols()) {
+                InfFlowContractPO.newSymbols(
+                        services.getProof().env().getInitConfig().activatedTaclets());
+            }
+            for (int j = 0; j < 10000; j++) {
+                String prefix =
+                        MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
+                                loopInv.getNamePrefix()).toString();
+                res = InfFlowContractPO.getTaclet(prefix);
+                if (res != null)
+                    return ((FindTaclet)res).find();
+            }
+            assert false; // This should not happen
+            return null;
+    }
+
     private Goal buildInfFlowValidityGoal(Goal goal, LoopInvariant inv,
                                           InfFlowData infFlowData,
                                           RuleApp ruleApp,                                          
-                                          Goal infFlowGoal) {
+                                          Goal infFlowGoal,
+                                          boolean loaded) {
         // generate proof obligation variables
         final ProofObligationVars instantiationVars =
                 new ProofObligationVars(infFlowData.selfTerm,
@@ -321,13 +341,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, infFlowData.services);
-        final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
+        final Term selfComposedExec = loaded ? loadFindTerm(inv, infFlowData.services)
+                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
 
-        final Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
+        final Sequent seq =
+                Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
         infFlowGoal = goal.getCleanGoal(seq);
         infFlowGoal.setBranchLabel("Information Flow Validity");
 
@@ -375,7 +396,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                          TB.and(beforeAssumptions,
                                 TB.apply(infData.updates.second,
                                          TB.and(afterAssumptions, infData.applPredTerm))));
-        
+
         goal.addFormula(new SequentFormula(infFlowAssumptions),
                         true,
                         false);
@@ -697,9 +718,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             // and associated taclet
             final Term loopInvApplPredTerm =
                     ifInvariantBuilder.buildContractApplPredTerm(true);
-            final Taclet informationFlowInvariantApp =
-                    ifInvariantBuilder.buildContractApplTaclet(true);
-
+            if (!InfFlowContractPO.hasSymbols()) {
+                InfFlowContractPO.newSymbols(
+                        services.getProof().env().getInitConfig().activatedTaclets());
+            }
+            final Taclet informationFlowInvariantApp = !loadedInfFlow ?
+                            ifInvariantBuilder.buildContractApplTaclet(true)
+                            : ifInvariantBuilder.loadContractApplTaclet();
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
                                           selfTerm, selfAtPost,
                                           guardAtPre, guardAtPost, guardJb, guardTerm,
@@ -707,7 +732,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                                           updates, loopInvApplPredTerm, informationFlowInvariantApp);
 
             // create information flow validity goal
-            infFlowGoal = buildInfFlowValidityGoal(goal, inst.inv, infFlowData, ruleApp, infFlowGoal);
+            infFlowGoal = buildInfFlowValidityGoal(goal, inst.inv, infFlowData, ruleApp,
+                                                   infFlowGoal, loadedInfFlow);
         } else {
             infFlowData = new InfFlowData();
         }

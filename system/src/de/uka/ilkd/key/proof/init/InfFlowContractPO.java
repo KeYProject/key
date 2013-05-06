@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -13,12 +14,15 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.MiscTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,12 +66,20 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        boolean loadedInfFlow =
+                services.getProof() != null &&
+                services.getProof().getSettings()
+                .getStrategySettings().getActiveStrategyProperties()
+                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
-        final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        final Term selfComposedExec = loadedInfFlow ?
+                loadFindTerm((ProgramMethod)contract.getTarget(), services)
+                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
@@ -76,6 +88,10 @@ public class InfFlowContractPO extends AbstractOperationPO
         assignPOTerms(finalTerm);
         collectClassAxioms(contract.getKJT());
 
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
                 addSymbol(t.taclet());
@@ -188,12 +204,46 @@ public class InfFlowContractPO extends AbstractOperationPO
         properties.setProperty("Non-interference contract", contract.getName());
     }
 
+    public static Taclet getTaclet(String prefix) {
+        assert !symbols().getTaclets().isEmpty();
+        for(Taclet t: symbols().getTaclets()) {
+            if (t.name().toString().startsWith(prefix)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    private Term loadFindTerm(ProgramMethod pm, Services services) {
+        Taclet res = null;
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
+        for (int j = 0; j < 10000; j++) {
+            String prefix =
+                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
+                                                pm.getNamePrefix()).toString();
+            res = InfFlowContractPO.getTaclet(prefix);
+            if (res != null)
+                return ((FindTaclet)res).find();
+        }
+        assert false; // This should not happen
+        return null;
+    }
+
+    public static void newSymbols(ImmutableSet<Taclet> taclets) {
+        InfFlowProofSymbols symbols = new InfFlowProofSymbols(taclets);
+        ifSymbols = symbols;
+    }
 
     private static InfFlowProofSymbols symbols() {
-        if (ifSymbols == null) {
-            ifSymbols = new InfFlowProofSymbols();
-        }
+        assert ifSymbols != null;
         return ifSymbols;
+    }
+
+    public static boolean hasSymbols() {
+        return ifSymbols != null;
     }
 
     public static void addSymbol(Object o) {
