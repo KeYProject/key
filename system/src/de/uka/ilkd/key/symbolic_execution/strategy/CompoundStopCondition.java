@@ -63,6 +63,10 @@ public class CompoundStopCondition implements IStopCondition {
    public void addChildren(IStopCondition... children) {
       Collections.addAll(this.children, children);
    }
+   
+   public void removeChild(IStopCondition... child){
+      children.remove(child);
+   }
 
    /**
     * {@inheritDoc}

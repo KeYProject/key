@@ -13,12 +13,7 @@
 
 package org.key_project.sed.core.model.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -30,7 +25,6 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
-import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 
@@ -41,9 +35,7 @@ import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement implements ISEDDebugTarget {
-   
-   
-   protected Map<JavaLineBreakpoint, Integer> breakpointMap;
+
    
    /**
     * The {@link ILaunch} in that this {@link IDebugTarget} is used.
@@ -81,9 +73,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    public AbstractSEDDebugTarget(ILaunch launch) {
       super(null);DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
-      breakpointMap = new HashMap<JavaLineBreakpoint, Integer>();
       this.launch = launch;
-      addBreakpoints();
       
    }
    
@@ -240,10 +230,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void breakpointAdded(IBreakpoint breakpoint) {
-      if(breakpoint instanceof JavaLineBreakpoint){
-         JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-         breakpointMap.put(lineBreakpoint, 0);
-      }
    }
 
    /**
@@ -251,11 +237,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-      if(breakpoint instanceof JavaLineBreakpoint){
-         JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-         breakpointMap.remove(lineBreakpoint);
-      }
-
    }
 
    /**
@@ -332,14 +313,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
       }
       catch (DebugException e) {
          return e.getMessage();
-      }
-   }
-   
-
-   private void addBreakpoints(){      
-      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
-      for(int i = 0; i < breakpoints.length; i++){
-         breakpointAdded(breakpoints[i]);
       }
    }
 }

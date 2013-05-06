@@ -16,10 +16,15 @@ package org.key_project.sed.key.core.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
@@ -36,6 +41,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -49,7 +55,18 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * debug a program.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class KeYDebugTarget extends SEDMemoryDebugTarget {
+   
+   /**
+    * The {@link CompoundStopCondition} that holds all BreakpointsStopCOnditons for this {@link KeYDebugTarget}.
+    */
+   private CompoundStopCondition breakpointStopConditions = new CompoundStopCondition();
+   
+   /**
+    * The Map of {@link JavaLineBreakpoint}s with their current HitCount as value.
+    */
+   private Map<JavaLineBreakpoint, LineBreakpointStopCondition> breakpointMap;
   
    /**
     * The used model identifier.
@@ -122,6 +139,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false);
+      breakpointMap = new HashMap<JavaLineBreakpoint, LineBreakpointStopCondition>();
+      addBreakpoints();
    }
 
    /**
@@ -187,7 +206,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      stopCondition.addChildren(new BreakpointStopCondition(breakpointMap));
+      stopCondition.addChildren(breakpointStopConditions);
       if (stepOver) {
          stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       }
@@ -454,5 +473,69 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    public IMethod getMethod() {
       return launchSettings.getMethod();
+   }
+   
+   
+   /**
+    * Adds all Breakpoints to this DebugTarget. Is called only when the DebugTarget is initially created.
+    */
+   private void addBreakpoints(){      
+      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
+      for(int i = 0; i < breakpoints.length; i++){
+         breakpointAdded(breakpoints[i]);
+      }
+   }
+   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void breakpointAdded(IBreakpoint breakpoint) {
+      if(breakpoint instanceof JavaLineBreakpoint){
+         JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
+         try {
+            LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(lineBreakpoint.getMarker().getResource().getLocation(), lineBreakpoint.getLineNumber(), lineBreakpoint.getHitCount(), lineBreakpoint.getCondition(), lineBreakpoint.isEnabled());
+            breakpointStopConditions.addChildren(stopCondition);
+            breakpointMap.put(lineBreakpoint, stopCondition);
+         }
+         catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+      if(breakpoint instanceof JavaLineBreakpoint){
+         JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
+         breakpointStopConditions.removeChild(breakpointMap.get(lineBreakpoint));
+         breakpointMap.remove(lineBreakpoint);
+      }
+
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+      if(breakpoint instanceof JavaLineBreakpoint){
+         JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
+         LineBreakpointStopCondition stopCondition = breakpointMap.get(lineBreakpoint);
+         try {
+            stopCondition.setCondition(lineBreakpoint.getCondition());
+            stopCondition.setHitCount(lineBreakpoint.getHitCount());
+            stopCondition.setEnabled(lineBreakpoint.isEnabled());
+         }
+         catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
    }
 }

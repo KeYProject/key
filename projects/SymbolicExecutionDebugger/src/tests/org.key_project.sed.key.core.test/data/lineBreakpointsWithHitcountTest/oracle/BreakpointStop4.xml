@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_371b3f45-9415-4a7e-8612-464f9a6f28c3" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_ebc26753-4233-4e26-8a05-c6d0f5741c5f" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_b1c96ea0-2b97-49b5-9738-6617df388218" name="self.main();" pathCondition="true" lineNumber="-1" charStart="219" charEnd="223">
+            <sedStatement xml:id="_119533ba-3782-4199-8714-a8410fba32c3" name="int a = 0;" pathCondition="true" lineNumber="-1" charStart="233" charEnd="242">
+               <sedStatement xml:id="_39c03325-e541-40cf-a7bf-ad5e02de62aa" name="return main(a);" pathCondition="true" lineNumber="-1" charStart="248" charEnd="263">
+                  <sedMethodCall xml:id="_39366bf9-2987-470d-8fe4-1e03e125beb6" name="self.main(a_1);" pathCondition="true" lineNumber="-1" charStart="285" charEnd="289">
+                     <sedStatement xml:id="_01fea046-5fbf-4031-b400-08c58cdcb2ab" name="a_1++;" pathCondition="true" lineNumber="-1" charStart="303" charEnd="307">
+                        <sedStatement xml:id="_572f9dab-7f12-40e5-a3ee-b25e9a9260d9" name="x=callee.main(a_1);" pathCondition="true" lineNumber="-1" charStart="312" charEnd="331">
+                           <sedBranchCondition xml:id="_c9472de6-cbb6-40b1-ba46-0cd061e1c177" name="!self.callee = null" pathCondition="!self.callee = null">
+                              <sedMethodCall xml:id="_ca25be26-58e9-4fad-81a8-7a249444605f" name="self.callee.main(a_2);" pathCondition="!self.callee = null" lineNumber="-1" charStart="75" charEnd="79">
+                                 <sedStatement xml:id="_5d0b810c-7017-4ff9-a1aa-112b479eb2f0" name="x=a_2+4;" pathCondition="!self.callee = null" lineNumber="-1" charStart="93" charEnd="99">
+                                    <sedStatement xml:id="_18a83f30-eaa2-424e-b1c7-16d601ef622f" name="return a_2*x;" pathCondition="!self.callee = null" lineNumber="-1" charStart="104" charEnd="115">
+                                       <sedMethodReturn xml:id="_09e75a7c-b456-435b-ab80-42707e5d35b9" name="&lt;return of self.callee.main(a_2);&gt;" pathCondition="!self.callee = null" lineNumber="-1" charStart="75" charEnd="79">
+                                          <sedStatement xml:id="_f236a6e4-236f-45b9-bf8a-8fbae0587fbf" name="x++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="336" charEnd="340">
+                                             <sedStatement xml:id="_426473c2-8a03-4a36-96d3-f4d46f4cde97" name="loop();" pathCondition="!self.callee = null" lineNumber="-1" charStart="345" charEnd="352">
+                                                <sedMethodCall xml:id="_912fc61a-b914-4312-8408-d94d7d8633d3" name="self.loop();" pathCondition="!self.callee = null" lineNumber="-1" charStart="128" charEnd="132">
+                                                   <sedLoopNode xml:id="_11ab4253-f4e2-4b5e-836a-cba8c816284e" name="for ( int i = 0; i&lt;=3; i++ ) {   x++; }" pathCondition="!self.callee = null" lineNumber="-1" charStart="142" charEnd="183">
+                                                      <sedStatement xml:id="_9db76220-f0f8-43b3-a744-373b9de5e545" name="int i = 0;" pathCondition="!self.callee = null" lineNumber="-1" charStart="146" charEnd="153">
+                                                         <sedLoopCondition xml:id="_fc828c91-9bcb-4a70-a07a-ba6e9eba9259" name="i&lt;=3" pathCondition="!self.callee = null" lineNumber="-1" charStart="154" charEnd="158">
+                                                            <sedStatement xml:id="_5ba61ecc-0070-4238-9dfa-005ed8887d83" name="x++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="171" charEnd="175">
+                                                               <sedStatement xml:id="_da985e4e-5373-4850-8a4d-0d4d3143b38a" name="i++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="159" charEnd="162">
+                                                                  <sedLoopCondition xml:id="_26a74dd6-935c-4529-8637-9b9c93d9e68a" name="i&lt;=3" pathCondition="!self.callee = null" lineNumber="-1" charStart="154" charEnd="158">
+                                                                     <sedStatement xml:id="_83d8a08a-152b-431c-a336-1764f7592a24" name="x++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="171" charEnd="175">
+                                                                        <sedStatement xml:id="_1f4276ac-6c38-4c81-82c2-4be104a0e886" name="i++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="159" charEnd="162">
+                                                                           <sedLoopCondition xml:id="_24b08854-0978-4963-a15c-7c07cb61816a" name="i&lt;=3" pathCondition="!self.callee = null" lineNumber="-1" charStart="154" charEnd="158">
+                                                                              <sedStatement xml:id="_ae68ec48-d017-4056-aaab-57b196dfe89b" name="x++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="171" charEnd="175">
+                                                                                 <sedStatement xml:id="_9a306024-5d1b-46e8-85a6-78c3dbd8157e" name="i++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="159" charEnd="162">
+                                                                                    <sedLoopCondition xml:id="_63d0b60b-cf71-4506-805f-e48ed6836b40" name="i&lt;=3" pathCondition="!self.callee = null" lineNumber="-1" charStart="154" charEnd="158">
+                                                                                       <sedStatement xml:id="_e9076755-b699-4ccb-ad39-a1b98be899f0" name="x++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="171" charEnd="175">
+                                                                                          <sedStatement xml:id="_9045946d-2a96-4cf6-919a-ff5054104383" name="i++;" pathCondition="!self.callee = null" lineNumber="-1" charStart="159" charEnd="162">
+                                                                                             <sedLoopCondition xml:id="_8c196438-26ca-47c3-ad7d-93662fa83ddb" name="i&lt;=3" pathCondition="!self.callee = null" lineNumber="-1" charStart="154" charEnd="158">
+                                                                                                <sedStatement xml:id="_2ab23f5f-ff99-46b6-b636-7c4921c449f8" name="return x;" pathCondition="!self.callee = null" lineNumber="-1" charStart="190" charEnd="199">
+                                                                                                   <sedStatement xml:id="_eace53d6-d6c5-43f1-aea6-a63986d98699" name="return x;" pathCondition="!self.callee = null" lineNumber="-1" charStart="357" charEnd="366">
+                                                                                                      <sedMethodReturn xml:id="_bbc93fed-0797-4234-a794-2275ac3988c3" name="&lt;return of self.main(a_1);&gt;" pathCondition="!self.callee = null" lineNumber="-1" charStart="285" charEnd="289">
+                                                                                                         <sedMethodReturn xml:id="_7b55c178-344e-47cb-875b-f567f140365a" name="&lt;return of self.main();&gt;" pathCondition="!self.callee = null" lineNumber="-1" charStart="219" charEnd="223">
+                                                                                                            <sedTermination xml:id="_4cc3e794-e9fc-4296-a305-6c06c378e24f" name="&lt;end&gt;" pathCondition="!self.callee = null">
+                                                                                                            </sedTermination>
+                                                                                                         </sedMethodReturn>
+                                                                                                      </sedMethodReturn>
+                                                                                                   </sedStatement>
+                                                                                                </sedStatement>
+                                                                                             </sedLoopCondition>
+                                                                                          </sedStatement>
+                                                                                       </sedStatement>
+                                                                                    </sedLoopCondition>
+                                                                                 </sedStatement>
+                                                                              </sedStatement>
+                                                                           </sedLoopCondition>
+                                                                        </sedStatement>
+                                                                     </sedStatement>
+                                                                  </sedLoopCondition>
+                                                               </sedStatement>
+                                                            </sedStatement>
+                                                         </sedLoopCondition>
+                                                      </sedStatement>
+                                                   </sedLoopNode>
+                                                </sedMethodCall>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedMethodCall>
+                           </sedBranchCondition>
+                           <sedBranchCondition xml:id="_176727b3-94d5-4ae5-bd29-3dc4f7ad2853" name="self.callee = null" pathCondition="self.callee = null">
+                              <sedUseOperationContract xml:id="_3c10eb62-d88a-4237-8f0b-6ef65691bfb3" name="self = new NullPointerException() catch(exc)
+pre: true
+post: self.message = null
+&amp; self.cause = null
+&amp; self.&lt;inv&gt;
+&amp; exc = null
+mod: {(self, message)} \cup {(self, cause)}
+termination: diamond" pathCondition="self.callee = null" lineNumber="-1" charStart="-1" charEnd="-1" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                                 <sedExceptionalTermination xml:id="_87c90bde-5b0a-4512-b54b-e1b81b820b3d" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.callee = null">
+                                 </sedExceptionalTermination>
+                              </sedUseOperationContract>
+                           </sedBranchCondition>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedMethodCall>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
