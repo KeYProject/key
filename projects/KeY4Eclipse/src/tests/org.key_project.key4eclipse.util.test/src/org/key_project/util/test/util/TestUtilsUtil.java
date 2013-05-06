@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
@@ -176,6 +177,34 @@ public class TestUtilsUtil {
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
       IProject project = createProject(name);
+      IFolder bin = project.getFolder("bin");
+      if (!bin.exists()) {
+         bin.create(true, true, null);
+      }
+      IFolder src = project.getFolder("src");
+      if (!src.exists()) {
+         src.create(true, true, null);
+      }
+      IJavaProject javaProject = JavaCore.create(project); 
+      JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
+      IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
+      entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+      page.init(javaProject, bin.getFullPath(), entries, false);
+      page.configureJavaProject(null);
+      return javaProject;
+   }
+   
+   public static IJavaProject createKeYProject(String name) throws CoreException, InterruptedException{
+      IProject project = createProject(name);
+      IProjectDescription description = project.getDescription();
+      //Add KeYNature
+      String[] natures = description.getNatureIds();
+      String[] newNatures = new String[natures.length + 1];
+      System.arraycopy(natures, 0, newNatures, 0, natures.length);
+      newNatures[natures.length] = JavaCore.NATURE_ID;
+      description.setNatureIds(newNatures);
+      project.setDescription(description, null);
+      
       IFolder bin = project.getFolder("bin");
       if (!bin.exists()) {
          bin.create(true, true, null);

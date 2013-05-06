@@ -14,13 +14,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.tools.JavaFileObject;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -39,9 +36,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jdt.internal.core.PackageFragment;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -53,7 +50,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -70,7 +66,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       IResourceDelta delta = this.getDelta(getProject());
       if(delta != null){
          if(delta.getKind() == (IResourceDelta.CHANGED)){
-            LinkedList<IMethod> methods = collectAllMethods(delta);
+            LinkedList<IMethod> methods = collectAllMethods(delta.getResource().getProject());
             if(!methods.isEmpty()){
                runProofs(methods);
             }
@@ -83,40 +79,9 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    }
    
    
-   
    /**
-    * Collects all {@link IMethod} of the given {@link IResourceDelta}s {@link IProject}.
-    * @param delta - the {@link IResourceDelta} for which the {@link IMethod}s will be collected.
-    * @return the {@link LinkedList<IMethod>} that contains the collected {@link IMethod}s.
-    * @throws JavaModelException - possible Exception form the {@link JavaProject}s {@link PackageFragment}.
-    */
-   private LinkedList<IMethod> collectAllMethods(IResourceDelta delta) throws JavaModelException{
-      IProject project = delta.getResource().getProject();
-      IJavaProject javaProject = JavaCore.create(project);
-      IPackageFragment[] packages = javaProject.getPackageFragments();
-      LinkedList<IMethod> methods = new LinkedList<IMethod>();
-      for(IPackageFragment aPackage : packages){
-         if (aPackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
-            
-          //find Java Classes
-            for (ICompilationUnit unit : aPackage.getCompilationUnits()) {
-               IType[] allTypes = unit.getAllTypes();
-               for (IType type : allTypes) {
-                  IMethod[] classMethods = type.getMethods();
-                  for(IMethod method : classMethods){
-                     methods.add(method);
-                  }
-               }
-            }         
-         }
-      }
-      return methods;
-   }
-   
-   
-   /**
-    * Iterates over the given {@link LinkedList<IMethod>}. For each {@link IMethod} the {@link OperationContract}s are collected. 
-    * When a {@link Proof} for the current {@link OperationContract} already exists it will be loaded and the AutoMode will be started.
+    * Iterates over the given {@link LinkedList<IMethod>}. For each {@link IMethod} the {@link FunctionalOperationContract}s are collected. 
+    * When a {@link Proof} for the current {@link FunctionalOperationContract} already exists it will be loaded and the AutoMode will be started.
     * If the {@link Proof} doesn't exists  it will be instantiated and then the AutoMode will be started. When the AutoMode is done, the {@link Proof} will be saved in a local directory.
     * @param methods - the {@link LinkedList<IMehod>} with the {@link IMetod}s for which the {@link Proof}s should run.
     */
@@ -131,7 +96,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             
             KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
             
-            ImmutableSet<FunctionalOperationContract> operationContracts = searchContractsForMethod(method, environment);
+            ImmutableSet<FunctionalOperationContract> operationContracts = collectAllContractsForMethod(method, environment);
             
             
             //Create Folder for Proofs of this Method
@@ -188,24 +153,55 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    }
    
    
+   
    /**
-    * Replaces invalid characters in the given {@link String} with '_' and returns a vaild {@link String}.
-    * @param str - the {@link String} to be made valid.
-    * @return the valid {@link String}
+    * Collects all {@link IMethod} of the given {@link IResourceDelta}s {@link IProject}.
+    * @param delta - the {@link IResourceDelta} for which the {@link IMethod}s will be collected.
+    * @return the {@link LinkedList<IMethod>} that contains the collected {@link IMethod}s.
+    * @throws JavaModelException - possible Exception form the {@link JavaProject}s {@link PackageFragment}.
     */
-   //In Util stecken
-   private String makePathValid(String str){
-      String tmp;
-      for(int i = 1; i<=str.length();i++){
-         tmp = str.substring(0, i);
-         Path path = new Path(tmp);
-         if(!path.isValidSegment(tmp)){
-            StringBuilder strbuilder = new StringBuilder(str);
-            strbuilder.setCharAt(i-1, '_');
-            str = strbuilder.toString();
+   private LinkedList<IMethod> collectAllMethods(IProject project) throws JavaModelException{
+      IJavaProject javaProject = JavaCore.create(project);
+      IPackageFragment[] packages = javaProject.getPackageFragments();
+      LinkedList<IMethod> methods = new LinkedList<IMethod>();
+      for(IPackageFragment aPackage : packages){
+         if (aPackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
+            
+          //find Java Classes
+            for (ICompilationUnit unit : aPackage.getCompilationUnits()) {
+               IType[] allTypes = unit.getAllTypes();
+               for (IType type : allTypes) {
+                  IMethod[] classMethods = type.getMethods();
+                  for(IMethod method : classMethods){
+                     methods.add(method);
+                  }
+               }
+            }         
          }
       }
-      return str;
+      return methods;
+   }
+   
+   
+   /**
+    * Collects all {@link FunctionalOperationContract}s of the given {@link IMethod}.
+    * @param method - the given {@link Method}.
+    * @param environment - the {@link KeYEnvironment} for this {@link IMethod}.
+    * @return - An {@link ImmutableSet<FunctionOperationContract>} that holds all {@link FunctionalOperationContract}s found for the given {@link IMethod}.
+    * @throws ProofInputException
+    */
+   private ImmutableSet<FunctionalOperationContract> collectAllContractsForMethod(IMethod method, KeYEnvironment<CustomConsoleUserInterface> environment) throws ProofInputException {
+      if (method != null && method.exists()) {
+            if(environment.getInitConfig() != null){
+               IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
+               if(pm != null){
+                  KeYJavaType type = pm.getContainerType();
+                  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(type, pm);
+                  return operationContracts;
+               }
+            }
+      }
+      return null;
    }
    
    
@@ -250,6 +246,27 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       }
       else return null;
    }
+   
+   
+   /**
+    * Replaces invalid characters in the given {@link String} with '_' and returns a vaild {@link String}.
+    * @param str - the {@link String} to be made valid.
+    * @return the valid {@link String}
+    */
+   //In Util stecken
+   private String makePathValid(String str){
+      String tmp;
+      for(int i = 1; i<=str.length();i++){
+         tmp = str.substring(0, i);
+         Path path = new Path(tmp);
+         if(!path.isValidSegment(tmp)){
+            StringBuilder strbuilder = new StringBuilder(str);
+            strbuilder.setCharAt(i-1, '_');
+            str = strbuilder.toString();
+         }
+      }
+      return str;
+   }
 
    
    /**
@@ -259,6 +276,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * @throws CoreException
     * @throws IOException
     */
+   //In Util stecken
    private void saveProofToProofFolder(Proof proof, IPath path) throws CoreException, IOException{ 
       if(proof.name().toString() != null){
          IFile file = createProofIFile(proof.name().toString(), path);
@@ -284,28 +302,6 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       }
    }
    
-   
-   /**
-    * Collects all {@link FunctionalOperationContract}s of the given {@link IMethod}.
-    * @param method - the given {@link Method}.
-    * @param environment - the {@link KeYEnvironment} for this {@link IMethod}.
-    * @return - An {@link ImmutableSet<FunctionOperationContract>} that holds all {@link FunctionalOperationContract}s found for the given {@link IMethod}.
-    * @throws ProofInputException
-    */
-   public ImmutableSet<FunctionalOperationContract> searchContractsForMethod(IMethod method, KeYEnvironment<CustomConsoleUserInterface> environment) throws ProofInputException {
-      if (method != null && method.exists()) {
-            if(environment.getInitConfig() != null){
-               IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
-               if(pm != null){
-                  KeYJavaType type = pm.getContainerType();
-                  ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(type, pm);
-                  return operationContracts;
-               }
-            }
-      }
-      return null;
-   }
-   
 
    private void setMarker(Proof proof, IMethod method) throws CoreException{
       //get File from Method
@@ -317,7 +313,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          IMarker marker = file.createMarker("org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker");
          if(marker.exists()){
                marker.setAttribute(IMarker.MESSAGE, "Proof closed");
-               marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberforMethod(method, file));
+               marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberOfMethod(method, file));
          }
       }
       
@@ -326,13 +322,13 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          if(marker.exists()){
                marker.setAttribute(IMarker.MESSAGE, "Proof not closed");
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-               marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberforMethod(method, file));
+               marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberOfMethod(method, file));
          }   
       }
    }
 
    
-   private int getLineNumberforMethod(IMethod method, IFile file) throws JavaModelException{
+   private int getLineNumberOfMethod(IMethod method, IFile file) throws JavaModelException{
       String str = method.getSource();
       try{
          FileInputStream fs = new FileInputStream(file.getLocation().toFile());

@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
 import org.eclipse.jface.wizard.WizardPage;
-import org.key_project.keyide.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.util.java.ObjectUtil;
 
 
