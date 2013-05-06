@@ -41,6 +41,7 @@ provable: ./heap/block_contracts/Simple__unnecessaryBlockContract.key
 provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 # the following test has a reload problem probably caused by the one-step-simplifier
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
+provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
 provable: ./heap/information_flow/ArrayList_contains.key

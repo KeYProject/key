@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -34,12 +47,12 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -755,9 +768,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param methodFullName The method name to search.
     * @return The first found {@link IProgramMethod} in the type.
     */
-   protected static IProgramMethod searchProgramMethod(Services services, 
-                                                      String containerTypeName, 
-                                                      final String methodFullName) {
+   public static IProgramMethod searchProgramMethod(Services services, 
+                                                    String containerTypeName, 
+                                                    final String methodFullName) {
       JavaInfo javaInfo = services.getJavaInfo();
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
@@ -979,20 +992,28 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
       tempFile.deleteOnExit();
+      Proof reloadedProof = null;
+      SymbolicExecutionTreeBuilder reloadedBuilder = null;
       try {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof
          env.getUi().loadProblem(tempFile);
          waitForAutoMode(env.getUi());
-         Proof reloadedProof = env.getUi().getMediator().getProof();
+         reloadedProof = env.getUi().getMediator().getProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
-         SymbolicExecutionTreeBuilder reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
+         reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
          reloadedBuilder.analyse();
          assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
       }
       finally {
+         if (reloadedBuilder != null) {
+            reloadedBuilder.dispose();
+         }
+         if (reloadedProof != null) {
+            reloadedProof.dispose();
+         }
          if (tempFile != null) {
             tempFile.delete();
          }

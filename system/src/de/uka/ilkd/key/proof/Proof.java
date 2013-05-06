@@ -26,15 +26,23 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.EnhancedStringBuffer;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -95,7 +103,7 @@ public class Proof implements Named {
 
     /** 
      * when load and save a proof with different versions of key this vector
-     * fills up with Strings containing the prcs versions.
+     * fills up with Strings containing the GIT versions.
      */
     public Vector<String> keyVersionLog;
    
@@ -972,16 +980,72 @@ public class Proof implements Named {
      * retrieves number of branches
      */
     public int countBranches() {
-	return root.countBranches();
+        return root.countBranches();
     }
 
     
-    public String statistics() {
-	return "Nodes:"  + countNodes() + "\n" +
-	    "Branches: " + countBranches() + "\n";
+    public List<Pair<String,String>> statistics() {
+        final List<Pair<String,String>> res = new ArrayList<Pair<String,String>>();
+        final NodeIterator it = root().subtreeIterator();
+        
+        int nodes = 0;
+        int branches = 1;
+        int interactive = 0;
+        int oss = 0;
+        int ossCaptured = 0;
+        int smt = 0;
+        int dep = 0;
+        int contr = 0;
+        int inv = 0;
+
+        while (it.hasNext()) {
+            nodes++;
+            final Node node = it.next();
+            branches += node.childrenCount()-1;
+
+            if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                interactive++;
+            }
+
+            final RuleApp ruleApp = node.getAppliedRuleApp();
+            if (ruleApp != null) {
+
+                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                    oss++;
+                    final Protocol protocol = ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                    if (protocol != null) ossCaptured += protocol.size()-1;
+                }
+                else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) smt++;
+                else if (ruleApp instanceof UseDependencyContractApp) dep++;
+                else if (ruleApp instanceof ContractRuleApp) contr++;
+                else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) inv++;
+            }
+        }
+        
+        final String nodeString = EnhancedStringBuffer.format(nodes).toString();
+        res.add(new Pair<String, String>("Nodes", nodeString));
+        res.add(new Pair<String, String>("Branches", 
+                EnhancedStringBuffer.format(branches).toString()));
+        res.add(new Pair<String, String>("Interactive steps", ""+interactive));
+        final long time = getAutoModeTime();
+        res.add(new Pair<String, String>("Automode time", 
+                EnhancedStringBuffer.formatTime(time).toString()));
+        if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
+        final String avgTime = ""+(time/nodes)+"."+((time*10/nodes)%10);
+        res.add(new Pair<String, String>("Avg. time per step", ""+avgTime+"ms"));
+        
+        res.add(new Pair<String, String>("Rule applications",""));
+        res.add(new Pair<String, String>("One-step Simplifier apps", ""+oss));
+        res.add(new Pair<String, String>("SMT solver apps", ""+smt));
+        res.add(new Pair<String, String>("Dependency Contract apps", ""+dep));
+        res.add(new Pair<String, String>("Operation Contract apps", ""+contr));
+        res.add(new Pair<String, String>("Loop invariant apps", ""+inv));
+        res.add(new Pair<String, String>("Total rule apps", 
+                EnhancedStringBuffer.format(nodes+ossCaptured).toString()));
+        
+        return res;
     }
 
-    
     /** toString */
     public String toString() {
 	StringBuffer result = new StringBuffer();
