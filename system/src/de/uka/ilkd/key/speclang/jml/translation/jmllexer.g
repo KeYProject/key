@@ -49,7 +49,7 @@ tokens {
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
     RESPECTS        = "respects";
-    SEGREGATES      = "segregates";
+    SEPARATES       = "separates";
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";

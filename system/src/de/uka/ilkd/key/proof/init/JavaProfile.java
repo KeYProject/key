@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -40,6 +41,7 @@ public class JavaProfile extends AbstractProfile {
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
 
+    private final static StrategyFactory SYMBOLIC_EXECUTION_FACTORY = new SymbolicExecutionStrategy.Factory();
 
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
         super(standardRules, gcb);
@@ -56,6 +58,7 @@ public class JavaProfile extends AbstractProfile {
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(DEFAULT);
+        set = set.add(SYMBOLIC_EXECUTION_FACTORY);
         return set;
     }
 

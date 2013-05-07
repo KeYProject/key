@@ -583,7 +583,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         assert inst.pm.isConstructor()
                || !(inst.actualResult != null && resultVar == null);
-        // TODO: here!
         final ProgramVariable excVar = TB.excVar(services, "exc", inst.pm, true);
         assert excVar != null;
         if (!loadedInfFlow)

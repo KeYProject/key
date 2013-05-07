@@ -15,6 +15,148 @@
 #
 
 
+# # Test for information flow
+# provable: ./information_flow/collection/SumExample_SumExample__getSum___.JML_accessible_clause.0.key
+# provable: ./information_flow/collection/SumExample_SumExample__getSum___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/SumExample_SumExample__getSum___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/SumExample_SumExample__getSum___.Symbolic_Execution.0.key
+# 
+# provable: ./information_flow/collection/aliasing.AliasingExamples_aliasing.AliasingExamples__insecure_1_aliasing.AliasingExamples,aliasing.AliasingExamples,int__.JML_operation_contract.0.proof
+# notprovable: ./information_flow/collection/aliasing.AliasingExamples_aliasing.AliasingExamples__insecure_1_aliasing.AliasingExamples,aliasing.AliasingExamples,int__.Non-interference_contract.0.proof
+# # notprovable: ./information_flow/collection/aliasing.AliasingExamples_aliasing.AliasingExamples__insecure_1_aliasing.AliasingExamples,aliasing.AliasingExamples,int__.Symbolic_Execution.0.proof
+# provable: ./information_flow/collection/aliasing.AliasingExamples_aliasing.AliasingExamples__secure_1_aliasing.AliasingExamples,aliasing.AliasingExamples,int__.JML_operation_contract.0.proof
+# provable: ./information_flow/collection/aliasing.AliasingExamples_aliasing.AliasingExamples__secure_1_aliasing.AliasingExamples,aliasing.AliasingExamples,int__.Non-interference_contract.0.proof
+# # notprovable: ./information_flow/collection/aliasing.AliasingExamples_aliasing.AliasingExamples__secure_1_aliasing.AliasingExamples,aliasing.AliasingExamples,int__.Symbolic_Execution.0.proof
+# 
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__insecure_assignment_n2___.JML_operation_contract.0.key
+# notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__insecure_assignment_n2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__insecure_assignment_n2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__insecure_if_high_n5_n1___.JML_operation_contract.0.key
+# notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__insecure_if_high_n5_n1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__insecure_if_high_n5_n1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n1___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n2___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n3___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n3___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n3___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n4___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n4___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n4___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n5_int__.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n5_int__.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n5_int__.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n6___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n6___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n6___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n9___.JML_operation_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__n9___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_assignment_0_n9___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_assignment_0_n9___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_assignment_0_n9___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_assignments_n2___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_assignments_n2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_assignments_n2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_catch_exception___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_catch_exception___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_catch_exception___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_if_high_n1___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_if_high_n1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_if_high_n1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_if_high_n5_n1___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_if_high_n5_n1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_if_high_n5_n1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_n5___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_n5___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_n5___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_n6___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_n6___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_n6___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_recursion_int__.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_recursion_int__.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_recursion_int__.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_sequential_n1_n2___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_sequential_n1_n2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_sequential_n1_n2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_sequential_n3_precond_n4___.JML_operation_contract.0.key
+# provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_sequential_n3_precond_n4___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_sequential_n3_precond_n4___.Symbolic_Execution.0.key
+# # provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_while_int__.JML_operation_contract.0.key
+# # provable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_while_int__.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/contract.IFMethodContract_contract.IFMethodContract__secure_while_int__.Symbolic_Execution.0.key
+# 
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p1_1___.JML_normal_behavior_operation_contract.0.key
+# notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p1_1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p1_1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p1_2___.JML_normal_behavior_operation_contract.0.key
+# notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p1_2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p1_2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p2_1___.JML_normal_behavior_operation_contract.0.key
+# notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p2_1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p2_1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p2_2___.JML_normal_behavior_operation_contract.0.key
+# notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p2_2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__insecure_p2_2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_1___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_1___.JML_normal_behavior_operation_contract.1.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_1___.Non-interference_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_1___.Non-interference_contract.1.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_1___.Symbolic_Execution.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_1___.Symbolic_Execution.1.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_2___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_3___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_3___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_3___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_4___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_4___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_4___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_5___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_5___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_5___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_6___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_6___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p1_6___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_1___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_1___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_1___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_2___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_2___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_2___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_3___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_3___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_3___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_4___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_4___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_4___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_5___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_5___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_5___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_6___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_6___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_6___.Symbolic_Execution.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_7___.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_7___.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/mini.MiniExamplesPaper_mini.MiniExamplesPaper__secure_p2_7___.Symbolic_Execution.0.key
+# 
+# provable: ./information_flow/collection/object.ObjectCreation_object.ObjectCreation__insecure_2___.JML_operation_contract.0.proof
+# notprovable: ./information_flow/collection/object.ObjectCreation_object.ObjectCreation__insecure_2___.Non-interference_contract.0.proof
+# # notprovable: ./information_flow/collection/object.ObjectCreation_object.ObjectCreation__insecure_2___.Symbolic_Execution.0.proof
+# provable: ./information_flow/collection/object.ObjectCreation_object.ObjectCreation__secure_1___.JML_operation_contract.0.proof
+# provable: ./information_flow/collection/object.ObjectCreation_object.ObjectCreation__secure_1___.Non-interference_contract.0.proof
+# # notprovable: ./information_flow/collection/object.ObjectCreation_object.ObjectCreation__secure_1___.Symbolic_Execution.0.proof
+# 
+# provable: ./information_flow/collection/passwordfile.SecurePasswordFile_passwordfile.SecurePasswordFile___userIndex___.JML_accessible_clause.0.key
+# provable: ./information_flow/collection/passwordfile.SecurePasswordFile_passwordfile.SecurePasswordFile__check_int,int__.JML_accessible_clause.0.key
+# provable: ./information_flow/collection/passwordfile.SecurePasswordFile_passwordfile.SecurePasswordFile__check_int,int__.JML_normal_behavior_operation_contract.0.key
+# provable: ./information_flow/collection/passwordfile.SecurePasswordFile_passwordfile.SecurePasswordFile__check_int,int__.Non-interference_contract.0.key
+# # notprovable: ./information_flow/collection/passwordfile.SecurePasswordFile_passwordfile.SecurePasswordFile__check_int,int__.Symbolic_Execution.0.key
+
+
 # Tests for rule application restrictions
 provable: ./heap/polarity_tests/wellformed1.key
 notprovable: ./heap/polarity_tests/wellformed2.key

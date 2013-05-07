@@ -119,7 +119,7 @@ tokens {
 	RETURN_BEHAVIOR 	= "return_behavior";
     RETURN_BEHAVIOUR 	= "return_behaviour";
     RESPECTS                    = "respects";
-    SEGREGATES                  = "segregates";
+    SEPARATES                   = "separates";
     SCOPE_SAFE 			= "scopeSafe";
     ARBITRARY_SCOPE             = "arbitraryScope";
     ARBITRARY_SCOPE_THIS        = "arbitraryScopeThis";

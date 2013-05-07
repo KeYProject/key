@@ -324,7 +324,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
                + getHTMLFor(origMby, "measured-by", services)
                + "<br><b>termination</b> " + modality
-               + getHTMLFor(origRespects, "segregates", services)
+               + getHTMLFor(origRespects, "separates", services)
                + "</html>";
     }
 

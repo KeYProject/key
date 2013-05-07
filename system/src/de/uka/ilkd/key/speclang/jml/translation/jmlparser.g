@@ -463,7 +463,7 @@ respectsclause returns  [Triple<ImmutableList<Term>,ImmutableList<Term>,Immutabl
     ImmutableList<Term> tmp;
 }
 :
-    (RESPECTS | SEGREGATES) (NOTHING | seg = respectslist)
+    (RESPECTS | SEPARATES) (NOTHING | seg = respectslist)
     (   (DECLASSIFIES (NOTHING | tmp = respectslist {decl = decl.append(tmp);})) |
         (ERASES (NOTHING | tmp = respectslist {erases = erases.append(tmp);}))
     )*
