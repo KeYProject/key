@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class Node {
+public class Node implements Iterable<Node> {
     /** the proof the node belongs to */
     private Proof               proof;
 
@@ -65,7 +65,7 @@ public class Node {
 
     public Node(Proof proof) {
 	this.proof = proof;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);        
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();        
         nodeInfo = new NodeInfo(this);
     }
 
@@ -74,7 +74,7 @@ public class Node {
     public Node(Proof proof, Sequent seq) {
 	this ( proof );
 	this.seq=seq;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
     }
 
 
@@ -88,7 +88,7 @@ public class Node {
 	this.seq=seq;	
 	this.parent=parent;
 	if (children!=null) {this.children=children;}
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -303,6 +303,21 @@ public class Node {
      */
     public NodeIterator childrenIterator() {
 	return new NodeIterator(children.iterator());
+    }
+    
+    private Collection<Node> subtree () {
+        Collection<Node> res = new ArrayList<Node>();
+        res.add(this);
+        for (Node child: this) {
+            res.addAll(child.subtree());
+        }
+        return res;
+    }
+
+    /** returns an iterator for all nodes in the subtree.
+     */
+    public NodeIterator subtreeIterator () {
+        return new NodeIterator(subtree().iterator());
     }
 
     /** returns number of children */
@@ -529,11 +544,19 @@ public class Node {
     public int siblingNr() {
         return siblingNr;
     }
-   
+
+
+    /** Iterator over children.
+     * Use <code>leavesIterator()</code> if you need to iterate over leaves instead.
+     */
+    @Override
+    public Iterator<Node> iterator() {
+        return childrenIterator();
+    }    
 
     // inner iterator class 
     public static class NodeIterator implements Iterator<Node> {
-	private Iterator<Node> it;
+	protected Iterator<Node> it;
 	
 	NodeIterator(Iterator<Node> it) {
 	    this.it=it;
@@ -565,5 +588,5 @@ public class Node {
 
     public int getUniqueTacletNr() {
         return getIntroducedRulesCount();
-    }    
+    }
  }

@@ -194,7 +194,7 @@
                 <!-- Copy examples into target directory -->
                 <copy todir="${target.folder}/examples" failonerror="true" overwrite="true">
                         <fileset dir="${key.rep}/examples/">
-                                <include name="heap/"/>
+                                <include name="firstTouch/"/>
                         </fileset>
                 </copy> 
 	</target>

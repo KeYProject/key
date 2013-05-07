@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.ui.launch;
 
 import java.beans.PropertyChangeEvent;
@@ -593,11 +606,12 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                    IRunnableWithProgressAndResult<InitConfig> run = new AbstractRunnableWithProgressAndResult<InitConfig>() {
                        @Override
                        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                           KeYEnvironment<?> environment = null;
                            try {
                               SWTUtil.checkCanceled(monitor);
                               monitor.beginTask("Receiving contracts.", IProgressMonitor.UNKNOWN);
                               SWTUtil.checkCanceled(monitor);
-                              KeYEnvironment<?> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+                              environment = KeYEnvironment.load(location, classPaths, bootClassPath);
                               SWTUtil.checkCanceled(monitor);
                               setResult(environment.getInitConfig());
                               monitor.done();
@@ -607,6 +621,11 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                            }
                            catch (Exception e) {
                               throw new InvocationTargetException(e, e.getMessage());
+                           }
+                           finally {
+                              if (environment != null) {
+                                 environment.dispose();
+                              }
                            }
                        }
                    };

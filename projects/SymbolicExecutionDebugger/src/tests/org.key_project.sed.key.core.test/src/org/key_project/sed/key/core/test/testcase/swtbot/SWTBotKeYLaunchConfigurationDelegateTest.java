@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
 import org.eclipse.core.runtime.Path;
@@ -49,7 +62,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          IEditorPart part = TestUtilsUtil.openEditor(project.getProject().getFile(new Path("src/MethodPartPOTest.java")));
          editor = bot.editorById(part.getSite().getId());
          // Select method in outline
-         SWTBotView outlineView = TestSedCoreUtil.getOutlineView(bot);
+         SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
          TestUtilsUtil.selectInTree(outlineView.bot().tree(), "MethodPartPOTest", "doSomething(int, String, boolean) : int");
          // Start launch
          outlineView.bot().tree().contextMenu("Debug As").menu("&1 Symbolic Execution Debugger (SED)").click();

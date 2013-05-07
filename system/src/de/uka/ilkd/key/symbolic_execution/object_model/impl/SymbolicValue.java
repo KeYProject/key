@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
@@ -32,19 +45,26 @@ public class SymbolicValue implements ISymbolicValue {
     * The value {@link Term}.
     */
    private Term value;
+   
+   /**
+    * The optional condition under which this value is valid.
+    */
+   private Term condition;
 
    /**
     * Constructor.
     * @param services The {@link Services} to use.
     * @param arrayIndex The array index.
     * @param value The value {@link Term}.
+    * @param condition The optional condition under which this value is valid.
     */
-   public SymbolicValue(Services services, int arrayIndex, Term value) {
+   public SymbolicValue(Services services, int arrayIndex, Term value, Term condition) {
       assert services != null;
       assert arrayIndex >= 0;
       this.services = services;
       this.arrayIndex = arrayIndex;
       this.value = value;
+      this.condition = condition;
    }
 
    /**
@@ -52,14 +72,16 @@ public class SymbolicValue implements ISymbolicValue {
     * @param services The {@link Services} to use.
     * @param programVariable The {@link IProgramVariable}.
     * @param value The value {@link Term}.
+    * @param condition The optional condition under which this value is valid.
     */
-   public SymbolicValue(Services services, IProgramVariable programVariable, Term value) {
+   public SymbolicValue(Services services, IProgramVariable programVariable, Term value, Term condition) {
       assert services != null;
       assert programVariable != null;
       this.services = services;
       this.programVariable = programVariable;
       this.value = value;
       this.arrayIndex = -1;
+      this.condition = condition;
    }
 
    /**
@@ -67,12 +89,21 @@ public class SymbolicValue implements ISymbolicValue {
     */
    @Override
    public String getName() {
+      StringBuffer sb = new StringBuffer();
       if (isArrayIndex()) {
-         return "[" + getArrayIndex() + "]";
+         sb.append("[");
+         sb.append(getArrayIndex());
+         sb.append("]");
       }
       else {
-         return getProgramVariableString();
+         sb.append(getProgramVariableString());
       }
+      if (condition != null) {
+         sb.append(" {");
+         sb.append(getConditionString());
+         sb.append("}");
+      }
+      return sb.toString();
    }
    
    /**
@@ -147,5 +178,27 @@ public class SymbolicValue implements ISymbolicValue {
    @Override
    public String toString() {
       return "Value of " + getName() + " is " + getValueString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getCondition() {
+      return condition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getConditionString() {
+      if (condition != null) {
+         StringBuffer sb = ProofSaver.printTerm(condition, services, true);
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
    }
 }

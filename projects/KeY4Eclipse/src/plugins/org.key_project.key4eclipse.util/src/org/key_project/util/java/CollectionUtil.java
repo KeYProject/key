@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.java;
 
 import java.util.ArrayList;
@@ -194,6 +207,30 @@ public class CollectionUtil {
     * @return The found element or {@code null} if no element was found.
     */
    public static <T> T searchAndRemove(Iterable<T> iterable, IFilter<T> filter) {
+      T result = null;
+      if (iterable != null && filter != null) {
+         Iterator<T> iter = iterable.iterator();
+         if (iter != null) {
+            while (result == null && iter.hasNext()) {
+               T next = iter.next();
+               if (filter.select(next)) {
+                  result = next;
+                  iter.remove();
+               }
+            }
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Searches an element in the given {@link Iterable} instance and removes
+    * the found element from it.
+    * @param iterable The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    */
+   public static <T, E extends Throwable> T searchAndRemoveWithException(Iterable<T> iterable, IFilterWithException<T, E> filter) throws E{
       T result = null;
       if (iterable != null && filter != null) {
          Iterator<T> iter = iterable.iterator();
