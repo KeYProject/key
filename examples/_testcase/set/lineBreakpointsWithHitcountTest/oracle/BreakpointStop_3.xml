@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+      <statement name="a++;" pathCondition="true" pathConditionChanged="false">
+         <statement name="x=callee.main(a);" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <methodCall name="self.callee.main(a_1);" pathCondition="true" pathConditionChanged="false">
+                  <statement name="x=a_1+4;" pathCondition="true" pathConditionChanged="false">
+                  </statement>
+               </methodCall>
+            </branchCondition>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
