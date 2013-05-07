@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.util.rifl;
 
@@ -22,12 +22,13 @@ import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import recoder.service.SourceInfo;
 
 /**
  * Writes JML* translation of RIFL specifications to Java files. This is a
  * manipulating Recoder source visitor. Implementation warning: manipulating the
  * AST before traversing it may have unexpected results.
- * 
+ *
  * @author bruns
  */
 public class SpecificationInjector extends SourceVisitor {
@@ -36,7 +37,7 @@ public class SpecificationInjector extends SourceVisitor {
      * Produces JML* respects clauses. Clauses are internally labeled with keys
      * (resulting from security domains in RIFL), which are discarded in the
      * final output.
-     * 
+     *
      * @author bruns
      */
     private static class JMLFactory {
@@ -44,7 +45,7 @@ public class SpecificationInjector extends SourceVisitor {
         private static final String DEFAULT_INDENTATION = "  ";
         private static final String DEFAULT_KEY = "";
         private static final String RESULT = "\\result";
-        private static final String RESPECTS = "respects";
+        private static final String RESPECTS = "separates";
         private static final String JML_END = "@*/";
         private static final String JML_START = "/*@ ";
 
@@ -123,9 +124,11 @@ public class SpecificationInjector extends SourceVisitor {
 
 
     private final SpecificationContainer sc;
+    private final SourceInfo si;
 
-    public SpecificationInjector(SpecificationContainer sc) {
+    public SpecificationInjector(SpecificationContainer sc, SourceInfo sourceInfo) {
         this.sc = sc;
+        si = sourceInfo;
     }
 
     // ////////////////////////////////////////////////////////////
@@ -140,6 +143,7 @@ public class SpecificationInjector extends SourceVisitor {
     private static void addComment(JavaProgramElement se, String comment) {
         // fixes issue with Recoder that it writes comments _after_ the element
         final NonTerminalProgramElement parent = se.getASTParent();
+        assert parent != null : "Program element "+se+" with null parent";
         for (int i = 0; i < parent.getChildCount(); i++) {
             if (i > 0 && parent.getChildAt(i) == se) {
                 // chose previous element
@@ -154,30 +158,34 @@ public class SpecificationInjector extends SourceVisitor {
         commentList.add(new Comment(comment));
         se.setComments(commentList);
     }
-    
+
     // ////////////////////////////////////////////////////////////
     // visitor methods
     // ////////////////////////////////////////////////////////////
 
     @Override
     public void visitClassDeclaration(ClassDeclaration cd) {
+        cd.setProgramModelInfo(si);
         accessChildren(cd);
+        addComment(cd, "\n// JML* comment created by KeY RIFL Transformer.\n");
     }
 
 
     @Override
     public void visitCompilationUnit(CompilationUnit cu) {
         accessChildren(cu);
-        addComment(cu, "\n// JML* comment created by KeY RIFL Transformer.\n");
     }
 
     @Override
     public void visitInterfaceDeclaration(InterfaceDeclaration id) {
+        id.setProgramModelInfo(si);
         accessChildren(id);
+        addComment(id, "\n// JML* comment created by KeY RIFL Transformer.\n");
     }
 
     @Override
     public void visitMethodDeclaration(MethodDeclaration md) {
+        md.setProgramModelInfo(si);
         final JMLFactory factory = new JMLFactory();
 
         // add return value

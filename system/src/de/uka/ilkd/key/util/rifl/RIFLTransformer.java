@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.util.rifl;
 
@@ -26,11 +26,10 @@ import java.util.List;
 import javax.xml.parsers.*;
 
 import org.xml.sax.*;
-import org.xml.sax.helpers.*;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
+import recoder.ServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 
@@ -42,7 +41,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * developed in the RS3 project. Method <code>transform</code> reads a RIFL file
  * and Java sources and writes JML* information flow specifications to the
  * original Java files.
- * 
+ *
  * @author bruns
  */
 public class RIFLTransformer {
@@ -62,13 +61,15 @@ public class RIFLTransformer {
         return "file:" + path;
     }
 
+    private static final String testPath = "/home/daniel/rifl-test/";
+
     /**
      * Entry point for the stand-alone RIFL to JML* tool.
      */
     public static void main(String[] args) {
-        final String riflFilename = "/tmp/test.xml";
-        final String javaFilename = "/tmp/Test.java";
-        final String targetFilename = "/tmp/TestNew.java";
+        final String riflFilename = testPath+"test.xml";
+        final String javaFilename = testPath+"Test.java";
+        final String targetFilename = testPath+"TestNew.java";
         RIFLTransformer.transform(riflFilename, javaFilename, targetFilename,
                 SimpleRIFLExceptionHandler.INSTANCE);
     }
@@ -110,13 +111,15 @@ public class RIFLTransformer {
         final Collection<String> javaFiles = new ArrayList<String>();
         javaFiles.add(source);
 
+        final ServiceConfiguration serviceConfiguration = jpf.getServiceConfiguration();
+
         // parse
         for (final String javaFile : javaFiles) {
             final CompilationUnit cu;
             final Reader fr = new BufferedReader(new FileReader(javaFile));
             cu = jpf.parseCompilationUnit(fr);
             javaCUs.add(cu);
-            jpf.getServiceConfiguration().getChangeHistory().updateModel();
+            serviceConfiguration.getChangeHistory().updateModel();
         }
     }
 
@@ -138,7 +141,7 @@ public class RIFLTransformer {
 
         // step 3: inject specifications
         for (final CompilationUnit cu : javaCUs) {
-            final SpecificationInjector si = new SpecificationInjector(sc);
+            final SpecificationInjector si = new SpecificationInjector(sc,jpf.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
         }
 
