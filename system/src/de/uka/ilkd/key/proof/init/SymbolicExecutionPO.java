@@ -14,8 +14,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.io.IOException;
@@ -54,8 +52,6 @@ public class SymbolicExecutionPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
-
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(contract, symbExecVars, services);
@@ -68,20 +64,18 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         final Term pre = TB.and(freePre, contractPre);
 
         // symbolic execution
-        Term symExec =
+        final Term symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
-        s.addSymbols(services.getNamespaces().programVariables().elements());
-        s.addTerm(symExec);
 
         // final symbolic execution term
-        Term finalTerm = TB.not(TB.and(pre, symExec));
+        final Term finalTerm = TB.not(TB.and(pre, symExec));
 
         // register final term
         assignPOTerms(finalTerm);
 
         // add class axioms
-        Proof initiatingProof = initiatingGoal.proof();
-        AbstractOperationPO initatingPO =
+        final Proof initiatingProof = initiatingGoal.proof();
+        final AbstractOperationPO initatingPO =
                 (AbstractOperationPO) services.getSpecificationRepository()
                                                     .getPOForProof(initiatingProof);
         taclets = initatingPO.getInitialTaclets();
@@ -93,7 +87,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         if (!(po instanceof SymbolicExecutionPO)) {
             return false;
         }
-        SymbolicExecutionPO cPO = (SymbolicExecutionPO) po;
+        final SymbolicExecutionPO cPO = (SymbolicExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -174,29 +168,6 @@ public class SymbolicExecutionPO extends AbstractOperationPO
     }
 
 
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * <p/>
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig,
-                                             Properties properties) throws IOException {
-        String contractName = properties.getProperty("Non-interference contract");
-        SpecificationRepository specs =
-                initConfig.getServices().getSpecificationRepository();
-        final Contract contract = specs.getContractByName(contractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + contractName);
-        } else {
-            ProofOblInput po = contract.createProofObl(initConfig);
-            return new LoadedPOContainer(po, 0);
-        }
-    }
-
-    
     // the following code is legacy code
     @Override
     @Deprecated

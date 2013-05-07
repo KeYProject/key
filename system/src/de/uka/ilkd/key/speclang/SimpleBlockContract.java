@@ -323,6 +323,15 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
+    public String getNamePrefix() {
+        if (getTarget() != null)
+            return "Block Contract " + getBlock().getStartPosition().getLine() +
+                    " " + ((ProgramMethod) getTarget()).getNamePrefix();
+        else
+            return "Block Contract " + getBlock().getStartPosition().getLine() + " ";
+    }
+
+    @Override
     public String getDisplayName() {
         return "Block Contract";
     }
@@ -495,6 +504,7 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
 
+    @SuppressWarnings("serial")
     private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
 
         public void replaceSelf(final ProgramVariable oldSelf, final S newSelf)
@@ -563,6 +573,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     }
 
+    @SuppressWarnings("serial")
     private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
 
         protected ProgramVariable convert(ProgramVariable variable)
@@ -572,6 +583,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     }
 
+    @SuppressWarnings("serial")
     private static class TermReplacementMap extends ReplacementMap<Term> {
 
         private static final TermBuilder TB = TermBuilder.DF;

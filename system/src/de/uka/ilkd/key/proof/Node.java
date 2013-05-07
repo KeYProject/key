@@ -71,7 +71,7 @@ public class Node implements Iterable<Node> {
 
     public Node(Proof proof) {
 	this.proof = proof;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);        
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();        
         nodeInfo = new NodeInfo(this);
     }
 
@@ -80,7 +80,7 @@ public class Node implements Iterable<Node> {
     public Node(Proof proof, Sequent seq) {
 	this ( proof );
 	this.seq=seq;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
     }
 
 
@@ -94,7 +94,7 @@ public class Node implements Iterable<Node> {
 	this.seq=seq;	
 	this.parent=parent;
 	if (children!=null) {this.children=children;}
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -309,6 +309,21 @@ public class Node implements Iterable<Node> {
      */
     public NodeIterator childrenIterator() {
 	return new NodeIterator(children.iterator());
+    }
+    
+    private Collection<Node> subtree () {
+        Collection<Node> res = new ArrayList<Node>();
+        res.add(this);
+        for (Node child: this) {
+            res.addAll(child.subtree());
+        }
+        return res;
+    }
+
+    /** returns an iterator for all nodes in the subtree.
+     */
+    public NodeIterator subtreeIterator () {
+        return new NodeIterator(subtree().iterator());
     }
 
     /** returns number of children */
@@ -554,7 +569,7 @@ public class Node implements Iterable<Node> {
 
     // inner iterator class 
     public static class NodeIterator implements Iterator<Node> {
-	private Iterator<Node> it;
+	protected Iterator<Node> it;
 	
 	NodeIterator(Iterator<Node> it) {
 	    this.it=it;

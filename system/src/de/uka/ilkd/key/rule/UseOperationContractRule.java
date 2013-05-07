@@ -54,8 +54,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -287,8 +288,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    
-    
+
+
     /**
      * @return (assumption, anon update, anon heap)
      */
@@ -298,9 +299,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 	                                     	   Services services) {
 	assert pm != null;
 	assert mod != null;
-	
+
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
+	final Name methodHeapName
+	= VariableNameProposer.DEFAULT
+	    .getNewName(services, new Name(TB.newName(services, heap+"After_" + pm.getName())));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
     final Term methodHeap = TB.func(methodHeapFunc);
@@ -313,7 +316,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                           methodHeap); 
 	final Term anonUpdate = TB.elementary(services, heap, methodHeap);
 	
-	return new AnonUpdateData(assumption, anonUpdate, methodHeap, TB.getBaseHeap(services), anonHeap);
+	return new AnonUpdateData(assumption, anonUpdate, methodHeap,
+	                          TB.getBaseHeap(services), anonHeap);
     } 
     
     
@@ -475,7 +479,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        ec, 
 	        services);
-	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
+	assert pm != null : "Getting program method failed.\nReference: "+mr+
+	              ", static type: "+staticType+", execution context: "+ec;
 	final Term actualSelf = getActualSelf(mr, pm, ec, services);
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
@@ -569,9 +574,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
-        assert inst.pm.isConstructor() 
+        assert inst.pm.isConstructor()
                || !(inst.actualResult != null && resultVar == null);
-        final ProgramVariable excVar = TB.excVar(services, inst.pm, true);
+        final VariableNamer vn = services.getVariableNamer();
+        final String excName = new ProgramElementName(TB.newName(services, "exc")).toString();
+        final ProgramVariable excVar = vn.rename(TB.excVar(services, excName, inst.pm, true),
+                                                 goal, ruleApp.posInOccurrence());
         assert excVar != null;
         goal.addProgramVariable(excVar);
         
@@ -732,10 +740,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = TB.and(reachableState,
 		                    TB.reachableValue(services, arg, argKJT));
 	}
-	final ContractPO po 
-		= services.getSpecificationRepository()
-		          .getPOForProof(goal.proof());
-	final Term mbyOk;	
+	final ContractPO po =
+	        services.getSpecificationRepository().getPOForProof(goal.proof());
+	final Term mbyOk;
 	if(po != null && po.getMbyAtPre() != null && mby != null ) {
     	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
     			       TB.lt(mby, po.getMbyAtPre(), services));
@@ -782,8 +789,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) ||
-            (po == null && loadedInfFlow))  {
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) {
             // prepare information flow analysis
             assert anonUpdateDatas.size() == 1 : "information flow extension " +
                                                  "is at the moment not " +
@@ -808,12 +814,13 @@ public final class UseOperationContractRule implements BuiltInRule {
             // and associated taclet
             Term contractApplPredTerm =
                     ifContractBuilder.buildContractApplPredTerm(false);
-            Taclet informationFlowContractApp =
-                    ifContractBuilder.buildContractApplTaclet(false);
-            SpecificationRepository specRepos = services.getSpecificationRepository();
-            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(contract.getTarget());
-            s.addTaclet(informationFlowContractApp, services);
-            s.addPredicate(ifContractBuilder.getContractApplPred(false));
+            if (!InfFlowContractPO.hasSymbols()) {
+                InfFlowContractPO.newSymbols(
+                        services.getProof().env().getInitConfig().activatedTaclets());
+            }
+            Taclet informationFlowContractApp = !loadedInfFlow ?
+                    ifContractBuilder.buildContractApplTaclet(false)
+                    : ifContractBuilder.loadContractApplTaclet();
 
             // add term and taclet to post goal
             postGoal.addFormula(new SequentFormula(contractApplPredTerm),

@@ -34,7 +34,7 @@ public class GeneralSettings implements Settings, Cloneable {
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String USE_OCL_KEY = "[General]UseOCL";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
-    private static final String SEPARATE_PROOF_FOLDER = "[General]SeparateProofFolder";
+    private static final String DEFAULT_PROOF_FOLDER = "[General]DefaultProofFolder";
     
     /** if true then JML/OCL specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
@@ -56,8 +56,8 @@ public class GeneralSettings implements Settings, Cloneable {
     /** launches the rightclick the macro menu. on by default. */
     private boolean rightClickMacros = true;
 
-    /** proofs are stored in a separate proof (sub) folder. */
-    private boolean separateProofFolder = false;
+    /** by default proofs are stored in a default proof folder (as a sub directory)). */
+    private boolean defaultProofFolder = true;
 
     /** JML is active by default */
     private boolean useJML = true;
@@ -92,8 +92,8 @@ public class GeneralSettings implements Settings, Cloneable {
         return rightClickMacros;
     }
 
-    public boolean storesInSeparateProofFolder() {
-        return separateProofFolder;
+    public boolean storesInDefaultProofFolder() {
+        return defaultProofFolder;
     }
 
     public boolean useJML() {
@@ -140,8 +140,8 @@ public class GeneralSettings implements Settings, Cloneable {
 
 
     public void setSeparateProofFolder(boolean b) {
-        if(this.separateProofFolder != b) {
-            separateProofFolder = b;
+        if(this.defaultProofFolder != b) {
+            defaultProofFolder = b;
             fireSettingsChanged();
         }
     }
@@ -189,9 +189,9 @@ public class GeneralSettings implements Settings, Cloneable {
             rightClickMacros = Boolean.valueOf(val).booleanValue();
         }
 
-        val = props.getProperty(SEPARATE_PROOF_FOLDER);
+        val = props.getProperty(DEFAULT_PROOF_FOLDER);
         if (val != null) {
-            separateProofFolder = Boolean.valueOf(val).booleanValue();
+            defaultProofFolder = Boolean.valueOf(val).booleanValue();
         }
 
         val = props.getProperty(USE_JML_KEY);
@@ -216,7 +216,7 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
-        props.setProperty(SEPARATE_PROOF_FOLDER, "" + separateProofFolder);
+        props.setProperty(DEFAULT_PROOF_FOLDER, "" + defaultProofFolder);
         props.setProperty(USE_JML_KEY, "" + useJML);
         props.setProperty(USE_OCL_KEY, "" + useOCL);
     }

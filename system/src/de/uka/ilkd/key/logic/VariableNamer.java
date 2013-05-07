@@ -462,7 +462,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         if(basename == null || "".equals(basename)) {
             basename = DEFAULT_BASENAME;
         }
-        int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus(null);
+        int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();
 	    //using null as undo anchor should be okay, since the name which the
 	    //the counter is used for is only temporary and will be changed
 	    //before the variable enters the logic

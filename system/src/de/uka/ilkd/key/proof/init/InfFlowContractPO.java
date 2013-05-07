@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -13,14 +14,16 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.MiscTools;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,45 +46,55 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     private final IFProofObligationVars ifVars;
 
+    private static InfFlowProofSymbols ifSymbols;
+
 
     public InfFlowContractPO(InitConfig initConfig,
                              InformationFlowContract contract) {
         super(initConfig, contract.getName());
+        ifSymbols = new InfFlowProofSymbols();
         this.contract = contract;
 
         // generate proof obligation variables
-        IProgramMethod pm = contract.getTarget();
+        final IProgramMethod pm = contract.getTarget();
         symbExecVars =
                 new ProofObligationVars(pm, contract.getKJT(), services,
                                         false, contract == null);
         assert (symbExecVars.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services, contract == null);
-        specRepos.addInfFlowProofSymbols(pm);
     }
 
     @Override
     public void readProblem() throws ProofInputException {
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
+        boolean loadedInfFlow =
+                services.getProof() != null &&
+                services.getProof().getSettings()
+                .getStrategySettings().getActiveStrategyProperties()
+                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
-        Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        Term post =
+        final Term selfComposedExec = loadedInfFlow ?
+                loadFindTerm((ProgramMethod)contract.getTarget(), services)
+                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        s.addTerm(selfComposedExec);
-        s.addTerm(post);
-        s.addSymbols(services.getNamespaces().programVariables().elements());
+        final Term finalTerm = TB.imp(selfComposedExec, post);
 
         // register final term, taclets and collect class axioms
-        assignPOTerms(TB.imp(selfComposedExec, post));
+        assignPOTerms(finalTerm);
         collectClassAxioms(contract.getKJT());
 
-        for (NoPosTacletApp t: taclets) {
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
+        for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                s.addTaclet(t.taclet(), services);
+                addSymbol(t.taclet());
             }
         }
 
@@ -94,7 +107,6 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            s.addTaclet(t, services);
         }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
@@ -104,7 +116,6 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            s.addTaclet(t, services);
         }
     }
 
@@ -114,7 +125,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         if (!(po instanceof InfFlowContractPO)) {
             return false;
         }
-        InfFlowContractPO cPO = (InfFlowContractPO) po;
+        final InfFlowContractPO cPO = (InfFlowContractPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -193,29 +204,61 @@ public class InfFlowContractPO extends AbstractOperationPO
         properties.setProperty("Non-interference contract", contract.getName());
     }
 
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * <p/>
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig,
-                                             Properties properties) throws IOException {
-        String contractName = properties.getProperty("Non-interference contract");
-        SpecificationRepository specs =
-                initConfig.getServices().getSpecificationRepository();
-        final Contract contract = specs.getContractByName(contractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + contractName);
-        } else {
-            ProofOblInput po = contract.createProofObl(initConfig);
-            return new LoadedPOContainer(po, 0);
+    public static Taclet getTaclet(String prefix) {
+        assert !symbols().getTaclets().isEmpty();
+        for(Taclet t: symbols().getTaclets()) {
+            if (t.name().toString().startsWith(prefix)) {
+                return t;
+            }
         }
+        return null;
     }
 
+    private Term loadFindTerm(ProgramMethod pm, Services services) {
+        Taclet res = null;
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
+        for (int j = 0; j < 10000; j++) {
+            String prefix =
+                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
+                                                pm.getNamePrefix()).toString();
+            res = InfFlowContractPO.getTaclet(prefix);
+            if (res != null)
+                return ((FindTaclet)res).find();
+        }
+        assert false; // This should not happen
+        return null;
+    }
+
+    public static void newSymbols(ImmutableSet<Taclet> taclets) {
+        InfFlowProofSymbols symbols = new InfFlowProofSymbols(taclets);
+        ifSymbols = symbols;
+    }
+
+    private static InfFlowProofSymbols symbols() {
+        assert ifSymbols != null;
+        return ifSymbols;
+    }
+
+    public static boolean hasSymbols() {
+        return ifSymbols != null;
+    }
+
+    public static void addSymbol(Object o) {
+        assert o != null;
+        symbols().add(o);
+    }
+
+    private static void addSymbols(ImmutableList<?> os) {
+        assert os != null;
+        symbols().add(os);
+    }
+
+    public static String printSymbols() {
+        return symbols().printProofSymbols();
+    }
 
     /**
      * Prepare program and location variables.
@@ -255,11 +298,11 @@ public class InfFlowContractPO extends AbstractOperationPO
 
 
         private void linkSymbExecVarsToCopies(ProofObligationVars symbExecVars) {
-            Iterator<Term> c1It = c1.termList.iterator();
-            Iterator<Term> c2It = c2.termList.iterator();
-            for (Term symbTerm : symbExecVars.termList) {
-                Term c1Term = c1It.next();
-                Term c2Term = c2It.next();
+            final Iterator<Term> c1It = c1.termList.iterator();
+            final Iterator<Term> c2It = c2.termList.iterator();
+            for (final Term symbTerm : symbExecVars.termList) {
+                final Term c1Term = c1It.next();
+                final Term c2Term = c2It.next();
                 if (symbTerm != null) {
                     map1.put(symbTerm, c1Term);
                     map2.put(symbTerm, c2Term);

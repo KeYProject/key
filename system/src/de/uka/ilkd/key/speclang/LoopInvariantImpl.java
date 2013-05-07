@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.Triple;
 
@@ -428,22 +429,36 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public void setGuard(Term guardTerm, Services services) {
-        assert this.guard == null;
+        Term oldGuard = null;
+        if (this.guard != null) {
+            oldGuard = this.guard;
+        }
         this.guard = guardTerm;
         
         ImmutableList<Triple<ImmutableList<Term>,
                              ImmutableList<Term>,
                              ImmutableList<Term>>> respects = getRespects(services);
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         originalRespects.remove(baseHeap);
-        respects =
-                respects.tail()
-                    .prepend(new Triple<ImmutableList<Term>,
-                                        ImmutableList<Term>,
-                                        ImmutableList<Term>>
-                    (respects.head().first.append(guardTerm),
-                     respects.head().second,
-                     respects.head().third));
+        if (oldGuard != null) {
+            respects =
+                    respects.tail()
+                        .prepend(new Triple<ImmutableList<Term>,
+                                            ImmutableList<Term>,
+                                            ImmutableList<Term>>
+                        (respects.head().first.removeFirst(oldGuard).append(guardTerm),
+                         respects.head().second,
+                         respects.head().third));
+        } else {
+            respects =
+                    respects.tail()
+                        .prepend(new Triple<ImmutableList<Term>,
+                                            ImmutableList<Term>,
+                                            ImmutableList<Term>>
+                        (respects.head().first.append(guardTerm),
+                         respects.head().second,
+                         respects.head().third));
+        }
         originalRespects.put(baseHeap, respects);
     }
 
@@ -533,6 +548,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
         else
             return "Loop Invariant " + getLoop().getStartPosition().getLine() +
                     " " + Math.abs(getLoop().hashCode());
+    }
+
+    @Override
+    public String getNamePrefix() {
+        if (getTarget() != null)
+            return "Loop Invariant " + getLoop().getStartPosition().getLine() +
+                    " " + ((ProgramMethod) getTarget()).getNamePrefix();
+        else
+            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " ";
     }
 
     @Override

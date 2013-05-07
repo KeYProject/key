@@ -12,19 +12,26 @@
 // 
 
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.rulefilter;
 
 import de.uka.ilkd.key.rule.Taclet;
 
-public class TacletFilterSplitGoal extends TacletFilter {
-	
-	public final static TacletFilterSplitGoal INSTANCE = new TacletFilterSplitGoal ();
-	
-	private TacletFilterSplitGoal () {
-	}
+/**
+ * Filter that selects taclets that belong to at least one
+ * rule set, i.e. taclets that can be applied automatically.
+ */
+public class AnyRuleSetTacletFilter extends TacletFilter {
 
-	protected boolean filter(Taclet taclet) {
-		return taclet.goalTemplates().size() > 1;
-	}
+    private AnyRuleSetTacletFilter () {
+    }
 
+    /**
+     * @return true iff <code>taclet</code> should be included in the
+     * result
+     */
+    public boolean filter ( Taclet taclet ) {
+	return !taclet.getRuleSets ().isEmpty();
+    }
+
+    public final static TacletFilter INSTANCE = new AnyRuleSetTacletFilter ();
 }

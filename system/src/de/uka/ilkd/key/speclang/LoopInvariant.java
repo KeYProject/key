@@ -159,4 +159,6 @@ public interface LoopInvariant extends SpecificationElement {
     public String getPlainText(Services services);
     
     public String getUniqueName();
+
+    public String getNamePrefix();
 }

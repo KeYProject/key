@@ -14,9 +14,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 
@@ -34,7 +33,6 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        IObserverFunction targetMethod =
                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
        final IProgramMethod pm = (IProgramMethod) targetMethod;
-       final SpecificationRepository specRepos = d.tb.getServices().getSpecificationRepository();
        StatementBlock targetBlock =
                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
        LoopInvariant loopInv =
@@ -42,13 +40,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        String nameString = generatePredicateName(pm, targetBlock, loopInv);
        final Function contApplPred =
                generateContApplPredicate(nameString, poVars.termList, d.tb);
-       InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(pm);
-       s.addPredicate(contApplPred);
-       s.addTerms(poVars.termList);
-       Term term = instantiateContApplPredicate(contApplPred, poVars, d.tb);
-       s.addTerm(term);
-
-       return term;
+       if (!InfFlowContractPO.hasSymbols()) {
+           InfFlowContractPO.newSymbols(
+                   d.tb.getServices().getProof().env().getInitConfig().activatedTaclets());
+       }
+       InfFlowContractPO.addSymbol(contApplPred);
+       return instantiateContApplPredicate(contApplPred, poVars, d.tb);
    }
 
 
@@ -65,7 +62,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                    new Sort[termList.size()];
 
            int i = 0;
-           for (Term arg : termList) {
+           for (final Term arg : termList) {
                argSorts[i] = arg.sort();
                i++;
            }
@@ -80,12 +77,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
    private Term instantiateContApplPredicate(Function pred,
                                              ProofObligationVars appData,
                                              TermBuilder.Serviced tb) {
-       Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+       final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
        pred.argSorts().toArray(predArgSorts);
        Term[] predArgs = new Term[predArgSorts.length];
 
        int i = 0;
-       for (Term arg : appData.termList) {
+       for (final Term arg : appData.termList) {
            predArgs[i] = arg;
            i++;
        }

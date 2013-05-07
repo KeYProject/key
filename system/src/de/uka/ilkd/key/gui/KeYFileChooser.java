@@ -97,7 +97,7 @@ public class KeYFileChooser {
         setSaveDialog(true);
 
         boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
-                         .getGeneralSettings().storesInSeparateProofFolder();
+                         .getGeneralSettings().storesInDefaultProofFolder();
 
         String proofDir =
                 (!proofFolderActive || resetFile.getParent().endsWith(PROOF_SUBDIRECTORY)) ?
@@ -125,6 +125,12 @@ public class KeYFileChooser {
 
     public boolean showOpenDialog(Component component) {
         setSaveDialog(false);
+
+        final File file = fileChooser.getSelectedFile() != null ?
+                fileChooser.getSelectedFile() : fileChooser.getCurrentDirectory();
+        fileChooser.setSelectedFile(file);
+        fileChooser.updateUI();
+
 	int result = fileChooser.showOpenDialog(component);
 	return (result == JFileChooser.APPROVE_OPTION);
     }

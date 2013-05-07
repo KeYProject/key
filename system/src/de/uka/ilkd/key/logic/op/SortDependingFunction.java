@@ -241,7 +241,7 @@ public final class SortDependingFunction extends Function {
 
         final SortDependingFunction sdp = (SortDependingFunction)subst;   
         if(!isSimilar(sdp)) {
-            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);            
+            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);
             return null;
         }
         
@@ -254,7 +254,7 @@ public final class SortDependingFunction extends Function {
             return null;
         }
         
-        return result;        
+        return result;
     }
     
     

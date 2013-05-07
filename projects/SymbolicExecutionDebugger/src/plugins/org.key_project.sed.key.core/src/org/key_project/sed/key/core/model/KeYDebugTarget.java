@@ -284,7 +284,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Remove proof from user interface
          environment.getUi().removeProof(environment.getProof());
          // Clear cache
-         environment.getBuilder().dispose();
+         environment.dispose();
          environment = null;
       }
       // Inform UI that the process is terminated

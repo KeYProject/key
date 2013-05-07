@@ -92,7 +92,7 @@ import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
 import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.SeparateProofFolder;
+import de.uka.ilkd.key.gui.actions.DefaultProofFolder;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
@@ -830,7 +830,7 @@ public final class MainWindow extends JFrame  {
 	options.add(new SMTOptionsAction(this));
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
-	options.add(new JCheckBoxMenuItem(new SeparateProofFolder(this)));
+	options.add(new JCheckBoxMenuItem(new DefaultProofFolder(this)));
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));

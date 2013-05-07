@@ -37,8 +37,8 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -163,6 +163,24 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
+    private Term loadFindTerm(BlockContract contract, Services services) {
+        Taclet res = null;
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
+        for (int j = 0; j < 10000; j++) {
+            String prefix =
+                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
+                                                contract.getNamePrefix()).toString();
+            res = InfFlowContractPO.getTaclet(prefix);
+            if (res != null)
+                return ((FindTaclet)res).find();
+        }
+        assert false; // This should not happen
+        return null;
+    }
+
     private static ImmutableSet<BlockContract>
                         getApplicableContracts(final SpecificationRepository specifications,
                                                final StatementBlock block,
@@ -279,15 +297,9 @@ public class BlockContractRule implements BuiltInRule {
                 .getStrategySettings().getActiveStrategyProperties()
                 .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
                 .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-        final ContractPO po
-        = services.getSpecificationRepository()
-                  .getPOForProof(goal.proof());
-
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) ||
-            (po == null && loadedInfFlow)) &&
-            contract.hasModifiesClause() &&
-            contract.getRespects() != null) {
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) || loadedInfFlow) &&
+            contract.hasModifiesClause() && contract.getRespects() != null) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +
@@ -345,12 +357,13 @@ public class BlockContractRule implements BuiltInRule {
             // and associated taclet
             final Term contractApplTerm =
                     ifContractBuilder.buildContractApplPredTerm(true);
-            Taclet informationFlowContractApp =
-                    ifContractBuilder.buildContractApplTaclet(true);
-
-            SpecificationRepository specRepos = services.getSpecificationRepository();
-            InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(contract.getTarget());
-            s.addTaclet(informationFlowContractApp, services);
+            if (!InfFlowContractPO.hasSymbols()) {
+                InfFlowContractPO.newSymbols(
+                        services.getProof().env().getInitConfig().activatedTaclets());
+            }
+            Taclet informationFlowContractApp = loadedInfFlow ?
+                    ifContractBuilder.loadContractApplTaclet()
+                    : ifContractBuilder.buildContractApplTaclet(true);
 
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
@@ -387,12 +400,10 @@ public class BlockContractRule implements BuiltInRule {
             InfFlowPOSnippetFactory infFlowFactory =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
-            Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory);
+            Pair<Sequent, Term> seqPostPair =
+                    buildBodyPreservesSequent(infFlowFactory, contract, loadedInfFlow, services);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
-            s.addTerm(post);
-            s.addTerms(ifVars.c1.termList.append(ifVars.c2.termList
-                            .append(ifVars.symbExecVars.termList)));
 
             Goal infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
@@ -402,13 +413,11 @@ public class BlockContractRule implements BuiltInRule {
             final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                s.addTaclet(t, services);
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
             final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                s.addTaclet(t, services);
             }
 
             return new InfFlowValidityData(infFlowAssumptions,
@@ -567,13 +576,16 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f) {
-        Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
+                                                  boolean loaded, Services services) {
+        Term selfComposedExec = loaded ?
+                loadFindTerm(contract, services)
+                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
+        Sequent seq =
+                Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
 
         return new Pair<Sequent, Term> (seq, post);
     }
@@ -760,9 +772,11 @@ public class BlockContractRule implements BuiltInRule {
 
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable) {
             if (placeholderVariable != null) {
-                Name newName = new Name(TB.newName(services, placeholderVariable.name().toString()));
-                newName = VariableNameProposer.DEFAULT.getNewName(services, newName);
-                LocationVariable newVariable =
+                final Name newName
+                = VariableNameProposer.DEFAULT
+                    .getNewName(services,
+                            new Name(TB.newName(services, placeholderVariable.name().toString())));
+                final LocationVariable newVariable =
                         new LocationVariable(new ProgramElementName(newName.toString()),
                                              placeholderVariable.getKeYJavaType());
                 goal.addProgramVariable(newVariable);

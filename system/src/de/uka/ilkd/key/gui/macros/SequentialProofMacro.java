@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofEvent;
 

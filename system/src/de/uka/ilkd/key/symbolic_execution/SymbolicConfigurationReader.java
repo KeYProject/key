@@ -158,7 +158,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found value in wrong hierarchy.");
             }
-            KeYlessValue value = new KeYlessValue(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes), getValueString(attributes), getTypeString(attributes));
+            KeYlessValue value = new KeYlessValue(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes), getValueString(attributes), getTypeString(attributes), getConditionString(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addValue(value);
             parentStack.addFirst(value);
          }
@@ -166,7 +166,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found association in wrong hierarchy.");
             }
-            KeYlessAssociation association = new KeYlessAssociation(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes));
+            KeYlessAssociation association = new KeYlessAssociation(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes), getConditionString(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addAssociation(association);
             parentStack.addFirst(association);
             associationTargetMapping.put(association, getTarget(attributes));
@@ -308,6 +308,15 @@ public class SymbolicConfigurationReader {
     */
    protected String getValueString(Attributes attributes) {
       return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_VALUE);
+   }
+
+   /**
+    * Returns the condition value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getConditionString(Attributes attributes) {
+      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_CONDITION);
    }
 
    /**
@@ -545,7 +554,8 @@ public class SymbolicConfigurationReader {
       @Override
       public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                                  boolean isArrayIndex, 
-                                                 int arrayIndex) {
+                                                 int arrayIndex,
+                                                 Term condition) {
          return null;
       }
 
@@ -555,7 +565,8 @@ public class SymbolicConfigurationReader {
       @Override
       public ISymbolicValue getValue(IProgramVariable programVariable, 
                                      boolean isArrayIndex, 
-                                     int arrayIndex) {
+                                     int arrayIndex,
+                                     Term condition) {
          return null;
       }
    }
@@ -625,7 +636,8 @@ public class SymbolicConfigurationReader {
       @Override
       public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                                  boolean isArrayIndex, 
-                                                 int arrayIndex) {
+                                                 int arrayIndex,
+                                                 Term condition) {
          return null;
       }
 
@@ -635,7 +647,8 @@ public class SymbolicConfigurationReader {
       @Override
       public ISymbolicValue getValue(IProgramVariable programVariable, 
                                      boolean isArrayIndex, 
-                                     int arrayIndex) {
+                                     int arrayIndex,
+                                     Term condition) {
          return null;
       }
    }
@@ -675,6 +688,11 @@ public class SymbolicConfigurationReader {
        * The array index.
        */
       private int arrayIndex;
+
+      /**
+       * The optional condition under which this value is valid.
+       */
+      private String conditionString;
       
       /**
        * Constructor.
@@ -684,8 +702,9 @@ public class SymbolicConfigurationReader {
        * @param arrayIndex The array index.
        * @param valueString The value.
        * @param typeString The type.
+       * @param conditionString The optional condition under which this value is valid.
        */
-      public KeYlessValue(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, String valueString, String typeString) {
+      public KeYlessValue(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, String valueString, String typeString, String conditionString) {
          super();
          this.name = name;
          this.programVariableString = programVariableString;
@@ -693,6 +712,7 @@ public class SymbolicConfigurationReader {
          this.arrayIndex = arrayIndex;
          this.valueString = valueString;
          this.typeString = typeString;
+         this.conditionString = conditionString;
       }
 
       /**
@@ -766,6 +786,22 @@ public class SymbolicConfigurationReader {
       public int getArrayIndex() {
          return arrayIndex;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getCondition() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getConditionString() {
+         return conditionString;
+      }
    }
    
    /**
@@ -800,14 +836,20 @@ public class SymbolicConfigurationReader {
       private int arrayIndex;
 
       /**
+       * The optional condition under which this association is valid.
+       */
+      private String conditionString;
+
+      /**
        * Constructor.
        * @param name The name.
        * @param programVariableString The program variable.
        * @param isArrayIndex The is array index flag.
        * @param arrayIndex The array index.
+       * @param conditionString The optional condition under which this association is valid.
        */
-      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex) {
-         this(name, programVariableString, isArrayIndex, arrayIndex, null);
+      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, String conditionString) {
+         this(name, programVariableString, isArrayIndex, arrayIndex, null, conditionString);
       }
 
       /**
@@ -817,14 +859,16 @@ public class SymbolicConfigurationReader {
        * @param isArrayIndex The is array index flag.
        * @param arrayIndex The array index.
        * @param target The target.
+       * @param conditionString The optional condition under which this association is valid.
        */
-      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, ISymbolicObject target) {
+      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, ISymbolicObject target, String conditionString) {
          super();
          this.name = name;
          this.programVariableString = programVariableString;
          this.isArrayIndex = isArrayIndex;
          this.arrayIndex = arrayIndex;
          this.target = target;
+         this.conditionString = conditionString;
       }
 
       /**
@@ -881,6 +925,22 @@ public class SymbolicConfigurationReader {
       @Override
       public int getArrayIndex() {
          return arrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getCondition() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getConditionString() {
+         return conditionString;
       }
    }
    

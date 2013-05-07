@@ -79,7 +79,7 @@ public final class ProblemInitializer {
 	public void reportStatus(Object sender, String status);
 	public void resetStatus(Object sender);
 	public void reportException(Object sender, ProofOblInput input, Exception e);
-    }    
+    }
     private static InitConfig baseConfig;
  
     private final Profile profile;

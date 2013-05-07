@@ -5,20 +5,20 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 
-public class SeparateProofFolder extends MainWindowAction {
+public class DefaultProofFolder extends MainWindowAction {
 
     /**
      * 
      */
     private static final long serialVersionUID = 3453843972242689758L;
 
-    public SeparateProofFolder(MainWindow mainWindow) {
+    public DefaultProofFolder(MainWindow mainWindow) {
         super(mainWindow);
-        setTooltip("If ticked and proofs are being saved, they are stored in a separate proof folder "+
-        "(which is created automatically, if it does not already exist).");
-        setName("Separate Proof Folder");
+        setTooltip("If ticked and proofs are being saved, they are stored in a default proof folder "+
+        "(as a sub directory, which is created automatically, if it does not already exist).");
+        setName("Default Proof Folder");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                                                  .storesInSeparateProofFolder());
+                                                  .storesInDefaultProofFolder());
     }
 
     @Override

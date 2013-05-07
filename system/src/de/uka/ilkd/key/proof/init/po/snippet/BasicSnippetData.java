@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
@@ -53,6 +52,8 @@ class BasicSnippetData {
      */
     private final EnumMap<Key, Object> contractContents =
             new EnumMap<Key, Object>(Key.class) {
+
+                private static final long serialVersionUID = -8548805965130100236L;
 
                 @Override
                 public Object put(Key key,
@@ -124,14 +125,11 @@ class BasicSnippetData {
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
 
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new ProofObligationVars(contract.getSelf(),
                                         contract.getParams(), contract.getResult(),
                                         contract.getExc(), heap, services, false);
-        s.addTerms(origVars.termList);
     }
     
     BasicSnippetData(LoopInvariant invariant,
@@ -147,8 +145,6 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.RESPECTS, invariant.getRespects(services));
 
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(invariant.getTarget());
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(invariant.getLoop(), services);
@@ -162,7 +158,6 @@ class BasicSnippetData {
                                         invariant.getGuard(),
                                         localInTerms, heap, localOutTerms,
                                         services, true);
-        s.addTerms(origVars.termList);
     }
     
     
@@ -188,14 +183,11 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.RESPECTS, contract.getRespects());
 
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new ProofObligationVars(contract.getSelf(),
                                         contract.getParams(), contract.getResult(),
                                         contract.getExc(), heap, services, false);
-        s.addTerms(origVars.termList);
     }
 
 
@@ -217,8 +209,6 @@ class BasicSnippetData {
         contractContents.put(Key.LABELS,
                              labels.toArray(new Label[labels.size()]));
 
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(contract.getTarget());
         final Term heapTerm = TermBuilder.DF.getBaseHeap(services);
         Terms vars = contract.getVariablesAsTerms();
         final ImmutableSet<ProgramVariable> localInVariables =
@@ -231,7 +221,6 @@ class BasicSnippetData {
                 new ProofObligationVars(vars.self, localInTerms, localOutTerms,
                                         vars.result, vars.exception, heapTerm,
                                         services, true);
-        s.addTerms(origVars.termList);
     }
 
 

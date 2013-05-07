@@ -94,4 +94,19 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
          SymbolicExecutionUtil.setUseLoopInvariants(proof, loopTreatmentInvariant);
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      Proof proof = getProof();
+      if (builder != null) {
+         builder.dispose();
+      }
+      if (proof != null && proof != getLoadedProof()) {
+         proof.dispose();
+      }
+      super.dispose();
+   }
 }

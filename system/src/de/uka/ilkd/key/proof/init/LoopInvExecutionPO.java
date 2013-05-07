@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
@@ -61,8 +60,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(getProgramMethod());
-
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
@@ -82,8 +79,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // final symbolic execution term
         Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
                                             TB.not(TB.and(inv, symExec)));
-        s.addTerm(symExec);
-        s.addSymbols(services.getNamespaces().programVariables().elements());
 
         // register final term
         assignPOTerms(finalTerm);
@@ -152,28 +147,6 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         properties.setProperty("Non-interference contract", loopInvariant.getUniqueName());
     }
 
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * <p/>
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig,
-                                             Properties properties) throws IOException {
-        String loopInvName = properties.getProperty("Non-interference contract");
-        SpecificationRepository specs =
-                initConfig.getServices().getSpecificationRepository();
-        final LoopInvariant loopInv = specs.getLoopInvariantByName(loopInvName);
-        if (loopInv == null) {
-            throw new RuntimeException("Contract not found: " + loopInvName);
-        } else {
-            ProofOblInput po = new InfFlowContractPO(initConfig, null);
-            return new LoadedPOContainer(po, 0);
-        }
-    }
 
     @Override
     public InformationFlowContract getContract() {

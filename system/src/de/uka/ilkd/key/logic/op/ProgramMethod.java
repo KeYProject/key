@@ -334,6 +334,10 @@ public final class ProgramMethod extends ObserverFunction
     	        "_" + Math.abs(getMethodDeclaration().hashCode());
     } // Included HasCode to make IF-Predicates unique
 
+   public String getNamePrefix() {
+        return getMethodDeclaration().getFullName() + "_";
+    } // For loading IF proofs
+
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()
     */

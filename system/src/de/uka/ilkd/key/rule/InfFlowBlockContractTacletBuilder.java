@@ -15,7 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -49,6 +49,19 @@ public final class InfFlowBlockContractTacletBuilder
                                            blockContract.getUniqueName());
     }
 
+    @Override
+    Taclet loadContractApplTaclet() {
+        Taclet t = null;
+        for (int j = 0; j < 10000; j++) {
+            String prefix =
+                    MiscTools.toValidTacletName("Use information flow contract for " +
+                                                blockContract.getNamePrefix()).toString();
+            t = InfFlowContractPO.getTaclet(prefix);
+            if (t != null)
+                return t;
+        }
+        return null;
+    }
 
     @Override
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
@@ -78,6 +91,20 @@ public final class InfFlowBlockContractTacletBuilder
 
 
     @Override
+    Term loadContractApplPred() {
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
+        }
+        final String prefix = MiscTools.toValidTacletName("Use information flow contract for " +
+                                                          blockContract.getNamePrefix()).toString();
+        Term pred = ((FindTaclet)InfFlowContractPO.getTaclet(prefix)).find();
+        assert pred.op().name().toString().startsWith("RELATED_BY_");
+        return pred;
+    }
+
+
+    @Override
     Term buildContractApplications(ProofObligationVars contAppData,
                                    ProofObligationVars contAppData2,
                                    Services services) {
@@ -85,9 +112,6 @@ public final class InfFlowBlockContractTacletBuilder
                 services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
-        InfFlowProofSymbols s =
-                services.getSpecificationRepository().getInfFlowProofSymbols(blockContract.getTarget());
-        s.addTerms(contAppData.termList.append(contAppData2.termList));
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
