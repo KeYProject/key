@@ -95,7 +95,7 @@ endif
 ifeq ($(JAVAC),ajc)
   OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.6 -target 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 endif
 
 JAVACC_MAIN=javacc
