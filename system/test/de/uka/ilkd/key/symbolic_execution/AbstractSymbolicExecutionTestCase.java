@@ -983,24 +983,23 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProofInputException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
     */
    protected void assertSaveAndReload(File baseDir, 
                                       String javaPathInBaseDir, 
                                       String oraclePathInBaseDirFile, 
-                                      SymbolicExecutionEnvironment<?> env) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+                                      SymbolicExecutionEnvironment<?> env) throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
-      tempFile.deleteOnExit();
-      Proof reloadedProof = null;
+      KeYEnvironment<CustomConsoleUserInterface> reloadedEnv = null;
       SymbolicExecutionTreeBuilder reloadedBuilder = null;
       try {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
-         // Load proof
-         env.getUi().loadProblem(tempFile);
-         waitForAutoMode(env.getUi());
-         reloadedProof = env.getUi().getMediator().getProof();
+         // Load proof from saved *.proof file
+         reloadedEnv = KeYEnvironment.load(tempFile, null, null);
+         Proof reloadedProof = reloadedEnv.getLoadedProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
          reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
@@ -1011,11 +1010,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          if (reloadedBuilder != null) {
             reloadedBuilder.dispose();
          }
-         if (reloadedProof != null) {
-            reloadedProof.dispose();
+         if (reloadedEnv != null) {
+            reloadedEnv.dispose();
          }
          if (tempFile != null) {
             tempFile.delete();
+            assertFalse(tempFile.exists());
          }
       }
    }
