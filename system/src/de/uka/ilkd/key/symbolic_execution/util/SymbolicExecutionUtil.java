@@ -1559,8 +1559,8 @@ public final class SymbolicExecutionUtil {
             antecedents = newAntecedents;
             succedents = newSuccedents;
          }
-         else {
-            throw new ProofInputException("Expected replacement as Sequent during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+         else if (goalTemplate.replaceWithExpressionAsObject() != null) {
+            throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
          }
       }
       // Construct branch condition from created antecedent and succedent terms as new implication 
