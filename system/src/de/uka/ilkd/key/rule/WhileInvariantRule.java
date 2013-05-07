@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -42,8 +43,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -137,9 +138,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
-            final Name anonFuncName =
-                    VariableNameProposer.DEFAULT.getNewName(services,
-                            new Name(TB.newName(services, pv.name().toString())));
+            final Name anonFuncName = new Name(TB.newName(services, pv.name().toString()));
             final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
@@ -157,23 +156,35 @@ public final class WhileInvariantRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
-                                                   Services services) {
+                                                   LoopInvariant inv, Services services) {
         final boolean loadedInfFlow = services.getProof().getSettings()
                                         .getStrategySettings().getActiveStrategyProperties()
                                         .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
                                         .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Name loopHeapName;
 	final Function loopHeapFunc;
 	if (loadedInfFlow) {
-	    loopHeapFunc =
-	            (Function) services.getNamespaces().functions().lookup(heap+"_After_LOOP_0");
-	} else {
-	    final Name loopHeapName =
-	            VariableNameProposer.DEFAULT.getNewName(services,
-	                    new Name(TB.newName(services, heap+"_After_LOOP")));
-	    loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
+            InfFlowProofSymbols symbols = new InfFlowProofSymbols();
+            final Term find = loadFindTerm(inv, services);
+            symbols.add(find);
+            String name = symbols.getProgramVariable(heap + "_After_LOOP")
+                                        .name().toString();
+            String sub = name.split("LOOP")[name.split("LOOP").length-1];
+            for (String s: new ImmutableArray<String> ("_A", "_B")) {
+                if (sub.contains(s)) {
+                    name = name.substring(0, name.indexOf(sub));
+                }
+            }
+            loopHeapName = new ProgramElementName(TB.newName(services, name));
+            loopHeapFunc = (Function) services.getNamespaces().functions().lookup(loopHeapName);
+        } else {
+            loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
+            loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
+        }
+	if (!loadedInfFlow)
 	    services.getNamespaces().functions().addSafely(loopHeapFunc);
-	}
+
         final Term loopHeap = TB.func(loopHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_LOOP"));
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
@@ -298,7 +309,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    private Term loadFindTerm(LoopInvariant loopInv, Services services) {
+    private static Term loadFindTerm(LoopInvariant loopInv, Services services) {
             Taclet res = null;
             if (!InfFlowContractPO.hasSymbols()) {
                 InfFlowContractPO.newSymbols(
@@ -510,17 +521,28 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TB.and(variantNonNeg, TB.lt(variant, TB.var(variantPV), services))
                 : TB.tt();
         //prepare guard
+        final ProgramElementName guardVarName;
         final LocationVariable guardVar;
         if (loadedInfFlow) {
-            guardVar =
-                    (LocationVariable) services.getNamespaces().programVariables().lookup("b_0");
+            InfFlowProofSymbols symbols = new InfFlowProofSymbols();
+            final Term find = loadFindTerm(inst.inv, services);
+            symbols.add(find);
+            String name = symbols.getProgramVariable("b", booleanKJT).name().toString();
+            for (String s: new ImmutableArray<String> ("_Before", "_After")) {
+                if (name.contains(s)) {
+                    name = name.substring(0, name.indexOf(s));
+                }
+            }
+            guardVarName = new ProgramElementName(TB.newName(services, name));
+            guardVar = (LocationVariable) services.getNamespaces()
+                          .programVariables().lookup(guardVarName);
         } else {
-            final String guardVarName =
-                    VariableNameProposer.DEFAULT.getNewName(services,
-                            new ProgramElementName(TB.newName(services, "b"))).toString();
-            guardVar = new LocationVariable(new ProgramElementName(guardVarName), booleanKJT);
-            services.getNamespaces().programVariables().addSafely(guardVar);
+            guardVarName =
+                    new ProgramElementName(TB.newName(services, "b"));
+            guardVar = new LocationVariable(guardVarName, booleanKJT);
         }
+        if (!loadedInfFlow)
+            services.getNamespaces().programVariables().addSafely(guardVar);
         final VariableSpecification guardVarSpec 
         = new VariableSpecification(guardVar, 
                 inst.loop.getGuardExpression(), 
@@ -537,9 +559,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final JavaBlock guardJb
         = JavaBlock.createJavaBlock(new StatementBlock(
                 guardVarMethodFrame));
-        final Term guardTrueTerm = TB.equals(TB.var(guardVar), 
+        final Term guardTrueTerm = TB.equals(TB.var(guardVar),
                 TB.TRUE(services));
-        final Term guardFalseTerm = TB.equals(TB.var(guardVar), 
+        final Term guardFalseTerm = TB.equals(TB.var(guardVar),
                 TB.FALSE(services));
 
         Term beforeLoopUpdate = null;
@@ -562,14 +584,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         for(ProgramVariable pv : localOuts) {
-            final ProgramElementName pvBeforeLoopName 
-            = new ProgramElementName(TB.newName(services, pv.name().toString() +
-                                     "Before_" + inst.inv.getName()));
-            final VariableNamer vn = services.getVariableNamer();
+            final String pvBeforeLoopName
+            = TB.newName(services, pv.name().toString() + "Before_" + inst.inv.getName());
             final LocationVariable pvBeforeLoop
-            = (LocationVariable) vn.rename(
-                    new LocationVariable(pvBeforeLoopName, pv.getKeYJavaType()), goal,
-                                         ruleApp.posInOccurrence());
+            = new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
             beforeLoopUpdate = TB.parallel(beforeLoopUpdate,
                                            TB.elementary(services,
@@ -589,7 +607,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 ImmutableSLList.<AnonUpdateData>nil();
         for(LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon
-            = createAnonUpdate(heap, mods.get(heap), services);
+            = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if(anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;

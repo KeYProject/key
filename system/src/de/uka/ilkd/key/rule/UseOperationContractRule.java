@@ -54,7 +54,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -299,12 +298,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 	assert pm != null;
 	assert mod != null;
 
+	final boolean loadedInfFlow = services.getProof().getSettings()
+	                                  .getStrategySettings().getActiveStrategyProperties()
+	                                  .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+	                                  .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name methodHeapName
-	= VariableNameProposer.DEFAULT
-	    .getNewName(services, new Name(TB.newName(services, heap+"After_" + pm.getName())));
+	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
-	services.getNamespaces().functions().addSafely(methodHeapFunc);
+	if (!loadedInfFlow)
+	    services.getNamespaces().functions().addSafely(methodHeapFunc);
     final Term methodHeap = TB.func(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
@@ -537,6 +540,11 @@ public final class UseOperationContractRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal, 
 	    			     Services services, 
 	    			     RuleApp ruleApp) {
+        final boolean loadedInfFlow = services.getProof().getSettings()
+                                        .getStrategySettings().getActiveStrategyProperties()
+                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+
 	//get instantiation
 	final Instantiation inst 
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
@@ -575,12 +583,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         assert inst.pm.isConstructor()
                || !(inst.actualResult != null && resultVar == null);
-        final VariableNamer vn = services.getVariableNamer();
-        final String excName = new ProgramElementName(TB.newName(services, "exc")).toString();
-        final ProgramVariable excVar = vn.rename(TB.excVar(services, excName, inst.pm, true),
-                                                 goal, ruleApp.posInOccurrence());
+        // TODO: here!
+        final ProgramVariable excVar = TB.excVar(services, "exc", inst.pm, true);
         assert excVar != null;
-        goal.addProgramVariable(excVar);
+        if (!loadedInfFlow)
+            goal.addProgramVariable(excVar);
         
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         //translate the contract
@@ -781,11 +788,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         	            true, 
         	            false);
 
-        boolean loadedInfFlow =
-                services.getProof().getSettings()
-                .getStrategySettings().getActiveStrategyProperties()
-                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) {
             // prepare information flow analysis

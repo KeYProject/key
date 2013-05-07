@@ -7,6 +7,7 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
@@ -66,6 +67,7 @@ public class InfFlowProofSymbols {
             }
         }
     }
+
     private void addTerm(Term t) {
         if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
@@ -201,6 +203,27 @@ public class InfFlowProofSymbols {
         return programVariables;
     }
 
+    public ProgramVariable getProgramVariable(String prefix) {
+        assert !getProgramVariables().isEmpty();
+        for(ProgramVariable pv: getProgramVariables()) {
+            if (pv.name().toString().startsWith(prefix)) {
+                return pv;
+            }
+        }
+        return null;
+    }
+
+    public ProgramVariable getProgramVariable(String prefix, KeYJavaType type) {
+        assert !getProgramVariables().isEmpty();
+        for(ProgramVariable pv: getProgramVariables()) {
+            if (pv.getKeYJavaType().equals(type) &&
+                    pv.name().toString().startsWith(prefix)) {
+                return pv;
+            }
+        }
+        return null;
+    }
+
     private ImmutableSet<SchemaVariable> getSchemaVariables() {
         return schemaVariables;
     }
@@ -211,6 +234,16 @@ public class InfFlowProofSymbols {
             res = res.add(t);
         }
         return res;
+    }
+
+    public Taclet getTaclet(String prefix) {
+        assert !getTaclets().isEmpty();
+        for(Taclet t: getTaclets()) {
+            if (t.name().toString().startsWith(prefix)) {
+                return t;
+            }
+        }
+        return null;
     }
 
     private String printSorts() {

@@ -205,13 +205,11 @@ public class InfFlowContractPO extends AbstractOperationPO
     }
 
     public static Taclet getTaclet(String prefix) {
-        assert !symbols().getTaclets().isEmpty();
-        for(Taclet t: symbols().getTaclets()) {
-            if (t.name().toString().startsWith(prefix)) {
-                return t;
-            }
-        }
-        return null;
+        return symbols().getTaclet(prefix);
+    }
+
+    public static ProgramVariable getProgramVariable(String prefix) {
+        return symbols().getProgramVariable(prefix);
     }
 
     private Term loadFindTerm(ProgramMethod pm, Services services) {
