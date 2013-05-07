@@ -142,7 +142,7 @@ public class UserDefinedSymbols {
                         }
                         return ruleHeader;
                 } else {
-                        return parent.ruleHeader;
+                        return parent.getRuleHeader(services);
                 }
         }
 

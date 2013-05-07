@@ -8,12 +8,14 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.lemmatagenerator.EnvironmentCreator;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
@@ -44,6 +46,13 @@ public abstract class TacletLoader {
     
         public KeYUserProblemFile getTacletFile() {
                 return tacletFile;
+        }
+        
+        /**
+         * subclasses may choose to give a special tacletfile per proof.
+         */
+        public ProofOblInput getTacletFile(Proof proof) {
+            return getTacletFile();
         }
 
 
@@ -220,7 +229,13 @@ public abstract class TacletLoader {
                         
                 }
                 
-
+                @Override 
+                public ProofOblInput getTacletFile(Proof proof) {
+                    String name = proof.name().toString();
+                    assert name.startsWith("Taclet: ") : 
+                        "This depends (unfortunately) on the name of the proof";
+                    return new TacletProofObligationInput(name.substring(8), profile);
+                }
 
 
                 @Override
@@ -229,7 +244,6 @@ public abstract class TacletLoader {
                 }
                 
         }
-        
 
 
 }

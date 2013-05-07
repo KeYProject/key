@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.CompoundProof;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -152,6 +153,28 @@ public class TacletSoundnessPOLoader {
                 thread.start();
         }
         
+        public void startSynchronously() {
+            for (LoaderListener listener : listeners) {
+                    listener.started();
+            }
+            try {
+                doWork();
+            } catch (ProofInputException exception) {
+                for (LoaderListener listener : listeners) {
+                    listener.stopped(exception);
+                }
+            } finally {
+                for (LoaderListener listener : listeners) {
+                    listener.stopped(
+                                    resultingProof,
+                                    isUsedOnlyForProvingTaclets() ? 
+                                    getResultingTaclets() : getResultingTacletsForOriginalProof(),
+                                    !loadAsLemmata);
+                }
+            }
+            
+        }
+        
         public ImmutableSet<Taclet> getResultingTacletsForOriginalProof() {
                 return resultingTacletsForOriginalProof;
         }
@@ -239,8 +262,9 @@ public class TacletSoundnessPOLoader {
                         return;
                 }
 
-                resultingProof = loadAsLemmata ? createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(),
-                                tacletLoader.getTacletFile(), axioms) : null;
+                resultingProof = loadAsLemmata ? 
+                        createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(),
+                                axioms) : null;
 
         }
         
@@ -298,7 +322,7 @@ public class TacletSoundnessPOLoader {
 
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
                         ImmutableSet<Taclet> taclets,
-                        KeYUserProblemFile keyFile, ImmutableSet<Taclet> axioms) {
+                        ImmutableSet<Taclet> axioms) {
                 removeTaclets(proofEnvForTaclets.getInitConfig(),taclets);
                 ProofObligationCreator creator = new ProofObligationCreator();
                 ProofAggregate p = creator.create(taclets,
@@ -314,7 +338,7 @@ public class TacletSoundnessPOLoader {
                         }
                 }
                 
-                registerProofs(p, proofEnvForTaclets, keyFile);
+                registerProofs(p, proofEnvForTaclets);
                 return p;
         }
         
@@ -333,16 +357,18 @@ public class TacletSoundnessPOLoader {
         }
 
         public void registerProofs(ProofAggregate aggregate,
-                        ProofEnvironment proofEnv, ProofOblInput keyFile) {
-                if (aggregate instanceof CompoundProof) {
-                        CompoundProof cp = (CompoundProof) aggregate;
-                        for (ProofAggregate child : cp.getChildren()) {
-                                registerProofs(child, proofEnv, keyFile);
-                        }
-                } else {
-                      assert aggregate instanceof SingleProof;
-                        proofEnv.registerProof(keyFile, aggregate);
-               }
+                        ProofEnvironment proofEnv) {
+            if (aggregate instanceof CompoundProof) {
+                CompoundProof cp = (CompoundProof) aggregate;
+                for (ProofAggregate child : cp.getChildren()) {
+                    registerProofs(child, proofEnv);
+                }
+            } else {
+                assert aggregate instanceof SingleProof;
+                Proof proof = aggregate.getFirstProof();
+                ProofOblInput keyFile = tacletLoader.getTacletFile(proof);
+                proofEnv.registerProof(keyFile, aggregate);
+            }
         }
 
         public ProofAggregate getResultingProof() {
