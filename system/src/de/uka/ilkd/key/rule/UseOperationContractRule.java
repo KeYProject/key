@@ -813,7 +813,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             SpecificationRepository specRepos = services.getSpecificationRepository();
             InfFlowProofSymbols s = specRepos.getInfFlowProofSymbols(contract.getTarget());
             s.addTaclet(informationFlowContractApp, services);
-            s.addPredicate((Function) contractApplPredTerm.op());
+            s.addPredicate(ifContractBuilder.getContractApplPred(false));
 
             // add term and taclet to post goal
             postGoal.addFormula(new SequentFormula(contractApplPredTerm),

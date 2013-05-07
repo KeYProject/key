@@ -110,6 +110,13 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
 
+    public Function getContractApplPred(boolean local) {
+        ProofObligationVars appData = getProofObligationVars(local);
+        Term contractApplPredTerm = getContractApplPred(appData);
+        return contractApplPredTerm.op(Function.class);
+    }
+
+
     // TODO: add exception var
     public Taclet buildContractApplTaclet(boolean local) {
         ProofObligationVars appData = getProofObligationVars(local);
