@@ -599,6 +599,11 @@ public final class ProblemInitializer {
     public void tryReadProof(IProofFileParser pfp, KeYUserProblemFile kupf) 
     		throws ProofInputException {
 	reportStatus("Loading proof", kupf.getNumberOfChars());
-	kupf.readProof(pfp);
+	try {
+	   kupf.readProof(pfp);
+	}
+	finally {
+	   kupf.close();
+	}
     }
 }
