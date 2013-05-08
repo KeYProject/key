@@ -204,6 +204,7 @@ public class Node implements Iterable<Node> {
      * containing <code>this</code> and <code>p_node</code>; we assume
      * that the two nodes are part of the same proof tree
      */
+    // XXX this method is never used
     public Node commonAncestor ( Node p_node ) {
 	if ( root () )
 	    return this;
@@ -651,12 +652,13 @@ public class Node implements Iterable<Node> {
 
     private int getIntroducedRulesCount() {
         int c = 0;
+        Node n = this;
 
-        if (parent != null) {
-            c = parent.getIntroducedRulesCount();
+        while (n != null) {
+            c += localIntroducedRules.size();
+            n = n.parent;
         }
-
-        return c + localIntroducedRules.size();
+        return c;
     }
 
     public int getUniqueTacletNr() {
