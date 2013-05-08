@@ -795,6 +795,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -804,7 +805,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 String baseContractName,
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
-                                                                                                                boolean useLoopInvarints) throws ProblemLoaderException, ProofInputException {
+                                                                                                                boolean useLoopInvarints,
+                                                                                                                boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -817,7 +819,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -837,6 +839,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -848,7 +851,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 String precondition,
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
-                                                                                                                boolean useLoopInvarints) throws ProblemLoaderException, ProofInputException {
+                                                                                                                boolean useLoopInvarints,
+                                                                                                                boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -861,7 +865,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -877,6 +881,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     */
@@ -884,7 +889,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 String proofPathInBaseDir, 
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
-                                                                                                                boolean useLoopInvarints) throws ProblemLoaderException {
+                                                                                                                boolean useLoopInvarints,
+                                                                                                                boolean aliasChecks) throws ProblemLoaderException {
       // Make sure that required files exists
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
@@ -893,7 +899,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -915,6 +921,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -928,7 +935,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 Position endPosition,
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
-                                                                                                                boolean useLoopInvarints) throws ProblemLoaderException, ProofInputException {
+                                                                                                                boolean useLoopInvarints,
+                                                                                                                boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -941,7 +949,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();

@@ -2166,7 +2166,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    private Feature setupApprovalF(Proof p_proof) {
+    protected Feature setupApprovalF(Proof p_proof) {
         final Feature depSpecF;
         final String depProp
         	= strategyProperties.getProperty(

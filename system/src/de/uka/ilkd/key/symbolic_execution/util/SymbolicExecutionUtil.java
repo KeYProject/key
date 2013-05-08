@@ -112,6 +112,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -1993,6 +1994,22 @@ public final class SymbolicExecutionUtil {
                                      StrategyProperties.LOOP_EXPAND;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+
+   /**
+    * Configures the proof to do alias checks or not.
+    * @param proof The {@link Proof} to configure.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
+    */
+   public static void setAliasChecks(Proof proof, boolean immediately) {
+      if (proof != null && !proof.isDisposed()) {
+         String aliasChecksValue = immediately ? 
+                                   SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY : 
+                                   SymbolicExecutionStrategy.ALIAS_CHECK_NEVER;
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         sp.setProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
