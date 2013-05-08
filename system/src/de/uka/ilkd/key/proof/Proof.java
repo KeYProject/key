@@ -984,6 +984,9 @@ public class Proof implements Named {
     }
 
 
+    /** Retrieves a bunch of statistics to the proof tree.
+     * This implementation traverses the proof tree only once.
+     */
     public List<Pair<String,String>> statistics() {
         final List<Pair<String,String>> res = new ArrayList<Pair<String,String>>();
         final NodeIterator it = root().subtreeIterator();
