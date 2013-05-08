@@ -236,10 +236,10 @@ public class InfFlowProofSymbols {
         return res;
     }
 
-    public Taclet getTaclet(String prefix) {
+    public Taclet getTaclet(String name) {
         assert !getTaclets().isEmpty();
         for(Taclet t: getTaclets()) {
-            if (t.name().toString().startsWith(prefix)) {
+            if (t.name().toString().equalsIgnoreCase(name)) {
                 return t;
             }
         }

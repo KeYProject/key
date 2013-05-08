@@ -162,7 +162,7 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
-    private Term loadFindTerm(BlockContract contract, Services services) {
+    private static FindTaclet loadFindTaclet(BlockContract contract, Services services) {
         Taclet res = null;
         if (!InfFlowContractPO.hasSymbols()) {
             InfFlowContractPO.newSymbols(
@@ -171,13 +171,17 @@ public class BlockContractRule implements BuiltInRule {
         for (int j = 0; j < 10000; j++) {
             String prefix =
                     MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
-                                                contract.getNamePrefix()).toString();
+                                                contract.getUniqueName()).toString();
             res = InfFlowContractPO.getTaclet(prefix);
             if (res != null)
-                return ((FindTaclet)res).find();
+                return (FindTaclet)res;
         }
         assert false; // This should not happen
         return null;
+    }
+
+    public static Term loadFindTerm(BlockContract contract, Services services) {
+        return loadFindTaclet(contract, services).find();
     }
 
     private static ImmutableSet<BlockContract>
@@ -360,9 +364,7 @@ public class BlockContractRule implements BuiltInRule {
                 InfFlowContractPO.newSymbols(
                         services.getProof().env().getInitConfig().activatedTaclets());
             }
-            Taclet informationFlowContractApp = loadedInfFlow ?
-                    ifContractBuilder.loadContractApplTaclet()
-                    : ifContractBuilder.buildContractApplTaclet(true);
+            Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet(true);
 
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
@@ -400,7 +402,7 @@ public class BlockContractRule implements BuiltInRule {
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
             Pair<Sequent, Term> seqPostPair =
-                    buildBodyPreservesSequent(infFlowFactory, contract, loadedInfFlow, services);
+                    buildBodyPreservesSequent(infFlowFactory, contract, services);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
 
@@ -576,10 +578,9 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
-                                                  boolean loaded, Services services) {
-        Term selfComposedExec = loaded ?
-                loadFindTerm(contract, services)
-                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+                                                  Services services) {
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
@@ -770,13 +771,19 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable) {
+            boolean loadedInfFlow =
+                    services.getProof().getSettings()
+                    .getStrategySettings().getActiveStrategyProperties()
+                    .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                    .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
             if (placeholderVariable != null) {
                 final ProgramElementName newName =
                         new ProgramElementName(
                                 TB.newName(services, placeholderVariable.name().toString()));
                 final LocationVariable newVariable =
                         new LocationVariable(newName, placeholderVariable.getKeYJavaType());
-                goal.addProgramVariable(newVariable);
+                if (!loadedInfFlow)
+                    goal.addProgramVariable(newVariable);
                 return newVariable;
             }
             else {

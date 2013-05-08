@@ -29,7 +29,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
    @Override
    public Term produce(BasicSnippetData d,
                        ProofObligationVars poVars)
-           throws UnsupportedOperationException {
+                   throws UnsupportedOperationException {
+
        IObserverFunction targetMethod =
                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
        final IProgramMethod pm = (IProgramMethod) targetMethod;
@@ -40,12 +41,10 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        String nameString = generatePredicateName(pm, targetBlock, loopInv);
        final Function contApplPred =
                generateContApplPredicate(nameString, poVars.termList, d.tb);
-       if (!InfFlowContractPO.hasSymbols()) {
-           InfFlowContractPO.newSymbols(
-                   d.tb.getServices().getProof().env().getInitConfig().activatedTaclets());
-       }
-       InfFlowContractPO.addSymbol(contApplPred);
-       return instantiateContApplPredicate(contApplPred, poVars, d.tb);
+       Term result = instantiateContApplPredicate(contApplPred, poVars, d.tb);
+       InfFlowContractPO.addSymbol(result, d.tb.getServices());
+       InfFlowContractPO.addSymbols(poVars.termList, d.tb.getServices());
+       return result;
    }
 
 

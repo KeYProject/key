@@ -80,11 +80,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        InfFlowContractPO.addSymbol(composedStates);
+        InfFlowContractPO.addSymbol(composedStates, services);
         return composedStates;
 //        return TB.and(TB.or(goalFormulas1), TB.or(goalFormulas2));
     }

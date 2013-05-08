@@ -79,8 +79,6 @@ public interface BlockContract extends SpecificationElement {
 
     public String getUniqueName();
 
-    public String getNamePrefix();
-
     public String getHtmlText(Services services);
 
     // TODO Find better name: Creates a new block contract with the given changes.

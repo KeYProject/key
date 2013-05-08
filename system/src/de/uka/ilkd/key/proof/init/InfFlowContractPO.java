@@ -21,7 +21,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
 import java.io.IOException;
@@ -66,20 +65,13 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        boolean loadedInfFlow =
-                services.getProof() != null &&
-                services.getProof().getSettings()
-                .getStrategySettings().getActiveStrategyProperties()
-                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
-        final Term selfComposedExec = loadedInfFlow ?
-                loadFindTerm((ProgramMethod)contract.getTarget(), services)
-                : f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        final Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
@@ -88,13 +80,9 @@ public class InfFlowContractPO extends AbstractOperationPO
         assignPOTerms(finalTerm);
         collectClassAxioms(contract.getKJT());
 
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                addSymbol(t.taclet());
+                addSymbol(t.taclet(), services);
             }
         }
 
@@ -204,30 +192,34 @@ public class InfFlowContractPO extends AbstractOperationPO
         properties.setProperty("Non-interference contract", contract.getName());
     }
 
-    public static Taclet getTaclet(String prefix) {
-        return symbols().getTaclet(prefix);
+    public static Taclet getTaclet(String name) {
+        return symbols().getTaclet(name);
     }
 
     public static ProgramVariable getProgramVariable(String prefix) {
         return symbols().getProgramVariable(prefix);
     }
 
-    private Term loadFindTerm(ProgramMethod pm, Services services) {
+    public static FindTaclet loadFindTaclet(IProgramMethod pm, Services services) {
         Taclet res = null;
         if (!InfFlowContractPO.hasSymbols()) {
             InfFlowContractPO.newSymbols(
                     services.getProof().env().getInitConfig().activatedTaclets());
         }
         for (int j = 0; j < 10000; j++) {
-            String prefix =
+            String name =
                     MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
-                                                pm.getNamePrefix()).toString();
-            res = InfFlowContractPO.getTaclet(prefix);
+                                                pm.getFullName()).toString();
+            res = InfFlowContractPO.getTaclet(name);
             if (res != null)
-                return ((FindTaclet)res).find();
+                return (FindTaclet)res;
         }
         assert false; // This should not happen
         return null;
+    }
+
+    public static Term loadFindTerm(IProgramMethod pm, Services services) {
+        return loadFindTaclet(pm, services).find();
     }
 
     public static void newSymbols(ImmutableSet<Taclet> taclets) {
@@ -249,9 +241,28 @@ public class InfFlowContractPO extends AbstractOperationPO
         symbols().add(o);
     }
 
-    private static void addSymbols(ImmutableList<?> os) {
-        assert os != null;
-        symbols().add(os);
+    public static void addSymbols(ImmutableList<?> l) {
+        assert l != null;
+        assert !l.isEmpty();
+        symbols().add(l);
+    }
+
+    public static void addSymbol(Object o, Services services) {
+        if (!hasSymbols()) {
+            ifSymbols =
+                    new InfFlowProofSymbols(services.getProof()
+                            .env().getInitConfig().activatedTaclets());
+        }
+        addSymbol(o);
+    }
+
+    public static void addSymbols(ImmutableList<?> l, Services services) {
+        if (!hasSymbols()) {
+            ifSymbols =
+                    new InfFlowProofSymbols(services.getProof()
+                            .env().getInitConfig().activatedTaclets());
+        }
+        addSymbols(l);
     }
 
     public static String printSymbols() {

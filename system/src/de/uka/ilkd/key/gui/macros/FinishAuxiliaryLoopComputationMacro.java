@@ -65,12 +65,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, services);
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
         final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifVars, services);
-        InfFlowContractPO.addSymbol(rwTaclet);
+        InfFlowContractPO.addSymbol(rwTaclet, services);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 
@@ -79,7 +75,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         // close auxiliary computation proof
         mediator.getUI().removeProof(proof);
     }
-    
+
     private Taclet generateRewriteTaclet(Term replacewith,
                                          LoopInvariant loopInv,
                                          IFProofObligationVars ifVars,

@@ -323,15 +323,6 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public String getNamePrefix() {
-        if (getTarget() != null)
-            return "Block Contract " + getBlock().getStartPosition().getLine() +
-                    " " + ((ProgramMethod) getTarget()).getNamePrefix();
-        else
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " ";
-    }
-
-    @Override
     public String getDisplayName() {
         return "Block Contract";
     }

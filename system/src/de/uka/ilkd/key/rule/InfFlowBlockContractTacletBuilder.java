@@ -51,16 +51,11 @@ public final class InfFlowBlockContractTacletBuilder
 
     @Override
     Taclet loadContractApplTaclet() {
-        Taclet t = null;
-        for (int j = 0; j < 10000; j++) {
-            String prefix =
-                    MiscTools.toValidTacletName("Use information flow contract for " +
-                                                blockContract.getNamePrefix()).toString();
-            t = InfFlowContractPO.getTaclet(prefix);
-            if (t != null)
-                return t;
+        if (!InfFlowContractPO.hasSymbols()) {
+            InfFlowContractPO.newSymbols(
+                    services.getProof().env().getInitConfig().activatedTaclets());
         }
-        return null;
+        return InfFlowContractPO.getTaclet(generateName().toString());
     }
 
     @Override
@@ -96,9 +91,7 @@ public final class InfFlowBlockContractTacletBuilder
             InfFlowContractPO.newSymbols(
                     services.getProof().env().getInitConfig().activatedTaclets());
         }
-        final String prefix = MiscTools.toValidTacletName("Use information flow contract for " +
-                                                          blockContract.getNamePrefix()).toString();
-        Term pred = ((FindTaclet)InfFlowContractPO.getTaclet(prefix)).find();
+        Term pred = ((FindTaclet)InfFlowContractPO.getTaclet(generateName().toString())).find();
         assert pred.op().name().toString().startsWith("RELATED_BY_");
         return pred;
     }

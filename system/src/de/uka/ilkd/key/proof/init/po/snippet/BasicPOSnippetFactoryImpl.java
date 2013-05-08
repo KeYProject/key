@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -126,11 +125,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                         + "method for snippet \"" + snippet.name() + ".");
             }
             Term result = m.produce(data, poVars);
-            if (!InfFlowContractPO.hasSymbols()) {
-                InfFlowContractPO.newSymbols(
-                        data.tb.getServices().getProof().env().getInitConfig().activatedTaclets());
-            }
-            InfFlowContractPO.addSymbol(result);
+            InfFlowContractPO.addSymbol(result, data.tb.getServices());
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "

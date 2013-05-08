@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -330,13 +331,13 @@ public final class ProgramMethod extends ObserverFunction
     */
    @Override
    public String getFullName() {
-    	return getMethodDeclaration().getFullName() +
-    	        "_" + Math.abs(getMethodDeclaration().hashCode());
-    } // Included HasCode to make IF-Predicates unique
-
-   public String getNamePrefix() {
-        return getMethodDeclaration().getFullName() + "_";
-    } // For loading IF proofs
+       return getName() + "_" +
+              Math.abs(ContractFactory.generateContractTypeName("",
+                                                                getContainerType(),
+                                                                this,
+                                                                getContainerType()
+                                                                ).hashCode());
+    } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()
