@@ -610,8 +610,10 @@ public class Node implements Iterable<Node> {
      */
     private static class SubtreeIterator extends NodeIterator {
         private Node n;
+        private boolean atRoot = true; // special handle
 
         private SubtreeIterator(Node root) {
+            assert root != null;
             n = root;
         }
 
@@ -628,6 +630,7 @@ public class Node implements Iterable<Node> {
 
         @Override
         public boolean hasNext(){
+            if (atRoot) return true;
             Node m = n;
             while (m != null) {
                 if (!m.leaf()) return true;
@@ -638,6 +641,10 @@ public class Node implements Iterable<Node> {
 
         @Override
         public Node next() {
+            if (atRoot) { // stay at root once
+                atRoot = false;
+                return n;
+            }
             Node m = n;
             while (m != null) {
                 if (!m.leaf()) {
