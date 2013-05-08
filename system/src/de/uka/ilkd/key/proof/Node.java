@@ -631,12 +631,8 @@ public class Node implements Iterable<Node> {
         @Override
         public boolean hasNext(){
             if (atRoot) return true;
-            Node m = n;
-            while (m != null) {
-                if (!m.leaf()) return true;
-                else m = nextSibling(m);
-            }
-            return false;
+            if (!n.leaf()) return true;
+            return nextSibling(n) != null;
         }
 
         @Override
@@ -645,15 +641,11 @@ public class Node implements Iterable<Node> {
                 atRoot = false;
                 return n;
             }
-            Node m = n;
-            while (m != null) {
-                if (!m.leaf()) {
-                    n = m.child(0);
-                    return n;
-                }
-                else m = nextSibling(m);
-            }
-            return null;
+            if (n.leaf()) {
+                Node s = nextSibling(n);
+                if (s != null) n = s;
+            } else n = n.child(0);
+            return n;
         }
     }
 
