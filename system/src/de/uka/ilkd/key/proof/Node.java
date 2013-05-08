@@ -26,6 +26,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 public class Node implements Iterable<Node> {
+    private static final String NODES = "nodes";
+
     /** the proof the node belongs to */
     private Proof               proof;
 
@@ -52,6 +54,8 @@ public class Node implements Iterable<Node> {
 
     private ImmutableList<RenamingTable>  renamings;
 
+    private String cachedName = null;
+
     /**
      * If the rule base has been extended e.g. by loading a new taclet as
      * lemma or by applying a taclet with an addrule section on this node,
@@ -65,7 +69,7 @@ public class Node implements Iterable<Node> {
 
     public Node(Proof proof) {
 	this.proof = proof;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -74,7 +78,7 @@ public class Node implements Iterable<Node> {
     public Node(Proof proof, Sequent seq) {
 	this ( proof );
 	this.seq=seq;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
     }
 
 
@@ -88,7 +92,7 @@ public class Node implements Iterable<Node> {
 	this.seq=seq;
 	this.parent=parent;
 	if (children!=null) {this.children=children;}
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus();
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -121,6 +125,11 @@ public class Node implements Iterable<Node> {
     public void setAppliedRuleApp(RuleApp ruleApp) {
         this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;
+        clearNameCache();
+    }
+
+    public void clearNameCache() {
+        cachedName = null;
     }
 
     public NameRecorder getNameRecorder() {
@@ -244,6 +253,7 @@ public class Node implements Iterable<Node> {
 
     /** removes child/parent relationship between this node and its
      * parent; if this node is root nothing happens.
+     * This is only used for testing purposes.
      */
     void remove() {
 	if (parent != null) {
@@ -421,29 +431,35 @@ public class Node implements Iterable<Node> {
     }
 
 
-    public String name() { // XXX this is called way too often -- cache stuff!
+    public String name() {
+        if (cachedName == null) {
 
-	RuleApp rap = getAppliedRuleApp();
-        if (rap == null) {
-	    Goal goal = proof().getGoal(this);
-	    if ( goal == null || this.isClosed() )
-                return "Closed goal";
-            else if(goal.isAutomatic())
-                return "OPEN GOAL";
-            else
-                return "INTERACTIVE GOAL";
-        }
-        if (rap.rule() == null) return "rule application without rule";
+            RuleApp rap = getAppliedRuleApp();
+            if (rap == null) {
+                Goal goal = proof().getGoal(this);
+                if ( goal == null || this.isClosed() )
+                    return "Closed goal"; // don't cache this
+                else if(goal.isAutomatic())
+                    cachedName = "OPEN GOAL";
+                else
+                    cachedName = "INTERACTIVE GOAL";
+                return cachedName;
+            }
+            if (rap.rule() == null) {
+                cachedName = "rule application without rule";
+                return cachedName;
+            }
 
-        if (nodeInfo.getFirstStatementString() != null) {
-            return nodeInfo.getFirstStatementString();
-        }
+            if (nodeInfo.getFirstStatementString() != null) {
+                return nodeInfo.getFirstStatementString();
+            }
 
-        String text = rap.rule().displayName();
-        if (text == null) {
-            text = "rule without name";
+            cachedName = rap.rule().displayName();
+            if (cachedName == null) {
+                cachedName = "rule without name";
+            }
         }
-        return text;
+        return cachedName;
     }
 
 
@@ -475,7 +491,7 @@ public class Node implements Iterable<Node> {
 
     /** marks a node as closed */
     Node close() {
-	closed = true;
+        closed = true;
         Node tmp = parent;
         Node result = this;
         while (tmp != null && tmp.isCloseable()) {
@@ -483,6 +499,7 @@ public class Node implements Iterable<Node> {
             result = tmp;
             tmp = tmp.parent();
         }
+        clearNameCache();
         return result;
     }
 

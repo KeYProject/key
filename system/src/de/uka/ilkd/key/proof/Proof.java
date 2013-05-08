@@ -662,7 +662,7 @@ public class Proof implements Named {
                     goal.getRuleAppManager().clearCache();
                     goal.ruleAppIndex().clearIndexes();
                     goal.node().setAppliedRuleApp(null);
-
+                    node.clearNameCache();
             }
 
             private void removeOpenGoals(Collection<Node> toBeRemoved){
