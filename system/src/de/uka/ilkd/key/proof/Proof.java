@@ -1001,7 +1001,8 @@ public class Proof implements Named {
         while (it.hasNext()) {
             nodes++;
             final Node node = it.next();
-            branches += node.childrenCount()-1;
+            final int c = node.childrenCount();
+            if (c>1) branches += c-1;
 
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 interactive++;
