@@ -655,7 +655,7 @@ public class Node implements Iterable<Node> {
         Node n = this;
 
         while (n != null) {
-            c += localIntroducedRules.size();
+            c += n.localIntroducedRules.size();
             n = n.parent;
         }
         return c;
