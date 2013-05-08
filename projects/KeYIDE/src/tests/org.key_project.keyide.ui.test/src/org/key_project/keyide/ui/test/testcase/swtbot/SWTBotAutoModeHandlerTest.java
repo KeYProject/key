@@ -103,7 +103,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          bot.toolbarButtonWithTooltip("Start Auto Mode").click();
-         
+         //bot.sleep(100);
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -181,7 +181,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          bot.toolbarButtonWithTooltip("Start Auto Mode").click();
-         
+         //bot.sleep(100);
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -199,21 +199,21 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
    }
    
    /**
-    * 
+    * Test starts the automode, stops the automode and restarts it till the proof is closed.
     * @throws CoreException
     * @throws InterruptedException
     * @throws ProblemLoaderException
     */
    @Test
-   public void testStopAutoMode_RestartAutoMode() throws CoreException, InterruptedException, ProblemLoaderException{
-      String projectName = "SWTBotStopAutoModeHandlerTest_testStopAutoMode_RestartAutoMode";
+   public void testStopAutoMode_RestartAutoMode_ProofClosed() throws CoreException, InterruptedException, ProblemLoaderException{
+      String projectName = "SWTBotStopAutoModeHandlerTest_testStopAutoMode_RestartAutoMode_ProofClosed";
       IStartProofTestRunnable startProofRunnable = new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Select method "chargeAndRecord(int) : void" in project explorer
+            // Select method "charge(int) : boolean" in project explorer
             SWTBotView projectView = TestUtilsUtil.getProjectExplorer(bot);
             SWTBotTree projectTree = projectView.bot().tree();
-            TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
+            TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
             TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
@@ -257,6 +257,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          bot.toolbarButtonWithTooltip("Start Auto Mode").click();
+         //bot.sleep(100);
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -264,6 +265,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
               
          //stop auto mode
          bot.toolbarButtonWithTooltip("Stop Auto Mode").click();
+         //bot.sleep(1000);
          //check that auto mode is available again
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is disabled
@@ -279,6 +281,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
 
          //make sure proof is closed
          keyEditor.getKeYEnvironment().getUi().waitWhileAutoMode();
+         //bot.sleep(1000);
          assertTrue(keyEditor.getProof().closed());
          //check that the start and stop buttons are both disabled
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
@@ -290,10 +293,15 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
       }
    }
 
-   
+   /**
+    * Test starts and stops the automode. The proof is still open after automode stopped.
+    * @throws CoreException
+    * @throws InterruptedException
+    * @throws ProblemLoaderException
+    */
    @Test
-   public void testStopAutoMode() throws CoreException, InterruptedException, ProblemLoaderException{
-      String projectName = "SWTBotStopAutoModeHandlerTest_testStopAutoMode";
+   public void testStopAutoMode_ProofOpen() throws CoreException, InterruptedException, ProblemLoaderException{
+      String projectName = "SWTBotStopAutoModeHandlerTest_testStopAutoMode_ProofOpen";
       IStartProofTestRunnable startProofRunnable = new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
@@ -342,6 +350,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          bot.toolbarButtonWithTooltip("Start Auto Mode").click();
+         //bot.sleep(100);
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -349,11 +358,11 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
                   
          //stop auto mode
          bot.toolbarButtonWithTooltip("Stop Auto Mode").click();
+         //bot.sleep(10000);
          //check that auto mode is available again
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is disabled
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
-         // TODO: Make sure that the proof is still open (not closed)
          
       }
       finally {

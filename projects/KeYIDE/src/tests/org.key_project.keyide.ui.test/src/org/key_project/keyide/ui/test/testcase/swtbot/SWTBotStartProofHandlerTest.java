@@ -241,7 +241,6 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       }, "OK", MessageDialogWithToggle.ALWAYS, KeYEditor.EDITOR_ID);
    }
    
-   // TODO: testSetPerspectiveChangedPreferences* What does these tests do? Do they set change the preference? Where is it tested that KeYIDEPreference.getSwitchToKeyPerspective() has changed as expected?
    /**
     * Tests starting of a proof via the context menu of a method ({@link IMethod}) in the outline view, without the "Confirm perspective switch" dialog.
     * By setting the {@link KeYIDEPreferences#SWITCH_TO_KEY_PERSPECTIVE} to "always".
@@ -619,6 +618,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
          // Test if the correct editor is opened
          SWTBotEditor editor = bot.activeEditor();
          assertEquals(expectedEditor, editor.getReference().getId());
+//         assertEquals(KeYIDEPreferences.SWITCH_TO_KEY_PERSPECTIVE, switchToPerspective);
       }
       finally {
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
