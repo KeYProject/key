@@ -26,6 +26,16 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 public class Node implements Iterable<Node> {
+    private static final String RULE_WITHOUT_NAME = "rule without name";
+
+    private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
+
+    private static final String INTERACTIVE_GOAL = "INTERACTIVE GOAL";
+
+    private static final String OPEN_GOAL = "OPEN GOAL";
+
+    private static final String CLOSED_GOAL = "Closed goal";
+
     private static final String NODES = "nodes";
 
     /** the proof the node belongs to */
@@ -48,7 +58,7 @@ public class Node implements Iterable<Node> {
     /** contains non-logical content, used for user feedback */
     private NodeInfo             nodeInfo;
 
-    int                          serialNr;
+    private int                  serialNr;
 
     private int                  siblingNr = -1;
 
@@ -350,6 +360,20 @@ public class Node implements Iterable<Node> {
 	return -1;
     }
 
+    private int getIntroducedRulesCount() {
+        int c = 0;
+        Node n = this;
+
+        while (n != null) {
+            c += n.localIntroducedRules.size();
+            n = n.parent;
+        }
+        return c;
+    }
+
+    public int getUniqueTacletNr() {
+        return getIntroducedRulesCount();
+    }
 
     /** helps toString method
      * @param prefix needed to keep track if a line has to be printed
@@ -439,15 +463,15 @@ public class Node implements Iterable<Node> {
             if (rap == null) {
                 Goal goal = proof().getGoal(this);
                 if ( goal == null || this.isClosed() )
-                    return "Closed goal"; // don't cache this
+                    return CLOSED_GOAL; // don't cache this
                 else if(goal.isAutomatic())
-                    cachedName = "OPEN GOAL";
+                    cachedName = OPEN_GOAL;
                 else
-                    cachedName = "INTERACTIVE GOAL";
+                    cachedName = INTERACTIVE_GOAL;
                 return cachedName;
             }
             if (rap.rule() == null) {
-                cachedName = "rule application without rule";
+                cachedName = RULE_APPLICATION_WITHOUT_RULE;
                 return cachedName;
             }
 
@@ -457,7 +481,7 @@ public class Node implements Iterable<Node> {
 
             cachedName = rap.rule().displayName();
             if (cachedName == null) {
-                cachedName = "rule without name";
+                cachedName = RULE_WITHOUT_NAME;
             }
         }
         return cachedName;
@@ -507,8 +531,8 @@ public class Node implements Iterable<Node> {
     /** checks if an inner node is closeable */
     private boolean isCloseable() {
 	assert childrenCount() > 0;
-	for (int i = 0; i<childrenCount(); i++) {
-	    if ( !child (i).isClosed() ) {
+	for (Node child: this) {
+	    if ( !child.isClosed() ) {
 		return false;
 	    }
 	}
@@ -523,14 +547,10 @@ public class Node implements Iterable<Node> {
      * retrieves number of nodes
      */
     public int countNodes() {
-	int nodes = 1 + children.size();
-	final LinkedList<Node> nodesToAdd = new LinkedList<Node>(children);
-	while (!nodesToAdd.isEmpty()) {
-	    final Node n = nodesToAdd.removeFirst();
-	    nodesToAdd.addAll(n.children);
-	    nodes += n.children.size();
-	}
-	return nodes;
+        NodeIterator it = subtreeIterator();
+        int res = 0;
+        while (it.hasNext()) res++;
+        return res;
     }
 
     /**
@@ -647,20 +667,5 @@ public class Node implements Iterable<Node> {
             } else n = n.child(0);
             return n;
         }
-    }
-
-    private int getIntroducedRulesCount() {
-        int c = 0;
-        Node n = this;
-
-        while (n != null) {
-            c += n.localIntroducedRules.size();
-            n = n.parent;
-        }
-        return c;
-    }
-
-    public int getUniqueTacletNr() {
-        return getIntroducedRulesCount();
     }
  }
