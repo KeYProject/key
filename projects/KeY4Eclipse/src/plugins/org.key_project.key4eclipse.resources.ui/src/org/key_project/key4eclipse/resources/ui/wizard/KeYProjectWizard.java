@@ -33,7 +33,7 @@ public class KeYProjectWizard extends JavaProjectWizard{
       try {
          Object obj = ObjectUtil.get(this, "fFirstPage");
          if(obj instanceof WizardPage){
-            ((WizardPage)obj).setDescription("Create a KeY Project");
+            ((WizardPage)obj).setTitle("Create a KeY Project");
          }
          else{
             LogUtil.getLogger().logWarning("API has changed");
@@ -73,8 +73,7 @@ public class KeYProjectWizard extends JavaProjectWizard{
             project.setDescription(description,null);
          }
          catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LogUtil.getLogger().createErrorStatus(e);
          }
       }
       return res;

@@ -9,15 +9,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -42,6 +45,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -57,6 +61,9 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 @SuppressWarnings("restriction")
 public class KeYProjectBuilder extends IncrementalProjectBuilder {
+   
+   private BackgroundProofList proofList;
+   
 
    public KeYProjectBuilder() {
    }
@@ -68,10 +75,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          if(delta.getKind() == (IResourceDelta.CHANGED)){
             LinkedList<IMethod> methods = collectAllMethods(delta.getResource().getProject());
             if(!methods.isEmpty()){
-               runProofs(methods);
-            }
-            else{
-               System.out.println("No methods found in this Project");
+               runProofs(methods, delta.getResource().getProject());
             }
          }
       }
@@ -84,12 +88,13 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * When a {@link Proof} for the current {@link FunctionalOperationContract} already exists it will be loaded and the AutoMode will be started.
     * If the {@link Proof} doesn't exists  it will be instantiated and then the AutoMode will be started. When the AutoMode is done, the {@link Proof} will be saved in a local directory.
     * @param methods - the {@link LinkedList<IMehod>} with the {@link IMetod}s for which the {@link Proof}s should run.
+    * @throws CoreException 
     */
-   private void runProofs(LinkedList<IMethod> methods){
+   private void runProofs(LinkedList<IMethod> methods, IProject project) throws CoreException{
+      LinkedList<IFile> proofFileList = new LinkedList<IFile>();
       for(IMethod method : methods){
          try{
             //Initialize KeYEnvironment for this method
-            IProject project = method.getResource().getProject();
             final File location = ResourceUtil.getLocation(project);
             final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
             final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
@@ -99,7 +104,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             ImmutableSet<FunctionalOperationContract> operationContracts = collectAllContractsForMethod(method, environment);
             
             
-            //Create Folder for Proofs of this Method
+            //Create Folder for Proofs of this ;Method
             IPath folderPath = null;
             if(!operationContracts.isEmpty()){
                folderPath = createProofFolder(method);   
@@ -113,47 +118,74 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
                IFile file = createProofIFile(input.name(), folderPath);
                Proof finalProof = null;
                if(!file.exists()){
-//                  System.out.println("NEW PROOF");
                   Proof proof = environment.createProof(input);
-//                  System.out.println("Proof: " + proof.name());
                   environment.getUi().startAndWaitForAutoMode(proof);
-                  saveProofToProofFolder(proof, folderPath);
+                  saveProof(proof, folderPath);
                   finalProof = proof;
                   
                }
                else{
-//                  System.out.println("PROOF EXISTS");
-                  final File proofFile = file.getLocation().toFile();
-                  KeYFile keyFile = new KeYFile(null,  proofFile, null);
-                  try{
-                     @SuppressWarnings("unused")
-                     String javaPath = keyFile.readJavaPath();
-                     final File keyFileBoot = keyFile.readBootClassPath();
-                     final List<File> keyFileClassPaths = keyFile.readClassPath();
-                     environment = KeYEnvironment.load(proofFile, keyFileClassPaths, keyFileBoot);
+                  File proofFile = file.getLocation().toFile();
+                     environment = KeYEnvironment.load(proofFile, null, null);
                      Proof proof = environment.getLoadedProof();
-//                     System.out.println("Proof: " + proof.name());
                      if(!proof.closed()){
                         environment.getUi().startAndWaitForAutoMode(proof);
-                     saveProofToProofFolder(proof, folderPath);
+                        saveProof(proof, folderPath);
                      }
                      finalProof = proof;
-                  }
-                  catch (ProofInputException e) {
-                     LogUtil.getLogger().createErrorStatus(e);
-                  }
+                     
                }
+               //add the proofFile to the proofFileList
+               proofFileList.add(file);
+               System.out.println("Add: " + file.getName());
+               
+               //set the marker for this proof
                setMarker(finalProof, method );               
             }
          }
          catch (Exception e) {
             LogUtil.getLogger().logError(e);
          }
-      }      
+         
+      }  
+      for(IFile file : proofFileList){
+         System.out.println(file.getName());
+      }
+      cleanProofFolder(proofFileList, project);
    }
    
    
    
+   private void cleanProofFolder(LinkedList<IFile> proofFileList, IProject project) throws CoreException {
+      IPath proofPath = project.getFullPath();
+      proofPath = proofPath.append("Proofs");
+      System.out.println("proofPath:" + proofPath);
+      IFolder proofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofPath);
+      IResource[] members = proofFolder.members();
+      for(IResource file : members){
+         System.out.println(file.getName() + "       " + file.getClass());
+         if(file instanceof File){
+            if(!proofFileList.contains(file)){
+               IContainer parent = file.getParent();
+               file.delete(true, null);
+               cleanParentFolders(parent);
+            }
+         }
+      }
+   }
+   
+   private void cleanParentFolders(IContainer parent) throws CoreException{
+      
+   if(parent instanceof IFolder){
+      IFolder parentFolder = (IFolder)parent;
+      if(parentFolder.members() == null || parentFolder.members().length == 0){
+         IContainer pParent = parentFolder.getParent();
+         parentFolder.delete(true, null);
+         cleanParentFolders(pParent);
+      } 
+   }
+   }   
+
    /**
     * Collects all {@link IMethod} of the given {@link IResourceDelta}s {@link IProject}.
     * @param delta - the {@link IResourceDelta} for which the {@link IMethod}s will be collected.
@@ -205,6 +237,17 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    }
    
    
+   private IPath splitPackageString(IPath path){
+      IPath folderPath = path;
+      while(!folderPath.segment(0).equals("src")){
+         folderPath = folderPath.removeFirstSegments(1);
+      }
+      folderPath = folderPath.removeFirstSegments(1);
+      
+      return folderPath;
+   }
+   
+   
    /**
     * Creates a {@link IFolder} for the {@link Proof}s of the given {@link IMethod}. The folder is named after the classname of the {@link IMethod}.
     * The classfolder will be a subfolder of the mainfolder "Proofs". This folder will be created if it doesn't exists.
@@ -213,20 +256,27 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * @throws CoreException
     */
    private IPath createProofFolder(IMethod method) throws CoreException{
-      //TODO: Test if javaProject==null.
-      IPath projectPath = method.getJavaProject().getPath();
-      IPath proofMainFolderPath = projectPath.append("Proofs");
-      IFolder proofMainFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofMainFolderPath);
-      if(!proofMainFolder.exists()){
-         proofMainFolder.create(true, true, null);
+      //create proofsProofFolder
+      IPath javaProjectPath = method.getJavaProject().getPath();
+      IPath proofProofFolderPath = javaProjectPath.append("Proofs");
+      IFolder proofProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofProofFolderPath);
+      if(!proofProofFolder.exists()){
+         proofProofFolder.create(true, true, null);
       }
-      IPath proofClassFolderPath = proofMainFolderPath.append(method.getParent().getElementName());
-      IFolder proofClassFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofClassFolderPath);
-      //TODO: Create überprüfen. Beide parameter true?
-      if(!proofClassFolder.exists()){
-         proofClassFolder.create(true, true, null);
+      
+      //create proofsPackageFolders
+      IPath path = splitPackageString(method.getResource().getFullPath());
+      IPath proofPackageFolderPath = proofProofFolderPath;
+      for(String folder : path.segments()){
+         proofPackageFolderPath = proofPackageFolderPath.append(folder);
+         IFolder proofPackageFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofPackageFolderPath);
+         if(!proofPackageFolder.exists()){
+            proofPackageFolder.create(true, true, null);
+         }
       }
-      return proofClassFolderPath;
+      
+      return proofPackageFolderPath;
+      
    }
    
    
@@ -277,8 +327,9 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * @throws IOException
     */
    //In Util stecken
-   private void saveProofToProofFolder(Proof proof, IPath path) throws CoreException, IOException{ 
+   private void saveProof(Proof proof, IPath path) throws CoreException, IOException{ 
       if(proof.name().toString() != null){
+         System.out.println(proof.name().toString());
          IFile file = createProofIFile(proof.name().toString(), path);
          if(file != null){
             String filePathAndName = file.getLocation().toOSString();
@@ -321,43 +372,16 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          IMarker marker = file.createMarker("org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker");
          if(marker.exists()){
                marker.setAttribute(IMarker.MESSAGE, "Proof not closed");
-               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
                marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberOfMethod(method, file));
          }   
       }
    }
 
    
-   private int getLineNumberOfMethod(IMethod method, IFile file) throws JavaModelException{
-      String str = method.getSource();
-      try{
-         FileInputStream fs = new FileInputStream(file.getLocation().toFile());
-         
-         BufferedReader br = new BufferedReader(new InputStreamReader(fs));
-         
-         StringBuilder sb = new StringBuilder();
-         String ls = System.getProperty("line.separator");
-         String line = null;
-         while ((line = br.readLine()) != null){
-            sb.append(line);
-            sb.append(ls);
-         }
-         String fullstr = sb.toString();
-         int lineCount = 1;
-         while(!fullstr.startsWith(str)){
-            if(fullstr.startsWith(System.getProperty("line.separator"))){
-               lineCount++;
-            }
-            fullstr = fullstr.substring(1, fullstr.length());
-         }
-         return lineCount;
-      } catch (FileNotFoundException e){
-         LogUtil.getLogger().createErrorStatus(e);
-      } catch (IOException ioE){
-         LogUtil.getLogger().createErrorStatus(ioE);
-      }
-      
-      return -1;
+   private int getLineNumberOfMethod(IMethod method, IFile file) throws CoreException {
+      Position pos = KeYUtil.getCursorPositionForOffset(method, method.getNameRange().getOffset());
+      return pos.getLine();
    }
 
 }
