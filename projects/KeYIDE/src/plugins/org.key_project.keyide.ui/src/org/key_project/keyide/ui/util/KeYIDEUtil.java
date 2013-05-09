@@ -90,10 +90,10 @@ public class KeYIDEUtil {
                                           Proof proof = openDialog(operationContracts, environment);
                                           environment.getMediator().setProof(proof);
                                           //TODO: Stupid Mode wirklich hier?
-                                          environment.getMediator().setStupidMode(true);
+                                          environment.getMediator().setStupidMode(true); // TODO: In Editor nicht hier
                                           //Open proof in Editor if correctly selected
                                           if(proof != null){
-                                             KeYIDEUtil.openEditor(proof, environment);
+                                             KeYIDEUtil.openEditor(proof, environment, method);
                                           }
                                        }
                                        catch (Exception e) {
@@ -139,10 +139,10 @@ public class KeYIDEUtil {
     * @param name The  name to display at the editor-tab
     * @param ui The UserInterface that holds the KeYMediator
     */
-   private static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment)throws PartInitException{
+   private static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
       String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
       IStorage storage = new ProofStorage(inputText, proof.name().toString());
-      IStorageEditorInput input = new ProofEditorInput(storage, proof, environment);
+      IStorageEditorInput input = new ProofEditorInput(storage, proof, environment, method);
          WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
    }
    

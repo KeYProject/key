@@ -2,6 +2,7 @@ package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
@@ -41,16 +42,19 @@ public class ProofEditorInput implements IStorageEditorInput{
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
-   // TODO: Add IMethod
+   private IMethod method;
+   
+
    
    /**
     * Constructor
     * @param storage The storage for this {@link IStorageEditorInput}
     */
-   public ProofEditorInput(IStorage storage, Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment){
+   public ProofEditorInput(IStorage storage, Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method){
       this.storage=storage;
       this.proof = proof;
       this.environment = environment;
+      this.method = method;
    }
 
    /** 
@@ -112,6 +116,10 @@ public class ProofEditorInput implements IStorageEditorInput{
    @Override
    public IStorage getStorage() throws CoreException {
       return storage;
+   }
+   
+   public IMethod getMethod(){
+      return method;
    }
 
 }
