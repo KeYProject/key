@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobManager;
@@ -34,9 +35,13 @@ import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -58,6 +63,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
@@ -1085,7 +1091,25 @@ public class TestUtilsUtil {
     * @param texts The path to the context menu item to click on.
     */
    public static void clickContextMenu(AbstractSWTBot<?> bot, String... texts) {
-      ContextMenuHelper.clickContextMenu(bot, texts);
+      clickContextMenu(bot, 0, 0, texts);
+   }
+   
+   /**
+    * <p>
+    * Performs a click on a menu item of the context menu of the given {@link AbstractSWTBot}.
+    * </p>
+    * <p>
+    * This utility method solves some SWTBot issues on context menu like missing
+    * support for structured context menus and widget is disposed exceptions o
+    * items provided to context menus via extension points.
+    * </p>
+    * @param bot The {@link AbstractSWTBot} to execute a context menu click on it.
+    * @param x The x-coordinate on the {@link AbstractSWTBot} to open context menu at.
+    * @param x The y-coordinate on the {@link AbstractSWTBot} to open context menu at.
+    * @param texts The path to the context menu item to click on.
+    */
+   public static void clickContextMenu(AbstractSWTBot<?> bot, int x, int y, String... texts) {
+      ContextMenuHelper.clickContextMenu(bot, x, y, texts);
    }
    
    /**
@@ -1188,16 +1212,6 @@ public class TestUtilsUtil {
    }
    
    /**
-    * Performs a click on the given {@link SWTBotRadio} to change the
-    * selected radio {@link Button} without any additional events.
-    * @param radio The {@link SWTBotRadio} to click on.
-    */
-   public static void clickDirectly(SWTBotRadio radio) {
-      assertNotNull(radio);
-      new SWTBotSimpleRadio(radio.widget).click();
-   }
-   
-   /**
     * Utility method used in {@link TestUtilsUtil#clickDirectly(SWTBotButton)}
     * to perform a direct click without other events.
     * @author Martin Hentschel
@@ -1222,6 +1236,16 @@ public class TestUtilsUtil {
          log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
          return this;
       }
+   }
+   
+   /**
+    * Performs a click on the given {@link SWTBotRadio} to change the
+    * selected radio {@link Button} without any additional events.
+    * @param radio The {@link SWTBotRadio} to click on.
+    */
+   public static void clickDirectly(SWTBotRadio radio) {
+      assertNotNull(radio);
+      new SWTBotSimpleRadio(radio.widget).click();
    }
    
    /**
@@ -1296,7 +1320,43 @@ public class TestUtilsUtil {
       }
       
    }
+   
+   /**
+    * Clicks on the given {@link SWTBotToolbarButton} directly without
+    * any other events.
+    * @param button The {@link SWTBotToolbarButton} to perform a direct click on.
+    */
+   public static void clickDirectly(SWTBotToolbarButton button) {
+      assertNotNull(button);
+      new SWTBotSimpleClickToolbarButton(button.widget).click();
+   }
+   
+   /**
+    * Utility method used in {@link TestUtilsUtil#clickDirectly(SWTBotToolbarButton)}
+    * to perform a direct click without other events.
+    * @author Martin Hentschel
+    */
+   private static final class SWTBotSimpleClickToolbarButton extends SWTBotToolbarButton {
+      /**
+       * Constructor.
+       * @param toolItem The {@link ToolItem}.
+       */
+      public SWTBotSimpleClickToolbarButton(ToolItem toolItem) {
+         super(toolItem);
+      }
 
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public SWTBotToolbarButton click() {
+         log.debug(MessageFormat.format("Clicking on {0}", SWTUtils.getText(widget)));
+         waitForEnabled();
+         notify(SWT.Selection);
+         log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
+         return this;
+      }
+   }
    
    /**
     * Searches a {@link IProgramMethod} in the given {@link Services}.
@@ -1320,5 +1380,29 @@ public class TestUtilsUtil {
       });
       assertNotNull(pm);
       return pm;
+   }
+   
+   public static <W extends Control> void setCursorLocation(final AbstractSWTBot<W> widget, 
+                                                            final int x, 
+                                                            final int y) {
+      Assert.isNotNull(widget);
+      // Change display location
+      final Display display = widget.widget.getDisplay();
+      display.syncExec(new Runnable() {
+         @Override
+         public void run() {
+            Point point = widget.widget.toDisplay(x, y);
+            display.setCursorLocation(point);
+         }
+      });
+      // Simulate mouse move event.
+      new AbstractSWTBot<W>(widget.widget) {
+         public void notifyMouseMove(int x, int y) {
+            Event event = createEvent();
+            event.x = x;
+            event.y = y;
+            notify(SWT.MouseMove, event, widget);
+         }
+      }.notifyMouseMove(x, y);
    }
 }

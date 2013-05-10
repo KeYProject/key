@@ -7,14 +7,16 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
+import org.key_project.keyide.ui.preference.page.KeYIDEPreferencePage;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-
+/**
+ * SWTBot tests for {@link KeYIDEPreferencePage}.
+ * @author Martin Hentschel
+ */
 public class SWTBotKeYIDEPreferencePageTest extends TestCase {
-   
    /**
     * Tests the perspective is always changed functionality by changing the value under "Window->Preferences->General->Perspectives->KeY Preferences"
     * @throws InterruptedException 
@@ -25,7 +27,6 @@ public class SWTBotKeYIDEPreferencePageTest extends TestCase {
       changedPerspectivePreferences("Always", MessageDialogWithToggle.ALWAYS);
    }
    
-
    /**
     * Tests the perspective is never changed functionality by changing the value under "Window->Preferences->General->Perspectives->KeY Preferences"
     * @throws InterruptedException 
@@ -36,7 +37,6 @@ public class SWTBotKeYIDEPreferencePageTest extends TestCase {
       changedPerspectivePreferences("Never", MessageDialogWithToggle.NEVER);
    }
    
-
    /**
     * Tests the switch perspective is set to prompt, by changing the value under "Window->Preferences->General->Perspectives->KeY Preferences"
     * @throws InterruptedException 
@@ -60,9 +60,10 @@ public class SWTBotKeYIDEPreferencePageTest extends TestCase {
       SWTBotPreferences.TIMEOUT = originalTimeout * 4;
       // Backup original switch perspective preference and set preference to test.
       String originalSwitchPerspectivePreference = KeYIDEPreferences.getSwitchToKeyPerspective();
-      if(radioButton.equalsIgnoreCase(MessageDialogWithToggle.PROMPT)){
+      if (radioButton.equalsIgnoreCase(MessageDialogWithToggle.PROMPT)) {
          KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.ALWAYS);   
-      }else{
+      }
+      else {
          KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
       }
       // Backup current perspective
@@ -87,5 +88,4 @@ public class SWTBotKeYIDEPreferencePageTest extends TestCase {
          bot.closeAllEditors();
       }
    }
-
 }

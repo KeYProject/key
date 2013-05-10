@@ -3,6 +3,7 @@ package org.key_project.keyide.ui.views;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -147,12 +148,16 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
     * Executes {@link #updateSelectedNode()} asynchronously and thread safe.
     */
    protected void updateSelectedNodeThreadSafe() {
-      getControl().getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            updateSelectedNode();
-         }
-      });
+      if (!getControl().getDisplay().isDisposed()) {
+         getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!getControl().isDisposed()) {
+                  updateSelectedNode();
+               }
+            }
+         });
+      }
    }
    
    /**
@@ -166,7 +171,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
          // Make sure that Node to select is loaded in lazy TreeViewer
          makeSureElementIsLoaded(mediatorNode);
          // Select Node in lazy TreeViewer
-         setSelection(SWTUtil.createSelection(mediatorNode));
+         getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode), true);
       }
    }
 
@@ -192,6 +197,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       for (Object unknownElement : unknownParents) {
          Object parent = contentProvider.getParent(unknownElement);
          int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
+         Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
          contentProvider.updateChildCount(parent, 0);
          contentProvider.updateElement(parent, viewIndex);
       }

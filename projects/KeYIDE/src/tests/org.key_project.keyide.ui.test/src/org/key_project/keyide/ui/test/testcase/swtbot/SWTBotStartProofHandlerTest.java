@@ -581,7 +581,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
    protected void doStartProofWithoutSwitchToPerspectiveDialogTest(String projectName, 
                                                                    IStartProofTestRunnable startProofRunnable, 
                                                                    String contractButton, 
-                                                                   String switchToPerspective, // TODO: Use as parameter MessageDialogWithToggle.ALWAYS, MessageDialogWithToggle.PROMPT or MessageDialogWithToggle.NEVER instead of local Strings. 
+                                                                   String switchToPerspective, 
                                                                    String expectedEditor) throws CoreException, InterruptedException {
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);

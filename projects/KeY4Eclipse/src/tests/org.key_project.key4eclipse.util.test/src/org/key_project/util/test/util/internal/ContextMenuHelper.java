@@ -8,9 +8,11 @@ import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
@@ -28,8 +30,10 @@ public class ContextMenuHelper {
     * @throws WidgetNotFoundException
     *             if the widget is not found.
     */
-   public static void clickContextMenu(final AbstractSWTBot<?> bot,
-         final String... texts) {
+   public static void clickContextMenu(final AbstractSWTBot<?> bot, 
+                                       final int x, 
+                                       final int y, 
+                                       final String... texts) {
 
       // show
       final MenuItem menuItem = UIThreadRunnable
@@ -39,7 +43,7 @@ public class ContextMenuHelper {
                   Control control = (Control) bot.widget;
                   
                   //MenuDetectEvent added by Stefan Schaefer
-                  Event event = new Event();
+                  Event event = createEvent(null, x, y);
                   control.notifyListeners(SWT.MenuDetect, event);
                   if (!event.doit) {
                      return null;
@@ -51,11 +55,11 @@ public class ContextMenuHelper {
                      Matcher<?> matcher = allOf(
                            instanceOf(MenuItem.class),
                            withMnemonic(text));
-                     menuItem = show(menu, matcher);
+                     menuItem = show(menu, x, y, matcher);
                      if (menuItem != null) {
                         menu = menuItem.getMenu();
                      } else {
-                        hide(menu);
+                        hide(menu, x, y);
                         break;
                      }
                   }
@@ -69,35 +73,32 @@ public class ContextMenuHelper {
       }
 
       // click
-      click(menuItem);
+      click(menuItem, x, y);
 
       // hide
       UIThreadRunnable.syncExec(new VoidResult() {
          public void run() {
-            hide(menuItem.getParent());
+            hide(menuItem.getParent(), x, y);
          }
       });
    }
 
-   private static MenuItem show(final Menu menu, final Matcher<?> matcher) {
+   private static MenuItem show(final Menu menu, final int x, final int y, final Matcher<?> matcher) {
       if (menu != null) {
-         menu.notifyListeners(SWT.Show, new Event());
+         menu.notifyListeners(SWT.Show, createEvent(null, x, y));
          MenuItem[] items = menu.getItems();
          for (final MenuItem menuItem : items) {
             if (matcher.matches(menuItem)) {
                return menuItem;
             }
          }
-         menu.notifyListeners(SWT.Hide, new Event());
+         menu.notifyListeners(SWT.Hide, createEvent(null, x, y));
       }
       return null;
    }
 
-   private static void click(final MenuItem menuItem) {
-      final Event event = new Event();
-      event.time = (int) System.currentTimeMillis();
-      event.widget = menuItem;
-      event.display = menuItem.getDisplay();
+   private static void click(final MenuItem menuItem, final int x, final int y) {
+      final Event event = createEvent(menuItem, x, y);
       event.type = SWT.Selection;
 
       UIThreadRunnable.asyncExec(menuItem.getDisplay(), new VoidResult() {
@@ -107,10 +108,18 @@ public class ContextMenuHelper {
       });
    }
 
-   private static void hide(final Menu menu) {
-      menu.notifyListeners(SWT.Hide, new Event());
+   private static void hide(final Menu menu, final int x, final int y) {
+      menu.notifyListeners(SWT.Hide, createEvent(menu, x, y));
       if (menu.getParentMenu() != null) {
-         hide(menu.getParentMenu());
+         hide(menu.getParentMenu(), x, y);
       }
+   }
+   
+   private static Event createEvent(Widget widget, int x, int y) {
+      Event event = new Event();
+      event.time = (int) System.currentTimeMillis();
+      event.widget = widget;
+      event.display = widget != null ? widget.getDisplay() : Display.getCurrent();
+      return event;
    }
 }
