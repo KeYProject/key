@@ -106,6 +106,7 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -1404,5 +1405,15 @@ public class TestUtilsUtil {
             notify(SWT.MouseMove, event, widget);
          }
       }.notifyMouseMove(x, y);
+   }
+
+   /**
+    * Blocks the current thread until a auto mode is started.
+    * @param ui The {@link UserInterface} to wait for its auto mode.
+    */
+   public static void waintUntilAutoMode(UserInterface ui) {
+      while (!ui.getMediator().autoMode()) {
+         sleep(10);
+      }
    }
 }
