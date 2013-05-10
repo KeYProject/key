@@ -101,7 +101,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-         TestUtilsUtil.waintUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
+         TestUtilsUtil.waitUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -179,7 +179,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-         TestUtilsUtil.waintUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
+         TestUtilsUtil.waitUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -255,7 +255,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-         TestUtilsUtil.waintUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
+         TestUtilsUtil.waitUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -272,7 +272,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(keyEditor.getProof().closed());
          //restart auto mode
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-         TestUtilsUtil.waintUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
+         TestUtilsUtil.waitUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
@@ -347,7 +347,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-         TestUtilsUtil.waintUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
+         TestUtilsUtil.waitUntilAutoMode(keyEditor.getKeYEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled

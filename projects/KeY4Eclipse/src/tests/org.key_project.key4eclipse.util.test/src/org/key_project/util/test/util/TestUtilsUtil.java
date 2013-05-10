@@ -1411,7 +1411,7 @@ public class TestUtilsUtil {
     * Blocks the current thread until a auto mode is started.
     * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static void waintUntilAutoMode(UserInterface ui) {
+   public static void waitUntilAutoMode(UserInterface ui) {
       while (!ui.getMediator().autoMode()) {
          sleep(10);
       }
