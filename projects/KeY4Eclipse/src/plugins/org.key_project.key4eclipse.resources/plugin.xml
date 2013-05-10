@@ -20,5 +20,13 @@
                class="org.key_project.key4eclipse.resources.builder.KeYProjectBuilder">
          </run></builder>
    </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/projectIcon.gif"
+            id="org.key_project.key4eclipse.resources.KeYProjectNatureImage"
+            natureId="org.key_project.key4eclipse.resources.KeYProjectNature">
+      </image>
+   </extension>
 
 </plugin>
