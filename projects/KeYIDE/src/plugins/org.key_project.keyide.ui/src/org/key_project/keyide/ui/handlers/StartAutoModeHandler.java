@@ -29,6 +29,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
                @Override
                protected IStatus run(IProgressMonitor monitor) {
                   monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
+                  proofProvider.getProof().getActiveStrategy(); // Make sure that the strategy is initialized correctly, otherwise the used settings are different to the one defined by the strategysettings which are shown in the UI.
                   proofProvider.getKeYEnvironment().getUi().startAndWaitForAutoMode(proofProvider.getProof());
                   monitor.done();
                   return Status.OK_STATUS;
