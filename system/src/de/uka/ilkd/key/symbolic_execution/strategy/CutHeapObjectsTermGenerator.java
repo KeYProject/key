@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -37,7 +38,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
       }
       // Compute equality terms
       HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
-      Set<Term> equalityTerms = new HashSet<Term>();
+      Set<Term> equalityTerms = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
          collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT);
       }
@@ -53,7 +54,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     */
    protected void collectEqualityTerms(SequentFormula sf, Set<Term> equalityTerms, Set<Term> topTerms, HeapLDT heapLDT) {
       // Collect objects (target of store operations on heap)
-      Set<Term> storeLocations = new HashSet<Term>();
+      Set<Term> storeLocations = new LinkedHashSet<Term>();
       collectStoreLocations(sf.formula(), storeLocations, heapLDT);
       // Check if equality checks are possible
       if (storeLocations.size() >= 2) {

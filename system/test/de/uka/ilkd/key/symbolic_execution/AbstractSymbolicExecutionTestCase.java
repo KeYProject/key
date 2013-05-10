@@ -22,6 +22,7 @@ import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -110,6 +112,26 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
    
    /**
+    * If the fast mode is enabled the step wise creation of models is disabled.
+    */
+   public static final boolean FAST_MODE = true;
+   
+   /**
+    * Number of executed SET nodes to execute all in one.
+    */
+   public static final int ALL_IN_ONE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN;
+
+   /**
+    * Number of executed SET nodes for only one SET node per auto mode run.
+    */
+   public static final int SINGLE_SET_NODE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP;
+
+   /**
+    * Default stop conditions of executed SET nodes.
+    */
+   public static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN;
+   
+   /**
     * The used temporary oracle directory.
     */
    protected static final File tempNewOracleDirectory;
@@ -123,6 +145,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * Creates the temporary oracle directory if required.
     */
    static {
+      // Define fast mode
+      if (FAST_MODE) {
+         DEFAULT_MAXIMAL_SET_NODES_PER_RUN = new int[] {ALL_IN_ONE_RUN};
+      }
+      else {
+         DEFAULT_MAXIMAL_SET_NODES_PER_RUN = new int[] {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
+      }
       // Create temporary director for oracle files if required.
       File directory = null;
       try {
@@ -1087,6 +1116,212 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
        */
       public boolean hasAutoModeStopped() {
          return done;
+      }
+   }
+   
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The java class to test.
+    * @param methodFullName The method to test.
+    * @param precondition An optional precondition.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param maximalNumberOfExecutedSetNodesPerRun The number of executed set nodes per auto mode run. The whole test is executed for each defined value.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param aliasChecks Do alias checks?
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected void doSETTest(File baseDir,
+                            String javaPathInBaseDir,
+                            String containerTypeName,
+                            String methodFullName,
+                            String precondition,
+                            String oraclePathInBaseDirFile,
+                            boolean includeVariables,
+                            boolean includeCallStack,
+                            int[] maximalNumberOfExecutedSetNodesPerRun,
+                            boolean mergeBranchConditions,
+                            boolean useOperationContracts,
+                            boolean useLoopInvariants,
+                            boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
+      for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, 
+                                                                                  javaPathInBaseDir, 
+                                                                                  containerTypeName, 
+                                                                                  methodFullName, 
+                                                                                  precondition,
+                                                                                  oraclePathInBaseDirFile, 
+                                                                                  includeVariables, 
+                                                                                  includeCallStack,
+                                                                                  maximalNumberOfExecutedSetNodesPerRun[i],
+                                                                                  mergeBranchConditions,
+                                                                                  useOperationContracts,
+                                                                                  useLoopInvariants,
+                                                                                  aliasChecks);
+         env.dispose();
+      }
+   }
+   
+   /**
+    * Executes {@link #doSETTest(File, String, String, String, String, boolean, boolean, int, boolean, boolean, boolean)} and disposes the created {@link SymbolicExecutionEnvironment}. 
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The java class to test.
+    * @param methodFullName The method to test.
+    * @param precondition An optional precondition.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param aliasChecks Do alias checks?
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected void doSETTestAndDispose(File baseDir,
+                                      String javaPathInBaseDir,
+                                      String containerTypeName,
+                                      String methodFullName,
+                                      String precondition,
+                                      String oraclePathInBaseDirFile,
+                                      boolean includeVariables,
+                                      boolean includeCallStack,
+                                      int maximalNumberOfExecutedSetNodes,
+                                      boolean mergeBranchConditions,
+                                      boolean useOperationContracts,
+                                      boolean useLoopInvariants,
+                                      boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeVariables, includeCallStack, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, aliasChecks);
+      env.dispose();
+   }
+
+   
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The java class to test.
+    * @param methodFullName The method to test.
+    * @param precondition An optional precondition.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param aliasChecks Do alias checks?
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> doSETTest(File baseDir,
+                                                                                String javaPathInBaseDir,
+                                                                                String containerTypeName,
+                                                                                final String methodFullName,
+                                                                                String precondition,
+                                                                                String oraclePathInBaseDirFile,
+                                                                                boolean includeVariables,
+                                                                                boolean includeCallStack,
+                                                                                int maximalNumberOfExecutedSetNodes,
+                                                                                boolean mergeBranchConditions,
+                                                                                boolean useOperationContracts,
+                                                                                boolean useLoopInvariants,
+                                                                                boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      String originalRuntimeExceptions = null;
+      try {
+         // Make sure that parameter are valid.
+         assertNotNull(javaPathInBaseDir);
+         assertNotNull(containerTypeName);
+         assertNotNull(methodFullName);
+         assertNotNull(oraclePathInBaseDirFile);
+         File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+         }
+         assertTrue(maximalNumberOfExecutedSetNodes >= 1);
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, aliasChecks);
+            env.dispose();
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Create proof environment for symbolic execution
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, aliasChecks);
+         // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
+         env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+         int nodeCount;
+         // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
+         do {
+            // Store the number of nodes before start of the auto mode 
+            nodeCount = env.getProof().countNodes();
+            // Run proof
+            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(env.getProof());
+            env.getUi().startAndWaitForAutoMode(env.getProof());
+            // Update symbolic execution tree 
+            env.getBuilder().analyse();
+            // Make sure that not to many set nodes are executed
+            Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+            for (Integer value : executedSetNodesPerGoal.values()) {
+               assertNotNull(value);
+               assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+            }
+         } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
+         // Create new oracle file if required in a temporary directory
+         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
+         // Read oracle file
+         ExecutionNodeReader reader = new ExecutionNodeReader();
+         IExecutionNode oracleRoot = reader.read(oracleFile);
+         assertNotNull(oracleRoot);
+         // Make sure that the created symbolic execution tree matches the expected one.
+         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false);
+         return env;
+      }
+      finally {
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
       }
    }
 }
