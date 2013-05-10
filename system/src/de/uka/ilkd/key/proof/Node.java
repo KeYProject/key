@@ -549,7 +549,7 @@ public class Node implements Iterable<Node> {
     public int countNodes() {
         NodeIterator it = subtreeIterator();
         int res = 0;
-        while (it.hasNext()) res++;
+        for (; it.hasNext(); it.next()) res++;
         return res;
     }
 
