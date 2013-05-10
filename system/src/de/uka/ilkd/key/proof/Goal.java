@@ -572,12 +572,6 @@ public final class Goal  {
         tagManager = new FormulaTagManager ( this );
     }
 
-    private void removeTaclets() {
-    	final Iterator<NoPosTacletApp> it = node.getLocalIntroducedRules().iterator();
-    	while ( it.hasNext () )
-           ruleAppIndex.removeNoPosTacletApp(it.next ());
-    }
-
     public void setBranchLabel(String s) {
         node.getNodeInfo().setBranchLabel(s);
     }
@@ -599,7 +593,6 @@ public final class Goal  {
     }
 
     public ImmutableList<Goal> apply( RuleApp p_ruleApp ) {
-//System.err.println(Thread.currentThread());
 
         final Proof proof = proof();
 

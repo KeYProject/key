@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.proof;
@@ -148,20 +148,20 @@ public class TestGoal extends TestCase {
                 proof.pruneProof(lg0.tail().head());
 
                  assertTrue(proof.openGoals().size()==4);
-                
+
                  assertTrue(proof.openGoals().contains(lg1.head()));
                  assertNotNull(lg1.head().indexOfTaclets().lookup("or_right"));
                  //
                  assertTrue(lg1.head().indexOfTaclets().lookup("or_left")==null);
-                 proof.remove(lg1.head());
-                 
-                
+                 proof.remove2(lg1.head());
+
+
                  assertTrue(proof.openGoals().contains(lg1.tail().head()));
                  assertNotNull(lg1.tail().head().indexOfTaclets().lookup("or_right"));
                  //
                  assertTrue(lg1.tail().head().indexOfTaclets().lookup("or_left")==null);
-                 proof.remove(lg1.tail().head());
-                 
+                 proof.remove2(lg1.tail().head());
+
                  if (proof.openGoals().head().indexOfTaclets().lookup("imp_right")!=null) {
                  assertNotNull
                  (proof.openGoals().tail().head().indexOfTaclets().lookup("imp_left"));
