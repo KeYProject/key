@@ -107,6 +107,7 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
        de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
        de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,

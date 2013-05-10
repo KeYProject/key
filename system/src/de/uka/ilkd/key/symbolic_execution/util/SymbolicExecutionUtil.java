@@ -123,6 +123,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -1977,8 +1978,8 @@ public final class SymbolicExecutionUtil {
             antecedents = newAntecedents;
             succedents = newSuccedents;
          }
-         else {
-            throw new ProofInputException("Expected replacement as Sequent during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+         else if (goalTemplate.replaceWithExpressionAsObject() != null) {
+            throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
          }
       }
       // Construct branch condition from created antecedent and succedent terms as new implication 
@@ -2432,6 +2433,22 @@ public final class SymbolicExecutionUtil {
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
+      }
+   }
+   
+   /**
+    * Configures the proof to do alias checks or not.
+    * @param proof The {@link Proof} to configure.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
+    */
+   public static void setAliasChecks(Proof proof, boolean immediately) {
+      if (proof != null && !proof.isDisposed()) {
+         String aliasChecksValue = immediately ? 
+                                   SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY : 
+                                   SymbolicExecutionStrategy.ALIAS_CHECK_NEVER;
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         sp.setProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
    

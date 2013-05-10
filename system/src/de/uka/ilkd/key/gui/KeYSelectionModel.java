@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -37,22 +37,22 @@ public class KeYSelectionModel {
     /** the listeners to this model */
     private List<KeYSelectionListener> listenerList;
     /** cached selected node event */
-    private KeYSelectionEvent selectionEvent = 
+    private KeYSelectionEvent selectionEvent =
 	new KeYSelectionEvent(this);
-        
+
     KeYSelectionModel() {
 	listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));
 	goalIsValid = false;
     }
 
-    /** sets the selected proof 
+    /** sets the selected proof
      * @param p the Proof that is selected
      */
     public void setSelectedProof(Proof p) {
 	goalIsValid = false;
 	proof = p;
         if (proof !=null) {
-	    Goal g = proof.openGoals().iterator().next();	    
+	    Goal g = proof.openGoals().iterator().next();
 	    if ( g == null) {
 	        selectedNode = proof.root().leavesIterator().next();
 	    } else {
@@ -69,7 +69,7 @@ public class KeYSelectionModel {
 
     /** returns the proof that is selected by the user
      * @return  the proof that is selected by the user
-     */ 
+     */
     public Proof getSelectedProof() {
 	return proof;
     }
@@ -95,7 +95,7 @@ public class KeYSelectionModel {
 
     /** returns the node that is selected by the user
      * @return  the node that is selected by the user
-     */ 
+     */
     public Node getSelectedNode() {
 	return selectedNode;
     }
@@ -104,7 +104,7 @@ public class KeYSelectionModel {
      * an inner node
      * @return  the goal the selected node belongs to, null if it is
      * an inner node
-     */ 
+     */
     public Goal getSelectedGoal() {
 	if (proof==null) {
 	    throw new IllegalStateException("No proof loaded.");
@@ -112,7 +112,7 @@ public class KeYSelectionModel {
 	if (!goalIsValid) {
 	    selectedGoal = proof.getGoal(selectedNode);
 	    goalIsValid = true;
-	} 
+	}
 	return selectedGoal;
     }
 
@@ -122,11 +122,11 @@ public class KeYSelectionModel {
     public boolean isGoal() {
 	if (!goalIsValid) {
 	    return (getSelectedGoal() != null);
-	}	
+	}
 	return selectedGoal != null;
     }
 
-   
+
     /** enumerate the possible goal selections, starting with the best
      * one
      */
@@ -186,7 +186,7 @@ public class KeYSelectionModel {
 	public  boolean hasNext          () {
 	    return nextOne != null;
 	}
-	
+
 	public void remove() {
 	    throw new UnsupportedOperationException();
 	}
@@ -196,17 +196,17 @@ public class KeYSelectionModel {
     /** selectes the first goal in the goal list of proof if available
      * if not it selectes a leaf of the proof tree
      */
-    public void defaultSelection() {		
+    public void defaultSelection() {
 	Goal           g       = null;
 	Goal           firstG  = null;
 	Iterator<Goal> it      = new DefaultSelectionIterator ();
-	
+
 	while ( g == null && it.hasNext () ) {
 	    g = it.next ();
 	    if ( firstG == null )
-		firstG = g;	    
+		firstG = g;
 	}
-	
+
 	/** Order of preference:
 	 * 1. Not yet closable goals
 	 * 2. Goals which are not closed for all metavariable
@@ -223,7 +223,7 @@ public class KeYSelectionModel {
 	}
 	/*
 	if (selectedNode != null) {
-	    Iterator<Node> nodeIt = selectedNode.leavesIterator();	
+	    Iterator<Node> nodeIt = selectedNode.leavesIterator();
 	    while (nodeIt.hasNext()) {
 		g = proof.getGoal(nodeIt.next());
 		if (g != null) {
@@ -231,37 +231,38 @@ public class KeYSelectionModel {
 		}
 	    }
 	}
-	if (g == null && !proof.openGoals().isEmpty() ) {	       	    
+	if (g == null && !proof.openGoals().isEmpty() ) {
 	    g = proof.openGoals().iterator().next();
 	}
 	if (g != null) {
 	    setSelectedGoal(g);
 	} else {
-	    setSelectedNode(proof.root().leavesIterator().next());	
+	    setSelectedNode(proof.root().leavesIterator().next());
 	}
 	*/
     }
-    
+
     /**
      * selects the first open goal below the given node <tt>old</tt>
      * if no open goal is available node <tt>old</tt> is selected. In case
-     * that <tt>old</tt> has been removed from the proof the proof root is 
+     * that <tt>old</tt> has been removed from the proof the proof root is
      * selected
      * @param old the Node to start looking for open goals
      */
+    // XXX this method is never used
     public void nearestOpenGoalSelection(Node old) {
         Node n = old;
         while (n!=null && n.isClosed()) {
             n = n.parent();
-        }        
+        }
         if (n == null) {
-            if (proof.find(old)) { 
+            if (proof.find(old)) {
                 setSelectedNode(old);
             } else {
                 setSelectedNode(proof.root());
             }
-        } else {                      
-            final Goal g = getFirstOpenGoalBelow(n);                        
+        } else {
+            final Goal g = getFirstOpenGoalBelow(n);
             if (g == null || g.node() == null) {
                 setSelectedNode(proof.root());
             } else {
@@ -270,14 +271,14 @@ public class KeYSelectionModel {
 	}
     }
 
-    /** 
+    /**
      * retrievs the first open goal below the given node, i.e. the goal
      * containing the first leaf of the subtree starting at
      *  <code>n</code> which is not already closed
-     * 
+     *
      * @param n the Node where to start from
-     * @return the goal containing the first leaf of the 
-     * subtree starting at <code>n</code>, which is not already closed. 
+     * @return the goal containing the first leaf of the
+     * subtree starting at <code>n</code>, which is not already closed.
      * <code>null</code> is returned if no such goal exists.
      */
     private Goal getFirstOpenGoalBelow(Node n) {
@@ -286,25 +287,25 @@ public class KeYSelectionModel {
             final Node node =it.next();
             if (!node.isClosed()) {
                return proof.getGoal(node);
-            }           
+            }
         }
         return null;
     }
-    
+
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
 	synchronized(listenerList) {
 	    Debug.log4jInfo("Adding "+listener.getClass(), "key.threading");
-	    listenerList.add(listener);	    
+	    listenerList.add(listener);
 	}
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
 	synchronized(listenerList) {
 	    Debug.log4jInfo("Removing "+listener.getClass(), "key.threading");
-	    listenerList.remove(listener);	    
+	    listenerList.remove(listener);
 	}
-    }		
+    }
 
     public synchronized void fireSelectedNodeChanged() {
 	synchronized(listenerList) {
@@ -322,6 +323,6 @@ public class KeYSelectionModel {
 	    }
             Debug.log4jInfo("Selected Proof changed, done firing.", "key.threading");
 	}
-    }    
-    
+    }
+
 }
