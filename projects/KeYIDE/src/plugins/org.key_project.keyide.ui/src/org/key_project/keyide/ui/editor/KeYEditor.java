@@ -30,6 +30,8 @@ import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -315,14 +317,55 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       }
    };
    
+   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
+      @Override
+      public void smtDataUpdate(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofStructureChanged(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofIsBeingPruned(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofGoalsChanged(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofGoalsAdded(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofGoalRemoved(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+      }
+      
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+         handleProofClosed(e);
+      }
+   };
+   
    /**
     * {@inheritDoc}
     */
    @Override
    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
       super.init(site, input);
+      getProof().addProofTreeListener(proofTreeListener);
       getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
    }
+
 
    /**
     * {@inheritDoc}
@@ -350,9 +393,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     */
    @Override
    public void dispose() {
+      getProof().removeProofTreeListener(proofTreeListener);
       getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       getKeYEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
-//      getProof().removeProofTreeListener(proofTreeListener); // Is this line irrelevant? Remove it from source code!
       outline.dispose();
       super.dispose();
    }
@@ -400,5 +443,13 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       else {
          return super.getAdapter(adapter);
       }
+   }
+
+   /**
+    * This method is called when the proof is closed.
+    * @param e The {@link ProofTreeEvent}.
+    */
+   protected void handleProofClosed(ProofTreeEvent e) {
+      AutoModeTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
    }
 }
