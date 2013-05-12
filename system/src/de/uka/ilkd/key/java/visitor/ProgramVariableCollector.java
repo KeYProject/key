@@ -15,7 +15,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -35,8 +35,8 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet<LocationVariable> result
-        = new HashSet<LocationVariable>();
+    private final LinkedHashSet<LocationVariable> result
+        = new LinkedHashSet<LocationVariable>();
 
     /**
      * collects all program variables occuring in the AST <tt>root</tt>
@@ -65,7 +65,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     }
 
 
-    public HashSet<LocationVariable> result() {
+    public LinkedHashSet<LocationVariable> result() {
     return result;
     }
 

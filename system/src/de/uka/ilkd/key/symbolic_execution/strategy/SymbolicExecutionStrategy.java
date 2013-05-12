@@ -15,14 +15,18 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -34,23 +38,71 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
    public static final Name name = new Name("Symbolic Execution Strategy");
 
    /**
+    * Key used in {@link StrategyProperties} to configure alias checks.
+    */
+   public static final String ALIAS_CHECK_OPTIONS_KEY = "ALIAS_CHECK_OPTIONS_KEY";
+   
+   /**
+    * Value of key {@link #ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to disable alias checks.
+    */
+   public static final String ALIAS_CHECK_NEVER = "ALIAS_CHECK_NEVER";
+   
+   /**
+    * Value of key {@link #ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to enable immediately alias checks.
+    */
+   public static final String ALIAS_CHECK_IMMEDIATELY = "ALIAS_CHECK_IMMEDIATELY";
+   
+   /**
     * Constructor.
     * @param proof The proof.
     * @param sp The {@link StrategyProperties} to use.
     */
    private SymbolicExecutionStrategy(Proof proof, StrategyProperties sp) {
       super(proof, sp);
-      RuleSetDispatchFeature rsd = getCostComputationDispatcher();
+      // Update cost dispatcher
+      RuleSetDispatchFeature costRsd = getCostComputationDispatcher();
 
-      clearRuleSetBindings (rsd, "simplify_prog" );
-      bindRuleSet (rsd, "simplify_prog",10000);
+      clearRuleSetBindings (costRsd, "simplify_prog" );
+      bindRuleSet (costRsd, "simplify_prog",10000);
       
-      clearRuleSetBindings (rsd, "simplify_prog_subset" );
-      bindRuleSet (rsd, "simplify_prog_subset",10000);
+      clearRuleSetBindings (costRsd, "simplify_prog_subset" );
+      bindRuleSet (costRsd, "simplify_prog_subset",10000);
       
       Feature splitF = ScaleFeature.createScaled(CountBranchFeature.INSTANCE, -400);
-      bindRuleSet(rsd, "split_if", splitF); // The costs of rules in heuristic "split_if" is reduced at runtime by numberOfBranches * -400. The result is that rules of "split_if" preferred to "split_cond" and run and step into has the same behavior
-      bindRuleSet(rsd, "instanceof_to_exists", inftyConst());
+      bindRuleSet(costRsd, "split_if", splitF); // The costs of rules in heuristic "split_if" is reduced at runtime by numberOfBranches * -400. The result is that rules of "split_if" preferred to "split_cond" and run and step into has the same behavior
+      bindRuleSet(costRsd, "instanceof_to_exists", inftyConst());
+      
+      // Update instantiation dispatcher
+      if (ALIAS_CHECK_IMMEDIATELY.equals(sp.get(ALIAS_CHECK_OPTIONS_KEY))) {
+         // Make sure that an immediately alias check is performed by doing cuts of objects to find out if they can be the same or not
+         RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
+         enableInstantiate();
+         final TermBuffer buffer = new TermBuffer();
+         Feature originalCut = instRsd.get(getHeuristic("cut"));
+         Feature newCut = forEach(buffer, new CutHeapObjectsTermGenerator(), add(instantiate ("cutFormula", buffer), longConst(-10000)));
+         if (originalCut instanceof OneOfCP) {
+            clearRuleSetBindings (instRsd, "cut" );
+            bindRuleSet (instRsd, "cut", oneOf(originalCut, newCut));
+         }
+         else {
+            bindRuleSet (instRsd, "cut", newCut);
+         }
+         disableInstantiate();
+      }
+      // TODO: For delayed similar to sequentContainsNoPrograms()
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected Feature setupApprovalF(Proof p_proof) {
+      Feature result = super.setupApprovalF(p_proof);
+      // Make sure that cuts are only applied if the cut term is not already part of the sequent. This check is performed exactly before the rule is applied because the sequent might has changed in the time after the schema variable instantiation was instantiated.
+      SetRuleFilter depFilter = new SetRuleFilter();
+      depFilter.addRuleToSet(p_proof.env().getInitConfig().lookupActiveTaclet(new Name("cut")));
+      result = add(result, ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
+      return result;
    }
 
    /**
@@ -67,12 +119,14 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+    * @param aliasChecks Do alias checks?
     * @return The default {@link StrategyProperties} for symbolic execution.
     */
    public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean splittingRulesAllowed,
                                                                            boolean quantifierInstantiationWithSplitting,
                                                                            boolean methodTreatmentContract, 
-                                                                           boolean loopTreatmentInvariant) {
+                                                                           boolean loopTreatmentInvariant,
+                                                                           boolean aliasChecks) {
       StrategyProperties sp = new StrategyProperties();
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
       sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
@@ -86,6 +140,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
       sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+      sp.setProperty(ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
       return sp;
    }
 
