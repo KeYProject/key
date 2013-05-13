@@ -44,18 +44,25 @@ public class DefaultRuleAnalyst implements IRuleAnalyst {
       ImmutableList<IDSProvableReference> result = ImmutableSLList.nil();
       ImmutableList<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(node, node.proof().getServices());
       for (IProofReference<?> reference : references) {
-         if (ProofReferenceUtil.INLINE_METHOD.equals(reference.getKind())) {
+         if (IProofReference.INLINE_METHOD.equals(reference.getKind())) {
             Assert.isTrue(reference.getTarget() instanceof IProgramMethod);
             IDSOperation operation = connection.getOperation((IProgramMethod)reference.getTarget());
             if (operation != null) {
-               result = result.append(new MemoryProvableReference(operation, KeyProofReferenceUtil.METHOD_BODY_EXPAND));
+               result = result.append(new MemoryProvableReference(operation, KeyProofReferenceUtil.INLINE_METHOD));
             }
          }
-         else if (ProofReferenceUtil.USE_CONTRACT.equals(reference.getKind())) {
+         else if (IProofReference.CALL_METHOD.equals(reference.getKind())) {
+            Assert.isTrue(reference.getTarget() instanceof IProgramMethod);
+            IDSOperation operation = connection.getOperation((IProgramMethod)reference.getTarget());
+            if (operation != null) {
+               result = result.append(new MemoryProvableReference(operation, KeyProofReferenceUtil.CALL_METHOD));
+            }
+         }
+         else if (IProofReference.USE_CONTRACT.equals(reference.getKind())) {
             Assert.isTrue(reference.getTarget() instanceof Contract);
             IDSOperationContract contract = connection.getOperationContract((Contract)reference.getTarget());
             if (contract != null) {
-               result = result.append(new MemoryProvableReference(contract, KeyProofReferenceUtil.USE_OPERATION_CONTRACT));
+               result = result.append(new MemoryProvableReference(contract, KeyProofReferenceUtil.USE_CONTRACT));
             }
          }
          else {

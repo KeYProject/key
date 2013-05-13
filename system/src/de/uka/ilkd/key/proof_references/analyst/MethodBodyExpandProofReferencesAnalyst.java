@@ -7,12 +7,11 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 
 /**
- * Extracts {@link MethodBodyExpandProofReference}s.
+ * Extracts inlined methods.
  * @author Martin Hentschel
  */
 public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesAnalyst {
@@ -26,7 +25,7 @@ public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesA
          if (info.getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs = (MethodBodyStatement)info.getActiveStatement();
             IProgramMethod pm = mbs.getProgramMethod(services);
-            DefaultProofReference<IProgramMethod> reference = new DefaultProofReference<IProgramMethod>(ProofReferenceUtil.INLINE_METHOD, node, pm);
+            DefaultProofReference<IProgramMethod> reference = new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD, node, pm);
             return ImmutableSLList.<IProofReference<?>>nil().append(reference);
          }
          else {

@@ -30,8 +30,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "main", 
                 true,
                 ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(), new ContractProofReferencesAnalyst()),
-                new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "UseOperationContractTest::main"), 
-                new ExpectedProofReferences(ProofReferenceUtil.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)}; mby: null; post: {heap=and(imp(equals(exc,null),and(equals(result,Z(2(4(#)))),java.lang.Object::<inv>(heap,self))),equals(exc,null))}; mods: {heap=allLocs, savedHeap=null}; hasMod: true; termination: diamond; transaction: false"));
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "UseOperationContractTest::main"), 
+                new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)}; mby: null; post: {heap=and(imp(equals(exc,null),and(equals(result,Z(2(4(#)))),java.lang.Object::<inv>(heap,self))),equals(exc,null))}; mods: {heap=allLocs, savedHeap=null}; hasMod: true; termination: diamond; transaction: false"));
    }
    
    /**
@@ -71,8 +71,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "main", 
                 false,
                 ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst()),
-                new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "MethodBodyExpand::main"), 
-                new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "MethodBodyExpand::magic42"));
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }
    
    /**
@@ -86,8 +86,9 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "main",
                 false,
                 null,
-                new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "MethodBodyExpand::main"), 
-                new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "MethodBodyExpand::magic42"));
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
+                new ExpectedProofReferences(IProofReference.CALL_METHOD, "MethodBodyExpand::magic42"), 
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }
    
    /**

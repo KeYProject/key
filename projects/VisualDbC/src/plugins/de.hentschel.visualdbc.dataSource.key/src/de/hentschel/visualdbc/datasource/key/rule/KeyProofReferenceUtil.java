@@ -46,16 +46,21 @@ public final class KeyProofReferenceUtil {
     * The extension point for rule analysts.
     */
    public static final String RULE_ANALYST_EXTENSION_POINT = "de.hentschel.visualdbc.dataSource.key.ruleAnalysts";
+
+   /**
+    * A method call which determines the possible implementations of a called method.
+    */
+   public static final String CALL_METHOD = "Call Method";
    
    /**
     * The proof step "methodBodyExpand" that inlines methods.
     */
-   public static final String METHOD_BODY_EXPAND = "methodBodyExpand";
+   public static final String INLINE_METHOD = "methodBodyExpand";
 
    /**
     * The proof step "Use Operation Contract".
     */
-   public static final String USE_OPERATION_CONTRACT = "Use Operation Contract";
+   public static final String USE_CONTRACT = "Use Operation Contract";
 
    /**
     * Contains the available {@link IRuleAnalyst} ordered by their priority.

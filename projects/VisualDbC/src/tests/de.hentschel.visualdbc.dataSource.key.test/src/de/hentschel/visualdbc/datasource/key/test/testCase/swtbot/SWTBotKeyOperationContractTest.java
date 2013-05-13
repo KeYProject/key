@@ -77,7 +77,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                       TestCase.assertNotNull(dsInitMethod);
                                       IDSMethod dsIncMethod = dsClass.getMethod("inc(x : int)");
                                       TestCase.assertNotNull(dsIncMethod);
-                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND), new MemoryProvableReference(dsIncMethod.getOperationContracts().get(0), KeyProofReferenceUtil.USE_OPERATION_CONTRACT));
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.INLINE_METHOD), new MemoryProvableReference(dsIncMethod.getOperationContracts().get(0), KeyProofReferenceUtil.USE_CONTRACT));
                                       result.add(event);
                                       return result;
                                    }
@@ -120,7 +120,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                       TestCase.assertNotNull(dsInitMethod);
                                       IDSMethod dsIncMethod = dsClass.getMethod("inc(x : int)");
                                       TestCase.assertNotNull(dsIncMethod);
-                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.METHOD_BODY_EXPAND));
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.INLINE_METHOD), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.CALL_METHOD), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.INLINE_METHOD));
                                       result.add(event);
                                       return result;
                                    }

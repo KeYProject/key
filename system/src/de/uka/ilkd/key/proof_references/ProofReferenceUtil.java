@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
+import de.uka.ilkd.key.proof_references.analyst.MethodCallProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 
 /**
@@ -34,20 +35,10 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
  */
 public final class ProofReferenceUtil {
    /**
-    * The proof step "methodBodyExpand" that inlines methods.
-    */
-   public static final String INLINE_METHOD = "Inline Method";
-
-   /**
-    * The proof step "Use Operation Contract" which approximates a method call via its method contract
-    * and also the usage of dependency contracts.
-    */
-   public static final String USE_CONTRACT = "Use Contract";
-
-   /**
     * The default {@link IProofReferencesAnalyst}s.
     */
-   public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(), 
+   public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(),
+                                                                                                                                       new MethodCallProofReferencesAnalyst(),
                                                                                                                                        new ContractProofReferencesAnalyst());
    
    /**

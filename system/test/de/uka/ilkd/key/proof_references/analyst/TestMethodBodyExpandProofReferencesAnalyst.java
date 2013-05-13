@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof_references.analyst;
 
 import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
-import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
+import de.uka.ilkd.key.proof_references.reference.IProofReference;
 
 /**
  * Tests for {@link MethodBodyExpandProofReferencesAnalyst}.
@@ -18,7 +18,7 @@ public class TestMethodBodyExpandProofReferencesAnalyst extends AbstractProofRef
                       "main", 
                       false,
                       new MethodBodyExpandProofReferencesAnalyst(),
-                      new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "MethodBodyExpand::main"), 
-                      new ExpectedProofReferences(ProofReferenceUtil.INLINE_METHOD, "MethodBodyExpand::magic42"));
+                      new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
+                      new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }
 }
