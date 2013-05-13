@@ -10,6 +10,10 @@ public class KeYProjectNature implements IProjectNature  {
    
    private IProject project;
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void configure() throws CoreException {
       IProjectDescription desc = project.getDescription();
@@ -31,23 +35,32 @@ public class KeYProjectNature implements IProjectNature  {
       project.setDescription(desc, null); // write to .project file
    }
       
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void deconfigure() throws CoreException {
       System.out.println("Nature: deconfigure");
-      // TODO Auto-generated method stub
       
    }
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public IProject getProject() {
       System.out.println("Nature: getProject()");
-      // TODO Auto-generated method stub
       return this.project;
    }
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void setProject(IProject project) {
-      // TODO Auto-generated method stub
       this.project = project;
    }
 

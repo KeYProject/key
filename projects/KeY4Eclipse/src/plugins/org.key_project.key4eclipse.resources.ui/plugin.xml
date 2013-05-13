@@ -19,22 +19,6 @@
       </category>
    </extension>
    <extension
-         id="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
-         name="ProofNotClosedMarker"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-   </extension>
-   <extension
-         id="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker"
-         name="ProofClosedMarker"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="true"

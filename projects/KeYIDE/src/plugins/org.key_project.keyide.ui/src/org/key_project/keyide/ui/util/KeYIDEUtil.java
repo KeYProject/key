@@ -138,7 +138,7 @@ public class KeYIDEUtil {
     * @param name The  name to display at the editor-tab
     * @param ui The UserInterface that holds the KeYMediator
     */
-   private static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment)throws PartInitException{
+   public static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment)throws PartInitException{
       String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
       IStorage storage = new ProofStorage(inputText, proof.name().toString());
       IStorageEditorInput input = new ProofEditorInput(storage, proof, environment);
