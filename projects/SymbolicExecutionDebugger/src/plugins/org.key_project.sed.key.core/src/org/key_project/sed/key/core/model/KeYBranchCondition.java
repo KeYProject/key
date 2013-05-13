@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
@@ -96,7 +109,12 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    @Override
    public String getName() throws DebugException {
       try {
-         return executionNode.getName();
+         if (executionNode.isBranchConditionComputed() || !executionNode.isDisposed()) {
+            return executionNode.getName();
+         }
+         else {
+            return null;
+         }
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));

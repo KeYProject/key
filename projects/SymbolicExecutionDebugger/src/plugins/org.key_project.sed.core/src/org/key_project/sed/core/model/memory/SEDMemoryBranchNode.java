@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.model.memory;
 
 import java.util.LinkedList;
@@ -38,9 +51,9 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
    private String pathCondition;
    
    /**
-    * The source name.
+    * The source path.
     */
-   private String sourceName;
+   private String sourcePath;
 
    /**
     * The line number.
@@ -86,8 +99,8 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
-      return sourceName;
+   public String getSourcePath() {
+      return sourcePath;
    }
    
    /**
@@ -198,11 +211,11 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
    }
    
    /**
-    * Sets the source name.
-    * @param sourceName The source name to set.
+    * Sets the source path.
+    * @param sourcePath The source path to set.
     */
-   public void setSourceName(String sourceName) {
-      this.sourceName = sourceName;
+   public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
    }
 
    /**

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
@@ -13,6 +26,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDLoopCondition} for the symbolic execution debugger (SED)
@@ -124,11 +138,11 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getGuardExpressionPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getGuardExpressionPositionInfo());
          if (sourceName == null) {
-            sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
+            sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
          }
       }
       return sourceName;
@@ -196,7 +210,14 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 
    /**

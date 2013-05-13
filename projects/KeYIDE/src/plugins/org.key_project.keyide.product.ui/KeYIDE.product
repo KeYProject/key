@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="KeYIDE" uid="org.key_project.keyide" id="org.key_project.keyide.product.ui.product" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="/org.key_project.keyide.product.ui/icons/About.gif"/>
+      <text>
+         KeYIDE
+
+Version: 1.0.0
+
+Developed as part of the KeY project.
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgs>-Xms128m
+-Xmx1024m
+-XX:MaxPermSize=256m</vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages i16="/org.key_project.keyide.product.ui/icons/logo16.gif" i32="/org.key_project.keyide.product.ui/icons/logo32.gif" i48="/org.key_project.keyide.product.ui/icons/logo48.gif" i64="/org.key_project.keyide.product.ui/icons/logo64.gif" i128="/org.key_project.keyide.product.ui/icons/logo128.gif"/>
+
+   <splash
+      location="org.key_project.keyide.product.ui"
+      startupProgressRect="30,275,445,15"
+      startupMessageRect="30,252,445,20"
+      startupForegroundColor="000000" />
+   <launcher name="KeYIDE">
+      <linux icon="/org.key_project.keyide.ui/icons/logo48.xpm"/>
+      <macosx icon="/org.key_project.keyide.ui/icons/logo.icns"/>
+      <solaris/>
+      <win useIco="true">
+         <ico path="/org.key_project.keyide.product.ui/icons/logo.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
+
+   <license>
+        <url>http://www.eclipse.org/legal/epl/notice.html</url>
+        <text>
+   Eclipse.org Software User Agreement
+
+Eclipse Foundation Software User Agreement
+March 17, 2005
+
+Usage Of Content
+
+THE ECLIPSE FOUNDATION MAKES AVAILABLE SOFTWARE, DOCUMENTATION, INFORMATION AND/OR OTHER MATERIALS FOR OPEN SOURCE PROJECTS
+(COLLECTIVELY &amp;quot;CONTENT&amp;quot;).  USE OF THE CONTENT IS GOVERNED BY THE TERMS AND CONDITIONS OF THIS AGREEMENT AND/OR THE TERMS AND
+CONDITIONS OF LICENSE AGREEMENTS OR NOTICES INDICATED OR REFERENCED BELOW.  BY USING THE CONTENT, YOU AGREE THAT YOUR USE
+OF THE CONTENT IS GOVERNED BY THIS AGREEMENT AND/OR THE TERMS AND CONDITIONS OF ANY APPLICABLE LICENSE AGREEMENTS OR
+NOTICES INDICATED OR REFERENCED BELOW.  IF YOU DO NOT AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT AND THE TERMS AND
+CONDITIONS OF ANY APPLICABLE LICENSE AGREEMENTS OR NOTICES INDICATED OR REFERENCED BELOW, THEN YOU MAY NOT USE THE CONTENT.
+   
+Applicable Licenses
+   
+Unless otherwise indicated, all Content made available by the Eclipse Foundation is provided to you under the terms and conditions of the Eclipse Public License Version 1.0
+(&amp;quot;EPL&amp;quot;).  A copy of the EPL is provided with this Content and is also available at http://www.eclipse.org/legal/epl-v10.html.
+For purposes of the EPL, &amp;quot;Program&amp;quot; will mean the Content.
+
+Content includes, but is not limited to, source code, object code, documentation and other files maintained in the Eclipse.org CVS repository (&amp;quot;Repository&amp;quot;) in CVS
+modules (&amp;quot;Modules&amp;quot;) and made available as downloadable archives (&amp;quot;Downloads&amp;quot;).
+   
+* Content may be structured and packaged into modules to facilitate delivering, extending, and upgrading the Content.  Typical modules may include plug-ins (&amp;quot;Plug-ins&amp;quot;), plug-in fragments (&amp;quot;Fragments&amp;quot;), and features (&amp;quot;Features&amp;quot;).
+* Each Plug-in or Fragment may be packaged as a sub-directory or JAR (Java(tm) ARchive) in a directory named &amp;quot;plugins&amp;quot;.
+* A Feature is a bundle of one or more Plug-ins and/or Fragments and associated material.  Each Feature may be packaged as a sub-directory in a directory named &amp;quot;features&amp;quot;.  Within a Feature, files named &amp;quot;feature.xml&amp;quot; may contain a list of the names and version numbers of the Plug-ins
+  and/or Fragments associated with that Feature.
+* Features may also include other Features (&amp;quot;Included Features&amp;quot;). Within a Feature, files named &amp;quot;feature.xml&amp;quot; may contain a list of the names and version numbers of Included Features.
+ 
+The terms and conditions governing Plug-ins and Fragments should be contained in files named &amp;quot;about.html&amp;quot; (&amp;quot;Abouts&amp;quot;). The terms and conditions governing Features and
+Included Features should be contained in files named &amp;quot;license.html&amp;quot; (&amp;quot;Feature Licenses&amp;quot;).  Abouts and Feature Licenses may be located in any directory of a Download or Module
+including, but not limited to the following locations:
+
+* The top-level (root) directory
+* Plug-in and Fragment directories
+* Inside Plug-ins and Fragments packaged as JARs
+* Sub-directories of the directory named &amp;quot;src&amp;quot; of certain Plug-ins
+* Feature directories
+  
+Note: if a Feature made available by the Eclipse Foundation is installed using the Eclipse Update Manager, you must agree to a license (&amp;quot;Feature Update License&amp;quot;) during the
+installation process.  If the Feature contains Included Features, the Feature Update License should either provide you with the terms and conditions governing the Included Features or
+inform you where you can locate them.  Feature Update Licenses may be found in the &amp;quot;license&amp;quot; property of files named &amp;quot;feature.properties&amp;quot; found within a Feature.
+Such Abouts, Feature Licenses, and Feature Update Licenses contain the terms and conditions (or references to such terms and conditions) that govern your use of the associated Content in
+that directory.
+
+THE ABOUTS, FEATURE LICENSES, AND FEATURE UPDATE LICENSES MAY REFER TO THE EPL OR OTHER LICENSE AGREEMENTS, NOTICES OR TERMS AND CONDITIONS.  SOME OF THESE
+OTHER LICENSE AGREEMENTS MAY INCLUDE (BUT ARE NOT LIMITED TO):
+
+* Common Public License Version 1.0 (available at http://www.eclipse.org/legal/cpl-v10.html)
+* Apache Software License 1.1 (available at http://www.apache.org/licenses/LICENSE)
+* Apache Software License 2.0 (available at http://www.apache.org/licenses/LICENSE-2.0)
+* IBM Public License 1.0 (available at http://oss.software.ibm.com/developerworks/opensource/license10.html) 
+* Metro Link Public License 1.00 (available at http://www.opengroup.org/openmotif/supporters/metrolink/license.html)
+* Mozilla Public License Version 1.1 (available at http://www.mozilla.org/MPL/MPL-1.1.html)
+
+IT IS YOUR OBLIGATION TO READ AND ACCEPT ALL SUCH TERMS AND CONDITIONS PRIOR TO USE OF THE CONTENT.  If no About, Feature License, or Feature Update License is provided, please
+contact the Eclipse Foundation to determine what terms and conditions govern that particular Content.
+
+Cryptography
+
+Content may contain encryption software. The country in which you are currently may have restrictions on the import, possession, and use, and/or re-export to
+another country, of encryption software. BEFORE using any encryption software, please check the country&amp;apos;s laws, regulations and policies concerning the import,
+possession, or use, and re-export of encryption software, to see if this is permitted.
+   
+Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in the United States, other countries, or both.
+         </text>
+   </license>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.platform" version="3.7.2.v20120207-1839-9gF7UHPDFxGjd-PqDr2jX_4yKaumkoHTz04_q-q"/>
+      <feature id="org.eclipse.jdt" version="3.7.2.v20120120-1414-7z8gFcuFMP7BW5XTz0jLTnz0l9B1"/>
+      <feature id="org.key_project.key4eclipse.bugfix_mac_os" version="1.0.0.qualifier"/>
+      <feature id="org.key_project.keyide.feature" version="1.0.0.qualifier"/>
+   </features>
+
+
+</product>

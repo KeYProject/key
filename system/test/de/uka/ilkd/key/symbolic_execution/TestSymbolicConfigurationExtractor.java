@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -17,6 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -49,6 +63,45 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
+
+
+   /**
+    * Tests "configurationExtractorWithOperationContractsTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testWithOperationContracts() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorWithOperationContractsTest/test/ConfigurationExtractorWithOperationContractsTest.java",
+             "ConfigurationExtractorWithOperationContractsTest",
+             "examples/_testcase/set/configurationExtractorWithOperationContractsTest/oracle/",
+             "ConfigurationExtractorWithOperationContractsTest.xml",
+             "testWithOperationContracts_initial",
+             ".xml",
+             "testWithOperationContracts_current",
+             ".xml",
+             null,
+             1,
+             2,
+             true);
+   }
+   
+   /**
+    * Tests "configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/test/AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.java",
+             "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
+             "examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/oracle/",
+             "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.xml",
+             "testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass_initial",
+             ".xml",
+             "testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass_current",
+             ".xml",
+             null,
+             1,
+             3,
+             false);
+   }
    
    /**
     * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
@@ -65,7 +118,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             2);
+             2,
+             false);
    }
    
    /**
@@ -83,7 +137,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              5,
-             2);
+             2,
+             false);
    }
    
    /**
@@ -101,7 +156,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -119,7 +175,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
 
    /**
@@ -137,7 +194,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             5);
+             5,
+             false);
    }
    
    /**
@@ -155,7 +213,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              2,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -173,7 +232,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -191,7 +251,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -209,7 +270,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -227,7 +289,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             5);
+             5,
+             false);
    }
 
    /**
@@ -245,7 +308,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             2);
+             2,
+             false);
    }
    
    /**
@@ -263,7 +327,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              2,
-             4);
+             4,
+             false);
    }
    
    /**
@@ -281,7 +346,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -299,7 +365,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -317,7 +384,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             2);
+             2,
+             false);
    }
    
    /**
@@ -335,7 +403,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -353,7 +422,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             4);
+             4,
+             false);
    }
    
    /**
@@ -371,7 +441,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             2);
+             2,
+             false);
    }
    
    /**
@@ -389,7 +460,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             1,
+             false);
    }
    
    /**
@@ -407,7 +479,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             4);
+             4,
+             false);
    }
    
 
@@ -426,7 +499,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "x != null & x.next != null & x.next.next != null",
              1,
-             4);
+             4,
+             false);
    }
    
    /**
@@ -444,7 +518,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             4);
+             4,
+             false);
    }
    
    /**
@@ -462,7 +537,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "x != null & x.next != null & x.next.next != null",
              1,
-             4);
+             4,
+             false);
    }
    
    /**
@@ -476,6 +552,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
     * @param currentStatesOraclePrefix Prefix for current configuration oracles.
     * @param currentStatesOracleFileExtension Current configuration oracle file extension.
     * @param precondition An optional precondition.
+    * @param useOperationContracts Use operation contracts?
     * @throws Exception Occurred Exception.
     */
    protected void doTest(String javaPathInkeyRepDirectory,
@@ -488,20 +565,23 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          String currentStatesOracleFileExtension,
                          String precondition,
                          int numberOfReturnNodeInMostLeftBranch,
-                         int expectedNumberOfConfigurations) throws Exception {
+                         int expectedNumberOfConfigurations,
+                         boolean useOperationContracts) throws Exception {
       String originalRuntimeExceptions = null;
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
       try {
          // Define test settings
          final String methodFullName = "compute";
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
+            env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false);
+            env.dispose();
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
          // Find most left method return node
@@ -571,6 +651,9 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          // Restore runtime option
          if (originalRuntimeExceptions != null) {
             SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
+         if (env != null) {
+            env.dispose();
          }
       }
    }
@@ -688,7 +771,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    public static void assertEquivalenceClass(ISymbolicEquivalenceClass expected, ISymbolicEquivalenceClass current) {
       if (expected != null) {
          assertNotNull(current);
-         assertListEquals(expected.getTermStrings(), current.getTermStrings());
+         assertStringListEqualsIgnoreWhiteSpace(expected.getTermStrings(), current.getTermStrings());
          assertEquals(expected.getRepresentativeString(), current.getRepresentativeString());
       }
       else {
@@ -697,18 +780,20 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    }
    
    /**
-    * Compares the given {@link ImmutableList}s.
+    * Compares the given {@link ImmutableList}s ignoring white space.
     * @param expected The expected instance.
     * @param current The current instance.
     */
-   public static <T> void assertListEquals(ImmutableList<T> expected, ImmutableList<T> current) {
+   public static void assertStringListEqualsIgnoreWhiteSpace(ImmutableList<String> expected, ImmutableList<String> current) {
       assertNotNull(expected);
       assertNotNull(current);
       assertEquals(expected.size(), current.size());
-      Iterator<T> expectedIter = expected.iterator();
-      Iterator<T> currentIter = current.iterator();
+      Iterator<String> expectedIter = expected.iterator();
+      Iterator<String> currentIter = current.iterator();
       while (expectedIter.hasNext() && currentIter.hasNext()) {
-         assertEquals(expectedIter.next(), currentIter.next());
+         String nextExpected = expectedIter.next();
+         String nextCurrent = currentIter.next();
+         assertTrue("\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"", JavaUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent));
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
@@ -746,6 +831,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertEquals(expected.getValueString(), current.getValueString());
          assertEquals(expected.getTypeString(), current.getTypeString());
+         assertEquals(expected.getConditionString(), current.getConditionString());
       }
       else {
          assertNull(current);
@@ -783,6 +869,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertObject(expected.getTarget(), current.getTarget(), false);
+         assertEquals(expected.getConditionString(), current.getConditionString());
       }
       else {
          assertNull(current);

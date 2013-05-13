@@ -6,16 +6,48 @@
       provider-name="KeY Project"
       plugin="org.key_project.sed.product.ui">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description>
+      A debugger based on symbolic execution.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright>
+      KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN
+
+Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+                        Universitaet Koblenz-Landau, Germany
+                        Chalmers University of Technology, Sweden
+Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+                        Technical University Darmstadt, Germany
+                        Chalmers University of Technology, Sweden
+
+Karlsruhe Institute of Technology
+Institute for Theoretical Computer Science
+Prof. Dr. Bernhard Beckert / Prof. Dr. Peter H. Schmitt
+Am Fasanengarten 5
+D-76131 Karlsruhe
+Germany
+
+Technische Universität Darmstadt
+Fachgebiet Software Engineering
+Hochschulstr. 10
+D-64289 Darmstadt 
+Germany
+
+Chalmers University of Technology
+Department of Computing Science
+Eklandagatan 86
+SE-41296 Gothenburg
+Sweden
+
+
+WWW: http://key-project.org
+e-mail: key@ira.uka.de
    </copyright>
 
    <license url="http://www.eclipse.org/legal/epl/notice.html">
-      Eclipse.org Software User Agreement
+      This feature is distributed unter the license below. For the provided plug-ins different licenses might apply.
+
+Eclipse.org Software User Agreement
 
 Eclipse Foundation Software User Agreement
 March 17, 2005
@@ -82,9 +114,24 @@ possession, or use, and re-export of encryption software, to see if this is perm
 Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in the United States, other countries, or both.
    </license>
 
+   <url>
+      <update label="KeY Indigo Updates" url="http://www.key-project.org/download/releases/eclipse/indigo"/>
+   </url>
+
    <includes
          id="org.key_project.key4eclipse.feature"
          version="0.0.0"/>
+
+   <requires>
+      <import feature="org.eclipse.platform" version="3.7.2"/>
+      <import feature="org.eclipse.jdt" version="3.7.2"/>
+      <import feature="org.eclipse.gef" version="3.7.2"/>
+      <import feature="org.eclipse.emf" version="2.7.2"/>
+      <import feature="org.eclipse.emf.validation" version="1.5.0"/>
+      <import feature="org.eclipse.emf.transaction" version="1.5.0"/>
+      <import feature="org.eclipse.emf.workspace" version="1.5.1"/>
+      <import feature="org.eclipse.graphiti.feature" version="0.8.2"/>
+   </requires>
 
    <plugin
          id="org.key_project.sed.product.ui"

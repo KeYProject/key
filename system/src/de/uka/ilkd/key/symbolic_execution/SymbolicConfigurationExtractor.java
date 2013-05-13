@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.ArrayList;
@@ -44,8 +57,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
@@ -270,19 +285,24 @@ public class SymbolicConfigurationExtractor {
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
             // Instantiate proof in which equivalent classes of symbolic objects in path conditions are computed
             ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
-            // Apply cut rules to compute equivalent classes
-            applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
-            // Finish proof automatically
-            SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
-            // Compute the available instance configurations via the opened goals of the equivalent proof.
-            appliedCutsPerConfiguration = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
-            // Create predicate required for state computation
-            initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
-            currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
-            // Create configuration maps which are filled lazily
-            initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-            currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-            configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+            try {
+               // Apply cut rules to compute equivalent classes
+               applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
+               // Finish proof automatically
+               SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
+               // Compute the available instance configurations via the opened goals of the equivalent proof.
+               appliedCutsPerConfiguration = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
+               // Create predicate required for state computation
+               initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
+               currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
+               // Create configuration maps which are filled lazily
+               initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+            }
+            finally {
+               equivalentClassesProofStarter.getProof().dispose();
+            }
          }
       }
    }
@@ -595,7 +615,9 @@ public class SymbolicConfigurationExtractor {
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
-         if (heapLDT.getHeap() != term.op() && !isImplicitProgramVariable(var) && !objectsToIgnore.contains(term)) {
+         if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && 
+             !isImplicitProgramVariable(var) && 
+             !objectsToIgnore.contains(term)) {
             toFill.add(new ExtractLocationParameter(var, true));
          }
       }
@@ -645,7 +667,7 @@ public class SymbolicConfigurationExtractor {
          }
       }
    }
-   
+
    /**
     * <p>
     * Computes for each location (value/association of an object) used in the 
@@ -733,12 +755,15 @@ public class SymbolicConfigurationExtractor {
             collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
          }
          else if (eu.lhs() instanceof ProgramVariable) {
+            final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
             ProgramVariable var = (ProgramVariable)eu.lhs();
-            if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(TermBuilder.DF.var(var))) {
-               locationsToFill.add(new ExtractLocationParameter(var, true));
-            }
-            if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
-               updateValueObjectsToFill.add(updateTerm.sub(0));
+            if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
+               if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(TermBuilder.DF.var(var))) {
+                  locationsToFill.add(new ExtractLocationParameter(var, true));
+               }
+               if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
+                  updateValueObjectsToFill.add(updateTerm.sub(0));
+               }
             }
          }
          else {
@@ -939,7 +964,7 @@ public class SymbolicConfigurationExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(node, currentConfigurations, configurationIndex, currentLocationTerm, currentLocations, null, computeCurrentStateName());
+      return getConfiguration(node, currentConfigurations, configurationIndex, currentLocationTerm, currentLocations, pathCondition, computeCurrentStateName());
    }
    
    /**
@@ -1051,21 +1076,30 @@ public class SymbolicConfigurationExtractor {
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, configurationCondition, configurationTerm, newUpdates);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_NORMAL);
-         Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(info, configurationTerm.op());
-         // Extract values and objects from result predicate and store them in variable value pairs
-         Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
-         for (ExtractLocationParameter param : locations) {
-            ExecutionVariableValuePair pair;
-            if (param.isArrayIndex()) {
-               pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), param.isStateMember());
+         try {
+            // Extract values and objects from result predicate and store them in variable value pairs
+            Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
+            int goalCount = info.getProof().openGoals().size();
+            for (Goal goal : info.getProof().openGoals()) {
+               Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, configurationTerm.op());
+               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
+               for (ExtractLocationParameter param : locations) {
+                  ExecutionVariableValuePair pair;
+                  if (param.isArrayIndex()) {
+                     pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
+                  }
+                  else {
+                     pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), condition, param.isStateMember());
+                  }
+                  pairs.add(pair);
+               }
             }
-            else {
-               pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), resultTerm.sub(param.getValueTermIndexInStatePredicate()), param.isStateMember());
-            }
-            pairs.add(pair);
+            // Create symbolic configuration
+            return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
          }
-         // Create symbolic configuration
-         return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
+         finally {
+            info.getProof().dispose();
+         }
       }
       else {
          // Create empty symbolic configuration
@@ -1201,10 +1235,11 @@ public class SymbolicConfigurationExtractor {
     * @param pairs Provides the available objects, their values and associations together with the variables and association of the state.
     * @param stateName The name of the state.
     * @return The created {@link ISymbolicConfiguration} with the given content.
+    * @throws ProofInputException Occurred Exception.
     */
    protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
                                                                                        Set<ExecutionVariableValuePair> pairs,
-                                                                                       String stateName) {
+                                                                                       String stateName) throws ProofInputException {
       SymbolicConfiguration result = new SymbolicConfiguration(equivalentClasses);
       // Create state
       SymbolicState state = new SymbolicState(stateName);
@@ -1246,7 +1281,8 @@ public class SymbolicConfigurationExtractor {
          Term valueTerm = pair.getValue();
          AbstractSymbolicAssociationValueContainer container;
          if (parent != null) {
-            container = objects.get(parent);
+            ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, parent);
+            container = objects.get(equivalentClass != null ? equivalentClass.getRepresentative() : parent);
          }
          else {
             if (pair.isStateMember() || !objectsToIgnore.contains(valueTerm)) {
@@ -1268,22 +1304,44 @@ public class SymbolicConfigurationExtractor {
             if (target != null) {
                SymbolicAssociation association;
                if (pair.isArrayIndex()) {
-                  association = new SymbolicAssociation(pair.getArrayIndex(), target);
+                  association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), target, pair.getCondition());
                }
                else {
-                  association = new SymbolicAssociation(pair.getProgramVariable(), target);
+                  association = new SymbolicAssociation(getServices(), pair.getProgramVariable(), target, pair.getCondition());
                }
-               container.addAssociation(association);
+               // Add association only if not already present
+               ISymbolicAssociation existingAssociation = container.getAssociation(association.getProgramVariable(), association.isArrayIndex(), association.getArrayIndex(), association.getCondition());
+               if (existingAssociation == null) {
+                  // Add association to the container
+                  container.addAssociation(association);
+               }
+               else {
+                  // Make sure that target is the same
+                  if (!JavaUtil.equals(association.getTarget(), existingAssociation.getTarget())) {
+                     throw new ProofInputException("Multiple association targets found: " + association + " and " + existingAssociation + ".");
+                  }
+               }
             }
             else {
                SymbolicValue value;
                if (pair.isArrayIndex()) {
-                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm);
+                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm, pair.getCondition());
                }
                else {
-                  value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm);
+                  value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm, pair.getCondition());
                }
-               container.addValue(value);
+               // Add value only if not already present
+               ISymbolicValue existingValue = container.getValue(value.getProgramVariable(), value.isArrayIndex(), value.getArrayIndex(), value.getCondition());
+               if (existingValue == null) {
+                  // Add value to the container
+                  container.addValue(value);
+               }
+               else {
+                  // Make sure that the value is the same
+                  if (!JavaUtil.equals(value.getValue(), existingValue.getValue())) {
+                     throw new ProofInputException("Multiple values found: " + value + " and " + existingValue + ".");
+                  }
+               }
             }
          }
       }
@@ -1596,23 +1654,31 @@ public class SymbolicConfigurationExtractor {
        * Defines if this location should explicitly be shown on the state.
        */
       private boolean stateMember;
+      
+      /**
+       * An optional condition under which the value is valid.
+       */
+      private Term condition;
 
       /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable}.
        * @param parent An optional parent object or {@code null} if it is a value/association of the state.
        * @param value The value or association target.
+       * @param condition An optional condition under which the value is valid.
        * @param stateMember Defines if this location should explicitly be shown on the state.
        */
       public ExecutionVariableValuePair(ProgramVariable programVariable, 
                                         Term parent, 
                                         Term value, 
+                                        Term condition,
                                         boolean stateMember) {
          assert programVariable != null;
          assert value != null;
          this.programVariable = programVariable;
          this.parent = parent;
          this.value = value;
+         this.condition = condition;
          this.arrayIndex = -1;
          this.stateMember = stateMember;
       }
@@ -1622,17 +1688,20 @@ public class SymbolicConfigurationExtractor {
        * @param arrayIndex The array index.
        * @param parent The parent object.
        * @param value The value or association target.
+       * @param condition An optional condition under which the value is valid.
        * @param stateMember Defines if this location should explicitly be shown on the state.
        */
       public ExecutionVariableValuePair(int arrayIndex, 
                                         Term parent, 
                                         Term value, 
+                                        Term condition,
                                         boolean stateMember) {
          assert parent != null;
          assert value != null;
          this.arrayIndex = arrayIndex;
          this.parent = parent;
          this.value = value;
+         this.condition = condition;
          this.stateMember = stateMember;
       }
 
@@ -1685,6 +1754,14 @@ public class SymbolicConfigurationExtractor {
       }
 
       /**
+       * Returns the optional condition under which the value is valid.
+       * @return The optional condition under which the value is valid.
+       */
+      public Term getCondition() {
+         return condition;
+      }
+
+      /**
        * {@inheritDoc}
        */
       @Override
@@ -1693,6 +1770,7 @@ public class SymbolicConfigurationExtractor {
             ExecutionVariableValuePair other = (ExecutionVariableValuePair)obj;
             return isArrayIndex() ? getArrayIndex() == other.getArrayIndex() : getProgramVariable().equals(other.getProgramVariable()) &&
                    getParent() != null ? getParent().equals(other.getParent()) : other.getParent() == null &&
+                   getCondition() != null ? getCondition().equals(other.getCondition()) : other.getCondition() == null &&
                    getValue().equals(other.getValue());
          }
          else {
@@ -1708,6 +1786,7 @@ public class SymbolicConfigurationExtractor {
          int result = 17;
          result = 31 * result + (isArrayIndex() ? getArrayIndex() : getProgramVariable().hashCode());
          result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
+         result = 31 * result + (getCondition() != null ? getCondition().hashCode() : 0);
          result = 31 * result + getValue().hashCode();
          return result;
       }

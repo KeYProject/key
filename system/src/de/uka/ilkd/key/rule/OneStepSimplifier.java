@@ -26,20 +26,17 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -47,9 +44,14 @@ import de.uka.ilkd.key.util.LRUCache;
 public final class OneStepSimplifier implements BuiltInRule, 	
 						KeYSelectionListener {
     
-    public final class Protocol extends ArrayList<RuleApp> { }
+    public final class Protocol extends ArrayList<RuleApp> {
+        private static final long serialVersionUID = 8788009073806993077L; 
+    }
     
-    // TODO: Remove the singleton instance or make the rule state less to allow parallelization of site proofs started via a ProofStarter which is currently not possible thanks to ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
+    // TODO: Remove the singleton instance or make the rule 
+    // state less to allow parallelization of site proofs started
+    // via a ProofStarter which is currently not possible thanks to 
+    // ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
     public static final OneStepSimplifier INSTANCE 
                                             = new OneStepSimplifier();
     
@@ -191,20 +193,22 @@ public final class OneStepSimplifier implements BuiltInRule,
      * the goals' taclet indices.
      */
     private void shutdownIndices() {
-	if(lastProof != null) {
-	    for(Goal g : lastProof.openGoals()) {
-		for(NoPosTacletApp app : appsTakenOver) {
-		    g.ruleAppIndex().addNoPosTacletApp(app);
-		}
-		g.getRuleAppManager().clearCache();
-		g.ruleAppIndex().clearIndexes();		
-	    }
-	    applicabilityCache.clear();
-	    lastProof = null;
-	    appsTakenOver = null;
-	    indices = null;
-	    notSimplifiableCaches = null;
-	}
+        if (lastProof != null) {
+            if (!lastProof.isDisposed()) {
+                for(Goal g : lastProof.openGoals()) {
+                    for(NoPosTacletApp app : appsTakenOver) {
+                        g.ruleAppIndex().addNoPosTacletApp(app);
+                    }
+                    g.getRuleAppManager().clearCache();
+                    g.ruleAppIndex().clearIndexes();    
+                }
+            }
+            applicabilityCache.clear();
+            lastProof = null;
+            appsTakenOver = null;
+            indices = null;
+            notSimplifiableCaches = null;
+        }
     }
     
     

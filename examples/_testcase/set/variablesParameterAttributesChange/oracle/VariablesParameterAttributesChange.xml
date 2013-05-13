@@ -102,7 +102,7 @@
                         <value name="c {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;10&apos; as result of self.main(a,b);&gt;">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;10&apos; as result of self.main(a,b);&gt;" isReturnValueComputed="true">
                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
                            <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>

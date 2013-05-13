@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
@@ -39,6 +52,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -57,12 +71,15 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -95,7 +112,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -137,19 +156,24 @@ public final class SymbolicExecutionUtil {
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
       // Return created sequent and the used predicate to identify the value interested in.
       ApplyStrategyInfo info = startSideProof(parentProof, sequentToProve);
-      // The simplified formula is the conjunction of all open goals
-      ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
-      if (openGoals.isEmpty()) {
-         return TermBuilder.DF.tt();
-      }
-      else {
-         ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
-         for (Goal goal : openGoals) {
-            Term goalImplication = sequentToImplication(goal.sequent());
-            goalImplication = TermBuilder.DF.not(goalImplication);
-            goalImplications = goalImplications.append(goalImplication);
+      try {
+         // The simplified formula is the conjunction of all open goals
+         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+         if (openGoals.isEmpty()) {
+            return TermBuilder.DF.tt();
          }
-         return TermBuilder.DF.not(TermBuilder.DF.or(goalImplications));
+         else {
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
+            for (Goal goal : openGoals) {
+               Term goalImplication = sequentToImplication(goal.sequent());
+               goalImplication = TermBuilder.DF.not(goalImplication);
+               goalImplications = goalImplications.append(goalImplication);
+            }
+            return TermBuilder.DF.not(TermBuilder.DF.or(goalImplications));
+         }
+      }
+      finally {
+         info.getProof().dispose();
       }
    }
    
@@ -451,7 +475,9 @@ public final class SymbolicExecutionUtil {
    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
       assert starter != null;
       starter.setMaxRuleApplications(1000);
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
+      StrategyProperties sp = !proof.isDisposed() ? 
+                              proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
+                              new StrategyProperties();
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
@@ -579,6 +605,19 @@ public final class SymbolicExecutionUtil {
          }
       }
       return heapUpdate;
+   }
+   
+   /**
+    * Checks if it is right now possible to compute the variables of the given {@link IExecutionStateNode}
+    * via {@link IExecutionStateNode#getVariables()}. 
+    * @param node The {@link IExecutionStateNode} to check.
+    * @return {@code true} right now it is possible to compute variables, {@code false} it is not possible to compute variables.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static boolean canComputeVariables(IExecutionStateNode<?> node) throws ProofInputException {
+      return node != null && 
+             !node.isDisposed() &&
+             !TermBuilder.DF.ff().equals(node.getPathCondition());
    }
    
    /**
@@ -964,7 +1003,9 @@ public final class SymbolicExecutionUtil {
       return ruleApp != null && // Do not handle the open goal node which has no applied rule
              posInfo != null && 
              posInfo.getEndPosition() != Position.UNDEFINED &&
-             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+             posInfo.getEndPosition().getLine() >= 0 &&  // Filter out statements where source code is missing.
+             !(statement instanceof EmptyStatement) && // Filter out empty statements
+             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // FIlter out empty blocks
    }
    
    /**
@@ -1028,7 +1069,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
     */
    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
-      if (node != null) {
+      if (node != null && !isRuleAppToIgnore(ruleApp)) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
@@ -1063,6 +1104,16 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Checks if the given {@link RuleApp} should be ignored or
+    * checked for possible symbolic execution tree node representation.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} ignore {@link RuleApp}, {@code false} check if the {@link RuleApp} represents a symbolic execution tree node. 
+    */
+   public static boolean isRuleAppToIgnore(RuleApp ruleApp) {
+      return "unusedLabel".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
    /**
     * Checks if the currently executed code is in an implicit method
     * ({@link IProgramMethod#isImplicit()} is {@code true}).
@@ -1265,9 +1316,9 @@ public final class SymbolicExecutionUtil {
     * <p>
     * The branch conditions are:
     * <ul>
-    *    <li>Post:    (pre1 | .. | preN)</li>
-    *    <li>ExcPost: (excPre1 | ... | excPreM)</li>
-    *    <li>Pre:     !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
+    *    <li>Post:    caller != null & (pre1 | .. | preN)</li>
+    *    <li>ExcPost: caller != null & (excPre1 | ... | excPreM)</li>
+    *    <li>Pre:     caller != null & !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
     *    <li>NPE:     caller = null</li>
     * </ul>
     * </p>
@@ -1303,7 +1354,8 @@ public final class SymbolicExecutionUtil {
       Semisequent antecedent = node.sequent().antecedent();
       SequentFormula sf = antecedent.get(antecedent.size() - 1);
       Term workingTerm = sf.formula();
-      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+      Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
+      workingTerm = updatesAndTerm.second;
       if (workingTerm.op() != Junctor.AND) {
          throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
       }
@@ -1319,24 +1371,94 @@ public final class SymbolicExecutionUtil {
       }
       Term exceptionDefinition = definitions.sub(0);
       // Collect all implications for normal or exceptional preconditions
+      Term result;
       Term implications = workingTerm.sub(1);
       ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
       if (!implicationTerms.isEmpty()) {
-         // Implications find, return their conditions as branchconditions
+         // Implications find, return their conditions as branch condition
          ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
          for (Term implication : implicationTerms) {
             condtionTerms = condtionTerms.append(implication.sub(0));
          }
-         
-         Term result = TermBuilder.DF.or(condtionTerms);
-         if (simplify) {
-            workingTerm = simplify(node.proof(), result);
-         }
-         return result;
+         result = TermBuilder.DF.or(condtionTerms);
+         // Add updates
+         result = TermBuilder.DF.applyParallel(updatesAndTerm.first, result);
       }
       else {
-         // No preconditions available, branchcondition is true
-         return TermBuilder.DF.tt();
+         // No preconditions available, branch condition is true
+         result = TermBuilder.DF.tt();
+      }
+      // Add caller not null to condition
+      if (parent.childrenCount() == 4) {
+         Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
+         callerNotNullTerm = TermBuilder.DF.goBelowUpdates(callerNotNullTerm);
+         if (callerNotNullTerm.op() != Junctor.NOT) {
+            throw new ProofInputException("Not operation expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
+            throw new ProofInputException("Equals operation expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
+            throw new ProofInputException("ProgramVariable expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(), parent.proof().getServices())) {
+            throw new ProofInputException("Null expacted, implementation of UseOperationContractRule might has changed!"); 
+         }
+         result = TermBuilder.DF.and(callerNotNullTerm, result);
+      }
+      if (simplify) {
+         result = simplify(node.proof(), result);
+      }
+      return result;
+   }
+
+   /**
+    * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Node}
+    * in the {@link Node} to apply on.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyOn The new {@link Node} to apply the {@link PosInOccurrence} on.
+    * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence pio, Node toApplyOn) {
+      if (original != null && toApplyOn != null) {
+         return posInOccurrenceInOtherNode(original.sequent(), pio, toApplyOn.sequent());
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Sequent}
+    * in the {@link Sequent} to apply on.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence} on.
+    * @return The {@link Term} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio, Sequent toApplyOn) {
+      if (original != null && pio != null && toApplyOn != null) {
+         // Search index of formula in original sequent
+         SequentFormula originalSF = pio.constrainedFormula();
+         boolean antecendet = pio.isInAntec();
+         int index;
+         if (antecendet) {
+            index = original.antecedent().indexOf(originalSF);
+         }
+         else {
+            index = original.succedent().indexOf(originalSF);
+         }
+         if (index >= 0) {
+            SequentFormula toApplyOnSF = (antecendet ? toApplyOn.antecedent() : toApplyOn.succedent()).get(index);
+            return toApplyOnSF.formula().subAt(pio.posInTerm());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
 
@@ -1431,13 +1553,15 @@ public final class SymbolicExecutionUtil {
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
             replaceTerm = TermBuilder.DF.equals(replaceTerm, ((PosTacletApp)app).posInOccurrence().subTerm());
             replaceTerm = TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), replaceTerm);
-            newAntecedents = newAntecedents.append(replaceTerm);
+            if (!newAntecedents.contains(replaceTerm)) {
+               newAntecedents = newAntecedents.append(replaceTerm);
+            }
             // Replace old with new lists
             antecedents = newAntecedents;
             succedents = newSuccedents;
          }
-         else {
-            throw new ProofInputException("Expected replacement as Sequent during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+         else if (goalTemplate.replaceWithExpressionAsObject() != null) {
+            throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
          }
       }
       // Construct branch condition from created antecedent and succedent terms as new implication 
@@ -1448,19 +1572,15 @@ public final class SymbolicExecutionUtil {
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Simplify branch condition if required
-         if (simplify) {
-            // Append update context because otherwise the formula is evaluated in wrong state
-            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
-            // Execute simplification
-            result = SymbolicExecutionUtil.simplify(node.proof(), result);
-         }
-         else {
-            result = leftAndRight;
-         }
+         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
       }
       else {
          // No update context, just use the implication as branch condition
          result = leftAndRight;
+      }
+      // Execute simplification if requested
+      if (simplify) {
+         result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }
       return result;
    }
@@ -1511,14 +1631,6 @@ public final class SymbolicExecutionUtil {
       clone.putAll(settings);
       clone.put(key, value);
       ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-   }
-
-   /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
 
    /**
@@ -1592,7 +1704,12 @@ public final class SymbolicExecutionUtil {
       Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent, nullExpected ? isNull : isNotNull);
       // Execute proof in the current thread
       ApplyStrategyInfo info = startSideProof(node.proof(), sequentToProve, StrategyProperties.SPLITTING_NORMAL);
-      return !info.getProof().openEnabledGoals().isEmpty();
+      try {
+         return !info.getProof().openEnabledGoals().isEmpty();
+      }
+      finally {
+         info.getProof().dispose();
+      }
    }
    
    /**
@@ -1878,6 +1995,51 @@ public final class SymbolicExecutionUtil {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+
+   /**
+    * Configures the proof to do alias checks or not.
+    * @param proof The {@link Proof} to configure.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
+    */
+   public static void setAliasChecks(Proof proof, boolean immediately) {
+      if (proof != null && !proof.isDisposed()) {
+         String aliasChecksValue = immediately ? 
+                                   SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY : 
+                                   SymbolicExecutionStrategy.ALIAS_CHECK_NEVER;
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         sp.setProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+   
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
+   }
+   
+   /**
+    * Checks if the given {@link Operator} is a heap.
+    * @param op The {@link Operator} to check.
+    * @param heapLDT The {@link HeapLDT} which provides the available heaps.
+    * @return {@code true} {@link Operator} is heap, {@code false} {@link Operator} is something else.
+    */
+   public static boolean isHeap(Operator op, HeapLDT heapLDT) {
+      if (op instanceof SortedOperator) {
+         final Sort opSort = ((SortedOperator) op).sort();
+         return JavaUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
+            @Override
+            public boolean select(LocationVariable element) {
+               return opSort == element.sort();
+            }
+         }) != null;
+      }
+      else {
+         return false;
       }
    }
 }

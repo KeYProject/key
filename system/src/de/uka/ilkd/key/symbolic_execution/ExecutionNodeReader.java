@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -356,7 +369,7 @@ public class ExecutionNodeReader {
     */
    protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes));
+         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_NODE.equals(qName)) {
          return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -371,7 +384,7 @@ public class ExecutionNodeReader {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
-         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes));
+         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), isReturnValueComputed(attributes));
       }
       else if (ExecutionNodeWriter.TAG_START_NODE.equals(qName)) {
          return new KeYlessStartNode(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -439,12 +452,30 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * Returns the has not nullc heck value.
+    * Returns the has not null check value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
    protected boolean isHasNotNullCheck(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+   
+   /**
+    * Returns the is return value computed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isReturnValueComputed(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
+   }
+
+   /**
+    * Returns the is branch condition computed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isBranchConditionComputed(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION_COMPUTED));
    }
    
    /**
@@ -638,6 +669,14 @@ public class ExecutionNodeReader {
       public String toString() {
          return getElementType() + " " + getName();
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDisposed() {
+         return false;
+      }
    }
    
    /**
@@ -770,6 +809,11 @@ public class ExecutionNodeReader {
       private boolean mergedBranchCondition;
       
       /**
+       * Indicates if branch condition is computed or not.
+       */
+      private boolean branchConditionComputed;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -777,16 +821,19 @@ public class ExecutionNodeReader {
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedBranchCondition The formated branch condition.
        * @param mergedBranchCondition Merged branch condition?
+       * @param branchConditionComputed Is branch condition computed?
        */
       public KeYlessBranchCondition(IExecutionNode parent, 
                                     String name, 
                                     String formatedPathCondition, 
                                     boolean pathConditionChanged,
                                     String formatedBranchCondition,
-                                    boolean mergedBranchCondition) {
+                                    boolean mergedBranchCondition,
+                                    boolean branchConditionComputed) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.formatedBranchCondition = formatedBranchCondition;
          this.mergedBranchCondition = mergedBranchCondition;
+         this.branchConditionComputed = branchConditionComputed;
       }
 
       /**
@@ -835,6 +882,14 @@ public class ExecutionNodeReader {
       @Override
       public Term[] getMergedBranchCondtions() throws ProofInputException {
          return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isBranchConditionComputed() {
+         return branchConditionComputed;
       }
    }
 
@@ -1198,6 +1253,11 @@ public class ExecutionNodeReader {
        * The name including the return value.
        */
       private String nameIncludingReturnValue;
+      
+      /**
+       * Defines if the return value is computed or not.
+       */
+      private boolean returnValueComputed;
 
       /**
        * Constructor.
@@ -1206,14 +1266,17 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param nameIncludingReturnValue The name including the return value.
+       * @param returnValueComputed Is the return value computed?
        */
       public KeYlessMethodReturn(IExecutionNode parent, 
                                  String name, 
                                  String formatedPathCondition, 
                                  boolean pathConditionChanged,
-                                 String nameIncludingReturnValue) {
+                                 String nameIncludingReturnValue,
+                                 boolean returnValueComputed) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.nameIncludingReturnValue = nameIncludingReturnValue;
+         this.returnValueComputed = returnValueComputed;
       }
 
       /**
@@ -1254,6 +1317,14 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Method Return";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isReturnValueComputed() {
+         return returnValueComputed;
       }
    }
 

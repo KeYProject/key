@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.ui.view;
 
 import java.util.HashSet;
@@ -31,6 +44,7 @@ import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -69,6 +83,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     * Shown string for loop treatment "Invariant".
     */
    public static final String LOOP_TREATMENT_INVARIANT = "Invariant";
+
+   /**
+    * Shown string for alias check "Never".
+    */
+   public static final String ALIAS_CHECK_NEVER = "Never";
+
+   /**
+    * Shown string for alias check "Immediately".
+    */
+   public static final String ALIAS_CHECK_IMMEDIATELY = "Immediately";
    
    /**
     * Control to define the method treatment.
@@ -79,6 +103,11 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     * Control to define the loop treatment.
     */
    private Combo loopTreatmentCombo;
+
+   /**
+    * Control to define alias checks.
+    */
+   private Combo aliasChecksCombo;
    
    /**
     * The proof to edit its proof search strategy settings.
@@ -142,6 +171,20 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
             }
          });
       }
+      // Alias checks
+      Group aliasChecksGroup = new Group(parent, SWT.NONE);
+      aliasChecksGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      aliasChecksGroup.setText("Alias Checks");
+      aliasChecksGroup.setLayout(new FillLayout());
+      aliasChecksCombo = new Combo(aliasChecksGroup, SWT.READ_ONLY);
+      aliasChecksCombo.add(ALIAS_CHECK_NEVER);
+      aliasChecksCombo.add(ALIAS_CHECK_IMMEDIATELY);
+      aliasChecksCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            aliasChecksChanged(e);
+         }
+      });
       // Set read-only if required
       updateShownValues();
    }
@@ -154,11 +197,13 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       if (proof != null && !proof.isDisposed()) {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          showSettings(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY), 
-                      sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
+                      sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY),
+                      sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
       }
       else {
          showSettings(StrategyProperties.METHOD_EXPAND, 
-                      StrategyProperties.LOOP_EXPAND);
+                      StrategyProperties.LOOP_EXPAND,
+                      SymbolicExecutionStrategy.ALIAS_CHECK_NEVER);
       }
    }
 
@@ -173,19 +218,26 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       if (loopTreatmentCombo != null) {
          loopTreatmentCombo.setEnabled(editable);
       }
+      if (aliasChecksCombo != null) {
+         aliasChecksCombo.setEnabled(editable);
+      }
    }
 
    /**
     * Updates the shown proof search strategy settings.
     * @param methodOptionsKey The method treatment setting to show.
     * @param loopOptionsKey The loop treatment setting to show.
+    * @param aliasCheckOptionsKey The alias treatment setting to show.
     */
-   protected void showSettings(String methodOptionsKey, String loopOptionsKey) {
+   protected void showSettings(String methodOptionsKey, String loopOptionsKey, String aliasCheckOptionsKey) {
       if (methodTreatmentCombo != null) {
          methodTreatmentCombo.setText(StrategyProperties.METHOD_CONTRACT.equals(methodOptionsKey) ? METHOD_TREATMENT_CONTRACT : METHOD_TREATMENT_EXPAND);
       }
       if (loopTreatmentCombo != null) {
          loopTreatmentCombo.setText(StrategyProperties.LOOP_INVARIANT.equals(loopOptionsKey) ? LOOP_TREATMENT_INVARIANT : LOOP_TREATMENT_EXPAND);
+      }
+      if (aliasChecksCombo != null) {
+         aliasChecksCombo.setText(SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(aliasCheckOptionsKey) ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
       }
    }
 
@@ -342,5 +394,13 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     */
    protected void loopTreatmentChanged(SelectionEvent e) {
       SymbolicExecutionUtil.setUseLoopInvariants(proof, LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText()));
+   }
+
+   /**
+    * When the selected alias checks has changed.
+    * @param e The event.
+    */
+   protected void aliasChecksChanged(SelectionEvent e) {
+      SymbolicExecutionUtil.setAliasChecks(proof, ALIAS_CHECK_IMMEDIATELY.equals(aliasChecksCombo.getText()));
    }
 }

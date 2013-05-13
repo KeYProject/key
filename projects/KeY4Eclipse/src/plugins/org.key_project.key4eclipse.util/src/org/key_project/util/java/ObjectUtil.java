@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.java;
 
 import java.lang.reflect.Field;
@@ -70,8 +83,188 @@ public final class ObjectUtil {
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
-      field.setAccessible(true);
-      return (T)field.get(obj);
+      boolean oldAccessible = field.isAccessible();
+      try {
+         field.setAccessible(true);
+         return (T)field.get(obj);
+      }
+      finally {
+         field.setAccessible(oldAccessible);
+      }
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param fieldName The name of the field.
+    * @param value The value to write.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, String fieldName, Object value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+      if (obj == null) {
+         throw new IllegalArgumentException("Object is undefined (null).");
+      }
+      set(obj, obj.getClass(), fieldName, value);
+   }
+
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param classInstance The class in that the field is declared.
+    * @param fieldName The name of the field.
+    * @param value The value to write.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, Class<?> classInstance, String fieldName, Object value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+      Field field = findField(classInstance, fieldName);
+      set(obj, field, value);
+   }
+
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param field The {@link Field} to write to.
+    * @param value The value to write.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException {
+      if (obj == null) {
+         throw new IllegalArgumentException("Object is undefined (null).");
+      }
+      if (field == null) {
+         throw new IllegalArgumentException("Field is undefined (null).");
+      }
+      boolean oldAccessible = field.isAccessible();
+      try {
+         field.setAccessible(true);
+         field.set(obj, value);
+      }
+      finally {
+         field.setAccessible(oldAccessible);
+      }
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param fieldName The name of the field.
+    * @param value The value to write.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, String fieldName, boolean value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+      if (obj == null) {
+         throw new IllegalArgumentException("Object is undefined (null).");
+      }
+      set(obj, obj.getClass(), fieldName, value);
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param classInstance The class in that the field is declared.
+    * @param fieldName The name of the field.
+    * @param value The value to write.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, Class<?> classInstance, String fieldName, boolean value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+      Field field = findField(classInstance, fieldName);
+      set(obj, field, value);
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param field The {@link Field} to write to.
+    * @param value The value to write.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, Field field, boolean value) throws IllegalArgumentException, IllegalAccessException {
+      if (obj == null) {
+         throw new IllegalArgumentException("Object is undefined (null).");
+      }
+      if (field == null) {
+         throw new IllegalArgumentException("Field is undefined (null).");
+      }
+      boolean oldAccessible = field.isAccessible();
+      try {
+         field.setAccessible(true);
+         field.setBoolean(obj, value);
+      }
+      finally {
+         field.setAccessible(oldAccessible);
+      }
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param fieldName The name of the field.
+    * @param value The value to write.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, String fieldName, int value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+      if (obj == null) {
+         throw new IllegalArgumentException("Object is undefined (null).");
+      }
+      set(obj, obj.getClass(), fieldName, value);
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param classInstance The class in that the field is declared.
+    * @param fieldName The name of the field.
+    * @param value The value to write.
+    * @throws SecurityException Occurred Exception.
+    * @throws NoSuchFieldException Occurred Exception.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, Class<?> classInstance, String fieldName, int value) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+      Field field = findField(classInstance, fieldName);
+      set(obj, field, value);
+   }
+   
+   /**
+    * Sets the value of the given field on the given {@link Object}.
+    * @param obj The object to write to.
+    * @param field The {@link Field} to write to.
+    * @param value The value to write.
+    * @throws IllegalArgumentException Occurred Exception.
+    * @throws IllegalAccessException Occurred Exception.
+    */
+   public static void set(Object obj, Field field, int value) throws IllegalArgumentException, IllegalAccessException {
+      if (obj == null) {
+         throw new IllegalArgumentException("Object is undefined (null).");
+      }
+      if (field == null) {
+         throw new IllegalArgumentException("Field is undefined (null).");
+      }
+      boolean oldAccessible = field.isAccessible();
+      try {
+         field.setAccessible(true);
+         field.setInt(obj, value);
+      }
+      finally {
+         field.setAccessible(oldAccessible);
+      }
    }
 
    /**
@@ -149,8 +342,14 @@ public final class ObjectUtil {
       if (method == null) {
          throw new IllegalArgumentException("Method is undefined (null).");
       }
-      method.setAccessible(true);
-      return (T)method.invoke(obj, parameters);
+      boolean oldAccessible = method.isAccessible();
+      try {
+         method.setAccessible(true);
+         return (T)method.invoke(obj, parameters);
+      }
+      finally {
+         method.setAccessible(oldAccessible);
+      }
    }
    
    /**

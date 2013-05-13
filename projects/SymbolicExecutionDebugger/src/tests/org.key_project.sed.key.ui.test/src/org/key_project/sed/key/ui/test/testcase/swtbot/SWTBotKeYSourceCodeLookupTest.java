@@ -1,4 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.ui.test.testcase.swtbot;
+
+import java.io.File;
 
 import junit.framework.TestCase;
 
@@ -202,7 +217,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          ISEDStatement s1 = (ISEDStatement)call.getChildren()[0];
          // Test KeYSourceLookupParticipant directly
          KeYSourceLookupParticipant participant = new KeYSourceLookupParticipant();
-         assertEquals(method.getResource().getName(), participant.getSourceName(s1));
+         assertEquals(File.separator + method.getResource().getName(), participant.getSourceName(s1));
          // Test KeYSourceLookupDirector directly
          KeYSourceLookupDirector director = new KeYSourceLookupDirector();
          director.initializeDefaults(launch.getLaunchConfiguration());

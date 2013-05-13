@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -131,6 +144,14 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       }
       return returnValue;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isReturnValueComputed() {
+      return returnValue != null;
+   }
    
    /**
     * Computes the return value lazily when
@@ -154,11 +175,16 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                                                                                                                                      methodReturnNode, 
                                                                                                                                                                                      resultVar);
             ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
-            returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
-            assert returnValue != null;
-            // Format return vale
-            StringBuffer sb = ProofSaver.printTerm(returnValue, getServices(), true);
-            formatedReturnValue = sb.toString();
+            try {
+               returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
+               assert returnValue != null;
+               // Format return vale
+               StringBuffer sb = ProofSaver.printTerm(returnValue, getServices(), true);
+               formatedReturnValue = sb.toString();
+            }
+            finally {
+               info.getProof().dispose();
+            }
          }
       }
    }
