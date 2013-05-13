@@ -13,10 +13,10 @@
 
 package de.hentschel.visualdbc.datasource.key.rule;
 
-import java.util.List;
-
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
+import de.hentschel.visualdbc.datasource.model.exception.DSException;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 
@@ -28,26 +28,14 @@ import de.uka.ilkd.key.proof.Node;
  */
 public interface IRuleAnalyst {
    /**
-    * Checks if this {@link IRuleAnalyst} implementation can handle the 
-    * given {@link Node} in the proof tree.
+    * This method is called to extract the contained references in the given {@link Node}.
     * @param connection The {@link KeyConnection} that has opened KeY.
     * @param services The {@link Services} to use.
     * @param node The {@link Node} to handle.
-    * @return {@code true} can handle given {@link Node}, {@code false} can't handle given {@link Node}.
+    * @return An {@link ImmutableList} with the found references as instances of {@link IDSProvableReference}.
+    * @throws DSException Occurred Exception
     */
-   public boolean canHandle(KeyConnection connection,
-                            Services services, 
-                            Node node);
-   
-   /**
-    * This method is called if {@link #canHandle(KeyConnection, Services, Node)} 
-    * is {@code true} to extract the contained references in the given {@link Node}.
-    * @param connection The {@link KeyConnection} that has opened KeY.
-    * @param services The {@link Services} to use.
-    * @param node The {@link Node} to handle.
-    * @return A {@link List} with the found references as instances of {@link IDSProvableReference}.
-    */
-   public List<IDSProvableReference> getReferences(KeyConnection connection,
-                                                   Services services, 
-                                                   Node node);
+   public ImmutableList<IDSProvableReference> getReferences(KeyConnection connection,
+                                                            Services services, 
+                                                            Node node) throws DSException;
 }

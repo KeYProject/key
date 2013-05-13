@@ -13,7 +13,6 @@
 
 package de.hentschel.visualdbc.datasource.key.rule;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +25,9 @@ import org.eclipse.core.runtime.Platform;
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
+import de.hentschel.visualdbc.datasource.model.exception.DSException;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,7 +37,7 @@ import de.uka.ilkd.key.proof.ProofVisitor;
  * Provides static methods to extract references from proofs in KeY.
  * @author Martin Hentschel
  * @see IRuleAnalyst
- * @see MethodBodyExpandRuleAnalyst
+ * @see DefaultRuleAnalyst
  * @see StrictlyPureMethodToUpdateRuleAnalyst
  * @see UseOperationContractRuleAnalyst
  */
@@ -51,39 +53,9 @@ public final class KeyProofReferenceUtil {
    public static final String METHOD_BODY_EXPAND = "methodBodyExpand";
 
    /**
-    * The proof step "strictlyPureMethodToUpdate".
-    */
-   public static final String STRICTLY_PURE_METHOD_TO_UPDATE = "strictlyPureMethodToUpdate";
-   
-   /**
-    * A reference to a guarded invariant.
-    */   
-   public static final String GUARDED_INVARIANT = "Guarded Invariant";
-
-   /**
     * The proof step "Use Operation Contract".
     */
    public static final String USE_OPERATION_CONTRACT = "Use Operation Contract";
-
-   /**
-    * A reference to an assumed invariant.
-    */
-   public static final String ASSUMED_INVARIANT = "Assumed Invariant";
-
-   /**
-    * A reference to an ensured invariant.
-    */
-   public static final String ENSURED_INVARIANT = "Ensured Invariant";
-   
-   /**
-    * A reference to a guard.
-    */   
-   public static final String GUARD = "Guard";
-
-   /**
-    * A reference to a super type.
-    */
-   public static final String SUPER_TYPE = "Super Type";
 
    /**
     * Contains the available {@link IRuleAnalyst} ordered by their priority.
@@ -101,28 +73,72 @@ public final class KeyProofReferenceUtil {
     * Computes all available proof references.
     * </p>
     * <p>
-    * Used operation contracts are directly extracted from the proof.
-    * </p>
-    * <p>
     * Used operation calls are extracted by traversing through the proof tree
-    * and by analyzing the applied rule on each node.
+    * and by analyzing the applied rule on each node via available {@link IRuleAnalyst}s.
     * </p>
     * @param connection The {@link KeyConnection} to use.
     * @param services The {@link Services} to use.
     * @param proof The {@link Proof} to analyze.
     * @return The found references that are might be empty if no references were found.
     */
-   public static List<IDSProvableReference> analyzeProof(final KeyConnection connection, 
-                                                         final Services services, 
-                                                         Proof proof) {
-      final List<IDSProvableReference> result = new LinkedList<IDSProvableReference>();
-      proof.breadthFirstSearch(proof.root(), new ProofVisitor() {
-         @Override
-         public void visit(Proof proof, Node visitedNode) {
-            result.addAll(getReferences(connection, services, visitedNode));
+   public static ImmutableList<IDSProvableReference> analyzeProof(KeyConnection connection, 
+                                                                  Services services, 
+                                                                  Proof proof) {
+      ReferenceAnalaystProofVisitor visitor = new ReferenceAnalaystProofVisitor(connection, services);
+      proof.breadthFirstSearch(proof.root(), visitor);
+      return visitor.getResult();
+   }
+   
+   /**
+    * Utility class used by {@link KeyProofReferenceUtil#analyzeProof(KeyConnection, Services, Proof)}.
+    * @author Martin Hentschel
+    */
+   private static class ReferenceAnalaystProofVisitor implements ProofVisitor {
+      /**
+       * The {@link KeyConnection} to use.
+       */
+      private KeyConnection connection;
+      
+      /**
+       * The {@link Services} to use.
+       */
+      private Services services;
+      
+      /**
+       * The result.
+       */
+      private ImmutableList<IDSProvableReference> result = ImmutableSLList.nil();
+
+      /**
+       * Constructor.
+       * @param connection The {@link KeyConnection} to use.
+       * @param services The {@link Services} to use.
+       */
+      public ReferenceAnalaystProofVisitor(KeyConnection connection, Services services) {
+         this.connection = connection;
+         this.services = services;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(Proof proof, Node visitedNode) {
+         try {
+            result = result.append(getReferences(connection, services, visitedNode));
          }
-      });
-      return result;
+         catch (DSException e) {
+            LogUtil.getLogger().logError(e);
+         }
+      }
+
+      /**
+       * Returns the result.
+       * @return The result.
+       */
+      public ImmutableList<IDSProvableReference> getResult() {
+         return result;
+      }
    }
    
    /**
@@ -131,38 +147,16 @@ public final class KeyProofReferenceUtil {
     * @param services The {@link Services} to use.
     * @param node The {@link Node} to analyze.
     * @return The found references that are might be empty if no references were found.
+    * @throws DSException Occurred Exception.
     */
-   public static List<IDSProvableReference> getReferences(KeyConnection connection,
-                                                          Services services, 
-                                                          Node node) {
-      List<IDSProvableReference> result;
-      IRuleAnalyst analyst = getRuleAnalyst(connection, services, node);
-      if (analyst != null) {
-         result = analyst.getReferences(connection, services, node);
-      }
-      else {
-         result = new LinkedList<IDSProvableReference>();
-      }
-      return result;
-   }
-   
-   /**
-    * Returns the first {@link IRuleAnalyst} in {@link #getRuleAnalysts()}
-    * that can handle the given {@link Node}.
-    * @param connection The {@link KeyConnection} to use.
-    * @param services The {@link Services} to use.
-    * @param node The {@link Node} to handle.
-    * @return The found {@link IRuleAnalyst} or {@code null} if no one can handle the {@link Node}.
-    */
-   public static IRuleAnalyst getRuleAnalyst(KeyConnection connection,
-                                             Services services, 
-                                             Node node) {
-      Iterator<IRuleAnalyst> analystsIter = getRuleAnalysts().iterator();
-      IRuleAnalyst result = null;
-      while (result == null && analystsIter.hasNext()) {
-         IRuleAnalyst next = analystsIter.next();
-         if (next.canHandle(connection, services, node)) {
-            result = next;
+   public static ImmutableList<IDSProvableReference> getReferences(KeyConnection connection,
+                                                                   Services services, 
+                                                                   Node node) throws DSException {
+      ImmutableList<IDSProvableReference> result = ImmutableSLList.nil();
+      for (IRuleAnalyst analyst : getRuleAnalysts()) {
+         ImmutableList<IDSProvableReference> analystResult = analyst.getReferences(connection, services, node);
+         if (analystResult != null) {
+            result = result.append(analystResult);
          }
       }
       return result;
@@ -174,12 +168,7 @@ public final class KeyProofReferenceUtil {
     * @return The created {@link IRuleAnalyst} instances.
     */
    private static List<IRuleAnalyst> createRuleAnalysts() {
-      // Create result list for each priority
-      List<IRuleAnalyst> veryLowAnalysts = new LinkedList<IRuleAnalyst>();
-      List<IRuleAnalyst> lowAnalysts = new LinkedList<IRuleAnalyst>();
-      List<IRuleAnalyst> normalAnalysts = new LinkedList<IRuleAnalyst>();
-      List<IRuleAnalyst> highAnalysts = new LinkedList<IRuleAnalyst>();
-      List<IRuleAnalyst> veryHighAnalysts = new LinkedList<IRuleAnalyst>();
+      List<IRuleAnalyst> result = new LinkedList<IRuleAnalyst>();
       // Add factories registered by the extension point
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       if (registry != null) {
@@ -192,22 +181,7 @@ public final class KeyProofReferenceUtil {
                for (IConfigurationElement configElement : configElements) {
                   try {
                      IRuleAnalyst analyst = (IRuleAnalyst)configElement.createExecutableExtension("class");
-                     String priority = configElement.getAttribute("priority");
-                     if ("VERY_HIGH".equals(priority)) {
-                        veryHighAnalysts.add(analyst);
-                     }
-                     else if ("HIGH".equals(priority)) {
-                        highAnalysts.add(analyst);
-                     }
-                     else if ("NORMAL".equals(priority)) {
-                        normalAnalysts.add(analyst);
-                     }
-                     else if ("LOW".equals(priority)) {
-                        lowAnalysts.add(analyst);
-                     }
-                     else {
-                        veryLowAnalysts.add(analyst);
-                     }
+                     result.add(analyst);
                   }
                   catch (Exception e) {
                      LogUtil.getLogger().logError(e);
@@ -222,13 +196,6 @@ public final class KeyProofReferenceUtil {
       else {
          LogUtil.getLogger().logError("Extension point registry is not loaded.");
       }
-      // Return analysts ordered by their priority
-      List<IRuleAnalyst> result = new LinkedList<IRuleAnalyst>();
-      result.addAll(veryHighAnalysts);
-      result.addAll(highAnalysts);
-      result.addAll(normalAnalysts);
-      result.addAll(lowAnalysts);
-      result.addAll(veryLowAnalysts);
       return result;
    }
    
