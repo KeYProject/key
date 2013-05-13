@@ -323,7 +323,7 @@ public class TacletSoundnessPOLoader {
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
                         ImmutableSet<Taclet> taclets,
                         ImmutableSet<Taclet> axioms) {
-                removeTaclets(proofEnvForTaclets.getInitConfig(),taclets);
+                tacletLoader.removeTaclets(proofEnvForTaclets.getInitConfig(), taclets);
                 ProofObligationCreator creator = new ProofObligationCreator();
                 ProofAggregate p = creator.create(taclets,
                                 proofEnvForTaclets.getInitConfig(), axioms,
@@ -342,20 +342,6 @@ public class TacletSoundnessPOLoader {
                 return p;
         }
         
-        private void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets){
-                ImmutableSet<Taclet> oldTaclets = initConfig.getTaclets();
-                ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
-                HashMap<Taclet,TacletBuilder> map = initConfig.getTaclet2Builder();
-                for(Taclet taclet: oldTaclets){
-                        if(!taclets.contains(taclet)){
-                                newTaclets = newTaclets.add(taclet);
-                        }else{
-                                map.remove(taclet);
-                        }
-                }
-                initConfig.setTaclets(newTaclets);
-        }
-
         public void registerProofs(ProofAggregate aggregate,
                         ProofEnvironment proofEnv) {
             if (aggregate instanceof CompoundProof) {
