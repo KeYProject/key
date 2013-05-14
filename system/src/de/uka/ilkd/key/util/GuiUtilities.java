@@ -15,7 +15,7 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.nodeviews.LeafNodeView;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 
 public class GuiUtilities {
 
@@ -85,7 +85,7 @@ public class GuiUtilities {
     }
 
     // is this still needed?
-    public static void copyHighlightToClipboard(LeafNodeView view) {
+    public static void copyHighlightToClipboard(CurrentGoalView view) {
         String s = view.getHighlightedText();
         // now CLIPBOARD
         java.awt.datatransfer.StringSelection ss = 

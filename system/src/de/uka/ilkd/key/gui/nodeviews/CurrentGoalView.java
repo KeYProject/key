@@ -51,7 +51,7 @@ import java.util.Vector;
  * formulas, selecting applicable rules (in particular taclets) and drag'n drop
  * instantiation of taclets.
  */
-public class LeafNodeView extends SequentView implements Autoscroll {
+public class CurrentGoalView extends SequentView implements Autoscroll {
 
     public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
 
@@ -94,8 +94,9 @@ public class LeafNodeView extends SequentView implements Autoscroll {
      * @param mediator the KeYMediator allowing access to the
      *  current system status
      */
-    public LeafNodeView(KeYMediator mediator) {
+    public CurrentGoalView(KeYMediator mediator) {
 	setMediator(mediator);
+        setBackground(Color.white);
 	// disables selection
 	setSelectionColor(getBackground());
 	listener = new SequentViewListener(this, getMediator());

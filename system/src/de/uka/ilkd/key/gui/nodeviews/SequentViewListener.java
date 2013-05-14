@@ -52,7 +52,7 @@ class SequentViewListener
         implements MouseListener, MouseMotionListener {
 	
     private KeYMediator mediator;
-    private LeafNodeView seqView;
+    private CurrentGoalView seqView;
 
     private TacletMenu menu;
     private boolean modalDragNDropEnabled;
@@ -62,7 +62,7 @@ class SequentViewListener
 
     private DragGestureListener seqViewDragGestureListener;
 
-    SequentViewListener(LeafNodeView seqView, KeYMediator mediator) {
+    SequentViewListener(CurrentGoalView seqView, KeYMediator mediator) {
 	this.mediator = mediator;
 	this.seqView = seqView;
 	menu = new TacletMenu();

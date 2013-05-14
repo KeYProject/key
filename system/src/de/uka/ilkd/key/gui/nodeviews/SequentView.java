@@ -2,8 +2,8 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
-import static de.uka.ilkd.key.gui.nodeviews.LeafNodeView.ADDITIONAL_HIGHLIGHT_COLOR;
-import static de.uka.ilkd.key.gui.nodeviews.LeafNodeView.DEFAULT_HIGHLIGHT_COLOR;
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
+import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -37,7 +37,6 @@ public abstract class SequentView extends JTextArea
     LogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
-    public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
     
     // the default tag of the highlight
     private final Object defaultHighlight;
@@ -67,7 +66,7 @@ public abstract class SequentView extends JTextArea
 
         titleButton = new TitleButton(this);
         setEditable(false);
-        setBackground(BACKGROUND_COLOR);
+        setBackground(new Color(249, 249, 249));
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
             setFont(myFont);
@@ -82,7 +81,7 @@ public abstract class SequentView extends JTextArea
 	setHighlighter(new DefaultHighlighter());
         additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
 	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
-        dndHighlight = getColorHighlight(LeafNodeView.DND_HIGHLIGHT_COLOR);
+        dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
 
     }

@@ -64,7 +64,7 @@ public class InnerNodeView extends SequentView {
     
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
-    final JTextArea tacletInfo;
+    public final JTextArea tacletInfo;
     
     public InnerNodeView(Node node, KeYMediator mediator) {
 
@@ -77,7 +77,7 @@ public class InnerNodeView extends SequentView {
         setSelectionColor(new Color(10,180,50));
         
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
-        tacletInfo.setBackground(BACKGROUND_COLOR);
+        tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(
                 new MatteBorder(3,0,0,0,Color.black),
                 new EmptyBorder(new Insets(4,0,0,0))));

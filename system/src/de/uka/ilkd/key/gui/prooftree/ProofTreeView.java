@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -44,6 +43,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class ProofTreeView extends JPanel {
     
@@ -96,6 +99,9 @@ public class ProofTreeView extends JPanel {
     
     /** the search dialog */
     private ProofTreeSearchBar proofTreeSearchPanel;
+    
+    // Taclet can be shown for inner nodes.
+    public final TacletInfoPanel tacletInfoPanel = new TacletInfoPanel();
 
     /** creates a new proof tree */
     public ProofTreeView (KeYMediator mediator) {
@@ -168,12 +174,27 @@ public class ProofTreeView extends JPanel {
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
 
-	updateUI();
+        updateUI();
 
-	this.setLayout(new BorderLayout());
-	this.add(new JScrollPane(delegateView), BorderLayout.CENTER);
-	this.proofTreeSearchPanel = new ProofTreeSearchBar(this);
-	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);	
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        this.add(new JScrollPane(delegateView), gbc);
+        
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridy = 1;
+        tacletInfoPanel.setVisible(false);
+        this.add(tacletInfoPanel, gbc);
+
+        this.proofTreeSearchPanel = new ProofTreeSearchBar(this);
+        gbc.gridy = 2;
+        this.add(proofTreeSearchPanel, gbc);
 	
 	layoutKeYComponent();	
 	
@@ -215,7 +236,6 @@ public class ProofTreeView extends JPanel {
 	ProofRenderer renderer= new ProofRenderer();	
 	delegateView.setCellRenderer(renderer);
 	delegateView.putClientProperty("JTree.lineStyle", "Angled");
-
 	delegateView.setVisible(true);	
     }
 

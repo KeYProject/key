@@ -84,10 +84,10 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 public class DragNDropInstantiator extends DropTargetAdapter {
 
     /** the sequentview where dnd has been initiated */
-    private LeafNodeView seqView;
+    private CurrentGoalView seqView;
     
     
-    DragNDropInstantiator(LeafNodeView seqView) {
+    DragNDropInstantiator(CurrentGoalView seqView) {
         this.seqView = seqView;
     }
 

@@ -63,7 +63,7 @@ class TacletMenu extends JMenu {
      */
     private static final long serialVersionUID = -4659105575090816693L;
     private PosInSequent pos;
-    private LeafNodeView sequentView;
+    private CurrentGoalView sequentView;
     private KeYMediator mediator;
     private static final Set<Name> CLUTTER_RULESETS = new HashSet<Name>();
 
@@ -106,7 +106,7 @@ class TacletMenu extends JMenu {
      * @param builtInList IList<BuiltInRule> with all applicable BuiltInRules
      * @param pos the PosInSequent
      */ 
-    TacletMenu(LeafNodeView sequentView,
+    TacletMenu(CurrentGoalView sequentView,
 	       ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
 	       ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
 	       PosInSequent pos) {
@@ -466,7 +466,7 @@ class TacletMenu extends JMenu {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() instanceof TacletMenuItem) {
-		((LeafNodeView)(getPopupMenu().getInvoker()))
+		((CurrentGoalView)(getPopupMenu().getInvoker()))
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             }else if(e.getSource() instanceof SMTMenuItem){

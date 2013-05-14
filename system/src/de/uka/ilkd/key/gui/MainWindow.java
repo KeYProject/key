@@ -57,7 +57,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -108,7 +107,7 @@ import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
-import de.uka.ilkd.key.gui.nodeviews.LeafNodeView;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
@@ -165,13 +164,13 @@ public final class MainWindow extends JFrame  {
     public MainFrame goalView;
 
     /** the current proof tree*/
-    private ProofTreeView proofTreeView;
+    public ProofTreeView proofTreeView;
 
     /** the list of current open goals*/
     private JScrollPane openGoalsView;
 
     /** the view of a sequent */
-    public LeafNodeView leafNodeView;
+    public CurrentGoalView leafNodeView;
     
     /** the rule view */
     private RuleView ruleView = null;
@@ -539,7 +538,7 @@ public final class MainWindow extends JFrame  {
 	}
 	
         Config.DEFAULT.setDefaultFonts();
-        leafNodeView = new LeafNodeView(mediator);
+        leafNodeView = new CurrentGoalView(mediator);
     }
     
     private ComplexButton createSMTComponent() {

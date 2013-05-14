@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -11,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -27,10 +27,20 @@ public class MainFrame extends JScrollPane {
     public static final Color openGoalRedLight =
             new Color((255 + 250) / 2, (90 + 250) / 2, (90 + 250) / 2);
     public static final Color transparent = new Color(0, 0, 0, 0);
-    public SequentView sequentView;
 
     public void setSequentView(SequentView sequentView) {
         setViewportView(new MainFrameBody(sequentView));
+
+        // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
+        boolean showTacletInfo = false;
+        ProofTreeView ptv = MainWindow.getInstance().proofTreeView;
+        if (ptv != null) {
+            if (sequentView instanceof InnerNodeView) {
+                showTacletInfo = true;
+                ptv.tacletInfoPanel.setText(((InnerNodeView) sequentView).tacletInfo.getText());
+            }
+            ptv.tacletInfoPanel.setVisible(showTacletInfo);
+        }
     }
 
     public MainFrame() {
@@ -57,7 +67,7 @@ public class MainFrame extends JScrollPane {
         public MainFrameBody(SequentView sequentView) {
 
             setLayout(new GridBagLayout());
-            setBackground(SequentView.BACKGROUND_COLOR);
+            setBackground(sequentView.getBackground());
 
             GridBagConstraints gbc = new GridBagConstraints();
 
@@ -66,7 +76,7 @@ public class MainFrame extends JScrollPane {
             gbc.gridy = 0;
             gbc.weightx = 1.0;
             gbc.weighty = 0.0;
-            add( javax.swing.Box.createGlue(), gbc);
+            add(javax.swing.Box.createGlue(), gbc);
 
             Insets titleButtonInsets = new Insets(0, 50, 4, 0);
             gbc.insets = titleButtonInsets;
@@ -90,12 +100,12 @@ public class MainFrame extends JScrollPane {
                 gbc.gridy = 2;
                 add(((InnerNodeView) sequentView).tacletInfo, gbc);
             }
-            
+
             gbc.fill = GridBagConstraints.BOTH;
             gbc.gridx = 0;
             gbc.gridy = 3;
             gbc.weighty = 1.0;
-            add( javax.swing.Box.createGlue(), gbc);
+            add(javax.swing.Box.createGlue(), gbc);
 
             setBorder(new SequentBorder(sequentView.titleButton, titleButtonInsets));
 
