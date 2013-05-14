@@ -175,12 +175,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
                 depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                longConst(-400));
-            } else {
-                depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                inftyConst());
-            }        
-        
+                                                                longConst(50));
+        } else {
+            depSpecF = ConditionalFeature.createConditional(depFilter,
+        	    					    inftyConst());
+        }
+
         final Feature loopInvF;
         final String loopProp
         	= strategyProperties.getProperty(
@@ -2177,7 +2177,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             depSpecF = ConditionalFeature.createConditional(
         	    		depFilter,
         	    		ifZero(new DependencyContractFeature(), 
-        	    		       longConst(0),
+        	    		       longConst(50),
         	    		       inftyConst()));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, 
