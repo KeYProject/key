@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof_references;
 
 import java.io.File;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -12,7 +13,6 @@ import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Tests for {@link ProofReferenceUtil}.
@@ -111,9 +111,9 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                             final ExpectedProofReferences... expectedReferences) throws Exception {
       IProofTester tester = new IProofTester() {
          @Override
-         public void doTest(KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof) throws Exception {
+         public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception {
             // Extract and assert proof references
-            final ImmutableList<IProofReference<?>> references = analysts != null ? 
+            final LinkedHashSet<IProofReference<?>> references = analysts != null ? 
                                                                  ProofReferenceUtil.computeProofReferences(proof, analysts) : 
                                                                  ProofReferenceUtil.computeProofReferences(proof);
             assertReferences(references, expectedReferences);
@@ -121,8 +121,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
             proof.breadthFirstSearch(proof.root(), new ProofVisitor() {
                @Override
                public void visit(Proof proof, Node visitedNode) {
-                  ImmutableList<IProofReference<?>> expectedNodeRefs = findReferences(references, visitedNode);
-                  ImmutableList<IProofReference<?>> currentNodeRefs = analysts != null ? 
+                  LinkedHashSet<IProofReference<?>> expectedNodeRefs = findReferences(references, visitedNode);
+                  LinkedHashSet<IProofReference<?>> currentNodeRefs = analysts != null ? 
                                                                       ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices(), analysts) : 
                                                                       ProofReferenceUtil.computeProofReferences(visitedNode, proof.getServices());
                   assertReferences(expectedNodeRefs, currentNodeRefs);

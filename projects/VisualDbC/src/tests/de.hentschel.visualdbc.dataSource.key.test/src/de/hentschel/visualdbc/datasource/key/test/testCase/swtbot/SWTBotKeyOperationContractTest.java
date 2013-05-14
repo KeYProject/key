@@ -29,8 +29,11 @@ import de.hentschel.visualdbc.datasource.key.rule.KeyProofReferenceUtil;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil.IDSProvableReferenceSelector;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil.IDSProvableSelector;
+import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSClass;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
+import de.hentschel.visualdbc.datasource.model.IDSEnum;
+import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
 import de.hentschel.visualdbc.datasource.model.IDSMethod;
 import de.hentschel.visualdbc.datasource.model.IDSOperationContract;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
@@ -42,6 +45,72 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryProvableReference;
  * @author Martin Hentschel
  */
 public class SWTBotKeyOperationContractTest extends TestCase {
+   /**
+    * Tests {@link IDSProvable#openInteractiveProof(String)} and
+    * specially the references of kind "Read Access" and "Write Access".
+    */
+   @Test
+   public void testReferences_readAndWriteAccess() {
+      TestKeyUtil.testOpenProof("KeyOperationContract_testReferences_readAndWriteAccess",
+                                "data/attributeAndEnumLiteralTest",
+                                new IDSProvableSelector() {
+                                   @Override
+                                   public IDSProvable getProvable(IDSConnection con) throws DSException {
+                                      IDSClass dsClass = con.getClass("Main");
+                                      TestCase.assertNotNull(dsClass);
+                                      IDSMethod dsMethod = dsClass.getMethod("main()");
+                                      TestCase.assertNotNull(dsMethod);
+                                      IDSOperationContract dsContract = dsMethod.getOperationContracts().get(0);
+                                      TestCase.assertNotNull(dsContract);
+                                      return dsContract;
+                                   }
+                                },
+                                KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
+                                TestKeY4EclipseUtil.createOperationContractId("Main", "Main", "main()", "0", "normal_behavior"),
+                                true,
+                                MethodTreatment.EXPAND,
+                                new IDSProvableReferenceSelector() {
+                                   @SuppressWarnings("unchecked")
+                                   @Override
+                                   public List<List<MemoryProvableReference>> getExpectedProofReferences(IDSConnection con) throws DSException {
+                                      List<List<MemoryProvableReference>> result = new LinkedList<List<MemoryProvableReference>>();
+                                      IDSClass mainClass = con.getClass("Main");
+                                      TestCase.assertNotNull(mainClass);
+                                      IDSMethod dsMethod = mainClass.getMethod("main()");
+                                      TestCase.assertNotNull(dsMethod);
+                                      IDSAttribute mainIntValue = mainClass.getAttribute("intValue");
+                                      TestCase.assertNotNull(mainIntValue);
+                                      IDSAttribute mainObjValue = mainClass.getAttribute("objValue");
+                                      TestCase.assertNotNull(mainObjValue);
+
+                                      IDSClass myClass = con.getClass("MyClass");
+                                      TestCase.assertNotNull(myClass);
+                                      IDSAttribute myClassIntValue = myClass.getAttribute("intValue");
+                                      TestCase.assertNotNull(myClassIntValue);
+                                      IDSAttribute myClassEnumValue = myClass.getAttribute("enumValue");
+                                      TestCase.assertNotNull(myClassEnumValue);
+                                      
+                                      IDSEnum myEnum = con.getEnum("MyEnum");
+                                      TestCase.assertNotNull(myEnum);
+                                      IDSAttribute myEnumIntValue = myEnum.getAttribute("intValue");
+                                      TestCase.assertNotNull(myEnumIntValue);
+                                      IDSEnumLiteral literalA = myEnum.getLiteral("LITERAL_A");
+                                      TestCase.assertNotNull(literalA);
+                                      
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsMethod, KeyProofReferenceUtil.INLINE_METHOD), 
+                                                                                                  new MemoryProvableReference(mainIntValue, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(mainObjValue, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(myClassEnumValue, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(myEnumIntValue, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(myClassIntValue, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(literalA, KeyProofReferenceUtil.ACCESS));
+                                      result.add(event);
+                                      return result;
+                                   }
+                                },
+                                false);
+   }
+   
    /**
     * Tests {@link IDSProvable#openInteractiveProof(String)} and
     * specially the references of kind "Use Operation Contract".
@@ -77,7 +146,11 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                       TestCase.assertNotNull(dsInitMethod);
                                       IDSMethod dsIncMethod = dsClass.getMethod("inc(x : int)");
                                       TestCase.assertNotNull(dsIncMethod);
-                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.INLINE_METHOD), new MemoryProvableReference(dsIncMethod.getOperationContracts().get(0), KeyProofReferenceUtil.USE_CONTRACT));
+                                      IDSAttribute dsAttr = dsClass.getAttribute("attr");
+                                      TestCase.assertNotNull(dsAttr);
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.INLINE_METHOD), 
+                                                                                                  new MemoryProvableReference(dsAttr, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(dsIncMethod.getOperationContracts().get(0), KeyProofReferenceUtil.USE_CONTRACT));
                                       result.add(event);
                                       return result;
                                    }
@@ -120,7 +193,12 @@ public class SWTBotKeyOperationContractTest extends TestCase {
                                       TestCase.assertNotNull(dsInitMethod);
                                       IDSMethod dsIncMethod = dsClass.getMethod("inc(x : int)");
                                       TestCase.assertNotNull(dsIncMethod);
-                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.INLINE_METHOD), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.CALL_METHOD), new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.INLINE_METHOD));
+                                      IDSAttribute dsAttr = dsClass.getAttribute("attr");
+                                      TestCase.assertNotNull(dsAttr);
+                                      List<MemoryProvableReference> event = CollectionUtil.toList(new MemoryProvableReference(dsInitMethod, KeyProofReferenceUtil.INLINE_METHOD), 
+                                                                                                  new MemoryProvableReference(dsAttr, KeyProofReferenceUtil.ACCESS), 
+                                                                                                  new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.CALL_METHOD),
+                                                                                                  new MemoryProvableReference(dsIncMethod, KeyProofReferenceUtil.INLINE_METHOD));
                                       result.add(event);
                                       return result;
                                    }

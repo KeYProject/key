@@ -1,16 +1,21 @@
 package de.uka.ilkd.key.proof_references;
 
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof_references.analyst.ProgramVariableReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodCallProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
@@ -39,7 +44,8 @@ public final class ProofReferenceUtil {
     */
    public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(),
                                                                                                                                        new MethodCallProofReferencesAnalyst(),
-                                                                                                                                       new ContractProofReferencesAnalyst());
+                                                                                                                                       new ContractProofReferencesAnalyst(),
+                                                                                                                                       new ProgramVariableReferencesAnalyst());
    
    /**
     * Forbid instances.
@@ -59,7 +65,7 @@ public final class ProofReferenceUtil {
     * @param proof The {@link Proof} to compute its references.
     * @return The found {@link IProofReference}s.
     */
-   public static ImmutableList<IProofReference<?>> computeProofReferences(Proof proof) {
+   public static LinkedHashSet<IProofReference<?>> computeProofReferences(Proof proof) {
       return computeProofReferences(proof, DEFAULT_ANALYSTS);
    }
 
@@ -76,7 +82,7 @@ public final class ProofReferenceUtil {
     * @param analysts The {@link IProofReferencesAnalyst} to use.
     * @return The found {@link IProofReference}s.
     */
-   public static ImmutableList<IProofReference<?>> computeProofReferences(Proof proof, 
+   public static LinkedHashSet<IProofReference<?>> computeProofReferences(Proof proof, 
                                                                           ImmutableList<IProofReferencesAnalyst> analysts) {
       if (proof != null) {
          Services services = proof.getServices();
@@ -85,7 +91,7 @@ public final class ProofReferenceUtil {
          return visitor.getResult();
       }
       else {
-         return ImmutableSLList.nil();
+         return new LinkedHashSet<IProofReference<?>>();
       }
    }
    
@@ -107,7 +113,7 @@ public final class ProofReferenceUtil {
       /**
        * The result.
        */
-      private ImmutableList<IProofReference<?>> result = ImmutableSLList.nil();
+      private LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
 
       /**
        * Constructor.
@@ -124,14 +130,14 @@ public final class ProofReferenceUtil {
        */
       @Override
       public void visit(Proof proof, Node visitedNode) {
-         result = result.append(computeProofReferences(visitedNode, services, analysts));
+         merge(result, computeProofReferences(visitedNode, services, analysts));
       }
 
       /**
        * Returns the result.
        * @return The result.
        */
-      public ImmutableList<IProofReference<?>> getResult() {
+      public LinkedHashSet<IProofReference<?>> getResult() {
          return result;
       }
    }
@@ -142,7 +148,7 @@ public final class ProofReferenceUtil {
     * @param services The {@link Services} to use.
     * @return The found {@link IProofReference}s.
     */
-   public static ImmutableList<IProofReference<?>> computeProofReferences(Node node, 
+   public static LinkedHashSet<IProofReference<?>> computeProofReferences(Node node, 
                                                                           Services services) {
       return computeProofReferences(node, services, DEFAULT_ANALYSTS);
    }
@@ -154,18 +160,47 @@ public final class ProofReferenceUtil {
     * @param analysts The {@link IProofReferencesAnalyst} to use.
     * @return The found {@link IProofReference}s.
     */
-   public static ImmutableList<IProofReference<?>> computeProofReferences(Node node, 
+   public static LinkedHashSet<IProofReference<?>> computeProofReferences(Node node, 
                                                                           Services services, 
                                                                           ImmutableList<IProofReferencesAnalyst> analysts) {
-      ImmutableList<IProofReference<?>> result = ImmutableSLList.nil();
+      LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
       if (node != null && analysts != null) {
          for (IProofReferencesAnalyst analyst : analysts) {
-            ImmutableList<IProofReference<?>> analystResult = analyst.computeReferences(node, services);
+            LinkedHashSet<IProofReference<?>> analystResult = analyst.computeReferences(node, services);
             if (analystResult != null) {
-               result = result.append(analystResult);
+               merge(result, analystResult);
             }
          }
       }
       return result;
+   }
+   
+   /**
+    * Merges the {@link IProofReference}s to add into the target.
+    * @param target The target to add to.
+    * @param toAdd The {@link IProofReference}s to add.
+    */
+   public static void merge(LinkedHashSet<IProofReference<?>> target, LinkedHashSet<IProofReference<?>> toAdd) {
+      for (IProofReference<?> reference : toAdd) {
+         merge(target, reference);
+      }
+   }
+   
+   /**
+    * Merges the {@link IProofReference} into the target:
+    * @param target The target to add to.
+    * @param reference The {@link IProofReference} to add.
+    */
+   public static void merge(LinkedHashSet<IProofReference<?>> target, final IProofReference<?> reference) {
+      if (!target.add(reference)) {
+         // Reference exist before, so merge nodes of both references.
+         IProofReference<?> existingFirst = JavaUtil.search(target, new IFilter<IProofReference<?>>() {
+            @Override
+            public boolean select(IProofReference<?> element) {
+               return element.equals(reference);
+            }
+         });
+         existingFirst.addNodes(reference.getNodes());
+      }
    }
 }

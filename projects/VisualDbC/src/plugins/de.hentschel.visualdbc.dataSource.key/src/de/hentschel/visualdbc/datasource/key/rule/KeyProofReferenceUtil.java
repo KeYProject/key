@@ -13,6 +13,7 @@
 
 package de.hentschel.visualdbc.datasource.key.rule;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,8 +27,6 @@ import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -55,12 +54,17 @@ public final class KeyProofReferenceUtil {
    /**
     * The proof step "methodBodyExpand" that inlines methods.
     */
-   public static final String INLINE_METHOD = "methodBodyExpand";
+   public static final String INLINE_METHOD = "Inline Method";
 
    /**
     * The proof step "Use Operation Contract".
     */
    public static final String USE_CONTRACT = "Use Operation Contract";
+   
+   /**
+    * Read/Write access of a field like instance or class variables during proof.
+    */
+   public static final String ACCESS = "Access";
 
    /**
     * Contains the available {@link IRuleAnalyst} ordered by their priority.
@@ -86,7 +90,7 @@ public final class KeyProofReferenceUtil {
     * @param proof The {@link Proof} to analyze.
     * @return The found references that are might be empty if no references were found.
     */
-   public static ImmutableList<IDSProvableReference> analyzeProof(KeyConnection connection, 
+   public static LinkedHashSet<IDSProvableReference> analyzeProof(KeyConnection connection, 
                                                                   Services services, 
                                                                   Proof proof) {
       ReferenceAnalaystProofVisitor visitor = new ReferenceAnalaystProofVisitor(connection, services);
@@ -112,7 +116,7 @@ public final class KeyProofReferenceUtil {
       /**
        * The result.
        */
-      private ImmutableList<IDSProvableReference> result = ImmutableSLList.nil();
+      private LinkedHashSet<IDSProvableReference> result = new LinkedHashSet<IDSProvableReference>();
 
       /**
        * Constructor.
@@ -130,7 +134,7 @@ public final class KeyProofReferenceUtil {
       @Override
       public void visit(Proof proof, Node visitedNode) {
          try {
-            result = result.append(getReferences(connection, services, visitedNode));
+            result.addAll(getReferences(connection, services, visitedNode));
          }
          catch (DSException e) {
             LogUtil.getLogger().logError(e);
@@ -141,7 +145,7 @@ public final class KeyProofReferenceUtil {
        * Returns the result.
        * @return The result.
        */
-      public ImmutableList<IDSProvableReference> getResult() {
+      public LinkedHashSet<IDSProvableReference> getResult() {
          return result;
       }
    }
@@ -154,14 +158,14 @@ public final class KeyProofReferenceUtil {
     * @return The found references that are might be empty if no references were found.
     * @throws DSException Occurred Exception.
     */
-   public static ImmutableList<IDSProvableReference> getReferences(KeyConnection connection,
+   public static LinkedHashSet<IDSProvableReference> getReferences(KeyConnection connection,
                                                                    Services services, 
                                                                    Node node) throws DSException {
-      ImmutableList<IDSProvableReference> result = ImmutableSLList.nil();
+      LinkedHashSet<IDSProvableReference> result = new LinkedHashSet<IDSProvableReference>();
       for (IRuleAnalyst analyst : getRuleAnalysts()) {
-         ImmutableList<IDSProvableReference> analystResult = analyst.getReferences(connection, services, node);
+         LinkedHashSet<IDSProvableReference> analystResult = analyst.getReferences(connection, services, node);
          if (analystResult != null) {
-            result = result.append(analystResult);
+            result.addAll(analystResult);
          }
       }
       return result;

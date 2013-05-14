@@ -1,11 +1,12 @@
 
 public class MethodBodyExpand {
 	/*@
-	  @ ensures \result == 42;
+	  @ ensures \result == 84;
 	  @*/
 	public int main() {
-		int result = magic42();
-		return result;
+		int first = magic42();
+      int second = magic42();
+		return first + second;
 	}
 	
 	public int magic42() {

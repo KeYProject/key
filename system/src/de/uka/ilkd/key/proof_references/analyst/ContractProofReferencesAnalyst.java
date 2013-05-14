@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof_references.analyst;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
@@ -18,11 +18,13 @@ public class ContractProofReferencesAnalyst implements IProofReferencesAnalyst {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<IProofReference<?>> computeReferences(Node node, Services services) {
+   public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
       if (node.getAppliedRuleApp() instanceof AbstractContractRuleApp) {
          AbstractContractRuleApp contractRuleApp = (AbstractContractRuleApp)node.getAppliedRuleApp();
          DefaultProofReference<Contract> reference = new DefaultProofReference<Contract>(IProofReference.USE_CONTRACT, node, contractRuleApp.getInstantiation());
-         return ImmutableSLList.<IProofReference<?>>nil().append(reference);
+         LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+         result.add(reference);
+         return result;
       }
       else {
          return null;

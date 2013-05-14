@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.services.IDisposable;
-import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
@@ -208,7 +207,7 @@ public class KeyProof extends MemoryProof implements IDisposable {
          Services services = connection.getServices();
          // Analyze tree
          List<IDSProvableReference> references = new LinkedList<IDSProvableReference>(); 
-         CollectionUtil.addAll(references, KeyProofReferenceUtil.analyzeProof(connection, services, proof));
+         references.addAll(KeyProofReferenceUtil.analyzeProof(connection, services, proof));
          // Add initial references from the ProofObjInput.
          if (inputReferences != null) {
             references.addAll(inputReferences);

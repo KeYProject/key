@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.proof_references.reference;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Default implementation of {@link IProofReference}.
@@ -20,18 +24,18 @@ public class DefaultProofReference<T> implements IProofReference<T> {
    /**
     * The {@link Node} in which the reference was found.
     */
-   private Node node;
+   private LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
 
    /**
     * Constructor
     * @param kind The reference kind as human readable {@link String}.
-    * @param node The {@link Node} in which the reference was found.
+    * @param node The first {@link Node} in which the reference was found.
     * @param target The target source member.
     */
    public DefaultProofReference(String kind, Node node, T target) {
       this.kind = kind;
-      this.node = node;
       this.target = target;
+      this.nodes.add(node);
    }
 
    /**
@@ -46,8 +50,16 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     * {@inheritDoc}
     */
    @Override
-   public Node getNode() {
-      return node;
+   public LinkedHashSet<Node> getNodes() {
+      return nodes;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addNodes(Collection<Node> nodes) {
+      this.nodes.addAll(nodes);
    }
 
    /**
@@ -62,7 +74,51 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     * {@inheritDoc}
     */
    @Override
+   public boolean equals(Object obj) {
+      if (obj instanceof IProofReference<?>) {
+         IProofReference<?> other = (IProofReference<?>)obj;
+         return JavaUtil.equals(getKind(), other.getKind()) &&
+                JavaUtil.equals(getTarget(), other.getTarget());
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int hashCode() {
+      int result = 17;
+      result = 31 * result + (getKind() != null ? getKind().hashCode() : 0);
+      result = 31 * result + (getTarget() != null ? getTarget().hashCode() : 0);
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public String toString() {
-      return getKind() + " Proof Reference to " + getTarget() + " of node" + getNode();
+      StringBuilder sb = new StringBuilder();
+      sb.append(getKind());
+      sb.append( " Proof Reference to \"");
+      sb.append(getTarget());
+      sb.append("\"");
+      if (!getNodes().isEmpty()) {
+         sb.append(" at node(s) ");
+         boolean afterFirst = false;
+         for (Node node : getNodes()) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(node.serialNr());
+         }
+      }
+      return sb.toString();
    }
 }

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof_references.analyst;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -19,14 +19,16 @@ public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesA
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<IProofReference<?>> computeReferences(Node node, Services services) {
+   public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
       if (node.getNodeInfo() != null) {
          NodeInfo info = node.getNodeInfo();
          if (info.getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs = (MethodBodyStatement)info.getActiveStatement();
             IProgramMethod pm = mbs.getProgramMethod(services);
             DefaultProofReference<IProgramMethod> reference = new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD, node, pm);
-            return ImmutableSLList.<IProofReference<?>>nil().append(reference);
+            LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+            result.add(reference);
+            return result;
          }
          else {
             return null;

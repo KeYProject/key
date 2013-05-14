@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof_references.analyst;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -29,25 +30,27 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<IProofReference<?>> computeReferences(Node node, Services services) {
-      String name = MiscTools.getRuleDisplayName(node);
+   public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+      String name = MiscTools.getRuleName(node);
       if (name != null && name.toLowerCase().contains("methodcall")) {
          NodeInfo info = node.getNodeInfo();
          if (info != null) {
             if (info.getActiveStatement() instanceof MethodReference) {
                ExecutionContext context = extractContext(node, services);
                IProofReference<IProgramMethod> reference = createReference(node, services, context, (MethodReference)info.getActiveStatement());
-               return ImmutableSLList.<IProofReference<?>>nil().append(reference);
+               LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+               result.add(reference);
+               return result;
             }
             else if (info.getActiveStatement() instanceof Assignment) {
                Assignment assignment = (Assignment)info.getActiveStatement();
                ExecutionContext context = extractContext(node, services);
-               ImmutableList<IProofReference<?>> result = ImmutableSLList.nil();
+               LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
                for (int i = 0; i < assignment.getChildCount(); i++) {
                   ProgramElement child = assignment.getChildAt(i);
                   if (child instanceof MethodReference) {
                      IProofReference<IProgramMethod> reference = createReference(node, services, context, (MethodReference)child);
-                     result = result.append(reference);
+                     ProofReferenceUtil.merge(result, reference);
                   }
                }
                return result;

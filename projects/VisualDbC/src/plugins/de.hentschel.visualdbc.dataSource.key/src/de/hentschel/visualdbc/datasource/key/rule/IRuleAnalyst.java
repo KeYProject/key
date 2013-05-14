@@ -13,6 +13,8 @@
 
 package de.hentschel.visualdbc.datasource.key.rule;
 
+import java.util.LinkedHashSet;
+
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
@@ -35,7 +37,7 @@ public interface IRuleAnalyst {
     * @return An {@link ImmutableList} with the found references as instances of {@link IDSProvableReference}.
     * @throws DSException Occurred Exception
     */
-   public ImmutableList<IDSProvableReference> getReferences(KeyConnection connection,
+   public LinkedHashSet<IDSProvableReference> getReferences(KeyConnection connection,
                                                             Services services, 
                                                             Node node) throws DSException;
 }

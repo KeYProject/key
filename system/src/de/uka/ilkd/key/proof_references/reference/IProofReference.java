@@ -1,6 +1,10 @@
 package de.uka.ilkd.key.proof_references.reference;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
@@ -47,16 +51,32 @@ public interface IProofReference<T> {
    public static final String USE_CONTRACT = "Use Contract";
    
    /**
+    * <p>
+    * Read/Write access of a field like instance or class variables during proof.
+    * </p>
+    * <p>
+    * References of this kind should provide an {@link IProgramVariable} as target ({@link #getTarget()}). 
+    * </p>
+    */
+   public static final String ACCESS = "Access";
+   
+   /**
     * Returns the reference kind which is a human readable {@link String}.
     * @return The reference kind as human readable {@link String}.
     */
    public String getKind();
    
    /**
-    * Returns the {@link Node} in which the reference was found.
-    * @return The {@link Node} in which the reference was found.
+    * Returns the {@link Node}s in which the reference was found.
+    * @return The {@link Node}s in which the reference was found.
     */
-   public Node getNode();
+   public LinkedHashSet<Node> getNodes();
+
+   /**
+    * Adds the given {@link Node}s to the own {@link Node}s.
+    * @param nodes The {@link Node}s to add.
+    */
+   public void addNodes(Collection<Node> nodes);
    
    /**
     * Returns the target source member.

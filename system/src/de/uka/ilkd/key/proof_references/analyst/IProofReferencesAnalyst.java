@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof_references.analyst;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
@@ -27,5 +28,5 @@ public interface IProofReferencesAnalyst {
     * @param services The {@link Services} to use.
     * @return The found {@link IProofReference} or {@code null}/empty set if the applied rule is not supported.
     */
-   public ImmutableList<IProofReference<?>> computeReferences(Node node, Services services);
+   public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services);
 }

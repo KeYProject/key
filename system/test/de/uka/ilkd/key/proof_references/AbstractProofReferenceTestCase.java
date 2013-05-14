@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof_references;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Provides the basic functionality to test the proof reference API.
@@ -42,13 +42,13 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                                   final ExpectedProofReferences... expectedReferences) throws Exception {
       IProofTester tester = new IProofTester() {
          @Override
-         public void doTest(KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof) throws Exception {
+         public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception {
             // Compute proof references
             ImmutableList<IProofReferencesAnalyst> analysts = ImmutableSLList.nil();
             if (analyst != null) {
                analysts = analysts.append(analyst);
             }
-            ImmutableList<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(proof, analysts);
+            LinkedHashSet<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(proof, analysts);
             // Assert proof references
             assertReferences(references, expectedReferences);
          }
@@ -62,11 +62,11 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param node The {@link Node} to look for.
     * @return The contained {@link IProofReference}s with the given node.
     */
-   protected ImmutableList<IProofReference<?>> findReferences(ImmutableList<IProofReference<?>> references, Node node) {
-      ImmutableList<IProofReference<?>> result = ImmutableSLList.nil();
+   protected LinkedHashSet<IProofReference<?>> findReferences(LinkedHashSet<IProofReference<?>> references, Node node) {
+      LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
       for (IProofReference<?> reference : references) {
-         if (reference.getNode() == node) {
-            result = result.append(reference);
+         if (reference.getNodes().contains(node)) {
+            result.add(reference);
          }
       }
       return result;
@@ -77,7 +77,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param expected The expected {@link IProofReference}s.
     * @param current The current {@link IProofReference}s.
     */
-   protected void assertReferences(ImmutableList<IProofReference<?>> expected, ImmutableList<IProofReference<?>> current) {
+   protected void assertReferences(LinkedHashSet<IProofReference<?>> expected, LinkedHashSet<IProofReference<?>> current) {
       assertNotNull(current);
       assertNotNull(expected);
       assertEquals(current.size(), expected.size());
@@ -88,7 +88,6 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          IProofReference<?> currentReference = currentIter.next();
          assertEquals(expectedReference.getKind(), currentReference.getKind());
          assertEquals(expectedReference.getTarget(), currentReference.getTarget());
-         assertEquals(expectedReference.getNode(), currentReference.getNode());
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
@@ -99,10 +98,10 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param current The current {@link IProofReference}s.
     * @param expected The expected {@link ExpectedProofReferences}s.
     */
-   protected void assertReferences(ImmutableList<IProofReference<?>> current, ExpectedProofReferences... expected) {
+   protected void assertReferences(LinkedHashSet<IProofReference<?>> current, ExpectedProofReferences... expected) {
       assertNotNull(current);
       assertNotNull(expected);
-      assertEquals(expected.length, current.size());
+      assertEquals("Computed References: " + current, expected.length, current.size());
       int i = 0;
       for (IProofReference<?> currentReference : current) {
          ExpectedProofReferences expectedReference = expected[i];
@@ -181,7 +180,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(javaFile, null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(javaFile, null, null);
       Proof proof = null;
       try {
          // Search method to proof
@@ -195,7 +194,18 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          assertNotNull(proof);
          // Start auto mode
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.put(StrategyProperties.METHOD_OPTIONS_KEY, useContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
+         sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
+         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+         sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+         sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
+         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
+         sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
+         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
          environment.getUi().startAndWaitForAutoMode(proof);
          // Do test
@@ -220,6 +230,6 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
        * @param proof The {@link Proof} to test.
        * @throws Exception Occurred Exception.
        */
-      public void doTest(KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof) throws Exception;
+      public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
    }
 }
