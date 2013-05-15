@@ -92,6 +92,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                 }
                 assert found;
             }
+        } else {
+            newIns2 = poVars2.localIns;
         }
         ProofObligationVars p2 = new ProofObligationVars(poVars2.self,
                                                          poVars2.selfAtPost,
