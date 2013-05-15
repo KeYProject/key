@@ -301,8 +301,6 @@ public class WindowUserInterface extends AbstractUserInterface {
            for (Proof p : rootTaskProofs) {
                //In a previous revision the following statement was performed only
                //on one proof object, namely on: mediator.getProof()
-               p.getServices().getSpecificationRepository().removeProof(p);
-               p.mgt().removeProofListener();
                p.dispose();
            }
            proof.dispose();
