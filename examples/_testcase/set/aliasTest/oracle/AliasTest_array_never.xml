@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.array(w,array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="w.value=1;" pathCondition="true" pathConditionChanged="false">
+         <statement name="array[0].value=2;" pathCondition="true" pathConditionChanged="false">
+            <statement name="array[1].value=3;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return w.value+array[0].value+array[1].value;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
++ \if (array[1] = w)
+      \then (3)
+      \else (\if (array[0] = w)  \then (2)  \else (1))
++ \if (array[1] = array[0])  \then (3)  \else (2)&apos; as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
