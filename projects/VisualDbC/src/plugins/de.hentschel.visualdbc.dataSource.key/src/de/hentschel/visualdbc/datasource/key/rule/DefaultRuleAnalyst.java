@@ -19,7 +19,9 @@ import org.eclipse.core.runtime.Assert;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
+import de.hentschel.visualdbc.datasource.model.IDSAxiom;
 import de.hentschel.visualdbc.datasource.model.IDSEnumLiteral;
+import de.hentschel.visualdbc.datasource.model.IDSInvariant;
 import de.hentschel.visualdbc.datasource.model.IDSOperation;
 import de.hentschel.visualdbc.datasource.model.IDSOperationContract;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
@@ -32,6 +34,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
@@ -83,6 +87,20 @@ public class DefaultRuleAnalyst implements IRuleAnalyst {
                if (attribute != null) {
                   result.add(new MemoryProvableReference(attribute, KeyProofReferenceUtil.ACCESS));
                }
+            }
+         }
+         else if (IProofReference.USE_INVARIANT.equals(reference.getKind())) {
+            Assert.isTrue(reference.getTarget() instanceof ClassInvariant);
+            IDSInvariant invariant = connection.getInvariant((ClassInvariant)reference.getTarget());
+            if (invariant != null) {
+               result.add(new MemoryProvableReference(invariant, KeyProofReferenceUtil.USE_INVARIANT));
+            }
+         }
+         else if (IProofReference.USE_AXIOM.equals(reference.getKind())) {
+            Assert.isTrue(reference.getTarget() instanceof ClassAxiom);
+            IDSAxiom axiom = connection.getAxiom((ClassAxiom)reference.getTarget());
+            if (axiom != null) {
+               result.add(new MemoryProvableReference(axiom, KeyProofReferenceUtil.USE_AXIOM));
             }
          }
          else {

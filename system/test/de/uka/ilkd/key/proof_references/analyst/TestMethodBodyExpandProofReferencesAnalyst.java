@@ -12,13 +12,13 @@ public class TestMethodBodyExpandProofReferencesAnalyst extends AbstractProofRef
     * Tests "MethodBodyExpand".
     */
    public void testMethodBodyExpand() throws Exception {
-      doReferenceTest(keyRepDirectory, 
-                      "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
-                      "MethodBodyExpand", 
-                      "main", 
-                      false,
-                      new MethodBodyExpandProofReferencesAnalyst(),
-                      new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
-                      new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
+      doReferenceMethodTest(keyRepDirectory, 
+                            "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
+                            "MethodBodyExpand", 
+                            "main", 
+                            false,
+                            new MethodBodyExpandProofReferencesAnalyst(),
+                            new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
+                            new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }
 }

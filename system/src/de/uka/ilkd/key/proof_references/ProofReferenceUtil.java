@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof_references.analyst.ClassAxiomAndInvariantProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.ProgramVariableReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
@@ -45,7 +46,8 @@ public final class ProofReferenceUtil {
    public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(),
                                                                                                                                        new MethodCallProofReferencesAnalyst(),
                                                                                                                                        new ContractProofReferencesAnalyst(),
-                                                                                                                                       new ProgramVariableReferencesAnalyst());
+                                                                                                                                       new ProgramVariableReferencesAnalyst(),
+                                                                                                                                       new ClassAxiomAndInvariantProofReferencesAnalyst());
    
    /**
     * Forbid instances.

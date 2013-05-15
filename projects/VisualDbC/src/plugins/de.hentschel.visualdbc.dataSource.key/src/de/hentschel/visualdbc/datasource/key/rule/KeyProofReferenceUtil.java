@@ -65,6 +65,16 @@ public final class KeyProofReferenceUtil {
     * Read/Write access of a field like instance or class variables during proof.
     */
    public static final String ACCESS = "Access";
+   
+   /**
+    * Used invariants during proof.
+    */
+   public static final String USE_INVARIANT = "Use Invariant";
+   
+   /**
+    * Used axioms during proof.
+    */
+   public static final String USE_AXIOM = "Use Axiom";
 
    /**
     * Contains the available {@link IRuleAnalyst} ordered by their priority.

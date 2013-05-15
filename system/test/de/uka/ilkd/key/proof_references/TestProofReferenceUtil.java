@@ -86,9 +86,11 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "main",
                 false,
                 null,
+                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"), 
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"), 
                 new ExpectedProofReferences(IProofReference.CALL_METHOD, "MethodBodyExpand::magic42"), 
-                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
+                new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"), 
+                new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
    }
    
    /**
@@ -130,6 +132,6 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
             });
          }
       };
-      doProofTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, useContracts, tester);
+      doProofMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, useContracts, tester);
    }
 }

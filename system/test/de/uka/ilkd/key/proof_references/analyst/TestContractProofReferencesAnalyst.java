@@ -12,12 +12,12 @@ public class TestContractProofReferencesAnalyst extends AbstractProofReferenceTe
     * Tests "UseOperationContractTest".
     */
    public void testUseOperationContracts() throws Exception {
-      doReferenceTest(keyRepDirectory, 
-                      "examples/_testcase/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
-                      "UseOperationContractTest", 
-                      "main", 
-                      true,
-                      new ContractProofReferencesAnalyst(),
-                      new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)}; mby: null; post: {heap=and(imp(equals(exc,null),and(equals(result,Z(2(4(#)))),java.lang.Object::<inv>(heap,self))),equals(exc,null))}; mods: {heap=allLocs, savedHeap=null}; hasMod: true; termination: diamond; transaction: false"));
+      doReferenceMethodTest(keyRepDirectory, 
+                            "examples/_testcase/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
+                            "UseOperationContractTest", 
+                            "main", 
+                            true,
+                            new ContractProofReferencesAnalyst(),
+                            new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)}; mby: null; post: {heap=and(imp(equals(exc,null),and(equals(result,Z(2(4(#)))),java.lang.Object::<inv>(heap,self))),equals(exc,null))}; mods: {heap=allLocs, savedHeap=null}; hasMod: true; termination: diamond; transaction: false"));
    }
 }

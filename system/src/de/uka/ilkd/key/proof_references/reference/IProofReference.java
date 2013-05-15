@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
@@ -59,6 +61,26 @@ public interface IProofReference<T> {
     * </p>
     */
    public static final String ACCESS = "Access";
+   
+   /**
+    * <p>
+    * Used invariants during proof.
+    * </p>
+    * <p>
+    * References of this kind should provide an {@link ClassInvariant} as target ({@link #getTarget()}). 
+    * </p>
+    */
+   public static final String USE_INVARIANT = "Use Invariant";
+   
+   /**
+    * <p>
+    * Used axioms during proof.
+    * </p>
+    * <p>
+    * References of this kind should provide an {@link ClassAxiom} as target ({@link #getTarget()}). 
+    * </p>
+    */
+   public static final String USE_AXIOM = "Use Axiom";
    
    /**
     * Returns the reference kind which is a human readable {@link String}.
