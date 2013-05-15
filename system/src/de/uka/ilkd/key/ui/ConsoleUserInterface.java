@@ -230,7 +230,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
       ProblemInitializer pi = new ProblemInitializer(this, 
             mediator.getProfile(), 
             new Services(mediator.getExceptionHandler()), 
-            true, 
+            false, 
             this);
       return pi;
    }
@@ -380,5 +380,13 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     */
    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
        pcs.firePropertyChange(propertyName, oldValue, newValue);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean isRegisterProofs() {
+      return false;
    }
 }
