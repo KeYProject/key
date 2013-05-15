@@ -175,7 +175,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
                 depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                longConst(65));
+                                                                longConst(400));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter,
         	    					    inftyConst());
@@ -981,8 +981,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  longConst ( -550 ) ) );
 
         bindRuleSet ( d, "conjNormalForm",
-                      add ( not ( applyTF ( FocusFormulaProjection.INSTANCE,
-                                            ff.propJunctor ) ),
+                      ifZero(add ( or ( FocusInAntecFeature.INSTANCE,
+                                        NotBelowQuantifierFeature.INSTANCE ),
+                                   NotInScopeOfModalityFeature.INSTANCE),
+                             add ( longConst ( -150 ),
+                                   ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
+                             inftyConst() ) );
+
+        bindRuleSet ( d, "conjNormalFormSets",
+                      add ( literalsSmallerThan( "commRight", "commLeft", numbers ),
                             NotInScopeOfModalityFeature.INSTANCE,
                             longConst ( -150 ) ) );
 
@@ -2177,7 +2184,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             depSpecF = ConditionalFeature.createConditional(
         	    		depFilter,
         	    		ifZero(new DependencyContractFeature(),
-        	    		       longConst(65),
+        	    		       longConst(400),
         	    		       inftyConst()));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, 
