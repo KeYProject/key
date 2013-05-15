@@ -316,4 +316,12 @@ public class WindowUserInterface extends AbstractUserInterface {
            r.gc();
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isRegisterProofs() {
+       return true;
+    }
 }
