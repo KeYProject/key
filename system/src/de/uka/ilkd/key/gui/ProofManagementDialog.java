@@ -203,7 +203,7 @@ public final class ProofManagementDialog extends JDialog {
         listWdPanel.setLayout(new BoxLayout(listWdPanel, 
                                         BoxLayout.X_AXIS));
         JScrollPane wdScrollPane = new JScrollPane(wdTree);
-        wdScrollPane.setBorder(new TitledBorder("Well-Definedness Targets"));
+        wdScrollPane.setBorder(new TitledBorder("Specifications"));
         Dimension wdScrollPaneDim = new Dimension(250, 400);
         wdScrollPane.setPreferredSize(wdScrollPaneDim);
         wdScrollPane.setMinimumSize(wdScrollPaneDim);
@@ -264,7 +264,7 @@ public final class ProofManagementDialog extends JDialog {
 	tabbedPane = new JTabbedPane();	
         tabbedPane.addTab("By Target", listPanelByMethod);
         tabbedPane.addTab("By Proof", listPanelByProof);
-        tabbedPane.addTab("Well-Definedness", listWdPanel);
+        tabbedPane.addTab("By Specification", listWdPanel);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
         	updateStartButton();
@@ -441,9 +441,13 @@ public final class ProofManagementDialog extends JDialog {
     
     
     private ContractSelectionPanel getActiveContractPanel() {
-	return tabbedPane.getSelectedIndex() == 0 
-	       ? contractPanelByMethod 
-		       : contractPanelByProof;
+        int index = tabbedPane.getSelectedIndex();
+        if (index == 0)
+            return contractPanelByMethod;
+        else if (index == 1)
+            return contractPanelByProof;
+        else
+            return wdPanel;
     }
 
     
@@ -543,7 +547,8 @@ public final class ProofManagementDialog extends JDialog {
         
     
     private void updateContractPanel() {
-	if(getActiveContractPanel() == contractPanelByMethod) {
+        ContractSelectionPanel pan = getActiveContractPanel();
+	if (pan == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
 	    if(entry != null && entry.target != null) {
 		final ImmutableSet<Contract> contracts 
@@ -553,7 +558,7 @@ public final class ProofManagementDialog extends JDialog {
 		getActiveContractPanel().setContracts(
 			DefaultImmutableSet.<Contract>nil(), "Contracts");
 	    }
-	} else {
+	} else if (pan == contractPanelByProof) {
 	    if(proofList.getSelectedValue() != null) {
 		final Proof p 
 			= ((ProofWrapper)proofList.getSelectedValue()).proof;
@@ -566,6 +571,14 @@ public final class ProofManagementDialog extends JDialog {
 		getActiveContractPanel().setContracts(
 			DefaultImmutableSet.<Contract>nil(), "Contracts");
 	    }	    
+	} else if (pan == wdPanel) {
+	    final ClassTree.Entry entry = wdTree.getSelectedEntry();
+	    if(entry != null && entry.target != null) {
+	        final ImmutableSet<Contract> wdContracts
+	        // TODO: Probably new contract "type" in specRepos necessary
+	            = specRepos.getContracts(entry.kjt, entry.target);
+	        getActiveContractPanel().setContracts(wdContracts, "Well-Definedness Checks");
+	    }
 	}
         updateStartButton();	
     }

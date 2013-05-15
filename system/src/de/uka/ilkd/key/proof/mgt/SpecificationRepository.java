@@ -1153,6 +1153,8 @@ public final class SpecificationRepository {
             else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
             }
+            // TODO: Here we will have to add a further distinction for SpecificationUnit (?)
+            // in order to permit well-definedness checks
             else {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
             }
@@ -1164,7 +1166,7 @@ public final class SpecificationRepository {
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
 	       : " observer is already limited: " + obs;
-	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProtramMethod?
+	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProgramMethod?
 	    return null;
 	}
 	
