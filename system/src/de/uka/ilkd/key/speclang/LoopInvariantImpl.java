@@ -439,24 +439,33 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              ImmutableList<Term>>> respects = getRespects(services);
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         originalRespects.remove(baseHeap);
+        Triple<ImmutableList<Term>,
+               ImmutableList<Term>,
+               ImmutableList<Term>> baseRespects = respects.head();
+        if (baseRespects == null) {
+            baseRespects = new Triple<ImmutableList<Term>,
+                                      ImmutableList<Term>,
+                                      ImmutableList<Term>> (ImmutableSLList.<Term>nil(),
+                                                            ImmutableSLList.<Term>nil(),
+                                                            ImmutableSLList.<Term>nil());
+        }
         if (oldGuard != null) {
             respects =
                     respects.tail()
                         .prepend(new Triple<ImmutableList<Term>,
                                             ImmutableList<Term>,
                                             ImmutableList<Term>>
-                        (respects.head().first.removeFirst(oldGuard).append(guardTerm),
-                         respects.head().second,
-                         respects.head().third));
+                        (baseRespects.first.removeFirst(oldGuard).append(guardTerm),
+                         baseRespects.second,
+                         baseRespects.third));
         } else {
             respects =
-                    respects.tail()
-                        .prepend(new Triple<ImmutableList<Term>,
-                                            ImmutableList<Term>,
-                                            ImmutableList<Term>>
-                        (respects.head().first.append(guardTerm),
-                         respects.head().second,
-                         respects.head().third));
+                    respects.tail().prepend(new Triple<ImmutableList<Term>,
+                                                ImmutableList<Term>,
+                                                ImmutableList<Term>>
+                                            (baseRespects.first.append(guardTerm),
+                                             baseRespects.second,
+                                             baseRespects.third));
         }
         originalRespects.put(baseHeap, respects);
     }

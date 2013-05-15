@@ -40,8 +40,11 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         Iterator<Term> out = poVars.localOuts.iterator();
         Iterator<Term> in = d.origVars.localIns.iterator();
         while (in.hasNext()) {
-            posts = posts.append(d.tb.equals(out.next(), in.next()));
-        }        
+            Term i = in.next();
+            Term o = out.next();
+            if (i != null && o != null)
+                posts = posts.append(d.tb.equals(o, i));
+        }
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
         
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);

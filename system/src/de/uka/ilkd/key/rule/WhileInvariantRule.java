@@ -112,7 +112,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final MethodFrame innermostMethodFrame =
 	        JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
 	inv = inv.setTarget(innermostMethodFrame.getProgramMethod());
-	
+
 	final Term selfTerm = innermostMethodFrame == null
 	                      ? null
 	                      : MiscTools.getSelfTerm(innermostMethodFrame, services);
@@ -131,8 +131,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	lastInstantiation = result;
 	return result;
     }
-    
-    
+
+
     private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
@@ -142,7 +142,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
             if(anonUpdate == null) {
                 anonUpdate = elemUpd;
-            }else{
+            } else {
                 anonUpdate = TB.parallel(anonUpdate, elemUpd);
             }
         }
@@ -358,7 +358,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
-        
+
         return infFlowGoal;
     }
 
@@ -397,7 +397,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                         false);
         goal.addTaclet(infData.infFlowApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        
+
         return goal;
     }
 
@@ -427,7 +427,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         return true;
     }
-    
+
 
     static Pair<Term, Term> applyUpdates(Term focusTerm) {
         if (focusTerm.op() instanceof UpdateApplication) {
@@ -448,7 +448,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
-        
+
         //get instantiation
         final Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
 
@@ -472,7 +472,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
-        
+
         //collect input and output local variables, 
         //prepare reachableIn and reachableOut
         final ImmutableSet<ProgramVariable> localIns =
@@ -489,8 +489,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             reachableOut = TB.and(reachableOut, 
                     TB.reachableValue(services, pv));
         }
-        
-      //prepare variant
+
+        //prepare variant
         final ProgramElementName variantName =
                 new ProgramElementName(TB.newName(services, "variant"));
         final LocationVariable variantPV = new LocationVariable(variantName, intKJT);
@@ -541,15 +541,15 @@ public final class WhileInvariantRule implements BuiltInRule {
                     TB.heapAtPreVar(services, heap+"Before_LOOP", heap.sort(), true);
             services.getNamespaces().programVariables().addSafely(lv);
             final Term u = TB.elementary(services, lv, TB.var(heap));
-            if(beforeLoopUpdate == null) {
+            if (beforeLoopUpdate == null) {
                 beforeLoopUpdate = u;
-            }else{
+            } else {
                 beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
             }
             heapToBeforeLoop.get(heap).put(TB.var(heap), TB.var(lv));
         }
 
-        for(ProgramVariable pv : localOuts) {
+        for (ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName
             = TB.newName(services, pv.name().toString() + "Before_" + inst.inv.getName());
             final LocationVariable pvBeforeLoop
@@ -571,18 +571,18 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term reachableState = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas =
                 ImmutableSLList.<AnonUpdateData>nil();
-        for(LocationVariable heap : heapContext) {
+        for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon
             = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if(anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;
-            }else{
+            } else{
                 anonUpdate = TB.parallel(anonUpdate, tAnon.anonUpdate);
             }
             if(wellFormedAnon == null) {
                 wellFormedAnon = TB.wellFormed(tAnon.anonHeap, services);
-            }else{
+            } else{
                 wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.anonHeap, services));
             }
             final Term m = mods.get(heap);
@@ -590,17 +590,17 @@ public final class WhileInvariantRule implements BuiltInRule {
           if (TB.strictlyNothing().equals(m) &&
                   heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
-            }else{
+            } else{
                 fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
             }
             if(frameCondition == null){
                 frameCondition = fc;
-            }else{
+            } else{
                 frameCondition = TB.and(frameCondition, fc);
             }
-            if(reachableState == null) {
+            if (reachableState == null) {
                 reachableState = TB.wellFormed(heap, services);
-              }else{
+              } else {
                 reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
               }
         }
@@ -658,7 +658,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) &&
             inst.inv.getRespects(services) != null) {
-            
+
             assert anonUpdateDatas.size() == 1 : "information flow " +
                                                  "extension is at the " +
                                                  "moment not compatible " +
@@ -732,7 +732,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             initGoal.setBranchLabel("Invariant Initially Valid");
             bodyGoal.setBranchLabel("Body Preserves Invariant");
             useGoal.setBranchLabel("Use Case");
-            
+
             //"Body Preserves Invariant":
             // \replacewith (==>  #atPreEqs(anon1)
             //                       -> #introNewAnonUpdate(
@@ -779,7 +779,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
         // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
         // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-        
+
         useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
@@ -851,7 +851,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    this.innermostExecutionContext = innermostExecutionContext;
 	}
     }
-    
+
     private static class AnonUpdateData {
 
         public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
@@ -887,7 +887,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final Term applPredTerm;
         public final Taclet infFlowApp;
         public final boolean isInfFlow;
-        
+
         public InfFlowData() {
             this.heapAtPre = null;
             this.heapAtPost = null;

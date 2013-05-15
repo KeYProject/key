@@ -37,14 +37,28 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                  ImmutableList<Term>,ImmutableList<Term>>>) d.get(BasicSnippetData.Key.RESPECTS);
 
         // the respects-sequents evaluated in the pre-state
+        ImmutableList<Term> newIns1 = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> ins = poVars1.localIns;
+        for (Term t1 : d.origVars.localOuts) {
+            boolean found = false;
+            for (Term t2: ins) {
+                ins = ins.removeFirst(t2);
+                if (t2.toString().contains(t1.toString()) &&
+                        t2.sort().equals(t1.sort()) &&
+                        !found) {
+                    newIns1 = newIns1.append(t2);
+                    found = true;
+                }
+            }
+            assert found;
+        }
         ProofObligationVars p1 = new ProofObligationVars(poVars1.self,
                                                          poVars1.selfAtPost,
                                                          poVars1.guard,
                                                          poVars1.localIns,
                                                          poVars1.guardAtPost,
-                                                         !poVars1.localOuts.isEmpty() ?
-                                                                 poVars1.localIns :
-                                                                     ImmutableSLList.<Term>nil(),
+                                                         !poVars1.localOuts.isEmpty() ? newIns1 :
+                                                             ImmutableSLList.<Term>nil(),
                                                          poVars1.result,
                                                          poVars1.resultAtPost,
                                                          poVars1.exception,
@@ -58,14 +72,28 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                                          poVars1.local);
         Triple<Term[],Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, p1);
 
+        ImmutableList<Term> newIns2 = ImmutableSLList.<Term>nil();
+        ins = poVars2.localIns;
+        for (Term t1 : d.origVars.localOuts) {
+            boolean found = false;
+            for (Term t2: ins) {
+                ins = ins.removeFirst(t2);
+                if (t2.toString().contains(t1.toString()) &&
+                        t2.sort().equals(t1.sort()) &&
+                        !found) {
+                    newIns2 = newIns2.append(t2);
+                    found = true;
+                }
+            }
+            assert found;
+        }
         ProofObligationVars p2 = new ProofObligationVars(poVars2.self,
                                                          poVars2.selfAtPost,
                                                          poVars2.guard,
                                                          poVars2.localIns,
                                                          poVars2.guardAtPost,
-                                                         !poVars2.localOuts.isEmpty() ?
-                                                                 poVars2.localIns :
-                                                                     ImmutableSLList.<Term>nil(),
+                                                         !poVars2.localOuts.isEmpty() ? newIns2 :
+                                                             ImmutableSLList.<Term>nil(),
                                                          poVars2.result,
                                                          poVars2.resultAtPost,
                                                          poVars2.exception,
@@ -89,7 +117,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         for (p = 0; p < pv.length; p++) {
             pre[p] = pv[p];
         }
-        for (Iterator<Term> ins1 = poVars1.localIns.iterator(); p < pre.length; p++) {
+        for (Iterator<Term> ins1 = newIns1.iterator(); p < pre.length; p++) {
             pre[p] = ins1.next();
         }
         pv = new Term[] {poVars1.heapAtPost,
@@ -115,7 +143,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         for (p = 0; p < pv.length; p++) {
             pre[p] = pv[p];
         }
-        for (Iterator<Term> ins2 = poVars2.localIns.iterator(); p < pre.length; p++) {
+        for (Iterator<Term> ins2 = newIns2.iterator(); p < pre.length; p++) {
             pre[p] = ins2.next();
         }
         pv = new Term[] {poVars2.heapAtPost,
