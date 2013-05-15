@@ -51,6 +51,17 @@ public final class TestKeY4EclipseUtil {
     * @return the create axiom contract ID.
     */
    public static String createAxiomContractId(String qualifiedName, String field, String id) {
-      return qualifiedName + "[" + qualifiedName + "::" + field+ "].JML accessible clause." + id;
+      return createCompleteAxiomContractId(qualifiedName, qualifiedName + "::" + field, id);
+   }
+
+   /**
+    * Creates the ID for an axiom contract.
+    * @param qualifiedName The full qualified class name.
+    * @param field The field.
+    * @param id The unique ID.
+    * @return the create axiom contract ID.
+    */
+   public static String createCompleteAxiomContractId(String qualifiedName, String field, String id) {
+      return qualifiedName + "[" + field + "].JML accessible clause." + id;
    }
 }
