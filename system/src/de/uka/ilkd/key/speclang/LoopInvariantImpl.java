@@ -441,14 +441,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
         originalRespects.remove(baseHeap);
         Triple<ImmutableList<Term>,
                ImmutableList<Term>,
-               ImmutableList<Term>> baseRespects = respects.head();
-        if (baseRespects == null) {
-            baseRespects = new Triple<ImmutableList<Term>,
+               ImmutableList<Term>> baseRespects = !respects.isEmpty() ?
+                       respects.head() :
+                           new Triple<ImmutableList<Term>,
                                       ImmutableList<Term>,
                                       ImmutableList<Term>> (ImmutableSLList.<Term>nil(),
                                                             ImmutableSLList.<Term>nil(),
                                                             ImmutableSLList.<Term>nil());
-        }
         if (oldGuard != null) {
             respects =
                     respects.tail()

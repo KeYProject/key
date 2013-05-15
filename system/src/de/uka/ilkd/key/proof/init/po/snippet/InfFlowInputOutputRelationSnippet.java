@@ -39,18 +39,22 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         // the respects-sequents evaluated in the pre-state
         ImmutableList<Term> newIns1 = ImmutableSLList.<Term>nil();
         ImmutableList<Term> ins = poVars1.localIns;
-        for (Term t1 : d.origVars.localOuts) {
-            boolean found = false;
-            for (Term t2: ins) {
-                ins = ins.removeFirst(t2);
-                if (t2.toString().contains(t1.toString()) &&
-                        t2.sort().equals(t1.sort()) &&
-                        !found) {
-                    newIns1 = newIns1.append(t2);
-                    found = true;
+        if (poVars1.localIns.size() > poVars1.localOuts.size()) {
+            for (Term t1 : d.origVars.localOuts) {
+                boolean found = false;
+                for (Term t2: ins) {
+                    ins = ins.removeFirst(t2);
+                    if (t2.toString().contains(t1.toString()) &&
+                            t2.sort().equals(t1.sort()) &&
+                            !found) {
+                        newIns1 = newIns1.append(t2);
+                        found = true;
+                    }
                 }
+                assert found;
             }
-            assert found;
+        } else {
+            newIns1 = poVars1.localIns;
         }
         ProofObligationVars p1 = new ProofObligationVars(poVars1.self,
                                                          poVars1.selfAtPost,
@@ -74,18 +78,20 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         ImmutableList<Term> newIns2 = ImmutableSLList.<Term>nil();
         ins = poVars2.localIns;
-        for (Term t1 : d.origVars.localOuts) {
-            boolean found = false;
-            for (Term t2: ins) {
-                ins = ins.removeFirst(t2);
-                if (t2.toString().contains(t1.toString()) &&
-                        t2.sort().equals(t1.sort()) &&
-                        !found) {
-                    newIns2 = newIns2.append(t2);
-                    found = true;
+        if (poVars2.localIns.size() > poVars2.localOuts.size()) {
+            for (Term t1 : d.origVars.localOuts) {
+                boolean found = false;
+                for (Term t2: ins) {
+                    ins = ins.removeFirst(t2);
+                    if (t2.toString().contains(t1.toString()) &&
+                            t2.sort().equals(t1.sort()) &&
+                            !found) {
+                        newIns2 = newIns2.append(t2);
+                        found = true;
+                    }
                 }
+                assert found;
             }
-            assert found;
         }
         ProofObligationVars p2 = new ProofObligationVars(poVars2.self,
                                                          poVars2.selfAtPost,
