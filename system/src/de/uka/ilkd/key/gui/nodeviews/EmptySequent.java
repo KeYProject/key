@@ -14,10 +14,6 @@ import java.awt.Font;
 public class EmptySequent extends SequentView {
 
     public EmptySequent() {
-        titleButton.setFontStyle(Font.ITALIC);
-        titleButton.setCursor(getCursor());
-        titleButton.setForeground(Color.GRAY);
-        titleButton.removeMouseListener(titleButton);
     }
 
     public String getTitle() {

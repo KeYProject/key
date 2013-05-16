@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.nodeviews;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.util.GuiUtilities;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,17 +15,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 /**
  *
  * @author Kai Wallisch
  */
 public class MainFrame extends JScrollPane {
-
-    public static final Color openGoalRed = new Color(250, 90, 90);
-    public static final Color openGoalRedLight =
-            new Color((255 + 250) / 2, (90 + 250) / 2, (90 + 250) / 2);
-    public static final Color transparent = new Color(0, 0, 0, 0);
 
     public void setSequentView(SequentView sequentView) {
         setViewportView(new MainFrameBody(sequentView));
@@ -78,15 +73,6 @@ public class MainFrame extends JScrollPane {
             gbc.weighty = 0.0;
             add(javax.swing.Box.createGlue(), gbc);
 
-            Insets titleButtonInsets = new Insets(0, 50, 4, 0);
-            gbc.insets = titleButtonInsets;
-            gbc.fill = GridBagConstraints.NONE;
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.weightx = 0.0;
-            gbc.weighty = 0.0;
-            add(sequentView.titleButton, gbc);
-
             gbc.insets = new Insets(0, 0, 0, 0);
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridx = 0;
@@ -107,7 +93,7 @@ public class MainFrame extends JScrollPane {
             gbc.weighty = 1.0;
             add(javax.swing.Box.createGlue(), gbc);
 
-            setBorder(new SequentBorder(sequentView.titleButton, titleButtonInsets));
+            setBorder(new TitledBorder(sequentView.getTitle()));
 
         }
     }

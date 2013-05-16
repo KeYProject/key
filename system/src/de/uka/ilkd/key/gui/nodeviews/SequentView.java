@@ -28,7 +28,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
 /*
- * Parent class of LeafNodeView and InnerNodeView.
+ * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
@@ -55,16 +55,9 @@ public abstract class SequentView extends JTextArea
      */
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
-    
-    /* 
-     * The MainFrame border displays a button in the top-left corner.
-     * Each SequentView has it and can be used for custom actions.
-     */
-    public TitleButton titleButton;
 
     SequentView() {
 
-        titleButton = new TitleButton(this);
         setEditable(false);
         setBackground(new Color(249, 249, 249));
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);

@@ -36,7 +36,6 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -165,12 +164,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
         updateHighlights = new Vector<Object>();
-
-        /*
-         * Custom colors for the button in the top row of each SequentView
-         */
-        titleButton.setBorderColor(MainFrame.openGoalRed);
-        titleButton.setToolTipText("Toggle hidden taclets visibility");
 
     }
     

@@ -43,8 +43,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -100,35 +99,33 @@ public class ProofTreeView extends JPanel {
     /** the search dialog */
     private ProofTreeSearchBar proofTreeSearchPanel;
     
-    // Taclet can be shown for inner nodes.
+    // Taclet info can be shown for inner nodes.
     public final TacletInfoPanel tacletInfoPanel = new TacletInfoPanel();
+    
 
     /** creates a new proof tree */
     public ProofTreeView (KeYMediator mediator) {
 
 	proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
-	delegateView = new JTree(
-		     new DefaultMutableTreeNode("No proof loaded")) {
-		/**
-                 * 
-                 */
-                private static final long serialVersionUID = 6555955929759162324L;
+        delegateView = new JTree(
+                new DefaultMutableTreeNode("No proof loaded")) {
+            private static final long serialVersionUID = 6555955929759162324L;
 
-        public void updateUI() {
-		    super.updateUI();
-		    /* we want plus/minus signs to expand/collapse tree nodes */
-		    final TreeUI ui = getUI();
-		    if (ui instanceof BasicTreeUI) {
-			final BasicTreeUI treeUI = (BasicTreeUI)ui;
-			treeUI.setExpandedIcon(IconFactory.expandedIcon());
-			treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
-		    }
-                    if(ui instanceof CacheLessMetalTreeUI){
-                        ((CacheLessMetalTreeUI) ui).clearDrawingCache();
-                    }
-		}
-	    };
+            public void updateUI() {
+                super.updateUI();
+                /* we want plus/minus signs to expand/collapse tree nodes */
+                final TreeUI ui = getUI();
+                if (ui instanceof BasicTreeUI) {
+                    final BasicTreeUI treeUI = (BasicTreeUI) ui;
+                    treeUI.setExpandedIcon(IconFactory.expandedIcon());
+                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
+                }
+                if (ui instanceof CacheLessMetalTreeUI) {
+                    ((CacheLessMetalTreeUI) ui).clearDrawingCache();
+                }
+            }
+        };
             
         delegateView.setUI(new CacheLessMetalTreeUI());
 
@@ -176,25 +173,14 @@ public class ProofTreeView extends JPanel {
 
         updateUI();
 
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        this.add(new JScrollPane(delegateView), gbc);
+        setLayout(new BorderLayout());
         
-        gbc.weighty = 0.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridy = 1;
-        tacletInfoPanel.setVisible(false);
-        this.add(tacletInfoPanel, gbc);
-
-        this.proofTreeSearchPanel = new ProofTreeSearchBar(this);
-        gbc.gridy = 2;
-        this.add(proofTreeSearchPanel, gbc);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, delegateView,
+                tacletInfoPanel);
+        splitPane.setResizeWeight(1.0);
+        add(splitPane, BorderLayout.CENTER);
+        proofTreeSearchPanel = new ProofTreeSearchBar(this);
+        add(proofTreeSearchPanel, BorderLayout.SOUTH);
 	
 	layoutKeYComponent();	
 	
@@ -704,7 +690,7 @@ public class ProofTreeView extends JPanel {
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(de.uka.ilkd.key.gui.nodeviews.MainFrame.openGoalRed);
+			tree_cell.setForeground(new Color(250, 90, 90));
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");

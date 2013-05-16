@@ -82,7 +82,6 @@ public class InnerNodeView extends SequentView {
                 new MatteBorder(3,0,0,0,Color.black),
                 new EmptyBorder(new Insets(4,0,0,0))));
         
-        titleButton.setActivated(false);
         posTable = printer.getInitialPositionTable();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         updateUI();
@@ -91,13 +90,7 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             highlightRuleAppPosition(app);
         }
-
-        /*
-         * Custom colors for this SequentView.
-         */
-        titleButton.setBorderColor(new Color(140, 170, 120));
-        titleButton.setToolTipText("Toggle taclet info");
-
+        
     }
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
