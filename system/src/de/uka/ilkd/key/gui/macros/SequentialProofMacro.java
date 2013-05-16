@@ -81,11 +81,12 @@ public abstract class SequentialProofMacro implements ProofMacro {
      * @throws InterruptedException
      *             if one of the wrapped macros is interrupted.
      */
-    @Override public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+    @Override 
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
             ProverTaskListener listener) throws InterruptedException {
 
         final Node initNode = mediator.getSelectedNode();
-        for (ProofMacro macro : proofMacros) {
+        for (ProofMacro macro : getProofMacros()) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
             macro.applyTo(mediator, posInOcc, listener);
