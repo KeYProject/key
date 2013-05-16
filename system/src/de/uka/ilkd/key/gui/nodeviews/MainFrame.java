@@ -27,14 +27,9 @@ public class MainFrame extends JScrollPane {
         setViewportView(new MainFrameBody(sequentView));
 
         // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
-        boolean showTacletInfo = false;
         ProofTreeView ptv = MainWindow.getInstance().proofTreeView;
         if (ptv != null) {
-            if (sequentView instanceof InnerNodeView) {
-                showTacletInfo = true;
-                ptv.tacletInfoPanel.setText(((InnerNodeView) sequentView).tacletInfo.getText());
-            }
-            ptv.tacletInfoPanel.setVisible(showTacletInfo);
+            ptv.tacletInfoToggle.setSequentView(sequentView);
         }
     }
 

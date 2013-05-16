@@ -38,6 +38,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -100,7 +101,7 @@ public class ProofTreeView extends JPanel {
     private ProofTreeSearchBar proofTreeSearchPanel;
     
     // Taclet info can be shown for inner nodes.
-    public final TacletInfoPanel tacletInfoPanel = new TacletInfoPanel();
+    public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
     
 
     /** creates a new proof tree */
@@ -175,12 +176,14 @@ public class ProofTreeView extends JPanel {
 
         setLayout(new BorderLayout());
         
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, delegateView,
-                tacletInfoPanel);
-        splitPane.setResizeWeight(1.0);
-        add(splitPane, BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(tacletInfoToggle, BorderLayout.NORTH);
         proofTreeSearchPanel = new ProofTreeSearchBar(this);
-        add(proofTreeSearchPanel, BorderLayout.SOUTH);
+        bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
+        
+        add(delegateView, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 	
 	layoutKeYComponent();	
 	
