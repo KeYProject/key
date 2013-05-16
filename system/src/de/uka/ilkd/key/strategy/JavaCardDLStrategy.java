@@ -475,7 +475,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet ( d, "boxDiamondConv", inftyConst () );
         
         bindRuleSet ( d, "cut", not ( isInstantiated ( "cutFormula" ) ) );
-        
+
         setupUserTaclets ( d );
         
         setupArithPrimaryCategories ( d );
@@ -991,6 +991,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                              add ( longConst ( -150 ),
                                    ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
                              inftyConst() ) );
+
+        bindRuleSet ( d, "setEqualityBlastingRight", longConst(-150) );
 
         bindRuleSet ( d, "cnf_setComm",
                       add ( SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
