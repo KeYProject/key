@@ -46,7 +46,30 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                                           boolean useContracts,
                                           IProofReferencesAnalyst analyst,
                                           ExpectedProofReferences... expectedReferences) throws Exception {
-      IProofTester tester = createReferenceMethodTester(analyst, expectedReferences);
+      doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName, useContracts, analyst, null, expectedReferences);
+   }
+   
+   /**
+    * Executes the test steps of test methods. 
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The name of the type which contains the method.
+    * @param targetName The target name to search.
+    * @param useContracts Use contracts or inline method bodies instead.
+    * @param analyst The {@link IProofReferencesAnalyst} to use.
+    * @param currentReferenceFilter An optional {@link IFilter} to limit the references to test.
+    * @param expectedReferences The expected proof references.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doReferenceFunctionTest(File baseDir, 
+                                          String javaPathInBaseDir, 
+                                          String containerTypeName, 
+                                          String targetName,
+                                          boolean useContracts,
+                                          IProofReferencesAnalyst analyst,
+                                          IFilter<IProofReference<?>> currentReferenceFilter,
+                                          ExpectedProofReferences... expectedReferences) throws Exception {
+      IProofTester tester = createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
       doProofFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName, useContracts, tester);
    }
 
@@ -68,7 +91,30 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                                         boolean useContracts,
                                         IProofReferencesAnalyst analyst,
                                         ExpectedProofReferences... expectedReferences) throws Exception {
-      IProofTester tester = createReferenceMethodTester(analyst, expectedReferences);
+      doReferenceMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, useContracts, analyst, null, expectedReferences);
+   }
+
+   /**
+    * Executes the test steps of test methods. 
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The name of the type which contains the method.
+    * @param methodFullName The method name to search.
+    * @param useContracts Use contracts or inline method bodies instead.
+    * @param analyst The {@link IProofReferencesAnalyst} to use.
+    * @param currentReferenceFilter An optional {@link IFilter} to limit the references to test.
+    * @param expectedReferences The expected proof references.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doReferenceMethodTest(File baseDir, 
+                                        String javaPathInBaseDir, 
+                                        String containerTypeName, 
+                                        String methodFullName,
+                                        boolean useContracts,
+                                        IProofReferencesAnalyst analyst,
+                                        IFilter<IProofReference<?>> currentReferenceFilter,
+                                        ExpectedProofReferences... expectedReferences) throws Exception {
+      IProofTester tester = createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
       doProofMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, useContracts, tester);
    }
    
@@ -76,10 +122,12 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * Creates the {@link IProofTester} used by {@link #doProofFunctionTest(File, String, String, String, boolean, IProofTester)}
     * and {@link #doProofMethodTest(File, String, String, String, boolean, IProofTester)}.
     * @param analyst The {@link IProofReferencesAnalyst} to use.
+    * @param currentReferenceFilter An optional {@link IFilter} to limit the references to test.
     * @param expectedReferences The expected proof references.
     * @return The created {@link IProofTester}.
     */
    protected IProofTester createReferenceMethodTester(final IProofReferencesAnalyst analyst,
+                                                      final IFilter<IProofReference<?>> currentReferenceFilter, 
                                                       final ExpectedProofReferences... expectedReferences) {
       return new IProofTester() {
          @Override
@@ -90,6 +138,16 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                analysts = analysts.append(analyst);
             }
             LinkedHashSet<IProofReference<?>> references = ProofReferenceUtil.computeProofReferences(proof, analysts);
+            // Filter references
+            if (currentReferenceFilter != null) {
+               LinkedHashSet<IProofReference<?>> filteredReferences = new LinkedHashSet<IProofReference<?>>();
+               for (IProofReference<?> reference : references) {
+                  if (currentReferenceFilter.select(reference)) {
+                     filteredReferences.add(reference);
+                  }
+               }
+               references = filteredReferences;
+            }
             // Assert proof references
             assertReferences(references, expectedReferences);
          }
