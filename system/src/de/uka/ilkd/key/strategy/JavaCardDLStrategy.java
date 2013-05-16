@@ -17,6 +17,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -277,6 +278,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private RuleSetDispatchFeature setupCostComputationF(Proof p_proof) {
         final IntegerLDT numbers =
             p_proof.getServices().getTypeConverter().getIntegerLDT();
+        final LocSetLDT locSetLDT =
+                p_proof.getServices().getTypeConverter().getLocSetLDT();
             
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
             
@@ -485,7 +488,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                
         
         if ( quantifierInstantiatedEnabled() ) {
-            setupFormulaNormalisation ( d, numbers );
+            setupFormulaNormalisation (d, numbers, locSetLDT);
         } else {
             bindRuleSet ( d, "negationNormalForm", inftyConst() );
             bindRuleSet ( d, "moveQuantToLeft", inftyConst() );
@@ -966,7 +969,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
 
     private void setupFormulaNormalisation(RuleSetDispatchFeature d,
-                                           IntegerLDT numbers) {
+                                           IntegerLDT numbers,
+                                           LocSetLDT locSetLDT) {
        
         bindRuleSet ( d, "negationNormalForm",
            add ( not ( NotBelowBinderFeature.INSTANCE ),
@@ -988,8 +992,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
                              inftyConst() ) );
 
-        bindRuleSet ( d, "conjNormalFormSets",
-                      add ( literalsSmallerThan( "commRight", "commLeft", numbers ),
+        bindRuleSet ( d, "cnf_setComm",
+                      add ( SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
                             NotInScopeOfModalityFeature.INSTANCE,
                             longConst ( -150 ) ) );
 
