@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
@@ -28,9 +27,8 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
     */
    @Override
    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-      NodeInfo info = node.getNodeInfo();
-      if (info != null) {
-         SourceElement statement = info.getActiveStatement();
+      if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
+         SourceElement statement = node.getNodeInfo().getActiveStatement();
          if (statement instanceof CopyAssignment) {
             LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
             listReferences(node, (CopyAssignment)statement, services.getJavaInfo().getArrayLength(), result, true);

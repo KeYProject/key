@@ -20,7 +20,7 @@ public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesA
     */
    @Override
    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-      if (node.getNodeInfo() != null) {
+      if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
          NodeInfo info = node.getNodeInfo();
          if (info.getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs = (MethodBodyStatement)info.getActiveStatement();
