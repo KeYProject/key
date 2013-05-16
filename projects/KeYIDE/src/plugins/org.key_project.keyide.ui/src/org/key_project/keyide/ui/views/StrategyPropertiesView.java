@@ -74,7 +74,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);
-            Object obj = part.getAdapter(this.getClass());
+            Object obj = part.getAdapter(Proof.class);
             if(obj instanceof Proof){
                proof = (Proof) obj;
                form.setProof((Proof)obj);
@@ -93,7 +93,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);
-            Object obj = part.getAdapter(this.getClass());
+            Object obj = part.getAdapter(Proof.class);
             if(obj instanceof Proof){
                proof = (Proof) obj;
                form.setProof((Proof)obj);

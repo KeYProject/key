@@ -36,7 +36,6 @@ import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
-import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
@@ -366,7 +365,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       getKeYEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
 //      getProof().removeProofTreeListener(proofTreeListener); // Is this line irrelevant? Remove it from source code!
-      outline.dispose();
+      if (outline != null) {
+         outline.dispose();
+      }
       super.dispose();
    }
 
@@ -399,14 +400,15 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
                outline = new ProofTreeContentOutlinePage(getProof(), getKeYEnvironment());
                getKeYEnvironment().getMediator().addKeYSelectionListener(keySelectionListener);
             }
-          
          }
          return outline;
       }
-      if(StrategyPropertiesView.class.equals(adapter)){
+      else if (Proof.class.equals(adapter)){
          return getProof();
       }
-
+      else if (KeYEnvironment.class.equals(adapter)){
+         return getKeYEnvironment();
+      }
       else if (IProofEnvironmentProvider.class.equals(adapter)) {
          return this;
       }
