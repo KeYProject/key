@@ -14,14 +14,13 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -78,8 +77,8 @@ public class TryCloseMacro implements ProofMacro {
                 "Applies only to goals beneath the selected node.";
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.gui.macros.ProofMacro#canApplyTo(de.uka.ilkd.key.gui.KeYMediator, de.uka.ilkd.key.logic.PosInOccurrence)
+    /*
+     * This macro is always applicable.
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
@@ -90,8 +89,12 @@ public class TryCloseMacro implements ProofMacro {
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#applyTo(de.uka.ilkd.key.gui.KeYMediator, de.uka.ilkd.key.logic.PosInOccurrence)
      */
     @Override
-    public void applyTo(final KeYMediator mediator, PosInOccurrence posInOcc) {
+    public void applyTo(final KeYMediator mediator, PosInOccurrence posInOcc) throws InterruptedException {
 
+        final ApplyStrategy applyStrategy = 
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        applyStrategy.addProverTaskObserver(mediator.getUI());
+        
         final Proof proof = mediator.getInteractiveProver().getProof();
         final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
 
@@ -123,28 +126,24 @@ public class TryCloseMacro implements ProofMacro {
         // start actual autoprove
         Node invokedNode = mediator.getSelectedNode();
         ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
-        mediator.startAutoMode(enabledGoals);
 
-        mediator.addAutoModeListener(new AutoModeListener() {
+        try {
+            applyStrategy.start(proof, enabledGoals);
+        } finally {
 
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                // set retreat mode back to old value
-                properties.put(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, oldRetreatMode);
-                strategySettings.setActiveStrategyProperties(properties);
+            // set retreat mode back to old value
+            properties.put(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, oldRetreatMode);
+            strategySettings.setActiveStrategyProperties(properties);
 
-                // reset the number of steps to old value
-                mediator.setMaxAutomaticSteps(oldNumberSteps);
+            // reset the number of steps to old value
+            mediator.setMaxAutomaticSteps(oldNumberSteps);
+        }
 
-                // listener has done its job. remove it.
-                mediator.removeAutoModeListener(this);
-            }
-
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-            }
-        });
-
+        if(applyStrategy.hasBeenInterrupted()) {
+            throw new InterruptedException();
+        }
+            
+        
     }
 
 }

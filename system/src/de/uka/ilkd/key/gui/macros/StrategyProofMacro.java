@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.InteractiveProver;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
@@ -74,21 +74,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            Proof proof = interactiveProver.getProof();
-            for (final Goal goal : proof.openGoals()) {
-                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
-                // touch the manager only if necessary
-                if(manager.getDelegate() != null) {
-                    while(manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
-                    }
-                    manager.clearCache();
-                    goal.setRuleAppManager(manager);
-                }
-            }
-
-            proof.setActiveStrategy(oldStrategy);
-            interactiveProver.removeProverTaskListener(this);
+           
         }
     }
 
@@ -109,11 +95,16 @@ public abstract class StrategyProofMacro implements ProofMacro {
      * Set a new rule app manager similar to the focussed mode.
      * Set a new strategy which only allows for the named admitted rules.
      * Then run automation mode and in the end reset the managers.
-     * and the strategy
+     * and the strategy.
+     * 
+     * If the automation is interrupted, report the interruption as an exception.
      */
     @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        InteractiveProver interactiveProver = mediator.getInteractiveProver();
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) throws InterruptedException {
+
+        final ApplyStrategy applyStrategy = 
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+        applyStrategy.addProverTaskObserver(mediator.getUI());
 
         // add a focus manager if there is a focus
         if(posInOcc != null) {
@@ -126,19 +117,38 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
         // set a new strategy.
-        Proof proof = interactiveProver.getProof();
+        Proof proof = mediator.getProof();
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
-
-        // this resets the proof strategy and the managers after the automation
-        // has run
-        interactiveProver.addProverTaskListener(
-                createTaskListener(interactiveProver, oldStrategy));
 
         // find the relevant goals
         // and start
         ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(mediator.getSelectedNode());
-        interactiveProver.startAutoMode(goals);
+        
+        try {
+            applyStrategy.start(proof, goals);
+        } finally {
+            // this resets the proof strategy and the managers after the automation
+            // has run
+            for (final Goal goal : proof.openGoals()) {
+                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
+                // touch the manager only if necessary
+                if(manager.getDelegate() != null) {
+                    while(manager.getDelegate() != null) {
+                        manager = manager.getDelegate();
+                    }
+                    manager.clearCache();
+                    goal.setRuleAppManager(manager);
+                }
+            }
+
+            proof.setActiveStrategy(oldStrategy);
+        }
+        
+        if(applyStrategy.hasBeenInterrupted()) {
+            throw new InterruptedException();
+        }
+
     }
 
 }
