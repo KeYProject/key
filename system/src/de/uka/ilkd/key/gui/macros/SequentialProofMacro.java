@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 
@@ -80,15 +81,14 @@ public abstract class SequentialProofMacro implements ProofMacro {
      * @throws InterruptedException
      *             if one of the wrapped macros is interrupted.
      */
-    @Override
-    public void applyTo(final KeYMediator mediator, final PosInOccurrence posInOcc) 
-            throws InterruptedException {
-        
+    @Override public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+
         final Node initNode = mediator.getSelectedNode();
         for (ProofMacro macro : proofMacros) {
             // reverse to original node
             mediator.getSelectionModel().setSelectedNode(initNode);
-            macro.applyTo(mediator, posInOcc);
+            macro.applyTo(mediator, posInOcc, listener);
         }
 
     }

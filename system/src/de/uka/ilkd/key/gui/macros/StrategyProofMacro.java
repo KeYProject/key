@@ -45,39 +45,6 @@ public abstract class StrategyProofMacro implements ProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 
-    protected ProverTaskListener createTaskListener(InteractiveProver interactiveProver,
-            Strategy oldStrategy) {
-        return new StopListener(interactiveProver, oldStrategy);
-    }
-
-    /**
-     * When a prove run is finished, we need to reset the goals' rule
-     * application managers using this listener.
-     */
-    private static class StopListener implements ProverTaskListener {
-
-        private final InteractiveProver interactiveProver;
-        private final Strategy oldStrategy;
-
-        public StopListener(InteractiveProver interactiveProver, Strategy oldStrategy) {
-            this.interactiveProver = interactiveProver;
-            this.oldStrategy = oldStrategy;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-        }
-
-        @Override
-        public void taskProgress(int position) {
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-           
-        }
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -99,12 +66,16 @@ public abstract class StrategyProofMacro implements ProofMacro {
      * 
      * If the automation is interrupted, report the interruption as an exception.
      */
-    @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) throws InterruptedException {
+    @Override 
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
 
         final ApplyStrategy applyStrategy = 
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
-        applyStrategy.addProverTaskObserver(mediator.getUI());
+
+        if(listener != null) {
+            applyStrategy.addProverTaskObserver(listener);
+        }
 
         // add a focus manager if there is a focus
         if(posInOcc != null) {

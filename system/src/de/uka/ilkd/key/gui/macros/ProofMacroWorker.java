@@ -69,7 +69,7 @@ public class ProofMacroWorker extends SwingWorker implements InterruptListener {
     @Override 
     public Object construct() {
         try {
-            macro.applyTo(mediator, posInOcc);
+            macro.applyTo(mediator, posInOcc, mediator.getUI());
         } catch(InterruptedException ex) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(ex);

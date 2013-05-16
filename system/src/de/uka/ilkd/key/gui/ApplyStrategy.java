@@ -32,6 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.gui.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
@@ -586,14 +587,8 @@ public class ApplyStrategy {
     }
     
     /**
-     * This entry point to the proof may provide inconsistent data. The
-     * properties within the proof may differ to the explicit data. This is
-     * disencouraged.
-     * 
-     * @return
-     * 
-     * @deprecated Use {@link #start(Proof, ImmutableList)}. Adjust the settings
-     *             beforehand if needed
+     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
+     * in {@link TryCloseMacro} now.
      */
     @Deprecated
     public ApplyStrategyInfo startRetreat(Proof proof,

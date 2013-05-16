@@ -25,7 +25,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 /**
  * Apply a single proof step.
  * 
- * @author Simon Greiner (?) 
+ * @author Simon Greiner
  */
 public class OneStepProofMacro extends StrategyProofMacro {
 
