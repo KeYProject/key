@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 /**
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
  * Doing interaction with KeY is often tedious, many steps have to be performed
  * over and over again. To facilitate the interaction, this frameworks allows a
  * developer to define "macro strategy steps" which combine many individual
- * steps and are helopful in an interactive verification attempt.
+ * steps and are helpful in an interactive verification attempt.
  *
  * This interface is kept deliberately separate from many of the other
  * mechanisms to remain open on how to implement the macro.
@@ -82,28 +83,46 @@ public interface ProofMacro {
 
     /**
      * Can apply this macro be applied?
-     *
+     * 
      * This method should not make any changes but check if the macro can be
      * applied or not in the given context.
-     *
+     * 
+     * This method may be called from within the GUI thread and be compatible
+     * with that fact.
+     * 
      * @param mediator
      *            the mediator (not <code>null</code>)
      * @param posInOcc
      *            the position in occurrence (may be <code>null</code>)
-     *
+     * 
      * @return <code>true</code>, if the macro is allowed to be applied
      */
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc);
 
     /**
-     * Apply this macro
-     *
+     * Apply this macro.
+     * 
      * This method can change the proof by applying rules to it.
-     *
+     * 
+     * This method is usually called from a dedicated thread and not the GUI
+     * thread. The thread it runs on may be interrupted. In this case, the macro
+     * may report the interruption by an {@link InterruptedException}.
+     * 
+     * A {@link ProverTaskListener} can be provided to which the progress will
+     * be reported. If no reports are desired, <code>null</code> cna be used for
+     * this parameter. If more than one listener is needed, consider combining
+     * them using a single listener object using the composite pattern.
+     * 
      * @param mediator
      *            the mediator (not <code>null</code>)
      * @param posInOcc
      *            the position in occurrence (may be <code>null</code>)
+     * @param listener
+     *            the listener to use for progress reports (may be
+     *            <code>null</code>)
+     * @throws InterruptedException
+     *             if the application of the macro has been interrupted.
      */
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc);
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, 
+            ProverTaskListener listener) throws InterruptedException;
 }

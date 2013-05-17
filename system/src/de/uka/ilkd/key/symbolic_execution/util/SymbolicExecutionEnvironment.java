@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -67,18 +80,35 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
     * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand methods.
     * @param loopTreatmentInvariant {@code true} use invariants, {@code false} expand loops.
+    * @param aliasChecks Do alias checks?
     */
    public static void configureProofForSymbolicExecution(Proof proof, 
                                                          int maximalNumberOfNodesPerBranch, 
                                                          boolean methodTreatmentContract,
-                                                         boolean loopTreatmentInvariant) {
+                                                         boolean loopTreatmentInvariant,
+                                                         boolean aliasChecks) {
       if (proof != null) {
-         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant);
+         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant, aliasChecks);
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
          SymbolicExecutionUtil.setUseLoopInvariants(proof, methodTreatmentContract);
          SymbolicExecutionUtil.setUseLoopInvariants(proof, loopTreatmentInvariant);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      Proof proof = getProof();
+      if (builder != null) {
+         builder.dispose();
+      }
+      if (proof != null && proof != getLoadedProof()) {
+         proof.dispose();
+      }
+      super.dispose();
    }
 }

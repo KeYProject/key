@@ -1,7 +1,20 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -34,17 +47,17 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
    /**
     * Contains the found declared {@link IProgramVariable}s.
     */
-   private Set<IProgramVariable> declaredVariables = new HashSet<IProgramVariable>();
+   private LinkedHashSet<IProgramVariable> declaredVariables = new LinkedHashSet<IProgramVariable>();
 
    /**
     * Contains the super result.
     */
-   private HashSet<LocationVariable> allVariables;
+   private LinkedHashSet<LocationVariable> allVariables;
    
    /**
     * Contains the undeclared variables as result.
     */
-   private HashSet<LocationVariable> undeclaredVariables;
+   private LinkedHashSet<LocationVariable> undeclaredVariables;
    
    /**
     * Constructor.
@@ -110,7 +123,7 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * Returns all used variables.
     * @return All used variables.
     */
-   public HashSet<LocationVariable> getAllVariables() {
+   public LinkedHashSet<LocationVariable> getAllVariables() {
       if (allVariables == null) {
          allVariables = super.result();
       }
@@ -122,10 +135,10 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * @return The undeclared variables.
     */
    @Override
-   public HashSet<LocationVariable> result() {
+   public LinkedHashSet<LocationVariable> result() {
       if (undeclaredVariables == null) {
          // Create result Set
-         undeclaredVariables = new HashSet<LocationVariable>();
+         undeclaredVariables = new LinkedHashSet<LocationVariable>();
          // Add all found variables
          undeclaredVariables.addAll(getAllVariables());
          // Remove all declared variables

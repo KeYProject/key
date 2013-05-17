@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.common.ui.preference.page;
 
 import java.io.File;
@@ -10,7 +23,7 @@ import org.key_project.key4eclipse.util.KeYExampleUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -61,9 +74,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
       KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(getExampleProof(), null, null);
-      if (env.getLoadedProof() != null) {
-         env.getLoadedProof().dispose();
-      }
+      env.dispose();
    }
    
    /**

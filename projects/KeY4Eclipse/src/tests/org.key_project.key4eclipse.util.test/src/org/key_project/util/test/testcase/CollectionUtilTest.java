@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.testcase;
 
 import java.util.Collection;
@@ -606,10 +619,51 @@ public class CollectionUtilTest extends TestCase {
    }
 
    /**
+    * Test for {@link CollectionUtil#addAll(Collection, Iterable)}
+    */
+   @Test
+   public void testAddAll_Iterable() {
+      List<String> collection = new LinkedList<String>();
+      CollectionUtil.addAll(null, CollectionUtil.toList("A"));
+      assertEquals(0, collection.size());
+      CollectionUtil.addAll(collection, (Iterable<String>)null);
+      assertEquals(0, collection.size());
+      CollectionUtil.addAll(collection, CollectionUtil.toList("A"));
+      assertEquals(1, collection.size());
+      assertEquals("A", collection.get(0));
+      CollectionUtil.addAll(collection, CollectionUtil.toList("B"));
+      assertEquals(2, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      CollectionUtil.addAll(collection, CollectionUtil.toList("C", "D"));
+      assertEquals(4, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      assertEquals("C", collection.get(2));
+      assertEquals("D", collection.get(3));
+      CollectionUtil.addAll(collection, CollectionUtil.toList("E"));
+      assertEquals(5, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      assertEquals("C", collection.get(2));
+      assertEquals("D", collection.get(3));
+      assertEquals("E", collection.get(4));
+      CollectionUtil.addAll(collection, CollectionUtil.toList("F", "G"));
+      assertEquals(7, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      assertEquals("C", collection.get(2));
+      assertEquals("D", collection.get(3));
+      assertEquals("E", collection.get(4));
+      assertEquals("F", collection.get(5));
+      assertEquals("G", collection.get(6));
+   }
+
+   /**
     * Test for {@link CollectionUtil#addAll(java.util.Collection, Object...)}
     */
    @Test
-   public void testAddAll() {
+   public void testAddAll_Array() {
       List<String> collection = new LinkedList<String>();
       CollectionUtil.addAll(null, "A");
       assertEquals(0, collection.size());

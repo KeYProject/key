@@ -1301,24 +1301,25 @@ public final class MainWindow extends JFrame  {
         }        
     }        
     
-    /** displays some status information */
-    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
-        String message;       
-        String timeString = "" + (time/1000)+"."+((time%1000)/100);        
-                
-        // display message in the status bar
-        
-        if ( appliedRules != 0 ) {
-            message = "Strategy: Applied " + appliedRules + " rule";
-            if ( appliedRules != 1 ) message += "s";
-            message += " (" + timeString + " sec), ";
-            message += " closed " + closedGoals + " goal";
-            if ( closedGoals != 1 ) message += "s";             
-            message += ", " + openGoals;
-            message += " remaining"; 
-            setStatusLine ( message );
-        }                              
-    }
+//    /** displays some status information */
+// MU: I moved this to DefaultTaskFinishedInfo.toString()
+//    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
+//        String message;       
+//        String timeString = "" + (time/1000)+"."+((time%1000)/100);        
+//                
+//        // display message in the status bar
+//        
+//        if ( appliedRules != 0 ) {
+//            message = "Strategy: Applied " + appliedRules + " rule";
+//            if ( appliedRules != 1 ) message += "s";
+//            message += " (" + timeString + " sec), ";
+//            message += " closed " + closedGoals + " goal";
+//            if ( closedGoals != 1 ) message += "s";             
+//            message += ", " + openGoals;
+//            message += " remaining"; 
+//            setStatusLine ( message );
+//        }                              
+//    }
     
     void displayResults(String message){
             setStatusLine(message);

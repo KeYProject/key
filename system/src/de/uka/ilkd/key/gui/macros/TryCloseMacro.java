@@ -14,15 +14,18 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -78,73 +81,104 @@ public class TryCloseMacro implements ProofMacro {
                 "Applies only to goals beneath the selected node.";
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.gui.macros.ProofMacro#canApplyTo(de.uka.ilkd.key.gui.KeYMediator, de.uka.ilkd.key.logic.PosInOccurrence)
+    /*
+     * This macro is always applicable.
      */
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.gui.macros.ProofMacro#applyTo(de.uka.ilkd.key.gui.KeYMediator, de.uka.ilkd.key.logic.PosInOccurrence)
+    /* 
+     * Run the automation on the goals. Retreat if not successful.
      */
-    @Override
-    public void applyTo(final KeYMediator mediator, PosInOccurrence posInOcc) {
-
-        final Proof proof = mediator.getInteractiveProver().getProof();
-        final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
-
-        // this returns a clone of the actual settings, ...
-        final StrategyProperties properties =
-                strategySettings.getActiveStrategyProperties();
-
-        final String oldRetreatMode =
-                properties.getProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY);
-
-        final int oldNumberSteps =
-                mediator.getMaxAutomaticSteps();
+    @Override 
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
 
         //
-        // activate retreat mode
-        properties.put(StrategyProperties.RETREAT_MODE_OPTIONS_KEY,
-                StrategyProperties.RETREAT_MODE_RETREAT);
+        // create the rule application engine
+        final ApplyStrategy applyStrategy = 
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
 
-        // ... we only had a clone, so we need to replace the original settings.
-        strategySettings.setActiveStrategyProperties(properties);
+        final Proof proof = mediator.getInteractiveProver().getProof();
+
+        //
+        // find the targets
+        Node invokedNode = mediator.getSelectedNode();
+        ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
 
         //
         // set the max number of steps if given
+        int oldNumberOfSteps = mediator.getMaxAutomaticSteps();
         if(numberSteps > 0) {
             mediator.setMaxAutomaticSteps(numberSteps);
         }
+        
+        // 
+        // inform the listener
+        int goalsTotal = enabledGoals.size();
+        int goalsClosed = 0;
+        int goalsDone = 0;
+        long time = 0;
+        int appliedRules = 0;
+        fireStart(listener, goalsTotal);
 
         //
         // start actual autoprove
-        Node invokedNode = mediator.getSelectedNode();
-        ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
-        mediator.startAutoMode(enabledGoals);
+        try {
+            for (Goal goal : enabledGoals) {
+                Node node = goal.node();
+                ApplyStrategyInfo result = 
+                        applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
 
-        mediator.addAutoModeListener(new AutoModeListener() {
+                // retreat if not closed
+                if(!node.isClosed()) {
+                    proof.pruneProof(node);
+                } else {
+                    goalsClosed ++;
+                }
 
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                // set retreat mode back to old value
-                properties.put(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, oldRetreatMode);
-                strategySettings.setActiveStrategyProperties(properties);
+                // update statistics
+                goalsDone++;
+                time += result.getTime();
+                appliedRules += result.getAppliedRuleApps();
 
-                // reset the number of steps to old value
-                mediator.setMaxAutomaticSteps(oldNumberSteps);
-
-                // listener has done its job. remove it.
-                mediator.removeAutoModeListener(this);
+                // only now reraise the interruption exception
+                if(applyStrategy.hasBeenInterrupted()) {
+                    throw new InterruptedException();
+                }
+                
+                fireProgress(listener, goalsDone);
             }
+        } finally {
+            // reset the old number of steps
+            mediator.setMaxAutomaticSteps(oldNumberOfSteps);
+            // inform the listener
+            fireStop(listener, proof, time, appliedRules, goalsClosed);
+        }
 
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-            }
-        });
+    }
 
+    private void fireStop(ProverTaskListener listener, Proof proof, long time, 
+            int appliedRules, int closedGoals) {
+        if(listener != null) {
+            listener.taskFinished(
+                    new DefaultTaskFinishedInfo(this, null, proof, 
+                            time, appliedRules, closedGoals));
+        }
+    }
+
+    private void fireStart(ProverTaskListener ptl, int numberGoals) {
+        if(ptl != null) {
+            ptl.taskStarted("Trying to close " + numberGoals +" open goals", numberGoals);
+        }
+    }
+
+    private void fireProgress(ProverTaskListener ptl, int steps) {
+        if (ptl != null) {
+            ptl.taskProgress(steps);
+        }
     }
 
 }
