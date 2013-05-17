@@ -16,6 +16,8 @@ package org.key_project.keyide.ui.editor;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -32,6 +34,9 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -45,6 +50,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 
 
@@ -53,7 +59,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
+public class KeYEditor extends TextEditor implements IProofProvider {
    public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
    
    private ProofTreeContentOutlinePage outline;
@@ -61,6 +67,11 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    private Node showNode; 
    
    private ProofSourceViewerDecorator textViewer; // TODO: Rename, into proofDecorator. And also its getter
+   
+   /**
+    * Contains the registered {@link IProofProviderListener}.
+    */
+   private List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
   
 //   private boolean dirtyFlag = false;
    
@@ -312,13 +323,13 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     */
    public void setShowNode(Node showNode) {
       this.showNode=showNode;
-      textViewer.setDocumentForNode(getShowNode(), getKeYEnvironment().getMediator());
+      textViewer.setDocumentForNode(getShowNode(), getEnvironment().getMediator());
    }
    
    
    /**
     * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
-    * of the {@link ConsoleUserInterface} provided via {@link #getKeYEnvironment()}.
+    * of the {@link ConsoleUserInterface} provided via {@link #getEnvironment()}.
     */
    private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() { // TODO: Move to the top of the class, order is attributes, constructors, methods like in UML
       @Override
@@ -333,7 +344,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    @Override
    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
       super.init(site, input);
-      getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      getEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
    }
 
    /**
@@ -342,17 +353,17 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    @Override
    public void createPartControl(Composite parent) {
       super.createPartControl(parent);
-      getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      getEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       ISourceViewer sourceViewer = getSourceViewer();
       textViewer = new ProofSourceViewerDecorator(sourceViewer);
 //      getProof().addProofTreeListener(proofTreeListener); // Is this line irrelevant? Remove it from source code!
       sourceViewer.setEditable(false);
       sourceViewer.getTextWidget().addMouseMoveListener(mouseMoveListener);
       if (this.getShowNode() != null) {
-         textViewer.setDocumentForNode(getShowNode(), getKeYEnvironment().getMediator());
+         textViewer.setDocumentForNode(getShowNode(), getEnvironment().getMediator());
       }
       else {
-         setShowNode(getProof().root());
+         setShowNode(getCurrentProof().root());
       }
    }
 
@@ -362,8 +373,8 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     */
    @Override
    public void dispose() {
-      getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-      getKeYEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
+      getEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      getEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
 //      getProof().removeProofTreeListener(proofTreeListener); // Is this line irrelevant? Remove it from source code!
       if (outline != null) {
          outline.dispose();
@@ -375,7 +386,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     * {@inheritDoc}
     */
    @Override
-   public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment() {
+   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
       Assert.isTrue(getEditorInput() instanceof ProofEditorInput);
       return ((ProofEditorInput)getEditorInput()).getEnvironment();
    }
@@ -384,9 +395,25 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     * {@inheritDoc}
     */
    @Override
-   public Proof getProof() {
+   public Proof getCurrentProof() {
       Assert.isTrue(getEditorInput() instanceof ProofEditorInput);
       return ((ProofEditorInput)getEditorInput()).getProof();
+   }
+
+
+   @Override
+   public Proof[] getCurrentProofs() {
+      Proof proof = getCurrentProof();
+      return proof != null ? new Proof[] {proof} : new Proof[0];
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public UserInterface getUI() {
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getUi() : null;
    }
    
    /**
@@ -397,23 +424,57 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       if (IContentOutlinePage.class.equals(adapter)) {
          synchronized (this) {
             if (outline == null) {
-               outline = new ProofTreeContentOutlinePage(getProof(), getKeYEnvironment());
-               getKeYEnvironment().getMediator().addKeYSelectionListener(keySelectionListener);
+               outline = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment());
+               getEnvironment().getMediator().addKeYSelectionListener(keySelectionListener);
             }
          }
          return outline;
       }
       else if (Proof.class.equals(adapter)){
-         return getProof();
+         return getCurrentProof();
       }
       else if (KeYEnvironment.class.equals(adapter)){
-         return getKeYEnvironment();
+         return getEnvironment();
       }
-      else if (IProofEnvironmentProvider.class.equals(adapter)) {
+      else if (UserInterface.class.equals(adapter)) {
+         return getUI();
+      }
+      else if (IProofProvider.class.equals(adapter)) {
          return this;
       }
       else {
          return super.getAdapter(adapter);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
+   }
+   
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
       }
    }
 }
