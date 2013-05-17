@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.ProblemLoaderException;
 
 public class KeYProjectBuilder extends IncrementalProjectBuilder {
 
+   public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
+   
    /**
     * {@inheritDoc}
     */

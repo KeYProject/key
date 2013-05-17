@@ -8,6 +8,8 @@ import org.eclipse.core.runtime.CoreException;
 
 public class KeYProjectNature implements IProjectNature  {
    
+   public final static String NATURE_ID = "org.key_project.key4eclipse.resources.KeYProjectNature";
+   
    private IProject project;
 
    

@@ -22,7 +22,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="true"
-            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <command
                commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
                label="Convert to KeY Project"

@@ -194,34 +194,6 @@ public class TestUtilsUtil {
       return javaProject;
    }
    
-   public static IJavaProject createKeYProject(String name) throws CoreException, InterruptedException{
-      IProject project = createProject(name);
-      IProjectDescription description = project.getDescription();
-      //Add KeYNature
-      String[] natures = description.getNatureIds();
-      String[] newNatures = new String[natures.length + 1];
-      System.arraycopy(natures, 0, newNatures, 0, natures.length);
-      newNatures[natures.length] = JavaCore.NATURE_ID;
-      description.setNatureIds(newNatures);
-      project.setDescription(description, null);
-      
-      IFolder bin = project.getFolder("bin");
-      if (!bin.exists()) {
-         bin.create(true, true, null);
-      }
-      IFolder src = project.getFolder("src");
-      if (!src.exists()) {
-         src.create(true, true, null);
-      }
-      IJavaProject javaProject = JavaCore.create(project); 
-      JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-      IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-      entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-      page.init(javaProject, bin.getFullPath(), entries, false);
-      page.configureJavaProject(null);
-      return javaProject;
-   }
-   
    /**
     * Returns the default JRE library entries.
     * @return The default JRE library entries.
