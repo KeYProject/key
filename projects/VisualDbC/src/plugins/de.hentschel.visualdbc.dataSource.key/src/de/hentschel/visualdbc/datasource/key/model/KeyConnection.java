@@ -44,6 +44,8 @@ import org.key_project.util.java.thread.IRunnableWithException;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
+import de.hentschel.visualdbc.datasource.key.model.event.IKeYConnectionListener;
+import de.hentschel.visualdbc.datasource.key.model.event.KeYConnectionEvent;
 import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
@@ -230,6 +232,11 @@ public class KeyConnection extends MemoryConnection {
     * Contains all instantiated {@link KeyProof}s to dispose them on disconnect.
     */
    private List<KeyProof> proofs;
+   
+   /**
+    * Contains the registered {@link IKeYConnectionListener}.
+    */
+   private List<IKeYConnectionListener> listeners = new LinkedList<IKeYConnectionListener>();
    
    /**
     * The used listener to observe {@link #main}.
@@ -716,7 +723,7 @@ public class KeyConnection extends MemoryConnection {
     * @param method The method.
     * @return The signature.
     */
-   protected String getSignature(IProgramMethod method) {
+   public static String getSignature(IProgramMethod method) {
       StringBuffer sb = new StringBuffer();
       sb.append(method.getFullName());
       sb.append(PARAMETER_START);
@@ -730,7 +737,7 @@ public class KeyConnection extends MemoryConnection {
     * @param method The method.
     * @return The signature parameters.
     */
-   protected String getSignatureParameters(IProgramMethod method) {
+   public static String getSignatureParameters(IProgramMethod method) {
       StringBuffer sb = new StringBuffer();
       ImmutableArray<ParameterDeclaration> parameters = method.getParameters();
       boolean firstParameter = true;
@@ -760,7 +767,7 @@ public class KeyConnection extends MemoryConnection {
     * @param packageManagement The {@link DSPackageManagement} to use.
     * @return The type name to use in the diagram model.
     */
-   protected String getTypeName(Type type, DSPackageManagement packageManagement) {
+   public static String getTypeName(Type type, DSPackageManagement packageManagement) {
       Assert.isTrue(type instanceof KeYJavaType);
       return getTypeName((KeYJavaType)type, packageManagement);
    }
@@ -771,7 +778,7 @@ public class KeyConnection extends MemoryConnection {
     * @param packageManagement The {@link DSPackageManagement} to use.
     * @return The type name to use in the diagram model.
     */
-   protected String getTypeName(TypeReference typeReference, DSPackageManagement packageManagement) {
+   public static String getTypeName(TypeReference typeReference, DSPackageManagement packageManagement) {
       return getTypeName(typeReference.getKeYJavaType(), packageManagement);
    }
 
@@ -781,8 +788,8 @@ public class KeyConnection extends MemoryConnection {
     * @param packageManagement The {@link DSPackageManagement} to use.
     * @return The type name to use in the diagram model.
     */
-   protected String getTypeName(KeYJavaType type, 
-                                DSPackageManagement packageManagement) {
+   public static String getTypeName(KeYJavaType type, 
+                                    DSPackageManagement packageManagement) {
       if (type.getJavaType() instanceof ArrayDeclaration) {
          ArrayDeclaration ad = (ArrayDeclaration)type.getJavaType();
          StringBuffer sb = new StringBuffer();
@@ -892,7 +899,7 @@ public class KeyConnection extends MemoryConnection {
     * @param classAxiom The {@link ClassAxiom} to check.
     * @return {@code true} include, {@code false} do not include
     */
-   protected boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
+   public static boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
       ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
       return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
              ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
@@ -1832,6 +1839,14 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
+    * Returns the treated {@link MainWindow}.
+    * @return The treated {@link MainWindow}.
+    */
+   public MainWindow getMain() {
+      return main;
+   }
+
+   /**
     * Closes the active task without user interaction.
     */
    public void closeTaskWithoutInteraction() {
@@ -1845,5 +1860,53 @@ public class KeyConnection extends MemoryConnection {
    public void registerProof(KeyProof proof) {
       Assert.isTrue(proofs != null, "Connection is not established.");
       proofs.add(proof);
+   }
+   
+   /**
+    * Registers the given {@link IKeYConnectionListener}.
+    * @param l The {@link IKeYConnectionListener} to register.
+    */
+   public void addKeYConnectionListener(IKeYConnectionListener l) {
+      if (l != null) {
+         listeners.add(l);
+      }
+   }
+   
+   /**
+    * Removes the given {@link IKeYConnectionListener}.
+    * @param l The {@link IKeYConnectionListener} to remove.
+    */
+   public void removeKeYConnectionListener(IKeYConnectionListener l) {
+      if (l != null) {
+         listeners.add(l);
+      }
+   }
+   
+   /**
+    * Checks if the given {@link IKeYConnectionListener} is registered.
+    * @param l The {@link IKeYConnectionListener} to check.
+    * @return {@code true} is registered, {@code false} is not registered.
+    */
+   public boolean hasKeYConnectionListener(IKeYConnectionListener l) {
+      return l != null ? listeners.contains(l) : false;
+   }
+   
+   /**
+    * Fires the event {@link IKeYConnectionListener#interactiveProofStarted(KeYConnectionEvent)} to all listeners.
+    * @param e The event to fire.
+    */
+   protected void fireInteractiveProofStarted(KeyProof proof) {
+      fireInteractiveProofStarted(new KeYConnectionEvent(this, proof));
+   }
+   
+   /**
+    * Fires the event {@link IKeYConnectionListener#interactiveProofStarted(KeYConnectionEvent)} to all listeners.
+    * @param e The event to fire.
+    */
+   protected void fireInteractiveProofStarted(KeYConnectionEvent e) {
+      IKeYConnectionListener[] toInform = listeners.toArray(new IKeYConnectionListener[listeners.size()]);
+      for (IKeYConnectionListener l : toInform) {
+         l.interactiveProofStarted(e);
+      }
    }
 }
