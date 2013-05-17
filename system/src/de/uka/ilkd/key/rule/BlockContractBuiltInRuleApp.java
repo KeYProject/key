@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.speclang.*;
 
 public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
