@@ -540,11 +540,6 @@ public final class UseOperationContractRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal, 
 	    			     Services services, 
 	    			     RuleApp ruleApp) {
-        final boolean loadedInfFlow = services.getProof().getSettings()
-                                        .getStrategySettings().getActiveStrategyProperties()
-                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-
 	//get instantiation
 	final Instantiation inst 
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
@@ -585,8 +580,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                || !(inst.actualResult != null && resultVar == null);
         final ProgramVariable excVar = TB.excVar(services, "exc", inst.pm, true);
         assert excVar != null;
-        if (!loadedInfFlow)
-            goal.addProgramVariable(excVar);
+        goal.addProgramVariable(excVar);
         
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         //translate the contract
@@ -788,7 +782,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	            false);
 
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) {
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))) {
             // prepare information flow analysis
             assert anonUpdateDatas.size() == 1 : "information flow extension " +
                                                  "is at the moment not " +

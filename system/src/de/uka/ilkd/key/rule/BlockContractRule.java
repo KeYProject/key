@@ -295,13 +295,8 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        boolean loadedInfFlow =
-                services.getProof().getSettings()
-                .getStrategySettings().getActiveStrategyProperties()
-                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) || loadedInfFlow) &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) &&
             contract.hasModifiesClause() && contract.getRespects() != null) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
@@ -771,19 +766,13 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable) {
-            boolean loadedInfFlow =
-                    services.getProof().getSettings()
-                    .getStrategySettings().getActiveStrategyProperties()
-                    .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                    .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
             if (placeholderVariable != null) {
                 final ProgramElementName newName =
                         new ProgramElementName(
                                 TB.newName(services, placeholderVariable.name().toString()));
                 final LocationVariable newVariable =
                         new LocationVariable(newName, placeholderVariable.getKeYJavaType());
-                if (!loadedInfFlow)
-                    goal.addProgramVariable(newVariable);
+                goal.addProgramVariable(newVariable);
                 return newVariable;
             }
             else {

@@ -155,10 +155,11 @@ public final class WhileInvariantRule implements BuiltInRule {
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    LoopInvariant inv, Services services) {
-        final boolean loadedInfFlow = services.getProof().getSettings()
-                                        .getStrategySettings().getActiveStrategyProperties()
-                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+        final boolean loadedInfFlow = false;
+//                                    services.getProof().getSettings()
+//                                        .getStrategySettings().getActiveStrategyProperties()
+//                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+//                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
 	final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
@@ -441,10 +442,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
-        final boolean loadedInfFlow = services.getProof().getSettings()
-                                        .getStrategySettings().getActiveStrategyProperties()
-                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
@@ -507,8 +504,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         //prepare guard
         final ProgramElementName guardVarName = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
-        if (!loadedInfFlow)
-            services.getNamespaces().programVariables().addSafely(guardVar);
+        services.getNamespaces().programVariables().addSafely(guardVar);
         final VariableSpecification guardVarSpec 
         = new VariableSpecification(guardVar, 
                 inst.loop.getGuardExpression(), 
@@ -656,7 +652,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         InfFlowData infFlowData = null;
 
         if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) || loadedInfFlow) &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))) &&
             inst.inv.getRespects(services) != null) {
 
             assert anonUpdateDatas.size() == 1 : "information flow " +

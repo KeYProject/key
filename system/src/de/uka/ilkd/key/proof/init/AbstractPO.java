@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -285,35 +286,27 @@ public abstract class AbstractPO implements IPersistablePO {
                          ? initConfig.getSettings()
                          : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
         assert p.openGoals().size() == 1 : "expected one first open goal";
-        if (this instanceof InfFlowRelatedPO) {
-            InfFlowRelatedPO po = (InfFlowRelatedPO) this;
-            if (po.getContract().hasModifiesClause() &&
-                po.getContract().getRespects() != null) {
-                StrategyInfoUndoMethod undo =
-                        new StrategyInfoUndoMethod() {
-
-                            @Override
-                            public void undo(
-                                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
-                                strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
-                            }
-                        };
-                p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
-            }
-        } else if (this instanceof LoopInvExecutionPO) {
-            LoopInvExecutionPO po = (LoopInvExecutionPO) this;
-            if (po.getLoopInvariant().getRespects(services) != null) {
-                StrategyInfoUndoMethod undo =
-                        new StrategyInfoUndoMethod() {
-                    
-                            @Override
-                            public void undo(
-                                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
-                                strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
-                            }
-                        };
-                p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
-            }
+        final boolean isInfFlowProof =
+                (this instanceof InfFlowRelatedPO &&
+                 ((InfFlowRelatedPO) this).getContract().hasModifiesClause() &&
+                 ((InfFlowRelatedPO) this).getContract().getRespects() != null) ||
+                (this instanceof LoopInvExecutionPO &&
+                 ((LoopInvExecutionPO) this).getContract().hasModifiesClause() &&
+                 ((LoopInvExecutionPO) this).getLoopInvariant().getRespects(services) != null) ||
+                // this is a hack and has to be changed by time
+                p.getSettings().getStrategySettings().getActiveStrategyProperties()
+                               .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                               .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);;
+        if (isInfFlowProof) {
+            StrategyInfoUndoMethod undo =
+                    new StrategyInfoUndoMethod() {
+                @Override
+                public void undo(
+                        de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                    strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
+                }
+            };
+            p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
         }
         return p;
     }
