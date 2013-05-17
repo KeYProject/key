@@ -13,8 +13,9 @@
 
 package de.hentschel.visualdbc.interactive.proving.ui.util;
 
-import java.util.HashMap;
+import java.lang.ref.WeakReference;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.util.java.ObjectUtil;
@@ -27,6 +28,8 @@ import de.hentschel.visualdbc.datasource.model.event.DSConnectionEvent;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.util.DriverUtil;
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
+import de.hentschel.visualdbc.interactive.proving.ui.util.event.IInteractiveConnectionUtilListener;
+import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConnectionUtilEvent;
 
 /**
  * <p>
@@ -43,9 +46,11 @@ import de.hentschel.visualdbc.dbcmodel.DbcModel;
  */
 public final class InteractiveConnectionUtil {
    /**
-    * The currently opened interactive {@link IDSConnection}.
+    * The currently opened interactive {@link IDSConnection}s.
     */
-   private static Map<DbcModel, IDSConnection> connections = new HashMap<DbcModel, IDSConnection>();
+   private static WeakHashMap<DbcModel, WeakReference<IDSConnection>> connections = new WeakHashMap<DbcModel, WeakReference<IDSConnection>>();
+   
+   private static WeakHashMap<IInteractiveConnectionUtilListener, Void> listeners = new WeakHashMap<IInteractiveConnectionUtilListener, Void>();
    
    /**
     * Forbid instances.
@@ -80,15 +85,17 @@ public final class InteractiveConnectionUtil {
       // Get connection settings
       Map<String, Object> connectionSettings = driver.fromPersistentProperties(model.toConnectionProperties()); 
       // Check if a connection already exists
-      IDSConnection result = connections.get(model);
+      IDSConnection result = getConnection(model);
+      boolean opened = false;
       if (result == null) {
          result = driver.createConnection();
          result.addConnectionListener(new ConnectionCloseListener(model));
-         connections.put(model, result);
+         connections.put(model, new WeakReference<IDSConnection>(result));
       }
       // Make sure that the connection is established
       if (!result.isConnected()) {
          result.connect(connectionSettings, true, monitor);
+         opened = true;
       }
       // Check that the correct connection is established
       if (result.getDriver() == null) {
@@ -103,6 +110,9 @@ public final class InteractiveConnectionUtil {
       if (!ObjectUtil.equals(connectionSettings, result.getConnectionSettings())) {
          throw new DSException("Connection settings in diagram root and current connection are different.");
       }
+      if (opened) {
+         fireConnectionOpened(new InteractiveConnectionUtilEvent(result, model));
+      }
       return result;
    }
    
@@ -114,12 +124,22 @@ public final class InteractiveConnectionUtil {
     */
    public static boolean isOpened(DbcModel model) throws DSException {
       if (model != null) {
-         IDSConnection connection = connections.get(model);
+         IDSConnection connection = getConnection(model);
          return connection != null && connection.isConnected();
       }
       else {
          return false;
       }
+   }
+   
+   /**
+    * Returns the {@link IDSConnection} for the given {@link DbcModel} if available.
+    * @param model The {@link DbcModel} to get its {@link IDSConnection}. 
+    * @return The {@link IDSConnection} for the given {@link DbcModel} or {@code null} if not available.
+    */
+   public static IDSConnection getConnection(DbcModel model) {
+      WeakReference<IDSConnection> reference = connections.get(model);
+      return reference != null ? reference.get() : null;
    }
    
    /**
@@ -129,9 +149,12 @@ public final class InteractiveConnectionUtil {
     */
    public static void closeConnection(DbcModel model) throws DSException {
       if (model != null) {
-         IDSConnection connection = connections.remove(model);
-         if (connection != null && connection.isConnected()) {
-            connection.disconnect();
+         WeakReference<IDSConnection> reference = connections.remove(model);
+         if (reference != null) {
+            IDSConnection connection = reference.get();
+            if (connection != null && connection.isConnected()) {
+               connection.disconnect();
+            }
          }
       }
    }
@@ -168,6 +191,37 @@ public final class InteractiveConnectionUtil {
          catch (DSException exception) {
             LogUtil.getLogger().logError(exception);
          }
+      }
+   }
+   
+   /**
+    * Registers the given {@link IInteractiveConnectionUtilListener}.
+    * @param l The {@link IInteractiveConnectionUtilListener} to register.
+    */
+   public static void addInteractiveConnectionUtilListener(IInteractiveConnectionUtilListener l) {
+      if (l != null) {
+         listeners.put(l, null);
+      }
+   }
+   
+   /**
+    * Removes the given {@link IInteractiveConnectionUtilListener}.
+    * @param l The {@link IInteractiveConnectionUtilListener} to remove.
+    */
+   public static void removeInteractiveConnectionUtilListener(IInteractiveConnectionUtilListener l) {
+      if (l != null) {
+         listeners.remove(l);
+      }
+   }
+   
+   /**
+    * Fires the event {@link IInteractiveConnectionUtilListener#connectionOpened(InteractiveConnectionUtilEvent)}.
+    * @param e The event object to fire.
+    */
+   private static void fireConnectionOpened(InteractiveConnectionUtilEvent e) {
+      IInteractiveConnectionUtilListener[] toInform = listeners.keySet().toArray(new IInteractiveConnectionUtilListener[listeners.keySet().size()]);
+      for (IInteractiveConnectionUtilListener l : toInform) {
+         l.connectionOpened(e);
       }
    }
 }
