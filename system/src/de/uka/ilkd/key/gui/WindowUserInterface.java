@@ -130,8 +130,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 				if (g == null) {
 					g = proof.openGoals().head();
 				}
-				mainWindow.getMediator().goalChosen(
-				        g);
+				mainWindow.getMediator().goalChosen(g);
 				if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
 					// iff Stop on non-closeable Goal is selected a little
 					// popup is generated and proof is stopped
@@ -141,9 +140,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 					dialog.show();
 				}
 			}
-			mainWindow.displayResults(
-			        info.getTime(), info.getAppliedRules(),
-			        info.getClosedGoals(), info.getProof().openGoals().size());
+			mainWindow.displayResults(info.toString());
 		} else if (info.getSource() instanceof ProblemLoader) {
 			if (!"".equals(info.getResult())) {
 				final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info

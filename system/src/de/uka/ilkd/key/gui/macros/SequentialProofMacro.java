@@ -17,14 +17,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProofEvent;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -75,60 +72,32 @@ public abstract class SequentialProofMacro implements ProofMacro {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * <p>
      * This launches the first macro and registers a new
      * {@link AutoModeListener} with the {@code mediator}. This listener
      * unregisters itself after the last macro.
+     * 
+     * @throws InterruptedException
+     *             if one of the wrapped macros is interrupted.
      */
-    @Override
-    public void applyTo(final KeYMediator mediator, final PosInOccurrence posInOcc) {
+    @Override 
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
 
-        // install the progressing listener
-        mediator.addAutoModeListener(new AutoModeListener() {
+        final Node initNode = mediator.getSelectedNode();
+        for (ProofMacro macro : getProofMacros()) {
+            // reverse to original node
+            mediator.getSelectionModel().setSelectedNode(initNode);
+            macro.applyTo(mediator, posInOcc, listener);
+        }
 
-            private int curMacro = 0;
-            private final List<ProofMacro> proofMacros = getProofMacros();
-            private final Node curNode = mediator.getSelectedNode();
-
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                curMacro ++;
-                if(curMacro >= proofMacros.size()) {
-                    mediator.removeAutoModeListener(this);
-                } else {
-                    // This has to be performed on the AWT event dispatch
-                    // thread. The other listeners code has to be executed
-                    // first! By this we ensure that the restart happens after
-                    // all autoModeStopped calls.
-                    assert SwingUtilities.isEventDispatchThread();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            mediator.getSelectionModel().setSelectedNode(curNode);
-                            proofMacros.get(curMacro).applyTo(mediator, posInOcc);
-                        }
-                    });
-
-//                    for(Goal g : mediator.getInteractiveProver().getProof().openGoals()) {
-//                        System.out.println(g.node().serialNr());
-//                    }
-//                    System.out.println(mediator.getInteractiveProver().getProof().openGoals().size());
-                }
-            }
-
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-            }
-        });
-
-        // start the first macro right away.
-        getProofMacros().get(0).applyTo(mediator, posInOcc);
     }
 
     /**
      * Gets the proof macros.
      *
-     * @return the proofMacros
+     * @return the proofMacros as an unmodifiable list.
      */
     public List<ProofMacro> getProofMacros() {
         if(proofMacros == null) {
