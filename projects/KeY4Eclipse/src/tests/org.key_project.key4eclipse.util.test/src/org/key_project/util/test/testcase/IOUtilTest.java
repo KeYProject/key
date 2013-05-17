@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.testcase;
 
 import java.io.BufferedReader;
@@ -8,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +35,9 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.IFileVisitor;
 import org.key_project.util.java.IOUtil.LineInformation;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -31,6 +47,152 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class IOUtilTest extends TestCase {
+   /**
+    * Tests {@link IOUtil#visit(File, org.key_project.util.java.IOUtil.IFileVisitor)}.
+    */
+   @Test
+   public void testVisit() throws IOException {
+      // Create files to test
+      File tempDir = IOUtil.createTempDirectory("ResourceUtilTest", "testCopyIntoWorkspace");
+      try {
+         File emptyFolder = new File(tempDir, "emptyFolder");
+         emptyFolder.mkdirs();
+         File subDir = new File(tempDir, "subFolder");
+         subDir.mkdirs();
+         File subFile = new File(subDir, "SubFile.txt");
+         IOUtil.writeTo(new FileOutputStream(subFile), "SubFile.txt");
+         File subSubDir = new File(subDir, "subSubFolder");
+         subSubDir.mkdirs();
+         File subSubA = new File(subSubDir, "SubSubFileA.txt");
+         IOUtil.writeTo(new FileOutputStream(subSubA), "SubSubFileA.txt");
+         File subSubB = new File(subSubDir, "SubSubFileB.txt");
+         IOUtil.writeTo(new FileOutputStream(subSubB), "SubSubFileB.txt");
+         File text = new File(tempDir, "Text.txt");
+         IOUtil.writeTo(new FileOutputStream(text), "Text.txt");
+         // Create visitor
+         LogVisitor visitor = new LogVisitor();
+         // Test null
+         IOUtil.visit(null, visitor);
+         assertEquals(0, visitor.getVisitedFiles().size());
+         // Test visiting
+         IOUtil.visit(tempDir, visitor);
+         assertEquals(8, visitor.getVisitedFiles().size());
+         assertEquals(tempDir, visitor.getVisitedFiles().get(0));
+         assertEquals(emptyFolder, visitor.getVisitedFiles().get(1));
+         assertEquals(subDir, visitor.getVisitedFiles().get(2));
+         assertEquals(subFile, visitor.getVisitedFiles().get(3));
+         assertEquals(subSubDir, visitor.getVisitedFiles().get(4));
+         assertEquals(subSubA, visitor.getVisitedFiles().get(5));
+         assertEquals(subSubB, visitor.getVisitedFiles().get(6));
+         assertEquals(text, visitor.getVisitedFiles().get(7));
+      }
+      finally {
+         IOUtil.delete(tempDir);
+      }
+   }
+   
+   /**
+    * A logging {@link IFileVisitor}.
+    * @author Martin Hentschel
+    */
+   private static final class LogVisitor implements IFileVisitor {
+      /**
+       * The visited {@link File}s.
+       */
+      private List<File> visitedFiles = new LinkedList<File>();
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(File file) throws IOException {
+         visitedFiles.add(file);
+      }
+
+      /**
+       * Returns the visited {@link File}s.
+       * @return The visited {@link File}s.
+       */
+      public List<File> getVisitedFiles() {
+         return visitedFiles;
+      }
+   }
+   
+   /**
+    * Tests {@link IOUtil#search(File, org.key_project.util.java.IFilter)}.
+    */
+   @Test
+   public void testSearch() throws IOException {
+      // Create files to test
+      File tempDir = IOUtil.createTempDirectory("ResourceUtilTest", "testCopyIntoWorkspace");
+      try {
+         File emptyFolder = new File(tempDir, "emptyFolder");
+         emptyFolder.mkdirs();
+         File subDir = new File(tempDir, "subFolder");
+         subDir.mkdirs();
+         File subFile = new File(subDir, "SubFile.txt");
+         IOUtil.writeTo(new FileOutputStream(subFile), "SubFile.txt");
+         File subSubDir = new File(subDir, "subSubFolder");
+         subSubDir.mkdirs();
+         File subSubA = new File(subSubDir, "SubSubFileA.txt");
+         IOUtil.writeTo(new FileOutputStream(subSubA), "SubSubFileA.txt");
+         File subSubB = new File(subSubDir, "SubSubFileB.txt");
+         IOUtil.writeTo(new FileOutputStream(subSubB), "SubSubFileB.txt");
+         File text = new File(tempDir, "Text.txt");
+         IOUtil.writeTo(new FileOutputStream(text), "Text.txt");
+         // Create filter
+         IFilter<File> filter = new IFilter<File>() {
+            @Override
+            public boolean select(File element) {
+               return element.getName().contains("Sub");
+            }
+         };
+         // Test null
+         List<File> result = IOUtil.search(null, filter);
+         assertEquals(0, result.size());
+         // Test no filter
+         result = IOUtil.search(tempDir, null);
+         assertEquals(8, result.size());
+         assertEquals(tempDir, result.get(0));
+         assertEquals(emptyFolder, result.get(1));
+         assertEquals(subDir, result.get(2));
+         assertEquals(subFile, result.get(3));
+         assertEquals(subSubDir, result.get(4));
+         assertEquals(subSubA, result.get(5));
+         assertEquals(subSubB, result.get(6));
+         assertEquals(text, result.get(7));
+         // Test with filter
+         result = IOUtil.search(tempDir, filter);
+         assertEquals(4, result.size());
+         assertEquals(subFile, result.get(0));
+         assertEquals(subSubDir, result.get(1));
+         assertEquals(subSubA, result.get(2));
+         assertEquals(subSubB, result.get(3));
+      }
+      finally {
+         IOUtil.delete(tempDir);
+      }
+   }
+   
+   /**
+    * Tests {@link IOUtil#getFileExtension(File)}
+    */
+   @Test
+   public void testGetFileExtension() {
+      assertNull(IOUtil.getFileExtension(null));
+      assertNull(IOUtil.getFileExtension(new File("")));
+      assertNull(IOUtil.getFileExtension(new File("hello")));
+      assertNull(IOUtil.getFileExtension(new File("path", "hello")));
+      assertEquals("java", IOUtil.getFileExtension(new File("hello.java")));
+      assertEquals("java", IOUtil.getFileExtension(new File("path", "hello.java")));
+      assertEquals("java", IOUtil.getFileExtension(new File(".java")));
+      assertEquals("java", IOUtil.getFileExtension(new File("path", ".java")));
+      assertEquals("", IOUtil.getFileExtension(new File(".")));
+      assertEquals("", IOUtil.getFileExtension(new File("path", ".")));
+      assertEquals("", IOUtil.getFileExtension(new File("hello.")));
+      assertEquals("", IOUtil.getFileExtension(new File("path", "hello.")));
+   }
+   
    /**
     * Tests {@link IOUtil#getHomeDirectory()}.
     */
@@ -353,10 +515,32 @@ public class IOUtilTest extends TestCase {
    }
    
    /**
+    * Tests {@link IOUtil#readFrom(File)}
+    */
+   @Test
+   public void testReadFrom_File() throws IOException {
+      // Test null
+      assertNull(IOUtil.readFrom((File)null));
+      File tempFile = File.createTempFile("IOUtilTest", "testReadFrom_File");
+      try {
+         // Test not existing file
+         IOUtil.delete(tempFile);
+         assertFalse(tempFile.exists());
+         assertNull(IOUtil.readFrom(tempFile));
+         // Test existing file
+         IOUtil.writeTo(new FileOutputStream(tempFile), "Hello World!");
+         assertEquals("Hello World!", IOUtil.readFrom(tempFile));
+      }
+      finally {
+         IOUtil.delete(tempFile);
+      }
+   }
+   
+   /**
     * Tests {@link IOUtil#readFrom(java.io.InputStream)}
     */
    @Test
-   public void testReadFrom() {
+   public void testReadFrom_InputStream() {
       try {
          doTestReadFrom(null);
          doTestReadFrom("One Line");
@@ -387,7 +571,7 @@ public class IOUtilTest extends TestCase {
          assertEquals(text, IOUtil.readFrom(new ByteArrayInputStream(text.getBytes())));
       }
       else {
-         assertNull(IOUtil.readFrom(null));
+         assertNull(IOUtil.readFrom((InputStream)null));
       }
    }
    

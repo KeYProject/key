@@ -118,11 +118,21 @@ public class LabeledStatement extends JavaStatement
 
 
     public SourceElement getFirstElement() {
-        return getBody().getFirstElement();
+       if (body instanceof StatementBlock) {
+          return body.getFirstElement();
+       }
+       else {
+          return body;
+       }
     }
 
     public SourceElement getLastElement() {
-        return body.getLastElement();
+       if (body instanceof StatementBlock) {
+          return body.getLastElement();
+       }
+       else {
+          return body;
+       }
     }
 
 

@@ -123,13 +123,15 @@ public abstract class SwingWorker {
                 }
                 finally {
                     threadVar.clear();
+                    // !! MU has moved this from behind the finally into the 
+                    // finally ... Cleanup should be performed also in case of failure.
+                    SwingUtilities.invokeLater(doFinished);
                 }
 
-                SwingUtilities.invokeLater(doFinished);
             }
         };
 
-        Thread t = new Thread(doConstruct);
+        Thread t = new Thread(doConstruct, getClass().getName());
         threadVar = new ThreadVar(t);
     }
 
@@ -140,6 +142,19 @@ public abstract class SwingWorker {
         Thread t = threadVar.get();
         if (t != null) {
             t.start();
+        }
+    }
+    
+    /**
+     * Join the worker thread.
+     * 
+     * Does nothing if no thread has been created.
+     * @throws InterruptedException if waiting is interrupted
+     */
+    public void join() throws InterruptedException {
+        Thread t = threadVar.get();
+        if (t != null) {
+            t.join();
         }
     }
 }

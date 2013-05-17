@@ -11,12 +11,7 @@
    <extension
          point="de.hentschel.visualdbc.dataSource.key.ruleAnalysts">
       <ruleAnalyst
-            class="de.hentschel.visualdbc.datasource.key.rule.MethodBodyExpandRuleAnalyst"
-            priority="VERY_LOW">
-      </ruleAnalyst>
-      <ruleAnalyst
-            class="de.hentschel.visualdbc.datasource.key.rule.UseOperationContractRuleAnalyst"
-            priority="VERY_LOW">
+            class="de.hentschel.visualdbc.datasource.key.rule.DefaultRuleAnalyst">
       </ruleAnalyst>
    </extension>
 </plugin>

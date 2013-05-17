@@ -1,6 +1,23 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.ui;
 
+import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
@@ -62,6 +79,20 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
    public void taskFinished(TaskFinishedInfo info) {
       if(isVerbose()) {
          System.out.println("CustomConsoleUserInterface.taskFinished()");
+      }
+      // Update selected node in KeYMediator. This is copied code from WindowUserInterface and should be refactored in the future
+      if (info.getSource() instanceof ApplyStrategy) {
+         resetStatus(this);
+         ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+
+         Proof proof = info.getProof();
+         if (!proof.closed()) {
+            Goal g = result.nonCloseableGoal();
+            if (g == null) {
+               g = proof.openGoals().head();
+            }
+            getMediator().goalChosen(g);
+         }
       }
    }
 }

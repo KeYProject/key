@@ -155,4 +155,8 @@ public final class PartialInvAxiom extends ClassAxiom {
     public String toString() {
 	return inv.toString();
     }
+    
+    public ClassInvariant getInv() {
+       return inv;
+    }
 }

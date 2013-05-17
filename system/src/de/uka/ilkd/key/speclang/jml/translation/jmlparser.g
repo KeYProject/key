@@ -1502,6 +1502,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 		body = TB.imp(range, body);
 
 		result = new SLExpression(TB.and(resTerm, TB.all(i, body)));
+	    } else {
+	        raiseError("\\nonnullelements may only be applied to arrays");
 	    }
 	}
 	
@@ -2043,3 +2045,4 @@ quantifiedvariabledeclarator[KeYJavaType t] returns [LogicVariable v = null] thr
 	  v = new LogicVariable(new Name(id.getText()), varType.getSort());
    }
 ;
+
