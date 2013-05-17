@@ -993,7 +993,7 @@ public class Proof implements Named {
      * This implementation traverses the proof tree only once.
      */
     public List<Pair<String,String>> statistics() {
-        final List<Pair<String,String>> res = new ArrayList<Pair<String,String>>();
+        final List<Pair<String,String>> res = new ArrayList<Pair<String,String>>(10);
         final NodeIterator it = root().subtreeIterator();
 
         int nodes = 0;

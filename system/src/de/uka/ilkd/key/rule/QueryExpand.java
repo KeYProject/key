@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -63,25 +63,27 @@ import de.uka.ilkd.key.proof.Goal;
 
 
 /**
- * The QueryExpand rule allows to apply contracts or to symbolically execute a query 
- * expression in the logic. It replaces the query expression by a new constant and 
- * constructs a box formula in the antecedent 'defining' the constant as the result of 
- * a method call. The method call is encoded directly as a method call in the box modality. 
+ * The QueryExpand rule allows to apply contracts or to symbolically execute a query
+ * expression in the logic. It replaces the query expression by a new constant and
+ * constructs a box formula in the antecedent 'defining' the constant as the result of
+ * a method call. The method call is encoded directly as a method call in the box modality.
  * The query is invoked in a context equal to the container type of the query method.
- * 
+ *
  * @author Richard Bubel
  */
 public class QueryExpand implements BuiltInRule {
 
     public static final QueryExpand INSTANCE = new QueryExpand();
 
+    private static final int DEFAULT_MAP_SIZE = 200;
+
     private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
 
     private static final TermBuilder tb = TermBuilder.DF;
-    
+
     /** Stores a number that indicates the time when term occurred for the first time where
      * this rule was applicable. The time is the number of rules applied on this branch.*/
-    private WeakHashMap<Term,Long> timeOfTerm = new WeakHashMap<Term,Long>(); 
+    private WeakHashMap<Term,Long> timeOfTerm = new WeakHashMap<Term,Long>(DEFAULT_MAP_SIZE);
 
 
     @Override
@@ -101,43 +103,43 @@ public class QueryExpand implements BuiltInRule {
         g.addFormula(new SequentFormula(topLevel), true, true);	//move the query call directly to the succedent. Use box instead of diamond?
 
         /*  replaces old query
-        final Term newFormula = replace(pio.constrainedFormula().formula(), 
+        final Term newFormula = replace(pio.constrainedFormula().formula(),
                 tb.func(placeHolderResult), pio.posInTerm().iterator());
         g.changeFormula(new SequentFormula(newFormula), pio.topLevel());
          */
 
         return newGoal;
     }
-    
+
     /** Creates an invocation of a query in a modal operator and stores the value in a
      *  new symbol. This is a utility method, that may also be used by other classes.
-     * @param services 
+     * @param services
      * @param query The query on which the query expand rule is applied
-     * @param instVars If null, then the result of the query can be stored in a constant (e.g. res=query(a)). 
-     *        Otherwise it is a list of logical variables that can be instantiated (using the rules allLeft, exRight) 
+     * @param instVars If null, then the result of the query can be stored in a constant (e.g. res=query(a)).
+     *        Otherwise it is a list of logical variables that can be instantiated (using the rules allLeft, exRight)
      *        and therefore the result of the query must be stored by function that depends on instVars (e.g. forall i; res(i)=query(i)).
      *        The list may be empty even if it not null.
      * @param newGoal The new goal that results from this rule application. (requires to register new symbols)
      * @return The formula (!{U}<result=query();>result=res_query) & query()=res_query
      * @author Richard Bubel
-     * @author gladisch 
+     * @author gladisch
      */
     public Term queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
-    	
+
     	   final IProgramMethod method = (IProgramMethod)query.op();
-    	   
+
            final ImmutableArray<ProgramVariable> args = getRegisteredArgumentVariables(method.getParameters(), services);
 
 
            //Names for additional symbols
-           
+
            final String calleeName     = tb.newName(services, "callee");
            final String progResultName = tb.newName(services, "queryResult");
            final String logicResultName= tb.newName(services, "res_"+method.getName());
            //For declaring the symbol that stores the result in a logical term a trick is done.
            //The new symbolc is introduced as a logical variable that is later skolemized by the ex_left rule.
            //  LogicVariable logicResultQV = new LogicVariable(new Name("res_"+method.getName()),query.sort());
-           
+
            KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(
              query.subs().size() == 1 ? // static query
                 query.sort()
@@ -157,19 +159,19 @@ public class QueryExpand implements BuiltInRule {
                offset = 1;
            }
 
-           final ProgramVariable result = 
+           final ProgramVariable result =
                    new LocationVariable(
-                           new ProgramElementName(progResultName), 
+                           new ProgramElementName(progResultName),
                                    progResultType);
 
 
            final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);
-           
+
            //final LocationVariable placeHoderResult = new LocationVariable(new ProgramElementName(logicResultName), logicResultType);
            //final Term placeHolderResultTrm = tb.var(logicResultQV);
            final Function placeHolderResult;
            final Term placeHolderResultTrm;
-           
+
            if(instVars==null || instVars.length==0) {
         	   placeHolderResult    = new Function(new Name(logicResultName), query.sort());
         	   placeHolderResultTrm = tb.func(placeHolderResult);
@@ -184,39 +186,39 @@ public class QueryExpand implements BuiltInRule {
         	   placeHolderResult    = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
         	   placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); //I'm not sure about the third parameter!
            }
-           
+
            services.getNamespaces().functions().addSafely(placeHolderResult);
-         
-           // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn} 
-           //                                  \[ res = o.m(p1,..,pn); \] (c = res) 
+
+           // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn}
+           //                                  \[ res = o.m(p1,..,pn); \] (c = res)
 
            ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
-           
+
            stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
-           
+
            final CopyAssignment assignment = new CopyAssignment(result, mr);
 
            stmnt.add(assignment);
-           
+
            StatementBlock s = new StatementBlock(stmnt.toArray(new Statement[stmnt.size()]));
 
-           
-           
-           final MethodFrame mf = new MethodFrame(null, 
+
+
+           final MethodFrame mf = new MethodFrame(null,
                    new ExecutionContext(new TypeRef(method.getContainerType()), method, null),
                    //new StatementBlock(assignment)
                    s);
-           final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));	
+           final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));
 
            final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result),placeHolderResultTrm)));  //Not sure if box or diamond should be used.
            //final Term methodCall = tb.box(jb, tb.equals(tb.var(result), query));
-           
+
            Term update = tb.elementary(services, services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
            if (callee != null) {
                update = tb.parallel(tb.elementary(services, tb.var(callee), query.sub(1)), update);
            }
 
-           final Term[] argUpdates = new Term[args.size()]; 
+           final Term[] argUpdates = new Term[args.size()];
            for (int i = 0; i<args.size(); i++) {
                argUpdates[i] = tb.elementary(services, tb.var(args.get(i)), query.sub(offset+1+i));
            }
@@ -226,16 +228,16 @@ public class QueryExpand implements BuiltInRule {
            Term topLevel = tb.not(tb.apply(update, methodCall));
 
 
-           // The following additional equation increases performance (sometimes significantly, e.g. by factor 10). 
+           // The following additional equation increases performance (sometimes significantly, e.g. by factor 10).
            topLevel = tb.and(topLevel, tb.equals(query,placeHolderResultTrm));
-           
+
            //topLevel = tb.ex(logicResultQV, topLevel); //Alternative way to declare the symbol
 
            return topLevel;
     }
 
-    
-    
+
+
     private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
             ImmutableArray<ParameterDeclaration> paramDecls, Services services) {
 
@@ -246,20 +248,20 @@ public class QueryExpand implements BuiltInRule {
         	final String baseName = pdecl.getVariableSpecification().getName();
         	final String newName = tb.newName(services,baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
-            args[i] = new LocationVariable(argVarName, 
+            args[i] = new LocationVariable(argVarName,
                     pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
             progvarsNS.addSafely(args[i]);
             //newGoal.addProgramVariable(pv);
             i++;
         }
-        
+
         return new ImmutableArray<ProgramVariable>(args);
     }
 
-    
-    /** 
-     * Apply "evaluate query" to the queries that occur in <code>term</code>. The query evaluations/expansions are inserted 
-     * into a copy of <code>term</code> that is returned. 
+
+    /**
+     * Apply "evaluate query" to the queries that occur in <code>term</code>. The query evaluations/expansions are inserted
+     * into a copy of <code>term</code> that is returned.
      * @param services
      * @param term  A formula that potentially contains queries that should be evaluated/expanded.
      * @param positiveContext Set false iff the <code>term</code> is in a logically negated context wrt. to the succedent.
@@ -269,13 +271,13 @@ public class QueryExpand implements BuiltInRule {
      */
     public Term evaluateQueries(Services services,  Term term, boolean positiveContext, boolean allowExpandBelowInstQuantifier){
     	//System.out.println("---------- evaluateQueries on:  ---------------- "+term+"\n-------------------------------\n");
-    	final int depth =term.depth(); 
+    	final int depth =term.depth();
     	List<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
     	Vector<Integer> path = new Vector<Integer>(depth);
     	path.setSize(depth);
     	final ImmutableSLList<QuantifiableVariable> instVars;
     	if(allowExpandBelowInstQuantifier){
-    		instVars = ImmutableSLList.nil(); 
+    		instVars = ImmutableSLList.nil();
     	}else{
     		instVars = null;
     	}
@@ -303,25 +305,25 @@ public class QueryExpand implements BuiltInRule {
         	//result = TB.and( queryExp, term);
     	return term;
     }
-    
-    
-    /** Find queries in t and suitable positions where to insert their evaluations in t. 
+
+
+    /** Find queries in t and suitable positions where to insert their evaluations in t.
      * This method is called by the method <code>evaluateQueries<\code>.
      * @param t The term where to search for queries and query evaluation positions.
      * @param level The current recursion level of this method call.
      * @param pathInTerm Vector of integers describing the current path in the syntax tree (of the term at level 0).
-     * @param instVars If null, then query evaluation below instantiable quantifiers (i.e. non-Skolemizable quantifiers) is suppressed. 
-     *         If not null, then this list collects the logical variables of instantiable quantifers that the query evaluation depends on. 
+     * @param instVars If null, then query evaluation below instantiable quantifiers (i.e. non-Skolemizable quantifiers) is suppressed.
+     *         If not null, then this list collects the logical variables of instantiable quantifers that the query evaluation depends on.
      *         This is to needed to create e.g. (forall i; query(i)=res(i)) instead of (forall i;query(i)=res); the latter is unsound.
-     * @param curPosIsPositive True iff the current position in the formula we are in is a logically positive context (when considering polarity wrt. logical negation). 
+     * @param curPosIsPositive True iff the current position in the formula we are in is a logically positive context (when considering polarity wrt. logical negation).
      * @param qepLevel The top-most level on the current path where the query evaluation could be inserted. Its either top-level (0) or below a quantifier.
      * @param qepIsPositive True iff the logical context at position qepLevel is positive (i.e., not negated, or negations have cancelled out).
      * @param qeps The resulting collection of query evaluation positions.
-     * @author gladisch 
+     * @author gladisch
      */
     @SuppressWarnings("unchecked")
-    private void findQueriesAndEvaluationPositions(Term t, int level, Vector<Integer> pathInTerm, 
-    		               ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, 
+    private void findQueriesAndEvaluationPositions(Term t, int level, Vector<Integer> pathInTerm,
+    		               ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive,
     		               int qepLevel, boolean qepIsPositive, List<QueryEvalPos> qeps){
     	if(t==null){
     		return;
@@ -347,15 +349,15 @@ public class QueryExpand implements BuiltInRule {
     	}else if(op== Junctor.NOT){
     		pathInTerm.set(nextLevel, 0);
     		findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, !curPosIsPositive, qepLevel, qepIsPositive, qeps);
-    	}else if(op== Equality.EQV){ 
-    		// Each subformula of "<->" is in both, positive and negative scope. Query expansion below it would be unsound. 
+    	}else if(op== Equality.EQV){
+    		// Each subformula of "<->" is in both, positive and negative scope. Query expansion below it would be unsound.
     		// Alternatively "<->" could be converted into "->" and "<-"
     		return;
     	}else if(t.javaBlock()!=JavaBlock.EMPTY_JAVABLOCK){ //do not descend below java blocks.
     		return;
-    	}else if(op== Quantifier.ALL ){ 
+    	}else if(op== Quantifier.ALL ){
     		if(curPosIsPositive){ //Quantifier that will be Skolemized
-    			//This is a potential query evaluation position. 
+    			//This is a potential query evaluation position.
         		pathInTerm.set(nextLevel, 0);
     			findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, curPosIsPositive, nextLevel, curPosIsPositive, qeps);
     		}else{ //Quantifier that will be instantiated. Warning: this may explode!
@@ -366,7 +368,7 @@ public class QueryExpand implements BuiltInRule {
     			   findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, curPosIsPositive, nextLevel, curPosIsPositive, qeps);
     			}
     		}
-    	}else if(op== Quantifier.EX ){ 
+    	}else if(op== Quantifier.EX ){
     		if(curPosIsPositive){ //Quantifier that will be instantiated. Warning: this may explode!
     			if(instVars!=null){
         		   pathInTerm.set(nextLevel, 0);
@@ -375,7 +377,7 @@ public class QueryExpand implements BuiltInRule {
     			   findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, curPosIsPositive, nextLevel, curPosIsPositive, qeps);
     			}
     		}else{ //Quantifier that will be Skolemized
-    			//This is a potential query evaluation position. 
+    			//This is a potential query evaluation position.
         		pathInTerm.set(nextLevel, 0);
     			findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, curPosIsPositive, nextLevel, curPosIsPositive, qeps);
     		}
@@ -388,23 +390,23 @@ public class QueryExpand implements BuiltInRule {
     		}
     	}
     }
-    
-    
+
+
     private Vector<Term> collectQueries(Term t){
     	Vector<Term> queries = new Vector<Term>();
     	collectQueriesRecursively(t,queries);
     	return queries;
     }
-    
-    
-    /** Utility method called by <code>collectQueriesRecursively</code> */    
+
+
+    /** Utility method called by <code>collectQueriesRecursively</code> */
     private void collectQueriesRecursively(Term t, Vector<Term> result){
     	if(t.javaBlock()!=JavaBlock.EMPTY_JAVABLOCK){
     		//System.out.println("collectQueriesRec encountered javaBlock.");
     		return;
     	}
     	// What about checking if an update is encountered?
-    	
+
     	if(t.op() instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t);
     		result.add(t);
@@ -416,7 +418,7 @@ public class QueryExpand implements BuiltInRule {
     	}
     }
 
-    
+
     /**
      * Tries to remove redundant query evaluations/expansions.
      */
@@ -434,25 +436,25 @@ public class QueryExpand implements BuiltInRule {
     		}
     	}
     }
-    
-    
+
+
     /**
      * Query evaluation position. Describes where to insert a query evaluation/expansion (see <code>QueryExpand</code>)
      * in a formula.
      * @author gladisch
      */
     private class QueryEvalPos implements Comparable<QueryEvalPos> {
-    	
-    	/** The query that is subject to query evaluation/expansion. 
-    	 * The query itself is not modified but a formula is added at a position 
+
+    	/** The query that is subject to query evaluation/expansion.
+    	 * The query itself is not modified but a formula is added at a position
     	 * described by the other fields. */
     	final public Term query;
     	/** Positive or negative position wrt. logical negation. 	 */
-    	final public boolean positivePosition; 
-    	/** Path in the syntax tree of the term where the query evaluation/expansion should be inserted. 
+    	final public boolean positivePosition;
+    	/** Path in the syntax tree of the term where the query evaluation/expansion should be inserted.
     	 *  The first element has no meaning and should be null. The path starts with the second element. */
     	final public Vector<Integer> pathInTerm;
-    	
+
     	final public LogicVariable[] instVars;
 
     	@SuppressWarnings("unchecked")
@@ -468,31 +470,31 @@ public class QueryExpand implements BuiltInRule {
 				instVars = new LogicVariable[0];
 			}
     	}
-    	
-    	
+
+
     	public String toString(){
     		String pathstr = "[";
     		for(Integer in:pathInTerm){
     			pathstr += in+", ";
     		}
     		pathstr+="]";
-    		return "QueryEvalPos of "+ (query!=null?query.toString():"NOQUERY")+ 
+    		return "QueryEvalPos of "+ (query!=null?query.toString():"NOQUERY")+
     				" in "+(positivePosition?"positive":"negative")+" position " +
     				(instVars.length>0?"  instVar:"+instVars[0]+" ":"") +
     				" insertPath:"+pathstr;
     	}
-    	
+
     	public Term getTermOnPath(Term root){
-    		Term result = root; 
+    		Term result = root;
     		for(int i=1 /*skip the first*/;i<pathInTerm.size();i++){
     			result = result.sub(pathInTerm.get(i));
     		}
     		return result;
     	}
 
-    	
+
     	public boolean subsumes(QueryEvalPos other){
-    		if(!query.equals(other.query) || pathInTerm.size()>other.pathInTerm.size() || 
+    		if(!query.equals(other.query) || pathInTerm.size()>other.pathInTerm.size() ||
     				!Arrays.deepEquals(instVars, other.instVars)) {
     			return false;
     		}
@@ -506,7 +508,7 @@ public class QueryExpand implements BuiltInRule {
     		return true;
     	}
 
-    	/** For sorting. Longer paths come first in order to apply 
+    	/** For sorting. Longer paths come first in order to apply
     	 * modifications to the target term in a depth-first order.	 */
 		@Override
 		public int compareTo(QueryEvalPos other) {
@@ -516,12 +518,12 @@ public class QueryExpand implements BuiltInRule {
 		}
     }
 
-    
+
     /**
-     * Replaces in a term. 
+     * Replaces in a term.
      * @param term
      * @param with
-     * @param it iterator with argument positions. This is the path in the syntax tree of term. 
+     * @param it iterator with argument positions. This is the path in the syntax tree of term.
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */
@@ -531,7 +533,7 @@ public class QueryExpand implements BuiltInRule {
         }
 
         final int arity = term.arity();
-        final Term newSubTerms[] = new Term[arity];    
+        final Term newSubTerms[] = new Term[arity];
         boolean changedSubTerm = false;
         int next = (Integer)(it.next());
         //System.out.print(next+", ");
@@ -561,9 +563,9 @@ public class QueryExpand implements BuiltInRule {
         }
 
         return result;
-    }  
+    }
 
-    
+
     @Override
     public Name name() {
         return QUERY_DEF_NAME;
@@ -580,7 +582,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
-    /** 
+    /**
      * Important the correctness of the implementation of this rule relies on the following side-conditions:
      * <ul>
      * <li>the query term has no free variables</li>
@@ -588,16 +590,16 @@ public class QueryExpand implements BuiltInRule {
      * </ul>
      * If you want to change this you need to adapt the application logic by adding preceding updates in front of the new added formula and/or
      * to take care of free variables when introducing the skolemfunction symbol and when replacing the query term by the skolem function.
-     * 
+     *
      * The method is equipped with a side-effect that stores the age of the term. This information is useful
      * for <code>QueryExpandCost</cost>.
      */
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {		
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
-            if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) && 
+            if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while ( it.next() != -1 ) {
@@ -612,26 +614,26 @@ public class QueryExpand implements BuiltInRule {
         }
         return false;
     }
-    
-    private void storeTimeOfQuery(Term query, Goal goal){    	
+
+    private void storeTimeOfQuery(Term query, Goal goal){
     	if(timeOfTerm.get(query)==null){
     		timeOfTerm.put(query, goal.getTime());
     	}
     }
-    
+
     public Long getTimeOfQuery(Term t){
     	if(t==null || !(t.op() instanceof IProgramMethod)){
     		System.err.println("QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is:"+(t!=null?t:"null"));
     		return null;
     	}
     	return timeOfTerm.get(t);
-    	
+
     }
 
 	@Override
     public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
-    
+
 
 }

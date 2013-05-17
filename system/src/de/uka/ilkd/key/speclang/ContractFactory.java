@@ -72,7 +72,7 @@ public class ContractFactory {
     addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars,
             foci.originalSelfVar, foci.originalResultVar, foci.originalExcVar, foci.originalParamVars, foci.originalAtPreVars);
 
-    Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>();
+    Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
     for(LocationVariable h : foci.originalPosts.keySet()) {
        if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
           newPosts.put(h, tb.and(foci.originalPosts.get(h), addedPost));
@@ -124,7 +124,7 @@ public class ContractFactory {
                 replaceVariables(addedPre, selfVar, paramVars, atPreVars,
                                  foci.originalSelfVar, foci.originalParamVars, foci.originalAtPreVars);
 
-      Map<LocationVariable,Term> newPres = new LinkedHashMap<LocationVariable,Term>();
+      Map<LocationVariable,Term> newPres = new LinkedHashMap<LocationVariable,Term>(10);
       for(LocationVariable h : foci.originalPres.keySet()) {
          if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
             newPres.put(h, tb.and(foci.originalPres.get(h), addedPre));
@@ -280,12 +280,12 @@ public class ContractFactory {
         }
 
         //collect information
-        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>(t.originalPres.size());
         for(LocationVariable h : t.originalPres.keySet()) {
            pres.put(h, t.originalPres.get(h));
         }
         Term mby = t.originalMby;
-        Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>(t.originalPosts.size());
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            Term oriPost = t.originalPosts.get(h);
            if(oriPost != null) {
@@ -395,7 +395,7 @@ public class ContractFactory {
     }
 
     private Term atPreify(Term t, Map<LocationVariable,? extends ProgramVariable> atPreVars) {
-        final Map<Term,Term> map = new LinkedHashMap<Term,Term>();
+        final Map<Term,Term> map = new LinkedHashMap<Term,Term>(atPreVars.size());
         for(LocationVariable h : atPreVars.keySet()) {
           if(atPreVars.get(h) != null) {
             map.put(tb.var(h), tb.var(atPreVars.get(h)));

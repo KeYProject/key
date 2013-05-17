@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.rule.conditions;
@@ -50,8 +50,8 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
      * call. The flag negation allows to reuse this condition for
      * ensuring non static references.
      */
-    public StaticMethodCondition (boolean negation, 
-				  SchemaVariable caller, 
+    public StaticMethodCondition (boolean negation,
+				  SchemaVariable caller,
 				  SchemaVariable methname,
 				  SchemaVariable args) {
 	this.negation = negation;
@@ -68,31 +68,32 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 	return new ImmutableArray<Expression>(result);
     }
 
-    
+
+    @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, 
-			 SVSubstitute subst, 
+    public boolean check(SchemaVariable var,
+			 SVSubstitute subst,
 			 SVInstantiations svInst,
 			 Services services) {
-	
+
 	ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
 	MethodName mn = (MethodName) svInst.getInstantiation(methname);
-	ImmutableArray<ProgramElement> ape = 
+	ImmutableArray<ProgramElement> ape =
 	    (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
 	if (rp != null && mn != null && ape != null) {
-	    ImmutableArray<Expression> ar 
+	    ImmutableArray<Expression> ar
 		= toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
-	    if (var == args) {		
+	    if (var == args) {
 		ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
 	    }
-	    ExecutionContext ec 
+	    ExecutionContext ec
 		= svInst.getContextInstantiation().activeStatementContext();
 	    MethodReference mr =new MethodReference(ar, mn, rp);
 	    IProgramMethod method = null;
 	    KeYJavaType prefixType = services.getTypeConverter().
 		getKeYJavaType((Expression) rp, ec);
-	    if((rp instanceof LocationVariable) && 
+	    if((rp instanceof LocationVariable) &&
 	       (((LocationVariable) rp).sort() instanceof NullSort)){
 		return true;
 	    }
@@ -101,22 +102,22 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 		// we are only interested in the signature. The method
 		// must be declared in the static context.
 	    } else { //no execution context
-		method = mr.method (services, prefixType, 
+		method = mr.method (services, prefixType,
 		        mr.getMethodSignature(services, ec),
 		        prefixType);
 	    }
-	    if (method == null) {	
-		return false;		
+	    if (method == null) {
+		return false;
 	    }
 	    return negation ^ method.isStatic();
 	}
 	return true;
     }
 
-    
-    @Override    
+
+    @Override
     public String toString () {
-	return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller 
+	return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller
 	       + ", " + methname + ", " + args + ")";
     }
 }
