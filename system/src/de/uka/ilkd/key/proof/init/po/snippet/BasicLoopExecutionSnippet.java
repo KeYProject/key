@@ -28,24 +28,24 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
-        if (poVars.selfAtPost != null)
-            posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
+        if (poVars.post.self != null)
+            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
 
-        if (poVars.guard != null) {
+        if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
             posts = posts.append(d.tb.box(guardJb,
-                                          d.tb.equals(poVars.guardAtPost,
-                                                      d.origVars.guard)));
+                                          d.tb.equals(poVars.post.guard,
+                                                      poVars.pre.guard)));
         }
-        Iterator<Term> out = poVars.localOuts.iterator();
-        Iterator<Term> in = d.origVars.localIns.iterator();
-        while (in.hasNext()) {
-            Term i = in.next();
-            Term o = out.next();
+        Iterator<Term> localVars = d.origVars.localVars.iterator();
+        Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
+        while (localVars.hasNext()) {
+            Term i = localVars.next();
+            Term o = localVarsAtPost.next();
             if (i != null && o != null)
                 posts = posts.append(d.tb.equals(o, i));
         }
-        posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
+        posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
         
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
@@ -88,8 +88,8 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
         //create update
         Term update = tb.skip();
-        Iterator<Term> paramIt = vs.localIns.iterator();
-        Iterator<Term> origParamIt = d.origVars.localIns.iterator();
+        Iterator<Term> paramIt = vs.pre.localVars.iterator();
+        Iterator<Term> origParamIt = d.origVars.localVars.iterator();
         while (paramIt.hasNext()) {
             Term paramUpdate =
                     d.tb.elementary(d.tb.getServices(), origParamIt.next(), paramIt.next());

@@ -7,9 +7,9 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.Triple;
 
@@ -37,137 +37,12 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                  ImmutableList<Term>,ImmutableList<Term>>>) d.get(BasicSnippetData.Key.RESPECTS);
 
         // the respects-sequents evaluated in the pre-state
-        ImmutableList<Term> newIns1 = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> ins = poVars1.localIns;
-        if (poVars1.localIns.size() > poVars1.localOuts.size()) {
-            for (Term t1 : d.origVars.localOuts) {
-                boolean found = false;
-                for (Term t2: ins) {
-                    ins = ins.removeFirst(t2);
-                    if (t2.toString().contains(t1.toString()) &&
-                            t2.sort().equals(t1.sort()) &&
-                            !found) {
-                        newIns1 = newIns1.append(t2);
-                        found = true;
-                    }
-                }
-                assert found;
-            }
-        } else {
-            newIns1 = poVars1.localIns;
-        }
-        ProofObligationVars p1 = new ProofObligationVars(poVars1.self,
-                                                         poVars1.selfAtPost,
-                                                         poVars1.guard,
-                                                         poVars1.localIns,
-                                                         poVars1.guardAtPost,
-                                                         !poVars1.localOuts.isEmpty() ? newIns1 :
-                                                             ImmutableSLList.<Term>nil(),
-                                                         poVars1.result,
-                                                         poVars1.resultAtPost,
-                                                         poVars1.exception,
-                                                         poVars1.exceptionAtPost,
-                                                         poVars1.heap,
-                                                         poVars1.heapAtPre,
-                                                         poVars1.heapAtPost,
-                                                         poVars1.mbyAtPre,
-                                                         poVars1.postfix,
-                                                         d.tb.getServices(),
-                                                         poVars1.local);
-        Triple<Term[],Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, p1);
+        Triple<Term[],Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, poVars1.pre);
+        Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, poVars2.pre);
 
-        ImmutableList<Term> newIns2 = ImmutableSLList.<Term>nil();
-        ins = poVars2.localIns;
-        if (poVars2.localIns.size() > poVars2.localOuts.size()) {
-            for (Term t1 : d.origVars.localOuts) {
-                boolean found = false;
-                for (Term t2: ins) {
-                    ins = ins.removeFirst(t2);
-                    if (t2.toString().contains(t1.toString()) &&
-                            t2.sort().equals(t1.sort()) &&
-                            !found) {
-                        newIns2 = newIns2.append(t2);
-                        found = true;
-                    }
-                }
-                assert found;
-            }
-        } else {
-            newIns2 = poVars2.localIns;
-        }
-        ProofObligationVars p2 = new ProofObligationVars(poVars2.self,
-                                                         poVars2.selfAtPost,
-                                                         poVars2.guard,
-                                                         poVars2.localIns,
-                                                         poVars2.guardAtPost,
-                                                         !poVars2.localOuts.isEmpty() ? newIns2 :
-                                                             ImmutableSLList.<Term>nil(),
-                                                         poVars2.result,
-                                                         poVars2.resultAtPost,
-                                                         poVars2.exception,
-                                                         poVars2.exceptionAtPost,
-                                                         poVars2.heap,
-                                                         poVars2.heapAtPre,
-                                                         poVars2.heapAtPost,
-                                                         poVars2.mbyAtPre,
-                                                         poVars2.postfix,
-                                                         d.tb.getServices(),
-                                                         poVars2.local);
-        Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, p2);
         // the respects-sequents evaluated in the post-state
-        Term[] pv = new Term[] {poVars1.heap,
-                                poVars1.self,
-                                poVars1.guard,
-                                poVars1.result,
-                                poVars1.exception};
-        Term[] pre = new Term[pv.length + poVars1.localOuts.size()];
-        int p;
-        for (p = 0; p < pv.length; p++) {
-            pre[p] = pv[p];
-        }
-        for (Iterator<Term> ins1 = newIns1.iterator(); p < pre.length; p++) {
-            pre[p] = ins1.next();
-        }
-        pv = new Term[] {poVars1.heapAtPost,
-                         poVars1.selfAtPost,
-                         poVars1.guardAtPost,
-                         poVars1.resultAtPost,
-                         poVars1.exceptionAtPost};
-        Term[] post = new Term[pv.length + poVars1.localOuts.size()];
-        for (p = 0; p < pv.length; p++) {
-            post[p] = pv[p];
-        }
-        for (Iterator<Term> outs1 = poVars1.localOuts.iterator(); p < post.length; p++) {
-            post[p] = outs1.next();
-        }
-        Triple<Term[],Term[],Term[]>[] respectsAtPost1 = replace(respectsAtPre1, pre, post);
-
-        pv = new Term[] {poVars2.heap,
-                         poVars2.self,
-                         poVars2.guard,
-                         poVars2.result,
-                         poVars2.exception};
-        pre = new Term[pv.length + poVars2.localOuts.size()];
-        for (p = 0; p < pv.length; p++) {
-            pre[p] = pv[p];
-        }
-        for (Iterator<Term> ins2 = newIns2.iterator(); p < pre.length; p++) {
-            pre[p] = ins2.next();
-        }
-        pv = new Term[] {poVars2.heapAtPost,
-                         poVars2.selfAtPost,
-                         poVars2.guardAtPost,
-                         poVars2.resultAtPost,
-                         poVars2.exceptionAtPost};
-        post = new Term[pv.length + poVars2.localOuts.size()];
-        for (p = 0; p < pv.length; p++) {
-            post[p] = pv[p];
-        }
-        for (Iterator<Term> outs2 = poVars2.localOuts.iterator(); p < post.length; p++) {
-            post[p] = outs2.next();
-        }
-        Triple<Term[],Term[],Term[]>[]
-                respectsAtPost2 = replace(respectsAtPre2, pre, post);
+        Triple<Term[],Term[],Term[]>[] respectsAtPost1 = replace(origRespects, d.origVars, poVars1.post);
+        Triple<Term[],Term[],Term[]>[] respectsAtPost2 = replace(origRespects, d.origVars, poVars2.post);
 
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];
@@ -215,7 +90,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                          respects1.second.length];        
 
         for (int i = 0; i < respects1.first.length; i++) {
-            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
+            SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
             respects1.first[i].execPreOrder(search);
             if (!search.termFound) {
                 // refLocTerms which contain \result are not included in
@@ -226,7 +101,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             }
         }
         for (int i = 0; i < respects1.second.length; i++) {
-            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
+            SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
             respects1.second[i].execPreOrder(search);
             if (!search.termFound) {
                 // refLocTerms which contain \result are not included in

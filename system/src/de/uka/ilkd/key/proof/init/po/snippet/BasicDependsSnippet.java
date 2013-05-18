@@ -23,8 +23,7 @@ class BasicDependsSnippet extends ReplaceAndRegisterMethod implements FactoryMet
                     + "depends-term for a contract without dependencies.");
         }
         assert Term.class.equals(BasicSnippetData.Key.DEPENDENS.getType());
-        Term origDep = (Term) d.get(
-                BasicSnippetData.Key.DEPENDENS);
-        return replace(origDep, d.origVars, poVars);
+        Term origDep = (Term) d.get(BasicSnippetData.Key.DEPENDENS);
+        return replace(origDep, d.origVars, poVars.pre);
     }
 }

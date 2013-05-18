@@ -13,9 +13,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -40,7 +39,7 @@ class BasicSnippetData {
     /**
      * Variables originally used during parsing.
      */
-    final ProofObligationVars origVars;
+    final StateVars origVars;
 
     /**
      * TermBuilder used by the FactoryMethods.
@@ -127,9 +126,9 @@ class BasicSnippetData {
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
-                new ProofObligationVars(contract.getSelf(),
-                                        contract.getParams(), contract.getResult(),
-                                        contract.getExc(), heap, services, false);
+                new StateVars(contract.getSelf(), contract.getParams(), heap,
+                              contract.getResult(), contract.getExc(), services,
+                              false);
     }
     
     BasicSnippetData(LoopInvariant invariant,
@@ -152,12 +151,14 @@ class BasicSnippetData {
                 MiscTools.getLocalOuts(invariant.getLoop(), services);
         final ImmutableList<Term> localInTerms = toTermList(localInVariables);
         final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<Term> localInsWithoutOutDuplicates =
+                    MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
+        final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
 
-        origVars =
-                new ProofObligationVars(invariant.getInternalSelfTerm(),
-                                        invariant.getGuard(),
-                                        localInTerms, heap, localOutTerms,
-                                        services, true);
+        origVars = new StateVars(invariant.getInternalSelfTerm(),
+                                 invariant.getGuard(),
+                                 localVarsTerms, heap,
+                                 services, true);
     }
     
     
@@ -185,9 +186,9 @@ class BasicSnippetData {
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
-                new ProofObligationVars(contract.getSelf(),
-                                        contract.getParams(), contract.getResult(),
-                                        contract.getExc(), heap, services, false);
+                new StateVars(contract.getSelf(), contract.getParams(), heap,
+                              contract.getResult(), contract.getExc(), services,
+                              false);
     }
 
 
@@ -209,18 +210,21 @@ class BasicSnippetData {
         contractContents.put(Key.LABELS,
                              labels.toArray(new Label[labels.size()]));
 
-        final Term heapTerm = TermBuilder.DF.getBaseHeap(services);
-        Terms vars = contract.getVariablesAsTerms();
+        final Term heap = TermBuilder.DF.getBaseHeap(services);
+        BlockContract.Terms vars = contract.getVariablesAsTerms();
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(contract.getBlock(), services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(contract.getBlock(), services);
         final ImmutableList<Term> localInTerms = toTermList(localInVariables);
         final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
-        origVars =
-                new ProofObligationVars(vars.self, localInTerms, localOutTerms,
-                                        vars.result, vars.exception, heapTerm,
-                                        services, true);
+        final ImmutableList<Term> localInsWithoutOutDuplicates =
+                    MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
+        final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
+
+        origVars = new StateVars(vars.self, localVarsTerms, heap,
+                                 vars.result, vars.exception,
+                                 services, true);
     }
 
 

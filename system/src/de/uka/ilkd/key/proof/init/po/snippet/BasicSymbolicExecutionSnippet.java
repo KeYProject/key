@@ -46,16 +46,16 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
-        if (poVars.selfAtPost != null) {
-            posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
+        if (poVars.post.self != null) {
+            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
-        if (poVars.resultAtPost != null) {
-            posts = posts.append(d.tb.equals(poVars.resultAtPost,
-                                             poVars.result));
+        if (poVars.post.result != null) {
+            posts = posts.append(d.tb.equals(poVars.post.result,
+                                             poVars.pre.result));
         }
-        posts = posts.append(d.tb.equals(poVars.exceptionAtPost,
-                                         poVars.exception));
-        posts = posts.append(d.tb.equals(poVars.heapAtPost, poVars.heap));
+        posts = posts.append(d.tb.equals(poVars.post.exception,
+                                         poVars.pre.exception));
+        posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
@@ -76,7 +76,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
                 ImmutableSLList.<LocationVariable>nil();
-        for (Term param : vs.localIns) {
+        for (Term param : vs.pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_"
                     + paramVar.name());
@@ -90,14 +90,14 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
 
         //create java block
         final JavaBlock jb = buildJavaBlock(d, formalParamVars,
-                                            vs.self != null
-                                            ? vs.self.op(ProgramVariable.class)
+                                            vs.pre.self != null
+                                            ? vs.pre.self.op(ProgramVariable.class)
                                             : null,
-                                            vs.result != null
-                                            ? vs.result.op(ProgramVariable.class)
+                                            vs.pre.result != null
+                                            ? vs.pre.result.op(ProgramVariable.class)
                                             : null,
-                                            vs.exception != null
-                                            ? vs.exception.op(ProgramVariable.class)
+                                            vs.pre.exception != null
+                                            ? vs.pre.exception.op(ProgramVariable.class)
                                             : null);
 
         //create program term
@@ -113,7 +113,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         //create update
         Term update = tb.skip();
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<Term> paramIt = vs.localIns.iterator();
+        Iterator<Term> paramIt = vs.pre.localVars.iterator();
         while (formalParamIt.hasNext()) {
             Term paramUpdate = tb.elementary(formalParamIt.next(),
                                              paramIt.next());

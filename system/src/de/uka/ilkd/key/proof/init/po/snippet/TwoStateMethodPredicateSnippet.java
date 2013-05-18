@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -39,11 +40,13 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        LoopInvariant loopInv =
                (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
        String nameString = generatePredicateName(pm, targetBlock, loopInv);
+       final ImmutableList<Term> termList =
+               poVars.pre.termList.append(poVars.post.termList);
        final Function contApplPred =
-               generateContApplPredicate(nameString, poVars.termList, d.tb);
-       Term result = instantiateContApplPredicate(contApplPred, poVars, d.tb);
+               generateContApplPredicate(nameString, termList, d.tb);
+       Term result = instantiateContApplPredicate(contApplPred, termList, d.tb);
        InfFlowContractPO.addSymbol(result, d.tb.getServices());
-       InfFlowContractPO.addSymbols(poVars.termList, d.tb.getServices());
+       InfFlowContractPO.addSymbols(termList, d.tb.getServices());
        return result;
    }
 
@@ -57,8 +60,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
        Function pred = (Function) functionNS.lookup(name);
        
        if (pred == null) {
-           Sort[] argSorts =
-                   new Sort[termList.size()];
+           Sort[] argSorts = new Sort[termList.size()];
 
            int i = 0;
            for (final Term arg : termList) {
@@ -74,14 +76,14 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
 
    private Term instantiateContApplPredicate(Function pred,
-                                             ProofObligationVars appData,
+                                             ImmutableList<Term> termList,
                                              TermBuilder.Serviced tb) {
        final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
        pred.argSorts().toArray(predArgSorts);
        Term[] predArgs = new Term[predArgSorts.length];
 
        int i = 0;
-       for (final Term arg : appData.termList) {
+       for (final Term arg : termList) {
            predArgs[i] = arg;
            i++;
        }

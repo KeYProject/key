@@ -3,12 +3,14 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
+
 public class SelfcomposedLoopSnippet extends ReplaceAndRegisterMethod implements
         InfFlowFactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars1,
-            ProofObligationVars poVars2) throws UnsupportedOperationException {
+    public Term produce(BasicSnippetData d,
+                        ProofObligationVars poVars1,
+                        ProofObligationVars poVars2) throws UnsupportedOperationException {
         BasicPOSnippetFactory f1 =
                 POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 =

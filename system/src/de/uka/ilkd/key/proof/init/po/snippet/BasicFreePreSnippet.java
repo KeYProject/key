@@ -21,14 +21,12 @@ class BasicFreePreSnippet implements FactoryMethod {
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(d, poVars);
 
-        // "wellformed(heap)"
-        final Term wellFormed = d.tb.wellFormed(poVars.heap);
+        // "wellformed(heapAtPre)"
+        final Term wellFormed = d.tb.wellFormed(poVars.pre.heap);
 
         // "heap == heapAtPre"
         final Term eqHeapAndHeapAtPre =
-                poVars.heapAtPre != null ?
-                d.tb.equals(poVars.heap, poVars.heapAtPre) :
-                d.tb.tt();
+                d.tb.equals(d.tb.getBaseHeap(), poVars.pre.heap);
 
         // "self != null"
         final Term selfNotNull = f.create(

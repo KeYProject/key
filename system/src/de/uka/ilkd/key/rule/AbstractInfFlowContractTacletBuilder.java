@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -27,17 +28,17 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced {
 
     private Term[] contextUpdates;
-    private Term contractSelf;
+    private Term contractSelfAtPre;
     private Term contractSelfAtPost;
-    private ImmutableList<Term> localIns;
+    private ImmutableList<Term> localVarsAtPre;
     private Term heapAtPre;
-    private ImmutableList<Term> localOuts;
-    private Term contractResult;
+    private ImmutableList<Term> localVarsAtPost;
+    private Term contractResultAtPre;
     private Term contractResultAtPost;
-    private Term exceptionVar;
+    private Term exceptionVarAtPre;
     private Term exceptionVarAtPost;
     private Term heapAtPost;
-    private Term loopGuard;
+    private Term loopGuardAtPre;
     private Term loopGuardAtPost;
 
 
@@ -60,8 +61,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
 
-    public void setSelf(Term contractSelf) {
-        this.contractSelf = contractSelf;
+    public void setSelfAtPre(Term contractSelf) {
+        this.contractSelfAtPre = contractSelf;
     }
     
     public void setSelfAtPost(Term contractSelfAtPost) {
@@ -69,31 +70,31 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
     public void setGuard(Term guard) {
-        this.loopGuard = guard;
+        this.loopGuardAtPre = guard;
     }
 
     public void setGuardAtPost(Term guardAtPost) {
         this.loopGuardAtPost = guardAtPost;
     }
 
-    public void setLocalIns(ImmutableList<Term> localIns) {
-        this.localIns = localIns;
+    public void setLocalVarsAtPre(ImmutableList<Term> localVarsAtPre) {
+        this.localVarsAtPre = localVarsAtPre;
     }
 
-    public void setLocalOuts(ImmutableList<Term> localOuts) {
-        this.localOuts = localOuts;
+    public void setLocalVarsAtPost(ImmutableList<Term> localVarsAtPost) {
+        this.localVarsAtPost = localVarsAtPost;
     }
 
-    public void setResult(Term contractResult) {
-        this.contractResult = contractResult;
+    public void setResultAtPre(Term contractResult) {
+        this.contractResultAtPre = contractResult;
     }
 
     public void setResultAtPost(Term resultAtPost) {
         this.contractResultAtPost = resultAtPost;
     }
 
-    public void setException(Term exceptionVar) {
-        this.exceptionVar = exceptionVar;
+    public void setExceptionAtPre(Term exceptionVar) {
+        this.exceptionVarAtPre = exceptionVar;
     }
 
     public void setExceptionAtPost(Term exceptionAtPost) {
@@ -136,10 +137,13 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     private ProofObligationVars getProofObligationVars(boolean local) {
-        return new ProofObligationVars(contractSelf, contractSelfAtPost, loopGuard, localIns,
-                                       heapAtPre, loopGuardAtPost, localOuts, contractResult,
-                                       contractResultAtPost, exceptionVar, exceptionVarAtPost,
-                                       heapAtPost, services, local);
+        StateVars pre =
+                new StateVars(contractSelfAtPre, loopGuardAtPre, localVarsAtPre,
+                                        heapAtPre, contractResultAtPre, exceptionVarAtPre, services, local);
+        StateVars post =
+                new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
+                                        heapAtPost, contractResultAtPost, exceptionVarAtPost, services, local);
+        return new ProofObligationVars(pre, post);
     }
 
 
@@ -150,41 +154,46 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                   ProofObligationVars appData,
-                                                   Services services,
-                                                   boolean local) {
-        Term selfSV =
-                createTermSV(appData.self, schemaPrefix, services);
+                                                       ProofObligationVars appData,
+                                                       Services services,
+                                                       boolean local) {
+        Term selfAtPreSV =
+                createTermSV(appData.pre.self, schemaPrefix, services);
         Term selfAtPostSV =
-                createTermSV(appData.selfAtPost, schemaPrefix, services);
-        ImmutableList<Term> localInSVs =
-                createTermSV(appData.localIns, schemaPrefix, services);        
-        Term guardSV =
-                createTermSV(appData.guard, schemaPrefix, services);
-        ImmutableList<Term> localOutSVs =
-                createTermSV(appData.localOuts, schemaPrefix, services);
+                createTermSV(appData.post.self, schemaPrefix, services);
+        ImmutableList<Term> localVarsAtPreSVs =
+                createTermSV(appData.pre.localVars, schemaPrefix, services);
+        Term guardAtPreSV =
+                createTermSV(appData.pre.guard, schemaPrefix, services);
+        ImmutableList<Term> localVarsAtPostSVs =
+                createTermSV(appData.post.localVars, schemaPrefix, services);
         Term guardAtPostSV =
-                createTermSV(appData.guardAtPost, schemaPrefix, services);
-        Term resSV =
-                createTermSV(appData.result, schemaPrefix, services);
+                createTermSV(appData.post.guard, schemaPrefix, services);
+        Term resAtPreSV =
+                createTermSV(appData.pre.result, schemaPrefix, services);
         Term resAtPostSV =
-                createTermSV(appData.resultAtPost, schemaPrefix, services);
-        Term excSV =
-                createTermSV(appData.exception, schemaPrefix, services);
+                createTermSV(appData.post.result, schemaPrefix, services);
+        Term excAtPreSV =
+                createTermSV(appData.pre.exception, schemaPrefix, services);
         Term excAtPostSV =
-                createTermSV(appData.exceptionAtPost, schemaPrefix, services);
-        Term heapSV =
-                createTermSV(appData.heap, schemaPrefix, services);
+                createTermSV(appData.post.exception, schemaPrefix, services);
         Term heapAtPreSV =
-                createTermSV(appData.heapAtPre, schemaPrefix, services);
+                createTermSV(appData.pre.heap, schemaPrefix, services);
         Term heapAtPostSV =
-                createTermSV(appData.heapAtPost, schemaPrefix, services);
+                createTermSV(appData.post.heap, schemaPrefix, services);
         Term mbyAtPreSV =
-                createTermSV(appData.mbyAtPre, schemaPrefix, services);
-        return new ProofObligationVars(selfSV, selfAtPostSV, guardSV, localInSVs,
-                                       guardAtPostSV, localOutSVs, resSV, resAtPostSV, excSV,
-                                       excAtPostSV, heapSV, heapAtPreSV,
-                                       heapAtPostSV, mbyAtPreSV, "", services, local);
+                createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
+        StateVars pre =
+                new StateVars(selfAtPreSV, guardAtPreSV,
+                                        localVarsAtPreSVs, resAtPreSV,
+                                        excAtPreSV, heapAtPreSV,
+                                        mbyAtPreSV, services, local);
+        StateVars post =
+                new StateVars(selfAtPostSV, guardAtPostSV,
+                                        localVarsAtPostSVs, resAtPostSV,
+                                        excAtPostSV, heapAtPostSV,
+                                        null, services, local);
+        return new ProofObligationVars(pre, post);
     }
 
 

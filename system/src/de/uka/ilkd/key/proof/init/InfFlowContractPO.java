@@ -57,9 +57,8 @@ public class InfFlowContractPO extends AbstractOperationPO
         // generate proof obligation variables
         final IProgramMethod pm = contract.getTarget();
         symbExecVars =
-                new ProofObligationVars(pm, contract.getKJT(), services,
-                                        false, contract == null);
-        assert (symbExecVars.self == null) == (pm.isStatic());
+                new ProofObligationVars(pm, contract.getKJT(), services, contract == null);
+        assert (symbExecVars.pre.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services, contract == null);
     }
 
@@ -121,7 +120,7 @@ public class InfFlowContractPO extends AbstractOperationPO
     @Override
     public Term getMbyAtPre() {
         if (contract.hasMby()) {
-            return symbExecVars.mbyAtPre;
+            return symbExecVars.pre.mbyAtPre;
         } else {
             return null;
         }

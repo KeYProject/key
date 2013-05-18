@@ -77,7 +77,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
 
         // final symbolic execution term
-        Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
+        Term finalTerm = TB.applyElementary(services, symbExecVars.pre.heap,
                                             TB.not(TB.and(inv, symExec)));
 
         // register final term
@@ -154,9 +154,12 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     }
 
     @Override
-    @Deprecated
     public Term getMbyAtPre() {
-        throw new UnsupportedOperationException("Not a contract.");
+                if (generatedIFContract.hasMby()) {
+            return symbExecVars.pre.mbyAtPre;
+        } else {
+            return null;
+        }
     }
 
 

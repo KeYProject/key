@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
- * Generate term "self != null".
+ * Generate term "MyClass::exactInstance(self) = TRUE".
  *
  * @author christoph
  */
@@ -34,12 +34,12 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
         Term result = d.tb.tt();
         if (forClass != null) {
             final Sort contractSort = forClass.getSort();
-            result = (poVars.self == null || pm.isConstructor())
-                    ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.self);
+            result = (poVars.pre.self == null || pm.isConstructor())
+                    ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.pre.self);
         } else if (d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM) != null) {
             final Sort loopInvSort= pm.sort();
-            result = (poVars.self == null || pm.isConstructor())
-                    ? d.tb.tt() : d.tb.exactInstance(loopInvSort, poVars.self);
+            result = (poVars.pre.self == null || pm.isConstructor())
+                    ? d.tb.tt() : d.tb.exactInstance(loopInvSort, poVars.pre.self);
         }
         return result;
     }

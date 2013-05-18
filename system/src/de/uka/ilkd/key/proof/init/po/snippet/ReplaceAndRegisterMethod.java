@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.Triple;
 import java.util.Iterator;
@@ -27,22 +28,30 @@ abstract class ReplaceAndRegisterMethod {
     final Term replace(Term term,
                        ProofObligationVars origVars,
                        ProofObligationVars poVars) {
+        Term intermediateResult = replace(term, origVars.pre, poVars.pre);
+        return replace(intermediateResult, origVars.post, poVars.post);
+    }
+
+
+    final Term replace(Term term,
+                       StateVars origVars,
+                       StateVars poVars) {
         de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
                 new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
 
         Iterator<Term> origVarsIt;
         Iterator<Term> poVarsIt;
-        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()) {
-            assert origVars.paddedTermListWithoutLocalVars.size() ==
-                   poVars.paddedTermListWithoutLocalVars.size();
-            origVarsIt = origVars.paddedTermListWithoutLocalVars.iterator();
-            poVarsIt = poVars.paddedTermListWithoutLocalVars.iterator();
-        } else {
-            assert origVars.paddedTermList.size() ==
-                   poVars.paddedTermList.size();
-            origVarsIt = origVars.paddedTermList.iterator();
-            poVarsIt = poVars.paddedTermList.iterator();
-        }
+//        if (origVars.localVars.isEmpty() && origVars.localOuts.isEmpty()) {
+//            assert origVars.paddedTermListWithoutLocalVars.size() ==
+//                   poVars.paddedTermListWithoutLocalVars.size();
+//            origVarsIt = origVars.paddedTermListWithoutLocalVars.iterator();
+//            poVarsIt = poVars.paddedTermListWithoutLocalVars.iterator();
+//        } else {
+        assert origVars.paddedTermList.size() ==
+               poVars.paddedTermList.size();
+        origVarsIt = origVars.paddedTermList.iterator();
+        poVarsIt = poVars.paddedTermList.iterator();
+//        }
         while (origVarsIt.hasNext()) {
             Term origTerm = origVarsIt.next();
             Term poTerm = poVarsIt.next();
@@ -64,8 +73,8 @@ abstract class ReplaceAndRegisterMethod {
 
 
     final Term[] replace(Term[] terms,
-                         ProofObligationVars origVars,
-                         ProofObligationVars poVars) {
+                         StateVars origVars,
+                         StateVars poVars) {
         final Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
             result[i] = replace(terms[i], origVars, poVars);
@@ -76,8 +85,8 @@ abstract class ReplaceAndRegisterMethod {
 
 
     final Triple<Term[], Term[], Term[]> replace(Triple<Term[], Term[], Term[]> terms,
-                                       Term[] origVars,
-                                       Term[] poVars) {
+            Term[] origVars,
+            Term[] poVars) {
         final Term[] result1 = new Term[terms.first.length];
         for (int i = 0; i < terms.first.length; i++) {
             result1[i] = replace(terms.first[i], origVars, poVars);
@@ -96,8 +105,8 @@ abstract class ReplaceAndRegisterMethod {
 
     final Triple<Term[], Term[], Term[]> replace(
             Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>> terms,
-            ProofObligationVars origVars,
-            ProofObligationVars poVars) {
+            StateVars origVars,
+            StateVars poVars) {
         final Term[] result1 = new Term[terms.first.size()];
         Iterator<Term> termIt1 = terms.first.iterator();
         for (int i = 0; termIt1.hasNext(); i++) {
@@ -118,8 +127,8 @@ abstract class ReplaceAndRegisterMethod {
 
 
     final Triple<Term[], Term[], Term[]>[] replace(Triple<Term[], Term[], Term[]>[] termss,
-                                                   Term[] origVars,
-                                                   Term[] poVars) {
+            Term[] origVars,
+            Term[] poVars) {
         final Triple<Term[], Term[], Term[]>[] result =
                 (Triple<Term[], Term[], Term[]>[]) new Triple[termss.length];
         for (int i = 0; i < termss.length; i++) {
@@ -132,8 +141,8 @@ abstract class ReplaceAndRegisterMethod {
     final Triple<Term[], Term[], Term[]>[] replace(ImmutableList<Triple<ImmutableList<Term>,
                                                                         ImmutableList<Term>,
                                                                         ImmutableList<Term>>> termss,
-                                                   ProofObligationVars origVars,
-                                                   ProofObligationVars poVars) {
+            StateVars origVars,
+            StateVars poVars) {
         final Triple<Term[], Term[], Term[]>[] result =
                 (Triple<Term[], Term[], Term[]>[]) new Triple[termss.size()];
         Iterator<Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>>> it =

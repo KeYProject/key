@@ -32,23 +32,23 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
-        if (poVars.selfAtPost != null) {
-            posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
+        if (poVars.post.self != null) {
+            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
-        Iterator<Term> out = poVars.localOuts.iterator();
-        Iterator<Term> in = d.origVars.localIns.iterator();
-        while (in.hasNext()) {
-            posts = posts.append(d.tb.equals(out.next(), in.next()));
+        Iterator<Term> localVars = d.origVars.localVars.iterator();
+        Iterator<Term> localPostVars = poVars.post.localVars.iterator();
+        while (localVars.hasNext()) {
+            posts = posts.append(d.tb.equals(localPostVars.next(), localVars.next()));
         }
-        if (poVars.resultAtPost != null) {
-            posts = posts.append(d.tb.equals(poVars.resultAtPost,
-                                             poVars.result));
+        if (poVars.post.result != null) {
+            posts = posts.append(d.tb.equals(poVars.post.result,
+                                             poVars.pre.result));
         }
-        if (poVars.exception != null && poVars.exceptionAtPost != null) {
-            posts = posts.append(d.tb.equals(poVars.exceptionAtPost,
-                                             poVars.exception));
+        if (poVars.pre.exception != null && poVars.post.exception != null) {
+            posts = posts.append(d.tb.equals(poVars.post.exception,
+                                             poVars.pre.exception));
         }
-        posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
+        posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
@@ -79,8 +79,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
 
         //create update
         Term update = tb.skip();
-        Iterator<Term> paramIt = vs.localIns.iterator();
-        Iterator<Term> origParamIt = d.origVars.localIns.iterator();
+        Iterator<Term> paramIt = vs.pre.localVars.iterator();
+        Iterator<Term> origParamIt = d.origVars.localVars.iterator();
         while (paramIt.hasNext()) {
             Term paramUpdate =
                     d.tb.elementary(d.tb.getServices(), origParamIt.next(), paramIt.next());

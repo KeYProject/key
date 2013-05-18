@@ -643,4 +643,16 @@ public final class MiscTools {
         }
         return sb.toString();
     }
+
+
+    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
+                                                          ImmutableList<Term> localOuts) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term localIn : localIns) {
+            if (!localOuts.contains(localIn)) {
+                result.append(localIn);
+            }
+        }
+        return result;
+    }
 }

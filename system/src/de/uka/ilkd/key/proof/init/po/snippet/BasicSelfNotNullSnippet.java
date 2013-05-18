@@ -28,7 +28,7 @@ class BasicSelfNotNullSnippet implements FactoryMethod {
                     + "which is no IProgramMethod.");
         }
         final IProgramMethod pm = (IProgramMethod) targetMethod;
-        return (poVars.self == null || pm.isConstructor())
-               ? d.tb.tt() : d.tb.not(d.tb.equals(poVars.self, d.tb.NULL()));
+        return (poVars.pre.self == null || pm.isConstructor())
+               ? d.tb.tt() : d.tb.not(d.tb.equals(poVars.pre.self, d.tb.NULL()));
     }
 }

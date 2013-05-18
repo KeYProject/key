@@ -75,7 +75,7 @@ public class BlockExecutionPO extends AbstractOperationPO
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
 
         // final symbolic execution term
-        final Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
+        final Term finalTerm = TB.applyElementary(services, symbExecVars.pre.heap,
                                                   TB.not(TB.and(pre, symExec)));
 
         // register final term
@@ -102,7 +102,7 @@ public class BlockExecutionPO extends AbstractOperationPO
     @Override
     public Term getMbyAtPre() {
         if (contract.hasMby()) {
-            return symbExecVars.mbyAtPre;
+            return symbExecVars.pre.mbyAtPre;
         } else {
             return null;
         }

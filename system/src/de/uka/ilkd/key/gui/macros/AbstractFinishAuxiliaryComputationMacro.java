@@ -67,10 +67,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                           IFProofObligationVars ifVars,
                                           Services services) {
         final Term[] goalFormulas1 =
-                buildExecution(ifVars.c1, ifVars.map1,
+                buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
                                proof.openGoals(), services);
         final Term[] goalFormulas2 =
-                buildExecution(ifVars.c2, ifVars.map2,
+                buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2),
                                proof.openGoals(), services);
 
         Term composedStates = TB.ff();
@@ -101,7 +101,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         Term[] result = new Term[renamedGoalFormulas.length];
         for (int i = 0; i < renamedGoalFormulas.length; i++) {
             result[i] =
-                    TB.applyElementary(services, c.heap, renamedGoalFormulas[i]);
+                    TB.applyElementary(services, c.pre.heap, renamedGoalFormulas[i]);
         }
         return result;
     }

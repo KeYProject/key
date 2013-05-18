@@ -12,8 +12,8 @@ import java.util.Map;
 
 
 /**
- * This class contains the set of four sets of ProofObligationVars necessary
- * for information flow proofs.
+ * This class contains the set of four sets of ProofObligationVars necessary for
+ * information flow proofs.
  * <p/>
  * @author christoph
  * <p/>
@@ -22,7 +22,7 @@ public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
 
-    public final Map<Term, Term> map1, map2;
+    private final Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
 
 
     public IFProofObligationVars(ProofObligationVars symbExecVars,
@@ -41,26 +41,38 @@ public class IFProofObligationVars {
         this.c2 = c2;
         this.symbExecVars = symbExecVars;
 
-        map1 = new HashMap<Term, Term>();
-        map2 = new HashMap<Term, Term>();
+        assert symbExecVars != null;
+        infFlowToSymbExecVarsMaps =
+                new HashMap<ProofObligationVars, Map<Term, Term>>();
+        infFlowToSymbExecVarsMaps.put(c1, new HashMap<Term, Term>());
+        infFlowToSymbExecVarsMaps.put(c2, new HashMap<Term, Term>());
+        linkSymbExecVarsToCopies();
+    }
 
-        if (symbExecVars != null) {
-            linkSymbExecVarsToCopies(symbExecVars);
+
+    private void linkSymbExecVarsToCopies() {
+        for (ProofObligationVars ifVars : infFlowToSymbExecVarsMaps.keySet()) {
+            linkStateVarsToCopies(ifVars.pre, symbExecVars.pre, getMapFor(ifVars));
+            linkStateVarsToCopies(ifVars.post, symbExecVars.post, getMapFor(ifVars));
         }
     }
 
 
-    private void linkSymbExecVarsToCopies(ProofObligationVars symbExecVars) {
-        final Iterator<Term> c1It = c1.termList.iterator();
-        final Iterator<Term> c2It = c2.termList.iterator();
-        for (final Term symbTerm : symbExecVars.termList) {
-            final Term c1Term = c1It.next();
-            final Term c2Term = c2It.next();
+    private void linkStateVarsToCopies(StateVars ifVars,
+                                       StateVars seVars,
+                                       Map<Term, Term> map) {
+        final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
+        for (final Term symbTerm : seVars.termList) {
+            final Term ifTerm = ifVarsIt.next();
             if (symbTerm != null) {
-                map1.put(symbTerm, c1Term);
-                map2.put(symbTerm, c2Term);
+                map.put(symbTerm, ifTerm);
             }
         }
+    }
+
+
+    public Map<Term, Term> getMapFor(ProofObligationVars vars) {
+        return infFlowToSymbExecVarsMaps.get(vars);
     }
 
 

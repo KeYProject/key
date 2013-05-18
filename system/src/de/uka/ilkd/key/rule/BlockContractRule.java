@@ -38,8 +38,9 @@ import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -111,35 +112,56 @@ public class BlockContractRule implements BuiltInRule {
         return varAtPost;
     }
 
-    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
-                                                     Services services) {
-        if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
-        }
-        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
-        for(Term varTerm: varTerms) {
-            assert varTerm.op() instanceof LocationVariable;        
+//    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
+//                                                     Services services) {
+//        if (varTerms == null || varTerms.isEmpty()) {
+//            return varTerms;
+//        }
+//        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
+//        for(Term varTerm: varTerms) {
+//            assert varTerm.op() instanceof LocationVariable;
+//
+//            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+//
+//            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
+//            LocationVariable varAtPreVar =
+//                    new LocationVariable(new ProgramElementName(name), resultType);
+//            register(varAtPreVar, services);
+//            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
+//            renamedLocalIns = renamedLocalIns.append(varAtPre);
+//        }
+//        return renamedLocalIns;
+//    }
 
-            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-
-            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-            LocationVariable varAtPreVar =
-                    new LocationVariable(new ProgramElementName(name), resultType);
-            register(varAtPreVar, services);
-            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-            renamedLocalIns = renamedLocalIns.append(varAtPre);
-        }
-        return renamedLocalIns;
-    }
-
-    private static ImmutableList<Term> buildLocalOuts(ImmutableList<Term> varTerms,
-                                                      Services services) {
+    private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
+                                                           Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
         ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
         for(Term varTerm: varTerms) {
-            assert varTerm.op() instanceof LocationVariable;        
+            assert varTerm.op() instanceof LocationVariable;
+
+            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+
+            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
+            LocationVariable varAtPostVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
+            register(varAtPostVar, services);
+            Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+            renamedLocalOuts = renamedLocalOuts.append(varAtPost);
+        }
+        return renamedLocalOuts;
+    }
+
+    private static ImmutableList<Term> buildLocalOutsAtPost(ImmutableList<Term> varTerms,
+                                                            Services services) {
+        if (varTerms == null || varTerms.isEmpty()) {
+            return varTerms;
+        }
+        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        for(Term varTerm: varTerms) {
+            assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
 
@@ -264,21 +286,32 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
-    private Pair<Term, Term> buildInfFlowAssumptions(InfFlowData infData) {
-        Term beforeAssumptions = TB.equals(infData.heapAtPre, infData.baseHeap);
-        Iterator<Term> newIns = infData.newIns.iterator();
-        for (Term locIn: infData.localIns) {
-            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
+    private Pair<Term, Term> buildInfFlowAssumptions(ProofObligationVars instVars,
+                                                     ImmutableList<Term> localOuts,
+                                                     ImmutableList<Term> localOutsAtPre,
+                                                     ImmutableList<Term> localOutsAtPost,
+                                                     Term baseHeap,
+                                                     Term applPredTerm) {
+        Term beforeAssumptions = TB.equals(instVars.pre.heap, baseHeap);
+//        Iterator<Term> newIns = instVars.newIns.iterator();
+//        for (Term locIn: instVars.localIns) {
+//            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
+//        }
+        Iterator<Term> outsAtPre = localOutsAtPre.iterator();
+        for (Term locOut: localOuts) {
+            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(outsAtPre.next(), locOut));
         }
-        Term afterAssumptions = TB.and(TB.equals(infData.heapAtPost, infData.baseHeap),
-                                       TB.equals(infData.selfAtPost, infData.self),
-                                       TB.equals(infData.resultAtPost, infData.result),
-                                       TB.equals(infData.exceptionAtPost, infData.exception));
-        Iterator<Term> newOuts = infData.newOuts.iterator();        
-        for (Term locOut: infData.localOuts) {
-            afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locOut));
+        Term resultEq = instVars.pre.result != null ? TB.equals(instVars.post.result, instVars.pre.result) : TB.tt();
+        Term exceptionEq = instVars.pre.exception != null ? TB.equals(instVars.post.exception, instVars.pre.exception) : TB.tt();
+        Term afterAssumptions = TB.and(TB.equals(instVars.post.heap, baseHeap),
+                                       TB.equals(instVars.post.self, instVars.pre.self),
+                                       resultEq,
+                                       exceptionEq);
+        Iterator<Term> outAtPost = localOutsAtPost.iterator();
+        for (Term locOut: localOuts) {
+            afterAssumptions = TB.and(afterAssumptions, TB.equals(outAtPost.next(), locOut));
         }
-        afterAssumptions = TB.and(afterAssumptions, infData.applPredTerm);        
+        afterAssumptions = TB.and(afterAssumptions, applPredTerm);        
 
         return new Pair<Term, Term> (beforeAssumptions, afterAssumptions);
     }
@@ -306,6 +339,7 @@ public class BlockContractRule implements BuiltInRule {
 
             final LocationVariable baseHeap =
                     services.getTypeConverter().getHeapLDT().getHeap();
+            // assert TB.var(heaps.get(0)) == baseHeap
             final boolean hasSelf = variables.self != null;
             final boolean hasRes = variables.result != null;
             final boolean hasExc = variables.exception != null;
@@ -315,19 +349,23 @@ public class BlockContractRule implements BuiltInRule {
                     new Name(TB.newName(services, "heap_After_BLOCK"));
             final Term heapAtPost =
                     TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
-            final Term self = hasSelf ? TB.var(variables.self) : TB.NULL(services);
+            final Term selfAtPre = hasSelf ? TB.var(variables.self) : TB.NULL(services);
             final Term selfAtPost =
-                    hasSelf ? buildAfterVar(self, "BLOCK", services) : TB.NULL(services);
-            final ImmutableList<Term> localInTerms = MiscTools.toTermList(localInVariables);
-            final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
-            final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
-            final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
-            Term result = hasRes ? TB.var(variables.result) : TB.NULL(services);
+                    hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : TB.NULL(services);
+            final ImmutableList<Term> localIns = MiscTools.toTermList(localInVariables);
+            final ImmutableList<Term> localOuts = MiscTools.toTermList(localOutVariables);
+            final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
+            final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
+            final ImmutableList<Term> localInsWithoutOutDuplicates =
+                    MiscTools.filterOutDuplicates(localIns, localOuts);
+            final ImmutableList<Term> localVarsAtPre = localInsWithoutOutDuplicates.append(localOutsAtPre);
+            final ImmutableList<Term> localVarsAtPost = localInsWithoutOutDuplicates.append(localOutsAtPost);
+            Term resultAtPre = hasRes ? TB.var(variables.result) : TB.NULL(services);
             final Term resultAtPost =
-                    hasRes ? buildAfterVar(result, "BLOCK", services) : TB.NULL(services);
-            final Term exception = hasExc ? TB.var(variables.exception) : TB.NULL(services);
+                    hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : TB.NULL(services);
+            final Term exceptionAtPre = hasExc ? TB.var(variables.exception) : TB.NULL(services);
             final Term exceptionAtPost =
-                    hasExc ? buildAfterVar(exception, "BLOCK", services) : TB.NULL(services);
+                    hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : TB.NULL(services);
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
@@ -335,20 +373,14 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(heapAtPre);
             ifContractBuilder.setHeapAtPost(heapAtPost);
-            if (hasSelf)
-                ifContractBuilder.setSelf(self);
-            if (hasSelf)
-                ifContractBuilder.setSelfAtPost(selfAtPost);
-            ifContractBuilder.setLocalIns(newLocalIns);
-            ifContractBuilder.setLocalOuts(newLocalOuts);
-            if (hasRes)
-                ifContractBuilder.setResult(result);
-            if (hasRes)
-                ifContractBuilder.setResultAtPost(resultAtPost);
-            if (hasExc)
-                ifContractBuilder.setException(exception);
-            if (hasExc)
-                ifContractBuilder.setExceptionAtPost(exceptionAtPost);
+            if (hasSelf) ifContractBuilder.setSelfAtPre(selfAtPre);
+            if (hasSelf) ifContractBuilder.setSelfAtPost(selfAtPost);
+            ifContractBuilder.setLocalVarsAtPre(localVarsAtPre);
+            ifContractBuilder.setLocalVarsAtPost(localVarsAtPost);
+            if (hasRes) ifContractBuilder.setResultAtPre(resultAtPre);
+            if (hasRes) ifContractBuilder.setResultAtPost(resultAtPost);
+            if (hasExc) ifContractBuilder.setExceptionAtPre(exceptionAtPre);
+            if (hasExc) ifContractBuilder.setExceptionAtPost(exceptionAtPost);
 
             // generate information flow contract application predicate
             // and associated taclet
@@ -360,36 +392,35 @@ public class BlockContractRule implements BuiltInRule {
             }
             Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet(true);
 
-            InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
-                                                      self, selfAtPost,
-                                                      localInTerms, newLocalIns,
-                                                      localOutTerms, newLocalOuts,
-                                                      result, resultAtPost,
-                                                      exception, exceptionAtPost,
-                                                      contractApplTerm);
-            // TB.var(heaps.get(0)) will be made anonymous by setUpUsageGoal
-
-            // set infFlowAssumptions
-            Pair<Term, Term> infFlowAssumptions = buildInfFlowAssumptions(infFlowData);
-
-            // create information flow validity goal
-
             // generate proof obligation variables
-            final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(hasSelf ? self : null,
-                                            hasSelf ? selfAtPost : null,
-                                            newLocalIns,
+            final StateVars instantiationPreVars =
+                    new StateVars(hasSelf ? selfAtPre : null,
+                                            localVarsAtPre,
                                             heapAtPre,
-                                            newLocalOuts,
-                                            hasRes ? result : null,
-                                            hasRes ? resultAtPost : null,
-                                            hasExc ? exception : null,
-                                            hasExc ? exceptionAtPost : null,
-                                            heapAtPost,
+                                            hasRes ? resultAtPre : null,
+                                            hasExc ? exceptionAtPre : null,
                                             services, true);
+            final StateVars instantiationPostVars =
+                    new StateVars(hasSelf ? selfAtPost : null,
+                                            localVarsAtPost,
+                                            heapAtPost,
+                                            hasRes ? resultAtPost : null,
+                                            hasExc ? exceptionAtPost : null,
+                                            services, true);
+            final ProofObligationVars instantiationVars =
+                    new ProofObligationVars(instantiationPreVars,
+                                                instantiationPostVars);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services, true);
             application.update(ifVars, instantiation.context);
+
+            // set infFlowAssumptions
+            Pair<Term, Term> infFlowAssumptions =
+                    buildInfFlowAssumptions(instantiationVars, localOuts,
+                                            localOutsAtPre, localOutsAtPost,
+                                            TB.var(baseHeap), contractApplTerm);
+
+            // create information flow validity goal
 
             // create proof obligation
             InfFlowPOSnippetFactory infFlowFactory =
@@ -1297,46 +1328,6 @@ public class BlockContractRule implements BuiltInRule {
 
         boolean hasInfFlowGoal() {
             return goal != null;
-        }
-    }
-
-    private static final class InfFlowData {
-        public final Term heapAtPre;
-        public final Term heapAtPost;
-        public final Term baseHeap;
-        public final Term self;
-        public final Term selfAtPost;
-        public final ImmutableList<Term> localIns;
-        public final ImmutableList<Term> newIns;
-        public final ImmutableList<Term> localOuts;
-        public final ImmutableList<Term> newOuts;
-        public final Term result;
-        public final Term resultAtPost;
-        public final Term exception;
-        public final Term exceptionAtPost;
-        public final Term applPredTerm;
-
-        public InfFlowData(Term heapAtPre, Term heapAtPost, Term baseHeap,
-                           Term self, Term selfAtPost,
-                           ImmutableList<Term> localIns, ImmutableList<Term> newIns,
-                           ImmutableList<Term> localOuts, ImmutableList<Term> newOuts,
-                           Term result, Term resultAtPost,
-                           Term exception, Term exceptionAtPost,
-                           Term applPredTerm) {
-            this.heapAtPre = heapAtPre;
-            this.heapAtPost = heapAtPost;
-            this.baseHeap = baseHeap;
-            this.self = self;
-            this.selfAtPost = selfAtPost;
-            this.localIns = localIns;
-            this.newIns = newIns;
-            this.localOuts = localOuts;
-            this.newOuts = newOuts;
-            this.result = result;
-            this.resultAtPost = resultAtPost;
-            this.exception = exception;
-            this.exceptionAtPost = exceptionAtPost;
-            this.applPredTerm = applPredTerm;
         }
     }
 }
