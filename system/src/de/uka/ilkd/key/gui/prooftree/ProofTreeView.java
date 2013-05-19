@@ -45,8 +45,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.BorderLayout;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 public class ProofTreeView extends JPanel {
     
@@ -182,7 +180,7 @@ public class ProofTreeView extends JPanel {
         proofTreeSearchPanel = new ProofTreeSearchBar(this);
         bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
         
-        add(delegateView, BorderLayout.CENTER);
+        add(new JScrollPane(delegateView), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 	
 	layoutKeYComponent();	
