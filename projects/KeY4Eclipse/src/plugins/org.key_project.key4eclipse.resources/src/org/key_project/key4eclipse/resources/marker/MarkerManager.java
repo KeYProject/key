@@ -7,7 +7,10 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 import de.uka.ilkd.key.java.Position;
@@ -15,6 +18,9 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class MarkerManager {
    
+   public final static String CLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker";
+   public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
+   public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
    
    /**
     * Sets the {@link IMarker} for the given {@link IMethod} depending on the {@link Proof}s status. The {@link IPath} of 
@@ -29,10 +35,10 @@ public class MarkerManager {
       IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
       IPath methodPath = method.getPath();
       IFile file = workspaceRoot.getFile(methodPath);
-      
+
       // set marker
       if (proof.closed()) {
-         IMarker marker = file.createMarker("org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker");
+         IMarker marker = file.createMarker(CLOSEDMARKER_ID);
          if (marker.exists()) {
             marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proof.name().toString());
             marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
@@ -41,7 +47,7 @@ public class MarkerManager {
          }
       }
       else {
-         IMarker marker = file.createMarker("org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker");
+         IMarker marker = file.createMarker(NOTCLOSEDMARKER_ID);
          if (marker.exists()) {
             marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proof.name().toString());
             marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
@@ -52,14 +58,25 @@ public class MarkerManager {
    }
    
    
+   public void setProblemLoaderExceptionMarker(IResource res) throws CoreException{
+      IMarker marker = res.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
+      if (marker.exists()) {
+         marker.setAttribute(IMarker.MESSAGE, "Error while loading Environment. Please check your JML-Specifications");
+         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+         marker.setAttribute(IMarker.LINE_NUMBER, 1);
+      }
+   }
+   
+   
    /**
     * Deletes all KeYResource {@link IMarker} from the given {@link IResource}.
     * @param res the {@link IResource} to use
     * @throws CoreException
     */
    public void deleteMarker(IResource res) throws CoreException{
-      res.deleteMarkers("org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker", false, IResource.DEPTH_INFINITE);
-      res.deleteMarkers("org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker", false, IResource.DEPTH_INFINITE);  
+      res.deleteMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
+      res.deleteMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
+      res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE);
    }
    
    

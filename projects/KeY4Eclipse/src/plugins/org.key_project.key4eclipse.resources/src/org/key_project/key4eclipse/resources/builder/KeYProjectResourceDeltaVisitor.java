@@ -1,6 +1,5 @@
 package org.key_project.key4eclipse.resources.builder;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -14,8 +13,8 @@ public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
 
    private ProofManager proofManager;
    
-   public KeYProjectResourceDeltaVisitor(IProject project) throws CoreException, ProblemLoaderException{
-      proofManager = new ProofManager(project);
+   public KeYProjectResourceDeltaVisitor(ProofManager proofManager) throws CoreException{
+      this.proofManager = proofManager;
    }
    
    
@@ -54,7 +53,9 @@ public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
       IPath proofFolderPath = res.getProject().getFullPath().append("Proofs");
       
       if(proofFolderPath.isPrefixOf(resourcePath)){
-         proofManager.deleteResource(res);
+         if(res.exists()){
+            proofManager.deleteResource(res);
+         }
       }
       //addedResoure is a File
       else if(res.getType() == IResource.FILE){

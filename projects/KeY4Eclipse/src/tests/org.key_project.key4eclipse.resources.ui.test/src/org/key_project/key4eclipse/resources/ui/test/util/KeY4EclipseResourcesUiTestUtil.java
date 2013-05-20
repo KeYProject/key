@@ -10,13 +10,16 @@ import java.util.List;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 
-public class KeY4EclipseResourcesTestUtil {
+public class KeY4EclipseResourcesUiTestUtil {
 
    
    
@@ -36,4 +39,13 @@ public class KeY4EclipseResourcesTestUtil {
       assertEquals(KeYProjectBuilder.BUILDER_ID, keyBuilder.getBuilderName());
    }
 
+   public static void enableAutoBuild(boolean enable) throws CoreException{
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      IWorkspaceDescription desc = workspace.getDescription();
+      if(desc.isAutoBuilding() != enable){
+         desc.setAutoBuilding(enable);
+         workspace.setDescription(desc);
+      }
+   }
+   
 }

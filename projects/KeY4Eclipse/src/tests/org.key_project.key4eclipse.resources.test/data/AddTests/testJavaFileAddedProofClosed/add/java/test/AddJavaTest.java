@@ -1,6 +1,6 @@
-package the.add.test;
+package add.java.test;
 
-public class AddTest {
+public class AddJavaTest {
 	/*@
 	  @ ensures \result == x + y;
 	  @*/

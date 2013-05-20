@@ -30,7 +30,7 @@
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
-         name="ProofNotClosedMarker"
+         name="Proof not closed"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
@@ -38,7 +38,7 @@
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker"
-         name="ProofClosedMarker"
+         name="Proof closed"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
@@ -57,6 +57,14 @@
             class="org.key_project.key4eclipse.resources.marker.notclosedmarker.ProofNotClosedMarkerQuickFix"
             markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
       </markerResolutionGenerator>
+   </extension>
+   <extension
+         id="org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker"
+         name="ProblemLoaderException"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
    </extension>
 
 </plugin>

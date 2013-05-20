@@ -7,9 +7,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesTestUtil;
+import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotConvertToKeYProjectTest extends TestCase{
@@ -24,10 +23,10 @@ public class SWTBotConvertToKeYProjectTest extends TestCase{
       IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotConvertToKeYProjectTest_testConvertToKeYProjectInProjectExplorer");
       openProjectExplorer(bot);
       selectViewByTitle(bot, "Project Explorer");
-      SWTBotTreeItem item = TestUtilsUtil.selectInTree(bot.tree(), project.getProject().getName());
+      TestUtilsUtil.selectInTree(bot.tree(), project.getProject().getName());
       TestUtilsUtil.clickContextMenu(bot.tree(), "Convert to KeY Project");
       TestUtilsUtil.waitForBuild();
-      KeY4EclipseResourcesTestUtil.assertKeYNature(project.getProject());
+      KeY4EclipseResourcesUiTestUtil.assertKeYNature(project.getProject());
    }
    
    @Test
@@ -37,10 +36,10 @@ public class SWTBotConvertToKeYProjectTest extends TestCase{
       IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotConvertToKeYProjectTest_testConvertToKeYProjectInPackageExplorer");
       openPackageExplorer(bot);
       selectViewByTitle(bot, "Package Explorer");
-      SWTBotTreeItem item = TestUtilsUtil.selectInTree(bot.tree(), project.getProject().getName());
+      TestUtilsUtil.selectInTree(bot.tree(), project.getProject().getName());
       TestUtilsUtil.clickContextMenu(bot.tree(), "Convert to KeY Project");
       TestUtilsUtil.waitForBuild();
-      KeY4EclipseResourcesTestUtil.assertKeYNature(project.getProject());
+      KeY4EclipseResourcesUiTestUtil.assertKeYNature(project.getProject());
    }
 
    @Test
@@ -50,10 +49,10 @@ public class SWTBotConvertToKeYProjectTest extends TestCase{
       IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotConvertToKeYProjectTest_testConvertToKeYProjectInNavigator");
       openNavigator(bot);
       selectViewByTitle(bot, "Navigator");
-      SWTBotTreeItem item = TestUtilsUtil.selectInTree(bot.tree(), project.getProject().getName());
+      TestUtilsUtil.selectInTree(bot.tree(), project.getProject().getName());
       TestUtilsUtil.clickContextMenu(bot.tree(), "Convert to KeY Project");
       TestUtilsUtil.waitForBuild();
-      KeY4EclipseResourcesTestUtil.assertKeYNature(project.getProject());
+      KeY4EclipseResourcesUiTestUtil.assertKeYNature(project.getProject());
    }
    
    public static void openProjectExplorer(SWTWorkbenchBot bot){

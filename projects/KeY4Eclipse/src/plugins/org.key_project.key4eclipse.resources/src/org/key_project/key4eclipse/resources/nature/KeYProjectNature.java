@@ -24,7 +24,7 @@ public class KeYProjectNature implements IProjectNature  {
       // get the build commands already associated with project.
       for (int i = 0; i < commands.length; ++i) {
             if (commands[i].getBuilderName().equals("org.key_project.key4eclipse.resources.KeYProjectBuilder")) {
-               return; // Do nothing if Sample builder is already associated with project
+               return; // Do nothing if builder is already associated with project
             }
       }
       ICommand[] newCommands = new ICommand[commands.length + 1];
@@ -43,7 +43,6 @@ public class KeYProjectNature implements IProjectNature  {
     */
    @Override
    public void deconfigure() throws CoreException {
-      System.out.println("Nature: deconfigure");
       
    }
 
@@ -53,7 +52,6 @@ public class KeYProjectNature implements IProjectNature  {
     */
    @Override
    public IProject getProject() {
-      System.out.println("Nature: getProject()");
       return this.project;
    }
 
