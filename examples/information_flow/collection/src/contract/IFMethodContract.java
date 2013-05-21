@@ -233,10 +233,11 @@ public class IFMethodContract {
       @ respects    low, x;
       @*/
     void secure_while(int x) {
-        /* @ loop_invariant 0 <= x;
-         *  respects low, x;
-         *  decreases x;
-         */
+        /*@ loop_invariant 0 <= x;
+          @ respects low, x;
+          @ decreases x;
+          @ assignable low;
+          @*/
         while (x > 0) {
             low = low + 1;
         }
