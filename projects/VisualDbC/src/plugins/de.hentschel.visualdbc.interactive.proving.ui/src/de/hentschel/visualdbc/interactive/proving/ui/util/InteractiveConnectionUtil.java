@@ -13,7 +13,6 @@
 
 package de.hentschel.visualdbc.interactive.proving.ui.util;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -48,7 +47,7 @@ public final class InteractiveConnectionUtil {
    /**
     * The currently opened interactive {@link IDSConnection}s.
     */
-   private static WeakHashMap<DbcModel, WeakReference<IDSConnection>> connections = new WeakHashMap<DbcModel, WeakReference<IDSConnection>>();
+   private static WeakHashMap<DbcModel, IDSConnection> connections = new WeakHashMap<DbcModel, IDSConnection>();
    
    private static WeakHashMap<IInteractiveConnectionUtilListener, Void> listeners = new WeakHashMap<IInteractiveConnectionUtilListener, Void>();
    
@@ -90,7 +89,7 @@ public final class InteractiveConnectionUtil {
       if (result == null) {
          result = driver.createConnection();
          result.addConnectionListener(new ConnectionCloseListener(model));
-         connections.put(model, new WeakReference<IDSConnection>(result));
+         connections.put(model, result);
       }
       // Make sure that the connection is established
       if (!result.isConnected()) {
@@ -99,15 +98,19 @@ public final class InteractiveConnectionUtil {
       }
       // Check that the correct connection is established
       if (result.getDriver() == null) {
+         result.disconnect();
          throw new DSException("Current data source connection has no driver reference.");
       }
       if (!result.isInteractive()) {
+         result.disconnect();
          throw new DSException("Connection is not interactive.");
       }
       if (!ObjectUtil.equals(model.getDriverId(), result.getDriver().getId())) {
+         result.disconnect();
          throw new DSException("Connected to wrong data source. Current driver has ID \"" + result.getDriver().getId() + "\" but expcted \"" + model.getDriverId() + "\".");
       }
       if (!ObjectUtil.equals(connectionSettings, result.getConnectionSettings())) {
+         result.disconnect();
          throw new DSException("Connection settings in diagram root and current connection are different.");
       }
       if (opened) {
@@ -138,8 +141,7 @@ public final class InteractiveConnectionUtil {
     * @return The {@link IDSConnection} for the given {@link DbcModel} or {@code null} if not available.
     */
    public static IDSConnection getConnection(DbcModel model) {
-      WeakReference<IDSConnection> reference = connections.get(model);
-      return reference != null ? reference.get() : null;
+      return connections.get(model);
    }
    
    /**
@@ -149,12 +151,9 @@ public final class InteractiveConnectionUtil {
     */
    public static void closeConnection(DbcModel model) throws DSException {
       if (model != null) {
-         WeakReference<IDSConnection> reference = connections.remove(model);
-         if (reference != null) {
-            IDSConnection connection = reference.get();
-            if (connection != null && connection.isConnected()) {
-               connection.disconnect();
-            }
+         IDSConnection connection = connections.remove(model);
+         if (connection != null && connection.isConnected()) {
+            connection.disconnect();
          }
       }
    }
