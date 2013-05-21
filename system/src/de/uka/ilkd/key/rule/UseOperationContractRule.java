@@ -796,12 +796,15 @@ public final class UseOperationContractRule implements BuiltInRule {
             ifContractBuilder.setContract(contract);
             ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
             ifContractBuilder.setHeapAtPre(heapAtPre);
-            ifContractBuilder.setHeapAtPost(heapAtPost);
             ifContractBuilder.setSelfAtPre(contractSelf);
             ifContractBuilder.setLocalVarsAtPre(contractParams);
-            ifContractBuilder.setLocalVarsAtPost(ImmutableSLList.<Term>nil());
             ifContractBuilder.setResultAtPre(contractResult);
             ifContractBuilder.setExceptionAtPre(TB.var(excVar));
+            ifContractBuilder.setHeapAtPost(heapAtPost);
+            ifContractBuilder.setSelfAtPost(contractSelf);
+            ifContractBuilder.setLocalVarsAtPost(contractParams);
+            ifContractBuilder.setResultAtPost(contractResult);
+            ifContractBuilder.setExceptionAtPost(TB.var(excVar));
 
             // generate information flow contract application predicate
             // and associated taclet

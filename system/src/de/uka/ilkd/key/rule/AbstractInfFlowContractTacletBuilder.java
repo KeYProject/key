@@ -101,7 +101,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         this.exceptionVarAtPost = exceptionAtPost;
     }
 
-    // TODO: add exception var
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = getProofObligationVars();
         Term contractApplPredTerm = getContractApplPred(appData);
@@ -113,7 +112,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
 
-    // TODO: add exception var
     public Taclet buildContractApplTaclet() {
         ProofObligationVars appData = getProofObligationVars();
         Taclet result = genInfFlowContractApplTaclet(appData, services);

@@ -31,7 +31,6 @@ public class StateVars {
 
     public final ImmutableList<Term> paddedTermList;
 
-//    public final ImmutableList<Term> paddedTermListWithoutLocalVars;
     public final Term self;
 
     public final Term guard;
@@ -91,16 +90,6 @@ public class StateVars {
         allTerms = allTerms.append(exception);
         allTerms = allTerms.append(mbyAtPre);
         paddedTermList = allTerms;
-
-//        ImmutableList<Term> allTermsButLocalVars =
-//                ImmutableSLList.<Term>nil();
-//        allTermsButLocalVars = allTermsButLocalVars.append(heap);
-//        allTermsButLocalVars = allTermsButLocalVars.append(self);
-//        allTermsButLocalVars = allTermsButLocalVars.append(guard);
-//        allTermsButLocalVars = allTermsButLocalVars.append(result);
-//        allTermsButLocalVars = allTermsButLocalVars.append(exception);
-//        allTermsButLocalVars = allTermsButLocalVars.append(mbyAtPre);
-//        paddedTermListWithoutLocalVars = allTermsButLocalVars;
     }
 
 
