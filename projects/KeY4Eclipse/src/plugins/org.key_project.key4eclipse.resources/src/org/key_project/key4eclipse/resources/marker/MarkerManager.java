@@ -7,10 +7,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 import de.uka.ilkd.key.java.Position;
@@ -21,6 +18,7 @@ public class MarkerManager {
    public final static String CLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker";
    public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
+   
    
    /**
     * Sets the {@link IMarker} for the given {@link IMethod} depending on the {@link Proof}s status. The {@link IPath} of 
@@ -58,6 +56,11 @@ public class MarkerManager {
    }
    
    
+   /**
+    * Sets the ProofLoaderException{@link IMarker} for the given {@link IResource}.
+    * @param res - the {@link IResource} to use
+    * @throws CoreException
+    */
    public void setProblemLoaderExceptionMarker(IResource res) throws CoreException{
       IMarker marker = res.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
       if (marker.exists()) {

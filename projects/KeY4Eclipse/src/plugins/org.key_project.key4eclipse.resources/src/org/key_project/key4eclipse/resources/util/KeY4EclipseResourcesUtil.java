@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -19,12 +19,26 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class KeY4EclipseResourcesUtil {
    
-   public static void openProofFileInKeYIDE(File file, IProject project) throws Exception{
+   
+   /**
+    * Opens the given {@link File} in a {@link KeYEditor}.
+    * @param file - the {@link File} to use
+    * @throws Exception
+    */
+   public static void openProofFileInKeYIDE(File file) throws Exception{
       KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(file, null, null);
       Proof proof = environment.getLoadedProof();
       KeYIDEUtil.openEditor(proof, environment);
    }
    
+   
+   /**
+    * Saves the given {@link Proof} into the given {@link IFile}
+    * @param proof - the {@link Proof} to be stored
+    * @param file - the {@link IFile} to store the {@link Proof} at
+    * @throws CoreException
+    * @throws IOException
+    */
    public static void saveProof(Proof proof, IFile file) throws CoreException, IOException{
       if(file != null){
          String filePathAndName = file.getLocation().toOSString();

@@ -14,6 +14,10 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 @SuppressWarnings("restriction")
 public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler {
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
       ISelection selection = HandlerUtil.getCurrentSelection(event);

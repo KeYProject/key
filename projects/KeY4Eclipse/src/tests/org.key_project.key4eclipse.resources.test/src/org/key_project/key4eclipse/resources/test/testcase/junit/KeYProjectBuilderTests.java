@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
 public class KeYProjectBuilderTests extends TestCase{
    
    /**
-    * This test add a Java-File to a KeYProject and checks if the Proofs and Marker were created.
+    * This test add a Java{@link IFile} to a KeYProject and checks if the {@link Proof}s and {@link IMarker} were created.
     * @throws CoreException
     * @throws InterruptedException
     */
@@ -66,22 +66,27 @@ public class KeYProjectBuilderTests extends TestCase{
       //make sure that the javaFile exists now
       assertTrue(javaFile.exists());
       //make sure that there are no KeYMarker on the added resource
-      assertFalse(KeY4EclipseResourcesTestUtil.hasKeYMarker(javaFile));
+      assertTrue(KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile).isEmpty());
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       //check if the proof files were created
       assertTrue(proofAdd.exists() && proofSub.exists());
       //check if the marker were set
-      LinkedList<IMarker> closedMarkerList = KeY4EclipseResourcesTestUtil.getKeYMarkerClosed(javaFile);
-      assertTrue(closedMarkerList.size() == 2 && closedMarkerList.get(0).getAttribute(IMarker.LINE_NUMBER).equals(7) && closedMarkerList.get(1).getAttribute(IMarker.LINE_NUMBER).equals(14));
-      assertFalse(KeY4EclipseResourcesTestUtil.hasKeYMarkerNotClosed(javaFile));
+      LinkedList<IMarker> allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
+      assertTrue(allMarkerList.size() == 2 && KeY4EclipseResourcesTestUtil.allMarkerInDifferentLines(allMarkerList));
+      for(IMarker marker : allMarkerList){
+         int lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
+         String markerType = marker.getType();
+         assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
+         assertTrue(lineNumber == 7 || lineNumber == 14);
+      }
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);;  
    }
    
    
    /**
-    * This test add a Java-File to a KeYProject and checks if the Proofs and Marker were created.
+    * This test add a Java{@link IFile} to a KeYProject and checks if the {@link Proof}s and {@link IMarker} were created.
     * @throws CoreException
     * @throws InterruptedException
     */
@@ -116,23 +121,78 @@ public class KeYProjectBuilderTests extends TestCase{
       //make sure that the javaFile exists now
       assertTrue(javaFile.exists());
       //make sure that there are no KeYMarker on the added resource
-      assertFalse(KeY4EclipseResourcesTestUtil.hasKeYMarker(javaFile));
+      assertTrue(KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile).isEmpty());
     //build
       KeY4EclipseResourcesTestUtil.build(project);
       //check if the proof files were created
       assertTrue(proofAdd.exists() && proofSub.exists());
       //check if the marker were set
-      LinkedList<IMarker> closedMarkerList = KeY4EclipseResourcesTestUtil.getKeYMarkerClosed(javaFile);
-      assertTrue(closedMarkerList.size() == 1 && closedMarkerList.get(0).getAttribute(IMarker.LINE_NUMBER).equals(7));
-      LinkedList<IMarker> notClosedMarkerList = KeY4EclipseResourcesTestUtil.getKeYMarkerNotClosed(javaFile);
-      assertTrue(notClosedMarkerList.size() == 1 && notClosedMarkerList.get(0).getAttribute(IMarker.LINE_NUMBER).equals(14));
+      LinkedList<IMarker> allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
+      assertTrue(allMarkerList.size() == 2 && KeY4EclipseResourcesTestUtil.allMarkerInDifferentLines(allMarkerList));
+      for(IMarker marker : allMarkerList){
+         int lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
+         String markerType = marker.getType();
+         assertTrue( (markerType.equals(MarkerManager.CLOSEDMARKER_ID) && lineNumber == 7) 
+                  || (markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID) && lineNumber == 14));
+      }
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
    }
    
    
    /**
-    * This test adds a non-Java File to a KeYProject and checks if any proofs were created.
+    * Adds a Java{@link IFile} which causes a {@link ProblemLoaderException} and checks if 
+    * the ProblemException{@link IMarker} was set and no {@link Proof}s were created after the build.
+    * @throws CoreException
+    * @throws InterruptedException
+    */
+   @Test
+   public void testJavaFileAddedWithProblemLoaderException() throws CoreException, InterruptedException{
+    //turn off autobuild
+      KeY4EclipseResourcesTestUtil.enableAutoBuild(false);
+      //create a KeYProject
+      IJavaProject keyProject = KeY4EclipseResourcesTestUtil.createKeYProject("KeYProjectBuilderTests_testJavaFileAddedWithProblemLoaderException");
+      IProject project = keyProject.getProject();
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //check if proofFolder exists
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
+      assertFalse(proofFolder.exists());
+      //get expected proofFiles
+      IPath pathAdd = project.getFullPath().append("Proofs").append("add").append("java").append("test").append("AddJavaTest.java").append("add.java.test.AddJavaTest[add.java.test.AddJavaTest__add(int,int)].JML operation contract.0.proof");
+      IPath pathSub = project.getFullPath().append("Proofs").append("add").append("java").append("test").append("AddJavaTest.java").append("add.java.test.AddJavaTest[add.java.test.AddJavaTest__sub(int,int)].JML operation contract.0.proof");
+      IFile proofAdd = root.getFile(pathAdd);
+      IFile proofSub = root.getFile(pathSub);
+      //make sure that the proofFiles don't exist yet
+      assertTrue(!proofAdd.exists() && !proofSub.exists());
+      //get the javaFile which will be added
+      IPath javaFilePath = project.getFullPath().append("src").append("add").append("java").append("test").append("AddJavaTest.java");
+      IFile javaFile = root.getFile(javaFilePath);
+      //make sure that the javaFile doesn't exists yet
+      assertFalse(javaFile.exists());
+      //add the JavaFile
+      IFolder src = project.getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/AddTests/testJavaFileAddedWithProblemLoaderException", src);
+      //make sure that the javaFile exists now
+      assertTrue(javaFile.exists());
+      //make sure that there are no KeYMarker on the added resource
+      assertTrue(KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile).isEmpty());
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //check if the proof files were created
+      assertTrue(!proofAdd.exists() && !proofSub.exists());
+      assertTrue(!proofFolder.exists());
+      //check if the marker were set
+      LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
+      assertTrue(allMarker.size() == 1 && allMarker.get(0).getType().equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID));
+      //turn on autobuild
+      KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
+   }
+   
+   
+   /**
+    * This test adds a non-Java{@link IFile} to a KeYProject and checks if any {@link Proof}s were created.
     * @throws CoreException
     * @throws InterruptedException
     */
@@ -160,8 +220,8 @@ public class KeYProjectBuilderTests extends TestCase{
    
    
    /**
-    * This test adds a Java File to a KeYProject. After the build a File will be added to the proof 
-    * Folder. Then it will be checked if the added File was deleted and the proof Files still exist.
+    * This test adds a Java{@link IFile} to a KeYProject. After the build a {@link IFile} will be added to the proof 
+    *  {@link IFolder}. Then it will be checked if the added {@link IFile} was deleted and the proof{@link IFile}s still exist.
     * @throws CoreException
     * @throws InterruptedException
     */
@@ -208,10 +268,10 @@ public class KeYProjectBuilderTests extends TestCase{
    
    
    /**
-    * This test adds two Java Files with different packages to a KeYProject. Right after building 
-    * the proofs, one of the Java Files will be deleted. If all proofs and all associated proofFolders 
-    * of this Java File were deleted, the second Java File will be deleted. The test is passed if 
-    * the whole ProofFolder is deleted after that
+    * This test adds two Java{@link IFile}s with different packages to a KeYProject. Right after building 
+    * the {@link Proof}s, one of the Java{@link IFile}s will be deleted. If all {@link Proof}s and all 
+    * associated proof{@link IFolder}s of this Java{@link IFile} were deleted, the second Java{@link IFile} 
+    * will be deleted. The test is passed if the whole Proof{@link IFolder} is deleted after that.
     * @throws CoreException
     * @throws InterruptedException
     */
@@ -280,9 +340,9 @@ public class KeYProjectBuilderTests extends TestCase{
    
    
    /**
-    * This test adds two javaFiles to a KeYProject. After the proofs are build first one of 
-    * the proofFiles will be deleted. If this file and all marker were recreated the whole proofFolder will 
-    * be deleted. The test is passed if all proofs and marker are recreated.
+    * This test adds two Java{@link IFile}s to a KeYProject. After the {@link Proof}s are build, first one of 
+    * the proof{@link IFile}s will be deleted. If this {@link IFile} and all {@link IMarker} were recreated the whole proof{@link IFolder} will 
+    * be deleted. The test is passed if all {@link Proof}s and {@link IMarker} are recreated.
     * @throws CoreException
     * @throws InterruptedException
     */
@@ -348,7 +408,9 @@ public class KeYProjectBuilderTests extends TestCase{
    
    
    /**
-    * 
+    * Adds a Java{@link IFile} which causes a ProofNotClosed{@link IMarker}. Then Java{@link IFile} 
+    * content will be changed. After the build the {@link Proof} should be closed and  the ProofNotClosed{@link IMarker} should change into a 
+    * ProofClosed{@link IMarker}
     * @throws CoreException
     * @throws InterruptedException
     * @throws ProblemLoaderException
@@ -418,6 +480,16 @@ public class KeYProjectBuilderTests extends TestCase{
    }
    
    
+   /**
+    * This test adds a Java{@link IFile} to the KeYProject. After building the {@link Proof} the 
+    * JML-Specification of the {@link IMethod} will be changed. The next build will cause a 
+    * ProblemLoaderException while loading the old proof{@link IFile}. In this case the {@link Proof} 
+    * will be recreated. The {@link IMarker} should change form a "proofNotClosed{@linkIMarker}" to a "proofClosed{@link IMarker}".
+    * @throws CoreException
+    * @throws InterruptedException
+    * @throws ProblemLoaderException
+    * @throws IOException
+    */
    @Test
    public void testJavaFileChangedMethodChangedCantLoadOldProof() throws CoreException, InterruptedException, ProblemLoaderException, IOException{
       //turn off autobuild
@@ -643,10 +715,10 @@ public class KeYProjectBuilderTests extends TestCase{
       //make sure that the java file exists now
       assertTrue(javaIFile.exists());
       //make sure that the marker were set correct
-      LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
-      assertTrue(allMarker.size() == 1);
-      String markerType = allMarker.get(0).getType();
-      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER);
+      LinkedList<IMarker> allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
+      assertTrue(allMarkerList.size() == 1);
+      String markerType = allMarkerList.get(0).getType();
+      int markerLineNumber = (Integer) allMarkerList.get(0).getAttribute(IMarker.LINE_NUMBER);
       assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 9);
       //check if proofFileOne was created and second file is missing
       assertTrue(proofFileMethodOne.exists() && !proofFileMethodTwo.exists());
@@ -658,14 +730,14 @@ public class KeYProjectBuilderTests extends TestCase{
       //check if both proofFile were created
       assertTrue(proofFileMethodOne.exists() && proofFileMethodTwo.exists());
       //make sure that the marker were set correct
-      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
-      assertTrue(allMarker.size() == 2);
-      String markerOneType = allMarker.get(0).getType();
-      int markerOneLine = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER);
-      assertTrue(markerOneType.equals(MarkerManager.CLOSEDMARKER_ID) && markerOneLine == 7);
-      String markerTwoType = allMarker.get(1).getType();
-      int markerTwoLine = (Integer) allMarker.get(1).getAttribute(IMarker.LINE_NUMBER);
-      assertTrue(markerTwoType.equals(MarkerManager.CLOSEDMARKER_ID) && markerTwoLine == 15);
+      allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
+      assertTrue(allMarkerList.size() == 2 && KeY4EclipseResourcesTestUtil.allMarkerInDifferentLines(allMarkerList));
+      for(IMarker marker : allMarkerList){
+         markerLineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
+         markerType = marker.getType();
+         assertTrue( (markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7) 
+                  || (markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 15));
+      }
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
    }
@@ -782,6 +854,128 @@ public class KeYProjectBuilderTests extends TestCase{
    }
    
    
+   @Test
+   public void testJavaFileChangedWithProblemLoaderException() throws CoreException, IOException, InterruptedException{
+    //turn off autobuild
+      KeY4EclipseResourcesTestUtil.enableAutoBuild(false);
+      //create a KeYProject
+      IJavaProject keyProject = KeY4EclipseResourcesTestUtil.createKeYProject("KeYProjectBuilderTests_testJavaFileChangedWithProblemLoaderException");
+      IProject project = keyProject.getProject();
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //check if proofFolder exists
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
+      assertFalse(proofFolder.exists());
+      //get expected proofFile
+      IPath proofFileOnePath = project.getFullPath().append("Proofs").append("method").append("changed").append("JavaFile.java").append("method.changed.JavaFile[method.changed.JavaFile__add(int,int)].JML operation contract.0.proof");
+      IPath proofFileTwoPath = project.getFullPath().append("Proofs").append("method").append("changed").append("anotherJavaFile.java").append("method.changed.anotherJavaFile[method.changed.anotherJavaFile__sub(int,int)].JML operation contract.0.proof");
+      IFile proofFileOne = root.getFile(proofFileOnePath);
+      IFile proofFileTwo = root.getFile(proofFileTwoPath);
+      //make sure that the expected proofFile doesnt't exists yet
+      assertTrue(!proofFileOne.exists() && !proofFileTwo.exists());
+      //get javaFile that will be added
+      IPath javaIFileOnePath = project.getFullPath().append("src").append("method").append("changed").append("JavaFile.java");
+      IPath javaIFileTwoPath = project.getFullPath().append("src").append("method").append("changed").append("anotherJavaFile.java");
+      IFile javaFileOne = root.getFile(javaIFileOnePath);
+      IFile javaFileTwo = root.getFile(javaIFileTwoPath);
+      //make sure that the javaFiles don't exist yet
+      assertTrue(!javaFileOne.exists() && !javaFileTwo.exists());
+      //add the javaFiles
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/filesToAdd", src);
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //make sure that the javaFiles exist
+      assertTrue(javaFileOne.exists() && javaFileTwo.exists());
+      //check if proofFiles were created
+      assertTrue(proofFileOne.exists() && proofFileTwo.exists());
+      //make sure that there is one marker in each javaFile and make sure that this marker is a "closedMarker"
+      LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
+      assertTrue(allMarker.size() == 1);
+      String markerType = allMarker.get(0).getType();
+      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      //check the second file
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
+      //change the first file
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/firstChangedJavaFile.java");
+      javaFileOne.setContents(is, IResource.FORCE, null);
+      is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/resetSecondFile.java");
+      javaFileTwo.setContents(is, IResource.FORCE, null);
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //make sure that there is still just one marker in the java file. but now its a "ProblemLoaderExceptionMarker"
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID) && markerLineNumber == 1);
+      //check the second file
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
+      //check if the proofFile for the changed javaFile was deleted
+      assertTrue(!proofFileOne.exists() && proofFileTwo.exists());
+      //change the second file
+      is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/firstChangedJavaFile.java");
+      javaFileTwo.setContents(is, IResource.FORCE, null);
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //make sure that there is now just one "ProblemLoaderExceptionMarker" in each javaFile 
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID) && markerLineNumber == 1);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID) && markerLineNumber == 1);
+      //check if the proofFile for the changed javaFile was deleted
+      assertTrue(!proofFileOne.exists() && !proofFileTwo.exists());
+      assertTrue(!proofFolder.exists());
+      //reset both files to their startvalues
+      is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/resetFirstFile.java");
+      javaFileOne.setContents(is, IResource.FORCE, null);
+      is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/resetSecondFile.java");
+      javaFileTwo.setContents(is, IResource.FORCE, null);
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      //make sure that the proofs were recreated
+      assertTrue(proofFileOne.exists() && proofFileTwo.exists());
+      //make sure that the marker were reseted
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
+      assertTrue(allMarker.size() == 1);
+      markerType = allMarker.get(0).getType();
+      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
+      //turn on autobuild
+      KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
+   }
+   
+   
+   
+   /**
+    * This test adds a Java{@link IFile} to a KeYProject and builds the {@link Proof}s. Then the 
+    * proof{@link IFolder} will be deleted and the {@link IncrementalProjectBuilder}s CLEAN_BUILD
+    * will be started. The test if passed if the proof{@link IFolder} and all {@link Proof}s exist 
+    * after the build.
+    * @throws CoreException
+    * @throws InterruptedException
+    */
    @Test
    public void testClean() throws CoreException, InterruptedException{
       //turn off autobuild

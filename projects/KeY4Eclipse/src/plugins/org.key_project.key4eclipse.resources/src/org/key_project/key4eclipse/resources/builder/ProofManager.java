@@ -50,37 +50,24 @@ public class ProofManager {
    private IProject project;
    private boolean problemLoaderException = false;
    
+   
+   /**
+    * The Constructor - sets up the {@link MarkerManager}, the main Proof{@link IFolder} and tries 
+    * to load the {@link KeYEnvironment}. If that fails the problemLoaderException will be set.
+    * @param project - the {@link IProject} to use
+    * @throws CoreException
+    */
    public ProofManager(IProject project) throws CoreException{
       markerManager = new MarkerManager();
       mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append("Proofs"));
       this.project = project;
       try{
-         final File location = ResourceUtil.getLocation(project);
-         final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
-         final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+         File location = ResourceUtil.getLocation(project);
+         File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+         List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
          environment = KeYEnvironment.load(location, classPaths, bootClassPath);
       } catch (ProblemLoaderException e) {
          problemLoaderException = true;
-      }
-   }
-      
-   
-   
-   private boolean loadKeYEnvironmentForResource(IResource res) throws ProblemLoaderException, CoreException{
-      if(problemLoaderException){
-         try{
-            final File location = ResourceUtil.getLocation(res);
-            final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
-            final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-            environment = KeYEnvironment.load(location, classPaths, bootClassPath);
-            return true;
-         } catch (ProblemLoaderException e) {
-            markerManager.setProblemLoaderExceptionMarker(res);
-            return false;
-         }
-      }
-      else{
-         return true;
       }
    }
    
@@ -90,7 +77,7 @@ public class ProofManager {
     * @param res - the given {@link IResource}
     * @throws Exception
     */
-   public void runProofsForResource(IResource res) throws Exception{
+   public void runProofsForResource(IResource res) throws Exception {
       //get all methods from the given resource.
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
       IFolder proofFolder = createProofFolder(res);
@@ -146,6 +133,16 @@ public class ProofManager {
             }
          }
       }
+   }
+   
+   
+   /**
+    * Deletes the main Proof{@link IFolder} and runs all {@link Proof}s for the {@link IProject}.
+    * @throws Exception
+    */
+   public void clean() throws Exception{
+      deleteResource(mainProofFolder);
+      runAllProofs();
    }
    
    
@@ -226,20 +223,43 @@ public class ProofManager {
    } 
    
    
-//   /**
-//    * Creates the main proofFolder for the given {@link IProject}. For example: /Project/Proofs/
-//    * @param project - the {@link IProject} to use
-//    * @throws CoreException
-//    */
-//   private IFolder createMainProofFolder(IProject project) throws CoreException{
-//      IPath projectPath = project.getFullPath();
-//      IPath proofFolderPath = projectPath.append("Proofs");
-//      IFolder proofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(proofFolderPath);
-//      if(!proofFolder.exists()){
-//         proofFolder.create(true, true, null);       
-//      }
-//      return proofFolder;
-//   }
+/**
+ * If the problemLoaderException is set, it will be tempted to load the {@link KeYEnvironment} for 
+ * the given {@link IResource}. If that fails, a ProblemLoaderExceptionMarker will be set.
+ * @param res - the {@link IResource} to use
+ * @return true if the {@link KeYEnvironment} was loaded. false otherwise
+ * @throws ProblemLoaderException
+ * @throws CoreException
+ */
+private boolean loadKeYEnvironmentForResource(IResource res) throws CoreException{
+   if(problemLoaderException){
+      try{
+         File location = ResourceUtil.getLocation(res);
+         File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+         List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+         environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+         return true;
+      } catch (ProblemLoaderException e) {
+         markerManager.setProblemLoaderExceptionMarker(res);
+         return false;
+      }
+   }
+   else{
+      return true;
+   }
+}
+
+
+   /**
+    * Runs all {@link Proof}s in the {@link IProject}.
+    * @throws Exception
+    */
+   private void runAllProofs() throws Exception{
+      LinkedList<IFile> javaFiles = collectAllJavaFilesForProject();
+      for(IFile file : javaFiles){
+         runProofsForResource(file);
+      }
+   }
    
    
    /**
@@ -293,6 +313,11 @@ public class ProofManager {
    }
    
    
+   /**
+    * Creates a {@link Proof} for the given {@link ProofOblInput} and runs the AutoMode.
+    * @param obl - the given {@link ProofOblInput}
+    * @return the created {@link Proof}
+    */
    private Proof createProof(ProofOblInput obl){
       try{
          Proof proof = environment.createProof(obl);
@@ -305,6 +330,11 @@ public class ProofManager {
    }
    
    
+   /**
+    * Loads the {@link Proof} of the given {@link IFile} and runs the AutoMode.
+    * @param file - the given {@link IFile}
+    * @return the loaded {@link Proof}
+    */
    private Proof loadProof(File file){
       try{
          environment = KeYEnvironment.load(file, null, null);
@@ -341,7 +371,7 @@ public class ProofManager {
    /**
     * Collects all {@link IMethod}s in the given {@link IResource}.
     * @param res - the given {@link IResource}
-    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @return - the {@link LinkedList} with all {@link IMethod}s
     * @throws JavaModelException
     */
    private LinkedList<IMethod> getResourceMethods(IResource res) throws JavaModelException{
@@ -361,7 +391,7 @@ public class ProofManager {
    /**
     * Creates all {@link ProofOblInput}s for the given {@link IMethod}.
     * @param method - the {@link IMethod to use
-    * @return - the {@link LinkedList<IMethod>} with all {@link ProofOblInput}s
+    * @return - the {@link LinkedList} with all {@link ProofOblInput}s
     * @throws ProofInputException
     */
    private LinkedList<ProofOblInput> createProofOblsForMethod(IMethod method) throws ProofInputException{
@@ -498,19 +528,13 @@ public class ProofManager {
       return path;
    }
    
-   public void clean(IProject project) throws Exception{
-      deleteResource(mainProofFolder);
-      runAllProofs(project);
-   }
    
-   private void runAllProofs(IProject project) throws Exception{
-      LinkedList<IFile> javaFiles = collectAllJavaFilesForProject(project);
-      for(IFile file : javaFiles){
-         runProofsForResource(file);
-      }
-   }
-   
-   private LinkedList<IFile> collectAllJavaFilesForProject(IProject project) throws JavaModelException{
+   /**
+    * Collects all Java{@link IFile}s of the {@link IProject}.
+    * @return the {@link LinkedList} with all Java{@link IFile}s
+    * @throws JavaModelException
+    */
+   private LinkedList<IFile> collectAllJavaFilesForProject() throws JavaModelException{
       IJavaProject javaProject = JavaCore.create(project);
       LinkedList<IFile> javaFiles = new LinkedList<IFile>();
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

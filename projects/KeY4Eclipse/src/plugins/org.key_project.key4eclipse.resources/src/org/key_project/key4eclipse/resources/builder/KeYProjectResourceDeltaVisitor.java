@@ -7,8 +7,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
-import de.uka.ilkd.key.proof.ProblemLoaderException;
-
 public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
 
    private ProofManager proofManager;
@@ -51,7 +49,7 @@ public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
       
       IPath resourcePath = res.getFullPath();
       IPath proofFolderPath = res.getProject().getFullPath().append("Proofs");
-      
+      //Resource was added in the ProofFolder
       if(proofFolderPath.isPrefixOf(resourcePath)){
          if(res.exists()){
             proofManager.deleteResource(res);
@@ -111,6 +109,6 @@ public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
             }
          }
       }
+      //TODO: what happens if a file in the prooffolder was changed?
    }
-
 }

@@ -36,6 +36,14 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class KeY4EclipseResourcesTestUtil {
 
+   
+   /**
+    * Creates a new KeYProject that is an {@link IJavaProject} with a KeYNature.
+    * @param name - the project name
+    * @return the created KeYProject
+    * @throws CoreException
+    * @throws InterruptedException
+    */
    public static IJavaProject createKeYProject(String name) throws CoreException, InterruptedException{
       IJavaProject javaProject = TestUtilsUtil.createJavaProject(name);
       IProject project = javaProject.getProject();
@@ -51,11 +59,27 @@ public class KeY4EclipseResourcesTestUtil {
       return javaProject;
    }
    
+   
+   /**
+    * Checks if the given {@link IProject} has the given nature.
+    * @param natureId - the given nature
+    * @param project - the {@link IProject} to use
+    * @return true if the {@link IProject} hat the given nature. False otherwise.
+    * @throws CoreException
+    */
    public static boolean hasNature(String natureId, IProject project) throws CoreException{
       IProjectDescription description = project.getDescription();
       return ArrayUtil.contains(description.getNatureIds(), natureId);
    }
    
+   
+   /**
+    * Checks if the given {@link IProject} has the given Builder.
+    * @param builderId - the given builder
+    * @param project - the {@link IProject} to use
+    * @return true if the {@link IProject} hat the given builder. False otherwise.
+    * @throws CoreException
+    */
    public static boolean hasBuilder(String builderId, IProject project) throws CoreException{
       IProjectDescription description = project.getDescription();
       ICommand keyBuilder = ArrayUtil.search(description.getBuildSpec(), new IFilter<ICommand>() {
@@ -70,6 +94,12 @@ public class KeY4EclipseResourcesTestUtil {
       else return false;
    }
    
+   
+   /**
+    * Enables or disables the AutoBuild function in eclipse.
+    * @param enable - true if the AutoBuild should be enabled. False otherwise
+    * @throws CoreException
+    */
    public static void enableAutoBuild(boolean enable) throws CoreException{
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       IWorkspaceDescription desc = workspace.getDescription();
@@ -79,63 +109,101 @@ public class KeY4EclipseResourcesTestUtil {
       }
    }
    
+   
+   /**
+    * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
+    * @param project - the {@link IProject} to use
+    * @throws CoreException
+    */
    public static void build(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
       TestUtilsUtil.waitForBuild();
    }
    
+   
+   /**
+    * Loads a given proof{@linkIFile} and returns the loaded {@link Proof}.
+    * @param file - the {@link IFile} to load
+    * @param project - the {@link IProject} to use
+    * @return the loaded {@link Proof}
+    * @throws CoreException
+    * @throws ProblemLoaderException
+    */
    public static Proof loadProofFile(File file, IProject project) throws CoreException, ProblemLoaderException{
-      
-      final File location = ResourceUtil.getLocation(project);
-      final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
-      final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+      File location = ResourceUtil.getLocation(project);
+      File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+      List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
       KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
       environment = KeYEnvironment.load(file, null, null);
       return environment.getLoadedProof();
    }
    
    
+   /**
+    * Returns the proof{@link IFolder} for the given {@link IProject}.
+    * @param project - the {@link IProject} to use
+    * @return the proof{@link IFolder}
+    */
    public static IFolder getProofFolder(IProject project){
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IPath proofFolderPath = project.getFullPath().append("Proofs");
       return root.getFolder(proofFolderPath);
    }
    
-   public static boolean hasKeYMarkerClosed(IResource res) throws CoreException{
-      LinkedList<IMarker> markerList = getKeYMarkerClosed(res);
-      return (markerList.isEmpty() ? false : true);  
-   }
    
-   public static boolean hasKeYMarkerNotClosed(IResource res) throws CoreException{
-      LinkedList<IMarker> markerList = getKeYMarkerNotClosed(res);
-      return (markerList.isEmpty() ? false : true);  
-   }
-   
-   public static boolean hasKeYMarker(IResource res) throws CoreException{
-      return hasKeYMarkerClosed(res) || hasKeYMarkerNotClosed(res);
-   }
-   
-   public static LinkedList<IMarker> getKeYMarkerClosed(IResource res) throws CoreException{
+   /**
+    * Collects all {@link IMarker} of the given type for the given {@link IResource}.
+    * @param type - the type to use
+    * @param res - the {@link IResource} to use
+    * @return the {@link LinkedList} with the collected {@link IMarker}
+    * @throws CoreException
+    */
+   private static LinkedList<IMarker> getKeYMarkerByType(String type, IResource res) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
-      IMarker[] markers = res.findMarkers(MarkerManager.CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
+      IMarker[] markers = res.findMarkers(type, true, IResource.DEPTH_INFINITE);
       for(IMarker marker : markers){
          markerList.add(marker);
       }
       return markerList;
    }
    
-   public static LinkedList<IMarker> getKeYMarkerNotClosed(IResource res) throws CoreException{
-      LinkedList<IMarker> markerList = new LinkedList<IMarker>();
-      IMarker[] markers = res.findMarkers(MarkerManager.NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
-      for(IMarker marker : markers){
-         markerList.add(marker);
-      }
-      return markerList;
-   }
    
+   /**
+    * Collects all KeY{@link IMarker} for the given {@link IResource}.
+    * @param res - the {@link IResource} to use
+    * @return the {@link LinkedList} with the collected {@link IMarker}
+    * @throws CoreException
+    */
    public static LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
-      LinkedList<IMarker> allMarkerList = getKeYMarkerClosed(res);
-      allMarkerList.addAll(getKeYMarkerNotClosed(res));
-      return allMarkerList;
+      LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerManager.CLOSEDMARKER_ID, res);
+      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.NOTCLOSEDMARKER_ID, res));
+      LinkedList<IMarker> problemLoaderExceptionMarker = getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, res);
+      if(allMarkerList.isEmpty())
+         return problemLoaderExceptionMarker;
+      else if(problemLoaderExceptionMarker.isEmpty()){
+         return allMarkerList;
+      }
+      else{
+         return null;
+      }
+   }
+   
+   
+   /**
+    * Checks if all {@link IMarker} of the given {@link LinkedList} are in different lines.
+    * @param markerList - the {@link IMarker} to check
+    * @return true if all {@link IMarker} are in different lines. False otherwise
+    * @throws CoreException
+    */
+   public static boolean allMarkerInDifferentLines(LinkedList<IMarker> markerList) throws CoreException{
+      LinkedList<Integer> lineNumberList = new LinkedList<Integer>();
+      for(IMarker marker : markerList){
+         int lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
+         if(!lineNumberList.contains(lineNumber)){
+            lineNumberList.add(lineNumber);
+         }
+         else return false;
+      }
+      return true;
    }
 }

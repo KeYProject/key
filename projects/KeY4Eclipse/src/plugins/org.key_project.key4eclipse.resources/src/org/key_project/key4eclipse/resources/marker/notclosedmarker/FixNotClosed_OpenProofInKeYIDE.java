@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -35,8 +34,7 @@ public class FixNotClosed_OpenProofInKeYIDE implements IMarkerResolution2{
          IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
          IFile file= root.getFile(proofPath);
          File proofFile = file.getLocation().toFile();
-         IProject project = marker.getResource().getProject();
-         KeY4EclipseResourcesUtil.openProofFileInKeYIDE(proofFile, project);
+         KeY4EclipseResourcesUtil.openProofFileInKeYIDE(proofFile);
       }
       catch (Exception e) {
          LogUtil.getLogger().createErrorStatus(e);

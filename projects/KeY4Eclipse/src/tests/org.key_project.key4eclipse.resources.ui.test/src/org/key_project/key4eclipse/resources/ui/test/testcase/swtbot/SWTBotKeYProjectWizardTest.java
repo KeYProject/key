@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -22,22 +21,32 @@ public class SWTBotKeYProjectWizardTest extends TestCase{
    
    private SWTWorkbenchBot bot;
    
+   
+   /**
+    * Creates a KeYProject by using the KeYProjectWizard. Asserts that the KeYNature and KeYBuild were set.
+    * @throws CoreException
+    * @throws InterruptedException
+    */
    @Test
    public void testKeYProjectWizard() throws CoreException, InterruptedException{
       bot = new SWTWorkbenchBot();
-      KeY4EclipseResourcesUiTestUtil.enableAutoBuild(false);
       TestUtilsUtil.closeWelcomeView(bot);
       createKeYProject(bot, "SWTBotKeYProjectWizardTest_testKeYProjectWizard");
       
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       
-      workspace.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
       TestUtilsUtil.waitForBuild();
       
       IProject project = workspace.getRoot().getProject("SWTBotKeYProjectWizardTest_testKeYProjectWizard");
       KeY4EclipseResourcesUiTestUtil.assertKeYNature(project);
    }
    
+   
+   /**
+    * Creates a KeYProject by using the KeYProjectWizard.
+    * @param bot - the {@link SWTWorkbenchBot} to use
+    * @param name - the projects name.
+    */
    public static void createKeYProject(SWTWorkbenchBot bot, String name){
       bot.menu("File").menu("New").menu("Project...").click();
       
