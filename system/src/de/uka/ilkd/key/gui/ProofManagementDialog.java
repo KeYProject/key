@@ -576,7 +576,7 @@ public final class ProofManagementDialog extends JDialog {
 	    if(entry != null && entry.target != null) {
 	        final ImmutableSet<Contract> wdContracts
 	        // TODO: Probably new contract "type" in specRepos necessary
-	            = specRepos.getContracts(entry.kjt, entry.target);
+	            = specRepos.getWdChecks(entry.kjt, entry.target);
 	        getActiveContractPanel().setContracts(wdContracts, "Well-Definedness Checks");
 	    }
 	}

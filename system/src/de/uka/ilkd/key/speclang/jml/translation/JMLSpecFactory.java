@@ -206,7 +206,7 @@ public class JMLSpecFactory {
      * and the map for atPre-Functions
      */
 
-    private ProgramVariableCollection createProgramVaribales(IProgramMethod pm) {
+    private ProgramVariableCollection createProgramVariables(IProgramMethod pm) {
         ProgramVariableCollection progVar = new ProgramVariableCollection();
         progVar.selfVar = TB.selfVar(services, pm, pm.getContainerType(), false);
         progVar.paramVars = TB.paramVars(services, pm, false);
@@ -992,7 +992,7 @@ public class JMLSpecFactory {
 
         // prepare program variables, translateToTerm JML clauses and generate post
         // condition
-        ProgramVariableCollection progVars = createProgramVaribales(pm);
+        ProgramVariableCollection progVars = createProgramVariables(pm);
         ContractClauses clauses =
                 translateJMLClauses(pm, textualSpecCase,
                                     progVars, originalBehavior);

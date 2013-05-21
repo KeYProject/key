@@ -121,8 +121,8 @@ public final class DependencyContractImpl implements DependencyContract {
     
     //-------------------------------------------------------------------------
     //public interface
-    //-------------------------------------------------------------------------    
-    
+    //-------------------------------------------------------------------------
+
     @Override
     public String getName() {
 	return name;

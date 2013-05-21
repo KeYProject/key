@@ -32,10 +32,9 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  * A contractual agreement about an ObserverFunction.
  */
 public interface Contract extends SpecificationElement {
-    
+
     public static final int INVALID_ID = Integer.MIN_VALUE;
-        
-    
+
     /**
      * Returns the id number of the contract. If a contract has instances for
      * several methods (inheritance!), all instances have the same id.

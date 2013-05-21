@@ -350,8 +350,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     
     //-------------------------------------------------------------------------
     //public interface
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
     @Override
     public String getName() {
         return name;

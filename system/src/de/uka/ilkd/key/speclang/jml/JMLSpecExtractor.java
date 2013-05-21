@@ -315,7 +315,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         		result = result.add(ax);
         	    } else {
         	        // DO NOTHING
-        	        // There may be ohter kinds of JML constructs which are not specifications.
+                        // There may be other kinds of JML constructs which are not specifications.
         	    }
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());
@@ -336,7 +336,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     /**
      * Extracts method specifications (i.e., contracts) from Java+JML input.
      * @param pm method to extract for
-     * @param addInvariant whether to add <i>static</i> invarants to pre- and post-conditions
+     * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override    
     public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
