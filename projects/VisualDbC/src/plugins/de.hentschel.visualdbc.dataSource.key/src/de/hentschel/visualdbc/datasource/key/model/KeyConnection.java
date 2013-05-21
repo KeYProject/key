@@ -115,6 +115,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -157,11 +158,6 @@ public class KeyConnection extends MemoryConnection {
     * Array declaration
     */
    public static final String ARRAY_DECLARATION = "[]";
-
-   /**
-    * Separator between packages and types.
-    */
-   public static final String PACKAGE_SEPARATOR = ".";
    
    /**
     * The name of implicit constructors.
@@ -397,8 +393,8 @@ public class KeyConnection extends MemoryConnection {
          String typeName = getTypeName(type, packageManagement);
          Assert.isTrue(type.getJavaType() instanceof ClassType);
          ClassType ct = (ClassType)type.getJavaType();
-         if (isInner(services, type)) {
-            String parentName = getParentName(services, type);
+         if (KeYTypeUtil.isInnerType(services, type)) {
+            String parentName = KeYTypeUtil.getParentName(services, type);
             if (ct.isInterface()) {
                MemoryInterface interfaceInstance = createInterface(services, ct, type, typeName);
                List<MemoryInterface> parentInnerInterfaces = innerInterfaces.get(parentName);
@@ -569,74 +565,6 @@ public class KeyConnection extends MemoryConnection {
          monitor.worked(1);
       }
       monitor.done();
-   }
-
-   /**
-    * Checks if the given type is an inner or anonymous type.
-    * @param services The {@link Services} to use.
-    * @param type The type to check.
-    * @return {@code true} is inner or anonymous, {@code false} is not
-    */
-   protected boolean isInner(Services services, KeYJavaType type) {
-      String parentName = getParentName(services, type);
-      if (parentName != null) {
-         return !services.getJavaInfo().isPackage(parentName);
-      }
-      else {
-         return false; // Normal class in default package
-      }
-   }
-   
-   /**
-    * Returns the name of the parent package/type or {@code null} if it has no one.
-    * @param services The {@link Services} to use.
-    * @param type The type.
-    * @return The parent package/type or {@code null} if it has no one.
-    */
-   protected String getParentName(Services services, KeYJavaType type) {
-      return getParentName(services, type.getFullName());
-   }
-   
-   /**
-    * Returns the name of the parent package/type or {@code null} if it has no one.
-    * @param services The {@link Services} to use.
-    * @param fullName The name of the current package/type.
-    * @return The parent package/type or {@code null} if it has no one.
-    */
-   protected String getParentName(Services services, String fullName) {
-      int lastSeparator = fullName.lastIndexOf(PACKAGE_SEPARATOR);
-      if (lastSeparator >= 0) {
-         String parentName = fullName.substring(0, lastSeparator);
-         // Check if parentName is existing package or type (required for anonymous classes that have multiple numbers like ClassContainer.DefaultChildClass.23543334.10115480)
-         if (services.getJavaInfo().isPackage(parentName)) {
-            return parentName;
-         }
-         else if (isType(services, parentName)) {
-            return parentName;
-         }
-         else {
-            return getParentName(services, parentName);
-         }
-      }
-      else {
-         return null;
-      }
-   }
-   
-   /**
-    * Checks if the given full name is a type in KeY.
-    * @param services The services to use.
-    * @param fullName The full name to check.
-    * @return {@code true} = is type, {@code false} = is no type
-    */
-   protected boolean isType(Services services, String fullName) {
-      try {
-         KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName); 
-         return kjt != null;
-      }
-      catch (Exception e) {
-         return false; // RuntimeException is thrown if type not exist.
-      }
    }
 
    /**

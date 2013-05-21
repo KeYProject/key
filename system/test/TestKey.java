@@ -114,6 +114,7 @@ public class TestKey extends TestSuite {
     };
     
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
+       de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
        de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
        de.uka.ilkd.key.proof_references.analyst.TestProgramVariableReferencesAnalyst.class,
        de.uka.ilkd.key.proof_references.analyst.TestClassAxiomAndInvariantProofReferencesAnalyst.class,
