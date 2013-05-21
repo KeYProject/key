@@ -249,13 +249,13 @@ public class Proof implements Named {
      * if someone still holds a refernce to this proof object.
      */
     public void dispose() {
+        if (isDisposed()) {
+            return;
+        }
+
         // Do required cleanup
-        if (services != null && services.getSpecificationRepository() != null) {
-            services.getSpecificationRepository().removeProof(this);
-        }
-        if (localMgt != null) {
-            localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
-        }
+        services.getSpecificationRepository().removeProof(this);
+        localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
         // remove setting listener from settings
         setSettings(null);
         // set every reference (except the name) to null
@@ -291,6 +291,7 @@ public class Proof implements Named {
      * returns the name of the proof. Describes in short what has to be proved.
      * @return the name of the proof
      */
+    @Override
     public Name name() {
 	return name;
     }
@@ -868,8 +869,8 @@ public class Proof implements Named {
     public synchronized void addProofTreeListener
 	(ProofTreeListener listener) {
 	synchronized(listenerList) {
-	    listenerList.add(listener);
-	}
+            listenerList.add(listener);
+        }
     }
 
 
@@ -879,11 +880,11 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
 	(ProofTreeListener listener) {
-       if (listenerList != null) {
+        if (listenerList != null) {
           synchronized(listenerList) {
-             listenerList.remove(listener);
-         }
-       }
+                listenerList.remove(listener);
+            }
+        }
     }
 
 

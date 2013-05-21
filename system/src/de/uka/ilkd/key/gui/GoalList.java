@@ -425,7 +425,7 @@ public class GoalList extends JList {
 	/** Sets whether this object should respond to changes in the
 	 * the proof immediately. */
 	private void setAttentive(boolean b) {
-	    if ( (b != attentive) && (proof != null) ) {
+	    if ( (b != attentive) && (proof != null) && !proof.isDisposed()) {
 		if (b) {
 		    proof.addProofTreeListener(proofTreeListener);
 		    clear();

@@ -510,6 +510,7 @@ public class ProofTreeView extends JPanel {
 
 	/** the selected proof has changed (e.g. a new proof has been
 	 * loaded) */ 
+        @Override
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    Debug.out("ProofTreeView: initialize with new proof");
 	    lastGoalNode = null;
@@ -544,8 +545,8 @@ public class ProofTreeView extends JPanel {
 		    delegateModel.updateTree (n);
 		}
 	    }
-	    if (!delegateModel.isAttentive()) {
-		delegateModel.setAttentive(true);	    
+	    if (!delegateModel.isAttentive() && !proof.isDisposed()) {
+		delegateModel.setAttentive(true);
 		mediator.addKeYSelectionListener(proofListener);
 	    }
  	    makeSelectedNodeVisible(mediator.getSelectedNode());

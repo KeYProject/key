@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -48,7 +49,7 @@ public class FinishAuxiliaryComputationMacro
 
 
     @Override
-    public void applyTo(KeYMediator mediator,
+    public void applyTo(final KeYMediator mediator,
                         PosInOccurrence posInOcc,
                         ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
@@ -73,7 +74,12 @@ public class FinishAuxiliaryComputationMacro
         saveAuxiliaryProof();
 
         // close auxiliary computation proof
-        mediator.getUI().removeProof(proof);
+        GuiUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                mediator.getUI().removeProof(proof);
+            }
+        });
+        
     }
 
 
