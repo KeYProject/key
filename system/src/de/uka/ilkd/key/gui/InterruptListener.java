@@ -14,10 +14,10 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.event.ActionEvent;
+import java.util.EventListener;
 
-public interface InterruptListener {
+public interface InterruptListener extends EventListener {
 
-    public void interruptionPerformed(ActionEvent e);
+    public void interruptionPerformed();
     
 }

@@ -29,7 +29,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.gui.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
@@ -41,6 +44,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -456,7 +460,7 @@ public class ApplyStrategy {
      * applies rules until this is no longer
      * possible or the thread is interrupted.
      */
-    synchronized ApplyStrategyInfo doWork(final IGoalChooser goalChooser, final IStopCondition stopCondition) {
+    private synchronized ApplyStrategyInfo doWork(final IGoalChooser goalChooser, final IStopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
         try{
@@ -533,6 +537,42 @@ public class ApplyStrategy {
     }
     
     
+    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+        
+        ProofSettings settings = proof.getSettings();
+        StrategySettings stratSet = settings.getStrategySettings();
+        int maxSteps = stratSet.getMaxSteps();
+        long timeout = stratSet.getTimeout();
+        
+        boolean stopAtFirstNonCloseableGoal = 
+                proof.getSettings().getStrategySettings()
+                .getActiveStrategyProperties().getProperty(
+                        StrategyProperties.STOPMODE_OPTIONS_KEY)
+                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        
+        boolean retreatMode = proof.getSettings().getStrategySettings()
+                .getActiveStrategyProperties().getProperty(
+                        StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
+                        .equals(StrategyProperties.RETREAT_MODE_RETREAT);
+        
+        if(retreatMode) {
+            return startRetreat(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
+        } else {
+            return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
+        }
+    }
+    
+    /**
+     * This entry point to the proof may provide inconsistent data. The
+     * properties within the proof may differ to the explicit data. This is
+     * disencouraged.
+     * 
+     * @return
+     * 
+     * @deprecated Use {@link #start(Proof, ImmutableList)}. Adjust the settings
+     *             beforehand if needed
+     */
+    @Deprecated
     public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
@@ -546,6 +586,11 @@ public class ApplyStrategy {
         return result;
     }
     
+    /**
+     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
+     * in {@link TryCloseMacro} now.
+     */
+    @Deprecated
     public ApplyStrategyInfo startRetreat(Proof proof,
                                           ImmutableList<Goal> goals,
                                           int maxSteps,
@@ -696,11 +741,11 @@ public class ApplyStrategy {
         }
     }
 
-    public boolean isAutoModeActive() {
+    private boolean isAutoModeActive() {
         return autoModeActive;
     }
 
-    public void setAutoModeActive(boolean autoModeActive) {
+    private void setAutoModeActive(boolean autoModeActive) {
         this.autoModeActive = autoModeActive;
     }    
 
@@ -713,5 +758,17 @@ public class ApplyStrategy {
         if(goalChooser!=null){
             goalChooser.init(null, ImmutableSLList.<Goal>nil());
         }
+    }
+    
+    /**
+     * Returns true iff the last run has been stopped due to a received
+     * {@link InterruptedException}. This exception would have been swallowed by
+     * the system. However, the cancelled flag is set in this case which allows
+     * detection of such a condition.
+     * 
+     * @return whether the last run has been interrupted
+     */
+    public boolean hasBeenInterrupted() {
+        return cancelled;
     }
 }

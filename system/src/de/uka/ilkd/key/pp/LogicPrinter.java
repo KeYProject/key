@@ -1745,7 +1745,7 @@ public final class LogicPrinter {
                 return layouter.mark(o);
         }
     }
-
+    
     /**
      * returns the PositionTable representing position information on
      * the sequent of this LogicPrinter. Subclasses may overwrite
@@ -1753,6 +1753,19 @@ public final class LogicPrinter {
      * is not computed there.
      */
     public InitialPositionTable getPositionTable() {
+        if (pure) {
+            return null;
+        }
+        return ((PosTableStringBackend)backend).getPositionTable();
+    }
+
+    /**
+     * returns the PositionTable representing position information on
+     * the sequent of this LogicPrinter. Subclasses may overwrite
+     * this method with a null returning body if position information
+     * is not computed there.
+     */
+    public InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }
