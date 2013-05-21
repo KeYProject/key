@@ -46,7 +46,7 @@ import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
-public class InteractiveProver {
+public class InteractiveProver implements InterruptListener {
 
     /** the proof the interactive prover works on */
     private Proof proof;
@@ -87,7 +87,7 @@ public class InteractiveProver {
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
         applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
-        applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
+        applyStrategy.addProverTaskObserver(mediator().getUI());
     }
 
     /** returns the KeYMediator */
@@ -173,9 +173,8 @@ public class InteractiveProver {
         worker.start();
     }
     
-    
     /** stops the execution of rules */
-    public void stopAutoMode () {
+    public void interruptionPerformed () {
         if (worker != null) worker.stop();
     }
     

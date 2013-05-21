@@ -31,10 +31,8 @@ public class Config {
     /** name of different fonts */
     public static final String KEY_FONT_PROOF_TREE 
 	= "KEY_FONT_PROOF_TREE";
-    public static final String KEY_FONT_CURRENT_GOAL_VIEW 
+    public static final String KEY_FONT_SEQUENT_VIEW 
 	= "KEY_FONT_CURRENT_GOAL_VIEW";
-    public static final String KEY_FONT_INNER_NODE_VIEW 
-	= "KEY_FONT_INNER_NODE_VIEW";
     public static final String KEY_FONT_GOAL_LIST_VIEW 
 	= "KEY_FONT_GOAL_LIST_VIEW";
     public static final String KEY_FONT_PROOF_LIST_VIEW 
@@ -89,10 +87,8 @@ public class Config {
     public void setDefaultFonts() {
 	UIManager.put(KEY_FONT_PROOF_TREE, 
 		      new Font("Default", Font.PLAIN, sizes[sizeIndex]));
-	UIManager.put(KEY_FONT_CURRENT_GOAL_VIEW, 
+	UIManager.put(KEY_FONT_SEQUENT_VIEW, 
 		      new Font("Monospaced", Font.PLAIN, sizes[sizeIndex]));
-	UIManager.put(KEY_FONT_INNER_NODE_VIEW, 
-		      new Font("Monospaced", Font.ITALIC, sizes[sizeIndex]));
 	UIManager.put(KEY_FONT_GOAL_LIST_VIEW, 
 		      new Font("Default", Font.PLAIN, sizes[2]));
 	UIManager.put(KEY_FONT_PROOF_LIST_VIEW, 

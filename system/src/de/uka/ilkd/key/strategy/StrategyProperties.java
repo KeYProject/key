@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import de.uka.ilkd.key.gui.macros.TryCloseMacro;
+
 
 public final class StrategyProperties extends Properties {
     
@@ -32,7 +34,12 @@ public final class StrategyProperties extends Properties {
     public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
     public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
-
+    
+    /**
+     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
+     * in {@link TryCloseMacro} now.
+     */
+    @Deprecated
     public final static String RETREAT_MODE_OPTIONS_KEY = "RETREAT_MODE_OPTIONS_KEY";
     public final static String RETREAT_MODE_NONE = "RETREAT_MODE_NONE";
     public final static String RETREAT_MODE_RETREAT = "RETREAT_MODE_RETREAT";
@@ -47,7 +54,7 @@ public final class StrategyProperties extends Properties {
     public final static String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public final static String LOOP_INVARIANT = "LOOP_INVARIANT";
     public final static String LOOP_NONE = "LOOP_NONE";
-
+    
     public final static String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
     public final static String BLOCK_CONTRACT = "BLOCK_CONTRACT";
     public final static String BLOCK_EXPAND = "BLOCK_EXPAND";
