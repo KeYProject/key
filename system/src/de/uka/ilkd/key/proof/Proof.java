@@ -253,7 +253,9 @@ public class Proof implements Named {
         if (services != null && services.getSpecificationRepository() != null) {
             services.getSpecificationRepository().removeProof(this);
         }
-        localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
+        if (localMgt != null) {
+            localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
+        }
         // remove setting listener from settings
         setSettings(null);
         // set every reference (except the name) to null
