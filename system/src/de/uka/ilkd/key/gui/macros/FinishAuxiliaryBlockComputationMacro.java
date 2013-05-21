@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -50,7 +51,8 @@ public class FinishAuxiliaryBlockComputationMacro
 
     @Override
     public void applyTo(KeYMediator mediator,
-                        PosInOccurrence posInOcc) {
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
         final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);

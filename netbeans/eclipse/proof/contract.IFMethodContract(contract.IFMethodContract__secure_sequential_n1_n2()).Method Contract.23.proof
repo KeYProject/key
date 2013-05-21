@@ -1,0 +1,482 @@
+\settings {
+"#Proof-Settings-Config-File
+#Tue May 21 14:53:44 CEST 2013
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , JavaCard-JavaCard\\:on , reach-reach\\:on , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:treatAsAxiom , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_TRUE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../../../examples/information_flow/collection";
+
+
+
+\sorts{
+LocSet;
+Update;
+boolean;
+Field;
+Formula;
+int;
+java.lang.Exception\extends java.lang.Throwable;
+contract.IFMethodContract\extends java.lang.Object;
+Heap;
+}
+
+\predicates{
+RELATED_BY_n2_635994323(Heap,contract.IFMethodContract,java.lang.Exception,Heap,contract.IFMethodContract,java.lang.Exception);
+RELATED_BY_n1_635070802(Heap,contract.IFMethodContract,java.lang.Exception,Heap,contract.IFMethodContract,java.lang.Exception);
+EXECUTION_OF_secure_sequential_n1_n2_993218941_WITH_PRE(Heap,contract.IFMethodContract,java.lang.Exception,int,Heap,contract.IFMethodContract,java.lang.Exception,int);
+}
+
+\functions{
+Heap heapAfter_n2_B_0;
+Heap anon_heap_n2_B_0;
+Heap heapAfter_n1_B_0;
+Heap anon_heap_n1_B_0;
+Heap heapAfter_n2_A_0;
+Heap anon_heap_n2_A_0;
+Heap heapAfter_n1_A_0;
+Heap anon(Heap,LocSet,Heap);
+LocSet allLocs;
+Heap anon_heap_n1_A_0;
+Heap heapAfter_n2;
+Heap heapAfter_n1;
+Formula java.lang.Object::<inv>(Heap,java.lang.Object);
+Formula wellFormed(Heap);
+boolean contract.IFMethodContract::exactInstance(any);
+boolean TRUE;
+boolean boolean::select(Heap,java.lang.Object,Field);
+Field java.lang.Object::<created>;
+Null null;
+int int::select(Heap,java.lang.Object,Field);
+Field contract.IFMethodContract::$low;
+int mbyAtPreAtPost_B;
+int mbyAtPreAtPre_B;
+int mbyAtPreAtPost_A;
+int mbyAtPreAtPre_A;
+}
+
+\programVariables{
+java.lang.Exception exc_0_B_0;
+java.lang.Exception exc_B_0;
+java.lang.Exception exc_0_A_0;
+java.lang.Exception exc_A_0;
+java.lang.Exception exc_0;
+java.lang.Exception exc;
+Heap heapAtPost;
+java.lang.Exception excAtPre;
+java.lang.Exception excAtPost;
+contract.IFMethodContract selfAtPost;
+Heap heapAtPre;
+Heap heap;
+contract.IFMethodContract selfAtPre;
+java.lang.Exception excAtPost_B;
+contract.IFMethodContract selfAtPost_B;
+Heap heapAtPost_B;
+java.lang.Exception excAtPre_B;
+contract.IFMethodContract selfAtPre_B;
+Heap heapAtPre_B;
+java.lang.Exception excAtPost_A;
+contract.IFMethodContract selfAtPost_A;
+Heap heapAtPost_A;
+java.lang.Exception excAtPre_A;
+contract.IFMethodContract selfAtPre_A;
+Heap heapAtPre_A;
+}
+
+\rules{
+
+Class_invariant_axiom_for_contract_IFMethodContract {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term contract.IFMethodContract sv_self;
+  
+  \assumes (contract.IFMethodContract::exactInstance(sv_self) = TRUE ==>  )
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith ( true )
+  \heuristics ( classAxiom )
+};
+
+Split_post_0 {
+  
+  \find (
+      int::select(heapAtPost_A, selfAtPost_A, contract.IFMethodContract::$low)
+    = int::select(heapAtPost_B, selfAtPost_B, contract.IFMethodContract::$low)
+  )
+  \succedentPolarity
+  \replacewith (
+      int::select(heapAtPost_A, selfAtPost_A, contract.IFMethodContract::$low)
+    = int::select(heapAtPost_B, selfAtPost_B, contract.IFMethodContract::$low)
+  )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Remove_post_0 {
+  
+  \find (
+      int::select(heapAtPost_A, selfAtPost_A, contract.IFMethodContract::$low)
+    = int::select(heapAtPost_B, selfAtPost_B, contract.IFMethodContract::$low)
+  )
+  \succedentPolarity
+  \replacewith ( false )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Use_information_flow_contract_for_n1_635070802 {
+  \schemaVar \term contract.IFMethodContract assumes_selfAtPre#7;
+  \schemaVar \term java.lang.Exception assumes_exc#8;
+  \schemaVar \term contract.IFMethodContract find_selfAtPre#0;
+  \schemaVar \term Heap assumes_heapAfter_n1#11;
+  \schemaVar \term Heap find_heapAfter_n1#5;
+  \schemaVar \term java.lang.Exception assumes_exc#9;
+  \schemaVar \term Heap assumes_heap#10;
+  \schemaVar \term java.lang.Exception find_exc#2;
+  \schemaVar \term java.lang.Exception find_exc#3;
+  \schemaVar \term Heap find_heap#4;
+  \schemaVar \term contract.IFMethodContract assumes_selfAtPre#6;
+  \schemaVar \term contract.IFMethodContract find_selfAtPre#1;
+  
+  \assumes ( RELATED_BY_n1_635070802(assumes_heap#10,
+                                     assumes_selfAtPre#6,
+                                     assumes_exc#8,
+                                     assumes_heapAfter_n1#11,
+                                     assumes_selfAtPre#7,
+                                     assumes_exc#9)
+            ==>
+             
+  )
+  \find (
+    RELATED_BY_n1_635070802(find_heap#4,
+                            find_selfAtPre#0,
+                            find_exc#2,
+                            find_heapAfter_n1#5,
+                            find_selfAtPre#1,
+                            find_exc#3)
+  )
+  \antecedentPolarity
+  \replacewith (
+    RELATED_BY_n1_635070802(find_heap#4,
+                            find_selfAtPre#0,
+                            find_exc#2,
+                            find_heapAfter_n1#5,
+                            find_selfAtPre#1,
+                            find_exc#3)
+  )
+  \add (      java.lang.Object::<inv>(find_heap#4, find_selfAtPre#0)
+            & java.lang.Object::<inv>(assumes_heap#10, assumes_selfAtPre#6)
+         ->   int::select(find_heap#4,
+                          find_selfAtPre#0,
+                          contract.IFMethodContract::$low)
+            = int::select(assumes_heap#10,
+                          assumes_selfAtPre#6,
+                          contract.IFMethodContract::$low)
+         ->   int::select(find_heapAfter_n1#5,
+                          find_selfAtPre#1,
+                          contract.IFMethodContract::$low)
+            = int::select(assumes_heapAfter_n1#11,
+                          assumes_selfAtPre#7,
+                          contract.IFMethodContract::$low)
+        ==>
+         
+  )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Use_information_flow_contract_for_n2_635994323 {
+  \schemaVar \term contract.IFMethodContract find_selfAtPre#13;
+  \schemaVar \term Heap assumes_heapAfter_n2#23;
+  \schemaVar \term Heap find_heapAfter_n2#17;
+  \schemaVar \term contract.IFMethodContract assumes_selfAtPre#19;
+  \schemaVar \term java.lang.Exception assumes_exc_0#20;
+  \schemaVar \term Heap assumes_heap#22;
+  \schemaVar \term java.lang.Exception assumes_exc_0#21;
+  \schemaVar \term contract.IFMethodContract assumes_selfAtPre#18;
+  \schemaVar \term contract.IFMethodContract find_selfAtPre#12;
+  \schemaVar \term java.lang.Exception find_exc_0#15;
+  \schemaVar \term Heap find_heap#16;
+  \schemaVar \term java.lang.Exception find_exc_0#14;
+  
+  \assumes ( RELATED_BY_n2_635994323(assumes_heap#22,
+                                     assumes_selfAtPre#18,
+                                     assumes_exc_0#20,
+                                     assumes_heapAfter_n2#23,
+                                     assumes_selfAtPre#19,
+                                     assumes_exc_0#21)
+            ==>
+             
+  )
+  \find (
+    RELATED_BY_n2_635994323(find_heap#16,
+                            find_selfAtPre#12,
+                            find_exc_0#14,
+                            find_heapAfter_n2#17,
+                            find_selfAtPre#13,
+                            find_exc_0#15)
+  )
+  \antecedentPolarity
+  \replacewith (
+    RELATED_BY_n2_635994323(find_heap#16,
+                            find_selfAtPre#12,
+                            find_exc_0#14,
+                            find_heapAfter_n2#17,
+                            find_selfAtPre#13,
+                            find_exc_0#15)
+  )
+  \add (      java.lang.Object::<inv>(find_heap#16, find_selfAtPre#12)
+            & java.lang.Object::<inv>(assumes_heap#22, assumes_selfAtPre#18)
+         ->   int::select(find_heap#16,
+                          find_selfAtPre#12,
+                          contract.IFMethodContract::$low)
+            = int::select(assumes_heap#22,
+                          assumes_selfAtPre#18,
+                          contract.IFMethodContract::$low)
+         ->   int::select(find_heapAfter_n2#17,
+                          find_selfAtPre#13,
+                          contract.IFMethodContract::$low)
+            = int::select(assumes_heapAfter_n2#23,
+                          assumes_selfAtPre#19,
+                          contract.IFMethodContract::$low)
+        ==>
+         
+  )
+  \heuristics ( information_flow_contract_appl )
+};
+
+unfold_computed_formula_0_of_secure_sequential_n1_n2_993218941 {
+  
+  \find (
+      EXECUTION_OF_secure_sequential_n1_n2_993218941_WITH_PRE(heapAtPre_A,
+                                                              selfAtPre_A,
+                                                              excAtPre_A,
+                                                              mbyAtPreAtPre_A,
+                                                              heapAtPost_A,
+                                                              selfAtPost_A,
+                                                              excAtPost_A,
+                                                              mbyAtPreAtPost_A)
+    & EXECUTION_OF_secure_sequential_n1_n2_993218941_WITH_PRE(heapAtPre_B,
+                                                              selfAtPre_B,
+                                                              excAtPre_B,
+                                                              mbyAtPreAtPre_B,
+                                                              heapAtPost_B,
+                                                              selfAtPost_B,
+                                                              excAtPost_B,
+                                                              mbyAtPreAtPost_B)
+  )
+  \antecedentPolarity
+  \replacewith (
+      {heap:=heapAtPre_A}
+        (  wellFormed(heap)
+         & heapAtPre_A = heap
+         &   boolean::select(heap, selfAtPre_A, java.lang.Object::<created>)
+           = TRUE
+         & contract.IFMethodContract::exactInstance(selfAtPre_A) = TRUE
+         & wellFormed(anon_heap_n1_A_0)
+         & anon(heap, allLocs, anon_heap_n1_A_0) = heapAfter_n1_A_0
+         & exc_A_0 = null
+         & RELATED_BY_n1_635070802(heap,
+                                   selfAtPre_A,
+                                   null,
+                                   heapAfter_n1_A_0,
+                                   selfAtPre_A,
+                                   null)
+         & wellFormed(anon_heap_n2_A_0)
+         & anon(heapAfter_n1_A_0, allLocs, anon_heap_n2_A_0) = heapAfter_n2_A_0
+         & exc_0_A_0 = null
+         & RELATED_BY_n2_635994323(heapAfter_n1_A_0,
+                                   selfAtPre_A,
+                                   null,
+                                   heapAfter_n2_A_0,
+                                   selfAtPre_A,
+                                   null)
+         & !{excAtPre_A:=null || heap:=heapAfter_n2_A_0}
+              !(  selfAtPre_A = selfAtPost_A
+                & excAtPre_A = excAtPost_A
+                & heapAtPost_A = heap)
+         & !selfAtPre_A = null)
+    & {heap:=heapAtPre_B}
+        (  wellFormed(heap)
+         & heapAtPre_B = heap
+         &   boolean::select(heap, selfAtPre_B, java.lang.Object::<created>)
+           = TRUE
+         & contract.IFMethodContract::exactInstance(selfAtPre_B) = TRUE
+         & wellFormed(anon_heap_n1_B_0)
+         & anon(heap, allLocs, anon_heap_n1_B_0) = heapAfter_n1_B_0
+         & exc_B_0 = null
+         & RELATED_BY_n1_635070802(heap,
+                                   selfAtPre_B,
+                                   null,
+                                   heapAfter_n1_B_0,
+                                   selfAtPre_B,
+                                   null)
+         & wellFormed(anon_heap_n2_B_0)
+         & anon(heapAfter_n1_B_0, allLocs, anon_heap_n2_B_0) = heapAfter_n2_B_0
+         & exc_0_B_0 = null
+         & RELATED_BY_n2_635994323(heapAfter_n1_B_0,
+                                   selfAtPre_B,
+                                   null,
+                                   heapAfter_n2_B_0,
+                                   selfAtPre_B,
+                                   null)
+         & !{excAtPre_B:=null || heap:=heapAfter_n2_B_0}
+              !(  selfAtPre_B = selfAtPost_B
+                & excAtPre_B = excAtPost_B
+                & heapAtPost_B = heap)
+         & !selfAtPre_B = null)
+  )
+  \heuristics ( concrete )
+};
+}
+
+\problem {
+!(  wellFormed(heapAtPre)
+  & heap = heapAtPre
+  & !selfAtPre = null
+  &   boolean::select(heap,
+                      selfAtPre,
+                      java.lang.Object::<created>)
+    = TRUE
+  &   contract.IFMethodContract::exactInstance(selfAtPre)
+    = TRUE
+  & java.lang.Object::<inv>(heapAtPre, selfAtPre)
+  & \[{
+        excAtPre=null;try {selfAtPre.secure_sequential_n1_n2()@contract.IFMethodContract;
+        }catch (java.lang.Exception e) {
+          excAtPre=e;
+        }
+      }\] (  selfAtPost = selfAtPre
+           & excAtPost = excAtPre
+           & heapAtPost = heap))
+
+}
+
+\proof {
+(keyLog "0" (keyUser "christoph" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "608")
+
+(branch "dummy ID"
+(rule "notRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "3"))
+(rule "assignment" (formula "6"))
+(rule "eqSymm" (formula "2"))
+(rule "eqSymm" (formula "6") (term "1,0,0,1"))
+(rule "eqSymm" (formula "6") (term "0,0,0,1"))
+(rule "applyEq" (formula "1") (term "0") (ifseqformula "2"))
+(rule "applyEq" (formula "5") (term "0") (ifseqformula "2"))
+(rule "Class_invariant_axiom_for_contract_IFMethodContract" (formula "5") (ifseqformula "4"))
+(rule "true_left" (formula "5"))
+(rule "methodBodyExpand" (formula "5") (term "1") (newnames "heapBefore_secure_sequential_n1_n2"))
+(builtin "One Step Simplification" (formula "5"))
+(rule "boxToDiamond" (formula "5") (term "1"))
+(builtin "One Step Simplification" (formula "5"))
+(rule "notLeft" (formula "5"))
+(builtin "Use Operation Contract" (formula "5") (newnames "heapBefore_n1,exc,heapAfter_n1,anon_heap_n1") (contract "contract.IFMethodContract[contract.IFMethodContract::n1()].JML operation contract.0"))
+(branch "Post (n1)"
+   (builtin "One Step Simplification" (formula "8"))
+   (builtin "One Step Simplification" (formula "7"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "andLeft" (formula "6"))
+   (rule "andLeft" (formula "7"))
+   (rule "andLeft" (formula "8"))
+   (rule "replace_known_left" (formula "8") (term "0") (ifseqformula "7"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "applyEq" (formula "9") (term "5") (ifseqformula "7"))
+   (rule "applyEq" (formula "9") (term "2") (ifseqformula "7"))
+   (rule "Class_invariant_axiom_for_contract_IFMethodContract" (formula "8") (ifseqformula "4"))
+   (rule "true_left" (formula "8"))
+   (builtin "Use Operation Contract" (formula "9") (newnames "heapBefore_n2,exc_0,heapAfter_n2,anon_heap_n2") (contract "contract.IFMethodContract[contract.IFMethodContract::n2()].JML operation contract.0"))
+   (branch "Post (n2)"
+      (builtin "One Step Simplification" (formula "12"))
+      (builtin "One Step Simplification" (formula "11"))
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "andLeft" (formula "10"))
+      (rule "andLeft" (formula "11"))
+      (rule "andLeft" (formula "12"))
+      (rule "replace_known_left" (formula "12") (term "0") (ifseqformula "11"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "applyEq" (formula "13") (term "5") (ifseqformula "11"))
+      (rule "applyEq" (formula "13") (term "2") (ifseqformula "11"))
+      (rule "Class_invariant_axiom_for_contract_IFMethodContract" (formula "12") (ifseqformula "4"))
+      (rule "true_left" (formula "12"))
+      (rule "methodCallEmpty" (formula "13") (term "1"))
+      (rule "tryEmpty" (formula "13") (term "1"))
+      (rule "emptyModality" (formula "13") (term "1"))
+      (opengoal "!(  wellFormed(heapAtPre)   & heap = heapAtPre   & !selfAtPre = null   &   boolean::select(heap,                       selfAtPre,                       java.lang.Object::<created>)     = TRUE   &   contract.IFMethodContract::exactInstance(selfAtPre)     = TRUE   & java.lang.Object::<inv>(heapAtPre, selfAtPre)   & \\[{         excAtPre=null;try {selfAtPre.secure_sequential_n1_n2()@contract.IFMethodContract;         }catch (java.lang.Exception e) {           excAtPre=e;         }       }\\] (  selfAtPost = selfAtPre            & excAtPost = excAtPre            & heapAtPost = heap)) ")
+   )
+   (branch "Exceptional Post (n2)"
+      (builtin "One Step Simplification" (formula "10"))
+      (builtin "One Step Simplification" (formula "11"))
+      (rule "andLeft" (formula "10"))
+      (rule "selectCreatedOfAnonEQ" (formula "11") (term "0,1,0") (ifseqformula "10"))
+      (builtin "One Step Simplification" (formula "11"))
+      (rule "selectCreatedOfAnonEQ" (formula "11") (term "0,0,1,0") (ifseqformula "6"))
+      (builtin "One Step Simplification" (formula "11"))
+      (rule "andLeft" (formula "11"))
+      (rule "andLeft" (formula "11"))
+      (rule "andLeft" (formula "13"))
+      (rule "notLeft" (formula "11"))
+      (rule "close" (formula "14") (ifseqformula "13"))
+   )
+   (branch "Pre (n2)"
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "wellFormedAnonEQ" (formula "9") (term "1") (ifseqformula "6"))
+      (rule "replace_known_left" (formula "9") (term "1,1") (ifseqformula "5"))
+      (builtin "One Step Simplification" (formula "9") (ifInst ""  (formula "1")))
+      (rule "Class_invariant_axiom_for_contract_IFMethodContract" (formula "9") (ifseqformula "4"))
+      (rule "closeTrue" (formula "9"))
+   )
+)
+(branch "Exceptional Post (n1)"
+   (builtin "One Step Simplification" (formula "7"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "andLeft" (formula "6"))
+   (rule "selectCreatedOfAnonEQ" (formula "7") (term "0,1,0") (ifseqformula "6"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "andLeft" (formula "7"))
+   (rule "andLeft" (formula "8"))
+   (rule "andLeft" (formula "7"))
+   (rule "notLeft" (formula "7"))
+   (rule "close" (formula "10") (ifseqformula "9"))
+)
+(branch "Pre (n1)"
+   (builtin "One Step Simplification" (formula "5") (ifInst ""  (formula "1")))
+   (rule "Class_invariant_axiom_for_contract_IFMethodContract" (formula "5") (ifseqformula "4"))
+   (rule "closeTrue" (formula "5"))
+)
+)
+
+}

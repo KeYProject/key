@@ -15,12 +15,9 @@ package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.InteractiveProver;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
@@ -58,6 +55,13 @@ public abstract class StrategyProofMacro implements ProofMacro {
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         return true;
     }
+
+    /**
+     * Subclasses can use this method to do some postprocessing on the
+     * proof-object after the strategy has finished.
+     * @param proof     The proof object.
+     */
+    protected void doPostProcessing(Proof proof) {}
 
     /*
      * Set a new rule app manager similar to the focussed mode.
@@ -115,6 +119,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
             }
 
             proof.setActiveStrategy(oldStrategy);
+            doPostProcessing(proof);
         }
         
         if(applyStrategy.hasBeenInterrupted()) {

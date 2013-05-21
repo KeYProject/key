@@ -1,0 +1,483 @@
+\settings {
+"#Proof-Settings-Config-File
+#Tue May 21 14:55:23 CEST 2013
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , JavaCard-JavaCard\\:on , reach-reach\\:on , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:treatAsAxiom , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_TRUE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../../../examples/information_flow/collection";
+
+
+
+\sorts{
+numbers;
+Update;
+boolean;
+Field;
+Formula;
+java.lang.Exception\extends java.lang.Throwable;
+int;
+contract.IFBlockExamples\extends java.lang.Object;
+Heap;
+}
+
+\predicates{
+EXECUTION_OF_BLOCK_at_line_17_in_secure_1_16885809_WITH_PRE(Heap,contract.IFBlockExamples,int,int,java.lang.Exception,Heap,contract.IFBlockExamples,int,int,java.lang.Exception);
+RELATED_BY_BLOCK_at_line_17_in_secure_1_16885809(Heap,contract.IFBlockExamples,int,int,java.lang.Exception,Heap,contract.IFBlockExamples,int,int,java.lang.Exception);
+EXECUTION_OF_secure_1_16885809_WITH_PRE(Heap,contract.IFBlockExamples,int,int,java.lang.Exception,int,Heap,contract.IFBlockExamples,int,int,java.lang.Exception,int);
+}
+
+\functions{
+int add(int,int);
+numbers 1(numbers);
+int Z(numbers);
+numbers 8(numbers);
+numbers #;
+Heap heap_After_BLOCK;
+Formula java.lang.Object::<inv>(Heap,java.lang.Object);
+Formula wellFormed(Heap);
+Formula inInt(int);
+boolean contract.IFBlockExamples::exactInstance(any);
+boolean TRUE;
+boolean boolean::select(Heap,java.lang.Object,Field);
+Field java.lang.Object::<created>;
+Null null;
+int int::select(Heap,java.lang.Object,Field);
+Field contract.IFBlockExamples::$low;
+int mbyAtPreAtPost_B_0;
+int mbyAtPreAtPre_B_0;
+int mbyAtPreAtPost_A_0;
+int mbyAtPreAtPre_A_0;
+}
+
+\programVariables{
+int l1_B_0;
+int l2_B_0;
+int l1_A_0;
+int l2_A_0;
+int l1;
+java.lang.Exception exc_1_After_BLOCK_B;
+int result_After_BLOCK_B;
+int l1_After_B;
+contract.IFBlockExamples selfAtPre_0_After_BLOCK_B;
+Heap heap_After_BLOCK_B;
+java.lang.Exception exc_1_B;
+int result_B;
+int l1_Before_B;
+contract.IFBlockExamples selfAtPre_0_B_0;
+Heap heap_Before_BLOCK_B;
+java.lang.Exception exc_1_After_BLOCK_A;
+int result_After_BLOCK_A;
+int l1_After_A;
+contract.IFBlockExamples selfAtPre_0_After_BLOCK_A;
+Heap heap_After_BLOCK_A;
+java.lang.Exception exc_1_A;
+int result_A;
+int l1_Before_A;
+contract.IFBlockExamples selfAtPre_0_A_0;
+Heap heap_Before_BLOCK_A;
+java.lang.Exception exc_1_After_BLOCK;
+int result_After_BLOCK;
+int l1_After;
+contract.IFBlockExamples selfAtPre_0_After_BLOCK;
+java.lang.Exception exc_1;
+int result;
+int l1_Before;
+Heap heap_Before_BLOCK;
+Heap heapAtPost_0;
+java.lang.Exception excAtPre_0;
+java.lang.Exception excAtPost_0;
+int resultAtPre;
+int resultAtPost;
+contract.IFBlockExamples selfAtPost_0;
+int _lAtPre;
+Heap heapAtPre_0;
+int lAtPost;
+int lAtPre;
+Heap heap;
+contract.IFBlockExamples selfAtPre_0;
+java.lang.Exception excAtPost_0_B;
+int resultAtPost_B;
+int lAtPost_B;
+contract.IFBlockExamples selfAtPost_0_B;
+Heap heapAtPost_0_B;
+java.lang.Exception excAtPre_0_B;
+int resultAtPre_B;
+int lAtPre_B;
+contract.IFBlockExamples selfAtPre_0_B;
+Heap heapAtPre_0_B;
+java.lang.Exception excAtPost_0_A;
+int resultAtPost_A;
+int lAtPost_A;
+contract.IFBlockExamples selfAtPost_0_A;
+Heap heapAtPost_0_A;
+java.lang.Exception excAtPre_0_A;
+int resultAtPre_A;
+int lAtPre_A;
+contract.IFBlockExamples selfAtPre_0_A;
+Heap heapAtPre_0_A;
+}
+
+\rules{
+
+Class_invariant_axiom_for_contract_IFBlockExamples {
+  \schemaVar \term contract.IFBlockExamples sv_self;
+  \schemaVar \term Heap sv_heap;
+  
+  \assumes (contract.IFBlockExamples::exactInstance(sv_self) = TRUE ==>  )
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith ( true )
+  \heuristics ( classAxiom )
+};
+
+Split_post_0 {
+  
+  \find (
+        int::select(heapAtPost_0_A,
+                    selfAtPost_0_A,
+                    contract.IFBlockExamples::$low)
+      = int::select(heapAtPost_0_B,
+                    selfAtPost_0_B,
+                    contract.IFBlockExamples::$low)
+    & resultAtPost_A = resultAtPost_B
+  )
+  \succedentPolarity
+  \replacewith (
+      int::select(heapAtPost_0_A,
+                  selfAtPost_0_A,
+                  contract.IFBlockExamples::$low)
+    = int::select(heapAtPost_0_B,
+                  selfAtPost_0_B,
+                  contract.IFBlockExamples::$low)
+  );
+  \replacewith ( resultAtPost_A = resultAtPost_B )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Remove_post_0 {
+  
+  \find (
+        int::select(heapAtPost_0_A,
+                    selfAtPost_0_A,
+                    contract.IFBlockExamples::$low)
+      = int::select(heapAtPost_0_B,
+                    selfAtPost_0_B,
+                    contract.IFBlockExamples::$low)
+    & resultAtPost_A = resultAtPost_B
+  )
+  \succedentPolarity
+  \replacewith ( false )
+  \heuristics ( information_flow_contract_appl )
+};
+
+Use_information_flow_contract_for_Block_Contract_17_secure_1_16885809 {
+  \schemaVar \term contract.IFBlockExamples assumes_selfAtPre_0_After_BLOCK#11;
+  \schemaVar \term contract.IFBlockExamples assumes_selfAtPre_0#10;
+  \schemaVar \term Heap find_heap_Before_BLOCK#8;
+  \schemaVar \term int assumes_l1_Before#12;
+  \schemaVar \term Heap find_heap_After_BLOCK#9;
+  \schemaVar \term contract.IFBlockExamples find_selfAtPre_0_After_BLOCK#1;
+  \schemaVar \term Heap assumes_heap_Before_BLOCK#18;
+  \schemaVar \term int assumes_result_After_BLOCK#15;
+  \schemaVar \term java.lang.Exception assumes_exc_1#16;
+  \schemaVar \term java.lang.Exception find_exc_1#6;
+  \schemaVar \term Heap assumes_heap_After_BLOCK#19;
+  \schemaVar \term java.lang.Exception find_exc_1_After_BLOCK#7;
+  \schemaVar \term int find_result#4;
+  \schemaVar \term contract.IFBlockExamples find_selfAtPre_0#0;
+  \schemaVar \term int find_l1_After#3;
+  \schemaVar \term java.lang.Exception assumes_exc_1_After_BLOCK#17;
+  \schemaVar \term int assumes_result#14;
+  \schemaVar \term int find_l1_Before#2;
+  \schemaVar \term int assumes_l1_After#13;
+  \schemaVar \term int find_result_After_BLOCK#5;
+  
+  \assumes ( RELATED_BY_BLOCK_at_line_17_in_secure_1_16885809(assumes_heap_Before_BLOCK#18,
+                                                              assumes_selfAtPre_0#10,
+                                                              assumes_l1_Before#12,
+                                                              assumes_result#14,
+                                                              assumes_exc_1#16,
+                                                              assumes_heap_After_BLOCK#19,
+                                                              assumes_selfAtPre_0_After_BLOCK#11,
+                                                              assumes_l1_After#13,
+                                                              assumes_result_After_BLOCK#15,
+                                                              assumes_exc_1_After_BLOCK#17)
+            ==>
+             
+  )
+  \find (
+    RELATED_BY_BLOCK_at_line_17_in_secure_1_16885809(find_heap_Before_BLOCK#8,
+                                                     find_selfAtPre_0#0,
+                                                     find_l1_Before#2,
+                                                     find_result#4,
+                                                     find_exc_1#6,
+                                                     find_heap_After_BLOCK#9,
+                                                     find_selfAtPre_0_After_BLOCK#1,
+                                                     find_l1_After#3,
+                                                     find_result_After_BLOCK#5,
+                                                     find_exc_1_After_BLOCK#7)
+  )
+  \antecedentPolarity
+  \replacewith (
+    RELATED_BY_BLOCK_at_line_17_in_secure_1_16885809(find_heap_Before_BLOCK#8,
+                                                     find_selfAtPre_0#0,
+                                                     find_l1_Before#2,
+                                                     find_result#4,
+                                                     find_exc_1#6,
+                                                     find_heap_After_BLOCK#9,
+                                                     find_selfAtPre_0_After_BLOCK#1,
+                                                     find_l1_After#3,
+                                                     find_result_After_BLOCK#5,
+                                                     find_exc_1_After_BLOCK#7)
+  )
+  \add (    find_l1_Before#2 = assumes_l1_Before#12
+         -> find_l1_After#3 = assumes_l1_After#13
+        ==>
+         
+  )
+  \heuristics ( information_flow_contract_appl )
+};
+
+unfold_computed_formula_0_of_Block_Contract_17_secure_1_16885809 {
+  
+  \find (
+      EXECUTION_OF_BLOCK_at_line_17_in_secure_1_16885809_WITH_PRE(heap_Before_BLOCK_A,
+                                                                  selfAtPre_0_A_0,
+                                                                  l1_Before_A,
+                                                                  result_A,
+                                                                  exc_1_A,
+                                                                  heap_After_BLOCK_A,
+                                                                  selfAtPre_0_After_BLOCK_A,
+                                                                  l1_After_A,
+                                                                  result_After_BLOCK_A,
+                                                                  exc_1_After_BLOCK_A)
+    & EXECUTION_OF_BLOCK_at_line_17_in_secure_1_16885809_WITH_PRE(heap_Before_BLOCK_B,
+                                                                  selfAtPre_0_B_0,
+                                                                  l1_Before_B,
+                                                                  result_B,
+                                                                  exc_1_B,
+                                                                  heap_After_BLOCK_B,
+                                                                  selfAtPre_0_After_BLOCK_B,
+                                                                  l1_After_B,
+                                                                  result_After_BLOCK_B,
+                                                                  exc_1_After_BLOCK_B)
+  )
+  \antecedentPolarity
+  \replacewith (
+        {heap:=heap_Before_BLOCK_A}
+          (  wellFormed(heap_Before_BLOCK_A)
+           &   boolean::select(heap_Before_BLOCK_A,
+                               selfAtPre_0_A_0,
+                               java.lang.Object::<created>)
+             = TRUE
+           & contract.IFBlockExamples::exactInstance(selfAtPre_0_A_0) = TRUE
+           & !l2_A_0 = Z(8(#))
+           & !{heap:=heap_Before_BLOCK_A || l1_A_0:=add(Z(1(#)), l1_Before_A)}
+                !(  selfAtPre_0_After_BLOCK_A = selfAtPre_0_A_0
+                  & l1_After_A = l1_A_0
+                  & result_After_BLOCK_A = result_A
+                  & exc_1_After_BLOCK_A = exc_1_A
+                  & heap_After_BLOCK_A = heap)
+           & !selfAtPre_0_A_0 = null)
+      & {heap:=heap_Before_BLOCK_B}
+          (  wellFormed(heap_Before_BLOCK_B)
+           &   boolean::select(heap_Before_BLOCK_B,
+                               selfAtPre_0_B_0,
+                               java.lang.Object::<created>)
+             = TRUE
+           & contract.IFBlockExamples::exactInstance(selfAtPre_0_B_0) = TRUE
+           & !l2_B_0 = Z(8(#))
+           & !{heap:=heap_Before_BLOCK_B || l1_B_0:=add(Z(1(#)), l1_Before_B)}
+                !(  selfAtPre_0_After_BLOCK_B = selfAtPre_0_B_0
+                  & l1_After_B = l1_B_0
+                  & result_After_BLOCK_B = result_B
+                  & exc_1_After_BLOCK_B = exc_1_B
+                  & heap_After_BLOCK_B = heap)
+           & !selfAtPre_0_B_0 = null)
+    | {heap:=heap_Before_BLOCK_A}
+        (  wellFormed(heap_Before_BLOCK_A)
+         &   boolean::select(heap_Before_BLOCK_A,
+                             selfAtPre_0_A_0,
+                             java.lang.Object::<created>)
+           = TRUE
+         & contract.IFBlockExamples::exactInstance(selfAtPre_0_A_0) = TRUE
+         & !l2_A_0 = Z(8(#))
+         & !{heap:=heap_Before_BLOCK_A || l1_A_0:=add(Z(1(#)), l1_Before_A)}
+              !(  selfAtPre_0_After_BLOCK_A = selfAtPre_0_A_0
+                & l1_After_A = l1_A_0
+                & result_After_BLOCK_A = result_A
+                & exc_1_After_BLOCK_A = exc_1_A
+                & heap_After_BLOCK_A = heap)
+         & !selfAtPre_0_A_0 = null)
+    & {heap:=heap_Before_BLOCK_B}
+        (  l2_B_0 = Z(8(#))
+         & wellFormed(heap_Before_BLOCK_B)
+         &   boolean::select(heap_Before_BLOCK_B,
+                             selfAtPre_0_B_0,
+                             java.lang.Object::<created>)
+           = TRUE
+         & contract.IFBlockExamples::exactInstance(selfAtPre_0_B_0) = TRUE
+         & !{heap:=heap_Before_BLOCK_B || l1_B_0:=add(Z(1(#)), l1_Before_B)}
+              !(  selfAtPre_0_After_BLOCK_B = selfAtPre_0_B_0
+                & l1_After_B = l1_B_0
+                & result_After_BLOCK_B = result_B
+                & exc_1_After_BLOCK_B = exc_1_B
+                & heap_After_BLOCK_B = heap)
+         & !selfAtPre_0_B_0 = null)
+    | {heap:=heap_Before_BLOCK_A}
+        (  l2_A_0 = Z(8(#))
+         & wellFormed(heap_Before_BLOCK_A)
+         &   boolean::select(heap_Before_BLOCK_A,
+                             selfAtPre_0_A_0,
+                             java.lang.Object::<created>)
+           = TRUE
+         & contract.IFBlockExamples::exactInstance(selfAtPre_0_A_0) = TRUE
+         & !{heap:=heap_Before_BLOCK_A || l1_A_0:=add(Z(1(#)), l1_Before_A)}
+              !(  selfAtPre_0_After_BLOCK_A = selfAtPre_0_A_0
+                & l1_After_A = l1_A_0
+                & result_After_BLOCK_A = result_A
+                & exc_1_After_BLOCK_A = exc_1_A
+                & heap_After_BLOCK_A = heap)
+         & !selfAtPre_0_A_0 = null)
+    & {heap:=heap_Before_BLOCK_B}
+        (  l2_B_0 = Z(8(#))
+         & wellFormed(heap_Before_BLOCK_B)
+         &   boolean::select(heap_Before_BLOCK_B,
+                             selfAtPre_0_B_0,
+                             java.lang.Object::<created>)
+           = TRUE
+         & contract.IFBlockExamples::exactInstance(selfAtPre_0_B_0) = TRUE
+         & !{heap:=heap_Before_BLOCK_B || l1_B_0:=add(Z(1(#)), l1_Before_B)}
+              !(  selfAtPre_0_After_BLOCK_B = selfAtPre_0_B_0
+                & l1_After_B = l1_B_0
+                & result_After_BLOCK_B = result_B
+                & exc_1_After_BLOCK_B = exc_1_B
+                & heap_After_BLOCK_B = heap)
+         & !selfAtPre_0_B_0 = null)
+  )
+  \heuristics ( concrete )
+};
+}
+
+\problem {
+{heap:=heap_Before_BLOCK}
+  !(  wellFormed(heap_Before_BLOCK)
+    & heap = heap_Before_BLOCK
+    & !selfAtPre_0 = null
+    &   boolean::select(heap,
+                        selfAtPre_0,
+                        java.lang.Object::<created>)
+      = TRUE
+    &   contract.IFBlockExamples::exactInstance(selfAtPre_0)
+      = TRUE
+    & (inInt(l1_Before) & inInt(l1_After))
+    & {l1:=l1_Before}
+        \[{method-frame(source=secure_1(int)@contract.IFBlockExamples,this=selfAtPre_0): {java.lang.Exception exc = null;breakOut:try { {
+                  l1++;if (l2==8) {}
+                }
+              }catch (java.lang.Exception e#0) {
+                exc=e#0;
+              }
+            }
+          }\] (  selfAtPre_0_After_BLOCK = selfAtPre_0
+               & l1_After = l1
+               & result_After_BLOCK = result
+               & exc_1_After_BLOCK = exc_1
+               & heap_After_BLOCK = heap))
+
+}
+
+\proof {
+(keyLog "0" (keyUser "christoph" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "133")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1"))
+(rule "notRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "variableDeclarationAssign" (formula "4") (term "1"))
+(rule "variableDeclaration" (formula "4") (term "1") (newnames "exc_2"))
+(rule "assignment" (formula "4") (term "1"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "postincrement" (formula "4") (term "1"))
+(rule "compound_int_cast_expression" (formula "4") (term "1") (inst "#v=x"))
+(rule "variableDeclarationAssign" (formula "4") (term "1"))
+(rule "variableDeclaration" (formula "4") (term "1") (newnames "x"))
+(rule "remove_parentheses_right" (formula "4") (term "1"))
+(rule "assignmentAdditionInt" (formula "4") (term "1"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "translateJavaAddInt" (formula "4") (term "0,1,0"))
+(rule "polySimp_addComm0" (formula "4") (term "0,1,0"))
+(rule "widening_identity_cast_5" (formula "4") (term "1"))
+(rule "assignment" (formula "4") (term "1"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "boxToDiamond" (formula "4") (term "1"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "notLeft" (formula "4"))
+(rule "ifUnfold" (formula "4") (term "1") (inst "#boolv=x"))
+(rule "variableDeclaration" (formula "4") (term "1") (newnames "x_1"))
+(rule "equality_comparison_simple" (formula "4") (term "1"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "ifSplit" (formula "4"))
+(branch "if x_1 true"
+   (builtin "One Step Simplification" (formula "5"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "blockEmpty" (formula "5") (term "1"))
+   (rule "tryEmpty" (formula "5") (term "1"))
+   (builtin "One Step Simplification" (formula "5"))
+   (rule "blockEmptyLabel" (formula "5") (term "1"))
+   (rule "blockEmpty" (formula "5") (term "1"))
+   (rule "methodCallEmpty" (formula "5") (term "1"))
+   (rule "emptyModality" (formula "5") (term "1"))
+   (opengoal "{heap:=heap_Before_BLOCK}   !(  wellFormed(heap_Before_BLOCK)     & heap = heap_Before_BLOCK     & !selfAtPre_0 = null     &   boolean::select(heap,                         selfAtPre_0,                         java.lang.Object::<created>)       = TRUE     &   contract.IFBlockExamples::exactInstance(selfAtPre_0)       = TRUE     & (inInt(l1_Before) & inInt(l1_After))     & {l1:=l1_Before}         \\[{method-frame(source=secure_1(int)@contract.IFBlockExamples,this=selfAtPre_0): {java.lang.Exception exc = null;breakOut:try { {                   l1++;if (l2==8) {}                 }               }catch (java.lang.Exception e#0) {                 exc=e#0;               }             }           }\\] (  selfAtPre_0_After_BLOCK = selfAtPre_0                & l1_After = l1                & result_After_BLOCK = result                & exc_1_After_BLOCK = exc_1                & heap_After_BLOCK = heap)) ")
+)
+(branch "if x_1 false"
+   (builtin "One Step Simplification" (formula "1"))
+   (builtin "One Step Simplification" (formula "5"))
+   (rule "notLeft" (formula "1"))
+   (rule "tryEmpty" (formula "5") (term "1"))
+   (builtin "One Step Simplification" (formula "5"))
+   (rule "blockEmptyLabel" (formula "5") (term "1"))
+   (rule "blockEmpty" (formula "5") (term "1"))
+   (rule "methodCallEmpty" (formula "5") (term "1"))
+   (rule "emptyModality" (formula "5") (term "1"))
+   (opengoal "{heap:=heap_Before_BLOCK}   !(  wellFormed(heap_Before_BLOCK)     & heap = heap_Before_BLOCK     & !selfAtPre_0 = null     &   boolean::select(heap,                         selfAtPre_0,                         java.lang.Object::<created>)       = TRUE     &   contract.IFBlockExamples::exactInstance(selfAtPre_0)       = TRUE     & (inInt(l1_Before) & inInt(l1_After))     & {l1:=l1_Before}         \\[{method-frame(source=secure_1(int)@contract.IFBlockExamples,this=selfAtPre_0): {java.lang.Exception exc = null;breakOut:try { {                   l1++;if (l2==8) {}                 }               }catch (java.lang.Exception e#0) {                 exc=e#0;               }             }           }\\] (  selfAtPre_0_After_BLOCK = selfAtPre_0                & l1_After = l1                & result_After_BLOCK = result                & exc_1_After_BLOCK = exc_1                & heap_After_BLOCK = heap)) ")
+)
+)
+
+}

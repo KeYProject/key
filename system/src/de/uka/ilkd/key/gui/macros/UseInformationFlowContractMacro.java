@@ -96,46 +96,42 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     @Override
-    protected void doPostProcessing(Proof proof, int numOfAppliedRules) {
-        // get last active goal
+    protected void doPostProcessing(Proof proof) {
         ImmutableList<Goal> openGoals = proof.openGoals();
-        Goal lastActiveGoal = openGoals.head();
-        for (Goal goal : openGoals) {
-            if (goal.node().serialNr() > lastActiveGoal.node().serialNr()) {
-                lastActiveGoal = goal;
-            }
-        }
+        for (Goal openGoal : openGoals) {
 
-        // set intuitive branch labels
-        Node node = lastActiveGoal.node();
-        Node parent = node.parent();
-        int i = 0;
-        while (i < numOfAppliedRules && parent != null) {
-            if (parent.parent() != null &&
-                getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
-                String appName = getAppRuleName(parent.parent());
-                appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
-                node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
-                parent.child(0).getNodeInfo().setBranchLabel("pre " + appName + " (information flow)");
-                node = parent.parent();
-                parent = node.parent();
-                i += 2;
-            } else if (parent.parent() != null &&
-                       getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
-                       getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
-                String appName = getAppRuleName(parent.parent());
-                appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
-                node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
-                parent.child(1).getNodeInfo().setBranchLabel("pre " + appName + " (information flow)");
-                parent.child(0).getNodeInfo().setBranchLabel("pre_A & pre_B " + appName + " (information flow)");
-                node = parent.parent();
-                parent = node.parent();
-                i += 2;
-            } else {
-                node = parent;
-                parent = node.parent();
-                i++;
+            // set intuitive branch labels
+            Node node = openGoal.node();
+            Node parent = node.parent();
+        //        int i = 0;
+        //        while (i < numOfAppliedRules && parent != null) {
+            while (parent != null) {
+                if (parent.parent() != null &&
+                    getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                    getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                    String appName = getAppRuleName(parent.parent());
+                    appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
+                    node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
+                    parent.child(0).getNodeInfo().setBranchLabel("pre " + appName + " (information flow)");
+                    node = parent.parent();
+                    parent = node.parent();
+        //                i += 2;
+                } else if (parent.parent() != null &&
+                           getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
+                           getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                    String appName = getAppRuleName(parent.parent());
+                    appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
+                    node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
+                    parent.child(1).getNodeInfo().setBranchLabel("pre " + appName + " (information flow)");
+                    parent.child(0).getNodeInfo().setBranchLabel("pre_A & pre_B " + appName + " (information flow)");
+                    node = parent.parent();
+                    parent = node.parent();
+        //                i += 2;
+                } else {
+                    node = parent;
+                    parent = node.parent();
+        //                i++;
+                }
             }
         }
     }

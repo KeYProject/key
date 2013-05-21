@@ -7,6 +7,7 @@ package de.uka.ilkd.key.gui.macros;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -85,7 +86,8 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
 
     @Override
     public void applyTo(KeYMediator mediator,
-                        PosInOccurrence posInOcc) {
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
         InitConfig initConfig = proof.env().getInitConfig();

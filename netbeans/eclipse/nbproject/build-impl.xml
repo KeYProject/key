@@ -144,6 +144,7 @@ is divided into following sections:
                 <available file="${src.genSrc.dir}"/>
                 <available file="${src.proof.dir}"/>
                 <available file="${src.gui.dir}"/>
+                <available file="${src.META-INF.dir}"/>
             </or>
         </condition>
         <condition property="netbeans.home+have.tests">
@@ -235,6 +236,7 @@ is divided into following sections:
         <fail unless="src.genSrc.dir">Must set src.genSrc.dir</fail>
         <fail unless="src.proof.dir">Must set src.proof.dir</fail>
         <fail unless="src.gui.dir">Must set src.gui.dir</fail>
+        <fail unless="src.META-INF.dir">Must set src.META-INF.dir</fail>
         <fail unless="test.test.dir">Must set test.test.dir</fail>
         <fail unless="build.dir">Must set build.dir</fail>
         <fail unless="dist.dir">Must set dist.dir</fail>
@@ -256,7 +258,7 @@ is divided into following sections:
     </target>
     <target depends="-init-ap-cmdline-properties" if="ap.supported.internal" name="-init-macrodef-javac-with-processors">
         <macrodef name="javac" uri="http://www.netbeans.org/ns/j2se-project/3">
-            <attribute default="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}" name="srcdir"/>
+            <attribute default="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}:${src.META-INF.dir}" name="srcdir"/>
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}" name="classpath"/>
             <attribute default="${javac.processorpath}" name="processorpath"/>
@@ -296,7 +298,7 @@ is divided into following sections:
     </target>
     <target depends="-init-ap-cmdline-properties" name="-init-macrodef-javac-without-processors" unless="ap.supported.internal">
         <macrodef name="javac" uri="http://www.netbeans.org/ns/j2se-project/3">
-            <attribute default="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}" name="srcdir"/>
+            <attribute default="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}:${src.META-INF.dir}" name="srcdir"/>
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}" name="classpath"/>
             <attribute default="${javac.processorpath}" name="processorpath"/>
@@ -328,7 +330,7 @@ is divided into following sections:
     </target>
     <target depends="-init-macrodef-javac-with-processors,-init-macrodef-javac-without-processors" name="-init-macrodef-javac">
         <macrodef name="depend" uri="http://www.netbeans.org/ns/j2se-project/3">
-            <attribute default="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}" name="srcdir"/>
+            <attribute default="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}:${src.META-INF.dir}" name="srcdir"/>
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}" name="classpath"/>
             <sequential>
@@ -926,7 +928,7 @@ is divided into following sections:
                 <include name="*"/>
             </dirset>
         </pathconvert>
-        <j2seproject3:depend srcdir="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}:${build.generated.subdirs}"/>
+        <j2seproject3:depend srcdir="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}:${src.META-INF.dir}:${build.generated.subdirs}"/>
     </target>
     <target depends="init,deps-jar,-pre-pre-compile,-pre-compile, -copy-persistence-xml,-compile-depend" if="have.sources" name="-do-compile">
         <j2seproject3:javac gensrcdir="${build.generated.sources.dir}"/>
@@ -935,6 +937,7 @@ is divided into following sections:
             <fileset dir="${src.genSrc.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.proof.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
             <fileset dir="${src.gui.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
+            <fileset dir="${src.META-INF.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
         </copy>
     </target>
     <target if="has.persistence.xml" name="-copy-persistence-xml">
@@ -955,7 +958,7 @@ is divided into following sections:
     <target depends="init,deps-jar,-pre-pre-compile" name="-do-compile-single">
         <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
         <j2seproject3:force-recompile/>
-        <j2seproject3:javac excludes="" gensrcdir="${build.generated.sources.dir}" includes="${javac.includes}" sourcepath="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}"/>
+        <j2seproject3:javac excludes="" gensrcdir="${build.generated.sources.dir}" includes="${javac.includes}" sourcepath="${src.src.dir}:${src.genSrc.dir}:${src.proof.dir}:${src.gui.dir}:${src.META-INF.dir}"/>
     </target>
     <target name="-post-compile-single">
         <!-- Empty placeholder for easier customization. -->
@@ -1228,6 +1231,9 @@ is divided into following sections:
             <fileset dir="${src.gui.dir}" excludes="*.java,${excludes}" includes="${includes}">
                 <filename name="**/*.java"/>
             </fileset>
+            <fileset dir="${src.META-INF.dir}" excludes="*.java,${excludes}" includes="${includes}">
+                <filename name="**/*.java"/>
+            </fileset>
             <fileset dir="${build.generated.sources.dir}" erroronmissingdir="false">
                 <include name="**/*.java"/>
                 <exclude name="*.java"/>
@@ -1245,6 +1251,9 @@ is divided into following sections:
                 <filename name="**/doc-files/**"/>
             </fileset>
             <fileset dir="${src.gui.dir}" excludes="${excludes}" includes="${includes}">
+                <filename name="**/doc-files/**"/>
+            </fileset>
+            <fileset dir="${src.META-INF.dir}" excludes="${excludes}" includes="${includes}">
                 <filename name="**/doc-files/**"/>
             </fileset>
             <fileset dir="${build.generated.sources.dir}" erroronmissingdir="false">
