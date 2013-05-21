@@ -545,7 +545,7 @@ public class ProofTreeView extends JPanel {
 		    delegateModel.updateTree (n);
 		}
 	    }
-	    if (!delegateModel.isAttentive() && !proof.isDisposed()) {
+	    if (!delegateModel.isAttentive()) {
 		delegateModel.setAttentive(true);
 		mediator.addKeYSelectionListener(proofListener);
 	    }
