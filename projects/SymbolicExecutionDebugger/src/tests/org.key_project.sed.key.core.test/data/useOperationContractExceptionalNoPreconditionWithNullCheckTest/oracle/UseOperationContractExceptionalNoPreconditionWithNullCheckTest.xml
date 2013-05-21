@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_b53ea593-2635-4526-a26d-444c31c28093" name="main(UseOperationContractExceptionalNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_dfa47354-a8ef-4a5b-b4eb-74dd9f205921" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_a9acbc48-9b82-462e-906e-3cb3ffdcf768" name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="100" charEnd="104">
-            <sedStatement xml:id="_dc3428c6-4cef-4fa6-8be9-2c4ee20cf7f9" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="188" charEnd="221">
-               <sedUseOperationContract xml:id="_6b05e237-fec5-4643-b515-940f33d41796" name="result = self.magic(x) catch(exc)
+   <sedTarget xml:id="_809a1cda-4070-445a-b9ec-22f474792c98" name="main(UseOperationContractExceptionalNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_be1a695e-05e9-41ed-8283-a003288bb232" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_36cfe8c3-0beb-4982-b3e1-0761c064145a" name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="100" charEnd="104">
+            <sedStatement xml:id="_2391a3d8-2854-40cd-b2cc-2da2838d2784" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="188" charEnd="221">
+               <sedUseOperationContract xml:id="_d272d9ae-d6d8-4154-a8a0-1c672cddc385" name="result = self.magic(x) catch(exc)
 pre: self.&lt;inv&gt;
 post: !exc = null
 &amp; (  (   java.lang.Exception::instance(exc) = TRUE
@@ -12,10 +12,10 @@ post: !exc = null
    &amp; java.lang.Exception::instance(exc) = TRUE)
 mod: allLocs
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="463" charEnd="468" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_d88721b2-8a5a-4ecf-9779-070fa0b80d7d" name="true" pathCondition="true">
-                     <sedStatement xml:id="_141dbb8c-511a-4313-b5ce-f57beb37720d" name="return -1;" pathCondition="true" lineNumber="-1" charStart="337" charEnd="347">
-                        <sedMethodReturn xml:id="_44bc829c-f570-48a5-89be-0021ea969ffc" name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="true" lineNumber="-1" charStart="100" charEnd="104">
-                           <sedTermination xml:id="_378c97cc-1507-4291-af1a-4cc054aca2bb" name="&lt;end&gt;" pathCondition="true">
+                  <sedBranchCondition xml:id="_e6dcce1c-b8de-4702-bc7f-bcea7b9fe4bd" name="!obj = null" pathCondition="!obj = null">
+                     <sedStatement xml:id="_484fa9cf-2121-480d-a423-d8da6fc9b6c6" name="return -1;" pathCondition="!obj = null" lineNumber="-1" charStart="337" charEnd="347">
+                        <sedMethodReturn xml:id="_09a05bb1-af83-43bd-866b-60d53835e97c" name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" lineNumber="-1" charStart="100" charEnd="104">
+                           <sedTermination xml:id="_a92bac1a-b466-4fbd-a021-3f5fd849c9cd" name="&lt;end&gt;" pathCondition="!obj = null">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>

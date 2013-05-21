@@ -208,7 +208,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     
     @Override
     public boolean equals(Object o){
-        if(!(o instanceof KeYUserProblemFile)) {
+        if(o == null || o.getClass() != this.getClass()) {
             return false;
         }
         final KeYUserProblemFile kf = (KeYUserProblemFile) o;

@@ -33,7 +33,7 @@ public final class AbandonTaskAction extends MainWindowAction {
 	setAcceleratorLetter(KeyEvent.VK_W);
 	setTooltip("Drop current proof.");
 
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
     }
 
     public synchronized void actionPerformed(ActionEvent e) {

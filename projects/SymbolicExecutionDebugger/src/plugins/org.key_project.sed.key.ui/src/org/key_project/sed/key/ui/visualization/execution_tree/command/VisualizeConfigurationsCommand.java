@@ -22,10 +22,13 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.sed.key.ui.visualization.object_diagram.editor.ConfigurationObjectDiagramEditor;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 
 /**
@@ -61,13 +64,19 @@ public class VisualizeConfigurationsCommand extends AbstractHandler {
     * @throws DebugException Occurred Exception.
     */
    public static boolean canVisualize(Object element) throws DebugException {
-      if (element instanceof IKeYSEDDebugNode<?>) {
-         IKeYSEDDebugNode<?> node = (IKeYSEDDebugNode<?>)element;
-         return !node.getExecutionNode().isDisposed() &&
-                node.getExecutionNode() instanceof IExecutionStateNode<?>;
+      try {
+         if (element instanceof IKeYSEDDebugNode<?>) {
+            IKeYSEDDebugNode<?> node = (IKeYSEDDebugNode<?>)element;
+            return !node.getExecutionNode().isDisposed() &&
+                   node.getExecutionNode() instanceof IExecutionStateNode<?> &&
+                   !TermBuilder.DF.ff().equals(node.getExecutionNode().getPathCondition());
+         }
+         else {
+            return false;
+         }
       }
-      else {
-         return false;
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
 

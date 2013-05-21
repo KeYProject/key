@@ -9,19 +9,11 @@
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                  <value name="next {  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null">
+                  <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
                <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                  <value name="previous {  self.previous = null &amp; self.previous = null
-| !self.previous = null
-&amp; !self.previous = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  self.previous = null &amp; self.previous = null
-| !self.previous = null
-&amp; !self.previous = null">
+                  <value name="previous {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -34,11 +26,7 @@
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                     <value name="next {  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null">
+                     <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                      </value>
                   </variable>
                   <variable name="previous" arrayIndex="-1" isArrayIndex="false">

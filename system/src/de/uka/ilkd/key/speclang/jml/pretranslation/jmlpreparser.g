@@ -1152,27 +1152,6 @@ decreasing_keyword
 //unsupported methodlevel stuff
 //-----------------------------------------------------------------------------
 
-assert_statement[ImmutableList<String> mods] 
-	returns [ImmutableList<TextualJMLConstruct> result = null] 
-	throws SLTranslationException
-{
-    PositionedString ps;
-}
-:
-    assert_keyword ps=expression
-    {
-        raiseNotSupported("JML assert statements");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();        
-    } 
-;
-
-
-assert_keyword
-:
-	ASSERT
-    |	ASSERT_REDUNDANTLY
-;
-
 
 assume_statement[ImmutableList<String> mods] 
 	returns [ImmutableList<TextualJMLConstruct> result = null] 
@@ -1227,6 +1206,27 @@ block_specification[ImmutableList<String> mods]
 :
     
     result=method_specification[mods]
+;
+
+
+assert_statement[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException
+{
+    PositionedString ps;
+}
+:
+    assert_keyword ps=expression
+    {
+    	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));				       
+    } 
+;
+
+
+assert_keyword
+:
+	ASSERT
+    |	ASSERT_REDUNDANTLY
 ;
 
 breaks_clause

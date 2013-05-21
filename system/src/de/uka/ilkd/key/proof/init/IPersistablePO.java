@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
