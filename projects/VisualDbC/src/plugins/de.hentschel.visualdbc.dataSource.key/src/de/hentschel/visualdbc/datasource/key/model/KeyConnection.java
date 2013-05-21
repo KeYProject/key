@@ -105,6 +105,7 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -211,14 +212,14 @@ public class KeyConnection extends MemoryConnection {
    private Map<ClassAxiom, IDSAxiom> axiomsMapping;
    
    /**
-    * Maps all {@link Field}s to their data source instance.
+    * Maps all {@link IProgramVariable}s to their data source instance.
     */
-   private Map<Field, IDSAttribute> attributesMapping;
+   private Map<IProgramVariable, IDSAttribute> attributesMapping;
    
    /**
-    * Maps all {@link Field}s to their data source instance.
+    * Maps all {@link IProgramVariable}s to their data source instance.
     */
-   private Map<Field, IDSEnumLiteral> enumLiteralsMapping;
+   private Map<IProgramVariable, IDSEnumLiteral> enumLiteralsMapping;
    
    /**
     * Maps all {@link KeYJavaType}s to their data source instance.
@@ -272,8 +273,8 @@ public class KeyConnection extends MemoryConnection {
          invariantsMapping = new HashMap<ClassInvariant, IDSInvariant>();
          typesMapping = new HashMap<KeYJavaType, IDSType>();
          axiomsMapping = new HashMap<ClassAxiom, IDSAxiom>();
-         attributesMapping = new HashMap<Field, IDSAttribute>();
-         enumLiteralsMapping = new HashMap<Field, IDSEnumLiteral>();
+         attributesMapping = new HashMap<IProgramVariable, IDSAttribute>();
+         enumLiteralsMapping = new HashMap<IProgramVariable, IDSEnumLiteral>();
          proofs = new LinkedList<KeyProof>();
          // Get settings
          final File location = getLocation(connectionSettings);
@@ -994,13 +995,13 @@ public class KeyConnection extends MemoryConnection {
 
    /**
     * Creates a new {@link IDSEnumLiteral} instance for the given KeY instance.
-    * @param variable The KeY instance.
+    * @param field The KeY instance.
     * @return The created {@link IDSEnumLiteral}.
     */
-   protected MemoryEnumLiteral createEnumLiteral(Services services, Field variable) {
+   protected MemoryEnumLiteral createEnumLiteral(Services services, Field field) {
       MemoryEnumLiteral result = new MemoryEnumLiteral();
-      result.setName(variable.getProgramName());
-      enumLiteralsMapping.put(variable, result);
+      result.setName(field.getProgramName());
+      enumLiteralsMapping.put(field.getProgramVariable(), result);
       return result;
    }
    
@@ -1270,28 +1271,28 @@ public class KeyConnection extends MemoryConnection {
 
    /**
     * Creates a new {@link IDSAttribute} instance for the given KeY instance.
-    * @param variable The KeY instance.
+    * @param field The KeY instance.
     * @return The created {@link IDSAttribute}.
     */
-   protected MemoryAttribute createAttribute(Services services, Field variable) {
+   protected MemoryAttribute createAttribute(Services services, Field field) {
       MemoryAttribute result = new MemoryAttribute();
-      result.setFinal(variable.isFinal());
-      result.setName(variable.getProgramName());
-      result.setStatic(variable.isStatic());
-      result.setType(getTypeName(variable.getType(), DSPackageManagement.NO_PACKAGES));
-      if (variable.isPrivate()) {
+      result.setFinal(field.isFinal());
+      result.setName(field.getProgramName());
+      result.setStatic(field.isStatic());
+      result.setType(getTypeName(field.getType(), DSPackageManagement.NO_PACKAGES));
+      if (field.isPrivate()) {
          result.setVisibility(DSVisibility.PRIVATE);
       }
-      else if (variable.isProtected()) {
+      else if (field.isProtected()) {
          result.setVisibility(DSVisibility.PROTECTED);
       }
-      else if (variable.isPublic()) {
+      else if (field.isPublic()) {
          result.setVisibility(DSVisibility.PUBLIC);
       }
       else {
          result.setVisibility(DSVisibility.DEFAULT);
       }
-      attributesMapping.put(variable, result);
+      attributesMapping.put(field.getProgramVariable(), result);
       return result;
    }
 
@@ -1717,21 +1718,21 @@ public class KeyConnection extends MemoryConnection {
    }
    
    /**
-    * Returns the {@link IDSAttribute} instance for the given {@link Field} from KeY.
-    * @param field The given {@link Field}.
+    * Returns the {@link IDSAttribute} instance for the given {@link IProgramVariable} from KeY.
+    * @param variable The given {@link IProgramVariable}.
     * @return The mapped {@link IDSAttribute} or {@code null} if no data source instance exists.
     */
-   public IDSAttribute getAttribute(Field field) {
-      return attributesMapping.get(field);
+   public IDSAttribute getAttribute(IProgramVariable variable) {
+      return attributesMapping.get(variable);
    }
    
    /**
-    * Returns the {@link IDSEnumLiteral} instance for the given {@link Field} from KeY.
-    * @param field The given {@link Field}.
+    * Returns the {@link IDSEnumLiteral} instance for the given {@link IProgramVariable} from KeY.
+    * @param variable The given {@link IProgramVariable}.
     * @return The mapped {@link IDSEnumLiteral} or {@code null} if no data source instance exists.
     */
-   public IDSEnumLiteral getEnumLiteral(Field field) {
-      return enumLiteralsMapping.get(field);
+   public IDSEnumLiteral getEnumLiteral(IProgramVariable variable) {
+      return enumLiteralsMapping.get(variable);
    }
 
 

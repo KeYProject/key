@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -39,11 +38,13 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
+import java.awt.BorderLayout;
 
 public class ProofTreeView extends JPanel {
     
@@ -76,8 +77,11 @@ public class ProofTreeView extends JPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
-    /** KeYStroke for the search panel */
-    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    /** KeYStroke for the search panel: STRG+SHIFT+F */
+    public final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK
+            | java.awt.event.InputEvent.SHIFT_DOWN_MASK
+            | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {
@@ -92,34 +96,35 @@ public class ProofTreeView extends JPanel {
     private HashSet<Node>    modifiedSubtreesCache = null;
     
     /** the search dialog */
-    private ProofTreeSearchPanel proofTreeSearchPanel;
+    private ProofTreeSearchBar proofTreeSearchPanel;
+    
+    // Taclet info can be shown for inner nodes.
+    public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
+    
 
     /** creates a new proof tree */
     public ProofTreeView (KeYMediator mediator) {
 
 	proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
-	delegateView = new JTree(
-		     new DefaultMutableTreeNode("No proof loaded")) {
-		/**
-                 * 
-                 */
-                private static final long serialVersionUID = 6555955929759162324L;
+        delegateView = new JTree(
+                new DefaultMutableTreeNode("No proof loaded")) {
+            private static final long serialVersionUID = 6555955929759162324L;
 
-        public void updateUI() {
-		    super.updateUI();
-		    /* we want plus/minus signs to expand/collapse tree nodes */
-		    final TreeUI ui = getUI();
-		    if (ui instanceof BasicTreeUI) {
-			final BasicTreeUI treeUI = (BasicTreeUI)ui;
-			treeUI.setExpandedIcon(IconFactory.expandedIcon());
-			treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
-		    }
-                    if(ui instanceof CacheLessMetalTreeUI){
-                        ((CacheLessMetalTreeUI) ui).clearDrawingCache();
-                    }
-		}
-	    };
+            public void updateUI() {
+                super.updateUI();
+                /* we want plus/minus signs to expand/collapse tree nodes */
+                final TreeUI ui = getUI();
+                if (ui instanceof BasicTreeUI) {
+                    final BasicTreeUI treeUI = (BasicTreeUI) ui;
+                    treeUI.setExpandedIcon(IconFactory.expandedIcon());
+                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
+                }
+                if (ui instanceof CacheLessMetalTreeUI) {
+                    ((CacheLessMetalTreeUI) ui).clearDrawingCache();
+                }
+            }
+        };
             
         delegateView.setUI(new CacheLessMetalTreeUI());
 
@@ -165,12 +170,18 @@ public class ProofTreeView extends JPanel {
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
 
-	updateUI();
+        updateUI();
 
-	this.setLayout(new BorderLayout());
-	this.add(new JScrollPane(delegateView), BorderLayout.CENTER);
-	this.proofTreeSearchPanel = new ProofTreeSearchPanel(this);
-	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);	
+        setLayout(new BorderLayout());
+        
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(tacletInfoToggle, BorderLayout.NORTH);
+        proofTreeSearchPanel = new ProofTreeSearchBar(this);
+        bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
+        
+        add(new JScrollPane(delegateView), BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 	
 	layoutKeYComponent();	
 	
@@ -178,7 +189,7 @@ public class ProofTreeView extends JPanel {
 	if (selProof != null) {
 	    setProof(selProof);
 	}
-	
+
 	
 	final ActionListener keyboardAction = new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
@@ -212,7 +223,6 @@ public class ProofTreeView extends JPanel {
 	ProofRenderer renderer= new ProofRenderer();	
 	delegateView.setCellRenderer(renderer);
 	delegateView.putClientProperty("JTree.lineStyle", "Angled");
-
 	delegateView.setVisible(true);	
     }
 
@@ -441,16 +451,11 @@ public class ProofTreeView extends JPanel {
 	}
     }
 
-
-
-    // INNER CLASSES 
-
     public void showSearchPanel() {
         proofTreeSearchPanel.setVisible(true);
-        proofTreeSearchPanel.requestFocus();
     }
 
-
+    // INNER CLASSES 
 
     // listens to gui events
     class GUIProofTreeGUIListener implements GUIListener,
@@ -686,7 +691,7 @@ public class ProofTreeView extends JPanel {
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(Color.red);
+			tree_cell.setForeground(new Color(250, 90, 90));
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
@@ -813,8 +818,6 @@ public class ProofTreeView extends JPanel {
 	        this.add(delayedCut);
 	    
 	    this.add(new JSeparator());
-
-	    
 
 	    this.add(expandAll);
 	    expandAll.addActionListener(this);
@@ -987,7 +990,7 @@ public class ProofTreeView extends JPanel {
 			selectBranchNode((GUIBranchNode)sibling);
 		}
             } else if (e.getSource() == search) {
-		proofTreeSearchPanel.setVisible(true);
+		showSearchPanel();
             } 
 	}
 
