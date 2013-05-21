@@ -46,8 +46,6 @@ public class StateVars {
 
     public final Term mbyAtPre;
 
-    public final boolean local;
-
 
     StateVars(IProgramMethod pm,
               KeYJavaType kjt,
@@ -64,8 +62,7 @@ public class StateVars {
                      Term exception,
                      Term heap,
                      Term mbyAtPre,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
@@ -73,14 +70,13 @@ public class StateVars {
         this.exception = exception;
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
-        this.local = local;
 
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
-        terms = terms.append(localVars);
+        terms = appendIfNotNull(terms, localVars);
         terms = appendIfNotNull(terms, result);
         terms = appendIfNotNull(terms, exception);
         terms = appendIfNotNull(terms, mbyAtPre);
@@ -119,7 +115,7 @@ public class StateVars {
                      Services services,
                      boolean local) {
         this(self, null, localVars, result, exception, heap,
-             mbyAtPre, services, local);
+             mbyAtPre, services);
     }
 
 
@@ -130,6 +126,16 @@ public class StateVars {
         } else {
             return list;
         }
+    }
+
+
+    private ImmutableList<Term> appendIfNotNull(ImmutableList<Term> list,
+                                                ImmutableList<Term> list2) {
+        ImmutableList<Term> result = list;
+        for (Term t : list2) {
+            result = appendIfNotNull(result, t);
+        }
+        return result;
     }
 
 
@@ -152,7 +158,7 @@ public class StateVars {
                      Term heap,
                      Services services,
                      boolean local) {
-        this(self, guard, localVars, null, null, heap, null, services, local);
+        this(self, guard, localVars, null, null, heap, null, services);
     }
 
 
@@ -164,7 +170,7 @@ public class StateVars {
                      Term exception,
                      Services services,
                      boolean local) {
-        this(self, guard, localVars, result, exception, heap, null, services, local);
+        this(self, guard, localVars, result, exception, heap, null, services);
     }
 
 
@@ -199,7 +205,7 @@ public class StateVars {
              copyLocationVariable(orig.result, postfix, services),
              copyLocationVariable(orig.exception, postfix, services),
              copyLocationVariable(orig.heap, postfix, services),
-             newFunction(orig.mbyAtPre, postfix, services), services, local);
+             newFunction(orig.mbyAtPre, postfix, services), services);
     }
 
 
