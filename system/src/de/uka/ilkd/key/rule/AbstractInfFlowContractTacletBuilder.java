@@ -102,8 +102,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
     // TODO: add exception var
-    public Term buildContractApplPredTerm(boolean local) {
-        ProofObligationVars appData = getProofObligationVars(local);
+    public Term buildContractApplPredTerm() {
+        ProofObligationVars appData = getProofObligationVars();
         Term contractApplPredTerm = getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
@@ -114,9 +114,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     // TODO: add exception var
-    public Taclet buildContractApplTaclet(boolean local) {
-        ProofObligationVars appData = getProofObligationVars(local);
-        Taclet result = genInfFlowContractApplTaclet(appData, services, local);
+    public Taclet buildContractApplTaclet() {
+        ProofObligationVars appData = getProofObligationVars();
+        Taclet result = genInfFlowContractApplTaclet(appData, services);
         InfFlowContractPO.addSymbol(result, services);
         return result;
     }
@@ -136,13 +136,14 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                      Services services);
 
 
-    private ProofObligationVars getProofObligationVars(boolean local) {
+    private ProofObligationVars getProofObligationVars() {
         StateVars pre =
                 new StateVars(contractSelfAtPre, loopGuardAtPre, localVarsAtPre,
-                                        heapAtPre, contractResultAtPre, exceptionVarAtPre, services, local);
+                              heapAtPre, contractResultAtPre, exceptionVarAtPre, services);
         StateVars post =
                 new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
-                                        heapAtPost, contractResultAtPost, exceptionVarAtPost, services, local);
+                              heapAtPost, contractResultAtPost, exceptionVarAtPost, services);
+        assert pre.paddedTermList.size() == post.paddedTermList.size();
         return new ProofObligationVars(pre, post);
     }
 
@@ -154,9 +155,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                       ProofObligationVars appData,
-                                                       Services services,
-                                                       boolean local) {
+                                                   ProofObligationVars appData,
+                                                   Services services) {
         Term selfAtPreSV =
                 createTermSV(appData.pre.self, schemaPrefix, services);
         Term selfAtPostSV =
@@ -187,27 +187,26 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                 new StateVars(selfAtPreSV, guardAtPreSV,
                                         localVarsAtPreSVs, resAtPreSV,
                                         excAtPreSV, heapAtPreSV,
-                                        mbyAtPreSV, services, local);
+                                        mbyAtPreSV, services);
         StateVars post =
                 new StateVars(selfAtPostSV, guardAtPostSV,
                                         localVarsAtPostSVs, resAtPostSV,
                                         excAtPostSV, heapAtPostSV,
-                                        null, services, local);
+                                        null, services);
         return new ProofObligationVars(pre, post);
     }
 
 
     private Taclet genInfFlowContractApplTaclet(ProofObligationVars appData,
-                                                Services services,
-                                                boolean local) {
+                                                Services services) {
         Name tacletName = generateName();
 
         // generate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs(
-                "find_", appData, services, local);
+                "find_", appData, services);
         Term schemaFind = generateSchemaFind(schemaDataFind, services);
         ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
-                "assumes_", appData, services, local);
+                "assumes_", appData, services);
         Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term

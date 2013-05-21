@@ -342,7 +342,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                           Services services) {
         // generate proof obligation variables
         final IFProofObligationVars ifVars =
-                new IFProofObligationVars(symbExecVars, services, true);
+                new IFProofObligationVars(symbExecVars, services);
         ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
         // create proof obligation
@@ -720,13 +720,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             // generate information flow invariant application predicate
             // and associated taclet
             final Term loopInvApplPredTerm =
-                    ifInvariantBuilder.buildContractApplPredTerm(true);
+                    ifInvariantBuilder.buildContractApplPredTerm();
             if (!InfFlowContractPO.hasSymbols()) {
                 InfFlowContractPO.newSymbols(
                         services.getProof().env().getInitConfig().activatedTaclets());
             }
             final Taclet informationFlowInvariantApp =
-                    ifInvariantBuilder.buildContractApplTaclet(true);
+                    ifInvariantBuilder.buildContractApplTaclet();
 
             // generate proof obligation variables
             final StateVars instantiationPreVars =
@@ -734,15 +734,13 @@ public final class WhileInvariantRule implements BuiltInRule {
                                             guardAtPre,
                                             localVarsAtPre,
                                             heapAtPre,
-                                            services,
-                                            true);
+                                            services);
             final StateVars instantiationPostVars =
                     new StateVars(selfAtPost,
                                             guardAtPost,
                                             localVarsAtPost,
                                             heapAtPost,
-                                            services,
-                                            true);
+                                            services);
             final ProofObligationVars instantiationVars =
                 new ProofObligationVars(instantiationPreVars, instantiationPostVars);
 

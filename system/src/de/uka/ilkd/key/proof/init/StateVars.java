@@ -49,9 +49,8 @@ public class StateVars {
 
     StateVars(IProgramMethod pm,
               KeYJavaType kjt,
-              Services services,
-              boolean local) {
-        this(pm, kjt, "", services, local);
+              Services services) {
+        this(pm, kjt, "", services);
     }
 
 
@@ -112,8 +111,7 @@ public class StateVars {
                      Term heap,
                      Term mbyAtPre,
                      String postfix,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this(self, null, localVars, result, exception, heap,
              mbyAtPre, services);
     }
@@ -145,10 +143,9 @@ public class StateVars {
                      Term exception,
                      Term heap,
                      Term heapAtPre,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this(self, localVars, result, exception, heap, null, "",
-             services, local);
+             services);
     }
 
 
@@ -156,8 +153,7 @@ public class StateVars {
                      Term guard,
                      ImmutableList<Term> localVars,
                      Term heap,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this(self, guard, localVars, null, null, heap, null, services);
     }
 
@@ -168,8 +164,7 @@ public class StateVars {
                      Term heap,
                      Term result,
                      Term exception,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this(self, guard, localVars, result, exception, heap, null, services);
     }
 
@@ -179,26 +174,23 @@ public class StateVars {
                      Term heap,
                      Term result,
                      Term exception,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this(self, localVars, result, exception,
-             heap, null, "", services, local);
+             heap, null, "", services);
     }
 
 
     public StateVars(Term self,
                      ImmutableList<Term> localVars,
                      Term heap,
-                     Services services,
-                     boolean local) {
-        this(self, localVars, heap, null, null, services, local);
+                     Services services) {
+        this(self, localVars, heap, null, null, services);
     }
 
 
     public StateVars(StateVars orig,
                      String postfix,
-                     Services services,
-                     boolean local) {
+                     Services services) {
         this(copyLocationVariable(orig.self, postfix, services),
              copyLocationVariable(orig.guard, postfix, services),
              copyLocationVariable(orig.localVars, postfix, services),
@@ -286,15 +278,14 @@ public class StateVars {
     StateVars(IProgramMethod pm,
               KeYJavaType kjt,
               String postfix,
-              Services services,
-              boolean local) {
+              Services services) {
         this(buildSelfVar(services, pm, kjt, postfix),
              buildParamVars(services, postfix, pm), // no local out variables
              buildResultVar(pm, services, postfix),
              buildExceptionVar(services, postfix, pm),
              buildHeapVar(postfix, services),
              buildMbyVar(postfix, services),
-             postfix, services, local);
+             postfix, services);
     }
 
 

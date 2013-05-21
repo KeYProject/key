@@ -127,8 +127,7 @@ class BasicSnippetData {
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(), heap,
-                              contract.getResult(), contract.getExc(), services,
-                              false);
+                              contract.getResult(), contract.getExc(), services);
     }
     
     BasicSnippetData(LoopInvariant invariant,
@@ -158,7 +157,7 @@ class BasicSnippetData {
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  invariant.getGuard(),
                                  localVarsTerms, heap,
-                                 services, true);
+                                 services);
     }
     
     
@@ -187,8 +186,7 @@ class BasicSnippetData {
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(), heap,
-                              contract.getResult(), contract.getExc(), services,
-                              false);
+                              contract.getResult(), contract.getExc(), services);
     }
 
 
@@ -224,7 +222,7 @@ class BasicSnippetData {
 
         origVars = new StateVars(vars.self, localVarsTerms, heap,
                                  vars.result, vars.exception,
-                                 services, true);
+                                 services);
     }
 
 

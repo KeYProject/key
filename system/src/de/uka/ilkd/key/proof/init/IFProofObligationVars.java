@@ -26,10 +26,9 @@ public class IFProofObligationVars {
 
 
     public IFProofObligationVars(ProofObligationVars symbExecVars,
-                                 Services services,
-                                 boolean local) {
-        this(new ProofObligationVars(symbExecVars, "_A", services, local),
-             new ProofObligationVars(symbExecVars, "_B", services, local),
+                                 Services services) {
+        this(new ProofObligationVars(symbExecVars, "_A", services),
+             new ProofObligationVars(symbExecVars, "_B", services),
              symbExecVars);
     }
 

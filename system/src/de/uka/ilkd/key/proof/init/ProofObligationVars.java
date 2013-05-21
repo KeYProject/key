@@ -22,24 +22,24 @@ public class ProofObligationVars {
 
     public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
-                               Services services,
-                               boolean local) {
-        this.pre = new StateVars(pm, kjt, "AtPre", services, local);
-        this.post = new StateVars(pm, kjt, "AtPost", services, local);
+                               Services services) {
+        this.pre = new StateVars(pm, kjt, "AtPre", services);
+        this.post = new StateVars(pm, kjt, "AtPost", services);
         this.postfix = "";
     }
 
 
     public ProofObligationVars(ProofObligationVars orig,
                                String postfix,
-                               Services services,
-                               boolean local) {
-        this.pre = new StateVars(orig.pre, postfix, services, local);
-        this.post = new StateVars(orig.post, postfix, services, local);
+                               Services services) {
+        this.pre = new StateVars(orig.pre, postfix, services);
+        this.post = new StateVars(orig.post, postfix, services);
         this.postfix = postfix;
     }
 
-    public ProofObligationVars(StateVars pre, StateVars post) {
+
+    public ProofObligationVars(StateVars pre,
+                               StateVars post) {
         this.pre = pre;
         this.post = post;
         this.postfix = "";

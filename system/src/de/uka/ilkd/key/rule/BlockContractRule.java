@@ -385,12 +385,12 @@ public class BlockContractRule implements BuiltInRule {
             // generate information flow contract application predicate
             // and associated taclet
             final Term contractApplTerm =
-                    ifContractBuilder.buildContractApplPredTerm(true);
+                    ifContractBuilder.buildContractApplPredTerm();
             if (!InfFlowContractPO.hasSymbols()) {
                 InfFlowContractPO.newSymbols(
                         services.getProof().env().getInitConfig().activatedTaclets());
             }
-            Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet(true);
+            Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
 
             // generate proof obligation variables
             final StateVars instantiationPreVars =
@@ -399,19 +399,19 @@ public class BlockContractRule implements BuiltInRule {
                                             heapAtPre,
                                             hasRes ? resultAtPre : null,
                                             hasExc ? exceptionAtPre : null,
-                                            services, true);
+                                            services);
             final StateVars instantiationPostVars =
                     new StateVars(hasSelf ? selfAtPost : null,
                                             localVarsAtPost,
                                             heapAtPost,
                                             hasRes ? resultAtPost : null,
                                             hasExc ? exceptionAtPost : null,
-                                            services, true);
+                                            services);
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(instantiationPreVars,
                                                 instantiationPostVars);
             final IFProofObligationVars ifVars =
-                    new IFProofObligationVars(instantiationVars, services, true);
+                    new IFProofObligationVars(instantiationVars, services);
             application.update(ifVars, instantiation.context);
 
             // set infFlowAssumptions
