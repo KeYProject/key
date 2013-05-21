@@ -1,3 +1,5 @@
+package contract;
+
 public class IFBlockExamples {
         int low;
 
