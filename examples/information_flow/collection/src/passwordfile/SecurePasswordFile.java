@@ -35,23 +35,23 @@ class SecurePasswordFile {
     /**
      * Returns whether password is correct.
      */
-    /*@ normal_behavior
-      @     ensures     \result
-      @              == (   \exists int i;
-      @                     0 <= i && i < names.length;
-      @                     names[i] == user && passwords[i] == password
-      @                 );
-      @     accessible  footprint;
-      @     modifies    \nothing;
-      @     respects    names[userIndex];
-      @     respects    names[userIndex], passwords[userIndex];
-      @     respects    user, password, result;
-      @     declassify  (   \exists int i;
-      @                     0 <= i && i < names.length;
-      @                     names[i] == user && passwords[i] == password
-      @                 )
-      @                 \to \seq(user, password, result);
-      @*/
+//    /*@ normal_behavior
+//      @     ensures     \result
+//      @              == (   \exists int i;
+//      @                     0 <= i && i < names.length;
+//      @                     names[i] == user && passwords[i] == password
+//      @                 );
+//      @     accessible  footprint;
+//      @     modifies    \nothing;
+//      @     respects    names[userIndex];
+//      @     respects    names[userIndex], passwords[userIndex];
+//      @     respects    user, password, result;
+//      @     declassify  (   \exists int i;
+//      @                     0 <= i && i < names.length;
+//      @                     names[i] == user && passwords[i] == password
+//      @                 )
+//      @                 \to \seq(user, password, result);
+//      @*/
     public boolean check(int user, int password) {
         /*@ loop_invariant
           @     0 <= i
