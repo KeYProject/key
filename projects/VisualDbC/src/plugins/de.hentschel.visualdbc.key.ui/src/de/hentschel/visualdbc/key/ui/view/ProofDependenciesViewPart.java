@@ -533,4 +533,17 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       getViewSite().getPage().removePartListener(partListener);
       super.dispose();
    }
+
+   /**
+    * Returns the currently shown {@link DbcModel} or {@code null} if not available.
+    * @return The currently shown {@link DbcModel} or {@code null} if not available.
+    */
+   public DbcModel getCurrentModel() {
+      if (isMessageShown()) {
+         return null;
+      }
+      else {
+         return creator != null ? creator.getModel() : null;
+      }
+   }
 }

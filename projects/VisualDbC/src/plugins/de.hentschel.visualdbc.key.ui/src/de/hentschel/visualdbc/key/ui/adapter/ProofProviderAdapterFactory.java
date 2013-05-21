@@ -23,6 +23,8 @@ import de.hentschel.visualdbc.datasource.key.model.event.KeYConnectionEvent;
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSProof;
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
+import de.hentschel.visualdbc.datasource.model.event.DSConnectionEvent;
+import de.hentschel.visualdbc.datasource.model.event.IDSConnectionListener;
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
@@ -94,7 +96,8 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
     */
    private static final class EditorProofProvider extends AbstractProofProvider implements ISelectionChangedListener,
                                                                                            IInteractiveConnectionUtilListener,
-                                                                                           IKeYConnectionListener {
+                                                                                           IKeYConnectionListener,
+                                                                                           IDSConnectionListener {
       /**
        * The {@link IEditorPart} which provides {@link DbcProof}s.
        */
@@ -126,6 +129,7 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
                      KeyConnection keyConnection = (KeyConnection)connection;
                      if (!keyConnection.hasKeYConnectionListener(this)) {
                         keyConnection.addKeYConnectionListener(this);
+                        keyConnection.addConnectionListener(this);
                      }
                      IDSFinder finder = FinderUtil.getDSFinder(connection);
                      if (finder != null) {
@@ -237,6 +241,7 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
                   DbcModel dbcModel = DbcModelUtil.getModelRoot(dbcProofs.get(0));
                   if (dbcModel != null && dbcModel.equals(e.getModel())) {
                      connection.addKeYConnectionListener(this);
+                     connection.addConnectionListener(this);
                   }
                }
             }
@@ -248,6 +253,13 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
        */
       @Override
       public void interactiveProofStarted(KeYConnectionEvent e) {
+         fireCurrentProofsChangedThreadSave();
+      }
+      
+      /**
+       * Fires the event thread save to all listeners.
+       */
+      protected void fireCurrentProofsChangedThreadSave() {
          final Shell shell = editor.getSite().getShell();
          if (!shell.isDisposed()) {
             shell.getDisplay().syncExec(new Runnable() {
@@ -263,6 +275,21 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
                }
             });
          }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void connected(DSConnectionEvent e) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void disconnected(DSConnectionEvent e) {
+         fireCurrentProofsChangedThreadSave();
       }
    };
 }

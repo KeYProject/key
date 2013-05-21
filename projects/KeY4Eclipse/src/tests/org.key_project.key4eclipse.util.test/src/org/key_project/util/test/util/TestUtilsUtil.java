@@ -1268,4 +1268,18 @@ public class TestUtilsUtil {
       assertNotNull(pm);
       return pm;
    }
+
+   /**
+    * Closes the given {@link IViewPart}.
+    * @param view The {@link IViewPart} to close.
+    */
+   public static void closeView(final IViewPart view) {
+      assertNotNull(view);
+      view.getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            WorkbenchUtil.closeView(view);
+         }
+      });
+   }
 }
