@@ -9,7 +9,7 @@
                      <branchCondition name="!array[1] = w" pathCondition="!array[0] = w &amp; !array[1] = array[0] &amp; !array[1] = w" pathConditionChanged="true" branchCondition="!array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="return w.value+array[0].value+array[1].value;" pathCondition="!array[0] = w &amp; !array[1] = array[0] &amp; !array[1] = w" pathConditionChanged="false">
                            <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; !array[1] = array[0] &amp; !array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;6&apos; as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; !array[1] = array[0] &amp; !array[1] = w" pathConditionChanged="false" exceptionalTermination="false">
+                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; !array[1] = array[0] &amp; !array[1] = w" pathConditionChanged="false" terminationKind="NORMAL">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -17,7 +17,7 @@
                      <branchCondition name="array[1] = w" pathCondition="!array[0] = w &amp; array[1] = w" pathConditionChanged="true" branchCondition="array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="return w.value+array[0].value+array[1].value;" pathCondition="!array[0] = w &amp; array[1] = w" pathConditionChanged="false">
                            <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;8&apos; as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = w" pathConditionChanged="false" exceptionalTermination="false">
+                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = w" pathConditionChanged="false" terminationKind="NORMAL">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -26,7 +26,7 @@
                   <branchCondition name="array[1] = array[0]" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="true" branchCondition="array[1] = array[0]" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return w.value+array[0].value+array[1].value;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;7&apos; as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                           <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" exceptionalTermination="false">
+                           <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -38,7 +38,7 @@
                   <branchCondition name="!array[1] = w" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="true" branchCondition="!array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return w.value+array[0].value+array[1].value;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;7&apos; as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" exceptionalTermination="false">
+                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -46,7 +46,7 @@
                   <branchCondition name="array[1] = w" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="true" branchCondition="array[1] = w" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return w.value+array[0].value+array[1].value;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;9&apos; as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" exceptionalTermination="false">
+                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
