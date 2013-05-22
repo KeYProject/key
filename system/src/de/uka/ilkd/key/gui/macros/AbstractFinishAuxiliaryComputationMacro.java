@@ -65,13 +65,13 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     protected Term calculateResultingTerm(Proof proof,
                                           IFProofObligationVars ifVars,
-                                          Services services) {
+                                          Goal initGoal) {
         final Term[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
-                               proof.openGoals(), services);
+                               proof.openGoals(), initGoal);
         final Term[] goalFormulas2 =
                 buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2),
-                               proof.openGoals(), services);
+                               proof.openGoals(), initGoal);
 
         Term composedStates = TB.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
@@ -80,16 +80,16 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
-        InfFlowContractPO.addSymbol(composedStates, services);
+        InfFlowContractPO.addSymbol(composedStates, initGoal.proof());
         return composedStates;
-//        return TB.and(TB.or(goalFormulas1), TB.or(goalFormulas2));
     }
 
 
     private Term[] buildExecution(ProofObligationVars c,
                                   Map<Term, Term> vsMap,
                                   ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
-                                  Services services) {
+                                  Goal initGoal) {
+        Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         // the build in heap symbol has to be handled with care
         final HashMap<Operator, Boolean> doNotReplace =
@@ -97,7 +97,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         doNotReplace.put(TB.getBaseHeap(services).op(), Boolean.TRUE);
         final Term[] renamedGoalFormulas =
                 renameVariablesAndSkolemConstants(goalFormulas, vsMap, doNotReplace,
-                                                  c.postfix, services);
+                                                  c.postfix, initGoal);
         Term[] result = new Term[renamedGoalFormulas.length];
         for (int i = 0; i < renamedGoalFormulas.length; i++) {
             result[i] =
@@ -155,7 +155,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                Map<Term, Term> replaceMap,
                                                Map<Operator, Boolean> notReplaceMap,
                                                String postfix,
-                                               Services services) {
+                                               Goal initGoal) {
+        Services services = initGoal.proof().getServices();
         if (term == null) {
             return null;
         }
@@ -179,7 +180,14 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                             new Name(pv.name() +
                                                                      postfix));
             final Operator renamedPv = pv.rename(newName);
-            services.getNamespaces().programVariables().addSafely(renamedPv);
+            if (renamedPv instanceof ProgramVariable) {
+                // for the taclet application dialog (which gets the declared
+                // program variables in a strange way and not directly from the
+                // namespace); adds it also to the namespace
+                initGoal.addProgramVariable((ProgramVariable)renamedPv);
+            } else {
+                services.getNamespaces().programVariables().addSafely(renamedPv);
+            }
             final Term pvTerm = TermFactory.DEFAULT.createTerm(renamedPv);
             replaceMap.put(term, pvTerm);
             return pvTerm;
@@ -204,9 +212,9 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                                   replaceMap,
                                                                   notReplaceMap,
                                                                   postfix,
-                                                                  services);
+                                                                  initGoal);
             final Term[] renamedSubs =
-                    renameSubs(term, replaceMap, notReplaceMap, postfix, services);
+                    renameSubs(term, replaceMap, notReplaceMap, postfix, initGoal);
             final ElementaryUpdate renamedU =
                     ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
             final Term uTerm = TermFactory.DEFAULT.createTerm(renamedU, renamedSubs);
@@ -215,7 +223,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         } else {
             insertBoundVarsIntoNotReplaceMap(term, notReplaceMap);
             final Term[] renamedSubs =
-                    renameSubs(term, replaceMap, notReplaceMap, postfix, services);
+                    renameSubs(term, replaceMap, notReplaceMap, postfix, initGoal);
             final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
                                                    term.boundVars(),
@@ -264,13 +272,13 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                      Map<Term, Term> replaceMap,
                                                      Map<Operator, Boolean> notReplaceMap,
                                                      String postfix,
-                                                     Services services) {
+                                                     Goal initGoal) {
         Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
             result[i] =
                     renameVariablesAndSkolemConstants(terms[i], replaceMap,
                                                       notReplaceMap, postfix,
-                                                      services);
+                                                      initGoal);
         }
         return result;
     }
@@ -280,11 +288,12 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                    Map<Term, Term> replaceMap,
                                                    Map<Operator, Boolean> notReplaceMap,
                                                    String postfix,
-                                                   Services services) {
+                                                   Goal initGoal) {
         final Term temp = renameFormulasWithoutPrograms(term, replaceMap,
                                                         notReplaceMap,
                                                         postfix,
-                                                        services);
+                                                        initGoal);
+        Services services = initGoal.proof().getServices();
         final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 extractProgamVarReplaceMap(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap, notReplaceMap,
@@ -320,7 +329,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                               Map<Term, Term> replaceMap,
                               Map<Operator, Boolean> notReplaceMap,
                               String postfix,
-                              Services services) {
+                              Goal initGoal) {
         Term[] renamedSubs = null;
         if (term.subs() != null) {
             renamedSubs = new Term[term.subs().size()];
@@ -329,7 +338,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                                replaceMap,
                                                                notReplaceMap,
                                                                postfix,
-                                                               services);
+                                                               initGoal);
             }
         }
         return renamedSubs;

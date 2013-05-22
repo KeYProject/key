@@ -65,9 +65,9 @@ public class FinishAuxiliaryComputationMacro
                 (InfFlowContractPO) services.getSpecificationRepository().getPOForProof(initiatingProof);
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifPO.getIFVars(), services);
+        final Term result = calculateResultingTerm(proof, ifPO.getIFVars(), initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
-        InfFlowContractPO.addSymbol(rwTaclet, services);
+        InfFlowContractPO.addSymbol(rwTaclet, initiatingGoal.proof());
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 

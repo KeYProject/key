@@ -108,7 +108,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
         }
-        InfFlowContractPO.addSymbol(contractApplPredTerm, services);
+        InfFlowContractPO.addSymbol(contractApplPredTerm, services.getProof());
         return contractApplPredTerm;
     }
 
@@ -116,7 +116,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     public Taclet buildContractApplTaclet() {
         ProofObligationVars appData = getProofObligationVars();
         Taclet result = genInfFlowContractApplTaclet(appData, services);
-        InfFlowContractPO.addSymbol(result, services);
+        InfFlowContractPO.addSymbol(result, services.getProof());
         return result;
     }
 

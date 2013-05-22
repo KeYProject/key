@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -25,8 +26,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -81,7 +80,7 @@ public class InfFlowContractPO extends AbstractOperationPO
 
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                addSymbol(t.taclet(), services);
+                addSymbol(t.taclet(), services.getProof());
             }
         }
 
@@ -246,19 +245,19 @@ public class InfFlowContractPO extends AbstractOperationPO
         symbols().add(l);
     }
 
-    public static void addSymbol(Object o, Services services) {
+    public static void addSymbol(Object o, Proof proof) {
         if (!hasSymbols()) {
             ifSymbols =
-                    new InfFlowProofSymbols(services.getProof()
+                    new InfFlowProofSymbols(proof
                             .env().getInitConfig().activatedTaclets());
         }
         addSymbol(o);
     }
 
-    public static void addSymbols(ImmutableList<?> l, Services services) {
+    public static void addSymbols(ImmutableList<?> l, Proof proof) {
         if (!hasSymbols()) {
             ifSymbols =
-                    new InfFlowProofSymbols(services.getProof()
+                    new InfFlowProofSymbols(proof
                             .env().getInitConfig().activatedTaclets());
         }
         addSymbols(l);

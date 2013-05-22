@@ -78,9 +78,9 @@ public class FinishAuxiliaryBlockComputationMacro
 
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifVars, services);
+        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
-        InfFlowContractPO.addSymbol(rwTaclet, services);
+        InfFlowContractPO.addSymbol(rwTaclet, initiatingGoal.proof());
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
 
