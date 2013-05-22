@@ -22,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the basic functionality to test the proof reference API.
@@ -280,13 +281,23 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                                       boolean useContracts,
                                       IProofTester tester) throws Exception {
       assertNotNull(tester);
-      // Make sure that required files exists
-      File javaFile = new File(baseDir, javaPathInBaseDir);
-      assertTrue(javaFile.exists());
-      // Load java file
-      KeYEnvironment<?> environment = KeYEnvironment.load(javaFile, null, null);
+      KeYEnvironment<?> environment = null;
       Proof proof = null;
+      String originalRuntimeExceptions = null;
       try {
+         // Make sure that required files exists
+         File javaFile = new File(baseDir, javaPathInBaseDir);
+         assertTrue(javaFile.exists());
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            environment = KeYEnvironment.load(javaFile, null, null);
+            environment.dispose();
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Load java file
+         environment = KeYEnvironment.load(javaFile, null, null);
          // Search type
          KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName);
          assertNotNull(containerKJT);
@@ -310,10 +321,17 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
+         // Dispose proof and environment
          if (proof != null) {
             proof.dispose();
          }
-         environment.dispose();
+         if (environment != null) {
+            environment.dispose();
+         }
       }
    }
    
@@ -334,13 +352,23 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
                                     boolean useContracts,
                                     IProofTester tester) throws Exception {
       assertNotNull(tester);
-      // Make sure that required files exists
-      File javaFile = new File(baseDir, javaPathInBaseDir);
-      assertTrue(javaFile.exists());
-      // Load java file
-      KeYEnvironment<?> environment = KeYEnvironment.load(javaFile, null, null);
+      KeYEnvironment<?> environment = null;
       Proof proof = null;
+      String originalRuntimeExceptions = null;
       try {
+         // Make sure that required files exists
+         File javaFile = new File(baseDir, javaPathInBaseDir);
+         assertTrue(javaFile.exists());
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            environment = KeYEnvironment.load(javaFile, null, null);
+            environment.dispose();
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Load java file
+         environment = KeYEnvironment.load(javaFile, null, null);
          // Search method to proof
          IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
          // Find first contract.
@@ -354,10 +382,17 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
+         // Dispose proof and environment
          if (proof != null) {
             proof.dispose();
          }
-         environment.dispose();
+         if (environment != null) {
+            environment.dispose();
+         }
       }
    }
    
