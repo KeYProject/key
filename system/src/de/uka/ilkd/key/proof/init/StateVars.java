@@ -269,13 +269,12 @@ public class StateVars {
     public static StateVars buildMethodContractPreVars(IProgramMethod pm,
                                                        KeYJavaType kjt,
                                                        Services services) {
-        final String postfix = "AtPre";
-        return new StateVars(buildSelfVar(services, pm, kjt, postfix),
-                             buildParamVars(services, postfix, pm),
-                             buildResultVar(pm, services, postfix),
-                             buildExceptionVar(services, postfix, pm),
-                             buildHeapVar(postfix, services),
-                             buildMbyVar(postfix, services),
+        return new StateVars(buildSelfVar(services, pm, kjt, ""),
+                             buildParamVars(services, "", pm),
+                             buildResultVar(pm, services, ""),
+                             buildExceptionVar(services, "", pm),
+                             buildHeapVar("AtPre", services),
+                             buildMbyVar("", services),
                              services);
     }
 
