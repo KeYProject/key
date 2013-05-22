@@ -17,7 +17,7 @@ public class IFMethodContract {
 
     
 //--------
-    
+
     
     //@ respects low;
     void secure_sequential_n1_n2() {

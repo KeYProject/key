@@ -9,7 +9,7 @@ package mini;
  *
  * @author christoph
  */
-public class MiniExamplesPaper {
+public class MiniExamples {
     public static int l;
     private static int h;
 
@@ -140,6 +140,14 @@ public class MiniExamplesPaper {
       @*/
     void secure_p2_7() {
         if (h==1) l=1; else l=0; l=0;
+    }
+
+    // Other examples
+
+    //@ respects x, \result;
+    int secure_parameter(int x) {
+        x++;
+        return x;
     }
 
 }
