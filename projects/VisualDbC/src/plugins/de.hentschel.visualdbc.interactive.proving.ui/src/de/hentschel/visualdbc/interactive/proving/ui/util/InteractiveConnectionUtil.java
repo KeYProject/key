@@ -1,18 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.interactive.proving.ui.util;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.util.java.ObjectUtil;
@@ -25,6 +27,8 @@ import de.hentschel.visualdbc.datasource.model.event.DSConnectionEvent;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.util.DriverUtil;
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
+import de.hentschel.visualdbc.interactive.proving.ui.util.event.IInteractiveConnectionUtilListener;
+import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConnectionUtilEvent;
 
 /**
  * <p>
@@ -41,9 +45,11 @@ import de.hentschel.visualdbc.dbcmodel.DbcModel;
  */
 public final class InteractiveConnectionUtil {
    /**
-    * The currently opened interactive {@link IDSConnection}.
+    * The currently opened interactive {@link IDSConnection}s.
     */
-   private static Map<DbcModel, IDSConnection> connections = new HashMap<DbcModel, IDSConnection>();
+   private static WeakHashMap<DbcModel, IDSConnection> connections = new WeakHashMap<DbcModel, IDSConnection>();
+   
+   private static WeakHashMap<IInteractiveConnectionUtilListener, Void> listeners = new WeakHashMap<IInteractiveConnectionUtilListener, Void>();
    
    /**
     * Forbid instances.
@@ -78,7 +84,8 @@ public final class InteractiveConnectionUtil {
       // Get connection settings
       Map<String, Object> connectionSettings = driver.fromPersistentProperties(model.toConnectionProperties()); 
       // Check if a connection already exists
-      IDSConnection result = connections.get(model);
+      IDSConnection result = getConnection(model);
+      boolean opened = false;
       if (result == null) {
          result = driver.createConnection();
          result.addConnectionListener(new ConnectionCloseListener(model));
@@ -87,19 +94,27 @@ public final class InteractiveConnectionUtil {
       // Make sure that the connection is established
       if (!result.isConnected()) {
          result.connect(connectionSettings, true, monitor);
+         opened = true;
       }
       // Check that the correct connection is established
       if (result.getDriver() == null) {
+         result.disconnect();
          throw new DSException("Current data source connection has no driver reference.");
       }
       if (!result.isInteractive()) {
+         result.disconnect();
          throw new DSException("Connection is not interactive.");
       }
       if (!ObjectUtil.equals(model.getDriverId(), result.getDriver().getId())) {
+         result.disconnect();
          throw new DSException("Connected to wrong data source. Current driver has ID \"" + result.getDriver().getId() + "\" but expcted \"" + model.getDriverId() + "\".");
       }
       if (!ObjectUtil.equals(connectionSettings, result.getConnectionSettings())) {
+         result.disconnect();
          throw new DSException("Connection settings in diagram root and current connection are different.");
+      }
+      if (opened) {
+         fireConnectionOpened(new InteractiveConnectionUtilEvent(result, model));
       }
       return result;
    }
@@ -112,12 +127,21 @@ public final class InteractiveConnectionUtil {
     */
    public static boolean isOpened(DbcModel model) throws DSException {
       if (model != null) {
-         IDSConnection connection = connections.get(model);
+         IDSConnection connection = getConnection(model);
          return connection != null && connection.isConnected();
       }
       else {
          return false;
       }
+   }
+   
+   /**
+    * Returns the {@link IDSConnection} for the given {@link DbcModel} if available.
+    * @param model The {@link DbcModel} to get its {@link IDSConnection}. 
+    * @return The {@link IDSConnection} for the given {@link DbcModel} or {@code null} if not available.
+    */
+   public static IDSConnection getConnection(DbcModel model) {
+      return connections.get(model);
    }
    
    /**
@@ -166,6 +190,37 @@ public final class InteractiveConnectionUtil {
          catch (DSException exception) {
             LogUtil.getLogger().logError(exception);
          }
+      }
+   }
+   
+   /**
+    * Registers the given {@link IInteractiveConnectionUtilListener}.
+    * @param l The {@link IInteractiveConnectionUtilListener} to register.
+    */
+   public static void addInteractiveConnectionUtilListener(IInteractiveConnectionUtilListener l) {
+      if (l != null) {
+         listeners.put(l, null);
+      }
+   }
+   
+   /**
+    * Removes the given {@link IInteractiveConnectionUtilListener}.
+    * @param l The {@link IInteractiveConnectionUtilListener} to remove.
+    */
+   public static void removeInteractiveConnectionUtilListener(IInteractiveConnectionUtilListener l) {
+      if (l != null) {
+         listeners.remove(l);
+      }
+   }
+   
+   /**
+    * Fires the event {@link IInteractiveConnectionUtilListener#connectionOpened(InteractiveConnectionUtilEvent)}.
+    * @param e The event object to fire.
+    */
+   private static void fireConnectionOpened(InteractiveConnectionUtilEvent e) {
+      IInteractiveConnectionUtilListener[] toInform = listeners.keySet().toArray(new IInteractiveConnectionUtilListener[listeners.keySet().size()]);
+      for (IInteractiveConnectionUtilListener l : toInform) {
+         l.connectionOpened(e);
       }
    }
 }

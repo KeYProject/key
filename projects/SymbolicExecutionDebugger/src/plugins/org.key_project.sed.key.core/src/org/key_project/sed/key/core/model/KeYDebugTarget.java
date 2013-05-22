@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.model;
 
 import java.util.HashMap;
@@ -107,7 +120,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false, false);
    }
 
    /**
@@ -168,7 +181,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof), isLoopTreatmentInvariant(proof));
+      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof), isLoopTreatmentInvariant(proof), isAliasChecks(proof));
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
@@ -203,6 +216,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    protected boolean isLoopTreatmentInvariant(Proof proof) {
       StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
       return StrategyProperties.LOOP_INVARIANT.equals(sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
+   }
+   
+   /**
+    * Checks if the given {@link Proof} uses alias checks right now.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} alias checks immediately, {@code false} alias checks never.
+    */
+   protected boolean isAliasChecks(Proof proof) {
+      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      return SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
    }
 
    /**
@@ -271,7 +294,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Remove proof from user interface
          environment.getUi().removeProof(environment.getProof());
          // Clear cache
-         environment.getBuilder().dispose();
+         environment.dispose();
          environment = null;
       }
       // Inform UI that the process is terminated

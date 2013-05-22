@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;

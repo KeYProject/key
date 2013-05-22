@@ -15,8 +15,8 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**

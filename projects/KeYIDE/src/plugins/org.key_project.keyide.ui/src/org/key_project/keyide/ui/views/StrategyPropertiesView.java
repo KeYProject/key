@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
@@ -61,7 +74,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);
-            Object obj = part.getAdapter(this.getClass());
+            Object obj = part.getAdapter(Proof.class);
             if(obj instanceof Proof){
                proof = (Proof) obj;
                form.setProof((Proof)obj);
@@ -80,7 +93,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);
-            Object obj = part.getAdapter(this.getClass());
+            Object obj = part.getAdapter(Proof.class);
             if(obj instanceof Proof){
                proof = (Proof) obj;
                form.setProof((Proof)obj);

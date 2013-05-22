@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -73,6 +86,12 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
     * Attribute name to store {@link ISymbolicValue#getValueString()}.
     */
    public static final String ATTRIBUTE_VALUE = "value";
+
+   /**
+    * Attribute name to store {@link ISymbolicValue#getConditionString()} and
+    * {@link ISymbolicAssociation#getConditionString()}.
+    */
+   public static final String ATTRIBUTE_CONDITION = "condition";
 
    /**
     * Attribute name to store {@link ISymbolicAssociation#getTarget()}.
@@ -249,6 +268,9 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, value.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_VALUE, value.getValueString());
       attributeValues.put(ATTRIBUTE_TYPE, value.getTypeString());
+      if (value.getConditionString() != null) {
+         attributeValues.put(ATTRIBUTE_CONDITION, value.getConditionString());
+      }
       appendEmptyTag(level, TAG_VALUE, attributeValues, sb);
    }
 
@@ -266,6 +288,9 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, association.isArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, association.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_TARGET, computeObjectId(model, association.getTarget()));
+      if (association.getConditionString() != null) {
+         attributeValues.put(ATTRIBUTE_CONDITION, association.getConditionString());
+      }
       appendEmptyTag(level, TAG_ASSOCIATION, attributeValues, sb);
    }
 

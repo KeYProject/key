@@ -110,6 +110,7 @@ public final class ArraySort extends AbstractSort {
 	    				 Sort serializableSort) {
 	if(elemType != PrimitiveType.JAVA_BYTE 
 	   && elemType != PrimitiveType.JAVA_CHAR
+	   && elemType != PrimitiveType.JAVA_INT
 	   && elemType != PrimitiveType.JAVA_LONG
 	   && elemType != PrimitiveType.JAVA_SHORT) {
 	    elemType = null;

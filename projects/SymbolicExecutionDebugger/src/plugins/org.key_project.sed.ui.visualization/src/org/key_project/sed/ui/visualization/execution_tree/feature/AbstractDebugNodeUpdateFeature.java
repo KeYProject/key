@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import java.util.Arrays;
@@ -563,11 +576,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected void centerChildren(Set<ISEDDebugNode> leafs, 
+   protected void centerChildren(final Set<ISEDDebugNode> leafs, 
                                  IProgressMonitor monitor) throws DebugException {
       final Set<ISEDDebugNode> doneNodes = new HashSet<ISEDDebugNode>(); // Contains all already centered nodes
       while (!leafs.isEmpty() && !monitor.isCanceled()) {
-         // Get leaf to center which is the first one which children are already centered (all children are contained in doneNodes) 
+         // Get leaf to center which is the first one which children are already centered (all children are contained in doneNodes) or if no centering of the child is required (not part of leafs)
          final ISEDDebugNode next = CollectionUtil.searchAndRemoveWithException(leafs, new IFilterWithException<ISEDDebugNode, DebugException>() {
             @Override
             public boolean select(ISEDDebugNode element) throws DebugException {
@@ -575,7 +588,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                ISEDDebugNode[] children = element.getChildren();
                int i = 0;
                while (allChildrenDone && i < children.length) {
-                  if (!doneNodes.contains(children[i])) {
+                  if (!doneNodes.contains(children[i]) && leafs.contains(children[i])) {
                      allChildrenDone = false;
                   }
                   i++;

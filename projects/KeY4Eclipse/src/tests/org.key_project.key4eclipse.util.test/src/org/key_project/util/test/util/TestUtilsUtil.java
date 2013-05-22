@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.util;
 
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
@@ -87,7 +100,9 @@ import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
@@ -174,20 +189,40 @@ public class TestUtilsUtil {
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
       IProject project = createProject(name);
-      IFolder bin = project.getFolder("bin");
+      final IFolder bin = project.getFolder("bin");
       if (!bin.exists()) {
          bin.create(true, true, null);
       }
-      IFolder src = project.getFolder("src");
+      final IFolder src = project.getFolder("src");
       if (!src.exists()) {
          src.create(true, true, null);
       }
-      IJavaProject javaProject = JavaCore.create(project); 
-      JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-      IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-      entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-      page.init(javaProject, bin.getFullPath(), entries, false);
-      page.configureJavaProject(null);
+      final IJavaProject javaProject = JavaCore.create(project); 
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
+               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
+               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               page.init(javaProject, bin.getFullPath(), entries, false);
+               page.configureJavaProject(null);
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() instanceof CoreException) {
+         throw (CoreException)run.getException();
+      }
+      else if (run.getException() instanceof InterruptedException) {
+         throw (InterruptedException)run.getException();
+      }
+      else if (run.getException() != null) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
+      }
       return javaProject;
    }
    
@@ -1383,6 +1418,12 @@ public class TestUtilsUtil {
       return pm;
    }
    
+   /**
+    * Sets the cursor location in the given {@link AbstractSWTBot}.
+    * @param widget The {@link AbstractSWTBot} to set cursor location in,.
+    * @param x The x coordinate inside the widget to set.
+    * @param y The y coordinate inside the widget to set.
+    */
    public static <W extends Control> void setCursorLocation(final AbstractSWTBot<W> widget, 
                                                             final int x, 
                                                             final int y) {
@@ -1415,5 +1456,19 @@ public class TestUtilsUtil {
       while (!ui.getMediator().autoMode()) {
          sleep(10);
       }
+   }
+
+   /**
+    * Closes the given {@link IViewPart}.
+    * @param view The {@link IViewPart} to close.
+    */
+   public static void closeView(final IViewPart view) {
+      assertNotNull(view);
+      view.getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            WorkbenchUtil.closeView(view);
+         }
+      });
    }
 }

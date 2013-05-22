@@ -1,4 +1,3 @@
-
 public class ModelFieldTest {
 	//@ model int f;
 	//@ represents f = 2 * x;

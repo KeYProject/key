@@ -2120,7 +2120,7 @@ sortId_check [boolean checkSort] returns [Sort s = null]
 }
     :
         p = sortId_check_help[checkSort]
-        s = array_decls[p]
+        s = array_decls[p, checkSort]
     ;
 
 // Generic and non-generic sorts, array sorts allowed
@@ -2130,7 +2130,7 @@ any_sortId_check [boolean checkSort] returns [Sort s = null]
 }
     :   
         p = any_sortId_check_help[checkSort]
-        s = array_decls[p]
+        s = array_decls[p, checkSort]
     ;
     
     
@@ -2179,6 +2179,9 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             } else if(name.equals(PrimitiveType.JAVA_SHORT.getName())) {
                 t = PrimitiveType.JAVA_SHORT;
                 name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_INT.getName())) {
+                t = PrimitiveType.JAVA_INT;
+                name = PrimitiveType.JAVA_INT.getName();
             } else if(name.equals(PrimitiveType.JAVA_LONG.getName())) {
                 t = PrimitiveType.JAVA_LONG;
                 name = PrimitiveType.JAVA_INT.getName();
@@ -2204,13 +2207,13 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
     ;
 
 
-array_decls[Pair<Sort,Type> p] returns [Sort s = null]                
+array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]                
 {
     int n = 0;    
 }
     :
      (EMPTYBRACKETS {n++;})*
-        { 
+        {   if (!checksort) return s;
             if(n != 0) {
                 final JavaInfo ji = getJavaInfo();
                 s = ArraySort.getArraySortForDim(p.first,

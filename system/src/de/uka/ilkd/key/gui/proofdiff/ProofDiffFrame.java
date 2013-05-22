@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.proofdiff;
 
 import java.awt.BorderLayout;
@@ -108,7 +121,7 @@ public class ProofDiffFrame extends JFrame {
         {
             this.textArea = new JEditorPane();
             textArea.setContentType("text/html");
-            Font myFont = UIManager.getFont(Config.KEY_FONT_CURRENT_GOAL_VIEW);
+            Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
             textArea.setFont(myFont);
             //            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
             textArea.setEditable(false);
@@ -236,7 +249,7 @@ public class ProofDiffFrame extends JFrame {
                 if(onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
-                    sb.append("<span style='background-color: #ff8080;text-decoration: line-through;'>").
+                    sb.append("<span style='background-color: #ff8080;'>").
                     append(toHtml(diff.text)).append("</span>");
                 }
                 break;
@@ -361,8 +374,8 @@ public class ProofDiffFrame extends JFrame {
                 "<p>This window can be used to select one or two sequents of an " +
                 "ongoing or closed proof. All actions refer to the currently selected proof.</p>" +
                 "<p>The textarea shows the <i>in-place diff</i> between two pretty printed " +
-                "sequences. Parts in <span style='background-color: #ff8080;text-decoration: " +
-                "line-through;'>striked-out red</span> are only present in the parent sequent and" +
+                "sequences. Parts in <span style='background-color: #ff8080;'>red</span>" +
+                " are only present in the parent sequent and " +
                 "parts in <span style='background-color: #80ff80;'>green</span> are added in the " +
                 "second proof node.</p>" +
                 "<h3>One node mode</h3>" +
@@ -376,6 +389,7 @@ public class ProofDiffFrame extends JFrame {
                 "component as displayed proof node.";
     }
 
+    // Use this to test the layout of this class.
     public static void main(String[] args) {
         ProofDiffFrame pdf = new ProofDiffFrame(null);
         pdf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

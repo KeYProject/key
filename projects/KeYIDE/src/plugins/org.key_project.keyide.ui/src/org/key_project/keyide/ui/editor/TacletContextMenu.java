@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.editor;
 
 import java.util.Iterator;
@@ -8,6 +21,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.ExtensionContributionFactory;
 import org.eclipse.ui.menus.IContributionRoot;
 import org.eclipse.ui.services.IServiceLocator;
+import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -33,7 +47,7 @@ public class TacletContextMenu extends ExtensionContributionFactory {
       IEditorPart activeEditor = WorkbenchUtil.getActiveEditor();
       if (activeEditor instanceof KeYEditor) {
          KeYEditor keyEditor = (KeYEditor)activeEditor;
-         KeYEnvironment<CustomConsoleUserInterface> environment = keyEditor.getKeYEnvironment();
+         KeYEnvironment<CustomConsoleUserInterface> environment = keyEditor.getEnvironment();
          KeYMediator mediator = environment.getMediator();
          if(mediator.getSelectedNode().getAppliedRuleApp() == null){
             ProofSourceViewerDecorator textViewer = keyEditor.getTextViewer();

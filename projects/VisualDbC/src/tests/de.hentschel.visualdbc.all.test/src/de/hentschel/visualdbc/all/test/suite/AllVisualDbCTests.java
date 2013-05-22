@@ -1,12 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.all.test.suite;
@@ -23,6 +25,7 @@ import de.hentschel.visualdbc.example.test.suite.AllExampleTests;
 import de.hentschel.visualdbc.generation.test.suite.AllGenerationTests;
 import de.hentschel.visualdbc.generation.ui.test.suite.AllGenerationUiTests;
 import de.hentschel.visualdbc.interactive.proving.ui.test.suite.AllInteractiveProvingUiTests;
+import de.hentschel.visualdbc.key.ui.test.suite.AllKeYUiTests;
 
 /**
  * <p>
@@ -47,7 +50,8 @@ import de.hentschel.visualdbc.interactive.proving.ui.test.suite.AllInteractivePr
    AllKeyDataSourceTests.class,
    AllDiagramCustomTests.class,
    AllInteractiveProvingUiTests.class,
-   AllExampleTests.class
+   AllExampleTests.class,
+   AllKeYUiTests.class
 })
    // TODO: Add unit 3 suite DbcModelAllTests
 public class AllVisualDbCTests {

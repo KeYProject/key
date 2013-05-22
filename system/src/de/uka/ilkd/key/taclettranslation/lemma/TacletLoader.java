@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
@@ -151,8 +164,7 @@ public abstract class TacletLoader {
                 
                
                 private InitConfig createInitConfig(InitConfig reference) {
-                        InitConfig newConfig = reference.copy();
-
+                    InitConfig newConfig = reference.deepCopy();
                         newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
                         newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
                        
@@ -169,7 +181,7 @@ public abstract class TacletLoader {
 
                         keyFile.setInitConfig(config);
                         try{
-                                keyFile.readRulesAndProblem();
+                            keyFile.readRulesAndProblem();
                         }catch(Throwable e){
                                 throw new RuntimeException(e);
                         }

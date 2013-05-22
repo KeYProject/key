@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -6,8 +19,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -113,16 +126,18 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                          String precondition,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
       try {
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
+            env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false);
+            env.dispose();
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
@@ -135,6 +150,9 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
          // Restore runtime option
          if (originalRuntimeExceptions != null) {
             SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
+         if (env != null) {
+            env.dispose();
          }
       }
    }

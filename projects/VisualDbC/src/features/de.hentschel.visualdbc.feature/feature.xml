@@ -115,7 +115,7 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
    </license>
 
    <url>
-      <update label="KeY Indigo Updates" url="http://www.key-project.org/download/releases/2.0/indigo"/>
+      <update label="KeY Indigo Updates" url="http://www.key-project.org/download/releases/eclipse/indigo"/>
    </url>
 
    <includes
@@ -233,6 +233,13 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
 
    <plugin
          id="de.hentschel.visualdbc.statistic.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.hentschel.visualdbc.key.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

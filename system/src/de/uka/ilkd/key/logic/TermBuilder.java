@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -52,6 +53,7 @@ import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -433,6 +435,14 @@ public class TermBuilder {
         return tf.createTerm(IfThenElse.IF_THEN_ELSE,
                          new Term[]{cond, _then, _else});
     }
+    
+    /** Construct a term with the \ifEx operator. */
+    public Term ifEx(QuantifiableVariable qv, Term cond, Term _then, Term _else) {
+        return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
+                            new ImmutableArray<Term>(cond,_then,_else),
+                            new ImmutableArray<QuantifiableVariable>(qv),
+                            null);
+    }
 
 
     public Term cast(Services services, Sort s, Term t) {
@@ -527,21 +537,33 @@ public class TermBuilder {
     }
 
 
-    public Term min(QuantifiableVariable qv, Term t, Services services) {
-        Function min = services.getTypeConverter().getIntegerLDT().getMin();
-        return tf.createTerm(min,
-                           new ImmutableArray<Term>(t),
-                           new ImmutableArray<QuantifiableVariable>(qv),
-                           null);
+    /** Translation of JML's \min operator using \ifEx operator. */
+    public Term min(QuantifiableVariable qv, Term guard, Term t, boolean bigInt, Services services) {
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
+        final Term xvar = var(x);
+        final Term subst = subst(qv, xvar, guard);
+        final Term lhs = bigInt? subst: and(inInt(xvar,services),subst);
+        final Term qvar = var(qv);
+        if (!bigInt) guard = and(inInt(qvar,services),guard);
+        final Term minForm = and(guard,all(x,imp(lhs,leq(qvar,xvar, services))));
+        final Term undef = func(new Function(new Name("undefMin"), intSort));
+        return ifEx(qv, minForm, t, undef);
     }
 
 
-    public Term max(QuantifiableVariable qv, Term t, Services services) {
-        Function max = services.getTypeConverter().getIntegerLDT().getMax();
-        return tf.createTerm(max,
-                           new ImmutableArray<Term>(t),
-                           new ImmutableArray<QuantifiableVariable>(qv),
-                           null);
+    /** Translation of JML's \max operator using \ifEx operator. */
+    public Term max(QuantifiableVariable qv, Term guard, Term t, boolean bigInt, Services services) {
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
+        final Term xvar = var(x);
+        final Term subst = subst(qv, xvar, guard);
+        final Term lhs = bigInt? subst: and(inInt(xvar,services),subst);
+        final Term qvar = var(qv);
+        if (!bigInt) guard = and(inInt(qvar,services),guard);
+        final Term maxForm = and(guard,all(x,imp(lhs,geq(qvar,xvar, services))));
+        final Term undef = func(new Function(new Name("undefMax"), intSort));
+        return ifEx(qv, maxForm, t, undef);
     }
 
 
@@ -667,6 +689,15 @@ public class TermBuilder {
                   Term substTerm,
                   Term origTerm) {
     return tf.createTerm(op,
+                     new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
+                     new ImmutableArray<QuantifiableVariable>(substVar),
+                     null);
+    }
+
+    public Term subst(QuantifiableVariable substVar,
+                  Term substTerm,
+                  Term origTerm) {
+    return tf.createTerm(WarySubstOp.SUBST,
                      new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
                      new ImmutableArray<QuantifiableVariable>(substVar),
                      null);

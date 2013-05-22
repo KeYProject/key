@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.monkey.product.ui.util;
 
 import java.io.File;
@@ -60,49 +73,56 @@ public final class MonKeYUtil {
       else {
          environment = KeYEnvironment.load(location, null, bootClassPath);
       }
-      boolean skipLibraryClasses = true;
-      // get all classes
-      SWTUtil.checkCanceled(monitor);
-      final Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
-      monitor.beginTask("Filtering types", kjts.size());
-      final Iterator<KeYJavaType> it = kjts.iterator();
-      while (it.hasNext()) {
+      try {
+         boolean skipLibraryClasses = true;
+         // get all classes
          SWTUtil.checkCanceled(monitor);
-         KeYJavaType kjt = it.next();
-         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-               kjt.getJavaType() instanceof InterfaceDeclaration) || 
-             (((TypeDeclaration)kjt.getJavaType()).isLibraryClass() && skipLibraryClasses)) {
-            it.remove();
+         final Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
+         monitor.beginTask("Filtering types", kjts.size());
+         final Iterator<KeYJavaType> it = kjts.iterator();
+         while (it.hasNext()) {
+            SWTUtil.checkCanceled(monitor);
+            KeYJavaType kjt = it.next();
+            if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+                  kjt.getJavaType() instanceof InterfaceDeclaration) || 
+                (((TypeDeclaration)kjt.getJavaType()).isLibraryClass() && skipLibraryClasses)) {
+               it.remove();
+            }
+            monitor.worked(1);
          }
-         monitor.worked(1);
-      }
-      monitor.done();
-      // sort classes alphabetically
-      SWTUtil.checkCanceled(monitor);
-      monitor.beginTask("Sorting types", IProgressMonitor.UNKNOWN);
-      final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
-      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
-         public int compare(KeYJavaType o1, KeYJavaType o2) {
-            return o1.getFullName().compareTo(o2.getFullName());
+         monitor.done();
+         // sort classes alphabetically
+         SWTUtil.checkCanceled(monitor);
+         monitor.beginTask("Sorting types", IProgressMonitor.UNKNOWN);
+         final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+         Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+            public int compare(KeYJavaType o1, KeYJavaType o2) {
+               return o1.getFullName().compareTo(o2.getFullName());
+            }
+         });
+         monitor.done();
+         // List all contracts
+         SWTUtil.checkCanceled(monitor);
+         List<MonKeYProof> proofs = new LinkedList<MonKeYProof>();
+         monitor.beginTask("Analysing types", kjtsarr.length);
+         for (KeYJavaType type : kjtsarr) {
+             SWTUtil.checkCanceled(monitor);
+             ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
+             for (IObserverFunction target : targets) {
+                 ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
+                 for (Contract contract : contracts) {
+                     proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment.getUi(), environment.getInitConfig(), contract));
+                 }
+             }
+             monitor.worked(1);
          }
-      });
-      monitor.done();
-      // List all contracts
-      SWTUtil.checkCanceled(monitor);
-      List<MonKeYProof> proofs = new LinkedList<MonKeYProof>();
-      monitor.beginTask("Analysing types", kjtsarr.length);
-      for (KeYJavaType type : kjtsarr) {
-          SWTUtil.checkCanceled(monitor);
-          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
-          for (IObserverFunction target : targets) {
-              ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
-              for (Contract contract : contracts) {
-                  proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment, contract));
-              }
-          }
-          monitor.worked(1);
+         return proofs;
       }
-      return proofs;
+      finally {
+         if (environment != null) {
+            environment.dispose();
+         }
+      }
    }
    
    /**

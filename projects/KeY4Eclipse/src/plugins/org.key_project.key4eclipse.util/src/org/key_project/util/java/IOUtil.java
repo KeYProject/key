@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.java;
 
 import java.awt.image.BufferedImage;
@@ -51,6 +64,32 @@ public final class IOUtil {
    }
    
    /**
+    * Returns the file extension of the given {@link File} if available.
+    * @param file The file to extract it extension.
+    * @return The file extension or {@code null} if not available.
+    */
+   public static String getFileExtension(File file) {
+      if (file != null) {
+         String name = file.getName();
+         if (name != null) {
+            int dotIndex = name.lastIndexOf(".");
+            if (dotIndex >= 0) {
+               return name.substring(dotIndex + 1);
+            }
+            else {
+               return null;
+            }
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * Returns the file name without file extension for the given file name with extension.
     * @param file The file name with extension for that the file name without extension is needed.
     * @return The file name without extension or {@code null} if it was not possible to compute it.
@@ -84,6 +123,21 @@ public final class IOUtil {
            }
            file.delete();
        }
+   }
+
+   /**
+    * Reads the complete content from the {@link File}.
+    * @param file The {@link File} to read from.
+    * @return The read content or {@code null} if the {@link File} is {@code null} or not an existing file.
+    * @throws IOException Occurred Exception.
+    */
+   public static String readFrom(File file) throws IOException {
+      if (file != null && file.isFile()) {
+         return readFrom(new FileInputStream(file));
+      }
+      else {
+         return null;
+      }
    }
 
    /**
@@ -449,5 +503,59 @@ public final class IOUtil {
          throw new IOException("Can't create temp directory, reason is unknown.");
       }
       return tempFile;
+   }
+   
+   /**
+    * Searches recursive in the given {@link File} all {@link File}s accepted
+    * by the given {@link IFilter}.
+    * @param file The {@link File} to start search in.
+    * @param filter An optional {@link IFilter} used to accept files. Without a filter all {@link File}s are accepted.
+    * @return The accepted {@link File}s.
+    * @throws IOException Occurred Exception
+    */
+   public static List<File> search(File file, final IFilter<File> filter) throws IOException {
+      final List<File> result = new LinkedList<File>();
+      if (file != null) {
+         visit(file, new IFileVisitor() {
+            @Override
+            public void visit(File visitedFile) {
+               if (filter == null || filter.select(visitedFile)) {
+                  result.add(visitedFile);
+               }
+            }
+         });
+      }
+      return result;
+   }
+   
+   /**
+    * Visits recursive all files and folders.
+    * @param file The {@link File} to start in.
+    * @param visitor The {@link IFileVisitor} which does something with the visited files
+    * @throws IOException Occurred Exception
+    */
+   public static void visit(File file, IFileVisitor visitor) throws IOException {
+      if (file != null && visitor != null) {
+         visitor.visit(file);
+         File[] children = file.listFiles();
+         if (children != null) {
+            for (File child : children) {
+               visit(child, visitor);
+            }
+         }
+      }
+   }
+   
+   /**
+    * A visitor which does something with {@link File}s.
+    * @author Martin Hentschel
+    */
+   public static interface IFileVisitor {
+      /**
+       * Do something with the visited {@link File}.
+       * @param file The visited {@link File}.
+       * @throws IOException Occurred Exception
+       */
+      public void visit(File file) throws IOException;
    }
 }

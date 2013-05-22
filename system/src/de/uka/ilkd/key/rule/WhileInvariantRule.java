@@ -41,7 +41,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;

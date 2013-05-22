@@ -23,6 +23,7 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -34,17 +35,16 @@ import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -6398875364204732175L;
+    private static final long serialVersionUID = -7536362498647498639L;
+    private static final String LEMMAS = "Lemmas";
+    private static final String TACLET_BASE = "Taclet Base";
     protected Goal goal;
     protected MutableTreeNode builtInRoot 
     = new DefaultMutableTreeNode("Built-In");
     protected MutableTreeNode axiomTacletRoot 
-    = new DefaultMutableTreeNode("Taclet Base");
+    = new DefaultMutableTreeNode(TACLET_BASE);
     protected MutableTreeNode proveableTacletsRoot 
-    = new DefaultMutableTreeNode("Lemmas");
+    = new DefaultMutableTreeNode(LEMMAS);
     
     public RuleTreeModel(Goal g) {
         super(new DefaultMutableTreeNode("Rule Base"));
@@ -150,5 +150,29 @@ public class RuleTreeModel extends DefaultTreeModel {
     
     public Goal getGoal() {
         return goal;
+    }
+    
+    public void updateTacletCount() {
+        axiomTacletRoot.setUserObject(TACLET_BASE+" ("+getAxiomTacletCount()+")");
+        proveableTacletsRoot.setUserObject(LEMMAS+" ("+getLemmaTacletCount()+")");
+    }
+    
+    public int getAxiomTacletCount(){
+        return getChildCount(axiomTacletRoot);
+    }
+    
+    public int getLemmaTacletCount(){
+        return getChildCount(proveableTacletsRoot);
+    }
+
+    private static int getChildCount(MutableTreeNode root) {
+        int res = 0;
+        for (int i= 0; i < root.getChildCount(); i++) {
+            final TreeNode child = root.getChildAt(i);
+            // there is no deeper nesting
+            final int grandchildren = child.getChildCount();
+            res += grandchildren==0? 1: grandchildren;
+        }
+        return res;
     }
 }

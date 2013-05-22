@@ -1,130 +1,168 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
-//TODO: Discuss settings and improve the code layout.
 /**
- * Strategy tailored to VBT aimed symbolic execution.
+ * {@link Strategy} to use for symbolic execution.
  */
-public class SymbolicExecutionStrategy extends VBTStrategy {
-    public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean splittingRulesAllowed, 
-                                                                            boolean quantifierInstantiationWithSplitting,
-                                                                            boolean methodTreatmentContract,
-                                                                            boolean loopTreatmentInvariant) {
-        final StrategyProperties res = new StrategyProperties();
-        res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-              loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
-        res.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                StrategyProperties.BLOCK_EXPAND);
-        res.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
-        res.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                StrategyProperties.QUERY_OFF);
-        res.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        res.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-              StrategyProperties.AUTO_INDUCTION_OFF);
-        res.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-              StrategyProperties.DEP_OFF);
-        res.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
-              StrategyProperties.QUERYAXIOM_OFF);
-        res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-              StrategyProperties.SPLITTING_DELAYED);
+public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
+   /**
+    * The {@link Name} of the symbolic execution {@link Strategy}.
+    */
+   public static final Name name = new Name("Symbolic Execution Strategy");
 
-        if (quantifierInstantiationWithSplitting) {
-            res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                    StrategyProperties.QUANTIFIERS_INSTANTIATE);
-        } else {
-            res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                    StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        }
+   /**
+    * Key used in {@link StrategyProperties} to configure alias checks.
+    */
+   public static final String ALIAS_CHECK_OPTIONS_KEY = "ALIAS_CHECK_OPTIONS_KEY";
+   
+   /**
+    * Value of key {@link #ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to disable alias checks.
+    */
+   public static final String ALIAS_CHECK_NEVER = "ALIAS_CHECK_NEVER";
+   
+   /**
+    * Value of key {@link #ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to enable immediately alias checks.
+    */
+   public static final String ALIAS_CHECK_IMMEDIATELY = "ALIAS_CHECK_IMMEDIATELY";
+   
+   /**
+    * Constructor.
+    * @param proof The proof.
+    * @param sp The {@link StrategyProperties} to use.
+    */
+   private SymbolicExecutionStrategy(Proof proof, StrategyProperties sp) {
+      super(proof, sp);
+      // Update cost dispatcher
+      RuleSetDispatchFeature costRsd = getCostComputationDispatcher();
 
-        return res;
-    }
+      clearRuleSetBindings (costRsd, "simplify_prog" );
+      bindRuleSet (costRsd, "simplify_prog",10000);
+      
+      clearRuleSetBindings (costRsd, "simplify_prog_subset" );
+      bindRuleSet (costRsd, "simplify_prog_subset",10000);
+      
+      Feature splitF = ScaleFeature.createScaled(CountBranchFeature.INSTANCE, -400);
+      bindRuleSet(costRsd, "split_if", splitF); // The costs of rules in heuristic "split_if" is reduced at runtime by numberOfBranches * -400. The result is that rules of "split_if" preferred to "split_cond" and run and step into has the same behavior
+      bindRuleSet(costRsd, "instanceof_to_exists", inftyConst());
+      
+      // Update instantiation dispatcher
+      if (ALIAS_CHECK_IMMEDIATELY.equals(sp.get(ALIAS_CHECK_OPTIONS_KEY))) {
+         // Make sure that an immediately alias check is performed by doing cuts of objects to find out if they can be the same or not
+         RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
+         enableInstantiate();
+         final TermBuffer buffer = new TermBuffer();
+         Feature originalCut = instRsd.get(getHeuristic("cut"));
+         Feature newCut = forEach(buffer, new CutHeapObjectsTermGenerator(), add(instantiate ("cutFormula", buffer), longConst(-10000)));
+         if (originalCut instanceof OneOfCP) {
+            clearRuleSetBindings (instRsd, "cut" );
+            bindRuleSet (instRsd, "cut", oneOf(originalCut, newCut));
+         }
+         else {
+            bindRuleSet (instRsd, "cut", newCut);
+         }
+         disableInstantiate();
+      }
+      // TODO: For delayed similar to sequentContainsNoPrograms()
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected Feature setupApprovalF(Proof p_proof) {
+      Feature result = super.setupApprovalF(p_proof);
+      // Make sure that cuts are only applied if the cut term is not already part of the sequent. This check is performed exactly before the rule is applied because the sequent might has changed in the time after the schema variable instantiation was instantiated.
+      SetRuleFilter depFilter = new SetRuleFilter();
+      depFilter.addRuleToSet(p_proof.env().getInitConfig().lookupActiveTaclet(new Name("cut")));
+      result = add(result, ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
+      return result;
+   }
 
-    protected SymbolicExecutionStrategy(Proof p_proof, StrategyProperties props) { // ,List<WatchPoint> watchpoints
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Name name() {
+      return name;
+   }
+   
+   /**
+    * Returns the default {@link StrategyProperties} of symbolic execution. 
+    * @param splittingRulesAllowed Allow splitting rules?
+    * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
+    * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
+    * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+    * @param aliasChecks Do alias checks?
+    * @return The default {@link StrategyProperties} for symbolic execution.
+    */
+   public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean splittingRulesAllowed,
+                                                                           boolean quantifierInstantiationWithSplitting,
+                                                                           boolean methodTreatmentContract, 
+                                                                           boolean loopTreatmentInvariant,
+                                                                           boolean aliasChecks) {
+      StrategyProperties sp = new StrategyProperties();
+      sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
+      sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
+      sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+      sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+      sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
+      sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
+      sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
+      sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+      sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+      sp.setProperty(ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
+      return sp;
+   }
 
-        super(p_proof, props, 0);
+   /**
+    * The {@link StrategyFactory} to create instances of {@link SymbolicExecutionStrategy}.
+    * @author Martin Hentschel
+    */
+   public static class Factory extends StrategyFactory {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Strategy create(Proof proof, StrategyProperties sp) {
+         return new SymbolicExecutionStrategy(proof, sp);
+      }
 
-//        final boolean isSplittingAllowed = props.get(
-//                VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(
-//                VISUAL_DEBUGGER_TRUE);
-//
-//        final boolean inUpdateAndAssumes = props.get(
-//                VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY).equals(
-//                VISUAL_DEBUGGER_TRUE);
-//
-//        final boolean inInitPhase = props
-//                .get(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY).equals(
-//                        VISUAL_DEBUGGER_TRUE);
-        
-        RuleSetDispatchFeature d = getCostComputationDispatcher();
-
-//        bindRuleSet(d, "simplify_autoname", ifZero(BreakpointFeature.create(),
-//                inftyConst(), longConst(0)));
-//        bindRuleSet(d, "method_expand", ifZero(BreakpointFeature.create(),
-//                inftyConst(), longConst(0)));
-//        if (!inInitPhase) {
-//            bindRuleSet(d, "simplify_autoname", ifZero(WatchPointFeature.create(watchpoints),
-//                    inftyConst(), longConst(0)));
-//        }
-//        if (!inInitPhase) {
-//            bindRuleSet(d, "method_expand", ifZero(WatchPointFeature.create(watchpoints),
-//                    inftyConst(), longConst(0)));
-       
-//        }
-        
-        final Feature splitF = ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, -400);
-        bindRuleSet(d, "split_if", splitF); // The costs of rules in heuristic "split_if" is reduced at runtime by numberOfBranches * -400. The result is that rules of "split_if" preferred to "split_cond" and run and step into has the same behavior
-        bindRuleSet(d, "instanceof_to_exists", inftyConst());
-
-//        bindRuleSet(d, "split_cond", ifZero(LabelFeature.INSTANCE,
-//                longConst(-3000), longConst(0)));
-
-//        bindRuleSet(d, "beta", ifZero(LabelFeature.INSTANCE, longConst(-3000),
-//                longConst(0)));
-
-//        final NamespaceSet nss = p_proof.getNamespaces();
-
-//        assert nss != null : "Rule set namespace not available.";
-
-//        // FIXME: do not add it for each rule set add it as sum feature
-//
-//        final ImmutableList<Named> h = nss.ruleSets().allElements();
-//
-//        final Feature inUpdateFeature = InUpdateFeature.create(
-//                isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
-//
-//        for (Named aH : h) {
-//            final String ruleSetName = aH.name().toString();
-//            bindRuleSet(d, ruleSetName, ifZero(inUpdateFeature, inftyConst(),
-//                    longConst(0)));
-//        }
-    }
-
-    public Name name() {
-        return new Name("DebuggerStrategy");
-    }
-
-    public static class Factory extends StrategyFactory {
-
-        public Factory() {
-        }
-
-        public Strategy create(Proof p_proof, StrategyProperties strategyProperties) {
-            return new SymbolicExecutionStrategy(p_proof, strategyProperties);
-        }
-
-        public Name name() {
-            return new Name("DebuggerStrategy");
-        }
-    }
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Name name() {
+         return name;
+      }
+   }
 }

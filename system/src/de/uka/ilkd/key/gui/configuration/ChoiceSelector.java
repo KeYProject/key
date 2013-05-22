@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.Set;
 
@@ -255,10 +256,13 @@ public class ChoiceSelector extends JDialog {
                     throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
                 }
                 explanationMap.loadFromXML(is);
-            } catch (IOException e) {
-                System.err.println("Cannot not load help messages in rule view");
+            } catch (InvalidPropertiesFormatException e) {
+                System.err.println("Cannot load help message in rule view (malformed XML).");
                 e.printStackTrace();
-            }
+            } catch (IOException e) {
+                System.err.println("Cannot load help messages in rule view.");
+                e.printStackTrace();
+            } 
         }
         
         String result = explanationMap.getProperty(category);

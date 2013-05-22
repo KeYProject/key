@@ -130,15 +130,15 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          // Get editor and test initial proof
          SWTBot editorBot = editor.bot();
          KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
-         assertFalse(keyEditor.getProof().closed());
+         assertFalse(keyEditor.getCurrentProof().closed());
          // Make sure that start stop auto mode buttons are as expected
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          // Start auto mode if required
          if (numOfRulesToApplyAutomatically >= 1) {
-            StrategySettings ss = keyEditor.getProof().getSettings().getStrategySettings();
+            StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
             ss.setMaxSteps(numOfRulesToApplyAutomatically);
-            keyEditor.getKeYEnvironment().getUi().startAndWaitForAutoMode(keyEditor.getProof());
+            keyEditor.getEnvironment().getUi().startAndWaitForAutoMode(keyEditor.getCurrentProof());
          }
          // Get node to apply rule on
          Node node = keyEditor.getShowNode();
@@ -149,7 +149,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          TestUtilsUtil.setCursorLocation(styledText, x, y);
          TestUtilsUtil.clickContextMenu(styledText, x, y, ruleNameToApply);
          // Make sure that correct rule was applied
-         assertEquals(expectedProofClosed, keyEditor.getProof().closed());
+         assertEquals(expectedProofClosed, keyEditor.getCurrentProof().closed());
          assertEquals(1, node.childrenCount());
          assertEquals(ruleNameToApply, MiscTools.getRuleDisplayName(node));
          assertEquals(expectedProofClosed, node.isClosed());

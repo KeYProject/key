@@ -1,22 +1,26 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.datasource.key.test.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.awt.Component;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,6 +65,9 @@ import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.model.KeyDriver;
+import de.hentschel.visualdbc.datasource.key.model.KeyProof;
+import de.hentschel.visualdbc.datasource.key.model.event.IKeYConnectionListener;
+import de.hentschel.visualdbc.datasource.key.model.event.KeYConnectionEvent;
 import de.hentschel.visualdbc.datasource.key.test.Activator;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
@@ -159,7 +166,7 @@ public final class TestKeyUtil {
     * @return The opened {@link IDSConnection}.
     * @throws DSException Occurred Exception
     */
-   public static IDSConnection createKeyConnection(File location) throws DSException {
+   public static KeyConnection createKeyConnection(File location) throws DSException {
       return createKeyConnection(location, null, null);
    }
    
@@ -168,7 +175,7 @@ public final class TestKeyUtil {
     * @return The opened {@link IDSConnection}.
     * @throws DSException Occurred Exception
     */
-   public static IDSConnection createKeyConnection(boolean interactive, 
+   public static KeyConnection createKeyConnection(boolean interactive, 
                                                    File location) throws DSException {
       return createKeyConnection(interactive, location, null, null);
    }
@@ -178,7 +185,7 @@ public final class TestKeyUtil {
     * @return The opened {@link IDSConnection}.
     * @throws DSException Occurred Exception
     */
-   public static IDSConnection createKeyConnection(File location,
+   public static KeyConnection createKeyConnection(File location,
                                                    DSPackageManagement packageManagement,
                                                    ConnectionLogger logger) throws DSException {
       return createKeyConnection(false, location, packageManagement, logger);
@@ -189,7 +196,7 @@ public final class TestKeyUtil {
     * @return The opened {@link IDSConnection}.
     * @throws DSException Occurred Exception
     */
-   public static IDSConnection createKeyConnection(boolean interactive,
+   public static KeyConnection createKeyConnection(boolean interactive,
                                                    File location,
                                                    DSPackageManagement packageManagement,
                                                    ConnectionLogger logger) throws DSException {
@@ -208,7 +215,7 @@ public final class TestKeyUtil {
     * @return The opened {@link IDSConnection}.
     * @throws DSException Occurred Exception
     */
-   public static IDSConnection createKeyConnection(Map<String, Object> settings,
+   public static KeyConnection createKeyConnection(Map<String, Object> settings,
                                                    ConnectionLogger logger) throws DSException {
       return createKeyConnection(false, settings, logger);
    }
@@ -218,7 +225,7 @@ public final class TestKeyUtil {
     * @return The opened {@link IDSConnection}.
     * @throws DSException Occurred Exception
     */
-   public static IDSConnection createKeyConnection(boolean interactive,
+   public static KeyConnection createKeyConnection(boolean interactive,
                                                    Map<String, Object> settings,
                                                    ConnectionLogger logger) throws DSException {
       // Get driver
@@ -259,7 +266,8 @@ public final class TestKeyUtil {
       }
       TestCase.assertFalse(expectedIter.hasNext());
       TestCase.assertFalse(currentIter.hasNext());
-      return connection;
+      TestCase.assertTrue(connection instanceof KeyConnection);
+      return (KeyConnection)connection;
    }
    
    /**
@@ -480,7 +488,7 @@ public final class TestKeyUtil {
                                                                "balance >= 0 & self.<inv>", 
                                                                "self.balance = balance\n" +
                                                                "&   self.transactionId\n" +
-                                                               "  = int::select(heapAtPre, null, transactionCounter)\n" +
+                                                               "  = heapAtPre[" + logRecordFullqualifiedName + ".transactionCounter]\n" +
                                                                "& self.<inv>\n" +
                                                                "& exc = null", 
                                                                "mod[heap]:           {(self, empty)} \\cup {(self, balance)}\n" +
@@ -571,9 +579,7 @@ public final class TestKeyUtil {
                                                                "& (amount >  0 & self.<inv>)", 
                                                                "!result = TRUE\n" +
                                                                "& (    self.unsuccessfulOperations\n" +
-                                                               "     = javaAddInt(int::select(heapAtPre,\n" +
-                                                               "                              self,\n" +
-                                                               "                              unsuccessfulOperations),\n" +
+                                                               "     = javaAddInt(heapAtPre[self.unsuccessfulOperations],\n" +
                                                                "                  1)\n" +
                                                                "   & self.<inv>)\n" +
                                                                "& exc = null", 
@@ -586,8 +592,7 @@ public final class TestKeyUtil {
                                                                "& (amount >  0 & self.<inv>)", 
                                                                "result = TRUE\n" +
                                                                "& (    self.balance\n" +
-                                                               "     = javaAddInt(amount,\n" +
-                                                               "                  int::select(heapAtPre, self, balance))\n" +
+                                                               "     = javaAddInt(amount, heapAtPre[self.balance])\n" +
                                                                "   & self.<inv>)\n" +
                                                                "& exc = null", 
                                                                "mod[heap]: {(self, balance)}", 
@@ -601,7 +606,7 @@ public final class TestKeyUtil {
       addOperationObligations(chargeAndRecord, true, true, true);
       MemoryOperationContract car = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "chargeAndRecord(int)", operationContractIDs[4], "normal_behavior"), 
                                                                 "amount >  0 & self.<inv>", 
-                                                                "self.balance >= int::select(heapAtPre, self, balance)\n" +
+                                                                "self.balance >= heapAtPre[self.balance]\n" +
                                                                 "& self.<inv>\n" +
                                                                 "& exc = null", 
                                                                 "mod[heap]: allLocs \\setMinus freshLocs(heap)", 
@@ -659,15 +664,10 @@ public final class TestKeyUtil {
       addOperationObligations(addRecord, true, true, true);
       MemoryOperationContract ar1 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedLogFileClass, qualifiedLogFileClass, "addRecord(int)", operationContractIds[0], "normal_behavior"),
                                                                 "balance >= 0 & self.<inv>", 
-                                                                "\\if (!  javaAddInt(int::select(heapAtPre,\n" +
-                                                                "                                 self,\n" +
-                                                                "                                 currentRecord),\n" +
-                                                                "                     1)\n" +
+                                                                "\\if (!  javaAddInt(heapAtPre[self.currentRecord], 1)\n" +
                                                                 "        = " + qualifiedLogFileClass + ".logFileSize)\n" +
                                                                 "      \\then (  self.currentRecord\n" +
-                                                                "             = javaAddInt(int::select(heapAtPre,\n" +
-                                                                "                                      self,\n" +
-                                                                "                                      currentRecord),\n" +
+                                                                "             = javaAddInt(heapAtPre[self.currentRecord],\n" +
                                                                 "                          1))\n" +
                                                                 "      \\else (self.currentRecord = 0)\n" +
                                                                 "& (    self.logArray[self.currentRecord].balance\n" +
@@ -1717,9 +1717,10 @@ public final class TestKeyUtil {
                                     MethodTreatment methodTreatment,
                                     IDSProvableReferenceSelector expectedReferenceSelector,
                                     boolean withInitialReferences) {
-      IDSConnection connection = null;
+      KeyConnection connection = null;
       ConnectionLogger logger = new ConnectionLogger();
       long originalTimeout = SWTBotPreferences.TIMEOUT;
+      LoggingKeYConnectionListener listener = new LoggingKeYConnectionListener();
       try {
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 2;
          // Create project and fill it with test data
@@ -1738,10 +1739,13 @@ public final class TestKeyUtil {
          TestCase.assertNotNull(selector);
          IDSProvable provable = selector.getProvable(connection);
          // Open interactive proof
+         TestCase.assertFalse(connection.hasKeYConnectionListener(listener));
+         connection.addKeYConnectionListener(listener);
+         TestCase.assertTrue(connection.hasKeYConnectionListener(listener));
          TestCase.assertFalse(provable.hasInteractiveProof(proofObligation));
-         Thread thread = openInteractiveProof(provable, proofObligation);
-         waitForThread(thread);
+         KeyProof proof = openInteractiveProof(provable, proofObligation);
          TestCase.assertTrue(provable.hasInteractiveProof(proofObligation));
+         listener.assertInteractiveProofStartedEvents(new KeYConnectionEvent(connection, proof));
          // Test initial references
          compareInitialProofReferences(provable, proofObligation, withInitialReferences);
          // Make sure that proof was opened
@@ -1773,16 +1777,16 @@ public final class TestKeyUtil {
          TestCase.assertEquals(0, tree.getModel().getChildCount(tree.getModel().getRoot()));
          // Open interactive proof
          TestCase.assertFalse(provable.hasInteractiveProof(proofObligation));
-         thread = openInteractiveProof(provable, proofObligation);
-         waitForThread(thread);
+         proof = openInteractiveProof(provable, proofObligation);
          TestCase.assertTrue(provable.hasInteractiveProof(proofObligation));
+         listener.assertInteractiveProofStartedEvents(new KeYConnectionEvent(connection, proof));
          // Test initial references
          compareInitialProofReferences(provable, proofObligation, withInitialReferences);
          // Make sure that proof was opened
          frame.bot().waitUntil(Conditions.hasSelection(tree));
          checkSelectedProofOnSingleProofModel(tree, expectedProofName);
          // Finish proof automatically
-         IDSProof proof = provable.getInteractiveProof(proofObligation);
+         proof = (KeyProof)provable.getInteractiveProof(proofObligation);
          TestCase.assertNotNull(proof);
          if (automaticCloseable) {
             TestCase.assertEquals(0, proof.getProofListeners().length);
@@ -1841,6 +1845,11 @@ public final class TestKeyUtil {
       finally {
          SWTBotPreferences.TIMEOUT = originalTimeout;
          try {
+            if (connection != null) {
+               TestCase.assertTrue(connection.hasKeYConnectionListener(listener));
+               connection.removeKeYConnectionListener(listener);
+               TestCase.assertFalse(connection.hasKeYConnectionListener(listener));
+            }
             if (connection != null && connection.isConnected()) {
                TestGenerationUtil.closeConnection(connection);
                TestDataSourceUtil.compareConnectionEvents(connection, logger, false, false, true);
@@ -1852,6 +1861,26 @@ public final class TestKeyUtil {
             e.printStackTrace();
             fail(e.getMessage());
          }
+      }
+   }
+   
+   private static class LoggingKeYConnectionListener implements IKeYConnectionListener {
+      private List<KeYConnectionEvent> interactiveProofStartedEvents = new LinkedList<KeYConnectionEvent>();
+
+      @Override
+      public void interactiveProofStarted(KeYConnectionEvent e) {
+         interactiveProofStartedEvents.add(e);
+      }
+      
+      public void assertInteractiveProofStartedEvents(KeYConnectionEvent... events) {
+         assertEquals(interactiveProofStartedEvents.size(), events.length);
+         int i = 0;
+         for (KeYConnectionEvent current : interactiveProofStartedEvents) {
+            assertEquals(current.getProof(), events[i].getProof());
+            assertEquals(current.getSource(), events[i].getSource());
+            i++;
+         }
+         interactiveProofStartedEvents.clear();
       }
    }
    
@@ -2011,19 +2040,65 @@ public final class TestKeyUtil {
     * @param provable The {@link IDSProvable} to execute on.
     * @param obligation The proof obligation to use.
     */
-   public static Thread openInteractiveProof(final IDSProvable provable, final String obligation) {
-      Thread thread = new Thread() {
-         @Override
-         public void run() {
-            try {
-               provable.openInteractiveProof(obligation);
-            }
-            catch (Exception e) {
-               e.printStackTrace();
-            }
-         }
-      };
+   public static KeyProof openInteractiveProof(IDSProvable provable, String obligation) {
+      OpenInteractiveProofThread thread = new OpenInteractiveProofThread(provable, obligation);
       thread.start();
-      return thread;
+      waitForThread(thread);
+      IDSProof result = thread.getOpenedProof();
+      TestCase.assertTrue(result instanceof KeyProof);
+      return (KeyProof)result;
+   }
+   
+   /**
+    * Utility {@link Thread} used by {@link TestKeyUtil#openInteractiveProof(IDSProvable, String)}
+    * to instantiate an interactive proof.
+    * @author Martin Hentschel
+    */
+   private static class OpenInteractiveProofThread extends Thread {
+      /**
+       * The target provable.
+       */
+      private IDSProvable provable;
+      
+      /**
+       * The proof obligation.
+       */
+      private String obligation;
+      
+      /**
+       * The opened {@link IDSProof}.
+       */
+      private IDSProof openedProof;
+      
+      /**
+       * Constructor.
+       * @param provable The target provable.
+       * @param obligation The proof obligation.
+       */
+      public OpenInteractiveProofThread(IDSProvable provable, String obligation) {
+         this.provable = provable;
+         this.obligation = obligation;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void run() {
+         try {
+            openedProof = provable.openInteractiveProof(obligation);
+         }
+         catch (Exception e) {
+            e.printStackTrace();
+         }
+      }
+
+      /**
+       * Returns the oepend {@link IDSProof}.
+       * @return The opened {@link IDSProof}.
+       */
+      public IDSProof getOpenedProof() {
+         return openedProof;
+      }
    }
 }

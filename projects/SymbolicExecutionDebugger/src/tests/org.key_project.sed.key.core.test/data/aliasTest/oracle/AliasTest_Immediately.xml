@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_710e7e66-48a2-4d37-a2f9-f0f8ef767055" name="main(AliasTest.IntWrapper, AliasTest.IntWrapper)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_098698bd-0e0c-4f87-8d92-d367b38b511e" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_62b1a6f8-fee2-409f-9457-f70cc7263815" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="217" charEnd="221">
+            <sedStatement xml:id="_8a22cf9e-8ae5-4a4e-ad5f-62a62b3775bb" name="a.value=2;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="267">
+               <sedBranchCondition xml:id="_189059bd-e0af-4d7b-942f-2f1c64186978" name="!a = null" pathCondition="!a = null">
+                  <sedStatement xml:id="_6263f94a-2b9e-42c1-9d60-d6a62e189d68" name="b.value=3;" pathCondition="!a = null" lineNumber="-1" charStart="271" charEnd="283">
+                     <sedBranchCondition xml:id="_5a6e06ed-3826-4cd3-a169-d5daedc77e91" name="!b = null" pathCondition="!a = null &amp; !b = null">
+                        <sedBranchCondition xml:id="_f118ef4f-592a-4896-9a83-0b2dc1277f8b" name="!b = a" pathCondition="!a = null &amp; !b = null &amp; !b = a">
+                           <sedStatement xml:id="_7a56ba8c-9e0d-459b-b0d7-75230ba761b1" name="return a.value+b.value;" pathCondition="!a = null &amp; !b = null &amp; !b = a" lineNumber="-1" charStart="287" charEnd="312">
+                              <sedMethodReturn xml:id="_d6372f23-ab78-4033-ac63-ca7d6f62e6fc" name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = null &amp; !b = null &amp; !b = a" lineNumber="-1" charStart="217" charEnd="221">
+                                 <sedTermination xml:id="_f4ab9f42-2fcc-47ef-872f-3a3f2dc09ec9" name="&lt;end&gt;" pathCondition="!a = null &amp; !b = null &amp; !b = a">
+                                 </sedTermination>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_ae4d16ca-002f-48ef-9b33-816774c86c8a" name="b = a" pathCondition="!a = null &amp; b = a">
+                           <sedStatement xml:id="_99836431-9c39-45ad-9ee6-3f18a6b3594c" name="return a.value+b.value;" pathCondition="!a = null &amp; b = a" lineNumber="-1" charStart="287" charEnd="312">
+                              <sedMethodReturn xml:id="_87c66e63-781c-454f-b4ea-1895f80b0a7e" name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = null &amp; b = a" lineNumber="-1" charStart="217" charEnd="221">
+                                 <sedTermination xml:id="_da471554-fe87-4d66-806f-2fd853a3da84" name="&lt;end&gt;" pathCondition="!a = null &amp; b = a">
+                                 </sedTermination>
+                              </sedMethodReturn>
+                           </sedStatement>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_be3e302c-82e1-42f8-827c-929187af4134" name="b = null" pathCondition="!a = null &amp; b = null">
+                        <sedExceptionalTermination xml:id="_364d6cae-e1cb-4a72-afcb-4308e37db6d2" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!a = null &amp; b = null">
+                        </sedExceptionalTermination>
+                     </sedBranchCondition>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_cb23e959-9d6d-4381-842e-911b5b566ef0" name="a = null" pathCondition="a = null">
+                  <sedExceptionalTermination xml:id="_cf6a1d44-a6b0-4966-b92c-9d38ceb9b994" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="a = null">
+                  </sedExceptionalTermination>
+               </sedBranchCondition>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
