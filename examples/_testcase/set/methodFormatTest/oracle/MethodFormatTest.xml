@@ -24,7 +24,7 @@
                                                                   <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.b();&gt;" isReturnValueComputed="true">
                                                                      <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.a();&gt;" isReturnValueComputed="true">
                                                                         <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.main();&gt;" isReturnValueComputed="true">
-                                                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                                                            </termination>
                                                                         </methodReturn>
                                                                      </methodReturn>

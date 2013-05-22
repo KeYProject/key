@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 
 /**
@@ -44,9 +45,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
         final Term oldFocus = oldPio.subTerm ();
         if ( !newFocus.equals ( oldFocus ) ) return false;
         if ( newFocus.isRigid () ) return true;
-        final ImmutableList<Term> oldUpdateContext =
+        final ImmutableList<UpdateLabelPair> oldUpdateContext =
             oldApp.instantiations ().getUpdateContext ();
-        final ImmutableList<Term> newUpdateContext =
+        final ImmutableList<UpdateLabelPair> newUpdateContext =
             newApp.instantiations ().getUpdateContext ();
         return oldUpdateContext.equals ( newUpdateContext );
     }

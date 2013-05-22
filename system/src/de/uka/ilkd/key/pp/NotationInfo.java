@@ -21,6 +21,7 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;

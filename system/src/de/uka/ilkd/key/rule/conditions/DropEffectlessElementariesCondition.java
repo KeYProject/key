@@ -79,7 +79,7 @@ public final class DropEffectlessElementariesCondition
 	    Term sub0 = update.sub(0);
 	    Term sub1 = update.sub(1);
 	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars);
-	    return newSub1 == null ? null : TB.apply(sub0, newSub1);
+	    return newSub1 == null ? null : TB.apply(sub0, newSub1, null);
 	} else {
 	    return null;
 	}
@@ -97,7 +97,7 @@ public final class DropEffectlessElementariesCondition
 							         varsInTarget); 
 	return simplifiedUpdate == null 
 	       ? null 
-	       : TB.apply(simplifiedUpdate, target); 
+	       : TB.apply(simplifiedUpdate, target, null); 
     }
     
     
