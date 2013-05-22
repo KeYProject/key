@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import java.util.Iterator;
 
 
 /**
@@ -155,32 +156,59 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
                                                    ProofObligationVars appData,
                                                    Services services) {
+        // generate a new schema variable for any pre variable
         Term selfAtPreSV =
                 createTermSV(appData.pre.self, schemaPrefix, services);
-        Term selfAtPostSV =
-                createTermSV(appData.post.self, schemaPrefix, services);
         ImmutableList<Term> localVarsAtPreSVs =
                 createTermSV(appData.pre.localVars, schemaPrefix, services);
         Term guardAtPreSV =
                 createTermSV(appData.pre.guard, schemaPrefix, services);
-        ImmutableList<Term> localVarsAtPostSVs =
-                createTermSV(appData.post.localVars, schemaPrefix, services);
-        Term guardAtPostSV =
-                createTermSV(appData.post.guard, schemaPrefix, services);
         Term resAtPreSV =
                 createTermSV(appData.pre.result, schemaPrefix, services);
-        Term resAtPostSV =
-                createTermSV(appData.post.result, schemaPrefix, services);
         Term excAtPreSV =
                 createTermSV(appData.pre.exception, schemaPrefix, services);
-        Term excAtPostSV =
-                createTermSV(appData.post.exception, schemaPrefix, services);
         Term heapAtPreSV =
                 createTermSV(appData.pre.heap, schemaPrefix, services);
-        Term heapAtPostSV =
-                createTermSV(appData.post.heap, schemaPrefix, services);
         Term mbyAtPreSV =
                 createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
+
+        // generate a new schema variable only for those post variables
+        // which do not equal the corresponding pre variable; else use
+        // the pre schema variable
+        Term selfAtPostSV = (appData.pre.self == appData.post.self ?
+                selfAtPreSV :
+                createTermSV(appData.post.self, schemaPrefix, services));
+
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
+        Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
+        for (Term appDataPostLocalVar : appData.post.localVars) {
+            Term appDataPreLocalVar = appDataPreLocalVarsIt.next();
+            Term localPreVar = schemaLocalVarsAtPreIt.next();
+            if (appDataPostLocalVar == appDataPreLocalVar) {
+                localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
+            } else {
+                localVarsAtPostSVs =
+                        localVarsAtPostSVs.append(createTermSV(appDataPostLocalVar,
+                                                               schemaPrefix,
+                                                               services));
+            }
+        }
+        
+        Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
+                guardAtPreSV :
+                createTermSV(appData.post.guard, schemaPrefix, services));
+        Term resAtPostSV = (appData.pre.result == appData.post.result ?
+                resAtPreSV :
+                createTermSV(appData.post.result, schemaPrefix, services));
+        Term excAtPostSV = (appData.pre.exception == appData.post.exception ?
+                excAtPreSV :
+                createTermSV(appData.post.exception, schemaPrefix, services));
+        Term heapAtPostSV = (appData.pre.heap == appData.post.heap ?
+                heapAtPreSV :
+                createTermSV(appData.post.heap, schemaPrefix, services));
+
+        // build state vararibale container for pre and post state
         StateVars pre =
                 new StateVars(selfAtPreSV, guardAtPreSV,
                                         localVarsAtPreSVs, resAtPreSV,
@@ -191,6 +219,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                         localVarsAtPostSVs, resAtPostSV,
                                         excAtPostSV, heapAtPostSV,
                                         null, services);
+
+        // return proof obligation schema variables
         return new ProofObligationVars(pre, post);
     }
 
