@@ -27,7 +27,7 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -99,8 +99,7 @@ public class KeYTabComposite extends Composite {
       if (node != null) {
          Node keyNode = node.getExecutionNode().getProofNode();
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
-         sequent = NonGoalInfoView.computeText(node.getExecutionNode().getMediator(), 
-                                               keyNode);
+         sequent = InnerNodeView.getTacletDescription(node.getExecutionNode().getMediator(), keyNode, null);
       }
       SWTUtil.setText(nodeText, name);
       SWTUtil.setText(sequentText, sequent);

@@ -264,8 +264,12 @@ public class Proof implements Named {
      */
     public void dispose() {
         // Do required cleanup
-        services.getSpecificationRepository().removeProof(this);
-        localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
+        if (services != null) {
+           services.getSpecificationRepository().removeProof(this);
+        }
+        if (localMgt != null) {
+           localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
+        }
         // remove setting listener from settings
         setSettings(null);
         // set every reference (except the name) to null

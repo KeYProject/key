@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -64,7 +63,7 @@ class TacletMenu extends JMenu {
      */
     private static final long serialVersionUID = -4659105575090816693L;
     private PosInSequent pos;
-    private SequentView sequentView;
+    private CurrentGoalView sequentView;
     private KeYMediator mediator;
     private static final Set<Name> CLUTTER_RULESETS = new HashSet<Name>();
 
@@ -107,13 +106,13 @@ class TacletMenu extends JMenu {
      * @param builtInList IList<BuiltInRule> with all applicable BuiltInRules
      * @param pos the PosInSequent
      */ 
-    TacletMenu(SequentView sequentView,
+    TacletMenu(CurrentGoalView sequentView,
 	       ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
 	       ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
 	       PosInSequent pos) {
         super();        
 	this.sequentView = sequentView;
-	this.mediator = sequentView.mediator();
+	this.mediator = sequentView.getMediator();
  	this.pos = pos;
  	findList = removeObsolete(findList);
     rewriteList = removeObsolete(rewriteList);
@@ -467,7 +466,7 @@ class TacletMenu extends JMenu {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() instanceof TacletMenuItem) {
-		((SequentView)(getPopupMenu().getInvoker()))
+		((CurrentGoalView)(getPopupMenu().getInvoker()))
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             }else if(e.getSource() instanceof SMTMenuItem){

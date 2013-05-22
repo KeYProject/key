@@ -103,6 +103,9 @@ public class KeYMediator {
 	
 	defaultExceptionHandler = new KeYRecoderExcHandler();
 
+	// There may be other interruption listeners, but the interaction
+	// engine listens by default.
+	addInterruptedListener(interactiveProver);
 	
 	// moved from layout main here; but does not actually belong here at all;
 	// we should get that rule to behave like a normal built-in rule
@@ -566,6 +569,14 @@ public class KeYMediator {
     public void removeAutoModeListener(AutoModeListener listener) {  
 	interactiveProver.removeAutoModeListener(listener);
     }
+    
+    public void addInterruptedListener(InterruptListener listener) {
+        listenerList.add(InterruptListener.class, listener);
+    }
+    
+    public void removeInterruptedListener(InterruptListener listener) {
+        listenerList.remove(InterruptListener.class, listener);
+    }
 
     /** sets the current goal 
      * @param goal the Goal being displayed in the view of the sequent
@@ -689,7 +700,10 @@ public class KeYMediator {
      * Stop automatic application of rules.
      */
     public void stopAutoMode() {
-        interactiveProver.stopAutoMode();
+        for (InterruptListener listener :
+               listenerList.getListeners(InterruptListener.class)) {
+            listener.interruptionPerformed();
+        }
     }
     
     public void setResumeAutoMode(boolean b) {
@@ -848,7 +862,10 @@ public class KeYMediator {
 	}	
     }
     
-    public void enableWhenProof(final Action a) {
+    /*
+     * Disable certain actions until a proof is loaded.
+     */
+    public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             public void selectedNodeChanged(KeYSelectionEvent e) {}
@@ -908,13 +925,13 @@ public class KeYMediator {
 
     
     
-    /** 
-     * returns the prover task listener of the main frame
-     */
-    // TODO used 1 time, drop it? (MU)
-    public ProverTaskListener getProverTaskListener() {
-        return ui;
-    }
+//    /** 
+//     * returns the prover task listener of the main frame
+//     */
+//    // TODO used 1 time, drop it? (MU)
+//    public ProverTaskListener getProverTaskListener() {
+//        return ui;
+//    }
 
     public boolean processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {

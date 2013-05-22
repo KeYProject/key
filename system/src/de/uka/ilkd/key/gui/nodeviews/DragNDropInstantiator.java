@@ -36,7 +36,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -85,10 +84,10 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 public class DragNDropInstantiator extends DropTargetAdapter {
 
     /** the sequentview where dnd has been initiated */
-    private SequentView seqView;
+    private CurrentGoalView seqView;
     
     
-    DragNDropInstantiator(SequentView seqView) {
+    DragNDropInstantiator(CurrentGoalView seqView) {
         this.seqView = seqView;
     }
 
@@ -129,6 +128,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         seqView.requestFocus();
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {       
         seqView.autoscroll(dtde.getLocation());                                          
         seqView.paintHighlights(dtde.getLocation());
@@ -155,7 +155,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             return;
         }
              
-        final Services services = seqView.mediator().getServices();
+        final Services services = seqView.getMediator().getServices();
 
         ImmutableList<PosTacletApp> applicableApps = 
             getAllApplicableApps(sourcePos, targetPos, services);        
@@ -182,7 +182,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         } else if (applicableApps.size() >= 1) {
             // open a pop up menu for user selection
             SimpleTacletSelectionMenu menu = new SimpleTacletSelectionMenu(
-                    applicableApps, seqView.mediator().getNotationInfo(),
+                    applicableApps, seqView.getMediator().getNotationInfo(),
                     new PopupListener());
 
             JPopupMenu pm = menu.getPopupMenu();
@@ -207,7 +207,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             					    final PosInSequent targetPos, 
             					    final Services services) {        
         final Sequent sequent = 
-            seqView.mediator().getSelectedGoal().sequent();
+            seqView.getMediator().getSelectedGoal().sequent();
         
  
         ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
@@ -338,7 +338,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         // if in replaceWithMode only apps that contain at least one replacewith
         // are collected. Otherwise only those without a replacewith.
-        for (final TacletApp app : seqView.mediator()
+        for (final TacletApp app : seqView.getMediator()
                 .getFindTaclet(findPos)) {
             if (filter.satisfiesFilterCondition(app.taclet())) {
                 allTacletsAtFindPosition = allTacletsAtFindPosition
@@ -511,7 +511,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         if (app == null) {
             return;
         }
-        final KeYMediator mediator = seqView.mediator();
+        final KeYMediator mediator = seqView.getMediator();
         mediator.applyInteractive(app, mediator.getSelectedGoal());
     }
 
