@@ -140,7 +140,10 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             // method is not void
             relevantPostVars = relevantPostVars.append(poVars.post.result);
         }
-        relevantPostVars = relevantPostVars.append(poVars.post.exception);
+        if (poVars.post.exception != null) {
+            // TODO: only null for loop invariants?
+            relevantPostVars = relevantPostVars.append(poVars.post.exception);
+        }
 
         // the heap is relevant in the pre and post state
         relevantPreVars = relevantPreVars.append(poVars.pre.heap);

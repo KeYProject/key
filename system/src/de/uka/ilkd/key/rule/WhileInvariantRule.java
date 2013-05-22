@@ -699,8 +699,10 @@ public final class WhileInvariantRule implements BuiltInRule {
             final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
             final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
-            final ImmutableList<Term> localVarsAtPre = localInsWithoutOutDuplicates.append(localOutsAtPre);
-            final ImmutableList<Term> localVarsAtPost = localInsWithoutOutDuplicates.append(localOutsAtPost);
+            final ImmutableList<Term> localVarsAtPre =
+                    localInsWithoutOutDuplicates.append(localOutsAtPre);
+            final ImmutableList<Term> localVarsAtPost =
+                    localInsWithoutOutDuplicates.append(localOutsAtPost);
             final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
 
             final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =

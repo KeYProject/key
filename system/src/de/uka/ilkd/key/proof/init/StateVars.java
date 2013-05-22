@@ -311,6 +311,9 @@ public class StateVars {
         Term self = (origPreVars.self == origPostVars.self) ?
                     preVars.self :
                     copyLocationVariable(origPostVars.self, postfix, services);
+        Term guard = (origPreVars.guard == origPostVars.guard) ?
+                     preVars.guard :
+                     copyLocationVariable(origPostVars.guard, postfix, services);
         Term result = (origPreVars.result == origPostVars.result) ?
                     preVars.result :
                     copyLocationVariable(origPostVars.result, postfix, services);
@@ -336,6 +339,7 @@ public class StateVars {
             localPostVars = localPostVars.append(localPostVar);
         }
         return new StateVars(self,
+                             guard,
                              localPostVars,
                              result,
                              exception,
