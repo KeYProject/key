@@ -23,8 +23,8 @@ public class ProofObligationVars {
     public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
                                Services services) {
-        this.pre = new StateVars(pm, kjt, "AtPre", services);
-        this.post = new StateVars(pm, kjt, "AtPost", services);
+        this.pre = StateVars.buildMethodContractPreVars(pm, kjt, services);
+        this.post = StateVars.buildMethodContractPostVars(this.pre, pm, kjt, services);
         this.postfix = "";
     }
 
@@ -32,8 +32,8 @@ public class ProofObligationVars {
     public ProofObligationVars(ProofObligationVars orig,
                                String postfix,
                                Services services) {
-        this.pre = new StateVars(orig.pre, postfix, services);
-        this.post = new StateVars(orig.post, postfix, services);
+        this.pre = StateVars.buildInfFlowPreVars(orig.pre, postfix, services);
+        this.post = StateVars.buildInfFlowPostVars(orig.pre, orig.post, pre, postfix, services);
         this.postfix = postfix;
     }
 

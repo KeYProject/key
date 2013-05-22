@@ -731,16 +731,16 @@ public final class WhileInvariantRule implements BuiltInRule {
             // generate proof obligation variables
             final StateVars instantiationPreVars =
                     new StateVars(selfTerm,
-                                            guardAtPre,
-                                            localVarsAtPre,
-                                            heapAtPre,
-                                            services);
+                                  guardAtPre,
+                                  localVarsAtPre,
+                                  heapAtPre,
+                                  services);
             final StateVars instantiationPostVars =
                     new StateVars(selfAtPost,
-                                            guardAtPost,
-                                            localVarsAtPost,
-                                            heapAtPost,
-                                            services);
+                                  guardAtPost,
+                                  localVarsAtPost,
+                                  heapAtPost,
+                                  services);
             final ProofObligationVars instantiationVars =
                 new ProofObligationVars(instantiationPreVars, instantiationPostVars);
 

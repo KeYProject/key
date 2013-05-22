@@ -395,18 +395,18 @@ public class BlockContractRule implements BuiltInRule {
             // generate proof obligation variables
             final StateVars instantiationPreVars =
                     new StateVars(hasSelf ? selfAtPre : null,
-                                            localVarsAtPre,
-                                            heapAtPre,
-                                            hasRes ? resultAtPre : null,
-                                            hasExc ? exceptionAtPre : null,
-                                            services);
+                                  localVarsAtPre,
+                                  heapAtPre,
+                                  hasRes ? resultAtPre : null,
+                                  hasExc ? exceptionAtPre : null,
+                                  services);
             final StateVars instantiationPostVars =
                     new StateVars(hasSelf ? selfAtPost : null,
-                                            localVarsAtPost,
-                                            heapAtPost,
-                                            hasRes ? resultAtPost : null,
-                                            hasExc ? exceptionAtPost : null,
-                                            services);
+                                  localVarsAtPost,
+                                  heapAtPost,
+                                  hasRes ? resultAtPost : null,
+                                  hasExc ? exceptionAtPost : null,
+                                  services);
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(instantiationPreVars,
                                                 instantiationPostVars);

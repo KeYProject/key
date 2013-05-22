@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import java.util.Iterator;
 
 
 /**
@@ -99,7 +100,6 @@ public class StateVars {
                      Term exception,
                      Term heap,
                      Term mbyAtPre,
-                     String postfix,
                      Services services) {
         this(self, null, localVars, result, exception, heap,
              mbyAtPre, services);
@@ -123,18 +123,6 @@ public class StateVars {
             result = appendIfNotNull(result, t);
         }
         return result;
-    }
-
-
-    public StateVars(Term self,
-                     ImmutableList<Term> localVars,
-                     Term result,
-                     Term exception,
-                     Term heap,
-                     Term heapAtPre,
-                     Services services) {
-        this(self, localVars, result, exception, heap, null, "",
-             services);
     }
 
 
@@ -165,7 +153,7 @@ public class StateVars {
                      Term exception,
                      Services services) {
         this(self, localVars, result, exception,
-             heap, null, "", services);
+             heap, null, services);
     }
 
 
@@ -269,12 +257,92 @@ public class StateVars {
               String postfix,
               Services services) {
         this(buildSelfVar(services, pm, kjt, postfix),
-             buildParamVars(services, postfix, pm), // no local out variables
+             buildParamVars(services, postfix, pm),
              buildResultVar(pm, services, postfix),
              buildExceptionVar(services, postfix, pm),
              buildHeapVar(postfix, services),
              buildMbyVar(postfix, services),
-             postfix, services);
+             services);
+    }
+
+
+    public static StateVars buildMethodContractPreVars(IProgramMethod pm,
+                                                       KeYJavaType kjt,
+                                                       Services services) {
+        final String postfix = "AtPre";
+        return new StateVars(buildSelfVar(services, pm, kjt, postfix),
+                             buildParamVars(services, postfix, pm),
+                             buildResultVar(pm, services, postfix),
+                             buildExceptionVar(services, postfix, pm),
+                             buildHeapVar(postfix, services),
+                             buildMbyVar(postfix, services),
+                             services);
+    }
+
+
+    public static StateVars buildMethodContractPostVars(StateVars preVars,
+                                                        IProgramMethod pm,
+                                                        KeYJavaType kjt,
+                                                        Services services) {
+        final String postfix = "AtPost";
+        return new StateVars(buildSelfVar(services, pm, kjt, postfix),
+                             preVars.localVars, // no local out variables
+                             buildResultVar(pm, services, postfix),
+                             buildExceptionVar(services, postfix, pm),
+                             buildHeapVar(postfix, services),
+                             preVars.mbyAtPre,
+                             services);
+    }
+
+
+    public static StateVars buildInfFlowPreVars(StateVars origPreVars,
+                                                String postfix,
+                                                Services services) {
+        return new StateVars(origPreVars, postfix, services);
+    }
+
+
+    public static StateVars buildInfFlowPostVars(StateVars origPreVars,
+                                                 StateVars origPostVars,
+                                                 StateVars preVars,
+                                                 String postfix,
+                                                 Services services) {
+        // create new post vars if original pre and original post var differ;
+        // else use pre var
+        Term self = (origPreVars.self == origPostVars.self) ?
+                    preVars.self :
+                    copyLocationVariable(origPostVars.self, postfix, services);
+        Term result = (origPreVars.result == origPostVars.result) ?
+                    preVars.result :
+                    copyLocationVariable(origPostVars.result, postfix, services);
+        Term exception = (origPreVars.exception == origPostVars.exception) ?
+                    preVars.exception :
+                    copyLocationVariable(origPostVars.exception, postfix, services);
+        Term heap = (origPreVars.heap == origPostVars.heap) ?
+                    preVars.heap :
+                    copyLocationVariable(origPostVars.heap, postfix, services);
+        Term mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ?
+                    preVars.mbyAtPre :
+                    copyLocationVariable(origPostVars.mbyAtPre, postfix, services);
+
+        ImmutableList<Term> localPostVars = ImmutableSLList.<Term>nil();
+        Iterator<Term> origPreVarsIt = origPreVars.localVars.iterator();
+        Iterator<Term> localPreVarsIt = preVars.localVars.iterator();
+        for (Term origPostVar : origPostVars.localVars) {
+            Term origPreVar = origPreVarsIt.next();
+            Term localPreVar = localPreVarsIt.next();
+            Term localPostVar = (origPreVar == origPostVar) ?
+                    localPreVar :
+                    copyLocationVariable(origPostVar, postfix, services);
+            localPostVars = localPostVars.append(localPostVar);
+        }
+        return new StateVars(self,
+                             localPostVars,
+                             result,
+                             exception,
+                             heap,
+                             mbyAtPre,
+                             services);
     }
 
 
