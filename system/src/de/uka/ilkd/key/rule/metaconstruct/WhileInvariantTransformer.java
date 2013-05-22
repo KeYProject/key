@@ -65,7 +65,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
-public final class WhileInvRule {
+public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = 
         SchemaVariableFactory.createProgramSV(new ProgramElementName("outer_label"),
@@ -98,7 +98,7 @@ public final class WhileInvRule {
     
     private KeYJavaType returnType;
     
-    public WhileInvRule() {
+    public WhileInvariantTransformer() {
     }
 
    

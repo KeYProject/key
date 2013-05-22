@@ -77,9 +77,8 @@ class LabeledTermImpl extends TermImpl {
 			return false;
 		}
 		final LabeledTermImpl cmp = (LabeledTermImpl) o;
-		boolean termStructureEqual = super.equals(o);
-		if (termStructureEqual) {
-			if (labels.size() != cmp.labels.size()) {
+		if (labels.size() == cmp.labels.size()) {
+			if (!super.equals(o)) {
 				return false;
 			}
 			for (ITermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
@@ -96,7 +95,7 @@ class LabeledTermImpl extends TermImpl {
 	 * {@inheritDoc}
 	 */
 	public int hashCode() {
-		return super.hashCode() * 7 + labels.hashCode();
+		return super.hashCode() * 17 + labels.hashCode();
 	}
 
 	/**
@@ -104,14 +103,15 @@ class LabeledTermImpl extends TermImpl {
 	 */
 	public String toString() {
 		StringBuilder result = new StringBuilder(super.toString());
-		result.append("@[[");
+		result.append("<<");
 		// as labels must not be empty at least one element exists
 		result.append(labels.get(0).toString()); 
 		for (int i = 1; i<labels.size();i++) {
-			result.append(", ");
+			result.append(", \"");
 			result.append(labels.get(i).toString());			
+         result.append("\"");
 		}		
-		result.append("]]");
+		result.append(">>");
 		return result.toString();
 	}
 }

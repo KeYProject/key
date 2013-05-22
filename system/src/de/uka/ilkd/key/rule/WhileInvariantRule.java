@@ -53,7 +53,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -432,7 +432,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 			    true, 
 			    false);
 
-	final WhileInvRule wir = new WhileInvRule();
+	final WhileInvariantTransformer wir = new WhileInvariantTransformer();
 	SVInstantiations svInst 
 		= SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
 					null, 
@@ -457,13 +457,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	   invTerm2 = invTerm;
 	}
 	
-//	Term bodyTerm = TB.tf().createTerm(wir, 
-//					   inst.progPost,
-//					   TB.and(new Term[]{invTerm2,
-//						   	     frameCondition,
-//						   	     variantPO}));
-	Term bodyTerm = wir.transform(this, bodyGoal, applicationSequent, ruleApp.posInOccurrence(), inst.progPost, TB.and(new Term[]{invTerm2, frameCondition, variantPO}), svInst, services);
-//	bodyTerm = LabelInstantiatorDispatcher.label(services, this, ruleApp.posInOccurrence(), bodyTerm);
+	Term bodyTerm = wir.transform(this, 
+	                              bodyGoal, 
+	                              applicationSequent, 
+	                              ruleApp.posInOccurrence(), 
+	                              inst.progPost, 
+	                              TB.and(new Term[]{invTerm2, frameCondition, variantPO}), 
+	                              svInst, 
+	                              services);
 	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 
 					  bodyTerm); 
 

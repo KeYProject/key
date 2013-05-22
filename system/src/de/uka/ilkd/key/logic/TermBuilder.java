@@ -649,15 +649,7 @@ public class TermBuilder {
 
 
     public Term imp(Term t1, Term t2) {
-    if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
-        return tt();
-    } else if(t1.op() == Junctor.TRUE) {
-        return t2;
-    } else if(t2.op() == Junctor.FALSE) {
-        return not(t1);
-    } else {
-        return tf.createTerm(Junctor.IMP, t1, t2);
-    }
+       return imp(t1, t2, null);
     }
 
 
