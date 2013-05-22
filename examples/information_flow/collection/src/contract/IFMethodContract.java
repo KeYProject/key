@@ -49,8 +49,8 @@ public class IFMethodContract {
         low = high;
         n2();
     }
-    
-    
+
+
 //--------
 
     
@@ -147,8 +147,26 @@ public class IFMethodContract {
     void n9() {
         low = high;
     }
-    
-    
+
+
+//--------
+
+
+    //@ requires a.length > 0;
+    //@ requires 0 <= pos && pos < a.length;
+    //@ respects (\forall int i; 0 <= i && i < a.length; a[i] == 0);
+    void secure_array_param(int[] a, int pos) {
+        a[pos] = secure_array_param_helper();
+    }
+
+
+    //@ ensures \result == 0;
+    //@ pure
+    int secure_array_param_helper() {
+        return 0;
+    }
+
+
 //-------- Exceptions
 
     
