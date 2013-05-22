@@ -84,6 +84,9 @@ public interface Contract extends SpecificationElement {
                        Map<LocationVariable,Term> atPres,
 	    	       Services services);    
     
+    public Term getRequires(LocationVariable heap);
+
+    public Term getAssignable(LocationVariable heap);
     
     /**
      * Returns the measured_by clause of the contract.

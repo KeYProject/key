@@ -463,6 +463,16 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }    
 
     @Override
+    public Term getRequires(LocationVariable heap) {
+        return originalPres.get(heap);
+    }
+
+    @Override
+    public Term getAssignable(LocationVariable heap) {
+        return originalMods.get(heap);
+    }
+
+    @Override
     public Term getMby(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services) {

@@ -3,26 +3,30 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
     /* accessible-clause, assignable-clause, breaks-clause, callable-clause, captures-clause,
      * choice-statement, continues-clause, diverges-clause, duration-clause, if-statement,
      * measured-clause, returns-clause, when-clause, working-space-clause, requires-clause,
      * initially-clause, constraint, ensures-clause, signals-clause */
-    static Type type;
     final Contract contract;
 
-    public MethodWellDefinedness(Contract contract) {
-        super(contract.getTarget());
+    public MethodWellDefinedness(Contract contract, Services services) {
+        super(contract.getTarget(), Type.METHOD_CONTRACT);
         assert contract != null;
         this.contract = contract;
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final LocationVariable baseHeap = heapLDT.getHeap();
+        this.ensures = contract.getRequires(baseHeap);
+        this.assignable = contract.getAssignable(baseHeap);
     }
 
     @Override
     public Type type() {
-        return type;
+        return Type.METHOD_CONTRACT;
     }
 
     @Override
@@ -32,20 +36,48 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public String getHTMLText(Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return getText(true, services);
     }
 
     @Override
     public String getPlainText(Services services) {
-        // TODO Auto-generated method stub
-        return null;
+        return getText(false, services);
     }
 
-    @Override
-    public boolean toBeSaved() {
-        return false;
-    }
+    private String getText(boolean includeHtmlMarkup, Services services) {
+        String mods = "";
+        if (getAssignable(null) != null) {
+            String printMods = LogicPrinter.quickPrintTerm(getAssignable(null), services);
+            mods = mods
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "mod"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
+        }
+
+        String pres = "";
+        if (getRequires(null) != null) {
+            String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
+            pres = pres
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "pre"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
+        }
+
+        if (includeHtmlMarkup) {
+           return "<html>"
+                 + pres
+                 + mods +
+                 "</html>";
+        }
+        else {
+           return pres
+                 + mods;
+        }
+     }
 
     @Override
     public boolean transactionApplicableContract() {
@@ -59,29 +91,18 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Contract setID(int newId) {
         return this;
     }    
 
     @Override
     public String getTypeName() {
-        return "wellDefinedness_" + contract.getTypeName();
+        return "Well-Definedness of " + contract.getTypeName();
     }
 
     @Override
     public String getName() {
-        return "wellDefinedness_" + contract.getName();
-    }
-
-    @Override
-    public String getDisplayName() {
-        return "wellDefinedness_" + contract.getDisplayName();
+        return "Well-Definedness of " + contract.getName();
     }
 
     @Override

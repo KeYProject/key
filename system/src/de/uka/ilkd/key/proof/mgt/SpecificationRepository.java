@@ -1182,7 +1182,7 @@ public final class SpecificationRepository {
     }
 
     public WellDefinednessCheck makeWdCheck(Contract contract) {
-        WellDefinednessCheck check = new MethodWellDefinedness(contract);
+        WellDefinednessCheck check = new MethodWellDefinedness(contract, services);
         IProgramMethod pm = (IProgramMethod)contract.getTarget();
         if (wdChecks.get(pm) == null) {
             return check;

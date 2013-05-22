@@ -192,7 +192,7 @@ class ContractSelectionPanel extends JPanel {
             	= DefaultImmutableSet.<FunctionalOperationContract>nil();
             for(Object contract : selection) {
         	contracts = contracts.add((FunctionalOperationContract) contract);
-            }        
+            }
             return services.getSpecificationRepository()
                            .combineOperationContracts(contracts);
         }

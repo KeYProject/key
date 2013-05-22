@@ -238,6 +238,16 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
+    public Term getRequires(LocationVariable heap) {
+        return originalPre;
+    }
+
+    @Override
+    public Term getAssignable(LocationVariable heap) {
+        throw new UnsupportedOperationException("Not applicable for dependency contracts.");
+    }
+
+    @Override
     public Term getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
 	               Services services) {

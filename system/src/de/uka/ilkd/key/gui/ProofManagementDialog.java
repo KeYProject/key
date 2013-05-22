@@ -551,8 +551,9 @@ public final class ProofManagementDialog extends JDialog {
 	if (pan == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
 	    if(entry != null && entry.target != null) {
-		final ImmutableSet<Contract> contracts 
+		ImmutableSet<Contract> contracts
 			= specRepos.getContracts(entry.kjt, entry.target);
+		contracts = contracts.union(specRepos.getWdChecks(entry.kjt, entry.target));
 		getActiveContractPanel().setContracts(contracts, "Contracts");
 	    } else {
 		getActiveContractPanel().setContracts(
@@ -575,10 +576,12 @@ public final class ProofManagementDialog extends JDialog {
 	    final ClassTree.Entry entry = wdTree.getSelectedEntry();
 	    if(entry != null && entry.target != null) {
 	        final ImmutableSet<Contract> wdContracts
-	        // TODO: Probably new contract "type" in specRepos necessary
 	            = specRepos.getWdChecks(entry.kjt, entry.target);
 	        getActiveContractPanel().setContracts(wdContracts, "Well-Definedness Checks");
-	    }
+	    } else {
+                getActiveContractPanel().setContracts(
+                        DefaultImmutableSet.<Contract>nil(), "Well-Definedness Checks");
+            }
 	}
         updateStartButton();	
     }

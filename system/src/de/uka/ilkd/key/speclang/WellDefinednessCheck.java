@@ -11,6 +11,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 
 /**
  * A contract for checking the well-definedness of a specification element
@@ -21,13 +24,13 @@ public abstract class WellDefinednessCheck implements Contract {
 
     protected static final TermBuilder TB = TermBuilder.DF;
 
-    public final WellDefinednessCheck.Type type;
+    public final Type type;
 
     private IObserverFunction target;
 
-    private Term ensures;
+    Term ensures;
 
-    private Term assignable;
+    Term assignable;
 
     public static enum Type {
         CLASS_INVARIANT, METHOD_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
@@ -37,38 +40,47 @@ public abstract class WellDefinednessCheck implements Contract {
         return type;
     }
 
-    WellDefinednessCheck(IObserverFunction target) {
-        if (this instanceof MethodWellDefinedness) {
-            type = Type.METHOD_CONTRACT;
-        }/* else if (this instanceof ClassWellDefinedness) {
-            type = Type.CLASS_INVARIANT;
-        } else if (this instanceof LoopWellDefinedness) {
-            type = Type.LOOP_INVARIANT;
-        } else if (this instanceof BlockWellDefinedness) {
-            type = Type.BLOCK_CONTRACT;
-        }*/ else {
-            type = null;
-        }
+    String typeString() {
+        return type().toString().toLowerCase();
+    }
+
+    WellDefinednessCheck(IObserverFunction target, Type type) {
+        this.type = type;
         this.target = target;
     }
 
     public WellDefinednessCheck add(WellDefinednessCheck check) {
-        this.ensures = TB.and(this.ensures, check.getEnsures());
-        this.assignable = TB.and(this.assignable, check.getAssignable());
+        this.ensures = TB.and(ensures, check.getRequires(null));
+        this.assignable = TB.and(assignable, check.getAssignable(null));
         return this;
     }
 
-    public Term getEnsures() {
+    public Term getRequires(LocationVariable heap) {
         return ensures;
     }
 
-    public Term getAssignable() {
+    public Term getAssignable(LocationVariable heap) {
         return assignable;
     }
 
     @Override
     public IObserverFunction getTarget() {
         return target;
+    }
+
+    @Override
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
+        return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Well-Definedness of JML " + typeString();
+    }
+
+    @Override
+    public boolean toBeSaved() {
+        return false;
     }
 
     @Deprecated
