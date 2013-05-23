@@ -115,6 +115,11 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
                                        mediator.getUI());
         try {
             pi.startProver(initConfig, symbExecPO, 0);
+            // stop interface again, because it is activated by the proof
+            // change through startProver; the ProofMacroWorker will activate
+            // it again at the right time
+            mediator.stopInterface(true);
+            mediator.setInteractive(false);
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }

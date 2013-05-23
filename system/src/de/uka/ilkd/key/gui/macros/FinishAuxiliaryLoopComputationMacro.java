@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class FinishAuxiliaryLoopComputationMacro extends
@@ -39,7 +40,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, ProverTaskListener listener) {
+    public void applyTo(final KeYMediator mediator, PosInOccurrence posInOcc, ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
         final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
@@ -74,7 +75,15 @@ public class FinishAuxiliaryLoopComputationMacro extends
         saveAuxiliaryProof();
 
         // close auxiliary computation proof
-        mediator.getUI().removeProof(proof);
+        GuiUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                // make everyone listen to the proof remove
+                mediator.startInterface(true);
+                mediator.getUI().removeProof(proof);
+                // go into automode again
+                mediator.stopInterface(true);
+            }
+        });
     }
 
     private Taclet generateRewriteTaclet(Term replacewith,

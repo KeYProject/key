@@ -76,10 +76,13 @@ public class FinishAuxiliaryComputationMacro
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {
             public void run() {
+                // make everyone listen to the proof remove
+                mediator.startInterface(true);
                 mediator.getUI().removeProof(proof);
+                // go into automode again
+                mediator.stopInterface(true);
             }
-        });
-        
+        });        
     }
 
 
