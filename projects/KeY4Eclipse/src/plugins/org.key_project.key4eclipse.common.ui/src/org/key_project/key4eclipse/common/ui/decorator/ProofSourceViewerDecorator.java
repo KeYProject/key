@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.keyide.ui.editor;
+package org.key_project.key4eclipse.common.ui.decorator;
 
 import java.util.Iterator;
 

@@ -339,9 +339,18 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       int i = 0;
       IExecutionNode[] children = parentToSearchIn.getChildren();
       while (result == null && i < children.length) {
-         if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
-             children[i].getElementType().equals(directChildToSearch.getElementType())) {
-            result = children[i];
+         if (children[i] instanceof IExecutionBranchCondition && directChildToSearch instanceof IExecutionBranchCondition) {
+            if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
+                JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)children[i]).getAdditionalBranchLabel(), ((IExecutionBranchCondition)directChildToSearch).getAdditionalBranchLabel()) &&
+                children[i].getElementType().equals(directChildToSearch.getElementType())) {
+                 result = children[i];
+              }
+         }
+         else{
+            if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
+                  children[i].getElementType().equals(directChildToSearch.getElementType())) {
+                 result = children[i];
+              }
          }
          i++;
       }
@@ -376,13 +385,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
+         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
       }
       else if (expected instanceof IExecutionStartNode) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStartNode);
       }
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
-         assertEquals(((IExecutionTermination)expected).isExceptionalTermination(), ((IExecutionTermination)current).isExceptionalTermination());
+         assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
       }
       else if (expected instanceof IExecutionBranchNode) {
          assertTrue("Expected IExecutionBranchNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchNode);
@@ -844,9 +854,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
-      ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true);
+      ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
+      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -890,9 +901,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
-      ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true);
+      ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
+      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -974,9 +986,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
-      ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true);
+      ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
+      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning

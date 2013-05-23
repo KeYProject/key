@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
@@ -17,6 +18,11 @@ public class DefaultProofReference<T> implements IProofReference<T> {
    private String kind;
 
    /**
+    * The source {@link Proof}.
+    */
+   private Proof source;
+   
+   /**
     * The target source member.
     */
    private T target;
@@ -29,11 +35,12 @@ public class DefaultProofReference<T> implements IProofReference<T> {
    /**
     * Constructor
     * @param kind The reference kind as human readable {@link String}.
-    * @param node The first {@link Node} in which the reference was found.
+    * @param source The source {@link Proof}.
     * @param target The target source member.
     */
    public DefaultProofReference(String kind, Node node, T target) {
       this.kind = kind;
+      this.source = node != null ? node.proof() : null;
       this.target = target;
       this.nodes.add(node);
    }
@@ -74,10 +81,19 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     * {@inheritDoc}
     */
    @Override
+   public Proof getSource() {
+      return source;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean equals(Object obj) {
       if (obj instanceof IProofReference<?>) {
          IProofReference<?> other = (IProofReference<?>)obj;
          return JavaUtil.equals(getKind(), other.getKind()) &&
+                JavaUtil.equals(getSource(), other.getSource()) &&
                 JavaUtil.equals(getTarget(), other.getTarget());
       }
       else {
@@ -92,6 +108,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
    public int hashCode() {
       int result = 17;
       result = 31 * result + (getKind() != null ? getKind().hashCode() : 0);
+      result = 31 * result + (getSource() != null ? getSource().hashCode() : 0);
       result = 31 * result + (getTarget() != null ? getTarget().hashCode() : 0);
       return result;
    }
@@ -118,6 +135,11 @@ public class DefaultProofReference<T> implements IProofReference<T> {
             }
             sb.append(node.serialNr());
          }
+      }
+      if (getSource() != null) {
+         sb.append(" of proof \"");
+         sb.append(getSource());
+         sb.append("\"");
       }
       return sb.toString();
    }

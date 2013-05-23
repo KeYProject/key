@@ -15,6 +15,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.hentschel.visualdbc.datasource.key.intern.helper,
  de.hentschel.visualdbc.datasource.key.model,
+ de.hentschel.visualdbc.datasource.key.model.event,
  de.hentschel.visualdbc.datasource.key.rule,
  de.hentschel.visualdbc.datasource.key.util
 Bundle-Vendor: Martin Hentschel

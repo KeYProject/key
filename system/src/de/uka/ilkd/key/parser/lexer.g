@@ -541,6 +541,13 @@ options {
       :   '>' '='
       ;
 
+RGUILLEMETS
+options {
+  paraphrase = "`>>'";
+}
+      :   '>' '>'
+      ;
+
 
 WS
 options {
@@ -568,6 +575,8 @@ LESS_DISPATCH
     |
      ('<' '=' ) => LESSEQUAL {$setType(LESSEQUAL);}
     |
+     ('<' '<' ) => LGUILLEMETS {$setType(LGUILLEMETS);}
+    |
      LESS {$setType(LESS);}
     ;
 
@@ -586,6 +595,15 @@ options {
 :
   '<' '='
     ;
+
+protected LGUILLEMETS
+options {
+  paraphrase = "'<<'";
+}
+:
+  '<' '<'
+    ;
+
 
 protected IMPLICIT_IDENT
 options {

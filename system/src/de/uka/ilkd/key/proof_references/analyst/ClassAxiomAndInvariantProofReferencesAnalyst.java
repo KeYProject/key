@@ -79,7 +79,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
             }
          }
          else {
-            throw new IllegalStateException("KeYJavaType of proof in which taclet \"" + name + "\" is used was not found applied in node \"" + node.serialNr() + "\".");
+            return null; // Proof might be disposed.
          }
       }
       else {
@@ -100,8 +100,11 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
       else if (problem instanceof ProgramMethodPO) {
          return ((ProgramMethodPO)problem).getProgramMethod().getContainerType();
       }
+      else if (problem != null) {
+         throw new IllegalStateException("Problem \"" + problem + "\" is not supported.");
+      }
       else {
-         return null;
+         return null; // Proof might be disposed.
       }
    }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel">
+  <proofs target="//@types.0/@methods.0/@operationContracts.0" obligation="ContractPO"/>
+  <types xsi:type="dbcmodel:DbcClass" name="Main">
+    <methods signature="main(c : MyClass, e : MyEnum)" returnType="int">
+      <operationContracts name="Main[Main::main(MyClass,MyEnum)].JML operation contract.0" pre="!self.mainClass = null&#xA;&amp; (!c = null &amp; !e = null)&#xA;&amp; (self.&lt;inv> &amp; (!c = null &amp; !e = null))" post="(   exc = null&#xA;   ->     result&#xA;        = javaAddInt(javaAddInt(javaAddInt(javaAddInt(self.mainValue,&#xA;                                                      self.mainClass.classValue),&#xA;                                           c.classValue),&#xA;                                e.enumValue),&#xA;                     MyEnum.A.enumValue)&#xA;      &amp; self.&lt;inv>)&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+  </types>
+</dbcmodel:DbcModel>

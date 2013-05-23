@@ -39,75 +39,454 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testLoopBodyBranchClosed() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed/test/LoopBodyBranchClosed.java", 
+                "LoopBodyBranchClosed", 
+                "deadBody", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed/oracle/LoopBodyBranchClosed.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testLoopUsageBranchClosed() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed/test/LoopUsageBranchClosed.java", 
+                "LoopUsageBranchClosed", 
+                "deadCodeAfterLoop", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed/oracle/LoopUsageBranchClosed.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/nestedLoopsWithContinue
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testNestedLoopsWithContinue() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/nestedLoopsWithContinue/test/NestedLoopsWithContinue.java", 
+                "NestedLoopsWithContinue", 
+                "main", 
+                null,
+                "examples/_testcase/set/nestedLoopsWithContinue/oracle/NestedLoopsWithContinue.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithContinue() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue/test/ArraySumWhileWithContinue.java", 
+                "ArraySumWhileWithContinue", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue/oracle/ArraySumWhileWithContinue.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantVoidWhileWithReturn
+    * </p>
+    * <p>
+    * Tests the handling of {@code return} when a loop invariant is applied.
+    * </p>
+    */
+   public void testVoidWhileWithReturn() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantVoidWhileWithReturn/test/VoidWhileWithReturn.java", 
+                "VoidWhileWithReturn", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantVoidWhileWithReturn/oracle/VoidWhileWithReturn.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn
+    * </p>
+    * <p>
+    * Tests the handling of {@code return} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithReturn() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn/test/ArraySumWhileWithReturn.java", 
+                "ArraySumWhileWithReturn", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn/oracle/ArraySumWhileWithReturn.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak
+    * </p>
+    * <p>
+    * Tests the handling of {@code break} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithBreak() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak/test/ArraySumWhileWithBreak.java", 
+                "ArraySumWhileWithBreak", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak/oracle/ArraySumWhileWithBreak.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithException
+    * </p>
+    * <p>
+    * Tests the handling of thrown exceptions when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithException/test/ArraySumWhileWithException.java", 
+                "ArraySumWhileWithException", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithException/oracle/ArraySumWhileWithException.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_preMethodContract.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_preExpandMethods() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_preExpandMethods.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_NoPreMethodContract() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreMethodContract.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_NoPreExpandMethods() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreExpandMethods.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySizeDoWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testUseLoopInvariantArraySizeDoWhile() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/test/ArraySizeDoWhile.java", 
+                "ArraySizeDoWhile", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/oracle/ArraySizeDoWhile.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySizeWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testUseLoopInvariantArraySizeWhile() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySizeWhile/test/ArraySizeWhile.java", 
+                "ArraySizeWhile", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySizeWhile/oracle/ArraySizeWhile.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumFor
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumFor() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
-//             "ArraySumFor", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
+                "ArraySumFor", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumForEach
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumForEach() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
-//             "ArraySumForEach", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
+                "ArraySumForEach", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumWhile() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
-//             "ArraySumWhile", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
+                "ArraySumWhile", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumWhileInitiallyInvalid() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
-//             "ArraySumWhileInitiallyInvalid", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
+                "ArraySumWhileInitiallyInvalid", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractQueryTest
+    */
+   public void testUseOperationContractQueryTest() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractQueryTest/test/UseOperationContractQueryTest.java", 
+                "UseOperationContractQueryTest", 
+                "main", 
+                "value == magicNumber()",
+                "examples/_testcase/set/useOperationContractQueryTest/oracle/UseOperationContractQueryTest.xml",
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false);
    }
    
    /**
