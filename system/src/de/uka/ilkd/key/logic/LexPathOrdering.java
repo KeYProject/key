@@ -199,7 +199,8 @@ public class LexPathOrdering implements TermOrdering {
 	    if ( v != 0 ) return v;
 
 	    // HACK: compare the hash values of the two symbols
-	    return sign ( bOp.hashCode () - aOp.hashCode () );
+	    //return sign ( bOp.hashCode () - aOp.hashCode () );
+	    return 0;
     }
 
     
