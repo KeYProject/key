@@ -489,7 +489,7 @@ public final class SymbolicExecutionUtil {
     */
    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
       assert starter != null;
-      starter.setMaxRuleApplications(1000);
+      starter.setMaxRuleApplications(10000);
       StrategyProperties sp = !proof.isDisposed() ? 
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();

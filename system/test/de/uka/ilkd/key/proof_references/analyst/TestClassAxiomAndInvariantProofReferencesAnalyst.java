@@ -22,7 +22,6 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             new IFilter<IProofReference<?>>() {
                               @Override
                               public boolean select(IProofReference<?> element) {
-                                 // Sometimes an invariant included and sometimes not. The filter makes sure that the tested references are always the same. The invariant reference is: Use Invariant Proof Reference to "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))
                                  return IProofReference.USE_AXIOM.equals(element.getKind());
                               }
                             },
@@ -39,6 +38,12 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             "main", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
+                            new IFilter<IProofReference<?>>() {
+                               @Override
+                               public boolean select(IProofReference<?> element) {
+                                  return IProofReference.USE_AXIOM.equals(element.getKind());
+                               }
+                             },
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null)))"));
    }
    
