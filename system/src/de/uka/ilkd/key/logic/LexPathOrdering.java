@@ -200,6 +200,10 @@ public class LexPathOrdering implements TermOrdering {
 
 	    // HACK: compare the hash values of the two symbols
 	    //return sign ( bOp.hashCode () - aOp.hashCode () );
+	    // The two functions have the same name, consider them
+	    // equal for the sake of this comparison.
+	    // Otherwise the proof is indeterministic as the hash
+	    // codes may change from run to run. (MU)
 	    return 0;
     }
 
