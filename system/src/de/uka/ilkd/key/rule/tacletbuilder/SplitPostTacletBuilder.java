@@ -26,24 +26,26 @@ public class SplitPostTacletBuilder {
     public ArrayList<Taclet> generateTaclets(Term post) {
         ArrayList<Term> postParts = extractPostParts(post);
         ArrayList<Taclet> splitPostTaclets = new ArrayList<Taclet>();
-        int i = 0;
-        for (Term postPart : postParts) {
-            ArrayList<Term> andTerms = extractAndTerms(postPart);
+        if (postParts.size() > 1) {
+            int i = 0;
+            for (Term postPart : postParts) {
+                ArrayList<Term> andTerms = extractAndTerms(postPart);
 
-            RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-            tacletBuilder.setName(new Name(SPLIT_POST_RULENAME + "_" + i));
-            tacletBuilder.setFind(postPart);
-            tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
-            tacletBuilder.setSurviveSmbExec(false);
-            for (Term t : andTerms) {
-                RewriteTacletGoalTemplate goal =
-                        new RewriteTacletGoalTemplate(t);
-                tacletBuilder.addTacletGoalTemplate(goal);
+                RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+                tacletBuilder.setName(new Name(SPLIT_POST_RULENAME + "_" + i));
+                tacletBuilder.setFind(postPart);
+                tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
+                tacletBuilder.setSurviveSmbExec(false);
+                for (Term t : andTerms) {
+                    RewriteTacletGoalTemplate goal =
+                            new RewriteTacletGoalTemplate(t);
+                    tacletBuilder.addTacletGoalTemplate(goal);
+                }
+                tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
+                splitPostTaclets.add(tacletBuilder.getTaclet());
+                InfFlowContractPO.addSymbol(tacletBuilder.getTaclet());
+                i++;
             }
-            tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
-            splitPostTaclets.add(tacletBuilder.getTaclet());
-            InfFlowContractPO.addSymbol(tacletBuilder.getTaclet());
-            i++;
         }
         return splitPostTaclets;
     }
