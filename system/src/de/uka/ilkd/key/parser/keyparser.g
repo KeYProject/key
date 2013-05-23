@@ -21,7 +21,7 @@ header {
   import java.io.*;
   import java.util.*;
   import java.math.BigInteger;
-
+  import java.util.LinkedHashMap;
   import de.uka.ilkd.key.collection.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
@@ -76,7 +76,7 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
-    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
+    static HashMap<String, Character> prooflabel2tag = new LinkedHashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -99,10 +99,10 @@ options {
    }
 
     private NamespaceSet nss;
-    private HashMap<String, String> category2Default = new HashMap<String, String>();
+    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
     private boolean onlyWith=false;
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private HashSet usedChoiceCategories = new HashSet();
+    private HashSet usedChoiceCategories = new LinkedHashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
     private KeYExceptionHandler keh = null;
@@ -213,7 +213,7 @@ options {
              new SchemaRecoder2KeY(services, nss),
 	     services, 
 	     nss, 
-	     new HashMap());
+	     new LinkedHashMap());
     }
 
 
@@ -924,7 +924,7 @@ options {
         }else 
   	  if(!isDeclParser()) {
             if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
-              return new HashSet();
+              return new LinkedHashSet();
             }   
             DeclarationProgramVariableCollector pvc
                = new DeclarationProgramVariableCollector(jb.program(), getServices());
@@ -2891,7 +2891,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 
 
 
-accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
+accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] {Term t = null;}:
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 

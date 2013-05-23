@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,7 +32,7 @@ public class TaskTreeModel extends DefaultTreeModel {
      * 
      */
     private static final long serialVersionUID = -4168248377205879699L;
-    private Map<Proof, TaskTreeNode> proofToTask = new HashMap<Proof, TaskTreeNode>();
+    private Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<Proof, TaskTreeNode>();
 
     public TaskTreeModel() {
 	super(new DefaultMutableTreeNode("Tasks"));
