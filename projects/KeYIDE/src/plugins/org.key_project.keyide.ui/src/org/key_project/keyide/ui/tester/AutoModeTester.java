@@ -17,6 +17,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 
 /**
@@ -52,12 +53,17 @@ public class AutoModeTester extends PropertyTester {
          //initialize values
          KeYEditor editor = (KeYEditor) receiver;
          ConsoleUserInterface userInterface = editor.getEnvironment().getUi();
-         //Set button states
-         if (PROPERTY_START.equals(property)) {
-            return !userInterface.isAutoMode();
-         }
-         if (PROPERTY_STOP.equals(property)) {
-            return userInterface.isAutoMode();
+         Proof proof = editor.getEnvironment().getMediator().getProof();
+         if(!proof.closed()){
+            //Set button states
+            if (PROPERTY_START.equals(property)) {
+               return !userInterface.isAutoMode();
+            }
+            if (PROPERTY_STOP.equals(property)) {
+               return userInterface.isAutoMode();
+            }
+         }else{
+            return false;
          }
       }
       return false;

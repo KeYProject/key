@@ -41,7 +41,7 @@ public class KeYIDEPreferences {
    
    /**
     * Returns the property which defines the behavior when a switch to the key perspective is requested.
-    * @return The property which defines the behavior when a switch to the key perspective is requested.
+    * @return The property which defines the behavior when a switch to the key perspective is requested. It is one of {@link MessageDialogWithToggle#ALWAYS}, {@link MessageDialogWithToggle#PROMPT} or {@link MessageDialogWithToggle#NEVER}.
     */
    public static String getSwitchToKeyPerspective() {
       return getStore().getString(SWITCH_TO_KEY_PERSPECTIVE);
@@ -49,7 +49,7 @@ public class KeYIDEPreferences {
    
    /**
     * Returns the default property which defines the behavior when a switch to the key perspective is requested.
-    * @return The default property which defines the behavior when a switch to the key perspective is requested.
+    * @return The default property which defines the behavior when a switch to the key perspective is requested. It is one of {@link MessageDialogWithToggle#ALWAYS}, {@link MessageDialogWithToggle#PROMPT} or {@link MessageDialogWithToggle#NEVER}.
     */
    public static String getDefaultSwitchToKeyPerspective() {
       return getStore().getDefaultString(SWITCH_TO_KEY_PERSPECTIVE);
@@ -57,7 +57,7 @@ public class KeYIDEPreferences {
    
    /**
     * Sets the property which defines the behavior when a switch to the key perspective is requested.
-    * @param value The property which defines the behavior when a switch to the key perspective is requested.
+    * @param value The property which defines the behavior when a switch to the key perspective is requested. It must be {@link MessageDialogWithToggle#ALWAYS}, {@link MessageDialogWithToggle#PROMPT} or {@link MessageDialogWithToggle#NEVER}.
     */
    public static void setSwitchToKeyPerspective(String value) {
       getStore().setValue(SWITCH_TO_KEY_PERSPECTIVE, value);
@@ -65,7 +65,7 @@ public class KeYIDEPreferences {
    
    /**
     * Sets the property which defines the behavior when a switch to the state key perspective is requested.
-    * @param defaultValue The default property which defines the behavior when a switch to the key perspective is requested.
+    * @param defaultValue The default property which defines the behavior when a switch to the key perspective is requested. It must be {@link MessageDialogWithToggle#ALWAYS}, {@link MessageDialogWithToggle#PROMPT} or {@link MessageDialogWithToggle#NEVER}.
     */
    public static void setDefaultSwitchToKeyPerspective(String defaultValue) {
       getStore().setDefault(SWITCH_TO_KEY_PERSPECTIVE, defaultValue);
