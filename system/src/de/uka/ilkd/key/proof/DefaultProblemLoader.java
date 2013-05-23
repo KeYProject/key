@@ -136,7 +136,8 @@ public class DefaultProblemLoader {
             if (proof != null) {
                replayProof(proof);
             }
-            return "This message is not used anywhere?!"; // Everything fine
+            // this message is propagated to the top level in console mode
+            return ""; // Everything fine
          }
          finally {
     	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);

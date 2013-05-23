@@ -94,8 +94,9 @@ public class DefaultProofFileParser implements IProofFileParser {
    }
 
    /**
-    * Communicates a non-fatal condition to the caller after the proof
-    *  has been parsed. Empty string means everything is OK.
+    * Communicates a non-fatal condition to the caller. Empty string
+    * means everything is OK. The message will be displayed to the user
+    * in the GUI after the proof has been parsed.
     */
    public String getStatus() {
        return status;
