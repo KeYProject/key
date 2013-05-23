@@ -1,10 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package key.explosion;
-
-
 /**
  *
  * @author christoph
@@ -59,6 +52,8 @@ public class Disjoint {
         disjointHelper();
         disjointHelper();
         disjointHelper();
+        disjointHelper();
+        disjointHelper();
     }
 
     /*@ requires    \disjoint(\locset(x), rep);
@@ -103,9 +98,23 @@ public class Disjoint {
     /*@ requires    \disjoint(rep, rep1);
         requires    \disjoint(rep, rep2);
         requires    \disjoint(rep, rep3);
+        requires    \disjoint(rep, rep4);
+        requires    \disjoint(rep, rep5);
+        requires    \disjoint(rep, rep6);
+        requires    \disjoint(rep, rep7);
+        requires    \disjoint(rep, rep8);
+        requires    \disjoint(rep, rep9);
+        requires    \disjoint(rep, rep10);
         ensures     \disjoint(rep, rep1);
         ensures     \disjoint(rep, rep2);
         ensures     \disjoint(rep, rep3);
+        ensures     \disjoint(rep, rep4);
+        ensures     \disjoint(rep, rep5);
+        ensures     \disjoint(rep, rep6);
+        ensures     \disjoint(rep, rep7);
+        ensures     \disjoint(rep, rep8);
+        ensures     \disjoint(rep, rep9);
+        ensures     \disjoint(rep, rep10);
      */
     void disjoint3() {
         disjointHelper3();
@@ -115,10 +124,24 @@ public class Disjoint {
     /*@ requires    \disjoint(rep, rep1);
         requires    \disjoint(rep, rep2);
         requires    \disjoint(rep, rep3);
+        requires    \disjoint(rep, rep4);
+        requires    \disjoint(rep, rep5);
+        requires    \disjoint(rep, rep6);
+        requires    \disjoint(rep, rep7);
+        requires    \disjoint(rep, rep8);
+        requires    \disjoint(rep, rep9);
+        requires    \disjoint(rep, rep10);
         ensures     \disjoint(rep, rep1);
         ensures     \disjoint(rep, rep2);
         ensures     \disjoint(rep, rep3);
-        assignable  rep1, rep2, rep3;
+        ensures     \disjoint(rep, rep4);
+        ensures     \disjoint(rep, rep5);
+        ensures     \disjoint(rep, rep6);
+        ensures     \disjoint(rep, rep7);
+        ensures     \disjoint(rep, rep8);
+        ensures     \disjoint(rep, rep9);
+        ensures     \disjoint(rep, rep10);
+        assignable  rep1, rep2, rep3, rep4, rep5, rep6, rep7, rep8, rep9, rep10;
      */
     void disjointHelper3() {
     }
