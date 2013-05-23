@@ -748,11 +748,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	} else {
 	    mbyOk = TB.tt();
 	}
-        preGoal.changeFormula(new SequentFormula(
-        			TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
-        	                                   TB.and(new Term[]{pre, 
-        	                                	   	     reachableState, 
-        	                                	   	     mbyOk}))),
+        final Term finalPreTerm =
+                TB.applySequential(new Term[]{inst.u, atPreUpdates},
+        	                                   TB.and(new Term[]{pre,
+        	                                	   	     reachableState,
+        	                                	   	     mbyOk}));
+        preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
        
         //create "Post" branch
@@ -822,6 +823,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 false);
             postGoal.addTaclet(informationFlowContractApp,
                                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+            // information flow proofs might get easier if we add the (proofed)
+            // method contract precondition as an assumption to the post goal
+            // (in case the precondition cannot be proofed easily)
+            postGoal.addFormula(new SequentFormula(finalPreTerm), true, false);
         }
 
         //create "Exceptional Post" branch
