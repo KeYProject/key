@@ -369,8 +369,8 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ass:ASSIGNABLE
     ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
-    | LESS_THAN_NOTHING // deprecated
-        { result = TB.strictlyNothing(); }
+    | l:LESS_THAN_NOTHING // deprecated
+        { translator.addDeprecatedWarning(l.getText()); result = TB.strictlyNothing(); }
     | STRICTLY_NOTHING
         { result = TB.strictlyNothing(); }
     )

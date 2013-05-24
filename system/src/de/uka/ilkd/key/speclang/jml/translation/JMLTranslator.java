@@ -1687,8 +1687,7 @@ final class JMLTranslator {
      */
     void addIgnoreWarning(String feature) {
         String msg = feature + " is not supported and has been silently ignored.";
-        Debug.out("JML translator warning: "+msg);
-        warnings.add(msg);
+        addWarning(msg);
     }
 
     void addIgnoreWarning(String feature, Token t) {
@@ -1701,6 +1700,14 @@ final class JMLTranslator {
      */
     private void addUnderspecifiedWarning(String feature) {
         String msg = feature + "is not supported and translated to an underspecified term or formula.";
+        addWarning(msg);
+    }
+
+    void addDeprecatedWarning(String feature) {
+        addWarning("deprecated syntax: "+feature);
+    }
+
+    private void addWarning(String msg) {
         Debug.out("JML translator warning: "+msg);
         warnings.add(msg);
     }
