@@ -67,5 +67,29 @@
             commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            category="org.key_project.key4eclipse.common.ui.keyProjectProperties"
+            class="org.key_project.key4eclipse.resources.ui.propertypages.ProofManagementPropertyPage"
+            id="org.key_project.key4eclipse.resources.ui.proofManagementPropertyPage"
+            name="KeY Proof Management">
+         <enabledWhen>
+            <and>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="org.eclipse.jdt.core.javanature">
+               </test>
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="org.key_project.key4eclipse.resources.KeYProjectNature">
+               </test>
+            </and>
+         </enabledWhen>
+      </page>
+   </extension>
 
 </plugin>

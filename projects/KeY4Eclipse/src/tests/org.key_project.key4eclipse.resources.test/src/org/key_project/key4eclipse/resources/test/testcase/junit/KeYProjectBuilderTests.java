@@ -394,6 +394,9 @@ public class KeYProjectBuilderTests extends TestCase{
       //make sure that the number of marker in the javaFile are correct
       assertTrue(KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne).size() == 2 && KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo).size() == 1);
       //delete whole proofFolder
+      proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
+      assertTrue(proofFolder.exists());
+      //TODO: warum kann der das folder nicht löschen? bei manueller ausführung geht es
       proofFolder.delete(true, null);
       //build
       KeY4EclipseResourcesTestUtil.build(project);

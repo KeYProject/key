@@ -61,10 +61,10 @@ public class MarkerManager {
     * @param res - the {@link IResource} to use
     * @throws CoreException
     */
-   public void setProblemLoaderExceptionMarker(IResource res) throws CoreException{
+   public void setProblemLoaderExceptionMarker(IResource res, String msg) throws CoreException{
       IMarker marker = res.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
       if (marker.exists()) {
-         marker.setAttribute(IMarker.MESSAGE, "Error while loading Environment. Please check your JML-Specifications");
+         marker.setAttribute(IMarker.MESSAGE, msg);
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
          marker.setAttribute(IMarker.LINE_NUMBER, 1);
       }
