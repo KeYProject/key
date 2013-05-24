@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
@@ -28,7 +29,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     private IObserverFunction target;
 
-    Term ensures;
+    Term requires;
 
     Term assignable;
 
@@ -50,18 +51,65 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     public WellDefinednessCheck add(WellDefinednessCheck check) {
-        this.ensures = TB.and(ensures, check.getRequires(null));
+        this.requires = TB.and(requires, check.getRequires(null));
         this.assignable = TB.and(assignable, check.getAssignable(null));
         return this;
     }
 
     public Term getRequires(LocationVariable heap) {
-        return ensures;
+        assert this.requires != null;
+        return this.requires;
     }
 
     public Term getAssignable(LocationVariable heap) {
-        return assignable;
+        assert this.assignable != null;
+        return this.assignable;
     }
+
+    @Override
+    public String getHTMLText(Services services) {
+        return getText(true, services);
+    }
+
+    @Override
+    public String getPlainText(Services services) {
+        return getText(false, services);
+    }
+
+    private String getText(boolean includeHtmlMarkup, Services services) {
+        String mods = "";
+        if (getAssignable(null) != null) {
+            String printMods = LogicPrinter.quickPrintTerm(getAssignable(null), services);
+            mods = mods
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "mod"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
+        }
+
+        String pres = "";
+        if (getRequires(null) != null) {
+            String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
+            pres = pres
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "pre"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
+        }
+
+        if (includeHtmlMarkup) {
+           return "<html>"
+                 + pres
+                 + mods +
+                 "</html>";
+        }
+        else {
+           return pres
+                 + mods;
+        }
+     }
 
     @Override
     public IObserverFunction getTarget() {
@@ -70,7 +118,13 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
+        assert contract instanceof WellDefinednessCheck;
         return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
+    }
+
+    public Term createPOTerm() {
+        Term po = getRequires(null);
+        return po;
     }
 
     @Override

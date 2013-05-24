@@ -93,8 +93,10 @@ public final class SpecificationRepository {
                       ImmutableSet<FunctionalOperationContract>> operationContracts
 		= new LinkedHashMap<Pair<KeYJavaType,IProgramMethod>,
 		                    ImmutableSet<FunctionalOperationContract>>();
-    private final Map<IProgramMethod,WellDefinednessCheck> wdChecks
-                = new LinkedHashMap<IProgramMethod, WellDefinednessCheck>();
+    private final Map<Pair<KeYJavaType,IObserverFunction>,
+                           ImmutableSet<WellDefinednessCheck>> wdChecks
+                = new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,
+                                    ImmutableSet<WellDefinednessCheck>>();
     private final Map<String,Contract> contractsByName
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<IObserverFunction>> contractTargets
@@ -519,7 +521,7 @@ public final class SpecificationRepository {
 	assert kjt != null;
 	assert target != null;
 	target = getCanonicalFormForKJT(target, kjt);
-	final Pair<KeYJavaType,IObserverFunction> pair 
+	final Pair<KeYJavaType,IObserverFunction> pair
 		= new Pair<KeYJavaType,IObserverFunction>(kjt, target);
 	final ImmutableSet<Contract> result = contracts.get(pair);
         return result == null 
@@ -641,8 +643,8 @@ public final class SpecificationRepository {
                ? DefaultImmutableSet.<IObserverFunction>nil() 
                : result;
     }
-        
-    
+
+
     /**
      * Registers the passed (atomic) contract, and inherits it to all
      * overriding methods.
@@ -675,9 +677,22 @@ public final class SpecificationRepository {
             addContract(contract);
         }
     }
-    
-        
-    
+
+
+    /**
+     * Registers the passed (atomic) well-definedness check for a method specification.
+     */
+    public void addWdMethodCheck(Contract contract) {
+        final ImmutableSet<Pair<KeYJavaType,IObserverFunction>> impls =
+                getOverridingTargets(contract.getKJT(), contract.getTarget())
+                .add(new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(),
+                                                             contract.getTarget()));
+        for (Pair<KeYJavaType,IObserverFunction> pair: impls) {
+            wdChecks.put(pair, getWdChecks(pair.first, pair.second)
+                                .add(new MethodWellDefinedness(contract, services)));
+        }
+    }
+
     /**
      * Creates a combined contract out of the passed atomic contracts.
      */
@@ -1170,26 +1185,27 @@ public final class SpecificationRepository {
     /**
      * Returns all registered (atomic) well-definedness checks for the passed target.
      */
-    public ImmutableSet<Contract> getWdChecks(KeYJavaType kjt,
-                                              IObserverFunction target) {
+    public ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt,
+                                                          IObserverFunction target) {
         assert kjt != null;
         assert target != null;
         target = getCanonicalFormForKJT(target, kjt);
-        final WellDefinednessCheck result = wdChecks.get(target);
+        final Pair<KeYJavaType,IObserverFunction> pair =
+                new Pair<KeYJavaType,IObserverFunction>(kjt, target);
+        final ImmutableSet<WellDefinednessCheck> result = wdChecks.get(pair);
         return result == null
-                ? DefaultImmutableSet.<Contract>nil()
-                        : DefaultImmutableSet.<Contract>nil().add(result);
+                ? DefaultImmutableSet.<WellDefinednessCheck>nil()
+                        : result;
     }
 
-    public WellDefinednessCheck makeWdCheck(Contract contract) {
-        WellDefinednessCheck check = new MethodWellDefinedness(contract, services);
-        IProgramMethod pm = (IProgramMethod)contract.getTarget();
-        if (wdChecks.get(pm) == null) {
-            return check;
+    public ImmutableSet<Contract> getWdContracts(KeYJavaType kjt,
+                                                 IObserverFunction target) {
+        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        for (WellDefinednessCheck check: checks) {
+            result = result.add((Contract)check);
         }
-        else {
-            return wdChecks.get(pm).add(check);
-        }
+        return result;
     }
 
     public void addWellDefinednessCheck(SpecificationElement spec) {
@@ -1201,8 +1217,7 @@ public final class SpecificationRepository {
         } else if (spec instanceof Contract) {
             // Method Contract
             Contract contract = (Contract)spec;
-            IProgramMethod pm = (IProgramMethod)contract.getTarget();
-            wdChecks.put(pm, makeWdCheck(contract));
+            addWdMethodCheck(contract);
         } else if (spec instanceof ClassInvariant) {
             // Class Invariant
         } // What about Class Axiom and InitiallyClause?

@@ -8,6 +8,8 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
+    protected static final WellDefinednessOperator WD = WellDefinednessOperator.WD;
+
     private WellDefinednessCheck check;
 
     public WellDefinednessPO(InitConfig initConfig, WellDefinednessCheck check) {
@@ -33,7 +35,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public void readProblem() throws ProofInputException {
         final IProgramMethod pm = getProgramMethod();
         // TODO: Build problem here
-        assignPOTerms(check.getRequires(getBaseHeap()));
+        Term po = check.createPOTerm();
+        assignPOTerms(WD.wd(po));
     }
 
     @Override

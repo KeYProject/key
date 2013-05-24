@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 
@@ -14,14 +15,70 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * initially-clause, constraint, ensures-clause, signals-clause */
     final Contract contract;
 
+    Term forall;
+    Term old;
+    Term diverges = TB.ff();
+    Term when;
+    Term workingSpace;
+    Term duration;
+    Term ensures = TB.tt();
+    Term signalsOnly;
+    Term signals = TB.ff();
+
     public MethodWellDefinedness(Contract contract, Services services) {
         super(contract.getTarget(), Type.METHOD_CONTRACT);
         assert contract != null;
         this.contract = contract;
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
-        this.ensures = contract.getRequires(baseHeap);
+        this.requires = contract.getRequires(baseHeap);
         this.assignable = contract.getAssignable(baseHeap);
+
+        this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
+        this.old = TB.tt(); // TODO: Where do we get the old-clause from?
+        this.diverges = TB.tt(); // TODO: Where do we get the diverges-clause from?
+        this.when = TB.tt(); // TODO: Where do we get the when-clause from?
+        this.workingSpace = TB.tt(); // TODO: Where do we get the working_space-clause from?
+        this.duration = TB.tt(); // TODO: Where do we get the duration-clause from?
+        this.ensures = TB.tt(); // TODO: Where do we get the ensures-clause from?
+        this.signalsOnly = TB.tt(); // TODO: Where do we get the signal_only-clause from?
+        this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
+    }
+
+    public Term getForall() {
+        return this.forall;
+    }
+
+    public Term getOld() {
+        return this.old;
+    }
+
+    public Term getDiverges() {
+        return this.diverges;
+    }
+
+    public Term getWhen() {
+        return this.when;
+    }
+
+    public Term getWorkingSpace() {
+        return this.workingSpace;
+    }
+
+    public Term getDuration() {
+        return this.duration;
+    }
+
+    public Term getEnsures() {
+        return this.ensures;
+    }
+
+    public Term getSignalsOnly() {
+        return this.signalsOnly;
+    }
+
+    public Term getSignals() {
+        return this.signals;
     }
 
     @Override
@@ -33,51 +90,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public int id() {
         return contract.id();
     }
-
-    @Override
-    public String getHTMLText(Services services) {
-        return getText(true, services);
-    }
-
-    @Override
-    public String getPlainText(Services services) {
-        return getText(false, services);
-    }
-
-    private String getText(boolean includeHtmlMarkup, Services services) {
-        String mods = "";
-        if (getAssignable(null) != null) {
-            String printMods = LogicPrinter.quickPrintTerm(getAssignable(null), services);
-            mods = mods
-                    + (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + "mod"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ?
-                            LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
-        }
-
-        String pres = "";
-        if (getRequires(null) != null) {
-            String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
-            pres = pres
-                    + (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + "pre"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ?
-                            LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
-        }
-
-        if (includeHtmlMarkup) {
-           return "<html>"
-                 + pres
-                 + mods +
-                 "</html>";
-        }
-        else {
-           return pres
-                 + mods;
-        }
-     }
 
     @Override
     public boolean transactionApplicableContract() {

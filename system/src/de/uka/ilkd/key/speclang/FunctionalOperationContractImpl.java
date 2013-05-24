@@ -77,7 +77,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     
     /**
      * If a method is strictly pure, it has no modifies clause which could
-     * anonymised.
+     * be anonymised.
      * @see #hasModifiesClause()
      */
     final boolean hasRealModifiesClause;

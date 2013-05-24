@@ -72,7 +72,7 @@ import de.uka.ilkd.key.util.Pair;
 
 
 public final class ProofManagementDialog extends JDialog {
-    
+
     /**
      * 
      */
@@ -93,13 +93,10 @@ public final class ProofManagementDialog extends JDialog {
 
     private JTabbedPane tabbedPane;
     private Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;
-    private Map<Pair<KeYJavaType,IObserverFunction>,Icon> wdTargetIcons;
     private ClassTree classTree;
-    private ClassTree wdTree;
     private JList proofList;
     private ContractSelectionPanel contractPanelByMethod;
     private ContractSelectionPanel contractPanelByProof;
-    private ContractSelectionPanel wdPanel;
     private JButton startButton;
     private JButton cancelButton;
 	private KeYMediator mediator;
@@ -168,15 +165,6 @@ public final class ProofManagementDialog extends JDialog {
 	    }
 	});
 
-	//create well-definedness tree
-        wdTargetIcons = new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
-        wdTree = new ClassTree(true, true, services, wdTargetIcons);
-        wdTree.addTreeSelectionListener(new TreeSelectionListener() {
-            public void valueChanged(TreeSelectionEvent e) {
-                updateContractPanel();
-            }
-        });
-
 	//create method list panel, scroll pane
 	JPanel listPanelByMethod = new JPanel();
 	listPanelByMethod.setLayout(new BoxLayout(listPanelByMethod, 
@@ -197,17 +185,6 @@ public final class ProofManagementDialog extends JDialog {
 	proofScrollPane.setPreferredSize(classScrollPaneDim);
 	proofScrollPane.setMinimumSize(classScrollPaneDim);
 	listPanelByProof.add(proofScrollPane);
-
-	//create well-definedness panel, scroll pane
-        JPanel listWdPanel = new JPanel();
-        listWdPanel.setLayout(new BoxLayout(listWdPanel, 
-                                        BoxLayout.X_AXIS));
-        JScrollPane wdScrollPane = new JScrollPane(wdTree);
-        wdScrollPane.setBorder(new TitledBorder("Specifications"));
-        Dimension wdScrollPaneDim = new Dimension(250, 400);
-        wdScrollPane.setPreferredSize(wdScrollPaneDim);
-        wdScrollPane.setMinimumSize(wdScrollPaneDim);
-        listWdPanel.add(wdScrollPane);
 	
 	//create contract panel by method
 	contractPanelByMethod = new ContractSelectionPanel(services, false);
@@ -243,28 +220,10 @@ public final class ProofManagementDialog extends JDialog {
 	});
 	listPanelByProof.add(contractPanelByProof);	
 
-	//create well-definedness panel
-        wdPanel = new ContractSelectionPanel(services, false);
-        wdPanel.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e){
-                if(e.getClickCount() == 2){
-                    startButton.doClick();
-                }
-            }
-        });
-        wdPanel.addListSelectionListener(
-                                new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                updateStartButton();
-            }
-        });
-        listWdPanel.add(wdPanel);
-
 	//create tabbed pane
 	tabbedPane = new JTabbedPane();	
         tabbedPane.addTab("By Target", listPanelByMethod);
         tabbedPane.addTab("By Proof", listPanelByProof);
-        tabbedPane.addTab("By Specification", listWdPanel);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
         	updateStartButton();
@@ -364,7 +323,6 @@ public final class ProofManagementDialog extends JDialog {
                 instance.classTree = null;
                 instance.contractPanelByMethod = null;
                 instance.contractPanelByProof = null;
-                instance.wdPanel = null;
                 instance.startButton = null;
                 instance.cancelButton = null;
                 //============================================
@@ -444,10 +402,8 @@ public final class ProofManagementDialog extends JDialog {
         int index = tabbedPane.getSelectedIndex();
         if (index == 0)
             return contractPanelByMethod;
-        else if (index == 1)
-            return contractPanelByProof;
         else
-            return wdPanel;
+            return contractPanelByProof;
     }
 
     
@@ -553,7 +509,7 @@ public final class ProofManagementDialog extends JDialog {
 	    if(entry != null && entry.target != null) {
 		ImmutableSet<Contract> contracts
 			= specRepos.getContracts(entry.kjt, entry.target);
-		contracts = contracts.union(specRepos.getWdChecks(entry.kjt, entry.target));
+		contracts = contracts.union(specRepos.getWdContracts(entry.kjt, entry.target));
 		getActiveContractPanel().setContracts(contracts, "Contracts");
 	    } else {
 		getActiveContractPanel().setContracts(
@@ -571,17 +527,7 @@ public final class ProofManagementDialog extends JDialog {
 	    } else {
 		getActiveContractPanel().setContracts(
 			DefaultImmutableSet.<Contract>nil(), "Contracts");
-	    }	    
-	} else if (pan == wdPanel) {
-	    final ClassTree.Entry entry = wdTree.getSelectedEntry();
-	    if(entry != null && entry.target != null) {
-	        final ImmutableSet<Contract> wdContracts
-	            = specRepos.getWdChecks(entry.kjt, entry.target);
-	        getActiveContractPanel().setContracts(wdContracts, "Well-Definedness Checks");
-	    } else {
-                getActiveContractPanel().setContracts(
-                        DefaultImmutableSet.<Contract>nil(), "Well-Definedness Checks");
-            }
+	    }
 	}
         updateStartButton();	
     }
