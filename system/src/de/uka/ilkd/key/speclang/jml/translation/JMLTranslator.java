@@ -1824,8 +1824,8 @@ final class JMLTranslator {
                     ((KeYJavaType) params[2]).getJavaType();
             if (!declsType.equals(PrimitiveType.JAVA_INT)
                     && !declsType.equals(PrimitiveType.JAVA_BIGINT))
-                throw new SLTranslationException(notInt);
-            return super.translate(excManager, params);
+                return createSkolemTerm();
+            else return super.translate(excManager, params);
         }
 
         @Override
@@ -1844,17 +1844,21 @@ final class JMLTranslator {
             LogicVariable lv = it.next();
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 // not interval range, create skolem term
-                addUnderspecifiedWarning("Numerical generalized Quantifier over non-interval domain");
-                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                final Function sk = new Function(new Name("genQuant"),intSort);
-                final Term res = TB.func(sk);
-                return res;
+                return createSkolemTerm();
             } else {
                 return translateBoundedNumericalQuantifier(lv,
                         lowerBound(t1, lv),
                         upperBound(t1, lv),
                         t2);
             }
+        }
+
+        private Term createSkolemTerm() {
+            addUnderspecifiedWarning("Numerical generalized Quantifier over non-interval domain");
+            final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+            final Function sk = new Function(new Name("genQuant"),intSort);
+            final Term res = TB.func(sk);
+            return res;
         }
 
         @Override
