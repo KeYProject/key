@@ -1603,6 +1603,21 @@ final class JMLTranslator {
     }
 
     /**
+     * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type int.
+     */
+    public SLExpression createSkolemExprInt(String jmlKeyWordName, Services services) {
+        addUnderspecifiedWarning(jmlKeyWordName);
+        assert services != null;
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(intSort);
+        final String shortName = jmlKeyWordName.replace("\\", "");
+        final int x = (new Random()).nextInt(999);
+        final Function sk = new Function(new Name(shortName+x),intSort);
+        final Term t = TB.func(sk);
+        return new SLExpression(t,intType);
+    }
+
+    /**
      * Get non-critical warnings.
      */
     public List<String> getWarnings() {
@@ -1670,10 +1685,14 @@ final class JMLTranslator {
      * @author bruns
      * @since 1.7.2178
      */
-    private void addIgnoreWarning(String feature) {
+    void addIgnoreWarning(String feature) {
         String msg = feature + " is not supported and has been silently ignored.";
-        Debug.out(msg);
+        Debug.out("JML translator warning: "+msg);
         warnings.add(msg);
+    }
+
+    void addIgnoreWarning(String feature, Token t) {
+        addIgnoreWarning(feature); // TODO: note position in file
     }
 
     /**
@@ -1682,7 +1701,7 @@ final class JMLTranslator {
      */
     private void addUnderspecifiedWarning(String feature) {
         String msg = feature + "is not supported and translated to an underspecified term or formula.";
-        Debug.out(msg);
+        Debug.out("JML translator warning: "+msg);
         warnings.add(msg);
     }
 
