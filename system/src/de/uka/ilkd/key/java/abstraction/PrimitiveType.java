@@ -48,7 +48,7 @@ public final class PrimitiveType implements Type {
 
     // must be first in file.
     private static final HashMap<String,PrimitiveType> typeMap =
-            new HashMap<String, PrimitiveType>();
+            new HashMap<String, PrimitiveType>(13);
     // must be first in file.
     private static final HashMap<Name,PrimitiveType> ldtMap =
             new HashMap<Name, PrimitiveType>();

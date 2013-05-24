@@ -430,14 +430,14 @@ public final class TypeConverter {
             return integerLDT.translateLiteral(lit, services);
         } else if (lit instanceof LongLiteral) {
             return integerLDT.translateLiteral(lit, services);
+        } else if (lit instanceof RealLiteral) {
+            return realLDT.translateLiteral(lit, services);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit, services);
         } else if (lit instanceof DoubleLiteral) {
             return doubleLDT.translateLiteral(lit, services);
         } else if (lit instanceof BigintLiteral) {
             return integerLDT.translateLiteral(lit,services);
-        } else if (lit instanceof RealLiteral) {
-            return realLDT.translateLiteral(lit, services);
         } else if (lit instanceof StringLiteral) {
             return charListLDT.translateLiteral(lit, services);
         } else if (lit instanceof EmptySetLiteral) {
