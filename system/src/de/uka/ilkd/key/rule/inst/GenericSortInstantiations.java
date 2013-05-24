@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.*;
@@ -492,8 +493,8 @@ public final class GenericSortInstantiations {
 	    Iterator<Sort>           it;
 	    Sort                     cur;
 	    ImmutableMap<GenericSort,Sort> res;
-	    HashSet<Sort>                  todo   = new HashSet<Sort> ();
-	    HashSet<Sort>                  done   = new HashSet<Sort> ();
+	    HashSet<Sort>                  todo   = new LinkedHashSet<Sort> ();
+	    HashSet<Sort>                  done   = new LinkedHashSet<Sort> ();
 	    Sort                     cand;
 
 	    // search for instantiated supersorts of gs (the method
@@ -597,9 +598,9 @@ public final class GenericSortInstantiations {
         if ( p_sorts.size () == 1 ) return p_sorts;
             
         final Iterator<Sort> p_itSorts = p_sorts.iterator();
-	HashSet<Sort>        inside    = new HashSet<Sort> ();
-	HashSet<Sort>        outside   = new HashSet<Sort> ();
-	HashSet<Sort>        todo      = new HashSet<Sort> ();
+	HashSet<Sort>        inside    = new LinkedHashSet<Sort> ();
+	HashSet<Sort>        outside   = new LinkedHashSet<Sort> ();
+	HashSet<Sort>        todo      = new LinkedHashSet<Sort> ();
 
 	inside.add(p_itSorts.next());
 

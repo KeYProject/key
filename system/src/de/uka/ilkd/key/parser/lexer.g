@@ -19,6 +19,7 @@ header {
     import java.io.InputStream;
     import de.uka.ilkd.key.util.*;
     import java.util.HashMap;
+    import java.util.LinkedHashMap;
     import antlr.TokenStreamSelector;
     import java.util.NoSuchElementException;
     import java.io.*;
@@ -216,8 +217,8 @@ tokens {
    private String modalityBegin = null;
    private String modalityEnd = null;
 
-   private static HashMap<String,String> modNames = new HashMap<String,String>(20);
-   private static HashMap<String,String> modPairs = new HashMap<String,String>(20);
+   private static HashMap<String,String> modNames = new LinkedHashMap<String,String>(20);
+   private static HashMap<String,String> modPairs = new LinkedHashMap<String,String>(20);
    
    static {
       modNames.put("\\<","diamond");
@@ -540,6 +541,13 @@ options {
       :   '>' '='
       ;
 
+RGUILLEMETS
+options {
+  paraphrase = "`>>'";
+}
+      :   '>' '>'
+      ;
+
 
 WS
 options {
@@ -567,6 +575,8 @@ LESS_DISPATCH
     |
      ('<' '=' ) => LESSEQUAL {$setType(LESSEQUAL);}
     |
+     ('<' '<' ) => LGUILLEMETS {$setType(LGUILLEMETS);}
+    |
      LESS {$setType(LESS);}
     ;
 
@@ -585,6 +595,15 @@ options {
 :
   '<' '='
     ;
+
+protected LGUILLEMETS
+options {
+  paraphrase = "'<<'";
+}
+:
+  '<' '<'
+    ;
+
 
 protected IMPLICIT_IDENT
 options {

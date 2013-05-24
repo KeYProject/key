@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -66,14 +67,14 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * a mapping of enums to the newly created class declarations.
      */
     Map<EnumDeclaration, EnumClassDeclaration> substitutes =
-            new HashMap<EnumDeclaration, EnumClassDeclaration>();
+            new LinkedHashMap<EnumDeclaration, EnumClassDeclaration>();
     
     /**
      * a mapping of constant references in switch-statements and their
      * substitutes.
      */
     Map<FieldReference, UncollatedReferenceQualifier> caseSubstitutes = 
-            new HashMap<FieldReference, UncollatedReferenceQualifier>(); 
+            new LinkedHashMap<FieldReference, UncollatedReferenceQualifier>(); 
 
     /**
      * find all enum declarations and make their substitutes.

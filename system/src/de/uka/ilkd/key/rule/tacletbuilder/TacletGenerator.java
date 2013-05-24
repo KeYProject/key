@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -166,7 +168,8 @@ public class TacletGenerator {
         final Sequent addedSeq =
                 Sequent.createAnteSequent(
                 Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
-        final Term findTerm = target.isStatic()
+        final Term findTerm = 
+                 target.isStatic()
                               ? TB.func(target, TB.var(heapSV))
                               : TB.func(target, TB.var(heapSV), TB.var(selfSV));
         final RewriteTacletGoalTemplate axiomTemplate =
@@ -288,7 +291,7 @@ public class TacletGenerator {
         final Term replaced = or.replace(term);
         final Term update = TB.elementary(services, TB.var(heapSV));
 
-        return TB.apply(update, replaced);
+        return TB.apply(update, replaced, null);
     }
 
 
@@ -298,8 +301,8 @@ public class TacletGenerator {
             final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder tacletBuilder) {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(
-                target, services, heapSV, selfSV, schemaRepresents,
-                tacletBuilder);
+              target, services, heapSV, selfSV, schemaRepresents,
+              tacletBuilder);
         SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
         final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
                 addedCf).semisequent();
@@ -398,7 +401,7 @@ public class TacletGenerator {
                             TB.var(heapSV),
                             eqVersion
                             ? TB.var(eqSV)
-                            : TB.var(selfSV));
+                            : TB.var(selfSV));        
         tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
                 new TacletGoalTemplate(addedSeq,
@@ -485,7 +488,7 @@ public class TacletGenerator {
             ImmutableList<SchemaVariable> schemaVars) {
         assert programVars.size() == schemaVars.size();
         final Map<ProgramVariable, ParsableVariable> map =
-                new HashMap<ProgramVariable, ParsableVariable>();
+                new LinkedHashMap<ProgramVariable, ParsableVariable>();
         Iterator<SchemaVariable> schemaIt = schemaVars.iterator();
         for (ProgramVariable progVar : programVars) {
             ParsableVariable schemaVar = schemaIt.next();
@@ -514,16 +517,16 @@ public class TacletGenerator {
         //collect all operator names used in t
         final OpCollector oc = new OpCollector();
         oc.visit(t);
-        final Set<Name> usedNames = new HashSet<Name>();
+        final Set<Name> usedNames = new LinkedHashSet<Name>();
         for (Operator op : oc.ops()) {
             usedNames.add(op.name());
         }
 
         //find and resolve name conflicts between schema variables
         ImmutableSet<VariableSV> newSVs = DefaultImmutableSet.<VariableSV>nil();
-        final Set<Name> namesOfNewSVs = new HashSet<Name>();
+        final Set<Name> namesOfNewSVs = new LinkedHashSet<Name>();
         final Map<VariableSV, VariableSV> replaceMap =
-                new HashMap<VariableSV, VariableSV>();
+                new LinkedHashMap<VariableSV, VariableSV>();
         for (VariableSV sv : intermediateRes.boundVars) {
             if (namesOfNewSVs.contains(sv.name())) {
                 //choose alternative name
@@ -558,7 +561,7 @@ public class TacletGenerator {
         ImmutableSet<VariableSV> svs = DefaultImmutableSet.<VariableSV>nil();
 
         //prepare op replacer, new bound vars
-        final Map<Operator, Operator> map = new HashMap<Operator, Operator>();
+        final Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
         final ImmutableArray<QuantifiableVariable> boundVars = t.boundVars();
         final QuantifiableVariable[] newBoundVars =
                 new QuantifiableVariable[boundVars.size()];
@@ -663,8 +666,7 @@ public class TacletGenerator {
                                            tacletBuilder, services)
                                            : TB.tt();
         //assemble formula
-        final Term guardedAxiom =
-                TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
+        final Term guardedAxiom = TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
         final SequentFormula guardedAxiomCf =
                 new SequentFormula(guardedAxiom);
         return guardedAxiomCf;

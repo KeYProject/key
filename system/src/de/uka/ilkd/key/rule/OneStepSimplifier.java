@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,13 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -425,7 +432,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    				       Protocol protocol) {
 	//collect context formulas (potential if-insts for replace-known)
 	final Map<Term,PosInOccurrence> context 
-		= new HashMap<Term,PosInOccurrence>();
+		= new LinkedHashMap<Term,PosInOccurrence>();
 	for(SequentFormula ante : seq.antecedent()) {
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
 		context.put(

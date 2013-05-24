@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -39,7 +40,7 @@ class PredictCostProver {
     private ImmutableSet<Term> assertLiterals;
     
     /** clauses from <code>instance</code> of CNF */
-    private Set<Clause> clauses = new HashSet<Clause>();
+    private Set<Clause> clauses = new LinkedHashSet<Clause>();
 
     private Services services;
 
@@ -208,7 +209,7 @@ class PredictCostProver {
     private long firstRefine() {
 	long cost = 1;
 	boolean assertChanged = false;
-	Set<Clause> res = new HashSet<Clause>();
+	Set<Clause> res = new LinkedHashSet<Clause>();
 	for (final Clause c : clauses) {
 	    c.firstRefine();
 	    long cCost = c.cost();

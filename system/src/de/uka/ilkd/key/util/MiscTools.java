@@ -436,7 +436,7 @@ public final class MiscTools {
     
     /**
      * <p>
-     * Returns the name of the applied rule in the given {@link Node} of
+     * Returns the display name of the applied rule in the given {@link Node} of
      * the proof tree in KeY.
      * </p>
      * <p>
@@ -456,7 +456,7 @@ public final class MiscTools {
     
     /**
      * <p>
-     * Returns the name of the {@link RuleApp}.
+     * Returns the display name of the {@link RuleApp}.
      * </p>
      * <p>
      * This method is required for the symbolic execution tree extraction,
@@ -476,6 +476,47 @@ public final class MiscTools {
        return name;
     }
     
+    /**
+     * <p>
+     * Returns the name of the applied rule in the given {@link Node} of
+     * the proof tree in KeY.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param node The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no one exists.
+     */
+    public static String getRuleName(Node node) {
+       String name = null;
+       if (node != null) {
+          name = getRuleName(node.getAppliedRuleApp());
+       }
+       return name;
+    }
+    
+    /**
+     * <p>
+     * Returns the name of the {@link RuleApp}.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param ruleApp The given {@link RuleApp}.
+     * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
+     */
+    public static String getRuleName(RuleApp ruleApp) {
+       String name = null;
+       if (ruleApp != null) {
+          Rule rule = ruleApp.rule();
+          if (rule != null) {
+             name = rule.name().toString();
+          }
+       }
+       return name;
+    }
     
     /**
      * Searches the {@link OneStepSimplifier} which is used in the 

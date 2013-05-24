@@ -21,7 +21,7 @@ header {
   import java.io.*;
   import java.util.*;
   import java.math.BigInteger;
-
+  import java.util.LinkedHashMap;
   import de.uka.ilkd.key.collection.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
@@ -76,7 +76,7 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
-    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
+    static HashMap<String, Character> prooflabel2tag = new LinkedHashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -99,10 +99,10 @@ options {
    }
 
     private NamespaceSet nss;
-    private HashMap<String, String> category2Default = new HashMap<String, String>();
+    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
     private boolean onlyWith=false;
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private HashSet usedChoiceCategories = new HashSet();
+    private HashSet usedChoiceCategories = new LinkedHashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
     private KeYExceptionHandler keh = null;
@@ -213,7 +213,7 @@ options {
              new SchemaRecoder2KeY(services, nss),
 	     services, 
 	     nss, 
-	     new HashMap());
+	     new LinkedHashMap());
     }
 
 
@@ -924,7 +924,7 @@ options {
         }else 
   	  if(!isDeclParser()) {
             if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
-              return new HashSet();
+              return new LinkedHashSet();
             }   
             DeclarationProgramVariableCollector pvc
                = new DeclarationProgramVariableCollector(jb.program(), getServices());
@@ -2891,13 +2891,16 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 
 
 
-accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
+accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] {Term t = null;}:
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
 atom returns [Term a = null]
+{
+  ImmutableArray<ITermLabel> labels;
+}
     :
-        {isTermTransformer()}? a = specialTerm
+(        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
@@ -2908,8 +2911,41 @@ atom returns [Term a = null]
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }   
+    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } RGUILLEMETS)?
     ; exception
         catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
+
+label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+{
+  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
+  ITermLabel label;
+}
+:
+   label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
+   {
+   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   }
+;
+
+single_label returns [ITermLabel label=null]
+{
+  String labelName = "";
+  ITermLabel left = null;
+  ITermLabel right = null;
+  List<String> parameters = new LinkedList<String>();
+}
+:
+  (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
+  {
+  	label = LabelFactory.createLabel(labelName, parameters);
+  }
+ 
+;  exception
+        catch [UnknownLabelException ex] {
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
@@ -3395,7 +3431,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN
+        ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
@@ -3408,7 +3444,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
             b.setIfSequent(ifSeq);
         }
         ( VARCOND LPAREN varexplist[b] RPAREN ) ?
-        goalspecs[b]
+        goalspecs[b, find != null]
         modifiers[b]
         RBRACE
         { 
@@ -3441,7 +3477,7 @@ modifiers[TacletBuilder b]
     ;
 
 seq returns [Sequent s] {Semisequent ant,suc; s = null; } : 
-        ant=semisequent SEQARROW suc=semisequent 
+        ant=semisequent SEQARROW suc=semisequent
         { s = Sequent.createSequent(ant, suc); }
     ;
 exception
@@ -3462,7 +3498,7 @@ termorseq returns [Object o]
 }
     :
         head=term ( COMMA s=seq | SEQARROW ss=semisequent ) ?
-        {
+        {        
             if ( s == null ) {
                 if ( ss == null ) {
                     // Just a term
@@ -3497,7 +3533,9 @@ semisequent returns [Semisequent ss]
     :
         /* empty */ | 
         head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new SequentFormula(head)).semisequent(); }
+        { 
+          ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
+        }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -3998,20 +4036,20 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
 ;
 
 
-goalspecs[TacletBuilder b] :
+goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
-    | goalspecwithoption[b] ( SEMI goalspecwithoption[b] )* ;
+    | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
 
-goalspecwithoption[TacletBuilder b]
+goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
 {
     ImmutableSet<Choice> soc = DefaultImmutableSet.<Choice>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
-                goalspec[b,soc] 
+                goalspec[b,soc,ruleWithFind] 
                 RBRACE)
         |  
-            goalspec[b,null] 
+            goalspec[b,null,ruleWithFind] 
         )
     ;
 
@@ -4038,7 +4076,7 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, ImmutableSet<Choice> soc] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 {
     Object rwObj = null;
     Sequent addSeq = Sequent.EMPTY_SEQUENT;

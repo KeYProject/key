@@ -135,6 +135,20 @@ public class CollectionUtil {
    }
    
    /**
+    * Adds all elements to the {@link Collection}. 
+    * @param <T> The type of the {@link Collection}s elements.
+    * @param collection The {@link Collection} to add to.
+    * @param elementsToAdd The elements to add.
+    */
+   public static <T> void addAll(Collection<T> collection, Iterable<T> iterable) {
+      if (collection != null && iterable != null) {
+         for (T toAdd : iterable) {
+            collection.add(toAdd);
+         }
+      }
+   }
+   
+   /**
     * Removes all elements from the {@link Collection}. 
     * @param <T> The type of the {@link Collection}s elements.
     * @param collection The {@link Collection} to remove from.

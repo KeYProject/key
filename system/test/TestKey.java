@@ -38,7 +38,8 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
 	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
 	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
-	de.uka.ilkd.key.logic.TestVariableNamer.class
+	de.uka.ilkd.key.logic.TestVariableNamer.class,
+	de.uka.ilkd.key.logic.LabeledTermImplTest.class
     };
 
 
@@ -106,10 +107,21 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
        de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
        de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
        de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+    };
+    
+    static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
+       de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
+       de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
+       de.uka.ilkd.key.proof_references.analyst.TestProgramVariableReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestClassAxiomAndInvariantProofReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestContractProofReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestMethodBodyExpandProofReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestMethodCallProofReferencesAnalyst.class
     };
 
      
@@ -144,6 +156,7 @@ public class TestKey extends TestSuite {
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+   suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -61,6 +62,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -421,6 +423,11 @@ public class TermBuilder {
     }
 
 
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<ITermLabel> labels) {
+    return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
+    }
+
+
     public Term box(JavaBlock jb, Term t) {
         return prog(Modality.BOX, jb, t);
     }
@@ -643,6 +650,11 @@ public class TermBuilder {
 
 
     public Term imp(Term t1, Term t2) {
+       return imp(t1, t2, null);
+    }
+
+
+    public Term imp(Term t1, Term t2, ImmutableArray<ITermLabel> labels) {
     if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
         return tt();
     } else if(t1.op() == Junctor.TRUE) {
@@ -650,7 +662,7 @@ public class TermBuilder {
     } else if(t2.op() == Junctor.FALSE) {
         return not(t1);
     } else {
-        return tf.createTerm(Junctor.IMP, t1, t2);
+        return tf.createTerm(Junctor.IMP, t1, t2, labels);
     }
     }
 
@@ -867,7 +879,7 @@ public class TermBuilder {
 
 
     public Term sequential(Term u1, Term u2) {
-    return parallel(u1, apply(u1, u2));
+    return parallel(u1, apply(u1, u2, null));
     }
 
 
@@ -894,8 +906,7 @@ public class TermBuilder {
     }
     }
 
-
-    public Term apply(Term update, Term target) {
+    public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
     if(update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
     } else if(update.op() == UpdateJunctor.SKIP) {
@@ -905,7 +916,8 @@ public class TermBuilder {
         } else {
         return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
                      update,
-                     target);
+                     target,
+                     labels);
     }
     }
 
@@ -914,14 +926,14 @@ public class TermBuilder {
                             Term loc,
                             Term value,
                             Term target) {
-    return apply(elementary(services, loc, value), target);
+    return apply(elementary(services, loc, value), target, null);
     }
 
 
     public Term applyElementary(Services services,
                             Term heap,
                             Term target) {
-    return apply(elementary(services, heap), target);
+    return apply(elementary(services, heap), target, null);
     }
 
 
@@ -930,19 +942,19 @@ public class TermBuilder {
                             Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term target : targets) {
-            result = result.append(apply(elementary(services, heap), target));
+            result = result.append(apply(elementary(services, heap), target, null));
         }
     return result;
     }
 
 
     public Term applyParallel(Term[] updates, Term target) {
-    return apply(parallel(updates), target);
+    return apply(parallel(updates), target, null);
     }
 
 
     public Term applyParallel(ImmutableList<Term> updates, Term target) {
-    return apply(parallel(updates), target);
+    return apply(parallel(updates), target, null);
     }
 
 
@@ -950,7 +962,7 @@ public class TermBuilder {
                           Term[] lhss,
                           Term[] values,
                           Term target) {
-    return apply(parallel(services, lhss, values), target);
+    return apply(parallel(services, lhss, values), target, null);
     }
 
 
@@ -962,7 +974,7 @@ public class TermBuilder {
                                             .append(updates)
                                             .tail();
         return apply(updates[0],
-                 applySequential(updateList, target));
+                 applySequential(updateList, target), null);
     }
     }
 
@@ -972,11 +984,18 @@ public class TermBuilder {
         return target;
     } else {
         return apply(updates.head(),
-                 applySequential(updates.tail(), target));
+                 applySequential(updates.tail(), target), null);
     }
     }
 
-
+    public Term applyUpdatePairsSequential(ImmutableList<UpdateLabelPair> updates, Term target) {
+       if(updates.isEmpty()) {
+           return target;
+       } else {
+           return apply(updates.head().getUpdate(),
+                 applyUpdatePairsSequential(updates.tail(), target), updates.head().getUpdateApplicationlabels());
+       }
+       }
 
     //-------------------------------------------------------------------------
     //boolean operators
@@ -1383,7 +1402,23 @@ public class TermBuilder {
     public Term arr(Services services, Term idx) {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
+    
+    public Term label(Term term, ImmutableArray<ITermLabel> labels) {
+        if ((labels == null || labels.isEmpty())) {
+            return term;
+        } else {
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
+                    term.javaBlock(), labels);
+        }
+    }
 
+    public Term label(Term term, ITermLabel label) {
+        if (label == null) {
+            return term;
+        } else {
+            return label(term, new ImmutableArray<ITermLabel>(label));
+        }
+    }
 
     public Term dotArr(Services services, Term ref, Term idx) {
         if(ref == null || idx == null) {
@@ -1650,7 +1685,7 @@ public class TermBuilder {
     final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
     final Map<LocationVariable, LogicVariable> map
-        = new HashMap<LocationVariable, LogicVariable>();
+        = new LinkedHashMap<LocationVariable, LogicVariable>();
     map.put(heapLDT.getHeap(), heapLV);
     final OpReplacer or = new OpReplacer(map);
     t = or.replace(t);
@@ -1904,5 +1939,7 @@ public class TermBuilder {
         }
 
     }
+
+
 
 }

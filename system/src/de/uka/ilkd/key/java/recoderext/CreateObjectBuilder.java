@@ -51,7 +51,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	(CrossReferenceServiceConfiguration services, 
 	 TransformerCache cache) {	
 	super(services, cache);
-	class2identifier = new HashMap<ClassDeclaration, Identifier>();
+	class2identifier = new LinkedHashMap<ClassDeclaration, Identifier>();
     }
 
    

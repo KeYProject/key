@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="de.hentschel.visualdbc.category"
+            class="de.hentschel.visualdbc.key.ui.view.ProofDependenciesViewPart"
+            icon="icons/logo16.gif"
+            id="de.hentschel.visualdbc.key.ui.view.ProofDependenciesView"
+            name="Proof Dependencies"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.key_project.monkey.product.ui.perspective">
+         <viewShortcut
+               id="de.hentschel.visualdbc.key.ui.view.ProofDependenciesView">
+         </viewShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.key_project.keyide.ui.perspectives">
+         <viewShortcut
+               id="de.hentschel.visualdbc.key.ui.view.ProofDependenciesView">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor"
+            class="de.hentschel.visualdbc.key.ui.adapter.ProofProviderAdapterFactory">
+         <adapter
+               type="org.key_project.key4eclipse.starter.core.util.IProofProvider">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor"
+            class="de.hentschel.visualdbc.key.ui.adapter.ProofProviderAdapterFactory">
+         <adapter
+               type="org.key_project.key4eclipse.starter.core.util.IProofProvider">
+         </adapter>
+      </factory>
+   </extension>
+
+</plugin>

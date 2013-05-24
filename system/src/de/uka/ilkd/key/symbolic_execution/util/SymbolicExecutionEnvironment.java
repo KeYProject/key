@@ -80,13 +80,15 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
     * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand methods.
     * @param loopTreatmentInvariant {@code true} use invariants, {@code false} expand loops.
+    * @param aliasChecks Do alias checks?
     */
    public static void configureProofForSymbolicExecution(Proof proof, 
                                                          int maximalNumberOfNodesPerBranch, 
                                                          boolean methodTreatmentContract,
-                                                         boolean loopTreatmentInvariant) {
+                                                         boolean loopTreatmentInvariant,
+                                                         boolean aliasChecks) {
       if (proof != null) {
-         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant);
+         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant, aliasChecks);
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));

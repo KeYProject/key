@@ -51,7 +51,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     // as these methods are thought to be only preliminary(we cache some
     // information here)
     private final Map<String, ProgramVariable> cache = 
-        new HashMap<String, ProgramVariable>(3);
+        new LinkedHashMap<String, ProgramVariable>(3);
 
     /**
      * keeps the currently used integer type
