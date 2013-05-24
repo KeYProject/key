@@ -19,6 +19,7 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -26,11 +27,13 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
@@ -496,6 +499,16 @@ final class JMLTranslator {
                     Term body) {
                 return TB.bsum(qv, lo, hi, body, services);
             }
+
+            @Override
+            protected Term createSkolemTerm ()  {
+                addUnderspecifiedWarning("\\sum over non-interval domain");
+                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final int x = (new Random()).nextInt(999);
+                final Function sk = new Function(new Name("sum"+x),intSort);
+                final Term res = TB.func(sk);
+                return res;
+            }
         });
 
         translationMethods.put(JMLKeyWord.PRODUCT,
@@ -508,6 +521,17 @@ final class JMLTranslator {
                     Term hi,
                     Term body) {
                 return TB.bprod(qv, lo, hi, body, services);
+            }
+
+
+            @Override
+            protected Term createSkolemTerm ()  {
+                addUnderspecifiedWarning("\\prod over non-interval domain");
+                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                final int x = (new Random()).nextInt(999);
+                final Function sk = new Function(new Name("prod"+x),intSort);
+                final Term res = TB.func(sk);
+                return res;
             }
         });
 
@@ -614,6 +638,18 @@ final class JMLTranslator {
                 final Term cond = TB.ife(TB.convertToFormula(body, services),
                                          TB.one(services), TB.zero(services));
                 return TB.bsum(qv, lo, hi, cond, services);
+            }
+
+            @Override
+            protected Term createSkolemTerm ()  {
+                addUnderspecifiedWarning("\\num_of over non-interval domain");
+                final TypeConverter typeConverter = services.getTypeConverter();
+                final IntegerLDT integerLDT = typeConverter.getIntegerLDT();
+                final Sort intSort = integerLDT.targetSort();
+                final int x = (new Random()).nextInt(999);
+                final Function sk = new Function(new Name("numOf"+x),intSort);
+                final Term res = TB.func(sk);
+                return res;
             }
         });
 
@@ -1688,6 +1724,7 @@ final class JMLTranslator {
                     (ImmutableList<LogicVariable>) params[3];
             boolean nullable = (Boolean) params[4];
             services = (Services) params[5];
+            assert services != null;
 
             Term nullTerm = TB.NULL(services);
             for (LogicVariable lv : declVars) {
@@ -1822,6 +1859,8 @@ final class JMLTranslator {
                     ImmutableList.class, Boolean.class, Services.class);
             de.uka.ilkd.key.java.abstraction.Type declsType =
                     ((KeYJavaType) params[2]).getJavaType();
+            services = (Services) params[5];
+            assert services != null;
             if (!declsType.equals(PrimitiveType.JAVA_INT)
                     && !declsType.equals(PrimitiveType.JAVA_BIGINT))
                 return createSkolemTerm();
@@ -1853,13 +1892,7 @@ final class JMLTranslator {
             }
         }
 
-        private Term createSkolemTerm() {
-            addUnderspecifiedWarning("Numerical generalized Quantifier over non-interval domain");
-            final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-            final Function sk = new Function(new Name("genQuant"),intSort);
-            final Term res = TB.func(sk);
-            return res;
-        }
+        protected abstract Term createSkolemTerm();
 
         @Override
         protected boolean isGeneralized () {
