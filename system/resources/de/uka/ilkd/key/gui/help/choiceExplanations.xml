@@ -112,5 +112,12 @@ Loading rules dealing with sequences can be disabled.
 <entry key="reach">
 Loading rules dealing with reachability can be disabled.
 </entry>
+
+<entry key="integerSimplificationRules">Loading less commonly used rules for (mathematical) integers, such as rules for bounded sums and products, modulo, or polynomials, can be disabled. If they are loaded, their application in the strategy can still be controlled as usual.
+
+This option is experimental. Depending of your understanding of 'less common', you may experience incompleteness. Doing proofs with Java int semantics will not work, definitely.
+
+Not to be confused with intRules, which controls the semantics of the Java type int.
+</entry>
 </properties>
 

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -318,7 +320,7 @@ public final class LogicPrinter {
     
     private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
 	
-	Set<SchemaVariable> result = new HashSet<SchemaVariable>();
+	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 	OpCollector oc = new OpCollector();
 	
 	//find, assumes
@@ -886,8 +888,42 @@ public final class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print("(");
+            }
             notationInfo.getNotation(t.op(), services).print(t,this);
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print(")");
+            }
         }
+        if (t.hasLabels()) {
+            printLabels(t);
+        }
+    }
+
+    public void printLabels(Term t) throws IOException {
+        layouter.beginC().print("<<");
+        boolean afterFirst = false;
+        for (ITermLabel l : t.getLabels()) {
+            if (afterFirst) {
+               layouter.print(",").brk(1, 0);
+            }
+            else {
+               afterFirst = true;
+            }
+            layouter.print(l.name().toString());
+            if (l.getChildCount()>0) {
+               layouter.print("(").beginC(2);
+               for (int i = 0; i < l.getChildCount(); i++) {
+                  layouter.print("\"" + l.getChild(i).toString() + "\"");
+                  if (i < l.getChildCount() - 1) {
+                     layouter.print(",").ind(1, 2);
+                  }
+               }
+               layouter.end().print(")");
+            }
+        }
+        layouter.end().print(">>");
     }
 
     /**
@@ -931,7 +967,16 @@ public final class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-        notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print("(");
+       }
+       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print(")");
+       }
+       if (t.hasLabels()) {
+          printLabels(t);
+       }
     }
 
 
@@ -1745,7 +1790,7 @@ public final class LogicPrinter {
                 return layouter.mark(o);
         }
     }
-
+    
     /**
      * returns the PositionTable representing position information on
      * the sequent of this LogicPrinter. Subclasses may overwrite
@@ -1753,6 +1798,19 @@ public final class LogicPrinter {
      * is not computed there.
      */
     public InitialPositionTable getPositionTable() {
+        if (pure) {
+            return null;
+        }
+        return ((PosTableStringBackend)backend).getPositionTable();
+    }
+
+    /**
+     * returns the PositionTable representing position information on
+     * the sequent of this LogicPrinter. Subclasses may overwrite
+     * this method with a null returning body if position information
+     * is not computed there.
+     */
+    public InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }

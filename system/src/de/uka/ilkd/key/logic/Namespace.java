@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
 import java.util.Iterator;
-
+import java.util.LinkedHashMap;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -98,7 +98,7 @@ public class Namespace implements java.io.Serializable {
     public void add(Named sym) {
 	if (numLocalSyms>0) {
                 if (symbols == null) {
-                    symbols = new HashMap<Name, Named>();
+                    symbols = new LinkedHashMap<Name, Named>();
                     if (localSym != null) {
                         symbols.put(localSym.name(), localSym);
                         localSym = null;
@@ -135,7 +135,7 @@ public class Namespace implements java.io.Serializable {
     
     /** "remember" all additions from now on */
     public void startProtocol() {
-        protocol = new HashMap<Name, Named>();
+        protocol = new LinkedHashMap<Name, Named>();
     }
 
     /** gets symbols added since last <code>startProtocol()</code>;

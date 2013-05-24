@@ -85,7 +85,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       String status = "";
       try {
          try {
-            status = load();
+            status = load(true);
          }
          catch (ExceptionHandlerException e) {
             // e.printStackTrace();

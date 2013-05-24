@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
@@ -38,10 +39,10 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     protected Namespace svns;
 
     /** caches access to methods for reflection */
-    private final static HashMap schemaCt2meth = new HashMap(400);
+    private final static HashMap schemaCt2meth = new LinkedHashMap(400);
 
     /** caches constructor access for reflection */
-    private final static HashMap recClass2schemakeyClassCons = new HashMap(400);
+    private final static HashMap recClass2schemakeyClassCons = new LinkedHashMap(400);
 
     // could this be the servConf of the super class?
     private static SchemaCrossReferenceServiceConfiguration schemaServConf = new SchemaCrossReferenceServiceConfiguration(

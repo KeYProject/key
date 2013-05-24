@@ -206,7 +206,8 @@ public class KeyProof extends MemoryProof implements IDisposable {
          // Get required parameters
          Services services = connection.getServices();
          // Analyze tree
-         List<IDSProvableReference> references = KeyProofReferenceUtil.analyzeProof(connection, services, proof);
+         List<IDSProvableReference> references = new LinkedList<IDSProvableReference>(); 
+         references.addAll(KeyProofReferenceUtil.analyzeProof(connection, services, proof));
          // Add initial references from the ProofObjInput.
          if (inputReferences != null) {
             references.addAll(inputReferences);

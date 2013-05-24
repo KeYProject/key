@@ -182,4 +182,13 @@ public class KeYEnvironment<U extends UserInterface> {
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<CustomConsoleUserInterface>(ui, initConfig, loader.getProof());
    }
+
+   /**
+    * Disposes this {@link KeYEnvironment}.
+    */
+   public void dispose() {
+      if (loadedProof != null) {
+         loadedProof.dispose();
+      }
+   }
 }

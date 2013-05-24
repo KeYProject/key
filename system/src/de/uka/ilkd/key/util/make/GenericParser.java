@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class GenericParser {
 
@@ -78,7 +79,7 @@ public class GenericParser {
     public static String generatedSrcPath;
 
     // Hashes rules that have been created
-    private static HashSet<String> ruleSet=new HashSet<String>();
+    private static HashSet<String> ruleSet=new LinkedHashSet<String>();
 
 
     // STATIC METHODS

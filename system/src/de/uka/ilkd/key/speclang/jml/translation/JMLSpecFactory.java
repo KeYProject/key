@@ -30,9 +30,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -83,7 +81,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         cf = new ContractFactory(services);
-        modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
+        modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 
 
@@ -244,6 +242,10 @@ public class JMLSpecFactory {
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            if(heap == savedHeap && textualSpecCase.getAssignable(heap.name().toString()).isEmpty()) {
              clauses.assignables.put(heap, null);
+           } else if (clauses.strictlyPure) {
+               final ImmutableList<PositionedString> assignableNothing = ImmutableSLList.<PositionedString>nil().append(new PositionedString("assignable \\nothing;"));
+               clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+                       progVars.paramVars,assignableNothing));
            }else{
              clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
@@ -441,7 +443,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         PositionedString[] array = new PositionedString[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new HashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),
@@ -466,7 +468,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         PositionedString[] array = new PositionedString[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new HashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),

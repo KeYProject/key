@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -184,7 +185,7 @@ public class BoundVariableTools {
         ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
 
         final Map<QuantifiableVariable, QuantifiableVariable> variableRenamings = 
-            new HashMap<QuantifiableVariable, QuantifiableVariable> ();
+            new LinkedHashMap<QuantifiableVariable, QuantifiableVariable> ();
         for ( int i = subtermsBegin + 1; i < subtermsEnd; ++i ) {
             // check that numbers and sorts of the quantified variables are
             // consistent
@@ -236,7 +237,7 @@ public class BoundVariableTools {
         
         final ImmutableArray<QuantifiableVariable> unifiedVars =
             unifyVariableArrays ( vars0, vars1, 
-                    new HashMap<QuantifiableVariable, QuantifiableVariable> () );
+                    new LinkedHashMap<QuantifiableVariable, QuantifiableVariable> () );
 
         final Term renamedTerm0 = renameVariables ( term0, vars0, unifiedVars );
         final Term renamedTerm1 = renameVariables ( term1, vars1, unifiedVars );

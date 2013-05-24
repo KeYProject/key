@@ -51,7 +51,7 @@ public class AutoModeTester extends PropertyTester {
       if (receiver instanceof KeYEditor){
          //initialize values
          KeYEditor editor = (KeYEditor) receiver;
-         ConsoleUserInterface userInterface = editor.getKeYEnvironment().getUi();
+         ConsoleUserInterface userInterface = editor.getEnvironment().getUi();
          //Set button states
          if (PROPERTY_START.equals(property)) {
             return !userInterface.isAutoMode();

@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import recoder.ServiceConfiguration;
 import recoder.abstraction.*;
@@ -47,7 +48,7 @@ import de.uka.ilkd.key.util.Debug;
 public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     
     // this somewhat doubles name2type in DefaultNameInfo to which we have no access
-    private HashMap<String, ClassType> classtypes = new HashMap<String, ClassType>(); 
+    private HashMap<String, ClassType> classtypes = new LinkedHashMap<String, ClassType>(); 
     
     public KeYCrossReferenceNameInfo(ServiceConfiguration config) {
         super(config);

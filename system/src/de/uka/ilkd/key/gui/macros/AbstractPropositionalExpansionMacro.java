@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui.macros;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -47,7 +48,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * convert a string array to a set of strings
      */
     protected static Set<String> asSet(String[] strings) {
-        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(strings)));
+        return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
     }
 
     /**
