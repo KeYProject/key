@@ -475,8 +475,8 @@ public final class TypeConverter {
         final Type t1 = type1.getJavaType();
         final Type t2 = type2.getJavaType();
 
-        if ((t1 == PrimitiveType.JAVA_REAL && isArithmeticType(t2)
-                || (isArithmeticType(t1) && t2 == PrimitiveType.JAVA_REAL)))
+        if ((t1 == PrimitiveType.JAVA_REAL && isNumericalType(t2)
+                || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL)))
                 return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
         else if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
                 t2 == PrimitiveType.JAVA_BOOLEAN)) {
@@ -913,7 +913,7 @@ public final class TypeConverter {
 		    to == PrimitiveType.JAVA_FLOAT);
 	}
 	if (from == PrimitiveType.JAVA_BIGINT) {
-	    return (to != PrimitiveType.JAVA_REAL || to != from);
+	    return (to != PrimitiveType.JAVA_REAL && to != from);
 		}
 	if (from == PrimitiveType.JAVA_REAL) {
 	    return (to != from);
@@ -970,8 +970,8 @@ public final class TypeConverter {
 	    return true;
 
 	// conversions between numeric types are always possible
-	if ( isArithmeticType ( from ) &&
-	     isArithmeticType ( to   ) )
+	if ( isNumericalType ( from ) &&
+	     isNumericalType ( to   ) )
 	    return true;
 
 	// all widening conversions
@@ -983,7 +983,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isArithmeticType ( Type t ) {
+    public boolean isNumericalType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
 	return

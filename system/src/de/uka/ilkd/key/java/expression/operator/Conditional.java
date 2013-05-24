@@ -99,8 +99,8 @@ public class Conditional extends Operator {
 	    return type1;
 
 	// numeric types
-	if (tc.isArithmeticType(type1) &&
-	    tc.isArithmeticType(type2) ) {
+	if (tc.isNumericalType(type1) &&
+	    tc.isNumericalType(type2) ) {
 	    if (type1.getJavaType() == PrimitiveType.JAVA_BYTE &&
 		type2.getJavaType() == PrimitiveType.JAVA_SHORT || 
 		type1.getJavaType() == PrimitiveType.JAVA_SHORT &&
