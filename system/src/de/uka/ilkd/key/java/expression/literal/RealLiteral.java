@@ -46,6 +46,9 @@ public class RealLiteral extends Literal {
         this.value="0.0";
     }
 
+    public RealLiteral (int value){
+        this(""+value+".0");
+    }
     public RealLiteral(double value) {
         this.value="" + value;
     }
@@ -57,6 +60,11 @@ public class RealLiteral extends Literal {
     public RealLiteral(ExtList children, String value) {
 	super(children);
         this.value=value;
+    }
+
+    public RealLiteral(ExtList children){
+        super(children);
+        value = "0.0";
     }
 
     /**

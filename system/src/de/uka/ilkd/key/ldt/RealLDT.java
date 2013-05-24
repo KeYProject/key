@@ -33,7 +33,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public final class RealLDT extends LDT {
 
-    public static final Name NAME = new Name("\\real");
+    public static final Name NAME = new Name("real");
 
 
     public RealLDT(Services services) {

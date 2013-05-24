@@ -53,6 +53,7 @@ public final class TypeConverter {
     private FreeLDT genLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
+    private RealLDT realLDT;
     private CharListLDT charListLDT;
 
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
@@ -83,6 +84,8 @@ public final class TypeConverter {
             this.floatLDT = (FloatLDT) ldt;
         } else if (ldt instanceof DoubleLDT) {
             this.doubleLDT = (DoubleLDT) ldt;
+        } else if (ldt instanceof RealLDT) {
+            this.realLDT = (RealLDT) ldt;
         } else if (ldt instanceof CharListLDT) {
             this.charListLDT = (CharListLDT) ldt;
         }
@@ -148,6 +151,10 @@ public final class TypeConverter {
 
     public FloatLDT getFloatLDT() {
         return floatLDT;
+    }
+
+    public RealLDT getRealLDT () {
+        return realLDT;
     }
 
     public DoubleLDT getDoubleLDT() {
@@ -427,6 +434,10 @@ public final class TypeConverter {
             return floatLDT.translateLiteral(lit, services);
         } else if (lit instanceof DoubleLiteral) {
             return doubleLDT.translateLiteral(lit, services);
+        } else if (lit instanceof BigintLiteral) {
+            return integerLDT.translateLiteral(lit,services);
+        } else if (lit instanceof RealLiteral) {
+            return realLDT.translateLiteral(lit, services);
         } else if (lit instanceof StringLiteral) {
             return charListLDT.translateLiteral(lit, services);
         } else if (lit instanceof EmptySetLiteral) {
@@ -464,7 +475,10 @@ public final class TypeConverter {
         final Type t1 = type1.getJavaType();
         final Type t2 = type2.getJavaType();
 
-        if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
+        if ((t1 == PrimitiveType.JAVA_REAL && isArithmeticType(t2)
+                || (isArithmeticType(t1) && t2 == PrimitiveType.JAVA_REAL)))
+                return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+        else if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
                 t2 == PrimitiveType.JAVA_BOOLEAN)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
         } else if ((t1 == PrimitiveType.JAVA_BYTE ||
@@ -520,20 +534,22 @@ public final class TypeConverter {
 	if (t1 == PrimitiveType.JAVA_BOOLEAN)
 	    // not really numeric ...
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-	if (t1 == PrimitiveType.JAVA_BYTE ||
+	else if (t1 == PrimitiveType.JAVA_BYTE ||
 	    t1 == PrimitiveType.JAVA_SHORT||
 	    t1 == PrimitiveType.JAVA_CHAR||
 	    t1 == PrimitiveType.JAVA_INT)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-	if (t1 == PrimitiveType.JAVA_LONG)
+	else if (t1 == PrimitiveType.JAVA_LONG)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-	if (t1 == PrimitiveType.JAVA_LOCSET)
+	else if (t1 == PrimitiveType.JAVA_LOCSET)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-	if (t1 == PrimitiveType.JAVA_SEQ)
+	else if (t1 == PrimitiveType.JAVA_SEQ)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-	if (t1 == PrimitiveType.JAVA_BIGINT)
+	else if (t1 == PrimitiveType.JAVA_BIGINT)
 	    return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-	throw new RuntimeException("Could not determine promoted type "+
+	else if (t1 == PrimitiveType.JAVA_REAL)
+        return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+	else throw new RuntimeException("Could not determine promoted type "+
 				   "of "+type1);
     }
 
@@ -686,15 +702,19 @@ public final class TypeConverter {
 	if (from == PrimitiveType.JAVA_BOOLEAN ||
 	    to == PrimitiveType.JAVA_BOOLEAN)
 	    return false;
-	// everything else can be coerced to a double
-	if (to == PrimitiveType.JAVA_DOUBLE) return true;
+    // everything else can be coerced to a \real
+	if (to == PrimitiveType.JAVA_REAL) return true;
+	// everything except \real and \bigint can be coerced to a double
+	if (to == PrimitiveType.JAVA_DOUBLE) return from != PrimitiveType.JAVA_BIGINT;
 	// but a double cannot be coerced to anything else
-	if (from == PrimitiveType.JAVA_DOUBLE) return false;
+	if (from == PrimitiveType.JAVA_DOUBLE) return from != PrimitiveType.JAVA_BIGINT;
 	// everything except doubles can be coerced to a float
 	if (to == PrimitiveType.JAVA_FLOAT) return true;
 	// but a float cannot be coerced to anything but float or double
 	if (from == PrimitiveType.JAVA_FLOAT) return false;
-	// everything except float or double can be coerced to a long
+	// any integral type can be coerced to a \bigint
+	if (to == PrimitiveType.JAVA_BIGINT) return true;
+	// everything except the above can be coerced to a long
 	if (to == PrimitiveType.JAVA_LONG) return true;
 	// but a long cannot be coerced to anything but float, double or long
 	if (from == PrimitiveType.JAVA_LONG) return false;
@@ -893,14 +913,11 @@ public final class TypeConverter {
 		    to == PrimitiveType.JAVA_FLOAT);
 	}
 	if (from == PrimitiveType.JAVA_BIGINT) {
-	    return (to == PrimitiveType.JAVA_BYTE ||
-			    to == PrimitiveType.JAVA_SHORT ||
-			    to == PrimitiveType.JAVA_CHAR ||
-			    to == PrimitiveType.JAVA_INT ||
-			    to == PrimitiveType.JAVA_LONG ||
-			    to == PrimitiveType.JAVA_FLOAT ||
-			    to == PrimitiveType.JAVA_DOUBLE);
+	    return (to != PrimitiveType.JAVA_REAL || to != from);
 		}
+	if (from == PrimitiveType.JAVA_REAL) {
+	    return (to != from);
+	}
 	return false;
     }
 
@@ -977,7 +994,9 @@ public final class TypeConverter {
 	    t == PrimitiveType.JAVA_LONG   ||
 	    t == PrimitiveType.JAVA_BIGINT ||
 	    t == PrimitiveType.JAVA_FLOAT  ||
-	    t == PrimitiveType.JAVA_DOUBLE;
+	    t == PrimitiveType.JAVA_DOUBLE ||
+	    t == PrimitiveType.JAVA_REAL
+	    ;
     }
 
 
