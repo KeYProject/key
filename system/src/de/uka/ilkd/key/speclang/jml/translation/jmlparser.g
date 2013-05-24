@@ -41,6 +41,7 @@ header {
     import java.util.List;
     import java.util.Map;
     import java.util.LinkedHashMap;
+    import java.util.ArrayList;
 }
 
 class KeYJMLParser extends Parser;
@@ -99,7 +100,7 @@ options {
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName,
 				    				offsetPos);
-        this.translator     = new JMLTranslator(excManager, services);
+        this.translator     = new JMLTranslator(excManager, fileName, services);
 
 	this.selfVar	    = self;
 	this.paramVars      = paramVars;
@@ -159,10 +160,6 @@ options {
 	throw excManager.createException(msg, t);
     }
 
-    private void raiseError(String msg, Token t, Exception cause) throws SLTranslationException {
-        throw excManager.createException(msg, t, cause);
-    }
-
     private void raiseNotSupported(String feature)
 	    throws SLTranslationException {
 	throw excManager.createWarningException(feature + " not supported");
@@ -179,8 +176,9 @@ options {
     }
 
     public List<PositionedString> getWarnings(){
-        // mutable -- but who cares?
-        return warnings;
+        List<PositionedString> res = new ArrayList<PositionedString>(warnings.size());
+        res.addAll(translator.getWarnings());
+        return res;
     }
 
 

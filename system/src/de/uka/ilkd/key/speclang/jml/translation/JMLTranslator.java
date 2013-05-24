@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import recoder.java.SourceElement.Position;
+
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -65,10 +67,11 @@ import de.uka.ilkd.key.util.Triple;
 final class JMLTranslator {
 
     private final static TermBuilder TB = TermBuilder.DF;
+    private final String fileName;
     @SuppressWarnings("unused")
     private Services services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
-    private List<String> warnings = new ArrayList<String>();
+    private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
 
@@ -167,11 +170,16 @@ final class JMLTranslator {
         }
     };
 
+    public JMLTranslator(SLTranslationExceptionManager excManager, Services services) {
+        this(excManager,null,services);
+    }
 
     public JMLTranslator(SLTranslationExceptionManager excManager,
+                            String fileName,
                          Services services) {
         this.excManager = excManager;
         this.services = services;
+        this.fileName = fileName;
 
         translationMethods =
                 new EnumMap<JMLKeyWord, JMLTranslationMethod>(JMLKeyWord.class) {
@@ -1620,8 +1628,8 @@ final class JMLTranslator {
     /**
      * Get non-critical warnings.
      */
-    public List<String> getWarnings() {
-        return new ArrayList<String>(warnings);
+    public List<PositionedString> getWarnings() {
+        return new ArrayList<PositionedString>(warnings);
     }
 
     /**
@@ -1629,8 +1637,8 @@ final class JMLTranslator {
      */
     public String getWarningsAsString() {
         StringBuffer sb = new StringBuffer();
-        for (String s: warnings) {
-            sb.append(s);
+        for (PositionedString s: warnings) {
+            sb.append(s.toString());
             sb.append("\n");
         }
         sb.deleteCharAt(sb.length()-1);
@@ -1691,7 +1699,8 @@ final class JMLTranslator {
     }
 
     void addIgnoreWarning(String feature, Token t) {
-        addIgnoreWarning(feature); // TODO: note position in file
+        String msg = feature + " is not supported and has been silently ignored.";
+        addWarning(msg,t);
     }
 
     /**
@@ -1709,7 +1718,12 @@ final class JMLTranslator {
 
     private void addWarning(String msg) {
         Debug.out("JML translator warning: "+msg);
-        warnings.add(msg);
+        warnings.add(new PositionedString(msg, fileName));
+    }
+
+    private void addWarning(String msg, Token t) {
+        Debug.out("JML translator warning: "+msg);
+        warnings.add(new PositionedString(msg, t));
     }
 
     //-------------------------------------------------------------------------

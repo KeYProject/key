@@ -178,13 +178,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
 	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
 	final Type varType  = kjt.getJavaType();
 
-	if (services.getTypeConverter().isReferenceType(varType) && !isImplicitVar) {
+	final TypeConverter typeConverter = services.getTypeConverter();
+    if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
 
 	    PositionedString ps
 	    = new PositionedString(varName + " != null", fileName, pos);
 	    result = result.add(ps);
 	    if (varType instanceof ArrayType &&
-		    services.getTypeConverter().
+		    typeConverter.
 		    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
 		final PositionedString arrayElementsNonNull
 		= new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
