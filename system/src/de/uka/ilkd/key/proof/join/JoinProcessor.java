@@ -30,10 +30,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.delayedcut.NodeGoalPair;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -196,8 +196,8 @@ public class JoinProcessor implements Runnable{
     }
     
     private Term buildIfElseTerm(){
-         Term thenTerm = TermBuilder.DF.apply(partner.getUpdate(0),partner.getCommonFormula());
-         Term elseTerm = TermBuilder.DF.apply(partner.getUpdate(1),partner.getCommonFormula());
+         Term thenTerm = TermBuilder.DF.apply(partner.getUpdate(0), partner.getCommonFormula(), null);
+         Term elseTerm = TermBuilder.DF.apply(partner.getUpdate(1), partner.getCommonFormula(), null);
          
          return TermBuilder.DF.ife(partner.getCommonPredicate(), thenTerm,elseTerm);
         

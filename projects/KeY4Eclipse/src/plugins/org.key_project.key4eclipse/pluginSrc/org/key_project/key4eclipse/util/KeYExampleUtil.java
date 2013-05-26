@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.Status;
 import org.key_project.key4eclipse.Activator;
 import org.osgi.framework.Bundle;
 
+import de.uka.ilkd.key.gui.ExampleChooser;
+
 /**
  * Provides static methods to work with the KeY examples in the Eclipse
  * integration of KeY.
@@ -46,6 +48,15 @@ public class KeYExampleUtil {
      */
     private KeYExampleUtil() {
     }
+    
+    /**
+     * Returns a *.key with a fast and simple proof.
+     * @return A *.key with a fast and simple proof.
+     */
+    public static File getExampleProof() {
+       String exampleDir = KeYExampleUtil.getLocalExampleDirectory();
+       return new File(exampleDir, "02-Subset" + File.separator + "project.key");
+    }
 
     /**
      * Returns a specified example directory in bundle file "customTargets.xml".
@@ -56,7 +67,7 @@ public class KeYExampleUtil {
      */
     public static String getLocalExampleDirectory() {
         String localKeyHome = getLocalKeYHomeDirectory();
-        return localKeyHome != null ? localKeyHome + File.separator + "examples" + File.separator + "heap" : null;
+        return localKeyHome != null ? localKeyHome + File.separator + ExampleChooser.EXAMPLES_PATH : null;
     }
 
     /**

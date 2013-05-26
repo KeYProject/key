@@ -31,7 +31,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -46,6 +48,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -884,8 +887,42 @@ public final class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print("(");
+            }
             notationInfo.getNotation(t.op(), services).print(t,this);
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print(")");
+            }
         }
+        if (t.hasLabels()) {
+            printLabels(t);
+        }
+    }
+
+    public void printLabels(Term t) throws IOException {
+        layouter.beginC().print("<<");
+        boolean afterFirst = false;
+        for (ITermLabel l : t.getLabels()) {
+            if (afterFirst) {
+               layouter.print(",").brk(1, 0);
+            }
+            else {
+               afterFirst = true;
+            }
+            layouter.print(l.name().toString());
+            if (l.getChildCount()>0) {
+               layouter.print("(").beginC(2);
+               for (int i = 0; i < l.getChildCount(); i++) {
+                  layouter.print("\"" + l.getChild(i).toString() + "\"");
+                  if (i < l.getChildCount() - 1) {
+                     layouter.print(",").ind(1, 2);
+                  }
+               }
+               layouter.end().print(")");
+            }
+        }
+        layouter.end().print(">>");
     }
 
     /**
@@ -929,7 +966,16 @@ public final class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-        notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print("(");
+       }
+       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print(")");
+       }
+       if (t.hasLabels()) {
+          printLabels(t);
+       }
     }
 
 
@@ -1003,15 +1049,24 @@ public final class LogicPrinter {
 			        : services.getTypeConverter().getHeapLDT();
         if(NotationInfo.PRETTY_SYNTAX
             && heapLDT != null
-            && t.sub(0).op() == heapLDT.getHeap()) {
+            && t.sub(0).op().sort(t.subs()).equals(
+               services.getNamespaces().sorts().lookup(new Name("Heap")))) {
             startTerm(3);
             
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
                 
-            markStartSub();
+            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
+            if (printHeap) {
+                markStartSub();
+                printTerm(t.sub(0));
+                markEndSub();
+                layouter.print("[");
+            } else {
+                markStartSub();
             //heap not printed
             markEndSub();
+            }
 
             if(objectTerm.equals(TermBuilder.DF.NULL(services))
                 && fieldTerm.op() instanceof Function
@@ -1065,6 +1120,9 @@ public final class LogicPrinter {
             } else {
         	printFunctionTerm(t.op().name().toString(), t);
             }	
+            if (printHeap) {
+                layouter.print("]");
+            }
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
@@ -1097,12 +1155,22 @@ public final class LogicPrinter {
 			        : services.getTypeConverter().getHeapLDT();	
 	if(NotationInfo.PRETTY_SYNTAX
            && heapLDT != null 
-           && t.sub(0).op() == heapLDT.getHeap()) {
-	    final IObserverFunction obs = (IObserverFunction) t.op();
+           && t.sub(0).op().sort(t.subs()).equals(
+                services.getNamespaces().sorts().lookup(new Name("Heap")))) {
+	    final ObserverFunction obs = (ObserverFunction) t.op();
             startTerm(t.arity());
-            markStartSub();
+
+            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
+            if (printHeap) {
+                markStartSub();
+                printTerm(t.sub(0));
+                markEndSub();
+                layouter.print("[");
+            } else {
+                markStartSub();
             //heap not printed
             markEndSub();
+            }
             
             if(!obs.isStatic()) {
         	markStartSub();
@@ -1128,6 +1196,9 @@ public final class LogicPrinter {
                     }
         	}
         	layouter.print(")").end();
+            }
+            if (printHeap) {
+                layouter.print("]");
             }
         } else {
             printFunctionTerm(t.op().name().toString(), t);            
@@ -1718,7 +1789,7 @@ public final class LogicPrinter {
                 return layouter.mark(o);
         }
     }
-
+    
     /**
      * returns the PositionTable representing position information on
      * the sequent of this LogicPrinter. Subclasses may overwrite
@@ -1726,6 +1797,19 @@ public final class LogicPrinter {
      * is not computed there.
      */
     public InitialPositionTable getPositionTable() {
+        if (pure) {
+            return null;
+        }
+        return ((PosTableStringBackend)backend).getPositionTable();
+    }
+
+    /**
+     * returns the PositionTable representing position information on
+     * the sequent of this LogicPrinter. Subclasses may overwrite
+     * this method with a null returning body if position information
+     * is not computed there.
+     */
+    public InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }

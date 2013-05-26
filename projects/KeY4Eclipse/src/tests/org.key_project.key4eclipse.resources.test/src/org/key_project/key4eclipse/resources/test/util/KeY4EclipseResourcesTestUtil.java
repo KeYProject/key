@@ -29,7 +29,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.proof.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -158,7 +158,7 @@ public class KeY4EclipseResourcesTestUtil {
     * @return the {@link LinkedList} with the collected {@link IMarker}
     * @throws CoreException
     */
-   private static LinkedList<IMarker> getKeYMarkerByType(String type, IResource res) throws CoreException{
+   public static LinkedList<IMarker> getKeYMarkerByType(String type, IResource res) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       IMarker[] markers = res.findMarkers(type, true, IResource.DEPTH_INFINITE);
       for(IMarker marker : markers){

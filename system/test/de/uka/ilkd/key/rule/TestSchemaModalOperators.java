@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -168,8 +169,8 @@ public class TestSchemaModalOperators extends TestCase {
 	 Debug.out("Find: ", find);
 	 Debug.out("Replace: ", replace);
 	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.syntacticalReplace(replace, null, mc);
-	 Term instfind = t.syntacticalReplace(replace, null, mc);
+	 Term instreplace = t.syntacticalReplace(replace, null, mc, null);
+	 Term instfind = t.syntacticalReplace(replace, null, mc, null);
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
     }

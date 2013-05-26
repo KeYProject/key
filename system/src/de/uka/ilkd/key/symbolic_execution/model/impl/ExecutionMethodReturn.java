@@ -175,11 +175,16 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                                                                                                                                      methodReturnNode, 
                                                                                                                                                                                      resultVar);
             ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
-            returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
-            assert returnValue != null;
-            // Format return vale
-            StringBuffer sb = ProofSaver.printTerm(returnValue, getServices(), true);
-            formatedReturnValue = sb.toString();
+            try {
+               returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
+               assert returnValue != null;
+               // Format return vale
+               StringBuffer sb = ProofSaver.printTerm(returnValue, getServices(), true);
+               formatedReturnValue = sb.toString();
+            }
+            finally {
+               info.getProof().dispose();
+            }
          }
       }
    }
@@ -241,7 +246,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().subTerm();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);

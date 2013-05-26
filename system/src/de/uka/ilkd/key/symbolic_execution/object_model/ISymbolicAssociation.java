@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 
@@ -63,4 +64,30 @@ public interface ISymbolicAssociation {
     * @return The target {@link ISymbolicObject}.
     */
    public ISymbolicObject getTarget();
+   
+   /**
+    * <p>
+    * Returns the optional condition under which this association is valid.
+    * </p>
+    * <p>
+    * The condition should be {@code null} by default. Only in rare cases,
+    * e.g. path condition is not strong enough to describe the path completely, 
+    * is a condition is provided.
+    * </p>
+    * @return The optional condition under which this association is valid.
+    */
+   public Term getCondition();
+   
+   /**
+    * <p>
+    * Returns the optional condition under which this association is valid as human readable {@link String}.
+    * </p>
+    * <p>
+    * The condition should be {@code null} by default. Only in rare cases,
+    * e.g. path condition is not strong enough to describe the path completely, 
+    * is a condition is provided.
+    * </p>
+    * @return The optional condition under which this association is valid as human readable {@link String}.
+    */
+   public String getConditionString();
 }

@@ -23,14 +23,14 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -130,8 +130,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 				if (g == null) {
 					g = proof.openGoals().head();
 				}
-				mainWindow.getMediator().goalChosen(
-				        g);
+				mainWindow.getMediator().goalChosen(g);
 				if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
 					// iff Stop on non-closeable Goal is selected a little
 					// popup is generated and proof is stopped
@@ -141,9 +140,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 					dialog.show();
 				}
 			}
-			mainWindow.displayResults(
-			        info.getTime(), info.getAppliedRules(),
-			        info.getClosedGoals(), info.getProof().openGoals().size());
+			mainWindow.displayResults(info.toString());
 		} else if (info.getSource() instanceof ProblemLoader) {
 			if (!"".equals(info.getResult())) {
 				final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
@@ -301,8 +298,6 @@ public class WindowUserInterface extends AbstractUserInterface {
            for (Proof p : rootTaskProofs) {
                //In a previous revision the following statement was performed only
                //on one proof object, namely on: mediator.getProof()
-               p.getServices().getSpecificationRepository().removeProof(p);
-               p.mgt().removeProofListener();
                p.dispose();
            }
            proof.dispose();
@@ -315,5 +310,13 @@ public class WindowUserInterface extends AbstractUserInterface {
            Runtime r = Runtime.getRuntime();
            r.gc();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isRegisterProofs() {
+       return true;
     }
 }

@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.resources.builder;
 
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IMethod;
 
@@ -15,8 +17,7 @@ public class ProofElement {
    
    private IFile javaFile;
    
-   public boolean hasProof;
-   
+   private LinkedList<String> types;   
    
    public ProofOblInput getProofObl() {
       return proofObl;
@@ -35,18 +36,26 @@ public class ProofElement {
    public IFile getJavaFile() {
       return javaFile;
    }
+   
+   public LinkedList<String> getTypes(){
+      return types;
+   }
 
 
-   public ProofElement(ProofOblInput proofObl, IMethod method, IFile proofFile, IFile javaFile){
+   public ProofElement(ProofOblInput proofObl, IMethod method, IFile proofFile, IFile javaFile, LinkedList<String> types){
       this.proofObl = proofObl;
       this.method = method;
       this.proofFile = proofFile;
       this.javaFile = javaFile;
+      this.types = types;
+   }
+   
+   public boolean hasProof(){
       if(proofFile == null){
-         hasProof = false;
+         return false;
       }
-      else{
-         hasProof = true;
+      else {
+         return true;
       }
    }
    

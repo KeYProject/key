@@ -9,7 +9,7 @@
                      <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
                         <methodReturn name="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of x.doSomething();&gt;" isReturnValueComputed="true">
                            <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
-                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                               </termination>
                            </methodReturn>
                         </methodReturn>

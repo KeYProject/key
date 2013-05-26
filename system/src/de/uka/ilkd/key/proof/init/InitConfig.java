@@ -366,6 +366,24 @@ public class InitConfig {
         return ic;
     }
     
+    
+
+    /** returns a copy of this initial configuration copying the namespaces,
+     * the contained JavaInfo while using the immutable set of taclets in the
+     * copy
+     */
+    @SuppressWarnings("unchecked")
+    public InitConfig deepCopy() {
+        InitConfig ic = new InitConfig(services.copy(),
+                                       profile);
+        ic.setActivatedChoices(activatedChoices);
+        ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
+        ic.setTaclet2Builder(
+                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
+        ic.setTaclets(taclets);
+        ic.originalKeYFileName = originalKeYFileName;
+        return ic;
+    }
 
     public String toString() {
         return

@@ -11,7 +11,7 @@ public final class KeYProjectProperties {
    public static enum EnableEfficientProofManagement{
       ENALBLE_EFFICIENT_PROOFMANAGEMENT,
       DISALBLE_EFFICIENT_PROOFMANAGEMENT
-  }
+   }
    
    public static void setEnableEfficientProofManagement(IProject project,  String enabled) throws CoreException{
       if(project != null){

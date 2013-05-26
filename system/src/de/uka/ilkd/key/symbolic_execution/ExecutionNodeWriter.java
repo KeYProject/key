@@ -59,9 +59,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE = "nameIncludingReturnValue";
 
    /**
-    * Attribute exceptional termination to store {@link IExecutionTermination#isExceptionalTermination()}.
+    * Attribute exceptional termination to store {@link IExecutionTermination#getTerminationKind()}.
     */
-   public static final String ATTRIBUTE_EXCEPTIONAL_TERMINATION = "exceptionalTermination";
+   public static final String ATTRIBUTE_TERMINATION_KIND = "terminationKind";
    
    /**
     * Attribute name to store {@link IExecutionVariable#getTypeString()}.
@@ -152,6 +152,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionUseLoopInvariant#isInitiallyValid()}.
     */
    public static final String ATTRIBUTE_INITIALLY_VALID = "initiallyValid";
+
+   /**
+    * Attribute name to store {@link IExecutionBranchCondition#getAdditionalBranchLabel()}.
+    */
+   public static final String ATTRIBUTE_ADDITIONAL_BRANCH_LABEL = "additionalBranchLabel";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -365,6 +370,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION, node.getFormatedBranchCondition());
       attributeValues.put(ATTRIBUTE_MERGED_BRANCH_CONDITION, node.isMergedBranchCondition() + "");
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION_COMPUTED, node.isBranchConditionComputed() + "");
+      attributeValues.put(ATTRIBUTE_ADDITIONAL_BRANCH_LABEL, node.getAdditionalBranchLabel());
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
@@ -623,7 +629,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
-      attributeValues.put(ATTRIBUTE_EXCEPTIONAL_TERMINATION, Boolean.valueOf(node.isExceptionalTermination()).toString());
+      attributeValues.put(ATTRIBUTE_TERMINATION_KIND, node.getTerminationKind().toString());
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, sb);

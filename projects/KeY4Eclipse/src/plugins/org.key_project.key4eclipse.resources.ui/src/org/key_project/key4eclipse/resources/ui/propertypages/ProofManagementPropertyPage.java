@@ -17,12 +17,11 @@ import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 public class ProofManagementPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
 
    private Button enableEfficentProofManagementButton;
-   
-   
-   public ProofManagementPropertyPage() {
-      // TODO Auto-generated constructor stub
-   }
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    protected Control createContents(Composite parent) {
       initializeDialogUnits(parent);
@@ -43,16 +42,19 @@ public class ProofManagementPropertyPage extends PropertyPage implements IWorkbe
    }
 
    
+   /**
+    * Sets the selection for the CheckBox
+    */
    private void enableDisableButton(){
       IProject project = getProject();
       String enabled;
       try {
          enabled = project.getPersistentProperty(KeYProjectProperties.PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT);
-         if(enabled.equals("TRUE")){
-            enableEfficentProofManagementButton.setSelection(true);
-         }
-         else if(enabled.equals(false)){
+         if(enabled == null || enabled.equals("FALSE")){
             enableEfficentProofManagementButton.setSelection(false);
+         }
+         else if(enabled.equals("TRUE")){
+            enableEfficentProofManagementButton.setSelection(true);
          }
       }
       catch (CoreException e) {
@@ -61,6 +63,10 @@ public class ProofManagementPropertyPage extends PropertyPage implements IWorkbe
       }
    }
    
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public boolean performOk() {
       IProject project = getProject();

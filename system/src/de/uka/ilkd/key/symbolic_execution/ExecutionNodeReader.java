@@ -71,6 +71,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
@@ -369,7 +370,7 @@ public class ExecutionNodeReader {
     */
    protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes));
+         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_NODE.equals(qName)) {
          return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -393,7 +394,7 @@ public class ExecutionNodeReader {
          return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
-         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isExceptionalTermination(attributes));
+         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes));
       }
       else if (ExecutionNodeWriter.TAG_USE_OPERATION_CONTRACT.equals(qName)) {
          return new KeYlessUseOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
@@ -404,6 +405,15 @@ public class ExecutionNodeReader {
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
+   }
+
+   /**
+    * Returns the additional branch label value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getAdditionalBranchLabel(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ADDITIONAL_BRANCH_LABEL);
    }
 
    /**
@@ -434,12 +444,12 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * Returns the exceptional termination value.
+    * Returns the termination kind value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   protected boolean isExceptionalTermination(Attributes attributes) {
-      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTIONAL_TERMINATION));
+   protected TerminationKind getTerminationKind(Attributes attributes) {
+      return TerminationKind.valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TERMINATION_KIND));
    }
    
    /**
@@ -812,6 +822,11 @@ public class ExecutionNodeReader {
        * Indicates if branch condition is computed or not.
        */
       private boolean branchConditionComputed;
+
+      /**
+       * The optional additional branch label.
+       */
+      private String additionalBranchLabel;
       
       /**
        * Constructor.
@@ -822,6 +837,7 @@ public class ExecutionNodeReader {
        * @param formatedBranchCondition The formated branch condition.
        * @param mergedBranchCondition Merged branch condition?
        * @param branchConditionComputed Is branch condition computed?
+       * @param additionalBranchLabel The optional additional branch label.
        */
       public KeYlessBranchCondition(IExecutionNode parent, 
                                     String name, 
@@ -829,11 +845,13 @@ public class ExecutionNodeReader {
                                     boolean pathConditionChanged,
                                     String formatedBranchCondition,
                                     boolean mergedBranchCondition,
-                                    boolean branchConditionComputed) {
+                                    boolean branchConditionComputed,
+                                    String additionalBranchLabel) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.formatedBranchCondition = formatedBranchCondition;
          this.mergedBranchCondition = mergedBranchCondition;
          this.branchConditionComputed = branchConditionComputed;
+         this.additionalBranchLabel = additionalBranchLabel;
       }
 
       /**
@@ -891,6 +909,14 @@ public class ExecutionNodeReader {
       public boolean isBranchConditionComputed() {
          return branchConditionComputed;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getAdditionalBranchLabel() {
+         return additionalBranchLabel;
+      }
    }
 
    /**
@@ -927,9 +953,9 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessTermination extends AbstractKeYlessExecutionNode implements IExecutionTermination {
       /**
-       * Exceptional termination?
+       * The {@link TerminationKind}.
        */
-      private boolean exceptionalTermination;
+      private TerminationKind terminationKind;
       
       /**
        * Constructor.
@@ -943,9 +969,9 @@ public class ExecutionNodeReader {
                                 String name, 
                                 String formatedPathCondition, 
                                 boolean pathConditionChanged, 
-                                boolean exceptionalTermination) {
+                                TerminationKind terminationKind) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
-         this.exceptionalTermination = exceptionalTermination;
+         this.terminationKind = terminationKind;
       }
 
       /**
@@ -963,21 +989,25 @@ public class ExecutionNodeReader {
       public Sort getExceptionSort() {
          return null;
       }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public boolean isExceptionalTermination() {
-         return exceptionalTermination;
-      }
       
       /**
        * {@inheritDoc}
        */
       @Override
       public String getElementType() {
-         return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+         switch (getTerminationKind()) {
+            case EXCEPTIONAL : return "Exceptional Termination";
+            case LOOP_BODY : return "Loop Body Termination";
+            default : return "Termination";
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public TerminationKind getTerminationKind() {
+         return terminationKind;
       }
    }
 

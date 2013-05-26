@@ -83,4 +83,13 @@ public class RuleSetDispatchFeature implements Feature {
     public void clear(RuleSet ruleSet) {
         rulesetToFeature.remove ( ruleSet );
     }
+    
+    /**
+     * Returns the used {@link Feature} for the given {@link RuleSet}.
+     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
+     * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not available.
+     */
+    public Feature get(RuleSet ruleSet) {
+       return rulesetToFeature.get(ruleSet);
+    }
 }

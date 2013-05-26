@@ -1,7 +1,10 @@
 package org.key_project.key4eclipse.resources.marker;
 
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -55,31 +58,65 @@ public class MarkerManager {
       }
    }
    
+   public void setMarkerForAltProofElement(Proof proof, int lineNumber, IFile javaFile, IFile proofFile) throws CoreException {
+
+      // set marker
+      if (proof.closed()) {
+         IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
+         if (marker.exists()) {
+            marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proof.name().toString());
+            marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
+            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+         }
+      }
+      else {
+         IMarker marker = javaFile.createMarker(NOTCLOSEDMARKER_ID);
+         if (marker.exists()) {
+            marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proof.name().toString());
+            marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
+            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+         }
+      }
+   }
+   
    
    /**
     * Sets the ProofLoaderException{@link IMarker} for the given {@link IResource}.
     * @param res - the {@link IResource} to use
     * @throws CoreException
     */
-   public void setProblemLoaderExceptionMarker(IResource res, String msg) throws CoreException{
-      IMarker marker = res.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
+   public void setProblemLoaderExceptionMarker(IProject project, String msg) throws CoreException{
+      IMarker marker = project.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
       if (marker.exists()) {
          marker.setAttribute(IMarker.MESSAGE, msg);
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-         marker.setAttribute(IMarker.LINE_NUMBER, 1);
       }
    }
    
    
    /**
-    * Deletes all KeYResource {@link IMarker} from the given {@link IResource}.
+    * Removes all KeYResource {@link IMarker} from the given {@link IFile}.
     * @param res the {@link IResource} to use
     * @throws CoreException
     */
-   public void deleteMarker(IResource res) throws CoreException{
+   public void deleteKeYMarker(IResource res) throws CoreException{
       res.deleteMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
       res.deleteMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
       res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE);
+   }
+
+   
+   /**
+    * Removes all KeYResource {@link IMarker} from the {@link IFile}s of the given {@link LinkedList}.
+    * @param files - the given {@link LinkedList}
+    * @throws CoreException
+    */
+   public void deleteKeYMarker(LinkedList<IFile> files) throws CoreException{
+      for(IFile file : files){
+         deleteKeYMarker(file);
+      }
    }
    
    

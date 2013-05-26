@@ -48,18 +48,19 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -227,11 +228,12 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();
        if (proof == null) {
-       // Create proof input
-       ProofOblInput input = createProofInput(launchConfigurationName, initConfig, settings);
-       // Create proof
-       proof = ui.createProof(initConfig, input);
+          // Create proof input
+          ProofOblInput input = createProofInput(launchConfigurationName, initConfig, settings);
+          // Create proof
+          proof = ui.createProof(initConfig, input);
        }
+       SymbolicExecutionUtil.configureProof(proof);
        // Create symbolic execution tree builder
        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
        builder.analyse();
@@ -273,6 +275,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                             settings.getPrecondition(), 
                                             start, 
                                             end,
+                                            true,
                                             true);
        }
        else if (settings.isUseExistingContract()) {
@@ -287,7 +290,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           }
           // Instantiate proof obligation
           if (contract instanceof FunctionalOperationContract) {
-             input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+             input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true, true);
           }
           else {
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));
@@ -298,6 +301,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                       computeProofObligationName(pm, null, null), 
                                       pm, 
                                       settings.getPrecondition(), 
+                                      true,
                                       true);
        }
        return input;

@@ -19,7 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -142,6 +145,38 @@ public final class MiscTools {
             result = result && equalsOrNull(a, b);
         }
         return result;
+    }
+    
+
+    // =======================================================
+    // Methods operating on Collections
+    // =======================================================
+    
+    /** Combine two maps by function application.
+     * Values of <code>m0</code> which are not keys of <code>m1</code>
+     * are dropped.
+     * This implementation tries to use the same implementation of {@link java.util.Map}
+     * (provided in Java SE) as <code>m0</code>.
+     */
+    public static <S,T,U> Map<S,U> apply(Map<S,? extends T> m0, Map<T,U> m1) {
+        Map<S,U> res = null;
+        // try to use more specific implementation
+        if (m0 instanceof java.util.TreeMap)
+            res = new java.util.TreeMap<S,U>();
+        else if (m0 instanceof java.util.concurrent.ConcurrentHashMap)
+            res = new java.util.concurrent.ConcurrentHashMap<S,U>();
+        else if (m0 instanceof java.util.IdentityHashMap)
+            res = new java.util.IdentityHashMap<S, U>();
+        else if (m0 instanceof java.util.WeakHashMap)
+            res = new java.util.WeakHashMap<S,U>();
+        else res = new HashMap<S,U>();
+        
+        for (Entry<S, ? extends T> e: m0.entrySet()) {
+            final U value = m1.get(e.getValue());
+            if (value != null)
+                res.put(e.getKey(), value);
+        }
+        return res;
     }
     
     
@@ -401,7 +436,7 @@ public final class MiscTools {
     
     /**
      * <p>
-     * Returns the name of the applied rule in the given {@link Node} of
+     * Returns the display name of the applied rule in the given {@link Node} of
      * the proof tree in KeY.
      * </p>
      * <p>
@@ -421,7 +456,7 @@ public final class MiscTools {
     
     /**
      * <p>
-     * Returns the name of the {@link RuleApp}.
+     * Returns the display name of the {@link RuleApp}.
      * </p>
      * <p>
      * This method is required for the symbolic execution tree extraction,
@@ -436,6 +471,48 @@ public final class MiscTools {
           Rule rule = ruleApp.rule();
           if (rule != null) {
              name = rule.displayName();
+          }
+       }
+       return name;
+    }
+    
+    /**
+     * <p>
+     * Returns the name of the applied rule in the given {@link Node} of
+     * the proof tree in KeY.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param node The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no one exists.
+     */
+    public static String getRuleName(Node node) {
+       String name = null;
+       if (node != null) {
+          name = getRuleName(node.getAppliedRuleApp());
+       }
+       return name;
+    }
+    
+    /**
+     * <p>
+     * Returns the name of the {@link RuleApp}.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param ruleApp The given {@link RuleApp}.
+     * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
+     */
+    public static String getRuleName(RuleApp ruleApp) {
+       String name = null;
+       if (ruleApp != null) {
+          Rule rule = ruleApp.rule();
+          if (rule != null) {
+             name = rule.name().toString();
           }
        }
        return name;

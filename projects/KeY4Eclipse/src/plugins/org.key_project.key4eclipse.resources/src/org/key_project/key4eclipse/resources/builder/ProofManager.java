@@ -2,9 +2,12 @@ package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -33,11 +36,18 @@ import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -73,43 +83,18 @@ public class ProofManager {
    }
    
    
-   private IFile getFileFromErrorMessage(String msg) {
-      StringBuffer sb = new StringBuffer(msg);
-      int lineBreak = sb.indexOf("\n");
-      sb.delete(0, lineBreak+1);
-      int cutIndex = sb.indexOf(", line");
-      sb.delete(cutIndex, sb.length()+1);
-      IPath path = new Path(sb.toString());
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFile file = root.getFileForLocation(path);
-      if(file.exists()){
-         return file;
-      }
-      else{
-         return null;
-      }
-   }
-   
-   
-   private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
-      //remove all KeYMarker in the whole project
-      LinkedList<IFile> allFiles = collectAllJavaFilesForProject();
-      for(IFile file : allFiles){
-         deleteMarker(file);
-      }
-      //add the ProblemExceptionMarker
-      IFile file = getFileFromErrorMessage(e.getMessage());
-      markerManager.setProblemLoaderExceptionMarker(file, e.getMessage());
-   }
-   
-   
+   /**
+    * Runs all {@link Proof}s in the {@link IProject}.
+    * @throws Exception
+    */
    public void runAllProofs() throws Exception{
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
-      LinkedList<IFile> javaFiles = collectAllJavaFilesForProject();
-      deleteAllKeYMarker(javaFiles);
-      LinkedList<ProofElement> proofElements = getAllProofElements(javaFiles);
+      LinkedList<ProofElement> proofElements = getAllProofElements();
+      LinkedList<IFile> javaFiles = getAllJavaFilesFromProofElements(proofElements);
+      markerManager.deleteKeYMarker(javaFiles);
+      markerManager.deleteKeYMarker(project);
       for(ProofElement pe : proofElements){
-         if(pe.hasProof){
+         if(pe.hasProof()){
             Proof proof = processProof(pe.getProofObl(), pe.getProofFile());
             markerManager.setMarker(proof, pe.getMethod(), pe.getProofFile());
             if(proof != null){
@@ -119,14 +104,20 @@ public class ProofManager {
          }
       }
       cleanProofFolder(proofFiles, mainProofFolder);
-      
    }
+
    
+   
+   /**
+    * Runs the {@link Proof}s for the {@link IFile}s given in the {@link LinkedList}.
+    * @param javaFiles - the {@link LinkedList} with the selected {@link IFiles}
+    * @throws Exception
+    */
    public void runSelectedProofs(LinkedList<IFile> javaFiles) throws Exception{
-      deleteAllKeYMarker(javaFiles);
+      markerManager.deleteKeYMarker(javaFiles);
       LinkedList<ProofElement> proofElements = getAllProofElements(javaFiles);
       for(ProofElement pe : proofElements){
-         if(pe.hasProof){
+         if(pe.hasProof()){
             Proof proof = processProof(pe.getProofObl(), pe.getProofFile());
             markerManager.setMarker(proof, pe.getMethod(), pe.getProofFile());
             if(proof != null){
@@ -139,64 +130,23 @@ public class ProofManager {
    }
    
    
-   private void cleanProofFolderSelective(LinkedList<LinkedList<ProofElement>> proofElementsByFile){
-      for(LinkedList<ProofElement> pel : proofElementsByFile){
-         ProofElement proofElement = pel.get(0);
-         IFolder proofFolder = null;
-         LinkedList<IFile> proofFiles = new LinkedList<IFile>();
-         if(proofElement.hasProof){
-            IContainer container = proofElement.getProofFile().getParent();
-            if(container.getType() == IResource.FOLDER){
-               proofFolder = (IFolder) container;
-            }
-            for(ProofElement pe : pel){
-               proofFiles.add(pe.getProofFile());
-            }
-         }
-         else{
-            proofFolder = getProofFolderForJavaFile(proofElement.getJavaFile());
-         }
-         //delete proof files which don't belong to any method
-         try{
-            deleteUnnecessaryProofFiles(proofFolder, proofFiles);
-         } catch (CoreException e){
-            LogUtil.getLogger().createErrorStatus(e);
-         }
-      }
+   /**
+    * Deletes the main Proof{@link IFolder} and runs all {@link Proof}s for the {@link IProject}.
+    * @throws Exception
+    */
+   public void clean() throws Exception{
+      deleteResource(mainProofFolder);
+      runAllProofs();
    }
    
    
-   private LinkedList<LinkedList<ProofElement>> getProofElementsByFile(LinkedList<ProofElement> proofElements){
-      //TODO: nicht der reihe nache einsortieren sondern der datei nach. dann immer die sortierten aus dem input löschen
-      LinkedList<LinkedList<ProofElement>> proofElementsByFile = new LinkedList<LinkedList<ProofElement>>();
-      IResource currentResource = null;
-      LinkedList<ProofElement> sameFile = new LinkedList<ProofElement>();
-      for(ProofElement pe : proofElements){
-         if(currentResource == null){
-            currentResource = pe.getJavaFile();
-            sameFile.add(pe);
-         }
-         else if(currentResource.equals(pe.getJavaFile())){
-            sameFile.add(pe);
-         }
-         else{
-            proofElementsByFile.add(sameFile);
-            sameFile = new LinkedList<ProofElement>();
-            currentResource = pe.getJavaFile();
-            sameFile.add(pe);
-         }
-      }
-      proofElementsByFile.add(sameFile);
-      return proofElementsByFile;
-   }
-   
-   
-   private void deleteAllKeYMarker(LinkedList<IFile> files) throws CoreException{
-      for(IFile file : files){
-         deleteMarker(file);
-      }
-   }
-   
+   /**
+    * Creates all {@link ProofElement}s for the given {@link IFile}s in the {@link LinkedList}.
+    * @param files the given {@link LinkedList}
+    * @return the {@link LinkedList} with the created {@link ProofElement}s
+    * @throws ProofInputException
+    * @throws CoreException
+    */
    private LinkedList<ProofElement> getAllProofElements(LinkedList<IFile> files) throws ProofInputException, CoreException{
       LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
       
@@ -204,14 +154,14 @@ public class ProofManager {
          IFolder proofFolder = createProofFolder(file);
          LinkedList<IMethod> methods = getResourceMethods(file);
          if(methods.size() == 0){
-            proofElements.add(new ProofElement(null, null, null, file));
+            proofElements.add(new ProofElement(null, null, null, file, null));
          }
          else{
             for(IMethod method : methods){
                LinkedList<ProofOblInput> obls = createProofOblsForMethod(method);
                for(ProofOblInput obl : obls){
                   IFile proofFile = getProofFile(obl.name(), proofFolder.getFullPath());
-                  proofElements.add(new ProofElement(obl, method, proofFile, file));
+                  proofElements.add(new ProofElement(obl, method, proofFile, file, null));
                }
             }
          }
@@ -220,6 +170,105 @@ public class ProofManager {
    }
    
    
+   /**
+    * Collects all Java{@link IFile}s from the given {@link ProofElement}s.
+    * @param proofElements - the {@link LinkedList} with the {@link ProofElement}s
+    * @return the {@link LinkedList} with the Java{@link IFile}s
+    */
+   private LinkedList<IFile> getAllJavaFilesFromProofElements(LinkedList<ProofElement> proofElements){
+      LinkedList<IFile> javaFiles = new LinkedList<IFile>();
+      for(ProofElement proofElement : proofElements){
+         javaFiles.add(proofElement.getJavaFile());
+      }
+      return javaFiles;
+   }
+   
+   
+   /**
+    * Collects all {@link ProofElement}s of the {@link IProject}.
+    * @return the {@link LinkedList} with all {@link ProofElement}s
+    * @throws ProofInputException
+    * @throws CoreException
+    */
+   private LinkedList<ProofElement> getAllProofElements() throws ProofInputException, CoreException{
+      IJavaProject javaProject = JavaCore.create(project);
+      LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
+      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+      for(IPackageFragment packageFragment : packageFragments){
+         ICompilationUnit[] units = packageFragment.getCompilationUnits();
+         for(ICompilationUnit unit : units){
+            IFile javaFile = (IFile) unit.getResource();
+            IFolder proofFolder = createProofFolder(javaFile);
+            IType[] types = unit.getAllTypes();
+            for(IType type : types){
+               IMethod[] methods = type.getMethods();
+               if(methods.length == 0){
+                  proofElements.add(new ProofElement(null, null, null, javaFile, null));
+               }
+               else{
+                  for(IMethod method : methods){
+                     LinkedList<ProofOblInput> obls = createProofOblsForMethod(method);
+                     for(ProofOblInput obl : obls){
+                        IFile proofFile = getProofFile(obl.name(), proofFolder.getFullPath());
+                        LinkedList<String> typesList = new LinkedList<String>();
+                        for(IType atype : types){
+                         typesList.add(atype.getFullyQualifiedName());  
+                        }
+                        proofElements.add(new ProofElement(obl, method, proofFile, javaFile, typesList));
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return proofElements;
+   }
+   
+   
+   /**
+    * Sorts the {@link ProofElement}s of the given {@link LinkedList} by their Java{@link IFile}s 
+    * and returns a {@link LinkedList} that contains the {@link LinkedList}s with the {@link ProofElement}s.
+    * All {@link ProofElement}s in the same {@link LinkedList} have the same Java{@link IFile}.
+    * @param proofElements
+    * @return
+    */
+   private LinkedList<LinkedList<ProofElement>> getProofElementsByFile(LinkedList<ProofElement> proofElements){
+      //TODO: nicht der reihe nache einsortieren sondern der datei nach. dann immer die sortierten aus dem input löschen
+      LinkedList<LinkedList<ProofElement>> proofElementsByFile = new LinkedList<LinkedList<ProofElement>>();
+      while(!proofElements.isEmpty()){
+         LinkedList<ProofElement> sameFile = new LinkedList<ProofElement>();
+         LinkedList<ProofElement> elementsToRemove = new LinkedList<ProofElement>();
+         //get all elements with same file as the first element
+         IResource currentResource = null;
+         for(ProofElement pe : proofElements){
+            if(currentResource == null){
+               currentResource = pe.getJavaFile();
+               sameFile.add(pe);
+               elementsToRemove.add(pe);
+            }
+            else{
+               if(pe.getJavaFile().equals(currentResource)){
+                  sameFile.add(pe);
+                  elementsToRemove.add(pe);
+               }
+            }
+         }
+         for(ProofElement pe : elementsToRemove){
+            proofElements.remove(pe);
+         }
+         proofElementsByFile.add(sameFile);
+      }
+      return proofElementsByFile;
+   }
+   
+   
+   /**
+    * Cleans every {@link IFolder} in the MainProofFolder by removing all files which are not 
+    * listed in the given {@link LinkedList}. Empty {@link IFolder} will be deleted.
+    * @param proofFiles - the {@link LinkedList} to use
+    * @param folder - the {@link IFolder} to start at
+    * @throws CoreException
+    */
    private void cleanProofFolder(LinkedList<IFile> proofFiles, IFolder folder) throws CoreException{
       IResource[] members = folder.members();
       for(IResource res : members){
@@ -239,22 +288,35 @@ public class ProofManager {
    
    
    /**
-    * Deletes the main Proof{@link IFolder} and runs all {@link Proof}s for the {@link IProject}.
-    * @throws Exception
+    * Cleans the proof{@link IFolder} selective. Just the {@link IFolder} in which proof{@link IFiles} 
+    * were created, changed or removed will be cleaned.
+    * @param proofElementsByFile - the files to keep
     */
-   public void clean() throws Exception{
-      deleteResource(mainProofFolder);
-      runAllProofs();
-   }
-   
-   
-   /**
-    * Deletes all KeY-{@link IMarker} from the given {@link IResource}.
-    * @param res - the given {@link IResource}
-    * @throws CoreException
-    */
-   public void deleteMarker(IResource res) throws CoreException{
-      markerManager.deleteMarker(res);
+   private void cleanProofFolderSelective(LinkedList<LinkedList<ProofElement>> proofElementsByFile){
+      for(LinkedList<ProofElement> pel : proofElementsByFile){
+         ProofElement proofElement = pel.get(0);
+         IFolder proofFolder = null;
+         LinkedList<IFile> proofFiles = new LinkedList<IFile>();
+         if(proofElement.hasProof()){
+            IContainer container = proofElement.getProofFile().getParent();
+            if(container.getType() == IResource.FOLDER){
+               proofFolder = (IFolder) container;
+               for(ProofElement pe : pel){
+                  proofFiles.add(pe.getProofFile());
+               }
+            }
+            
+         }
+         else{
+            proofFolder = getProofFolderForJavaFile(proofElement.getJavaFile());
+         }
+         //delete proof files which don't belong to any method
+         try{
+            deleteUnnecessaryProofFiles(proofFolder, proofFiles);
+         } catch (CoreException e){
+            LogUtil.getLogger().createErrorStatus(e);
+         }
+      }
    }
    
    
@@ -332,7 +394,6 @@ public class ProofManager {
     * @throws CoreException
     */
    private IFolder createProofFolder(IResource res) throws CoreException{
-//      IFolder mainProofFolder = createMainProofFolder(res.getProject());
       IFolder proofFolder = mainProofFolder;
       if(!proofFolder.exists()){
          proofFolder.create(true, true, null);
@@ -497,7 +558,6 @@ public class ProofManager {
     * @param str - the {@link String} to be made valid.
     * @return the valid {@link String}
     */
-   //TODO: In Util stecken?
    private String makePathValid(String str){
       String tmp;
       for(int i = 1; i<=str.length();i++){
@@ -605,13 +665,155 @@ public class ProofManager {
       IPackageFragment[] packageFragments = javaProject.getPackageFragments();
       for(IPackageFragment packageFragment : packageFragments){
          ICompilationUnit[] units = packageFragment.getCompilationUnits();
-         for(ICompilationUnit unit : units){
+         for(ICompilationUnit unit : units){            
             IPath filePath = unit.getResource().getFullPath();
-            IFile file = root.getFile(unit.getResource().getFullPath());
-            
-            if(!javaFiles.contains(file) && sourcePath.isPrefixOf(filePath)){
-               javaFiles.add(file);
+            IFile javaFile = root.getFile(unit.getResource().getFullPath());
+            if(!javaFiles.contains(javaFile) && sourcePath.isPrefixOf(filePath)){
+               javaFiles.add(javaFile);
             }
+         }
+      }
+      return javaFiles;
+   }
+   
+   
+   /**
+    * Handles the occurrence of a {@link ProblemLoaderException}. All KeYMarker will be deleted and a ProblemException{@link IMarker} will be set.
+    * @param e - the {@link ProblemLoaderException}
+    * @throws CoreException
+    */
+   private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
+      //remove all KeYMarker in the whole project
+      markerManager.deleteKeYMarker(project);
+      LinkedList<IFile> allFiles = collectAllJavaFilesForProject();
+      for(IFile file : allFiles){
+         markerManager.deleteKeYMarker(file);
+      }
+      //add the ProblemExceptionMarker
+      markerManager.setProblemLoaderExceptionMarker(project, e.getMessage());
+   }
+   
+   
+   /**
+    * Extracts the file that is described in the message of the {@link ProblemLoaderException}.
+    * @param msg - the {@link ProblemLoaderException}s message
+    * @return the extracted {@link IFile}
+    */
+   private IFile getFileFromErrorMessage(String msg) {
+      StringBuffer sb = new StringBuffer(msg);
+      int lineBreak = sb.indexOf("\n");
+      sb.delete(0, lineBreak+1);
+      int cutIndex = sb.indexOf(", line");
+      sb.delete(cutIndex, sb.length()+1);
+      IPath path = new Path(sb.toString());
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFile file = root.getFileForLocation(path);
+      if(file.exists()){
+         return file;
+      }
+      else{
+         return null;
+      }
+   }
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //Testing the new contract-collecting
+   
+   public void runAllProofsWithContractList() throws Exception{
+      LinkedList<AlternativeElement> altProofElements = getAllAltProofElements();
+      LinkedList<IFile> javaFiles = getAllJavaFilesFromAltProofElements(altProofElements);
+      markerManager.deleteKeYMarker(javaFiles);
+      markerManager.deleteKeYMarker(project);
+      for(AlternativeElement ape : altProofElements){
+         IFolder proofFolder = createProofFolder(ape.getJavaFile());
+         IFile proofFile = getProofFile(ape.getProofObl().name(), proofFolder.getFullPath());
+         Proof proof = processProof(ape.getProofObl(), proofFile);
+         markerManager.setMarkerForAltProofElement(proof, ape.getLineNumber(), ape.getJavaFile(), proofFile);
+         KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
+         
+      }
+   }
+   
+   
+   private LinkedList<AlternativeElement> getAllAltProofElements() {
+      Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
+      Iterator<KeYJavaType> it = kjts.iterator();
+      while (it.hasNext()) {
+         KeYJavaType kjt = it.next();
+         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+               kjt.getJavaType() instanceof InterfaceDeclaration) || 
+             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+            it.remove();
+         }
+      }
+      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+         public int compare(KeYJavaType o1, KeYJavaType o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+         }
+      });
+      LinkedList<AlternativeElement> altProofElements = new LinkedList<AlternativeElement>();
+      for (KeYJavaType type : kjtsarr) {
+         ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
+         Type javaType = type.getJavaType();
+         IFile javaFile = null;
+         int lineNumber = -1;
+         if(javaType instanceof ClassDeclaration){
+            ClassDeclaration classDecl = (ClassDeclaration) javaType;
+            String fileName = classDecl.getPositionInfo().getFileName();
+            IPath location = new Path(fileName);
+            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
+            lineNumber = classDecl.getPositionInfo().getStartPosition().getLine();
+         }
+         else if(javaType instanceof InterfaceDeclaration){
+            InterfaceDeclaration interDecl = (InterfaceDeclaration) javaType;
+            String fileName = interDecl.getPositionInfo().getFileName();
+            IPath location = new Path(fileName);
+            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
+            lineNumber = interDecl.getPositionInfo().getStartPosition().getLine();
+         }
+         for (IObserverFunction target : targets) {
+            //TODO add the rest
+            if(target instanceof ProgramMethod){
+               ProgramMethod progMethod = (ProgramMethod) target;
+               if(progMethod.getContainerType().getJavaType().equals(javaType)){
+                  lineNumber = progMethod.getPositionInfo().getStartPosition().getLine();
+               }
+            }
+            ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
+            for (Contract contract : contracts) {
+               ProofOblInput obl = contract.createProofObl(environment.getInitConfig(), contract);
+               altProofElements.add(new AlternativeElement(obl, javaFile, lineNumber));
+            }
+         }
+      }
+      return altProofElements;
+   }
+   
+   
+   private LinkedList<IFile> getAllJavaFilesFromAltProofElements(LinkedList<AlternativeElement> altProofElements) {
+      LinkedList<IFile> javaFiles = new LinkedList<IFile>();
+      for(AlternativeElement ape : altProofElements){
+         IFile javaFile = ape.getJavaFile();
+         if(!javaFiles.contains(javaFile)){
+            javaFiles.add(javaFile);
          }
       }
       return javaFiles;

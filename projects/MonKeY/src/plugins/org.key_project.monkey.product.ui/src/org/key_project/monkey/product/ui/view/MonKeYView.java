@@ -19,6 +19,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.monkey.product.ui.composite.MonKeYComposite;
 
 /**
@@ -78,5 +79,18 @@ public class MonKeYView extends ViewPart {
     public void saveState(IMemento memento) {
         composite.saveState(memento);
         super.saveState(memento);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+        if (IProofProvider.class.equals(adapter)) {
+            return composite;
+        }
+        else {
+            return super.getAdapter(adapter);
+        }
     }
 }

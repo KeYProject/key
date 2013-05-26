@@ -24,12 +24,12 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IHTacletFilter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 
 

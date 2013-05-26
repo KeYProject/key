@@ -25,7 +25,7 @@ import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestU
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.proof.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 
 public class KeYProjectBuilderTests extends TestCase{
@@ -185,6 +185,8 @@ public class KeYProjectBuilderTests extends TestCase{
       assertTrue(!proofFolder.exists());
       //check if the marker were set
       LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
+      assertTrue(allMarker.size() == 0);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(project);
       assertTrue(allMarker.size() == 1 && allMarker.get(0).getType().equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID));
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
@@ -912,39 +914,29 @@ public class KeYProjectBuilderTests extends TestCase{
       javaFileTwo.setContents(is, IResource.FORCE, null);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
-      //make sure that there is still just one marker in the java file. but now its a "ProblemLoaderExceptionMarker"
+      //make sure that there are no marker in the javaFiles but now its a "ProblemLoaderExceptionMarker" at the project.
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
-      assertTrue(allMarker.size() == 1);
-      markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID) && markerLineNumber == 1);
-      //check the second file
-      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
-      assertTrue(allMarker.size() == 1);
-      markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
-      //check if the proofFile for the changed javaFile was deleted
-      assertTrue(!proofFileOne.exists() && proofFileTwo.exists());
+      assertTrue(allMarker.size() == 0);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
+      assertTrue(allMarker.size() == 0);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(project);
+      assertTrue(allMarker.size() == 1 && allMarker.get(0).getType().equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID));
       //change the second file
       is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/firstChangedJavaFile.java");
       javaFileTwo.setContents(is, IResource.FORCE, null);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
-      //make sure that there is now just one "ProblemLoaderExceptionMarker" in each javaFile 
+      //make sure that the marker are still the same.
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
-      assertTrue(allMarker.size() == 1);
-      markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID) && markerLineNumber == 1);
-      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
-      assertTrue(allMarker.size() == 1);
-      markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID) && markerLineNumber == 1);
-      //check if the proofFile for the changed javaFile was deleted
-      assertTrue(!proofFileOne.exists() && !proofFileTwo.exists());
-      assertTrue(!proofFolder.exists());
+      assertTrue(allMarker.size() == 0);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
+      assertTrue(allMarker.size() == 0);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(project);
+      assertTrue(allMarker.size() == 1 && allMarker.get(0).getType().equals(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID));
+      
+      //check if the proofFiles are still exist
+      assertTrue(proofFileOne.exists() && proofFileTwo.exists());
+      assertTrue(proofFolder.exists());
       //reset both files to their startvalues
       is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/resetFirstFile.java");
       javaFileOne.setContents(is, IResource.FORCE, null);
@@ -965,6 +957,9 @@ public class KeYProjectBuilderTests extends TestCase{
       markerType = allMarker.get(0).getType();
       markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
       assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
+      allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(project);
+      LinkedList<IMarker> allProblemLoaderExceptionMarker = KeY4EclipseResourcesTestUtil.getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, project);
+      assertTrue(allMarker.size() == 2 && allProblemLoaderExceptionMarker.size() == 0);
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
    }

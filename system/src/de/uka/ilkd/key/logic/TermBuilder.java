@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -52,6 +53,7 @@ import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -59,6 +61,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -419,6 +422,11 @@ public class TermBuilder {
     }
 
 
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<ITermLabel> labels) {
+    return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
+    }
+
+
     public Term box(JavaBlock jb, Term t) {
         return prog(Modality.BOX, jb, t);
     }
@@ -432,6 +440,14 @@ public class TermBuilder {
     public Term ife(Term cond, Term _then, Term _else) {
         return tf.createTerm(IfThenElse.IF_THEN_ELSE,
                          new Term[]{cond, _then, _else});
+    }
+    
+    /** Construct a term with the \ifEx operator. */
+    public Term ifEx(QuantifiableVariable qv, Term cond, Term _then, Term _else) {
+        return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
+                            new ImmutableArray<Term>(cond,_then,_else),
+                            new ImmutableArray<QuantifiableVariable>(qv),
+                            null);
     }
 
 
@@ -527,21 +543,33 @@ public class TermBuilder {
     }
 
 
-    public Term min(QuantifiableVariable qv, Term t, Services services) {
-        Function min = services.getTypeConverter().getIntegerLDT().getMin();
-        return tf.createTerm(min,
-                           new ImmutableArray<Term>(t),
-                           new ImmutableArray<QuantifiableVariable>(qv),
-                           null);
+    /** Translation of JML's \min operator using \ifEx operator. */
+    public Term min(QuantifiableVariable qv, Term guard, Term t, boolean bigInt, Services services) {
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
+        final Term xvar = var(x);
+        final Term subst = subst(qv, xvar, guard);
+        final Term lhs = bigInt? subst: and(inInt(xvar,services),subst);
+        final Term qvar = var(qv);
+        if (!bigInt) guard = and(inInt(qvar,services),guard);
+        final Term minForm = and(guard,all(x,imp(lhs,leq(qvar,xvar, services))));
+        final Term undef = func(new Function(new Name("undefMin"), intSort));
+        return ifEx(qv, minForm, t, undef);
     }
 
 
-    public Term max(QuantifiableVariable qv, Term t, Services services) {
-        Function max = services.getTypeConverter().getIntegerLDT().getMax();
-        return tf.createTerm(max,
-                           new ImmutableArray<Term>(t),
-                           new ImmutableArray<QuantifiableVariable>(qv),
-                           null);
+    /** Translation of JML's \max operator using \ifEx operator. */
+    public Term max(QuantifiableVariable qv, Term guard, Term t, boolean bigInt, Services services) {
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
+        final Term xvar = var(x);
+        final Term subst = subst(qv, xvar, guard);
+        final Term lhs = bigInt? subst: and(inInt(xvar,services),subst);
+        final Term qvar = var(qv);
+        if (!bigInt) guard = and(inInt(qvar,services),guard);
+        final Term maxForm = and(guard,all(x,imp(lhs,geq(qvar,xvar, services))));
+        final Term undef = func(new Function(new Name("undefMax"), intSort));
+        return ifEx(qv, maxForm, t, undef);
     }
 
 
@@ -621,6 +649,11 @@ public class TermBuilder {
 
 
     public Term imp(Term t1, Term t2) {
+       return imp(t1, t2, null);
+    }
+
+
+    public Term imp(Term t1, Term t2, ImmutableArray<ITermLabel> labels) {
     if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
         return tt();
     } else if(t1.op() == Junctor.TRUE) {
@@ -628,7 +661,7 @@ public class TermBuilder {
     } else if(t2.op() == Junctor.FALSE) {
         return not(t1);
     } else {
-        return tf.createTerm(Junctor.IMP, t1, t2);
+        return tf.createTerm(Junctor.IMP, t1, t2, labels);
     }
     }
 
@@ -667,6 +700,15 @@ public class TermBuilder {
                   Term substTerm,
                   Term origTerm) {
     return tf.createTerm(op,
+                     new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
+                     new ImmutableArray<QuantifiableVariable>(substVar),
+                     null);
+    }
+
+    public Term subst(QuantifiableVariable substVar,
+                  Term substTerm,
+                  Term origTerm) {
+    return tf.createTerm(WarySubstOp.SUBST,
                      new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
                      new ImmutableArray<QuantifiableVariable>(substVar),
                      null);
@@ -836,7 +878,7 @@ public class TermBuilder {
 
 
     public Term sequential(Term u1, Term u2) {
-    return parallel(u1, apply(u1, u2));
+    return parallel(u1, apply(u1, u2, null));
     }
 
 
@@ -863,8 +905,7 @@ public class TermBuilder {
     }
     }
 
-
-    public Term apply(Term update, Term target) {
+    public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
     if(update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
     } else if(update.op() == UpdateJunctor.SKIP) {
@@ -874,7 +915,8 @@ public class TermBuilder {
         } else {
         return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
                      update,
-                     target);
+                     target,
+                     labels);
     }
     }
 
@@ -883,14 +925,14 @@ public class TermBuilder {
                             Term loc,
                             Term value,
                             Term target) {
-    return apply(elementary(services, loc, value), target);
+    return apply(elementary(services, loc, value), target, null);
     }
 
 
     public Term applyElementary(Services services,
                             Term heap,
                             Term target) {
-    return apply(elementary(services, heap), target);
+    return apply(elementary(services, heap), target, null);
     }
 
 
@@ -899,19 +941,19 @@ public class TermBuilder {
                             Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term target : targets) {
-            result = result.append(apply(elementary(services, heap), target));
+            result = result.append(apply(elementary(services, heap), target, null));
         }
     return result;
     }
 
 
     public Term applyParallel(Term[] updates, Term target) {
-    return apply(parallel(updates), target);
+    return apply(parallel(updates), target, null);
     }
 
 
     public Term applyParallel(ImmutableList<Term> updates, Term target) {
-    return apply(parallel(updates), target);
+    return apply(parallel(updates), target, null);
     }
 
 
@@ -919,7 +961,7 @@ public class TermBuilder {
                           Term[] lhss,
                           Term[] values,
                           Term target) {
-    return apply(parallel(services, lhss, values), target);
+    return apply(parallel(services, lhss, values), target, null);
     }
 
 
@@ -931,7 +973,7 @@ public class TermBuilder {
                                             .append(updates)
                                             .tail();
         return apply(updates[0],
-                 applySequential(updateList, target));
+                 applySequential(updateList, target), null);
     }
     }
 
@@ -941,11 +983,18 @@ public class TermBuilder {
         return target;
     } else {
         return apply(updates.head(),
-                 applySequential(updates.tail(), target));
+                 applySequential(updates.tail(), target), null);
     }
     }
 
-
+    public Term applyUpdatePairsSequential(ImmutableList<UpdateLabelPair> updates, Term target) {
+       if(updates.isEmpty()) {
+           return target;
+       } else {
+           return apply(updates.head().getUpdate(),
+                 applyUpdatePairsSequential(updates.tail(), target), updates.head().getUpdateApplicationlabels());
+       }
+       }
 
     //-------------------------------------------------------------------------
     //boolean operators
@@ -1352,7 +1401,23 @@ public class TermBuilder {
     public Term arr(Services services, Term idx) {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
+    
+    public Term label(Term term, ImmutableArray<ITermLabel> labels) {
+        if ((labels == null || labels.isEmpty())) {
+            return term;
+        } else {
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
+                    term.javaBlock(), labels);
+        }
+    }
 
+    public Term label(Term term, ITermLabel label) {
+        if (label == null) {
+            return term;
+        } else {
+            return label(term, new ImmutableArray<ITermLabel>(label));
+        }
+    }
 
     public Term dotArr(Services services, Term ref, Term idx) {
         if(ref == null || idx == null) {
@@ -1873,5 +1938,7 @@ public class TermBuilder {
         }
 
     }
+
+
 
 }

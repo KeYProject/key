@@ -129,8 +129,8 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public boolean hasVariables() throws DebugException {
       return !executionValue.isDisposed() && 
-             super.hasVariables() && 
-             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+             super.hasVariables(); 
+             
    }
 
    /**
