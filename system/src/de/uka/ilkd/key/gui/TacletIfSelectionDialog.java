@@ -142,6 +142,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	    try {
 		tf.setCaretPosition( col-1 );
 	    } catch (IllegalArgumentException iae) {
+                Debug.out(iae);
 		Debug.out("tacletifselectiondialog:: something is wrong with " +
 			  "the caret position calculation.");		
 	    } finally {

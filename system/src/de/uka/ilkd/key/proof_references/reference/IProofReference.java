@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -105,4 +106,10 @@ public interface IProofReference<T> {
     * @return The target source member.
     */
    public T getTarget();
+   
+   /**
+    * Returns the source {@link Proof}.
+    * @return The source {@link Proof}.
+    */
+   public Proof getSource();
 }

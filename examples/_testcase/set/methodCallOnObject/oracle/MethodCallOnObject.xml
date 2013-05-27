@@ -3,13 +3,17 @@
    <methodCall name="MethodCallOnObject.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="MethodCallOnObject();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of MethodCallOnObject();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObject();&gt;" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of MethodCallOnObject();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObject();&gt;" isReturnValueComputed="true">
                <statement name="return x.doSomething();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="x.doSomething();" pathCondition="true" pathConditionChanged="false">
                      <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of x.doSomething();&gt;" isReturnValueComputed="true">
-                           <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
-                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                        <methodReturn name="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of x.doSomething();&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                           </methodReturnValue>
+                           <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                              </methodReturnValue>
+                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                               </termination>
                            </methodReturn>
                         </methodReturn>

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -269,7 +270,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public String getPlainText(Services services) {
        return "invariants: " 
-             + originalInvariants
+             + JavaUtil.toSortedString(originalInvariants)
              + ";\nmodifies: " 
              + originalModifies
              + ";\nvariant: "

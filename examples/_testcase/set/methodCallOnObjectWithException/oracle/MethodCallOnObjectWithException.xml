@@ -3,20 +3,24 @@
    <methodCall name="MethodCallOnObjectWithException.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="MethodCallOnObjectWithException();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of MethodCallOnObjectWithException();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObjectWithException();&gt;" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of MethodCallOnObjectWithException();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObjectWithException();&gt;" isReturnValueComputed="true">
                <statement name="return x.doSomething();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="x.doSomething();" pathCondition="true" pathConditionChanged="false">
                      <statement name="MethodCallOnObjectWithException x = null;" pathCondition="true" pathConditionChanged="false">
                         <statement name="return x_3.return42();" pathCondition="true" pathConditionChanged="false">
                            <statement name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();" pathCondition="true" pathConditionChanged="false">
                               <methodCall name="MethodCallOnObjectWithException();" pathCondition="true" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of MethodCallOnObjectWithException();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObjectWithException();&gt;" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of MethodCallOnObjectWithException();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObjectWithException();&gt;" isReturnValueComputed="true">
                                     <statement name="return y.return42();" pathCondition="true" pathConditionChanged="false">
                                        <methodCall name="y.return42();" pathCondition="true" pathConditionChanged="false">
                                           <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of y.return42();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of y.return42();&gt;" isReturnValueComputed="true">
-                                                <methodReturn name="&lt;return of MethodCallOnObjectWithException.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodCallOnObjectWithException.main();&gt;" isReturnValueComputed="true">
-                                                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                             <methodReturn name="&lt;return of y.return42();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of y.return42();&gt;" isReturnValueComputed="true">
+                                                <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                </methodReturnValue>
+                                                <methodReturn name="&lt;return of MethodCallOnObjectWithException.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodCallOnObjectWithException.main();&gt;" isReturnValueComputed="true">
+                                                   <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                                                   </methodReturnValue>
+                                                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                                    </termination>
                                                 </methodReturn>
                                              </methodReturn>

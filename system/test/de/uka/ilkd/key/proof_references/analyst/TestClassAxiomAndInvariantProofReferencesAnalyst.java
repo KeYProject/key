@@ -22,11 +22,9 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             new IFilter<IProofReference<?>>() {
                               @Override
                               public boolean select(IProofReference<?> element) {
-                                 // Sometimes an invariant included and sometimes not. The filter makes sure that the tested references are always the same. The invariant reference is: Use Invariant Proof Reference to "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))
                                  return IProofReference.USE_AXIOM.equals(element.getKind());
                               }
                             },
-                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null)))"),
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(Child::select(heap,self,InvariantInOperationContract::$child),null)))"));
    }
    
@@ -40,7 +38,12 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             "main", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
-                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null)))"),
+                            new IFilter<IProofReference<?>>() {
+                               @Override
+                               public boolean select(IProofReference<?> element) {
+                                  return IProofReference.USE_AXIOM.equals(element.getKind());
+                               }
+                             },
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(ChildContainer::select(heap,self,NestedInvariantInOperationContract::$cc),null)))"));
    }
    
@@ -55,8 +58,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
                             new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
-                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"),
-                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
+                            new ExpectedProofReferences(IProofReference.USE_AXIOM, "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
    }
    
    /**
@@ -83,7 +85,6 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                               "java.lang.Object::<inv>", 
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
-                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
                               new ExpectedProofReferences(IProofReference.USE_INVARIANT, "java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c))"));
    }

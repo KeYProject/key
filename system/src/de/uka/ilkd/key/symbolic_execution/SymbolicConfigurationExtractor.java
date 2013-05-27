@@ -1614,6 +1614,36 @@ public class SymbolicConfigurationExtractor {
             return programVariable + (parentTerm != null ? " of " + parentTerm : "");
          }
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean equals(Object obj) {
+         if (obj instanceof ExtractLocationParameter) {
+            ExtractLocationParameter other = (ExtractLocationParameter)obj;
+            return arrayIndex == other.arrayIndex &&
+                   stateMember == other.stateMember &&
+                   JavaUtil.equals(parentTerm, other.parentTerm) &&
+                   JavaUtil.equals(programVariable, other.programVariable);
+         }
+         else {
+            return false;
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int hashCode() {
+         int result = 17;
+         result = 31 * result + arrayIndex;
+         result = 31 * result + (stateMember ? 1 : 0);
+         result = 31 * result + (parentTerm != null ? parentTerm.hashCode() : 0);
+         result = 31 * result + (programVariable != null ? programVariable.hashCode() : 0);
+         return result;
+      }
    }
    
    /**

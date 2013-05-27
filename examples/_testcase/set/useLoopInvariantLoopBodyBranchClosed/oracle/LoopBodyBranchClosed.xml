@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="LoopBodyBranchClosed.deadBody();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <useLoopInvariant name="invariants: {heap=equals(i,Z(0(#)))};
+modifies: {heap=false};
+variant: i" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+            <callStackEntry path="/0"/>
+            <statement name="return i;" pathCondition="true" pathConditionChanged="false">
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of LoopBodyBranchClosed.deadBody();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                  <callStackEntry path="/0"/>
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </useLoopInvariant>
+      </statement>
+   </methodCall>
+</startNode>

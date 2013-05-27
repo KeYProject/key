@@ -4,16 +4,16 @@
       <branchNode name="if (obj==null) {return 1; }else  {return 0; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="obj = null" pathCondition="obj = null" pathConditionChanged="true" branchCondition="obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="obj = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="obj = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of IsNullTest.compute(obj);&gt;" isReturnValueComputed="true">
-                  <termination name="&lt;end&gt;" pathCondition="obj = null" pathConditionChanged="false" exceptionalTermination="false">
+               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="obj = null" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="obj = null" pathConditionChanged="false" terminationKind="NORMAL">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
          <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 0;" pathCondition="!obj = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of IsNullTest.compute(obj);&gt;" isReturnValueComputed="true">
-                  <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" exceptionalTermination="false">
+               <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL">
                   </termination>
                </methodReturn>
             </statement>

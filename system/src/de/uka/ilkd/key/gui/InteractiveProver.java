@@ -35,12 +35,12 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -75,6 +75,8 @@ public class InteractiveProver implements InterruptListener {
     private boolean resumeAutoMode = false;
 
     private AutoModeWorker worker;
+
+    private boolean autoMode; // autoModeStarted has been fired
 
 
     /** creates a new interactive prover object 
@@ -112,6 +114,7 @@ public class InteractiveProver implements InterruptListener {
 
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
+        autoMode = true; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStarted(e);
         }
@@ -119,6 +122,7 @@ public class InteractiveProver implements InterruptListener {
 
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
+        autoMode = false; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStopped(e);
         }
@@ -156,6 +160,14 @@ public class InteractiveProver implements InterruptListener {
      */
     public Proof getProof() {
 	return proof;
+    }
+    
+    /**
+     * Checks if the auto mode is currently running.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
+     */
+    public boolean isAutoMode() {
+        return autoMode;
     }
     
     /** starts the execution of rules with active strategy. The

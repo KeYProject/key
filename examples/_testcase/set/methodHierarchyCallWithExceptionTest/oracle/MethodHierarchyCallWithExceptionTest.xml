@@ -30,12 +30,12 @@
                               <statement name="int a1 = 1;" pathCondition="true" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
                                  <callStackEntry path="/0/0/0"/>
-                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.a();&gt;" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.a();&gt;" isReturnValueComputed="true">
                                     <callStackEntry path="/0"/>
                                     <callStackEntry path="/0/0/0"/>
-                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;" isReturnValueComputed="false">
+                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;" isReturnValueComputed="true">
                                        <callStackEntry path="/0"/>
-                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                        </termination>
                                     </methodReturn>
                                  </methodReturn>

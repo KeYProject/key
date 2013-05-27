@@ -86,6 +86,7 @@ public class KeyOperationContract extends MemoryOperationContract {
             if (proofResult != null) {
                KeyProof dsProof = new KeyProof(proofResult, connection);
                addProof(obligation, dsProof);
+               connection.fireInteractiveProofStarted(dsProof);
                return dsProof;
             }
             else {

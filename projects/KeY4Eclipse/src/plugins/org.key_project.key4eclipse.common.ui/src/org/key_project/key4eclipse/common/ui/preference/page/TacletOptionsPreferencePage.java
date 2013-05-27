@@ -13,7 +13,6 @@
 
 package org.key_project.key4eclipse.common.ui.preference.page;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -60,7 +59,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
          loadChoiceSettings();
       }
       catch (Exception e) {
-         throw new InvocationTargetException(e);
+         throw new InvocationTargetException(e, e.getMessage());
       }
       finally {
          monitor.done();
@@ -73,17 +72,8 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * @throws ProblemLoaderException
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
-      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(getExampleProof(), null, null);
+      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
       env.dispose();
-   }
-   
-   /**
-    * Returns a *.key with a fast and simple proof.
-    * @return A *.key with a fast and simple proof.
-    */
-   public static File getExampleProof() {
-      String exampleDir = KeYExampleUtil.getLocalExampleDirectory();
-      return new File(exampleDir, "list" + File.separator + "ArrayList_add.key");
    }
    
    /**

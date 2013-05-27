@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -112,11 +113,11 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @param endPosition The end position.
     */
    public ProgramMethodSubsetPO(InitConfig initConfig, 
-                       String name, 
-                       IProgramMethod pm, 
-                       String precondition,
-                       Position startPosition,
-                       Position endPosition) {
+                                String name, 
+                                IProgramMethod pm, 
+                                String precondition,
+                                Position startPosition,
+                                Position endPosition) {
       super(initConfig, name, pm, precondition);
       assert startPosition != null;
       assert endPosition != null;
@@ -133,15 +134,17 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @param startPosition The start position.
     * @param endPosition The end position.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
     */
    public ProgramMethodSubsetPO(InitConfig initConfig, 
-                       String name, 
-                       IProgramMethod pm, 
-                       String precondition,
-                       Position startPosition,
-                       Position endPosition,
-                       boolean addUninterpretedPredicate) {
-      super(initConfig, name, pm, precondition, addUninterpretedPredicate);
+                                String name, 
+                                IProgramMethod pm, 
+                                String precondition,
+                                Position startPosition,
+                                Position endPosition,
+                                boolean addUninterpretedPredicate,
+                                boolean addSymbolicExecutionLabel) {
+      super(initConfig, name, pm, precondition, addUninterpretedPredicate, addSymbolicExecutionLabel);
       assert startPosition != null;
       assert endPosition != null;
       this.startPosition = startPosition;
@@ -343,7 +346,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                                                              getPrecondition(properties),
                                                              getStartPosition(properties),
                                                              getEndPosition(properties),
-                                                             isAddUninterpretedPredicate(properties)));
+                                                             isAddUninterpretedPredicate(properties),
+                                                             isAddSymbolicExecutionLabel(properties)));
    }
 
    /**
