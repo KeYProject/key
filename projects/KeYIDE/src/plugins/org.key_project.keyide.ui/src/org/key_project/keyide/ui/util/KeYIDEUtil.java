@@ -48,7 +48,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -139,7 +139,7 @@ public class KeYIDEUtil {
     * @param ui The UserInterface that holds the KeYMediator
     */
    public static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment)throws PartInitException{
-      String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
+      String inputText = InnerNodeView.getTacletDescription(environment.getMediator(), proof.root(), null);
       IStorage storage = new ProofStorage(inputText, proof.name().toString());
       IStorageEditorInput input = new ProofEditorInput(storage, proof, environment);
       WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
