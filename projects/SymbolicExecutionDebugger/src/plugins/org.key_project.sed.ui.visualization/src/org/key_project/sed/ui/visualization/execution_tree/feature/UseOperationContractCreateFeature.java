@@ -20,12 +20,12 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDUseLoopInvariant;
-import org.key_project.sed.core.model.memory.SEDMemoryUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
+import org.key_project.sed.core.model.memory.SEDMemoryUseOperationContract;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDUseLoopInvariant}s.
+ * Implementation of {@link ICreateFeature} for {@link ISEDUseOperationContract}s.
  * @author Martin Hentschel
  */
 public class UseOperationContractCreateFeature extends AbstractDebugNodeCreateFeature {
@@ -34,7 +34,7 @@ public class UseOperationContractCreateFeature extends AbstractDebugNodeCreateFe
     * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
     */
    public UseOperationContractCreateFeature(IFeatureProvider fp) {
-       super(fp, "Use Loop Invariant", "Create a new Use Loop Invariant");
+       super(fp, "Use Operation Contract", "Create a new Use Operation Contract");
    }
    
    /**
@@ -42,7 +42,7 @@ public class UseOperationContractCreateFeature extends AbstractDebugNodeCreateFe
     */
    @Override
    public String getCreateImageId() {
-      return IExecutionTreeImageConstants.IMG_USE_LOOP_INVARIANT;
+      return IExecutionTreeImageConstants.IMG_USE_OPERATION_CONTRACT;
    }
 
    /**
@@ -50,7 +50,7 @@ public class UseOperationContractCreateFeature extends AbstractDebugNodeCreateFe
     */   
    @Override
    public String getNodeType() {
-      return "Use Loop Invariant";
+      return "Use Operation Contract";
    }
 
    /**
@@ -61,7 +61,7 @@ public class UseOperationContractCreateFeature extends AbstractDebugNodeCreateFe
                                               ISEDDebugNode parent,
                                               ISEDThread thread,
                                               String name) throws DebugException {
-      SEDMemoryUseLoopInvariant result = new SEDMemoryUseLoopInvariant(target, parent, thread);
+      SEDMemoryUseOperationContract result = new SEDMemoryUseOperationContract(target, parent, thread);
       result.setName(name);
       return result;
    }

@@ -66,14 +66,14 @@
 &amp;   \if (current.right.left = current)
         \then (current.right.left)
         \else (current.parent)
-  = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
+  = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                             <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
 &amp;   \if (current.right.left = current)
         \then (current.right.left)
         \else (current.parent)
-  = null" pathConditionChanged="false" exceptionalTermination="false">
+  = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>
@@ -128,14 +128,14 @@
 &amp; !  \if (current.right.left = current)
          \then (current.right.left)
          \else (current.parent)
-   = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
+   = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                             <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
 &amp; !  \if (current.right.left = current)
          \then (current.right.left)
          \else (current.parent)
-   = null" pathConditionChanged="false" exceptionalTermination="false">
+   = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>
@@ -175,11 +175,11 @@
                                                       <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
+&amp; current.parent = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false" exceptionalTermination="false">
+&amp; current.parent = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                          </termination>
                                                       </methodReturn>
                                                    </statement>
@@ -210,11 +210,11 @@
                                                       <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
+&amp; !current.parent = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false" exceptionalTermination="false">
+&amp; !current.parent = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                          </termination>
                                                       </methodReturn>
                                                    </statement>
@@ -231,13 +231,13 @@
                   </statement>
                </branchCondition>
                <branchCondition name="current.right = null" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="true" branchCondition="current.right = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="false" exceptionalTermination="true">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="current = null" pathCondition="current = null" pathConditionChanged="true" branchCondition="current = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="current = null" pathConditionChanged="false" exceptionalTermination="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="current = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
             </termination>
          </branchCondition>
       </statement>

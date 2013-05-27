@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -111,17 +112,18 @@ public class DefaultProblemLoader {
    /**
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible. 
+    * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
     * @return An error message or {@code ""} (empty string) if everything is fine.
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public String load() throws ProblemLoaderException {
+   public String load(boolean registerProof) throws ProblemLoaderException {
       try {
          // Read environment
       boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
          envInput = createEnvInput();
-         problemInitializer = createProblemInitializer();
+         problemInitializer = createProblemInitializer(registerProof);
          initConfig = createInitConfig();
          // Read proof obligation settings
          LoadedPOContainer poContainer = createProofObligationContainer();
@@ -134,6 +136,7 @@ public class DefaultProblemLoader {
             if (proof != null) {
                replayProof(proof);
             }
+            // this message is propagated to the top level in console mode
             return ""; // Everything fine
          }
          finally {
@@ -195,14 +198,15 @@ public class DefaultProblemLoader {
    
    /**
     * Instantiates the {@link ProblemInitializer} to use.
+    * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
     * @return The {@link ProblemInitializer} to use.
     */
-   protected ProblemInitializer createProblemInitializer() {
+   protected ProblemInitializer createProblemInitializer(boolean registerProof) {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui, 
                                     mediator.getProfile(), 
                                     new Services(mediator.getExceptionHandler()), 
-                                    true, 
+                                    registerProof, 
                                     ui);
    }
    
@@ -312,10 +316,16 @@ public class DefaultProblemLoader {
 
       mediator.stopInterface(true); // first stop (above) is not enough
 
+      String status = "";
       if (envInput instanceof KeYUserProblemFile) {
-         problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
+         IProofFileParser parser = new DefaultProofFileParser(proof,
+                                                              mediator);
+         problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+         status = parser.getStatus();
       }
-      mediator.getUI().resetStatus(this);
+
+      if ("".equals(status)) mediator.getUI().resetStatus(this);
+         else mediator.getUI().reportStatus(this, status);
    }
 
    /**

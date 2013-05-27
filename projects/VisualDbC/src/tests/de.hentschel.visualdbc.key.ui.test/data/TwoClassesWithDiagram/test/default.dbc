@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <proofs target="//@types.0/@methods.0/@operationContracts.0" obligation="ContractPO"/>
+  <proofs target="//@types.1/@methods.0/@operationContracts.0" obligation="ContractPO"/>
+  <types xsi:type="dbcmodel:DbcClass" name="First">
+    <methods signature="firstMagic()" static="true" returnType="int">
+      <operationContracts name="First[First::firstMagic()].JML operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="(exc = null -> result = 42) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+    <constructors signature="First()" visibility="default"/>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="Second">
+    <methods signature="secondMagic()" static="true" returnType="int">
+      <operationContracts name="Second[Second::secondMagic()].JML operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="(exc = null -> result = javaUnaryMinusInt(42))&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+    <constructors signature="Second()" visibility="default"/>
+  </types>
+  <connectionSettings key="location" value="/SWTBotProofProviderAdapterFactoryTest/src"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="org.eclipse.core.runtime.IPath"/>
+  <connectionSettings key="skipLibraryClasses" value="true"/>
+  <connectionSettings key="skipLibraryClassesType" value="java.lang.Boolean"/>
+  <proofObligations obligation="ContractPO"/>
+</dbcmodel:DbcModel>

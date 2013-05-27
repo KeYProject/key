@@ -7,11 +7,11 @@ pre: false
 post: result = 42 &amp; exc = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of UseOperationContractFalsePreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;84&apos; as result of UseOperationContractFalsePreconditionTest.main();&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     <methodReturn name="&lt;return of UseOperationContractFalsePreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>

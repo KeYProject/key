@@ -3,13 +3,13 @@
    <methodCall name="MethodPOTest.returnMethod(param);" pathCondition="true" pathConditionChanged="false">
       <statement name="return param.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!param = null" pathCondition="!param = null" pathConditionChanged="true" branchCondition="!param = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;param.x&apos; as result of MethodPOTest.returnMethod(param);&gt;" isReturnValueComputed="true">
-               <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" exceptionalTermination="false">
+            <methodReturn name="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" isReturnValueComputed="false">
+               <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" terminationKind="NORMAL">
                </termination>
             </methodReturn>
          </branchCondition>
          <branchCondition name="param = null" pathCondition="param = null" pathConditionChanged="true" branchCondition="param = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="param = null" pathConditionChanged="false" exceptionalTermination="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="param = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
             </termination>
          </branchCondition>
       </statement>

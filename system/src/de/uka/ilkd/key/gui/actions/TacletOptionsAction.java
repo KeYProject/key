@@ -33,7 +33,7 @@ public class TacletOptionsAction extends MainWindowAction {
 	setName("Taclet Options...");
 	setAcceleratorLetter(KeyEvent.VK_T);
 	
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
 
     }
 
