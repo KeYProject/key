@@ -48,6 +48,15 @@ public class KeYExampleUtil {
      */
     private KeYExampleUtil() {
     }
+    
+    /**
+     * Returns a *.key with a fast and simple proof.
+     * @return A *.key with a fast and simple proof.
+     */
+    public static File getExampleProof() {
+       String exampleDir = KeYExampleUtil.getLocalExampleDirectory();
+       return new File(exampleDir, "02-Subset" + File.separator + "project.key");
+    }
 
     /**
      * Returns a specified example directory in bundle file "customTargets.xml".

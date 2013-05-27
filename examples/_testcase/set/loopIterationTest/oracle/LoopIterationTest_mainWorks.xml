@@ -11,8 +11,8 @@
                            <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                               <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                                  <statement name="int j;" pathCondition="true" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of self.mainWorks();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.mainWorks();&gt;" isReturnValueComputed="false">
-                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                    <methodReturn name="&lt;return of self.mainWorks();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                        </termination>
                                     </methodReturn>
                                  </statement>

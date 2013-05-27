@@ -88,7 +88,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
     }
 
     public void test1() {
-	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(null, insts);
+	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(null, insts, null);
 	rw.execPostOrder(srv);
 	assertEquals(srv.getTerm(), t_allxpxpx);
     }
@@ -99,7 +99,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	Term result=TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
 	SyntacticalReplaceVisitor v = new
 	    SyntacticalReplaceVisitor
-	    (null, SVInstantiations.EMPTY_SVINSTANTIATIONS);
+	    (null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
 	orig.execPostOrder(v);
 	assertEquals("Substitution Term not resolved correctly.",
 		     v.getTerm().sub(0), result.sub(0));
