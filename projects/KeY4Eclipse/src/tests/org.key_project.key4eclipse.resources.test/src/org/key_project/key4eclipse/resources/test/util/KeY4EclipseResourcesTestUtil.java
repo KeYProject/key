@@ -49,10 +49,7 @@ public class KeY4EclipseResourcesTestUtil {
       IProject project = javaProject.getProject();
       IProjectDescription description = project.getDescription();
       //Add KeYNature
-      String[] natures = description.getNatureIds();
-      String[] newNatures = new String[natures.length + 1];
-      System.arraycopy(natures, 0, newNatures, 0, natures.length);
-      newNatures[natures.length] = KeYProjectNature.NATURE_ID;
+      String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
       description.setNatureIds(newNatures);
       project.setDescription(description, null);
       assertTrue(hasNature(KeYProjectNature.NATURE_ID, javaProject.getProject()) && hasBuilder(KeYProjectBuilder.BUILDER_ID, javaProject.getProject()));
