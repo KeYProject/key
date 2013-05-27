@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
@@ -50,14 +51,15 @@ public class SWTBotKeYProjectWizardTest extends TestCase{
    public static void createKeYProject(SWTWorkbenchBot bot, String name){
       bot.menu("File").menu("New").menu("Project...").click();
       
-      SWTBotShell shell = bot.shell("New Project");
-      shell.activate();
+      SWTBotShell wizardShell = bot.shell("New Project");
       bot.tree().expandNode("KeY").select("KeY Project");
-      bot.button("Next >").click();
+      TestUtilsUtil.clickDirectly(bot.button("Next >"));
  
-      bot.textWithLabel("Project name:").setText(name);
+      wizardShell.bot().textWithLabel("Project name:").setText(name);
  
       bot.button("Finish").click();
+      bot.waitUntil(Conditions.shellCloses(wizardShell));
+      
    }
    
    
