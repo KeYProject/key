@@ -275,13 +275,14 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
+    * extract the return value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param contextObjectType The type of the current object (this reference).
     * @param contextMethod The current method.
     * @param contextObject The current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param methodReturnNode The method return {@link Node} which provides the sequent to extract updates and return expression from.
+    * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to start site proof in.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
@@ -289,34 +290,38 @@ public final class SymbolicExecutionUtil {
                                                                                      TypeReference contextObjectType,
                                                                                      IProgramMethod contextMethod,
                                                                                      ReferencePrefix contextObject,
-                                                                                     Node node,
+                                                                                     Node methodReturnNode,
+                                                                                     Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Create execution context in that the method was called.
       IExecutionContext context = new ExecutionContext(contextObjectType, contextMethod, contextObject);
       // Create sequent
-      return createExtractReturnVariableValueSequent(services, context, node, variable);
+      return createExtractReturnVariableValueSequent(services, context, methodReturnNode, methodCallEmptyNode, variable);
    }
 
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
+    * extract the return value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param context The {@link IExecutionContext} that defines the current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param methodReturnNode The method return {@link Node} which provides the sequent to extract updates and return expression from.
+    * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to start site proof in.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
                                                                                      IExecutionContext context,
-                                                                                     Node node,
+                                                                                     Node methodReturnNode,
+                                                                                     Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Make sure that correct parameters are given
       assert context != null;
-      assert node != null;
+      assert methodReturnNode != null;
+      assert methodCallEmptyNode != null;
       assert variable instanceof ProgramVariable;
       // Create method frame which will be executed in site proof
-      Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
+      Statement originalReturnStatement = (Statement)methodReturnNode.getNodeInfo().getActiveStatement();
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
@@ -325,8 +330,11 @@ public final class SymbolicExecutionUtil {
       Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      // Get the updates from the return node which includes the value interested in.
+      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, modalityTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null, modalityTerm, originalUpdates);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -503,24 +511,6 @@ public final class SymbolicExecutionUtil {
       starter.setStrategy(sp);
       // Execute proof in the current thread
       return starter.start();
-   }
-   
-   /**
-    * Extracts the value for the formula with the given {@link Operator}
-    * from the site proof result ({@link ApplyStrategyInfo}).
-    * @param info The site proof result.
-    * @param operator The {@link Operator} for the formula which should be extracted.
-    * @return The value of the formula with the given {@link Operator}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public static Term extractOperatorValue(ApplyStrategyInfo info, Operator operator) throws ProofInputException {
-      // Make sure that valid parameters are given
-      assert info != null;
-      if (info.getProof().openGoals().size() != 1) {
-         throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
-      }
-      // Get node of open goal
-      return extractOperatorValue(info.getProof().openGoals().head(), operator);
    }
 
    /**

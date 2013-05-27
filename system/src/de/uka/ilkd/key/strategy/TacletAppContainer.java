@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.strategy;
@@ -32,21 +32,21 @@ import de.uka.ilkd.key.util.Debug;
  * Instances of this class are immutable
  */
 public abstract class TacletAppContainer extends RuleAppContainer {
-    
+
     private final long age;
 
     protected TacletAppContainer ( RuleApp     p_app,
 				   RuleAppCost p_cost,
                                    long        p_age ) {
 	super ( p_app, p_cost );
-	age = p_age; 
+	age = p_age;
     }
 
 
     protected NoPosTacletApp getTacletApp () {
 	return (NoPosTacletApp)getRuleApp();
     }
-    
+
     public long getAge () {
         return age;
     }
@@ -83,7 +83,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
 
     /**
-     * Create a list of new RuleAppContainers that are to be 
+     * Create a list of new RuleAppContainers that are to be
      * considered for application.
      */
     public final ImmutableList<RuleAppContainer> createFurtherApps (Goal p_goal,
@@ -102,7 +102,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             ImmutableSLList.<RuleAppContainer>nil().prepend ( newCont );
 
         if ( getTacletApp ().ifInstsComplete () ) {
-            res = addInstances ( getTacletApp (), res, p_goal, p_strategy );            
+            res = addInstances ( getTacletApp (), res, p_goal, p_strategy );
         } else {
             for (TacletApp tacletApp : incMatchIfFormulas(p_goal)) {
                 final TacletApp app = tacletApp;
@@ -110,7 +110,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 res = addInstances(app, res, p_goal, p_strategy);
             }
         }
-        
+
         return res;
     }
 
@@ -138,8 +138,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                   Strategy p_strategy) {
         // just for being able to modify the result-list in an
         // anonymous class
+        @SuppressWarnings("unchecked")
         final ImmutableList<RuleAppContainer>[] resA =  new ImmutableList[] { targetList };
-        
+
         final RuleAppCostCollector collector =
             new RuleAppCostCollector () {
                 public void collect(RuleApp newApp, RuleAppCost cost) {
@@ -154,7 +155,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                     getPosInOccurrence ( p_goal ),
                                     p_goal,
                                     collector );
-        
+
         return resA[0];
     }
 
@@ -203,7 +204,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
         return true;
     }
-    
+
     private TacletAppContainer createContainer (Goal p_goal, Strategy p_strategy) {
         return createContainer ( getTacletApp (),
                                  getPosInOccurrence ( p_goal ),
@@ -220,7 +221,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         ( NoPosTacletApp p_app, Goal p_goal, Strategy  p_strategy ) {
 	return createAppContainers ( p_app, null, p_goal, p_strategy );
     }
-    
+
     /**
      * Create containers for FindTaclets or NoFindTaclets.
      * @param p_app if <code>p_pio</code> is null, <code>p_app</code> has to be
@@ -234,7 +235,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
           PosInOccurrence p_pio,
           Goal            p_goal,
           Strategy        p_strategy ) {
-        if ( !( p_pio == null 
+        if ( !( p_pio == null
                 ? p_app.taclet () instanceof NoFindTaclet
                 : p_app.taclet () instanceof FindTaclet ) )
             // faster than <code>assertTrue</code>
@@ -263,7 +264,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     	final Iterator<IfFormulaInstantiation> it =
     	    getTacletApp().ifFormulaInstantiations().iterator();
-	final Sequent seq = p_goal.sequent(); 
+	final Sequent seq = p_goal.sequent();
 
 	while ( it.hasNext () ) {
 	    final IfFormulaInstantiation ifInst2 = it.next ();
@@ -276,7 +277,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 	          .contains ( ifInst.getConstrainedFormula() ) )
 		return false;
 	}
-	
+
 	return true;
     }
 
@@ -286,7 +287,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * considered)
      */
     protected abstract boolean isStillApplicable ( Goal p_goal );
-    
+
 
     protected PosInOccurrence getPosInOccurrence ( Goal p_goal ) {
     	return null;
@@ -294,43 +295,43 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
 
     /**
-     * Create a <code>RuleApp</code> that is suitable to be applied 
+     * Create a <code>RuleApp</code> that is suitable to be applied
      * or <code>null</code>.
      */
     public RuleApp completeRuleApp(Goal p_goal, Strategy strategy) {
         if ( !isStillApplicable ( p_goal ) )
             return null;
-    
+
         if ( !ifFormulasStillValid ( p_goal ) )
             return null;
-    
+
         TacletApp app = getTacletApp ();
-    
+
         final PosInOccurrence pio = getPosInOccurrence ( p_goal );
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
-    
+
         if ( pio != null ) {
             app = app.setPosInOccurrence ( pio, p_goal.proof().getServices() );
             if ( app == null ) return null;
         }
-    
+
         if ( !app.complete() )
             app = app.tryToInstantiate ( p_goal.proof().getServices() );
-    
+
         return app;
     }
-    
+
     /**
      * This class implements custom instantiation of if-formulas.
      */
     private class IfInstantiator {
         private final Goal      goal;
-        
+
         private ImmutableList<IfFormulaInstantiation> allAntecFormulas;
         private ImmutableList<IfFormulaInstantiation> allSuccFormulas;
 
         private ImmutableList<TacletApp> results = ImmutableSLList.<TacletApp>nil();
-        
+
         IfInstantiator ( final Goal goal ) {
             this.goal = goal;
         }
@@ -348,7 +349,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             results = results.prepend ( cont );
             */
         }
-        
+
         /**
          * Find all possible instantiations of the if sequent formulas
          * within the sequent "p_seq".
@@ -377,12 +378,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             }
         }
 
-        
+
         private Taclet getTaclet () {
             return getTacletApp ().taclet ();
         }
 
-        
+
         /**
          * @param p_all
          *            if true then return all formulas of the particular
@@ -415,7 +416,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          */
         private ImmutableList<IfFormulaInstantiation> selectNewFormulas (boolean p_antec) {
             final Iterator<IfFormulaInstantiation> it =
-                getAllSequentFormulas ( p_antec ).iterator ();                                                                
+                getAllSequentFormulas ( p_antec ).iterator ();
             ImmutableList<IfFormulaInstantiation> res =
                 ImmutableSLList.<IfFormulaInstantiation>nil();
 
@@ -424,7 +425,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 if ( isNewFormulaDirect ( ifInstantiation ) )
                     res = res.prepend ( ifInstantiation );
             }
-            
+
             return res;
         }
 
@@ -508,7 +509,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         /**
          * Recursive function for matching the remaining tail of an if sequent
-         * 
+         *
          * @param p_ifSeqTail
          *            tail of the current semisequent as list
          * @param p_ifSeqTail2nd
@@ -526,7 +527,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
               ImmutableList<IfFormulaInstantiation>  p_alreadyMatched,
               MatchConditions               p_matchCond,
               boolean                       p_alreadyMatchedNewFor ) {
-            
+
             while ( p_ifSeqTail.isEmpty () ) {
                 if ( p_ifSeqTail2nd == null ) {
                     // All formulas have been matched, collect the results
@@ -562,7 +563,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 final IfFormulaInstantiation ifInstantiation = itCand.next ();
                 final boolean nextAlreadyMatchedNewFor = lastIfFormula
                                          || p_alreadyMatchedNewFor
-                                         || isNewFormula ( ifInstantiation );                
+                                         || isNewFormula ( ifInstantiation );
                 findIfFormulaInstantiationsHelp ( p_ifSeqTail,
                                                   p_ifSeqTail2nd,
                                                   p_alreadyMatched.prepend ( ifInstantiation ),
@@ -582,7 +583,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         private NoPosTacletApp setAllInstantiations ( MatchConditions p_matchCond, ImmutableList<IfFormulaInstantiation> p_alreadyMatched ) {
             return NoPosTacletApp.createNoPosTacletApp(
         	    getTaclet(),
-                    p_matchCond.getInstantiations(), 
+                    p_matchCond.getInstantiations(),
                     p_alreadyMatched,
                     getServices());
         }
@@ -593,7 +594,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             for (final SequentFormula cf : p_ss) {
                 res = res.prepend ( cf );
             }
-            return res; 
+            return res;
         }
 
         /**
@@ -604,7 +605,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
     }
 
-    
+
     /**
      * Direct-mapped cache of lists of formulas (potential instantiations of
      * if-formulas of taclets) that were modified after a certain point of time
@@ -612,18 +613,18 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     /**
      * Hashmaps of the particular lists of formulas; the keys of the maps
-     * is the point of time that separates old from new (modified) formulas 
-     * 
+     * is the point of time that separates old from new (modified) formulas
+     *
      * Keys: Long        Values: IList<IfFormulaInstantiation>
      */
     protected static final class IfInstCache {
         public Node cacheKey = null;
 
-        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> 
+        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>
             antecCache = new HashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
-        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  = 
-            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();  
-        
+        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  =
+            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
+
         public void reset(Node n){
             cacheKey = n;
             antecCache.clear ();
@@ -631,9 +632,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
     }
 
-    /**This field causes a memory leak (that is ad-hoc-ly fixed in 
-     * QueueRuleApplicationManager.clearCache()) because it is static and it 
-     * has a reference to node which has again a reference to proof. 
+    /**This field causes a memory leak (that is ad-hoc-ly fixed in
+     * QueueRuleApplicationManager.clearCache()) because it is static and it
+     * has a reference to node which has again a reference to proof.
      * Can this field be made non-static by putting it in some other class?
      * This field was private before the fix*/
     public static final IfInstCache ifInstCache = new IfInstCache ();

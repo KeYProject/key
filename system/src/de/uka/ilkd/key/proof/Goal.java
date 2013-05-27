@@ -73,7 +73,7 @@ public final class Goal  {
     private AutomatedRuleApplicationManager ruleAppManager;
 
     /** goal listeners  */
-    private List<GoalListener> listeners = new ArrayList<GoalListener>();
+    private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;

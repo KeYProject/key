@@ -13,7 +13,7 @@ post: (exc = null -&gt; result = javaAddInt(x.value, y.value))
 mod: allLocs
 termination: diamond" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;result_0&apos; as result of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" isReturnValueComputed="true">
+                           <methodReturn name="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" isReturnValueComputed="false">
                               <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" terminationKind="NORMAL">
                               </termination>
                            </methodReturn>

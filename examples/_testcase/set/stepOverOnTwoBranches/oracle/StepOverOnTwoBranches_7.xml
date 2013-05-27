@@ -10,7 +10,7 @@
                         <statement name="int j = i_2;" pathCondition="a = 0" pathConditionChanged="false">
                            <statement name="i_2=j_2;" pathCondition="a = 0" pathConditionChanged="false">
                               <statement name="return j_2;" pathCondition="a = 0" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of self.valueLonger(i_2);&gt;" isReturnValueComputed="true">
+                                 <methodReturn name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="a = 0" pathConditionChanged="false" isReturnValueComputed="false">
                                     <statement name="int y = value(j_1);" pathCondition="a = 0" pathConditionChanged="false">
                                     </statement>
                                  </methodReturn>
@@ -28,7 +28,7 @@
                   <statement name="int x = value(i_1);" pathCondition="!a = 0" pathConditionChanged="false">
                      <methodCall name="self.value(i_3);" pathCondition="!a = 0" pathConditionChanged="false">
                         <statement name="return i_3;" pathCondition="!a = 0" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of self.value(i_3);&gt;" pathCondition="!a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of self.value(i_3);&gt;" isReturnValueComputed="true">
+                           <methodReturn name="&lt;return of self.value(i_3);&gt;" pathCondition="!a = 0" pathConditionChanged="false" isReturnValueComputed="false">
                               <statement name="int y = valueLonger(j);" pathCondition="!a = 0" pathConditionChanged="false">
                               </statement>
                            </methodReturn>

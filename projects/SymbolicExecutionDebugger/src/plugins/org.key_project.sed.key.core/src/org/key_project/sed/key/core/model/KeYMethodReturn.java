@@ -127,9 +127,9 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    @Override
    public String getName() throws DebugException {
       try {
-         return (executionNode.isReturnValueComputed() || !executionNode.isDisposed()) && getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
-                executionNode.getNameIncludingReturnValue() : 
-                executionNode.getName();
+         return (executionNode.isReturnValuesComputed() || !executionNode.isDisposed()) && getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
+                 executionNode.getNameIncludingReturnValue() : 
+                 executionNode.getName();
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute method return name including return value.", e));
