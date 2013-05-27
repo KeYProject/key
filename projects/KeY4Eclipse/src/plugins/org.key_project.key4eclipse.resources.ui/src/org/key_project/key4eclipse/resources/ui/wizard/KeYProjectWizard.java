@@ -15,12 +15,14 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
 import org.eclipse.jface.wizard.WizardPage;
+import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 
 
 @SuppressWarnings("restriction")
-public class KeYProjectWizard extends JavaProjectWizard{
+public class KeYProjectWizard extends JavaProjectWizard {
 //TODO: irgendwas war mit dem title oder der description.
    
    /**
@@ -40,30 +42,17 @@ public class KeYProjectWizard extends JavaProjectWizard{
       super.addPages();
       try {
          Object obj = ObjectUtil.get(this, "fFirstPage");
-         if(obj instanceof WizardPage){
+         if(obj instanceof WizardPage) {
             ((WizardPage)obj).setTitle("Create a KeY Project");
          }
-         else{
+         else {
             LogUtil.getLogger().logWarning("API has changed");
          }
       }
-      catch (SecurityException e) {
-         // TODO Auto-generated catch block
+      catch (Exception e) {
          LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
       }
-      catch (NoSuchFieldException e) {
-         // TODO Auto-generated catch block
-         LogUtil.getLogger().logError(e);
-      }
-      catch (IllegalArgumentException e) {
-         // TODO Auto-generated catch block
-         LogUtil.getLogger().logError(e);
-      }
-      catch (IllegalAccessException e) {
-         // TODO Auto-generated catch block
-         LogUtil.getLogger().logError(e);
-      }
-      
    }
    
    
@@ -72,15 +61,12 @@ public class KeYProjectWizard extends JavaProjectWizard{
     */
    @Override
    public boolean performFinish(){
-      boolean res = super.performFinish();
-      if(res){
-         final IProject project = getCreatedElement().getJavaProject().getProject();
+      boolean result = super.performFinish();
+      if (result) {
+         IProject project = getCreatedElement().getJavaProject().getProject();
          try {
             IProjectDescription description = project.getDescription();
-            String[] natures = description.getNatureIds();
-            String[] newNatures = new String[natures.length + 1];
-            System.arraycopy(natures,0,newNatures,0,natures.length);
-            newNatures[natures.length] = "org.key_project.key4eclipse.resources.KeYProjectNature";
+            String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
             description.setNatureIds(newNatures);
             project.setDescription(description,null);
          }
@@ -88,6 +74,6 @@ public class KeYProjectWizard extends JavaProjectWizard{
             LogUtil.getLogger().createErrorStatus(e);
          }
       }
-      return res;
+      return result;
    }
 }
