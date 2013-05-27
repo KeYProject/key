@@ -9,12 +9,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.ui.IWorkbenchPropertyPage;
-import org.eclipse.ui.dialogs.PropertyPage;
+import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 
-public class ProofManagementPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
+public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
    private Button enableEfficentProofManagementButton;
 
@@ -46,20 +45,14 @@ public class ProofManagementPropertyPage extends PropertyPage implements IWorkbe
     * Sets the selection for the CheckBox
     */
    private void enableDisableButton(){
-      IProject project = getProject();
-      String enabled;
       try {
-         enabled = project.getPersistentProperty(KeYProjectProperties.PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT);
-         if(enabled == null || enabled.equals("FALSE")){
-            enableEfficentProofManagementButton.setSelection(false);
-         }
-         else if(enabled.equals("TRUE")){
-            enableEfficentProofManagementButton.setSelection(true);
-         }
+         IProject project = getProject();
+         enableEfficentProofManagementButton.setSelection(KeYProjectProperties.isEnableEfficientProofManagement(project));
       }
       catch (CoreException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         enableEfficentProofManagementButton.setEnabled(false);
       }
    }
    
@@ -69,50 +62,22 @@ public class ProofManagementPropertyPage extends PropertyPage implements IWorkbe
     */
    @Override
    public boolean performOk() {
-      IProject project = getProject();
-      String enabled;
-      if(enableEfficentProofManagementButton.getSelection()){
-         enabled = "TRUE";
-      }
-      else {
-         enabled = "FALSE";
-      }
       try {
-         KeYProjectProperties.setEnableEfficientProofManagement(project, enabled);
+         IProject project = getProject();
+         KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
+         return super.performOk();
       }
       catch (CoreException e) {
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         return false;
       }
-      return super.performOk();
    }
    
    
    @Override
    protected void performDefaults() {
-      IProject project = getProject();
       enableEfficentProofManagementButton.setSelection(false);
-   try {
-      KeYProjectProperties.setEnableEfficientProofManagement(project, "FALSE");
-   }
-   catch (CoreException e) {
-      LogUtil.getLogger().createErrorStatus(e);
-   }
       super.performDefaults();
-   }
-   
-   
-   
-   //TODO: war von martin. nachfragen ob die methode in eine utilklasse kommt oder was sonst damit passiert.
-   /**
-    * Returns the {@link IProject} that is currently configured.
-    * @return The {@link IProject} to configure.
-    */
-   public IProject getProject() {
-       if (getElement() != null) {
-           return (IProject)getElement().getAdapter(IProject.class);
-       }
-       else {
-           return null;
-       }
    }
 }

@@ -29,8 +29,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       if (delta != null) {
          try{
             proofManager = new ProofManager(getProject());
-            String enableEfficientProofmanagement = getProject().getPersistentProperty(KeYProjectProperties.PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT);
-            if(enableEfficientProofmanagement == null || enableEfficientProofmanagement.equals("FALSE")){
+            if(!KeYProjectProperties.isEnableEfficientProofManagement(getProject())) {
                proofManager.runAllProofs();
                //alternatively try proofManager.runAllProofsWithContractList() to use the experimental contract-collecting.
             }
