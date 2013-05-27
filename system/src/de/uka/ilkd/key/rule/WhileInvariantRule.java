@@ -699,6 +699,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
             final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOutTerms, services);
             final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
+            // localIns contains the local variables which might be read in the
+            // loop body, localOuts contains the local variables which might be
+            // assigned. Both sets might overlap. Hence we have to filter out
+            // those local variables from localIns which also appear in
+            // localOuts (not the other way around because we have to generate
+            // atPost variables for all local variables which might be assigned
+            // to).
             final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
             final ImmutableList<Term> localVarsAtPre =
