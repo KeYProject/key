@@ -30,8 +30,8 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          try{
             proofManager = new ProofManager(getProject());
             if(!KeYProjectProperties.isEnableEfficientProofManagement(getProject())) {
-               proofManager.runAllProofs();
-               //alternatively try proofManager.runAllProofsWithContractList() to use the experimental contract-collecting.
+//               proofManager.runAllProofs();
+               proofManager.runAllProofsWithContractList();
             }
             else{
                //Do not use. Not working right now.

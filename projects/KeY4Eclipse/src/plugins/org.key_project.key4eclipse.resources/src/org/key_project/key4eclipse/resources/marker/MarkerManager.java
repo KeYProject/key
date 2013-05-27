@@ -67,7 +67,8 @@ public class MarkerManager {
             marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proof.name().toString());
             marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
             marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber); // TODO: Add also start and end character use KeyUti#convertToSourceLocation() to convert a PositionInfo with tab size from KeY into position info with tab size from Eclipse
+            // TODO: Find out how to make marker type persistent
          }
       }
       else {
@@ -76,7 +77,7 @@ public class MarkerManager {
             marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proof.name().toString());
             marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
             marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber); // TODO: Add also start and end character use KeyUti#convertToSourceLocation() to convert a PositionInfo with tab size from KeY into position info with tab size from Eclipse
          }
       }
    }

@@ -32,9 +32,11 @@ import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -50,6 +52,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class ProofManager {
@@ -775,19 +778,14 @@ public class ProofManager {
          Type javaType = type.getJavaType();
          IFile javaFile = null;
          int lineNumber = -1;
-         if(javaType instanceof ClassDeclaration){
-            ClassDeclaration classDecl = (ClassDeclaration) javaType;
-            String fileName = classDecl.getPositionInfo().getFileName();
+         if(javaType instanceof JavaSourceElement){
+            JavaSourceElement javaElement = (JavaSourceElement) javaType;
+            String fileName = SymbolicExecutionUtil.getSourcePath(javaElement.getPositionInfo());
             IPath location = new Path(fileName);
-            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
-            lineNumber = classDecl.getPositionInfo().getStartPosition().getLine();
-         }
-         else if(javaType instanceof InterfaceDeclaration){
-            InterfaceDeclaration interDecl = (InterfaceDeclaration) javaType;
-            String fileName = interDecl.getPositionInfo().getFileName();
-            IPath location = new Path(fileName);
-            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
-            lineNumber = interDecl.getPositionInfo().getStartPosition().getLine();
+            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location); // TODO: Search file in source folder because a file can be contiained multiple time in the workspace
+            lineNumber = javaElement.getPositionInfo().getStartPosition().getLine();
+            
+//            SourceLocation sc = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo()); // TODO: Use this instead of line number
          }
          for (IObserverFunction target : targets) {
             //TODO add the rest
