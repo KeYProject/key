@@ -8,10 +8,13 @@
       <wizard
             category="org.key_project.key4eclipse.resources.ui.KeYCategory"
             class="org.key_project.key4eclipse.resources.ui.wizard.KeYProjectWizard"
-            icon="icons/projectIcon.gif"
+            icon="icons/logo16.gif"
             id="org.key_project.key4eclipse.resources.ui.keyprojectwizard"
             name="KeY Project"
             project="true">
+         <description>
+            Create a KeY project
+         </description>
       </wizard>
       <category
             id="org.key_project.key4eclipse.resources.ui.KeYCategory"
@@ -55,16 +58,51 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
+      <category
+            id="org.key_project.key4eclipse.resources.ui.category"
+            name="KeY">
+      </category>
       <command
+            categoryId="org.key_project.key4eclipse.resources.ui.category"
+            description="Add functionality of a KeY project to the current project."
             id="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
-            name="convertToKeYProject">
+            name="Convert to KeY Project.">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
+            icon="icons/logo16.gif">
+      </image>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="org.key_project.key4eclipse.resources.ui.handlers.ConvertJavaToKeYProjectHandler"
             commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+               </adapt>
+               <not>
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                     </test>
+                  </adapt>
+               </not>
+            </iterate>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -85,5 +123,4 @@
          </enabledWhen>
       </page>
    </extension>
-
 </plugin>
