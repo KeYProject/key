@@ -81,6 +81,8 @@ public interface LoopInvariant extends SpecificationElement {
                                                                   Map<LocationVariable,Term> atPres,
                                                                   Services services);
 
+    public boolean hasRespects(Services services);
+
     /**
      * Returns the variant term. 
      */

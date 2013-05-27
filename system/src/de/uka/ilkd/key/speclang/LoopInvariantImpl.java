@@ -562,4 +562,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	assert false;
 	return null;
     }
+
+
+    @Override
+    public boolean hasRespects(Services services) {
+        return !getRespects(services).isEmpty();
+    }
 }

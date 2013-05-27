@@ -666,12 +666,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         bodyTerm = wir.transform(bodyTerm, svInst, services);
 	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), bodyTerm);
 
+        boolean isInfFlowProof =
+                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
 
-        if (((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))) &&
-            inst.inv.getRespects(services) != null) {
+        if (isInfFlowProof && inst.inv.hasRespects(services)) {
+            // prepare information flow validity goal
 
             assert anonUpdateDatas.size() == 1 : "information flow " +
                                                  "extension is at the " +
@@ -756,15 +758,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             // create information flow validity goal
             infFlowGoal = buildInfFlowValidityGoal(goal, inst.inv, instantiationVars,
                                                    ruleApp, infFlowGoal, services);
-        } else {
-            infFlowData = new InfFlowData();
         }
 
         //split goal into three branches
         final Goal initGoal;
         Goal useGoal;
         ImmutableList<Goal> result;
-        if (!infFlowData.isInfFlow) {
+        if (!isInfFlowProof) {
             result = goal.split(3);
             initGoal = result.tail().tail().head();
             final Goal bodyGoal = result.tail().head();
@@ -802,10 +802,13 @@ public final class WhileInvariantRule implements BuiltInRule {
             useGoal = result.head();
             initGoal.setBranchLabel("Invariant Initially Valid");
             useGoal.setBranchLabel("Use Case");
-            result = result.append(infFlowGoal);
+            if (inst.inv.hasRespects(services)) {
+                // add information flow validity goal
+                result = result.append(infFlowGoal);
 
-            // set infFlowAssumptions, add term and taclet to post goal
-            useGoal = addInfFlowAssumptionsAndTaclet(infFlowData, anonUpdateDatas.head().loopHeapAtPre, useGoal);
+                // set infFlowAssumptions, add term and taclet to post goal
+                useGoal = addInfFlowAssumptionsAndTaclet(infFlowData, anonUpdateDatas.head().loopHeapAtPre, useGoal);
+            }
         }
 
         //"Invariant Initially Valid":
@@ -920,22 +923,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final Pair<Term, Term> updates;
         public final Term applPredTerm;
         public final Taclet infFlowApp;
-        public final boolean isInfFlow;
-
-        public InfFlowData() {
-            this.symbExecVars = null;
-            this.guardAtPre = null;
-            this.guardAtPost = null;
-            this.guardJb = null;
-            this.guardTerm = null;
-            this.localOuts = ImmutableSLList.<Term>nil();
-            this.localOutsAtPre = ImmutableSLList.<Term>nil();
-            this.localOutsAtPost = ImmutableSLList.<Term>nil();
-            this.updates = new Pair<Term, Term> (null, null);
-            this.infFlowApp = null;
-            this.applPredTerm = null;
-            this.isInfFlow = false;
-        }
 
         public InfFlowData(ProofObligationVars symbExecVars,
                            Term guardAtPre, Term guardAtPost,
@@ -958,7 +945,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             this.updates = updates;
             this.infFlowApp = infFlowApp;
             this.applPredTerm = applPredTerm;
-            this.isInfFlow = true;
         }
     }
 }
