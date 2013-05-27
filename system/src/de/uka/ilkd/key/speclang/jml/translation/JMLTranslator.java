@@ -1560,6 +1560,7 @@ final class JMLTranslator {
         Object result = null;
         try {
             result = parser.top();
+            List<PositionedString> warnings = parser.getWarnings();
         } catch (antlr.ANTLRException e) {
             throw parser.getExceptionManager().convertException(e);
         }
