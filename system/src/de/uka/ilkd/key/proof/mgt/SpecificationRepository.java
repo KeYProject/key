@@ -661,14 +661,14 @@ public final class SpecificationRepository {
         registerContract(contract, impls);
         assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
     }
-    
+
+
     /** Registers the passed (atomic) contract without inheriting it. */
     public void addContractNoInheritance(Contract contract){
         registerContract(prepareContract(contract));
     }
 
-    
-    
+
     /**
      * Registers the passed contracts.
      */
@@ -678,20 +678,6 @@ public final class SpecificationRepository {
         }
     }
 
-
-    /**
-     * Registers the passed (atomic) well-definedness check for a method specification.
-     */
-    public void addWdMethodCheck(Contract contract) {
-        final ImmutableSet<Pair<KeYJavaType,IObserverFunction>> impls =
-                getOverridingTargets(contract.getKJT(), contract.getTarget())
-                .add(new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(),
-                                                             contract.getTarget()));
-        for (Pair<KeYJavaType,IObserverFunction> pair: impls) {
-            wdChecks.put(pair, getWdChecks(pair.first, pair.second)
-                                .add(new MethodWellDefinedness(contract, services)));
-        }
-    }
 
     /**
      * Creates a combined contract out of the passed atomic contracts.
@@ -715,8 +701,8 @@ public final class SpecificationRepository {
        
         return cf.union(contractsArray);
     }
-    
-    
+
+
     /**
      * Splits the passed contract into its atomic components. 
      */
@@ -737,8 +723,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Registers the passed class invariant, and inherits it to all
      * subclasses if it is public or protected.
@@ -762,8 +748,8 @@ public final class SpecificationRepository {
             }
         }
     }
-    
-    
+
+
     /**
      * Registers the passed class invariants.
      */
@@ -772,8 +758,8 @@ public final class SpecificationRepository {
             addClassInvariant(inv);
         }
     }
- 
-    
+
+
     /**
      * Adds postconditions raising from initially clauses to all constructors.
      * <b>Warning</b>: To be called after all contracts have been registered.
@@ -790,7 +776,8 @@ public final class SpecificationRepository {
             }
         }
     }
-    
+
+
     /** 
      * Registers the passed initially clause.
      * Initially clauses in JML specify the post-state of any constructor of subtypes;
@@ -800,14 +787,14 @@ public final class SpecificationRepository {
      * of respective constructors (or adds a contract if there is none yet).
      * @param ini initially clause
      */
-    public void addInitiallyClause(InitiallyClause ini){
+    public void addInitiallyClause(InitiallyClause ini) {
         ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
         if (oldClauses == null)
             oldClauses = DefaultImmutableSet.<InitiallyClause>nil();
         initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
     }
-    
-    
+
+
     /**
      * Registers the passed initially clauses.
      */
@@ -816,7 +803,8 @@ public final class SpecificationRepository {
             addInitiallyClause(inv);
         }
     }
-    
+
+
     /**
      * Returns all class axioms visible in the passed class, including
      * the axioms induced by invariant declarations.
@@ -874,8 +862,8 @@ public final class SpecificationRepository {
 	}
 	return result;
     }
-    
-    
+
+
     /**
      * Registers the passed class axiom.
      */
@@ -915,8 +903,8 @@ public final class SpecificationRepository {
             axioms.put(kjt, currentAxioms.add(ax));
         }
     }
-    
-    
+
+
     /**
      * Registers the passed class axioms.
      */
@@ -925,8 +913,8 @@ public final class SpecificationRepository {
             addClassAxiom(ax);
         }
     }    
-    
-    
+
+
     /**
      * Returns all proofs registered for the passed PO (or stronger POs).
      */
@@ -942,8 +930,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Returns all proofs registered for the passed atomic contract, or for
      * combined contracts including the passed atomic contract
@@ -965,7 +953,7 @@ public final class SpecificationRepository {
         }
         return result;
     }    
-    
+
 
     /**
      * Returns all proofs registered for the passed target and its overriding
@@ -994,8 +982,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Returns all proofs registered with this specification repository.
      */
@@ -1007,8 +995,8 @@ public final class SpecificationRepository {
 	}
 	return result;
     }
-    
-    
+
+
     /**
      * Returns the PO that the passed proof is about, or null.
      */
@@ -1023,7 +1011,8 @@ public final class SpecificationRepository {
         }
         return null;
     }    
-    
+
+
     /**
      * Returns the {@link ProofOblInput} from which the given {@link Proof}
      * was created.
@@ -1040,7 +1029,8 @@ public final class SpecificationRepository {
        }
        return null;
     }
-    
+
+
     /**
      * Returns the target that the passed proof is about, or null.
      */
@@ -1048,16 +1038,16 @@ public final class SpecificationRepository {
 	final ContractPO po = getPOForProof(proof);
 	return po == null ? null : po.getContract().getTarget();
     }
-    
+
 
     /**
      * Registers the passed proof. 
      */
     public void registerProof(ProofOblInput po, Proof proof) {
         proofs.put(po, getProofs(po).add(proof));
-    }    
-    
-    
+    }
+
+
     /**
      * Unregisters the passed proof.
      */
@@ -1076,14 +1066,15 @@ public final class SpecificationRepository {
             }
         }
     }
-        
-    
+
+
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
     public LoopInvariant getLoopInvariant(LoopStatement loop) {
         return loopInvs.get(loop);
     }
+
 
     /**
      * Copies a loop invariant from a loop statement to another.
@@ -1105,6 +1096,7 @@ public final class SpecificationRepository {
         }
     }
 
+
     /**
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
@@ -1113,8 +1105,8 @@ public final class SpecificationRepository {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
-    
-    
+
+
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         if (blockContracts.get(block) == null) {
             return DefaultImmutableSet.<BlockContract>nil();
@@ -1124,8 +1116,9 @@ public final class SpecificationRepository {
         }
     }
 
-    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality)
-    {
+
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
+                                                         final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
@@ -1137,8 +1130,8 @@ public final class SpecificationRepository {
         return result;
     }
 
-    private Modality getMatchModality(final Modality modality)
-    {
+
+    private Modality getMatchModality(final Modality modality) {
         if (modality.transaction()) {
             return modality == Modality.DIA_TRANSACTION ? Modality.DIA : Modality.BOX;
         }
@@ -1147,8 +1140,8 @@ public final class SpecificationRepository {
         }
     }
 
-    public void addBlockContract(final BlockContract contract)
-    {
+
+    public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         blockContracts.put(block, getBlockContracts(block).add(contract));
     }
@@ -1156,31 +1149,36 @@ public final class SpecificationRepository {
 
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
-            addWellDefinednessCheck(spec);
-
             if (spec instanceof Contract) {
                 addContract((Contract)spec);
+                addWellDefinednessCheck((Contract)spec);
             }
             else if (spec instanceof ClassInvariant) {
                 addClassInvariant((ClassInvariant)spec);
+                addWellDefinednessCheck((ClassInvariant)spec);
             }
             else if (spec instanceof InitiallyClause) {
                 addInitiallyClause((InitiallyClause)spec);
+                // TODO: Sense of WellDefinedness?
             }
             else if (spec instanceof ClassAxiom) {
                 addClassAxiom((ClassAxiom)spec);
+                // TODO: Sense of WellDefinedness?
             }
             else if (spec instanceof LoopInvariant) {
                 addLoopInvariant((LoopInvariant)spec);
+                addWellDefinednessCheck((LoopInvariant)spec);
             }
             else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
+                addWellDefinednessCheck((BlockContract)spec);
             }
             else {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
             }
         }
     }
+
 
     /**
      * Returns all registered (atomic) well-definedness checks for the passed target.
@@ -1198,6 +1196,7 @@ public final class SpecificationRepository {
                         : result;
     }
 
+
     public ImmutableSet<Contract> getWdContracts(KeYJavaType kjt,
                                                  IObserverFunction target) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
@@ -1208,26 +1207,44 @@ public final class SpecificationRepository {
         return result;
     }
 
-    public void addWellDefinednessCheck(SpecificationElement spec) {
-        if (spec instanceof LoopInvariant) {
-            // Loop Invariant
-            LoopInvariant loopInv = (LoopInvariant)spec;
-        } else if (spec instanceof BlockContract) {
-            // Block Contract
-        } else if (spec instanceof Contract) {
-            // Method Contract
-            Contract contract = (Contract)spec;
-            addWdMethodCheck(contract);
-        } else if (spec instanceof ClassInvariant) {
-            // Class Invariant
-        } // What about Class Axiom and InitiallyClause?
+
+    public void addWellDefinednessCheck(Contract mc) {
+        // Method Contract
+        final ImmutableSet<Pair<KeYJavaType,IObserverFunction>> impls =
+                getOverridingTargets(mc.getKJT(), mc.getTarget())
+                .add(new Pair<KeYJavaType,IObserverFunction>(mc.getKJT(),
+                                                             mc.getTarget()));
+        for (Pair<KeYJavaType,IObserverFunction> pair: impls) {
+            wdChecks.put(pair, getWdChecks(pair.first, pair.second)
+                                .add(new MethodWellDefinedness(mc, services)));
+        }
     }
+
+
+    public void addWellDefinednessCheck(ClassInvariant ci) {
+        // Class Invariant
+        // TODO
+    }
+
+
+    public void addWellDefinednessCheck(LoopInvariant li) {
+        // Loop Invariant
+        // TODO
+    }
+
+
+    public void addWellDefinednessCheck(BlockContract bc) {
+        // Block Contract
+        // TODO
+    }
+
 
     public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
 	       : " observer is already limited: " + obs;
-	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProgramMethod?
+	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
+	    // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProgramMethod?
 	    return null;
 	}
 	

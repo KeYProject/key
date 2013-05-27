@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
     /* accessible-clause, assignable-clause, breaks-clause, callable-clause, captures-clause,
@@ -26,13 +28,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Term signals = TB.ff();
 
     public MethodWellDefinedness(Contract contract, Services services) {
-        super(contract.getTarget(), Type.METHOD_CONTRACT);
+        super(contract.getTarget(), Type.METHOD_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final LocationVariable baseHeap = heapLDT.getHeap();
-        this.requires = contract.getRequires(baseHeap);
-        this.assignable = contract.getAssignable(baseHeap);
+        this.requires = contract.getRequires(heap);
+        this.assignable = contract.getAssignable(heap);
 
         this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
         this.old = TB.tt(); // TODO: Where do we get the old-clause from?
@@ -43,6 +43,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.ensures = TB.tt(); // TODO: Where do we get the ensures-clause from?
         this.signalsOnly = TB.tt(); // TODO: Where do we get the signal_only-clause from?
         this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
+    }
+
+    // TODO: Not used atm, do we even need this method here? Better alternatives?
+    public Term getPre(ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                       Services services) {
+        return contract.getPre(heap, selfVar, paramVars, atPreVars, services);
     }
 
     public Term getForall() {

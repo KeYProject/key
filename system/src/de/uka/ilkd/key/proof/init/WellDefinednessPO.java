@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -9,6 +10,8 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     protected static final WellDefinednessOperator WD = WellDefinednessOperator.WD;
+
+    protected static final TermBuilder TB = TermBuilder.DF;
 
     private WellDefinednessCheck check;
 
@@ -22,14 +25,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         assert pm instanceof IProgramMethod;
         return (IProgramMethod)pm;
      }
-
-    /**
-     * Returns the base heap.
-     * @return The {@link LocationVariable} which contains the base heap.
-     */
-    private LocationVariable getBaseHeap() {
-       return services.getTypeConverter().getHeapLDT().getHeap();
-    }
 
     @Override
     public void readProblem() throws ProofInputException {
@@ -52,6 +47,14 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     @Override
     public WellDefinednessCheck getContract() {
         return check;
+    }
+
+    /**
+     * Returns the base heap.
+     * @return The {@link LocationVariable} which contains the base heap.
+     */
+    private LocationVariable getHeap() {
+       return services.getTypeConverter().getHeapLDT().getHeap();
     }
 
     @Deprecated

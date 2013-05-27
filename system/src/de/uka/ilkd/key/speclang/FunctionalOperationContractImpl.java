@@ -74,15 +74,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final int id;
     final boolean transaction;
     final boolean toBeSaved;
-    
+
     /**
      * If a method is strictly pure, it has no modifies clause which could
      * be anonymised.
      * @see #hasModifiesClause()
      */
     final boolean hasRealModifiesClause;
-    
-    
+
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -237,8 +237,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	    		      ProgramVariable excVar,
 	    		      Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    		      Services services) {
-	final Map<ProgramVariable, ProgramVariable> result = new LinkedHashMap<ProgramVariable, ProgramVariable>();
-	
+	final Map<ProgramVariable, ProgramVariable> result =
+	        new LinkedHashMap<ProgramVariable, ProgramVariable>();
+
         //self
 	if(selfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
@@ -344,10 +345,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         
 	return result;
-    }    
-    
-    
-    
+    }
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -356,32 +356,32 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     public String getName() {
         return name;
     }
-    
+
 
     @Override
     public int id() {
 	return id;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKJT() {
 	return kjt;
     }
-    
-    
+
+
     @Override
     public IProgramMethod getTarget() {
         return pm;
     }
-    
-    
+
+
     @Override
     public boolean hasMby() {
 	return originalMby != null;
     }
-    
-        
+
+
     @Override
     public Term getPre(LocationVariable heap,
                        ProgramVariable selfVar, 
@@ -392,15 +392,16 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
-                                             paramVars, 
-                                             null, 
-                                             null,
-                                             atPreVars, 
-                                             services);
+	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
+	                                                                       paramVars,
+	                                                                       null,
+	                                                                       null,
+	                                                                       atPreVars,
+	                                                                       services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPres.get(heap));
     }
+
 
     public Term getPre(List<LocationVariable> heapContext,
                        ProgramVariable selfVar, 
@@ -418,8 +419,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        }
        return result;
     }
-    
-    
+
+
     @Override
     public Term getPre(LocationVariable heap,
                        Term heapTerm,
@@ -432,17 +433,18 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm, 
-					     selfTerm, 
-					     paramTerms, 
-					     null, 
-					     null,
-                                             atPres, 
-					     services);
+	final Map<Term, Term> replaceMap = getReplaceMap(heap,
+	                                                 heapTerm,
+	                                                 selfTerm,
+	                                                 paramTerms,
+	                                                 null,
+	                                                 null,
+	                                                 atPres,
+	                                                 services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPres.get(heap));
     }    
-    
+
 
     public Term getPre(List<LocationVariable> heapContext,
                        Map<LocationVariable,Term> heapTerms,
@@ -462,15 +464,18 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        return result;
     }    
 
+
     @Override
     public Term getRequires(LocationVariable heap) {
         return originalPres.get(heap);
     }
 
+
     @Override
     public Term getAssignable(LocationVariable heap) {
         return originalMods.get(heap);
     }
+
 
     @Override
     public Term getMby(ProgramVariable selfVar, 
@@ -480,34 +485,35 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
-                                             paramVars, 
-                                             null,
-                                             null,
-                                             null,
-                                             services);
+	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
+	                                                                       paramVars,
+	                                                                       null,
+	                                                                       null,
+	                                                                       null,
+	                                                                       services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalMby);
     }
-    
-    
+
+
     @Override
     public Term getMby(Term heapTerm,
-	               Term selfTerm, 
+	               Term selfTerm,
 	    	       ImmutableList<Term> paramTerms,
                        Services services) {
-	assert heapTerm != null;		
+	assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(null, heapTerm, 
-					     selfTerm, 
-					     paramTerms, 
-					     null, 
-					     null, 
-                                             null,
-					     services);
+	final Map<Term, Term> replaceMap = getReplaceMap(null,
+	                                                 heapTerm,
+					                 selfTerm,
+					                 paramTerms,
+					                 null,
+					                 null,
+					                 null,
+					                 services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalMby);
     }    

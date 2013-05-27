@@ -22,7 +22,7 @@ public class WellDefinednessOperator {
         int subs = t.arity();
         if (op.equals(Junctor.TRUE) || op.equals(Junctor.FALSE)) {
             assert subs == 0;
-            return TB.tt();
+            return primaryExpr(t);
         } else if (op.equals(Junctor.NOT)) {
             assert subs == 1;
             return wd(t.sub(0));
@@ -38,14 +38,25 @@ public class WellDefinednessOperator {
         } else if (op.equals(Equality.EQV) || op.equals(Equality.EQUALS)) {
             assert subs == 2;
             return wd(t.sub(0), t.sub(1));
+        } else if (op.name().toString().endsWith("<inv>")) {
+            return inv(t);
         } // TODO: How to test if t is a fresh variable?
         else {
-            throw new TermCreationException("fleisch");
+            throw new TermCreationException("Unknown term!" + '\n' +
+                                            "Operator: " + op.toString() + '\n' +
+                                            "Term: " + t.toString());
         }
     }
 
     private Term wd(Term a, Term b) {
         return TB.and(wd(a), wd(b));
+    }
+
+    // true, false
+    private Term primaryExpr(Term a) {
+        int subs = a.arity();
+        assert subs == 0;
+        return TB.tt();
     }
 
     // a || b
@@ -68,5 +79,9 @@ public class WellDefinednessOperator {
         Term guard = TB.and(wd(a), TB.equals(a, TB.ff()));
         Term wd = TB.and(wd(a), wd(b));
         return TB.or(guard, wd);
+    }
+
+    private Term inv(Term a) {
+        return TB.tt();
     }
 }

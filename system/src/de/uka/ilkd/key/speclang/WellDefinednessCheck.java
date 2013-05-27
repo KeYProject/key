@@ -29,6 +29,8 @@ public abstract class WellDefinednessCheck implements Contract {
 
     private IObserverFunction target;
 
+    final LocationVariable heap;
+
     Term requires;
 
     Term assignable;
@@ -45,25 +47,28 @@ public abstract class WellDefinednessCheck implements Contract {
         return type().toString().toLowerCase();
     }
 
-    WellDefinednessCheck(IObserverFunction target, Type type) {
+    WellDefinednessCheck(IObserverFunction target, Type type, Services services) {
         this.type = type;
         this.target = target;
+        this.heap = services.getTypeConverter().getHeapLDT().getHeap();
     }
 
-    public WellDefinednessCheck add(WellDefinednessCheck check) {
-        this.requires = TB.and(requires, check.getRequires(null));
-        this.assignable = TB.and(assignable, check.getAssignable(null));
-        return this;
-    }
-
-    public Term getRequires(LocationVariable heap) {
+    public Term getRequires() {
         assert this.requires != null;
         return this.requires;
     }
 
-    public Term getAssignable(LocationVariable heap) {
+    public Term getAssignable() {
         assert this.assignable != null;
         return this.assignable;
+    }
+
+    public Term getRequires(LocationVariable heap) {
+        return getRequires();
+    }
+
+    public Term getAssignable(LocationVariable heap) {
+        return getAssignable();
     }
 
     @Override
@@ -123,7 +128,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     public Term createPOTerm() {
-        Term po = getRequires(null);
+        Term po = getRequires(heap);
         return po;
     }
 
