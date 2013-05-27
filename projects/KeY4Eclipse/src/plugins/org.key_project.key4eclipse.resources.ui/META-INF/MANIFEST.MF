@@ -18,4 +18,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.key4eclipse.resources.ui.wizard
+Export-Package: org.key_project.key4eclipse.resources.ui.handlers,
+ org.key_project.key4eclipse.resources.ui.propertypages,
+ org.key_project.key4eclipse.resources.ui.wizard

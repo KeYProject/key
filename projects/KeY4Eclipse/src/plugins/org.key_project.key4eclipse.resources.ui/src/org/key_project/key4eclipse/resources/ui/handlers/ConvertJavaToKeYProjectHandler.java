@@ -20,7 +20,6 @@ public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler
     */
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
-System.out.println("DOING");
       ISelection selection = HandlerUtil.getCurrentSelection(event);
       Object[] elements = SWTUtil.toArray(selection);
       for(Object obj : elements){
