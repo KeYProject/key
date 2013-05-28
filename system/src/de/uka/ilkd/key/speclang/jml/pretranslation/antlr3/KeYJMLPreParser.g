@@ -58,7 +58,7 @@ options {
     private KeYJMLPreParser(KeYJMLPreLexer lexer,
                             String fileName,
                             Position offsetPos) {
-    	this(lexer);
+    	this(new LegacyCommonTokenStream(lexer));
     	this.lexer      = lexer;
     	this.excManager = new SLTranslationExceptionManager(this,
     							    fileName,
@@ -69,7 +69,7 @@ options {
     public KeYJMLPreParser(String comment,
     			   String fileName,
     			   Position offsetPos) {
-	this(new KeYJMLPreLexer(new StringReader(comment)),
+	this(new KeYJMLPreLexer(new ANTLRStringStream(comment)),
 	     fileName,
 	     offsetPos);
     }
@@ -98,7 +98,7 @@ options {
     		throws SLTranslationException {
         try {
             return classlevel_comment();
-        } catch(ANTLRException e) {
+        } catch(RecognitionException e) {
 	    throw excManager.convertException(e);
         }
     }
@@ -108,7 +108,7 @@ options {
     		throws SLTranslationException {
         try {
             return methodlevel_comment();
-        } catch(ANTLRException e) {
+        } catch(RecognitionException e) {
 	    throw excManager.convertException(e);
         }
     }
