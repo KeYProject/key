@@ -130,7 +130,7 @@
 
 
   <target name="compile" depends="prepare, keyparser-antlr3, proofjavaparser, schemajavaparser, 
-  	                                   jmlparser, jmlpreparser, copy"
+  	                                   jmlparser, jmlpreparser-antlr3, copy"
           description="Compiles all java files into the source directory.">
   	
      <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
@@ -231,7 +231,7 @@
     <java jar="${ext.dir}/antlr.jar" fork="true">
       <arg value="-o" />
       <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3" />
-      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/jmlprelexer.g" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/KeYJMLPreLexer.g" />
     </java>
   </target>
 
@@ -239,7 +239,7 @@
     <java jar="${ext.dir}/antlr.jar" fork="true">
       <arg value="-o" />
       <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3" />
-      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/jmlpreparser.g" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/KeYJMLPreParser.g" />
     </java>
   </target>
 
