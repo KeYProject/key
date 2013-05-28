@@ -869,7 +869,7 @@ field_declaration[ImmutableList<String> mods]
     type=IDENT 	      { sb.append(type.getText() + " "); }
     name=IDENT 	      { sb.append(name.getText()); }
     (
-    	    init=INITIALISER  { sb.append(init.getText()); }
+    	    init=initialiser  { sb.append(init); }
     	|   semi=SEMICOLON    { sb.append(semi.getText()); }
     )
     {
@@ -1171,17 +1171,30 @@ assume_keyword
 
 expression returns [PositionedString result = null]
 @init {
-    lexer.setExpressionMode(true);
-    LT(1);
-    lexer.setExpressionMode(false);
+    int parenthesesCounter = 0;
+    final StringBuilder text = new StringBuilder();
+    Token begin = null;
 }
 :
-    t=EXPRESSION
+    (
+        (
+            t=LPARENT { parenthesesCounter++; }
+        |   t=RPARENT { parenthesesCounter--; }
+        |   { parenthesesCounter > 0 }? t=SEMICOLON
+        |   t=~(LPARENT|RPARENT|SEMICOLON)
+        )
+        { if (begin == null) { begin = t; } text.append(t.getText()); }
+    )*
+    { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } text.append(t.getText()); }
     {
-    	result = createPositionedString(t.getText(), t);
+    	result = createPositionedString(text.toString(), begin);
     }
 ;
 
+initialiser returns [String s = null]
+    :
+        EQUALITY ps=expression { s = "=" + ps.text; }
+    ;
 
 
 //-----------------------------------------------------------------------------

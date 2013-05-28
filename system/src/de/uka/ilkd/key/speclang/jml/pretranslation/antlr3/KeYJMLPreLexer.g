@@ -37,6 +37,9 @@ lexer grammar KeYJMLPreLexer;
     }
 }
 
+    LPARENT : '(';
+    RPARENT : ')';
+    EQUALITY : '=';
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
     ACCESSIBLE_REDUNDANTLY      : 'accessible_redundantly';
@@ -262,7 +265,6 @@ WS
 }
 @after { paraphrase.pop(); }
 :
-    {!expressionMode}?
     ( 
     	    ' '
     	|   '\t'
@@ -290,7 +292,6 @@ IDENT
 }
 @after { paraphrase.pop(); }
 :
-    {!expressionMode}?
     LETTER 
     (	options { greedy = true; }
     	:
@@ -308,7 +309,6 @@ PARAM_LIST
 }
 @after { paraphrase.pop(); }
 :
-    {!expressionMode}?
     '(' 
     (
         PARAM_DECL
@@ -323,13 +323,11 @@ PARAM_LIST
 
 NEST_START
 :
-    {!expressionMode}?
     '{|'
 ;
 
 NEST_END
 :
-    {!expressionMode}?
     '|}'
 ;
 
@@ -343,7 +341,6 @@ BODY
 }
 @after { paraphrase.pop(); }
 :
-    {!expressionMode}?
     '{'
     (
 	   '{'                      { braceCounter++; ignoreAt = false; }
@@ -361,28 +358,12 @@ BODY
 ;
 
 
-INITIALISER
-@init {
-    paraphrase.push("an initialiser");
-    assert inputState.guessing == 0;
-}
-@after { paraphrase.pop(); }
-:
-    {!expressionMode}?
-    (
-	'='         { setExpressionMode(true); }
-	EXPRESSION  { setExpressionMode(false); }
-    )
-;
-
-
 SEMICOLON
 @init {
     paraphrase.push("a semicolon");
 }
 @after { paraphrase.pop(); }
 :
-    {!expressionMode}?
     ';'
 ;
 
@@ -417,23 +398,6 @@ ESC
     )
     ;
 
-
-EXPRESSION
-@init {
-    int parenthesesCounter = 0;
-}
-:
-    {expressionMode}?
-    (
-            '('   { parenthesesCounter++; }
-        |   ')'   { parenthesesCounter--; }
-        |   {parenthesesCounter > 0}? ';'
-        |   '\n'  { newline(); }
-        |    ~';'
-    )* 
-    {parenthesesCounter == 0}? ';'
-;
-    
 
     AXIOM_NAME_BEGIN
     @init {
