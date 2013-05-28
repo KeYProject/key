@@ -95,6 +95,7 @@
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
   	
 	<mkdir dir="${build.dir}"/>
@@ -225,6 +226,22 @@
 	        </classpath>
 	     </antlr>
 	  </target>
+
+  <target name="jmlprelexer-antlr3">
+    <java jar="${ext.dir}/antlr.jar" fork="true">
+      <arg value="-o" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/jmlprelexer.g" />
+    </java>
+  </target>
+
+  <target name="jmlpreparser-antlr3" depends="jmlprelexer-antlr3">
+    <java jar="${ext.dir}/antlr.jar" fork="true">
+      <arg value="-o" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/antlr3/jmlpreparser.g" />
+    </java>
+  </target>
 
 	<target name="jmllexer">
 	     <antlr

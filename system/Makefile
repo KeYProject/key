@@ -110,14 +110,14 @@ JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx1024m
 
 
 ANTLR_PARSER= \
-	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java
 
 ANTLR3_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYParser.java
+	$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYParser.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/antlr3/KeYJMLPreLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/antlr3/KeYJMLPreParser.java
 
 
 JAVACC_PARSER= \
@@ -359,6 +359,11 @@ $(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYLexer.java : $(SRC)$(PFX)parser/antl
 $(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYParser.java : $(SRC)$(PFX)parser/antlr3/KeYParser.g
 	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)parser/antlr3 $<
 
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/antlr3/KeYJMLPreLexer.java : $(SRC)$(PFX)speclang/jml/pretranslation/antlr3/KeYJMLPreLexer.g
+	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/antlr3 $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/antlr3/KeYJMLPreParser.java : $(SRC)$(PFX)speclang/jml/pretranslation/antlr3/KeYJMLPreParser.g
+	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/antlr3 $<
 
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexerTokenTypes.txt \
