@@ -934,6 +934,20 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 		opToken = geq;
 	    }
 	|
+	    llt:LOCKSET_LT right=postfixexpr
+	    {
+	        final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+	        f = new Function(new Name("lockset_lt"), Sort.FORMULA, objSort, objSort);
+	        opToken = llt;
+	    }
+	|
+	    lleq:LOCKSET_LT right=postfixexpr
+	    {
+	        final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+	        f = new Function(new Name("lockset_leq"), Sort.FORMULA, objSort, objSort);
+	        opToken = lleq;
+	    }
+	|
 	    io:INSTANCEOF type=typespec
 	    {
 		f = type.getSort().getInstanceofSymbol(services);

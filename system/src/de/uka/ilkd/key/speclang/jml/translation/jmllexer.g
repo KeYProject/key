@@ -100,6 +100,8 @@ LEQ : "<=";
 LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU);
 // less_than_nothing is *deprecated* and to be removed eventually, use strictly_nothing instead
 LOCKSET : "\\lockset";
+LOCKSET_LT: "<#";
+LOCKSET_LEQ: "<#=";
 LOGICALAND : "&&";
 LOGICALOR : "||";
 MAX_SPACE : "\\max_space"; //KeY extension, not official JML
