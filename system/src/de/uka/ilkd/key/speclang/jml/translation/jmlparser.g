@@ -936,13 +936,15 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 	|
 	    llt:LOCKSET_LT right=postfixexpr
 	    {
+	        addIgnoreWarning("Lockset ordering is not supported",llt);
 	        final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
 	        f = new Function(new Name("lockset_lt"), Sort.FORMULA, objSort, objSort);
 	        opToken = llt;
 	    }
 	|
-	    lleq:LOCKSET_LT right=postfixexpr
+	    lleq:LOCKSET_LEQ right=postfixexpr
 	    {
+	        addIgnoreWarning("Lockset ordering is not supported",lleq);
 	        final Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
 	        f = new Function(new Name("lockset_leq"), Sort.FORMULA, objSort, objSort);
 	        opToken = lleq;
@@ -963,9 +965,12 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 		assert right.isType();
 
 		if (result.getTerm() == null) {
-		    raiseError("subtype expression <: only supported for" +
+		    addIgnoreWarning("subtype expression <: only supported for" +
 			" \\typeof() arguments on the left side.", st);
-		}
+			final int x = (new java.util.Random()).nextInt(1000);
+			final Function z = new Function(new Name("subtype"+x),Sort.FORMULA);
+			result = new SLExpression(TB.func(z));
+		} else {
 
 		Sort os = right.getType().getSort();
 		Function ioFunc = os.getInstanceofSymbol(services);
@@ -974,6 +979,7 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 		    TB.equals(
 			TB.func(ioFunc, result.getTerm()),
 			TB.TRUE(services)));
+	    }
 	    }
 	)?
 	{
