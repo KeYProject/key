@@ -1567,17 +1567,17 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   duration:DURATION LPAREN result=expression RPAREN
 	{
-	    result = translator.createSkolemExprInt(duration,services);
+	    result = translator.createSkolemExprLong(duration,services);
 	}
 
     |   space:SPACE LPAREN result=expression RPAREN
 	{
-	    result = translator.createSkolemExprInt(space,services);
+	    result = translator.createSkolemExprLong(space,services);
 	}
 
     |   wspace:WORKINGSPACE LPAREN result=expression RPAREN
 	{
-	    result = translator.createSkolemExprInt(wspace,services);
+	    result = translator.createSkolemExprLong(wspace,services);
 	}
 
     |   ("\\max") => max:"\\max" LPAREN result=expression RPAREN

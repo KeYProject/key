@@ -1615,15 +1615,33 @@ final class JMLTranslator {
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type int.
      */
     public SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
+        return skolemExprIntHelper(jmlKeyWord, PrimitiveType.JAVA_INT, services);
+    }
+
+    /**
+     * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type long.
+     */
+    public SLExpression createSkolemExprLong(Token jmlKeyWord, Services services) {
+        return skolemExprIntHelper(jmlKeyWord, PrimitiveType.JAVA_LONG, services);
+    }
+
+    /**
+     * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type \bigint.
+     */
+    public SLExpression createSkolemExprBigint(Token jmlKeyWord, Services services) {
+        return skolemExprIntHelper(jmlKeyWord, PrimitiveType.JAVA_BIGINT, services);
+    }
+
+    private SLExpression skolemExprIntHelper(Token jmlKeyWord, PrimitiveType type, Services services) {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
+        final KeYJavaType resultType = services.getJavaInfo().getPrimitiveKeYJavaType(type);
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(intSort);
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         final int x = (new Random()).nextInt(1000); // function is unique anyway
         final Function sk = new Function(new Name(shortName+x),intSort);
         final Term t = TB.func(sk);
-        return new SLExpression(t,intType);
+        return new SLExpression(t,resultType);
     }
 
     /**
