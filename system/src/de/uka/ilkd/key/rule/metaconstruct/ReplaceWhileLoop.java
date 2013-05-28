@@ -34,7 +34,7 @@ import de.uka.ilkd.key.util.ExtList;
  * 
  * It can be applied to EnhancedFors also.
  * 
- * @see WhileInvRule
+ * @see WhileInvariantTransformer
  * @see WhileInvariantTransformation
  */
 public class ReplaceWhileLoop extends CreatingASTVisitor {

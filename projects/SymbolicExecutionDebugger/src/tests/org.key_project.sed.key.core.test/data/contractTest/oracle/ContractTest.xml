@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4aae8a60-a6a6-4b8a-aba9-e0486c7ece32" name="returnValue(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_f1035b62-9327-4281-b6a1-1c90515ac04e" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_b7eb8972-6b09-440e-9795-f5845095fdbe" name="self.returnValue(value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-            <sedStatement xml:id="_dfe49456-e765-492b-9186-e89e1491899b" name="return value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
-               <sedMethodReturn xml:id="_9b21d869-9d58-463c-af58-59609b6f5bd5" name="&lt;return &apos;value&apos; as result of self.returnValue(value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-                  <sedTermination xml:id="_38cc008b-0137-4f7d-b2dc-fcaba5c68fa6" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_c9c9b075-495e-4ab2-bb13-99de3063f9c8" name="returnValue(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_56af8b44-2026-4654-860f-dde3e7eeb1d3" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_2c6e6011-a813-4f30-b262-8d7b718c6f13" name="self.returnValue(value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+            <sedStatement xml:id="_af3ec31e-cf9c-486d-bcdd-497a9c5d3404" name="return value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
+               <sedMethodReturn xml:id="_9b2bad92-7e12-4afd-87a2-ebdd9ca1c8c5" name="&lt;return value as result of self.returnValue(value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+                  <sedTermination xml:id="_9a8ba72f-8dbb-4919-88d9-db28aa3789e9" name="&lt;end&gt;" pathCondition="true">
                   </sedTermination>
                </sedMethodReturn>
             </sedStatement>

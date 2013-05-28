@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_a31c9210-a714-405b-aad1-8291bfa69871" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d67ccf01-9626-4b46-8cdd-08696467a0e2" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_ee22f342-fb6a-43a1-9321-ac82bebd70a1" name="self.main();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="57">
-            <sedStatement xml:id="_cd984055-917c-45a5-9dfa-2af0dc0e40fd" name="int a = a();" pathCondition="true" lineNumber="-1" charStart="65" charEnd="77">
-               <sedMethodCall xml:id="_a736d10e-3aab-446c-8e25-7f91cf521c1c" name="self.a();" pathCondition="true" lineNumber="-1" charStart="131" charEnd="132">
-                  <sedStatement xml:id="_fa06ed5c-d302-4dda-889b-e1a5bb841fb1" name="int b1 = b();" pathCondition="true" lineNumber="-1" charStart="140" charEnd="153">
-                     <sedMethodCall xml:id="_a78448da-d3b9-4b97-a198-2f2796894c7b" name="self.b();" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
-                        <sedStatement xml:id="_af3e2446-da42-4d9f-9fda-e7a3eb829abe" name="return c();" pathCondition="true" lineNumber="-1" charStart="239" charEnd="250">
-                           <sedMethodCall xml:id="_bf2dbbc9-fd70-4f28-947f-636e8873aa3e" name="self.c();" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
-                              <sedStatement xml:id="_28f9dc72-9c43-4a3d-a2f4-e571fd2d5196" name="return 42;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="290">
-                                 <sedMethodReturn xml:id="_897707d1-ae97-4472-b557-e2e06cce117b" name="&lt;return &apos;42&apos; as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
-                                    <sedMethodReturn xml:id="_e5f37c0d-d447-4b8f-b3f8-84a5af694b9d" name="&lt;return &apos;42&apos; as result of self.b();&gt;" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
-                                       <sedStatement xml:id="_e2faebec-5b4e-4de7-b687-b54940f48bfb" name="int b2 = b();" pathCondition="true" lineNumber="-1" charStart="157" charEnd="170">
-                                          <sedMethodCall xml:id="_40adf4bc-c6bd-4a7f-ba9d-f8a612849034" name="self.b();" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
-                                             <sedStatement xml:id="_38076698-5abd-4a26-b91c-cefa4a25c81c" name="return c();" pathCondition="true" lineNumber="-1" charStart="239" charEnd="250">
-                                                <sedMethodCall xml:id="_765b8493-5ab1-44be-8d09-00391c7b61ef" name="self.c();" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
-                                                   <sedStatement xml:id="_7c40974a-303a-483a-ac7c-2de2c485a087" name="return 42;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="290">
-                                                      <sedMethodReturn xml:id="_dea9d065-e8cf-4db8-977a-ed66671a4b37" name="&lt;return &apos;42&apos; as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
-                                                         <sedMethodReturn xml:id="_cbcb69b8-eebd-470a-8c05-8ee06d2b0c59" name="&lt;return &apos;42&apos; as result of self.b();&gt;" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
-                                                            <sedStatement xml:id="_7a5c967c-bcc6-4107-ae8e-d0861a2b13de" name="int c = c();" pathCondition="true" lineNumber="-1" charStart="174" charEnd="186">
-                                                               <sedMethodCall xml:id="_25adae25-78db-48f1-84b0-3fccf8bbdb9b" name="self.c();" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
-                                                                  <sedStatement xml:id="_b8313e40-c457-4ca1-8666-f9ed3782e96d" name="return 42;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="290">
-                                                                     <sedMethodReturn xml:id="_df3d54ef-d576-489a-b433-a73cbb4df5ca" name="&lt;return &apos;42&apos; as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
-                                                                        <sedStatement xml:id="_6cff793b-528a-4576-b75b-18cf6d79c5e8" name="return b1+b2+c;" pathCondition="true" lineNumber="-1" charStart="190" charEnd="209">
-                                                                           <sedMethodReturn xml:id="_f740fd49-bc46-4f67-93b9-9c94de17caf2" name="&lt;return &apos;126&apos; as result of self.a();&gt;" pathCondition="true" lineNumber="-1" charStart="131" charEnd="132">
-                                                                              <sedStatement xml:id="_e11e33b9-020a-4997-ab09-94489c1a1f70" name="int x = x();" pathCondition="true" lineNumber="-1" charStart="81" charEnd="93">
-                                                                                 <sedMethodCall xml:id="_40ac0d7b-de14-4505-9bd5-4a04fec47816" name="self.x();" pathCondition="true" lineNumber="-1" charStart="311" charEnd="312">
-                                                                                    <sedStatement xml:id="_eb0bdb61-2083-4a4f-8793-a518c543515c" name="return 2;" pathCondition="true" lineNumber="-1" charStart="320" charEnd="329">
-                                                                                       <sedMethodReturn xml:id="_cad9c777-b5a2-4f39-904f-1afc37b08910" name="&lt;return &apos;2&apos; as result of self.x();&gt;" pathCondition="true" lineNumber="-1" charStart="311" charEnd="312">
-                                                                                          <sedStatement xml:id="_6639cfd7-4c28-46c0-b3e4-bec652e156b9" name="return a*x;" pathCondition="true" lineNumber="-1" charStart="97" charEnd="110">
-                                                                                             <sedMethodReturn xml:id="_da02eabe-b270-404a-9cac-b874824dda1d" name="&lt;return &apos;252&apos; as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="53" charEnd="57">
-                                                                                                <sedTermination xml:id="_a687ceeb-bb8f-4ab3-8d1e-ab5f145dde3b" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_ca5296ce-8b06-498c-953c-381a6307e59f" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_88880e88-3569-4afa-8450-9490909a4ce7" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_499b9a9f-926c-4aec-9de5-8aad62e5641b" name="self.main();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="57">
+            <sedStatement xml:id="_a5660d70-25fd-4a9b-91cf-7048233d6c6f" name="int a = a();" pathCondition="true" lineNumber="-1" charStart="65" charEnd="77">
+               <sedMethodCall xml:id="_9e779bbc-c159-4b03-a87b-c8fa7a2ed0b5" name="self.a();" pathCondition="true" lineNumber="-1" charStart="131" charEnd="132">
+                  <sedStatement xml:id="_3d68e625-3059-4df8-8666-daec1ec2ac24" name="int b1 = b();" pathCondition="true" lineNumber="-1" charStart="140" charEnd="153">
+                     <sedMethodCall xml:id="_403e7af8-1dc2-42f9-a40a-fe519debfd5c" name="self.b();" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
+                        <sedStatement xml:id="_7689536b-7f15-4818-871e-bfd2c6fd0350" name="return c();" pathCondition="true" lineNumber="-1" charStart="239" charEnd="250">
+                           <sedMethodCall xml:id="_3672473b-ffa7-4e10-abeb-a822c2f0967f" name="self.c();" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
+                              <sedStatement xml:id="_28a5cec7-c9f0-4b3c-9b42-78d63417c97d" name="return 42;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="290">
+                                 <sedMethodReturn xml:id="_d8838022-e73c-4266-bf4a-e0a7b79fda3a" name="&lt;return 42 as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
+                                    <sedMethodReturn xml:id="_34744563-072f-48e6-bc7e-333c1d5df573" name="&lt;return 42 as result of self.b();&gt;" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
+                                       <sedStatement xml:id="_948527b0-772d-47fe-a263-4393207a5de8" name="int b2 = b();" pathCondition="true" lineNumber="-1" charStart="157" charEnd="170">
+                                          <sedMethodCall xml:id="_98a5492c-2a39-457d-afa1-8f834b2d88e5" name="self.b();" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
+                                             <sedStatement xml:id="_644f0918-b426-4478-9192-b8eae8d7291a" name="return c();" pathCondition="true" lineNumber="-1" charStart="239" charEnd="250">
+                                                <sedMethodCall xml:id="_ab86d475-c46b-44e0-b76a-c89b0d099532" name="self.c();" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
+                                                   <sedStatement xml:id="_20ab2c65-f17d-4315-a6bd-7a708ab4266b" name="return 42;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="290">
+                                                      <sedMethodReturn xml:id="_24cf859c-02e9-474e-b5dc-6f5f5b0f522f" name="&lt;return 42 as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
+                                                         <sedMethodReturn xml:id="_fbbdab25-5901-4cf6-956f-8f60bca652ca" name="&lt;return 42 as result of self.b();&gt;" pathCondition="true" lineNumber="-1" charStart="230" charEnd="231">
+                                                            <sedStatement xml:id="_d0c8602c-5d1b-4c26-8658-81cc66f07b39" name="int c = c();" pathCondition="true" lineNumber="-1" charStart="174" charEnd="186">
+                                                               <sedMethodCall xml:id="_27939b87-15bb-432c-8984-b479ed372fe7" name="self.c();" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
+                                                                  <sedStatement xml:id="_4abde610-60c0-4917-a8c2-67bd05739efb" name="return 42;" pathCondition="true" lineNumber="-1" charStart="280" charEnd="290">
+                                                                     <sedMethodReturn xml:id="_bfce827f-d78b-4e75-bc50-ad4aa1d7f83b" name="&lt;return 42 as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="271" charEnd="272">
+                                                                        <sedStatement xml:id="_1a565533-2f83-4798-86e4-863b6ed224cd" name="return b1+b2+c;" pathCondition="true" lineNumber="-1" charStart="190" charEnd="209">
+                                                                           <sedMethodReturn xml:id="_0eef96c5-3205-4332-8034-91221e835cbf" name="&lt;return 126 as result of self.a();&gt;" pathCondition="true" lineNumber="-1" charStart="131" charEnd="132">
+                                                                              <sedStatement xml:id="_dc8ae877-84d0-49c6-b547-bace8644eacd" name="int x = x();" pathCondition="true" lineNumber="-1" charStart="81" charEnd="93">
+                                                                                 <sedMethodCall xml:id="_e99f2e00-0c44-4bd8-958c-a6999dab0d6d" name="self.x();" pathCondition="true" lineNumber="-1" charStart="311" charEnd="312">
+                                                                                    <sedStatement xml:id="_c89f37f2-6aa0-41e4-b7e2-6fb0fa6f6f0e" name="return 2;" pathCondition="true" lineNumber="-1" charStart="320" charEnd="329">
+                                                                                       <sedMethodReturn xml:id="_b9f05380-d89c-46be-9815-4b70c8a9d2c3" name="&lt;return 2 as result of self.x();&gt;" pathCondition="true" lineNumber="-1" charStart="311" charEnd="312">
+                                                                                          <sedStatement xml:id="_97b02f9f-1cc4-4812-b1ab-aa49ba53fa4b" name="return a*x;" pathCondition="true" lineNumber="-1" charStart="97" charEnd="110">
+                                                                                             <sedMethodReturn xml:id="_b6366e9b-50fe-4fe4-bc2b-a415d109e0e6" name="&lt;return 252 as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="53" charEnd="57">
+                                                                                                <sedTermination xml:id="_7c3cde31-f223-48c6-b1b8-7944badebd29" name="&lt;end&gt;" pathCondition="true">
                                                                                                 </sedTermination>
                                                                                              </sedMethodReturn>
                                                                                           </sedStatement>

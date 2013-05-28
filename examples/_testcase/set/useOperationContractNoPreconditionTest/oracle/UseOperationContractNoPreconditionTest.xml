@@ -9,8 +9,8 @@ mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of UseOperationContractNoPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;84&apos; as result of UseOperationContractNoPreconditionTest.main();&gt;" isReturnValueComputed="true">
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                  <methodReturn name="&lt;return of UseOperationContractNoPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>

@@ -80,6 +80,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    private ImmutableList<PosInOccurrence> builtinIfInsts;
    private int currIfInstFormula;
    private PosInTerm currIfInstPosInTerm;
+   private String status = "";
 
 
    private KeYMediator mediator;
@@ -90,6 +91,15 @@ public class DefaultProofFileParser implements IProofFileParser {
       this.mediator = mediator;
       currNode = proof.root(); // initialize loader
       children = currNode.childrenIterator(); // --"--
+   }
+
+   /**
+    * Communicates a non-fatal condition to the caller. Empty string
+    * means everything is OK. The message will be displayed to the user
+    * in the GUI after the proof has been parsed.
+    */
+   public String getStatus() {
+       return status;
    }
 
 
@@ -243,6 +253,8 @@ public class DefaultProofFileParser implements IProofFileParser {
                currGoal.apply(app);
                children = currNode.childrenIterator();
                currNode = null;
+           } catch (SkipSMTRuleException e) {
+           // silently continue; status will be reported via polling
            } catch (BuiltInConstructionException e) {
                throw new RuntimeException("Error loading proof. Line "+
                    linenr+" rule: "+currTacletName,e);
@@ -283,7 +295,14 @@ public class DefaultProofFileParser implements IProofFileParser {
     * @return current rule application for updateSimplification
     */
    private IBuiltInRuleApp constructBuiltinApp()
-                              throws BuiltInConstructionException {
+                              throws SkipSMTRuleException,
+                                     BuiltInConstructionException {
+
+        if ("SMTRule".equals(currTacletName)) {
+            status = "Your proof has been loaded, but SMT solvers have not been run";
+            throw new SkipSMTRuleException();
+        }
+
 
      IBuiltInRuleApp ourApp = null;
        PosInOccurrence pos = null;
@@ -526,4 +545,8 @@ public class DefaultProofFileParser implements IProofFileParser {
       super(cause);
   }  
    }
+
+    private static class SkipSMTRuleException extends Exception {
+    }
+
 }

@@ -166,7 +166,8 @@ public class Semisequent implements Iterable<SequentFormula> {
 	    searchList = searchList.tail();	    
 	    
 	    if (cf.formula().equalsModRenaming(conForm.formula())) {		  
-		semiCI.rejectedFormula( cf );
+		
+	    semiCI.rejectedFormula( cf );
 		return semiCI; // semisequent already contains formula
 
 	    }

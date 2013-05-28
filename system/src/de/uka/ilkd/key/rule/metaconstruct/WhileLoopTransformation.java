@@ -19,13 +19,44 @@ import java.util.Stack;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Case;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.Default;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.Finally;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.IForUpdates;
+import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.LabelJumpStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.java.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -34,7 +65,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -318,7 +348,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		needInnerLabel = true;
 	    } else if (runMode == TRANSFORMATION) {
                 needInnerLabel = true;
-		addChild(new Break(breakInnerLabel.getLabel()));
+		addChild(KeYJavaASTFactory.breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo())); // Keep the PositionInfo because it is required for symbolic execution tree extraction and this assignment is the only unique representation of the replaced continue
 		changed();
 	    }
 	} else {
@@ -904,7 +934,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    ExtList changeList = stack.peek();
 	    if ( changeList.size () > 0 && 
 		 changeList.getFirst() == CHANGED ) {	    
-		changeList.removeFirst();	    
+		changeList.removeFirst();
+		changeList.add(x.getPositionInfo());
 		addNewChild(changeList);
 	    } else {
 		doDefaultAction(x);

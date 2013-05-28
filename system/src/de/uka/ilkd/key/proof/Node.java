@@ -43,7 +43,7 @@ public class Node implements Iterable<Node> {
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private List<Node>           children            = new LinkedList<Node>();
+    private List<Node>           children            = new ArrayList<Node>(5);
 
     private Node                 parent              = null;
 

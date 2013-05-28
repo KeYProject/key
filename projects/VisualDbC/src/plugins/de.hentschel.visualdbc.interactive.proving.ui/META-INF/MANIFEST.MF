@@ -21,4 +21,5 @@ Export-Package: de.hentschel.visualdbc.interactive.proving.ui.command,
  de.hentschel.visualdbc.interactive.proving.ui.finder,
  de.hentschel.visualdbc.interactive.proving.ui.job,
  de.hentschel.visualdbc.interactive.proving.ui.job.event,
- de.hentschel.visualdbc.interactive.proving.ui.util
+ de.hentschel.visualdbc.interactive.proving.ui.util,
+ de.hentschel.visualdbc.interactive.proving.ui.util.event

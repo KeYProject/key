@@ -7,8 +7,8 @@
                <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="array[0]=42;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                      <statement name="return array[0];" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of ArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of ArrayIndexWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
-                           <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" exceptionalTermination="false">
+                        <methodReturn name="&lt;return of ArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -16,8 +16,8 @@
                </branchCondition>
                <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of ArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of ArrayIndexWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" exceptionalTermination="false">
+                     <methodReturn name="&lt;return of ArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -26,8 +26,8 @@
          </branchCondition>
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of ArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of ArrayIndexWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
-                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" exceptionalTermination="false">
+               <methodReturn name="&lt;return of ArrayIndexWriteAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL">
                   </termination>
                </methodReturn>
             </statement>

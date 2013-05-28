@@ -8,30 +8,26 @@
                   <statement name="x.next.next.value=3;" pathCondition="!x = null &amp; !x.next = null" pathConditionChanged="false">
                      <branchCondition name="!x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="true" branchCondition="!x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="return x.value+x.next.value+x.next.next.value;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
-+ \if (x.next.next = x)
-      \then (3)
-      \else (\if (x.next = x)  \then (2)  \else (1))
-+ \if (x.next.next = x.next)  \then (3)  \else (2)&apos; as result of SimpleLinkedOjbects.compute(x);&gt;" isReturnValueComputed="true">
-                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" exceptionalTermination="false">
+                           <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" isReturnValueComputed="false">
+                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" terminationKind="NORMAL">
                               </termination>
                            </methodReturn>
                         </statement>
                      </branchCondition>
                      <branchCondition name="x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="true" branchCondition="x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" exceptionalTermination="true">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                         </termination>
                      </branchCondition>
                   </statement>
                </branchCondition>
                <branchCondition name="x.next = null" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="true" branchCondition="x.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" exceptionalTermination="true">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" exceptionalTermination="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
             </termination>
          </branchCondition>
       </statement>

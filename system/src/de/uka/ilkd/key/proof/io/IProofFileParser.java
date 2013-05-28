@@ -22,4 +22,6 @@ public interface IProofFileParser {
    void beginExpr(char eid, String str);
 
    void endExpr(char eid, int stringLiteralLine);
+
+   String getStatus();
 }

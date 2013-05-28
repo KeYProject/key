@@ -136,6 +136,7 @@ public class DefaultProblemLoader {
             if (proof != null) {
                replayProof(proof);
             }
+            // this message is propagated to the top level in console mode
             return ""; // Everything fine
          }
          finally {
@@ -318,10 +319,16 @@ public class DefaultProblemLoader {
 
       mediator.stopInterface(true); // first stop (above) is not enough
 
+      String status = "";
       if (envInput instanceof KeYUserProblemFile) {
-         problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
+         IProofFileParser parser = new DefaultProofFileParser(proof,
+                                                              mediator);
+         problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+         status = parser.getStatus();
       }
-      mediator.getUI().resetStatus(this);
+
+      if ("".equals(status)) mediator.getUI().resetStatus(this);
+         else mediator.getUI().reportStatus(this, status);
    }
 
    /**

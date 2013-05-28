@@ -99,7 +99,7 @@
                            <value name="result_1 {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <methodReturn name="&lt;return of self.sum(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of self.sum(a_1,b_1);&gt;" isReturnValueComputed="true">
+                        <methodReturn name="&lt;return of self.sum(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                               <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
@@ -133,7 +133,7 @@
                                  <value name="sum {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of self.main();&gt;" isReturnValueComputed="true">
+                              <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
@@ -142,7 +142,7 @@
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                  </termination>
                               </methodReturn>
                            </statement>
