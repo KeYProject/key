@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="org.key_project.key4eclipse.common.ui.globalStarter" name="Global Starter" schema="schema/org.key_project.key4eclipse.common.ui.globalStarter.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
@@ -34,6 +35,12 @@
       </page>
       <page
             category="org.key_project.key4eclipse.common.ui.preference.page.KeY"
+            class="org.key_project.key4eclipse.common.ui.preference.page.StarterPreferencePage"
+            id="org.key_project.key4eclipse.common.ui.preference.page.StarterPreferencePage"
+            name="Applications">
+      </page>
+      <page
+            category="org.key_project.key4eclipse.common.ui.preference.page.KeY"
             class="org.key_project.key4eclipse.common.ui.preference.page.TacletOptionsPreferencePage"
             id="org.key_project.key4eclipse.common.ui.preference.page.TacletOptions"
             name="Taclet Options">
@@ -58,6 +65,106 @@
             Create a new Java Project and fill it with an example provided by KeY.
          </description>
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Contains all commands which are provided by the KeY project."
+            id="org.key_project.key4eclipse.common.ui.category"
+            name="KeY">
+      </category>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Open an application without loading any specific content."
+            id="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+            name="Open Application">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+            icon="icons/logo16.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.key_project.key4eclipse.common.ui.handler.GlobalStarterHandler"
+            commandId="org.key_project.key4eclipse.common.ui.globalStarterCommand">
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="org.key_project.key4eclipse.common.ui.globalStarterAvailable">
+            </test>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="org.key_project.key4eclipse.common.ui.keyMenu"
+               label="KeY"
+               mnemonic="K">
+            <command
+                  commandId="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+                  icon="icons/logo16.gif"
+                  id="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+                  label="Open Application"
+                  mnemonic="O"
+                  style="push"
+                  tooltip="Open an application without loading any specific content.">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.globalStarterAvailable">
+                  </test>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.key_project.key4eclipse.common.ui.keyToolbar"
+               label="KeY">
+            <command
+                  commandId="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+                  icon="icons/logo16.gif"
+                  id="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+                  label="Open Application"
+                  mnemonic="O"
+                  style="push"
+                  tooltip="Open an application without loading any specific content.">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.globalStarterAvailable">
+                  </test>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtilInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.key_project.key4eclipse.common.ui.expression.GlobalStarterAvailablePropertyTester"
+            id="org.key_project.key4eclipse.common.ui.expression.GlobalStarterAvailablePropertyTester"
+            namespace="org.key_project.key4eclipse.common.ui"
+            properties="globalStarterAvailable"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
 
 </plugin>

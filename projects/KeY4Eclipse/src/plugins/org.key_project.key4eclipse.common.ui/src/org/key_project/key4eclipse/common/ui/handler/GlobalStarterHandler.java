@@ -11,22 +11,24 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.starter.ui.handler;
+package org.key_project.key4eclipse.common.ui.handler;
 
 import org.eclipse.core.commands.ExecutionEvent;
-import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 
 /**
- * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.
+ * Handler to start a global application.
  */
-public class StartKeYHandler extends AbstractSaveExecutionHandler {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Object doExecute(ExecutionEvent event) throws Exception {
-        KeYUtil.openMainWindowAsync();
-        return null;
-    }
+public class GlobalStarterHandler extends AbstractSaveExecutionHandler {
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected Object doExecute(ExecutionEvent event) throws Exception {
+      Shell parentShell = HandlerUtil.getActiveShell(event);
+      StarterUtil.openGlobalStarter(parentShell);
+      return null;
+   }
 }

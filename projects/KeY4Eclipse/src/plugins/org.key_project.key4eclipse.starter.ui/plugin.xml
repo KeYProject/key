@@ -3,25 +3,14 @@
 <plugin>
    <extension
          point="org.eclipse.ui.commands">
-      <category
-            description="Contains all commands which are provided by the KeY Eclipse integration."
-            id="org.key_project.sed.external.key.starter.ui.commands.category"
-            name="KeY">
-      </category>
       <command
-            categoryId="org.key_project.sed.external.key.starter.ui.commands.category"
-            description="Opens KeY main window."
-            id="org.key_project.sed.external.key.starter.ui.commands.startKeYCommand"
-            name="Start KeY">
-      </command>
-      <command
-            categoryId="org.key_project.sed.external.key.starter.ui.commands.category"
+            categoryId="org.key_project.key4eclipse.common.ui.category"
             description="Loads the selected resource in KeY."
             id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
             name="Load in KeY">
       </command>
       <command
-            categoryId="org.key_project.sed.external.key.starter.ui.commands.category"
+            categoryId="org.key_project.key4eclipse.common.ui.category"
             description="Starts a new proof in KeY."
             id="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
             name="Start Proof in KeY">
@@ -29,10 +18,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
-      <image
-            commandId="org.key_project.sed.external.key.starter.ui.commands.startKeYCommand"
-            icon="icons/logo16.gif">
-      </image>
       <image
             commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
             icon="icons/logo16.gif">
@@ -44,10 +29,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
-      <handler
-            commandId="org.key_project.sed.external.key.starter.ui.commands.startKeYCommand"
-            class="org.key_project.key4eclipse.starter.ui.handler.StartKeYHandler">
-      </handler>
       <handler
             class="org.key_project.key4eclipse.starter.ui.handler.LoadResourceHandler"
             commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand">
@@ -159,12 +140,6 @@
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="org.key_project.sed.external.key.starter.ui.commands.startKeYCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+K"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-      <key
             commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -179,53 +154,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="org.key_project.sed.external.key.starter.ui.menus.keyMenu"
-               label="KeY"
-               mnemonic="K">
-            <command
-                  commandId="org.key_project.sed.external.key.starter.ui.commands.startKeYCommand"
-                  icon="icons/logo16.gif"
-                  id="org.key_project.sed.external.key.starter.ui.menus.startKeYCommand"
-                  label="Start KeY"
-                  mnemonic="K"
-                  style="push"
-                  tooltip="Opens KeY main window.">
-            </command>
-            <command
-                  commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-                  icon="icons/logo16.gif"
-                  id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-                  label="Load in KeY"
-                  mnemonic="L"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-                  icon="icons/logo16.gif"
-                  id="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-                  label="Start Proof in KeY"
-                  mnemonic="P"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="org.key_project.sed.external.key.starter.ui.toolbars.keyToolbar">
-            <command
-                  commandId="org.key_project.sed.external.key.starter.ui.commands.startKeYCommand"
-                  icon="icons/logo16.gif"
-                  id="org.key_project.sed.external.key.starter.ui.toolbars.sampleCommand"
-                  label="Start KeY"
-                  style="push"
-                  tooltip="Opens KeY main window.">
-            </command>
-         </toolbar>
-      </menuContribution>
       <menuContribution
             allPopups="true"
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
@@ -346,6 +274,26 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.key_project.key4eclipse.common.ui.keyMenu?after=additions">
+         <command
+               commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
+               label="Load in KeY"
+               mnemonic="L"
+               style="push">
+         </command>
+         <command
+               commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
+               label="Start Proof in KeY"
+               mnemonic="P"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -367,5 +315,14 @@
             id="org.key_project.key4eclipse.starter.ui.editor.proofEditor"
             name="Proof Editor">
       </editor>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.globalStarter">
+      <starter
+            class="org.key_project.key4eclipse.starter.ui.starter.KeYGlobalStarter"
+            description="Original user interface of KeY."
+            id="org.key_project.key4eclipse.starter.ui.starter.KeYGlobalStarter"
+            name="KeY">
+      </starter>
    </extension>
 </plugin>
