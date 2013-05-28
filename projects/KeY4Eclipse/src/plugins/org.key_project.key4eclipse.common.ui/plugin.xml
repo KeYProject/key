@@ -3,6 +3,8 @@
 <plugin>
    <extension-point id="org.key_project.key4eclipse.common.ui.globalStarter" name="Global Starter" schema="schema/org.key_project.key4eclipse.common.ui.globalStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.methodStarter" name="Method Starter" schema="schema/org.key_project.key4eclipse.common.ui.methodStarter.exsd"/>
+   <extension-point id="org.key_project.key4eclipse.common.ui.fileStarter" name="File Starter" schema="schema/org.key_project.key4eclipse.common.ui.fileStarter.exsd"/>
+   <extension-point id="org.key_project.key4eclipse.common.ui.projectStarter" name="Project Starter" schema="schema/org.key_project.key4eclipse.common.ui.projectStarter.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
@@ -86,6 +88,18 @@
             id="org.key_project.key4eclipse.common.ui.startProofCommand"
             name="Start Proof">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Loads the selected file."
+            id="org.key_project.key4eclipse.common.ui.loadFileCommand"
+            name="Load File">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Loads the selected project."
+            id="org.key_project.key4eclipse.common.ui.loadProjectCommand"
+            name="Load Project">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -95,6 +109,14 @@
       </image>
       <image
             commandId="org.key_project.key4eclipse.common.ui.startProofCommand"
+            icon="icons/logo16.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.common.ui.loadFileCommand"
+            icon="icons/logo16.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.common.ui.loadProjectCommand"
             icon="icons/logo16.gif">
       </image>
    </extension>
@@ -171,6 +193,81 @@
             </or>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.key4eclipse.common.ui.handler.FileStarterHandler"
+            commandId="org.key_project.key4eclipse.common.ui.loadFileCommand">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.key4eclipse.common.ui.fileStarterAvailable">
+               </test>
+               <or>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
+                     </instanceof>
+                     <or>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="key">
+                        </test>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="proof">
+                        </test>
+                     </or>
+                  </and>
+                  <with
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IFile">
+                        <or>
+                           <test
+                                 property="org.eclipse.core.resources.extension"
+                                 value="key">
+                           </test>
+                           <test
+                                 property="org.eclipse.core.resources.extension"
+                                 value="proof">
+                           </test>
+                        </or>
+                     </adapt>
+                  </with>
+               </or>
+            </iterate>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.key4eclipse.common.ui.handler.ProjectStarterHandler"
+            commandId="org.key_project.key4eclipse.common.ui.loadProjectCommand">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <or>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test>
+                  </and>
+                  <instanceof
+                        value="org.eclipse.jdt.core.IJavaProject">
+                  </instanceof>
+               </or>
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.key4eclipse.common.ui.projectStarterAvailable">
+               </test>
+            </iterate>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -179,6 +276,18 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+P">
+      </key>
+      <key
+            commandId="org.key_project.key4eclipse.common.ui.loadFileCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+L">
+      </key>
+      <key
+            commandId="org.key_project.key4eclipse.common.ui.loadProjectCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+L">
       </key>
    </extension>
    <extension
@@ -217,6 +326,36 @@
                   <test
                         forcePluginActivation="true"
                         property="org.key_project.key4eclipse.common.ui.methodStarterAvailable">
+                  </test>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.key_project.key4eclipse.common.ui.loadFileCommand"
+                  icon="icons/logo16.gif"
+                  id="org.key_project.key4eclipse.common.ui.loadFileCommand"
+                  label="Load File"
+                  mnemonic="L"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.fileStarterAvailable">
+                  </test>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.key_project.key4eclipse.common.ui.loadProjectCommand"
+                  icon="icons/logo16.gif"
+                  id="org.key_project.key4eclipse.common.ui.loadProjectCommand"
+                  label="Load Project"
+                  mnemonic="L"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.projectStarterAvailable">
                   </test>
                </visibleWhen>
             </command>
@@ -314,6 +453,74 @@
                </or>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.key_project.key4eclipse.common.ui.loadFileCommand"
+               icon="icons/logo16.gif"
+               id="org.key_project.key4eclipse.common.ui.loadFileCommand"
+               label="Load File"
+               mnemonic="L"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     operator="and">
+                  <and>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.key4eclipse.common.ui.fileStarterAvailable">
+                     </test>
+                     <instanceof
+                           value="org.eclipse.core.resources.IFile">
+                     </instanceof>
+                     <or>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="key">
+                        </test>
+                        <test
+                              property="org.eclipse.core.resources.extension"
+                              value="proof">
+                        </test>
+                     </or>
+                  </and>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.key_project.key4eclipse.common.ui.loadProjectCommand"
+               icon="icons/logo16.gif"
+               id="org.key_project.key4eclipse.common.ui.loadProjectCommand"
+               label="Load Project"
+               mnemonic="L"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <and>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.key4eclipse.common.ui.projectStarterAvailable">
+                     </test>
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.core.resources.IProject">
+                           </instanceof>
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.jdt.core.javanature">
+                           </test>
+                        </and>
+                        <instanceof
+                              value="org.eclipse.jdt.core.IJavaProject">
+                        </instanceof>
+                     </or>
+                  </and>
+               </iterate>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -336,6 +543,20 @@
             id="org.key_project.key4eclipse.common.ui.expression.MethodStarterAvailablePropertyTester"
             namespace="org.key_project.key4eclipse.common.ui"
             properties="methodStarterAvailable"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.key4eclipse.common.ui.expression.FileStarterAvailablePropertyTester"
+            id="org.key_project.key4eclipse.common.ui.expression.FileStarterAvailablePropertyTester"
+            namespace="org.key_project.key4eclipse.common.ui"
+            properties="fileStarterAvailable"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.key4eclipse.common.ui.expression.ProjectStarterAvailablePropertyTester"
+            id="org.key_project.key4eclipse.common.ui.expression.ProjectStarterAvailablePropertyTester"
+            namespace="org.key_project.key4eclipse.common.ui"
+            properties="projectStarterAvailable"
             type="java.lang.Object">
       </propertyTester>
    </extension>

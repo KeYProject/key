@@ -14,8 +14,10 @@
 package org.key_project.key4eclipse.common.ui.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 
@@ -43,5 +45,19 @@ public class StarterPreferenceUtilInitializer extends AbstractPreferenceInitiali
       }
       StarterPreferenceUtil.setDefaultDontAskForMethodStarter(false);
       StarterPreferenceUtil.setDefaultMethodStarterDisabled(false);
+      // File starter
+      ImmutableList<StarterDescription<IFileStarter>> fileStarters = StarterUtil.getFileStarters();
+      if (!fileStarters.isEmpty()) {
+         StarterPreferenceUtil.setDefaultSelectedFileStarterID(fileStarters.head().getId());
+      }
+      StarterPreferenceUtil.setDefaultDontAskForFileStarter(false);
+      StarterPreferenceUtil.setDefaultFileStarterDisabled(false);
+      // Project starter
+      ImmutableList<StarterDescription<IProjectStarter>> projectStarters = StarterUtil.getProjectStarters();
+      if (!projectStarters.isEmpty()) {
+         StarterPreferenceUtil.setDefaultSelectedProjectStarterID(projectStarters.head().getId());
+      }
+      StarterPreferenceUtil.setDefaultDontAskForProjectStarter(false);
+      StarterPreferenceUtil.setDefaultProjectStarterDisabled(false);
    }
 }

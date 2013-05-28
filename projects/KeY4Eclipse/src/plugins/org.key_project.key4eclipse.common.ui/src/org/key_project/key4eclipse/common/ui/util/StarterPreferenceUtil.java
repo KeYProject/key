@@ -15,8 +15,10 @@ package org.key_project.key4eclipse.common.ui.util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.key_project.key4eclipse.common.ui.Activator;
+import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 
 /**
  * Provides utility methods to edit the starter preferences.
@@ -52,6 +54,36 @@ public final class StarterPreferenceUtil {
     * Property that indicates that the method start functionality is disabled or enabled.
     */
    public static final String METHOD_STARTER_DISABLED = "org.key_project.key4eclipse.common.ui.methodStarterDisabled";
+   
+   /**
+    * Property which stores the ID of the selected {@link IFileStarter}.
+    */
+   public static final String SELECTED_FILE_STARTER_ID = "org.key_project.key4eclipse.common.ui.selectedFileStarterID";
+
+   /**
+    * Property that indicates not to ask for an {@link IFileStarter} and to use the selected {@link IFileStarter} instead.
+    */
+   public static final String DONT_ASK_FOR_FILE_STARTER = "org.key_project.key4eclipse.common.ui.dontAskForFileStarter";
+
+   /**
+    * Property that indicates that the file start functionality is disabled or enabled.
+    */
+   public static final String FILE_STARTER_DISABLED = "org.key_project.key4eclipse.common.ui.fileStarterDisabled";
+   
+   /**
+    * Property which stores the ID of the selected {@link IProjectStarter}.
+    */
+   public static final String SELECTED_PROJECT_STARTER_ID = "org.key_project.key4eclipse.common.ui.selectedProjectStarterID";
+
+   /**
+    * Property that indicates not to ask for an {@link IProjectStarter} and to use the selected {@link IProjectStarter} instead.
+    */
+   public static final String DONT_ASK_FOR_PROJECT_STARTER = "org.key_project.key4eclipse.common.ui.dontAskForProjectStarter";
+
+   /**
+    * Property that indicates that the project start functionality is disabled or enabled.
+    */
+   public static final String PROJECT_STARTER_DISABLED = "org.key_project.key4eclipse.common.ui.projectStarterDisabled";
    
    /**
     * Forbid instances.
@@ -269,5 +301,209 @@ public final class StarterPreferenceUtil {
     */
    public static void setDefaultMethodStarterDisabled(boolean disabled) {
       getStore().setDefault(METHOD_STARTER_DISABLED, disabled);
+   }
+   
+   
+   
+   /**
+    * Returns the current value of property {@link #SELECTED_FILE_STARTER_ID}.
+    * @return The current value of property{@link #SELECTED_FILE_STARTER_ID}.
+    */
+   public static String getSelectedFileStarterID() {
+      return getStore().getString(SELECTED_FILE_STARTER_ID);
+   }
+   
+   /**
+    * Returns the default value of property {@link #SELECTED_FILE_STARTER_ID}.
+    * @return The default value of property{@link #SELECTED_FILE_STARTER_ID}.
+    */
+   public static String getDefaultSelectedFileStarterID() {
+      return getStore().getDefaultString(SELECTED_FILE_STARTER_ID);
+   }
+   
+   /**
+    * Sets the current value of property {@link #SELECTED_FILE_STARTER_ID}.
+    * @param selectedGlobalStarterId The new value to set.
+    */
+   public static void setSelectedFileStarterID(String selectedGlobalStarterId) {
+      getStore().setValue(SELECTED_FILE_STARTER_ID, selectedGlobalStarterId);
+   }
+   
+   /**
+    * Sets the default value of property {@link #SELECTED_FILE_STARTER_ID}.
+    * @param selectedGlobalStarterId The new value to set.
+    */
+   public static void setDefaultSelectedFileStarterID(String selectedGlobalStarterId) {
+      getStore().setDefault(SELECTED_FILE_STARTER_ID, selectedGlobalStarterId);
+   }
+   
+
+   
+   /**
+    * Returns the current value of property {@link #DONT_ASK_FOR_FILE_STARTER}.
+    * @return The current value of property{@link #DONT_ASK_FOR_FILE_STARTER}.
+    */
+   public static boolean isDontAskForFileStarter() {
+      return getStore().getBoolean(DONT_ASK_FOR_FILE_STARTER);
+   }
+   
+   /**
+    * Returns the default value of property {@link #DONT_ASK_FOR_FILE_STARTER}.
+    * @return The default value of property{@link #DONT_ASK_FOR_FILE_STARTER}.
+    */
+   public static boolean isDefaultDontAskForFileStarter() {
+      return getStore().getDefaultBoolean(DONT_ASK_FOR_FILE_STARTER);
+   }
+   
+   /**
+    * Sets the current value of property {@link #DONT_ASK_FOR_FILE_STARTER}.
+    * @param dontAsk The new value to set.
+    */
+   public static void setDontAskForFileStarter(boolean dontAsk) {
+      getStore().setValue(DONT_ASK_FOR_FILE_STARTER, dontAsk);
+   }
+   
+   /**
+    * Sets the default value of property {@link #DONT_ASK_FOR_FILE_STARTER}.
+    * @param dontAsk The new value to set.
+    */
+   public static void setDefaultDontAskForFileStarter(boolean dontAsk) {
+      getStore().setDefault(DONT_ASK_FOR_FILE_STARTER, dontAsk);
+   }
+   
+
+   
+   /**
+    * Returns the current value of property {@link #FILE_STARTER_DISABLED}.
+    * @return The current value of property{@link #FILE_STARTER_DISABLED}.
+    */
+   public static boolean isFileStarterDisabled() {
+      return getStore().getBoolean(FILE_STARTER_DISABLED);
+   }
+   
+   /**
+    * Returns the default value of property {@link #FILE_STARTER_DISABLED}.
+    * @return The default value of property{@link #FILE_STARTER_DISABLED}.
+    */
+   public static boolean isDefaultFileStarterDisabled() {
+      return getStore().getDefaultBoolean(FILE_STARTER_DISABLED);
+   }
+   
+   /**
+    * Sets the current value of property {@link #FILE_STARTER_DISABLED}.
+    * @param disabled The new value to set.
+    */
+   public static void setFileStarterDisabled(boolean disabled) {
+      getStore().setValue(FILE_STARTER_DISABLED, disabled);
+   }
+   
+   /**
+    * Sets the default value of property {@link #FILE_STARTER_DISABLED}.
+    * @param disabled The new value to set.
+    */
+   public static void setDefaultFileStarterDisabled(boolean disabled) {
+      getStore().setDefault(FILE_STARTER_DISABLED, disabled);
+   }
+   
+   
+   
+   /**
+    * Returns the current value of property {@link #SELECTED_PROJECT_STARTER_ID}.
+    * @return The current value of property{@link #SELECTED_PROJECT_STARTER_ID}.
+    */
+   public static String getSelectedProjectStarterID() {
+      return getStore().getString(SELECTED_PROJECT_STARTER_ID);
+   }
+   
+   /**
+    * Returns the default value of property {@link #SELECTED_PROJECT_STARTER_ID}.
+    * @return The default value of property{@link #SELECTED_PROJECT_STARTER_ID}.
+    */
+   public static String getDefaultSelectedProjectStarterID() {
+      return getStore().getDefaultString(SELECTED_PROJECT_STARTER_ID);
+   }
+   
+   /**
+    * Sets the current value of property {@link #SELECTED_PROJECT_STARTER_ID}.
+    * @param selectedGlobalStarterId The new value to set.
+    */
+   public static void setSelectedProjectStarterID(String selectedGlobalStarterId) {
+      getStore().setValue(SELECTED_PROJECT_STARTER_ID, selectedGlobalStarterId);
+   }
+   
+   /**
+    * Sets the default value of property {@link #SELECTED_PROJECT_STARTER_ID}.
+    * @param selectedGlobalStarterId The new value to set.
+    */
+   public static void setDefaultSelectedProjectStarterID(String selectedGlobalStarterId) {
+      getStore().setDefault(SELECTED_PROJECT_STARTER_ID, selectedGlobalStarterId);
+   }
+   
+
+   
+   /**
+    * Returns the current value of property {@link #DONT_ASK_FOR_PROJECT_STARTER}.
+    * @return The current value of property{@link #DONT_ASK_FOR_PROJECT_STARTER}.
+    */
+   public static boolean isDontAskForProjectStarter() {
+      return getStore().getBoolean(DONT_ASK_FOR_PROJECT_STARTER);
+   }
+   
+   /**
+    * Returns the default value of property {@link #DONT_ASK_FOR_PROJECT_STARTER}.
+    * @return The default value of property{@link #DONT_ASK_FOR_PROJECT_STARTER}.
+    */
+   public static boolean isDefaultDontAskForProjectStarter() {
+      return getStore().getDefaultBoolean(DONT_ASK_FOR_PROJECT_STARTER);
+   }
+   
+   /**
+    * Sets the current value of property {@link #DONT_ASK_FOR_PROJECT_STARTER}.
+    * @param dontAsk The new value to set.
+    */
+   public static void setDontAskForProjectStarter(boolean dontAsk) {
+      getStore().setValue(DONT_ASK_FOR_PROJECT_STARTER, dontAsk);
+   }
+   
+   /**
+    * Sets the default value of property {@link #DONT_ASK_FOR_PROJECT_STARTER}.
+    * @param dontAsk The new value to set.
+    */
+   public static void setDefaultDontAskForProjectStarter(boolean dontAsk) {
+      getStore().setDefault(DONT_ASK_FOR_PROJECT_STARTER, dontAsk);
+   }
+   
+
+   
+   /**
+    * Returns the current value of property {@link #PROJECT_STARTER_DISABLED}.
+    * @return The current value of property{@link #PROJECT_STARTER_DISABLED}.
+    */
+   public static boolean isProjectStarterDisabled() {
+      return getStore().getBoolean(PROJECT_STARTER_DISABLED);
+   }
+   
+   /**
+    * Returns the default value of property {@link #PROJECT_STARTER_DISABLED}.
+    * @return The default value of property{@link #PROJECT_STARTER_DISABLED}.
+    */
+   public static boolean isDefaultProjectStarterDisabled() {
+      return getStore().getDefaultBoolean(PROJECT_STARTER_DISABLED);
+   }
+   
+   /**
+    * Sets the current value of property {@link #PROJECT_STARTER_DISABLED}.
+    * @param disabled The new value to set.
+    */
+   public static void setProjectStarterDisabled(boolean disabled) {
+      getStore().setValue(PROJECT_STARTER_DISABLED, disabled);
+   }
+   
+   /**
+    * Sets the default value of property {@link #PROJECT_STARTER_DISABLED}.
+    * @param disabled The new value to set.
+    */
+   public static void setDefaultProjectStarterDisabled(boolean disabled) {
+      getStore().setDefault(PROJECT_STARTER_DISABLED, disabled);
    }
 }

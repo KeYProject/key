@@ -2,166 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.key_project.key4eclipse.common.ui.category"
-            description="Loads the selected resource in KeY."
-            id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-            name="Load in KeY">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commandImages">
-      <image
-            commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-            icon="icons/logo16.gif">
-      </image>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="org.key_project.key4eclipse.starter.ui.handler.LoadResourceHandler"
-            commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand">
-         <enabledWhen>
-            <iterate
-                  ifEmpty="false"
-                  operator="and">
-               <or>
-                  <and>
-                     <instanceof
-                           value="org.eclipse.core.resources.IProject">
-                     </instanceof>
-                     <test
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
-                     </test>
-                  </and>
-                  <instanceof
-                        value="org.eclipse.jdt.core.IJavaProject">
-                  </instanceof>
-                  <and>
-                     <instanceof
-                           value="org.eclipse.core.resources.IFile">
-                     </instanceof>
-                     <or>
-                        <test
-                              property="org.eclipse.core.resources.extension"
-                              value="key">
-                        </test>
-                        <test
-                              property="org.eclipse.core.resources.extension"
-                              value="proof">
-                        </test>
-                     </or>
-                  </and>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IFile">
-                        <or>
-                           <test
-                                 property="org.eclipse.core.resources.extension"
-                                 value="key">
-                           </test>
-                           <test
-                                 property="org.eclipse.core.resources.extension"
-                                 value="proof">
-                           </test>
-                        </or>
-                     </adapt>
-                  </with>
-               </or>
-            </iterate>
-         </enabledWhen>
-      </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+L">
-      </key>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="true"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <command
-               commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-               icon="icons/logo16.gif"
-               id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-               label="Load Project in KeY"
-               mnemonic="L"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <or>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.core.resources.IProject">
-                        </instanceof>
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </and>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IJavaProject">
-                     </instanceof>
-                  </or>
-               </iterate>                  
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-               icon="icons/logo16.gif"
-               id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand.file"
-               label="Load File in KeY"
-               mnemonic="L"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     operator="and">
-                  <and>
-                     <instanceof
-                           value="org.eclipse.core.resources.IFile">
-                     </instanceof>
-                     <or>
-                        <test
-                              property="org.eclipse.core.resources.extension"
-                              value="key">
-                        </test>
-                        <test
-                              property="org.eclipse.core.resources.extension"
-                              value="proof">
-                        </test>
-                     </or>
-                  </and>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:org.key_project.key4eclipse.common.ui.keyMenu?after=additions">
-         <command
-               commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-               icon="icons/logo16.gif"
-               id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-               label="Load in KeY"
-               mnemonic="L"
-               style="push">
-         </command>
-      </menuContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="org.eclipse.ui.editors.text.TextEditor"
@@ -197,6 +37,24 @@
             class="org.key_project.key4eclipse.starter.ui.starter.KeYMethodStarter"
             description="Original user interface of KeY."
             id="org.key_project.key4eclipse.starter.ui.starter.KeYMethodStarter"
+            name="KeY">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.fileStarter">
+      <starter
+            class="org.key_project.key4eclipse.starter.ui.starter.KeYFileStarter"
+            description="Original user interface of KeY."
+            id="org.key_project.key4eclipse.starter.ui.starter.KeYFileStarter"
+            name="KeY">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.projectStarter">
+      <starter
+            class="org.key_project.key4eclipse.starter.ui.starter.KeYProjectStarter"
+            description="Original user interface of KeY."
+            id="org.key_project.key4eclipse.starter.ui.starter.KeYProjectStarter"
             name="KeY">
       </starter>
    </extension>

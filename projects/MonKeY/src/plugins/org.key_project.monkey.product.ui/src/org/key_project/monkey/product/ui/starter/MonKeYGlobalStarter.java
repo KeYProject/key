@@ -5,7 +5,7 @@ import org.key_project.monkey.product.ui.perspective.MonKeYPerspective;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
- * Starts the original user interface of KeY.
+ * Starts MonKeY which means that the MonKeY perspective is opened.
  * @author Martin Hentschel
  */
 public class MonKeYGlobalStarter implements IGlobalStarter {

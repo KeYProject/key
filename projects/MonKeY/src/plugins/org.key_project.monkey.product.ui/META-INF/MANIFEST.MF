@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.key_project.monkey.product.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.monkey.product.ui.Activator
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.101",
  org.eclipse.ui,
  org.eclipse.ui.ide.application;bundle-version="1.0.300",
  org.eclipse.ui.ide;bundle-version="3.7.0",

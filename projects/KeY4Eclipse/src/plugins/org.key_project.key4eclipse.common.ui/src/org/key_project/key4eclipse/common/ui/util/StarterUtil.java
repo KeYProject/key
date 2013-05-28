@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.common.ui.util;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -7,8 +9,10 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -34,6 +38,16 @@ public final class StarterUtil {
    public static final String METHOD_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.methodStarter";
    
    /**
+    * ID of the used extension point.
+    */
+   public static final String FILE_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.fileStarter";
+   
+   /**
+    * ID of the used extension point.
+    */
+   public static final String PROJECT_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.projectStarter";
+   
+   /**
     * Contains all available {@link StarterDescription}s of {@link IGlobalStarter}s.
     */
    private static ImmutableList<StarterDescription<IGlobalStarter>> globalStarters;
@@ -42,6 +56,16 @@ public final class StarterUtil {
     * Contains all available {@link StarterDescription}s of {@link IMethodStarter}s.
     */
    private static ImmutableList<StarterDescription<IMethodStarter>> methodStarters;
+   
+   /**
+    * Contains all available {@link StarterDescription}s of {@link IFileStarter}s.
+    */
+   private static ImmutableList<StarterDescription<IFileStarter>> fileStarters;
+   
+   /**
+    * Contains all available {@link StarterDescription}s of {@link IProjectStarter}s.
+    */
+   private static ImmutableList<StarterDescription<IProjectStarter>> projectStarters;
 
    /**
     * Forbid instances.
@@ -71,6 +95,30 @@ public final class StarterUtil {
          methodStarters = createStarters(METHOD_STARTER_EXTENSION_POINT, IMethodStarter.class);
       }
       return methodStarters;
+   }
+   
+   /**
+    * Returns all available {@link StarterDescription}s of {@link IFileStarter}s.
+    * @return The available {@link StarterDescription}s of  {@link IFileStarter}s.
+    */
+   public static ImmutableList<StarterDescription<IFileStarter>> getFileStarters() {
+      // Lazy loading if needed
+      if (fileStarters == null) {
+         fileStarters = createStarters(FILE_STARTER_EXTENSION_POINT, IFileStarter.class);
+      }
+      return fileStarters;
+   }
+   
+   /**
+    * Returns all available {@link StarterDescription}s of {@link IProjectStarter}s.
+    * @return The available {@link StarterDescription}s of  {@link IProjectStarter}s.
+    */
+   public static ImmutableList<StarterDescription<IProjectStarter>> getProjectStarters() {
+      // Lazy loading if needed
+      if (projectStarters == null) {
+         projectStarters = createStarters(PROJECT_STARTER_EXTENSION_POINT, IProjectStarter.class);
+      }
+      return projectStarters;
    }
    
    /**
@@ -201,6 +249,66 @@ public final class StarterUtil {
                                                                             StarterPreferenceUtil.METHOD_STARTER_DISABLED);
       if (starter != null && starter.getInstance() != null) {
          starter.getInstance().open(method);
+      }
+   }
+   
+   /**
+    * Checks if file starter are available or not.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public static boolean areFileStartersAvailable() {
+      ImmutableList<StarterDescription<IFileStarter>> starter = getFileStarters();
+      return !starter.isEmpty() && !StarterPreferenceUtil.isFileStarterDisabled();
+   }
+   
+   /**
+    * Opens the file starter.
+    * @param parentShell The parent {@link Shell} to use.
+    * @param file The {@link IFile} to load.
+    * @throws Exception Occurred Exception.
+    */
+   public static void openFileStarter(Shell parentShell, IFile file) throws Exception {
+      ImmutableList<StarterDescription<IFileStarter>> starterDescriptions = getFileStarters();
+      StarterDescription<IFileStarter> starter = StarterWizard.openWizard(parentShell, 
+                                                                          "Load File", 
+                                                                          "Select application", 
+                                                                          "Select the application to load file in.", 
+                                                                          starterDescriptions, 
+                                                                          StarterPreferenceUtil.SELECTED_FILE_STARTER_ID, 
+                                                                          StarterPreferenceUtil.DONT_ASK_FOR_FILE_STARTER, 
+                                                                          StarterPreferenceUtil.FILE_STARTER_DISABLED);
+      if (starter != null && starter.getInstance() != null) {
+         starter.getInstance().open(file);
+      }
+   }
+   
+   /**
+    * Checks if project starter are available or not.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public static boolean areProjectStartersAvailable() {
+      ImmutableList<StarterDescription<IProjectStarter>> starter = getProjectStarters();
+      return !starter.isEmpty() && !StarterPreferenceUtil.isProjectStarterDisabled();
+   }
+   
+   /**
+    * Opens the project starter.
+    * @param parentShell The parent {@link Shell} to use.
+    * @param project The {@link IProject} to load.
+    * @throws Exception Occurred Exception.
+    */
+   public static void openProjectStarter(Shell parentShell, IProject project) throws Exception {
+      ImmutableList<StarterDescription<IProjectStarter>> starterDescriptions = getProjectStarters();
+      StarterDescription<IProjectStarter> starter = StarterWizard.openWizard(parentShell, 
+                                                                             "Load Project", 
+                                                                             "Select application", 
+                                                                             "Select the application to load project in.", 
+                                                                             starterDescriptions, 
+                                                                             StarterPreferenceUtil.SELECTED_PROJECT_STARTER_ID, 
+                                                                             StarterPreferenceUtil.DONT_ASK_FOR_PROJECT_STARTER, 
+                                                                             StarterPreferenceUtil.PROJECT_STARTER_DISABLED);
+      if (starter != null && starter.getInstance() != null) {
+         starter.getInstance().open(project);
       }
    }
 }

@@ -22,8 +22,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
@@ -79,11 +81,31 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
       ImmutableList<StarterDescription<IMethodStarter>> methodStarter = StarterUtil.getMethodStarters();
       if (!methodStarter.isEmpty()) {
          createTab(starterKindsTabFolder, 
-                   "Proof of selected method", 
+                   "Start Proof", 
                    methodStarter, 
                    StarterPreferenceUtil.SELECTED_METHOD_STARTER_ID, 
                    StarterPreferenceUtil.DONT_ASK_FOR_METHOD_STARTER, 
                    StarterPreferenceUtil.METHOD_STARTER_DISABLED);
+      }
+      // File starter
+      ImmutableList<StarterDescription<IFileStarter>> fileStarter = StarterUtil.getFileStarters();
+      if (!fileStarter.isEmpty()) {
+         createTab(starterKindsTabFolder, 
+                   "Load File", 
+                   fileStarter, 
+                   StarterPreferenceUtil.SELECTED_FILE_STARTER_ID, 
+                   StarterPreferenceUtil.DONT_ASK_FOR_FILE_STARTER, 
+                   StarterPreferenceUtil.FILE_STARTER_DISABLED);
+      }
+      // Project starter
+      ImmutableList<StarterDescription<IProjectStarter>> projectStarter = StarterUtil.getProjectStarters();
+      if (!projectStarter.isEmpty()) {
+         createTab(starterKindsTabFolder, 
+                   "Load Project", 
+                   projectStarter, 
+                   StarterPreferenceUtil.SELECTED_PROJECT_STARTER_ID, 
+                   StarterPreferenceUtil.DONT_ASK_FOR_PROJECT_STARTER, 
+                   StarterPreferenceUtil.PROJECT_STARTER_DISABLED);
       }
    }
    
