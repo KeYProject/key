@@ -1099,6 +1099,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
     
+    
     public void printAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
@@ -1108,7 +1109,17 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }
-    
+
+    public void printAllObjects(de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\all_objects", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }
+
     public void printEmptySeqLiteral(EmptySeqLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);

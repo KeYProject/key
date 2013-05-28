@@ -99,6 +99,7 @@ import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
@@ -210,6 +211,8 @@ public interface Visitor {
     void performActionOnSetMinus(SetMinus x);
     
     void performActionOnAllFields(AllFields x);
+    
+	void performActionOnAllObjects(AllObjects allObjects);
     
     void performActionOnEmptySeqLiteral(EmptySeqLiteral x);
     
@@ -477,4 +480,5 @@ public interface Visitor {
     void performActionOnSeqGet(SeqGet seqGet);
     
     void performActionOnTransactionStatement(TransactionStatement transSt);
+
 }
