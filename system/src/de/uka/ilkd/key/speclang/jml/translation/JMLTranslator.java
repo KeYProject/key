@@ -1615,53 +1615,35 @@ final class JMLTranslator {
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type int.
      */
     public SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
-        return skolemExprIntHelper(jmlKeyWord, PrimitiveType.JAVA_INT, services);
+        return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_INT, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type long.
      */
     public SLExpression createSkolemExprLong(Token jmlKeyWord, Services services) {
-        return skolemExprIntHelper(jmlKeyWord, PrimitiveType.JAVA_LONG, services);
+        return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_LONG, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type \bigint.
      */
     public SLExpression createSkolemExprBigint(Token jmlKeyWord, Services services) {
-        return skolemExprIntHelper(jmlKeyWord, PrimitiveType.JAVA_BIGINT, services);
-    }
-
-    private SLExpression skolemExprIntHelper(Token jmlKeyWord, PrimitiveType type, Services services) {
-        addUnderspecifiedWarning(jmlKeyWord);
-        assert services != null;
-        final KeYJavaType resultType = services.getJavaInfo().getPrimitiveKeYJavaType(type);
-        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(1000); // function is unique anyway
-        final Function sk = new Function(new Name(shortName+x),intSort);
-        final Term t = TB.func(sk);
-        return new SLExpression(t,resultType);
+        return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_BIGINT, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type Object.
      */
     public SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
-        addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
         final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
-        final Sort objSort = objType.getSort();
-        assert objSort != null;
-        final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(1000); // function is unique anyway
-        final Function sk = new Function(new Name(shortName+x),objSort);
-        final Term t = TB.func(sk);
-        return new SLExpression(t,objType);
+        assert objType != null;
+        return skolemExprHelper(jmlKeyWord, objType, services);
     }
 
     /**
-     * Create a predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
+     * Create a nullary predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
      */
     public SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
@@ -1734,6 +1716,21 @@ final class JMLTranslator {
         return resultClass.cast(result);
     }
 
+    private SLExpression skolemExprHelper(Token jmlKeyWord, PrimitiveType type, Services services) {
+        final KeYJavaType kjt = services.getJavaInfo().getPrimitiveKeYJavaType(type);
+        return skolemExprHelper(jmlKeyWord,kjt,services);
+    }
+
+    private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, Services services) {
+        addUnderspecifiedWarning(jmlKeyWord);
+        assert services != null;
+        final Sort sort = type.getSort();
+        final String shortName = jmlKeyWord.getText().replace("\\", "");
+        final int x = (new Random()).nextInt(1000); // function is unique anyway
+        final Function sk = new Function(new Name(shortName+x),sort);
+        final Term t = TB.func(sk);
+        return new SLExpression(t,type);
+    }
 
     /**
      * This is used for features without semantics such as labels or annotations.

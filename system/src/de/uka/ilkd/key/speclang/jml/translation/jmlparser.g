@@ -1507,7 +1507,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   desc:INFORMAL_DESCRIPTION
 	{
-	    // was: raiseNotSupported("informal predicates");
 	    result = translator.translate("(* *)", SLExpression.class, services, desc,
 	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap()));
 	}
@@ -1525,6 +1524,8 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
         result = translator.createSkolemExprBool(na);
         }
+
+    // TODO: add \only_*
 
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
