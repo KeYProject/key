@@ -38,7 +38,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.pretranslation.antlr3.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
