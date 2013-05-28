@@ -1614,16 +1614,43 @@ final class JMLTranslator {
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type int.
      */
-    public SLExpression createSkolemExprInt(String jmlKeyWordName, Services services) {
-        addUnderspecifiedWarning(jmlKeyWordName);
+    public SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
+        addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(intSort);
-        final String shortName = jmlKeyWordName.replace("\\", "");
-        final int x = (new Random()).nextInt(999);
+        final String shortName = jmlKeyWord.getText().replace("\\", "");
+        final int x = (new Random()).nextInt(999); // function is unique anyway
         final Function sk = new Function(new Name(shortName+x),intSort);
         final Term t = TB.func(sk);
         return new SLExpression(t,intType);
+    }
+
+    /**
+     * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type Object.
+     */
+    public SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
+        addUnderspecifiedWarning(jmlKeyWord);
+        assert services != null;
+        final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
+        final Sort objSort = services.getTypeConverter().getPrimitiveSort(objType);
+        final String shortName = jmlKeyWord.getText().replace("\\", "");
+        final int x = (new Random()).nextInt(999); // function is unique anyway
+        final Function sk = new Function(new Name(shortName+x),objSort);
+        final Term t = TB.func(sk);
+        return new SLExpression(t,objType);
+    }
+
+    /**
+     * Create a predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
+     */
+    public SLExpression createSkolemExprBool(Token jmlKeyWord) {
+        addUnderspecifiedWarning(jmlKeyWord);
+        final String shortName = jmlKeyWord.getText().replace("\\", "");
+        final int x = (new Random()).nextInt(999); // function is unique anyway
+        final Function sk = new Function(new Name(shortName+x),Sort.FORMULA);
+        final Term t = TB.func(sk);
+        return new SLExpression(t);
     }
 
     /**
@@ -1711,6 +1738,11 @@ final class JMLTranslator {
     private void addUnderspecifiedWarning(String feature) {
         String msg = feature + "is not supported and translated to an underspecified term or formula.";
         addWarning(msg);
+    }
+
+    private void addUnderspecifiedWarning(Token t) {
+        String msg = t.getText() + "is not supported and translated to an underspecified term or formula.";
+        addWarning(msg, t);
     }
 
     void addDeprecatedWarning(String feature) {

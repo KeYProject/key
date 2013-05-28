@@ -1521,6 +1521,10 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
         result = new SLExpression(translator.translate("\\not_modified", Term.class, services, atPres == null ? null : atPres.get(getBaseHeap()), t));
         }
+    |   na:NOT_ASSIGNED LPAREN t=storeRefUnion RPAREN
+        {
+        result = translator.createSkolemExprBool(na);
+        }
 
     |   FRESH LPAREN list=expressionlist RPAREN
 	{
@@ -1561,21 +1565,25 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         result = translator.translate("reachLocs", SLExpression.class, t, e1, e3, services);
 	}
 
-    |   DURATION LPAREN result=expression RPAREN
+    |   duration:DURATION LPAREN result=expression RPAREN
 	{
-	    result = translator.createSkolemExprInt("\\duration",services);
+	    result = translator.createSkolemExprInt(duration,services);
 	}
 
-    |   SPACE LPAREN result=expression RPAREN
+    |   space:SPACE LPAREN result=expression RPAREN
 	{
-	    result = translator.createSkolemExprInt("\\space",services);
+	    result = translator.createSkolemExprInt(space,services);
 	}
 
-    |   WORKINGSPACE LPAREN result=expression RPAREN
+    |   wspace:WORKINGSPACE LPAREN result=expression RPAREN
 	{
-	    result = translator.createSkolemExprInt("\\working_space",services);
+	    result = translator.createSkolemExprInt(wspace,services);
 	}
 
+    |   ("\\max") => max:"\\max" LPAREN result=expression RPAREN
+    {
+        result = translator.createSkolemExprObject(max,services);
+    }
     |   TYPEOF LPAREN result=expression RPAREN
 	{
 	    result = new SLExpression(result.getTerm(),
