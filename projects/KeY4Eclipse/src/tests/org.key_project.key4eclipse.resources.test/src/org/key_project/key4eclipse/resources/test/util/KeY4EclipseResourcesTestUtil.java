@@ -184,23 +184,4 @@ public class KeY4EclipseResourcesTestUtil {
          return null;
       }
    }
-   
-   
-   /**
-    * Checks if all {@link IMarker} of the given {@link LinkedList} are in different lines.
-    * @param markerList - the {@link IMarker} to check
-    * @return true if all {@link IMarker} are in different lines. False otherwise
-    * @throws CoreException
-    */
-   public static boolean allMarkerInDifferentLines(LinkedList<IMarker> markerList) throws CoreException{
-      LinkedList<Integer> lineNumberList = new LinkedList<Integer>();
-      for(IMarker marker : markerList){
-         int lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
-         if(!lineNumberList.contains(lineNumber)){
-            lineNumberList.add(lineNumber);
-         }
-         else return false;
-      }
-      return true;
-   }
 }

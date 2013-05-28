@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.util.eclipse.BundleUtil;
@@ -73,12 +74,10 @@ public class KeYProjectBuilderTests extends TestCase{
       assertTrue(proofAdd.exists() && proofSub.exists());
       //check if the marker were set
       LinkedList<IMarker> allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      assertTrue(allMarkerList.size() == 2 && KeY4EclipseResourcesTestUtil.allMarkerInDifferentLines(allMarkerList));
+      assertTrue(allMarkerList.size() == 2);
       for(IMarker marker : allMarkerList){
-         int lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
          String markerType = marker.getType();
          assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
-         assertTrue(lineNumber == 7 || lineNumber == 14);
       }
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);;  
@@ -128,12 +127,11 @@ public class KeYProjectBuilderTests extends TestCase{
       assertTrue(proofAdd.exists() && proofSub.exists());
       //check if the marker were set
       LinkedList<IMarker> allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      assertTrue(allMarkerList.size() == 2 && KeY4EclipseResourcesTestUtil.allMarkerInDifferentLines(allMarkerList));
+      assertTrue(allMarkerList.size() == 2);
       for(IMarker marker : allMarkerList){
-         int lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
          String markerType = marker.getType();
-         assertTrue( (markerType.equals(MarkerManager.CLOSEDMARKER_ID) && lineNumber == 7) 
-                  || (markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID) && lineNumber == 14));
+         assertTrue( markerType.equals(MarkerManager.CLOSEDMARKER_ID) 
+                  || markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID));
       }
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
@@ -234,6 +232,8 @@ public class KeYProjectBuilderTests extends TestCase{
       //create a KeYProject
       IJavaProject keyProject = KeY4EclipseResourcesTestUtil.createKeYProject("KeYProjectBuilderTests_testFileAddedToProofFolder");
       IProject project = keyProject.getProject();
+      //enable auto proof file remove
+      KeYProjectProperties.setAutoDeleteProofFiles(project, true);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       //check if proofFolder exists
@@ -284,6 +284,8 @@ public class KeYProjectBuilderTests extends TestCase{
       //create a KeYProject
       IJavaProject keyProject = KeY4EclipseResourcesTestUtil.createKeYProject("KeYProjectBuilderTests_testJavaFileDeleted");
       IProject project = keyProject.getProject();
+      //enable auto proof file remove
+      KeYProjectProperties.setAutoDeleteProofFiles(project, true);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       //check if proofFolder exists
@@ -455,8 +457,7 @@ public class KeYProjectBuilderTests extends TestCase{
       LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       String markerType = allMarker.get(0).getType();
-      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID));
       //check if proofFile was created
       assertTrue(proofFile.exists());
       //load Proof and assert that it is not closed yet
@@ -472,8 +473,7 @@ public class KeYProjectBuilderTests extends TestCase{
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //check if proof is closed now
       proofFile = root.getFile(proofFilePath);
       assertTrue(proofFile.exists());
@@ -529,8 +529,7 @@ public class KeYProjectBuilderTests extends TestCase{
       LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       String markerType = allMarker.get(0).getType();
-      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID));
       //check if proofFile was created
       assertTrue(proofFile.exists());
       //load Proof and assert that it is not closed yet
@@ -546,8 +545,7 @@ public class KeYProjectBuilderTests extends TestCase{
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //check if proof is closed now
       proofFile = root.getFile(proofFilePath);
       assertTrue(proofFile.exists());
@@ -589,12 +587,11 @@ public class KeYProjectBuilderTests extends TestCase{
       KeY4EclipseResourcesTestUtil.build(project);
       //make sure that the javaFile exists
       assertTrue(javaIFile.exists());
-      //make sure that there is one marker in the javaFile and make sure that this marker is a "notClosedMarker"
+      //make sure that there is one marker in the javaFile and make sure that this marker is a "closedMarker"
       LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       String markerType = allMarker.get(0).getType();
-      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //check if proofFile was created
       assertTrue(proofFile.exists());
       //load Proof and assert that it is not closed
@@ -606,12 +603,11 @@ public class KeYProjectBuilderTests extends TestCase{
       javaIFile.setContents(is, IResource.FORCE, null);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
-      //make sure that there is still just one marker in the java file and that its sill a "notClosedMarker"
+      //make sure that there is still just one marker in the java file and that its sill a "closedMarker"
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //check if proof is closed now
       proofFile = root.getFile(proofFilePath);
       assertTrue(proofFile.exists());
@@ -657,8 +653,7 @@ public class KeYProjectBuilderTests extends TestCase{
       LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       String markerType = allMarker.get(0).getType();
-      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID));
       //check if proofFile was created
       assertTrue(proofFile.exists());
       //load Proof and assert that it is not closed
@@ -674,8 +669,7 @@ public class KeYProjectBuilderTests extends TestCase{
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarker.size() == 1);
       markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID));
       //check if proof is closed now
       proofFile = root.getFile(proofFilePath);
       assertTrue(proofFile.exists());
@@ -723,8 +717,7 @@ public class KeYProjectBuilderTests extends TestCase{
       LinkedList<IMarker> allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
       assertTrue(allMarkerList.size() == 1);
       String markerType = allMarkerList.get(0).getType();
-      int markerLineNumber = (Integer) allMarkerList.get(0).getAttribute(IMarker.LINE_NUMBER);
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 9);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //check if proofFileOne was created and second file is missing
       assertTrue(proofFileMethodOne.exists() && !proofFileMethodTwo.exists());
       //change the method
@@ -736,12 +729,11 @@ public class KeYProjectBuilderTests extends TestCase{
       assertTrue(proofFileMethodOne.exists() && proofFileMethodTwo.exists());
       //make sure that the marker were set correct
       allMarkerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaIFile);
-      assertTrue(allMarkerList.size() == 2 && KeY4EclipseResourcesTestUtil.allMarkerInDifferentLines(allMarkerList));
+      assertTrue(allMarkerList.size() == 2);
       for(IMarker marker : allMarkerList){
-         markerLineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
          markerType = marker.getType();
-         assertTrue( (markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7) 
-                  || (markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 15));
+         assertTrue( markerType.equals(MarkerManager.CLOSEDMARKER_ID) 
+                  || markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       }
       //turn on autobuild
       KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
@@ -755,6 +747,8 @@ public class KeYProjectBuilderTests extends TestCase{
       //create a KeYProject
       IJavaProject keyProject = KeY4EclipseResourcesTestUtil.createKeYProject("KeYProjectBuilderTests_testJavaFileChangedSingleMethodRemoved");
       IProject project = keyProject.getProject();
+      //enable auto proof file remove
+      KeYProjectProperties.setAutoDeleteProofFiles(project, true);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       //check if proofFolder exists
@@ -810,6 +804,8 @@ public class KeYProjectBuilderTests extends TestCase{
       //create a KeYProject
       IJavaProject keyProject = KeY4EclipseResourcesTestUtil.createKeYProject("KeYProjectBuilderTests_testJavaFileChangedAllMethodsRemoved");
       IProject project = keyProject.getProject();
+      //enable auto proof file remove
+      KeYProjectProperties.setAutoDeleteProofFiles(project, true);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       //check if proofFolder exists
@@ -899,14 +895,12 @@ public class KeYProjectBuilderTests extends TestCase{
       LinkedList<IMarker> allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
       assertTrue(allMarker.size() == 1);
       String markerType = allMarker.get(0).getType();
-      int markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //check the second file
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
       assertTrue(allMarker.size() == 1);
       markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       //change the first file
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/ChangeTests/testJavaFileChangedWithProblemLoaderException/firstChangedJavaFile.java");
       javaFileOne.setContents(is, IResource.FORCE, null);
@@ -950,13 +944,11 @@ public class KeYProjectBuilderTests extends TestCase{
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileOne);
       assertTrue(allMarker.size() == 1);
       markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 7);
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFileTwo);
       assertTrue(allMarker.size() == 1);
-      markerType = allMarker.get(0).getType();
-      markerLineNumber = (Integer) allMarker.get(0).getAttribute(IMarker.LINE_NUMBER); 
-      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID) && markerLineNumber == 12);
+      markerType = allMarker.get(0).getType(); 
+      assertTrue(markerType.equals(MarkerManager.CLOSEDMARKER_ID));
       allMarker = KeY4EclipseResourcesTestUtil.getAllKeYMarker(project);
       LinkedList<IMarker> allProblemLoaderExceptionMarker = KeY4EclipseResourcesTestUtil.getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, project);
       assertTrue(allMarker.size() == 2 && allProblemLoaderExceptionMarker.size() == 0);

@@ -30,8 +30,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          try{
             proofManager = new ProofManager(getProject());
             if(!KeYProjectProperties.isEnableEfficientProofManagement(getProject())) {
-//               proofManager.runAllProofs();
-               proofManager.runAllProofsWithContractList();
+               proofManager.runAllProofs(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
             }
             else{
                //Do not use. Not working right now.
@@ -53,7 +52,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    protected void clean(IProgressMonitor monitor) throws CoreException {
       try {
          proofManager = new ProofManager(getProject());
-         proofManager.clean();
+         proofManager.clean(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
          super.clean(monitor);
       }
       catch (Exception e) {
@@ -95,7 +94,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             LogUtil.getLogger().createErrorStatus(e);
          }
       }
-      proofManager.runSelectedProofs(deltasFiles);
+//      proofManager.runSelectedProofs(deltasFiles);
    }
    
    

@@ -29,34 +29,26 @@
       </image>
    </extension>
    <extension
-         id="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
-         name="Proof not closed"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-   </extension>
-   <extension
          id="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker"
          name="Proof closed"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
       </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
    <extension
-         point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator
-            class="org.key_project.key4eclipse.resources.marker.closedmarker.ProofClosedMarkerQuickFix"
-            markerType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker">
-      </markerResolutionGenerator>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator
-            class="org.key_project.key4eclipse.resources.marker.notclosedmarker.ProofNotClosedMarkerQuickFix"
-            markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
-      </markerResolutionGenerator>
+         id="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
+         name="Proof not closed"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker"
@@ -65,6 +57,23 @@
       <super
             type="org.eclipse.core.resources.problemmarker">
       </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.key_project.key4eclipse.resources.marker.ProofMarkerResolutionGenerator"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker">
+      </markerResolutionGenerator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.key_project.key4eclipse.resources.marker.ProofMarkerResolutionGenerator"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
+      </markerResolutionGenerator>
    </extension>
 
 </plugin>

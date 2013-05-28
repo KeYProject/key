@@ -16,6 +16,8 @@ import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
    private Button enableEfficentProofManagementButton;
+   
+   private Button autoDeleteProofFilesButton;
 
    
    /**
@@ -35,16 +37,19 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       builderSettingsComposite.setLayout(new GridLayout(1, false));
       enableEfficentProofManagementButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableEfficentProofManagementButton.setText("Efficient proof management enabled");
-      enableDisableButton();
+      setSelectionForEnableEfficientProofManagementButton();
+      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
+      setSelectionForAutoDeleteProofFilesButton();
       
       return root;
    }
 
    
    /**
-    * Sets the selection for the CheckBox
+    * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
     */
-   private void enableDisableButton(){
+   private void setSelectionForEnableEfficientProofManagementButton(){
       try {
          IProject project = getProject();
          enableEfficentProofManagementButton.setSelection(KeYProjectProperties.isEnableEfficientProofManagement(project));
@@ -53,6 +58,22 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          LogUtil.getLogger().logError(e);
          LogUtil.getLogger().openErrorDialog(getShell(), e);
          enableEfficentProofManagementButton.setEnabled(false);
+      }
+   }
+   
+
+   /**
+    * Sets the selection for the AutoDeleteProofFilesButton CheckBox.
+    */
+   private void setSelectionForAutoDeleteProofFilesButton(){
+      try {
+         IProject project = getProject();
+         autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isEnableEfficientProofManagement(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         autoDeleteProofFilesButton.setEnabled(false);
       }
    }
    
@@ -65,6 +86,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       try {
          IProject project = getProject();
          KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
+         KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          return super.performOk();
       }
       catch (CoreException e) {
@@ -75,9 +97,13 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    }
    
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    protected void performDefaults() {
       enableEfficentProofManagementButton.setSelection(false);
+      autoDeleteProofFilesButton.setSelection(false);
       super.performDefaults();
    }
 }

@@ -1,62 +1,27 @@
 package org.key_project.key4eclipse.resources.builder;
 
-import java.util.LinkedList;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.IMethod;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 public class ProofElement {
-   
    private ProofOblInput proofObl;
-   
-   private IMethod method;
-   
-   private IFile proofFile;
-   
    private IFile javaFile;
-   
-   private LinkedList<String> types;   
-   
+   private SourceLocation scl;
    public ProofOblInput getProofObl() {
       return proofObl;
    }
-
-
-   public IMethod getMethod() {
-      return method;
-   }
-   
-   public IFile getProofFile() {
-      return proofFile;
-   }
-
-
    public IFile getJavaFile() {
       return javaFile;
    }
-   
-   public LinkedList<String> getTypes(){
-      return types;
+   public SourceLocation getSourceLocation() {
+      return scl;
    }
-
-
-   public ProofElement(ProofOblInput proofObl, IMethod method, IFile proofFile, IFile javaFile, LinkedList<String> types){
-      this.proofObl = proofObl;
-      this.method = method;
-      this.proofFile = proofFile;
+   
+   public ProofElement(ProofOblInput obl, IFile javaFile, SourceLocation scl){
+      this.proofObl = obl;
       this.javaFile = javaFile;
-      this.types = types;
+      this.scl = scl;
    }
-   
-   public boolean hasProof(){
-      if(proofFile == null){
-         return false;
-      }
-      else {
-         return true;
-      }
-   }
-   
 }

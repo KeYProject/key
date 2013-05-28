@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.key_project.util.java.ArrayUtil;
 
 public class KeYProjectNature implements IProjectNature  {
    
@@ -27,12 +28,10 @@ public class KeYProjectNature implements IProjectNature  {
                return; // Do nothing if builder is already associated with project
             }
       }
-      ICommand[] newCommands = new ICommand[commands.length + 1];
       // create a new build command
-      System.arraycopy(commands, 0, newCommands, 0, commands.length);
       ICommand command = desc.newCommand();
-      command.setBuilderName("org.key_project.key4eclipse.resources.KeYProjectBuilder"); // attach it to sample builder      
-      newCommands[newCommands.length - 1] = command;
+      command.setBuilderName("org.key_project.key4eclipse.resources.KeYProjectBuilder"); // attach it to sample builder
+      ICommand[] newCommands = ArrayUtil.add(commands, command);
       desc.setBuildSpec(newCommands);
       project.setDescription(desc, null); // write to .project file
    }

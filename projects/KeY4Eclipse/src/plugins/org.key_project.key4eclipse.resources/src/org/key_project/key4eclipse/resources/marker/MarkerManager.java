@@ -6,14 +6,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.core.IMethod;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.proof.Proof;
 
 public class MarkerManager {
@@ -24,60 +19,40 @@ public class MarkerManager {
    
    
    /**
-    * Sets the {@link IMarker} for the given {@link IMethod} depending on the {@link Proof}s status. The {@link IPath} of 
-    * the given Proof-{@link IFile} will be stored in the {@link IMarker} as attribute.
-    * @param proof - the {@link Proof} to use for isClosed() check
-    * @param method - the {@link IMethod} to store the {@link IMarker at.
-    * @param proofFile - the {@link IFile} to use for remembering the {@link IPath}
+    * Creates the {@link IMarker} for the given {@link Proof} in the given java{@link IFile}.
+    * @param proof - the {@link Proof} to use
+    * @param scl - the {@link SourceLocation} that provides the start- and end-char for the {@link IMarker}
+    * @param javaFile - the java{@link IFile} to create the {@link IMarker} at.
+    * @param proofFile - the proof{@link IFile} required to set the {@link IMarker} message
     * @throws CoreException
     */
-   public void setMarker(Proof proof, IMethod method, IFile proofFile) throws CoreException {
-      // get File from Method
-      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-      IPath methodPath = method.getPath();
-      IFile file = workspaceRoot.getFile(methodPath);
-
-      // set marker
-      if (proof.closed()) {
-         IMarker marker = file.createMarker(CLOSEDMARKER_ID);
-         if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proof.name().toString());
-            marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
-            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-            marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberOfMethod(method));
-         }
-      }
-      else {
-         IMarker marker = file.createMarker(NOTCLOSEDMARKER_ID);
-         if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proof.name().toString());
-            marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
-            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-            marker.setAttribute(IMarker.LINE_NUMBER, getLineNumberOfMethod(method));
-         }
-      }
-   }
-   
-   public void setMarkerForAltProofElement(Proof proof, int lineNumber, IFile javaFile, IFile proofFile) throws CoreException {
-
-      // set marker
+   public void setMarker(Proof proof, SourceLocation scl, IFile javaFile, IFile proofFile) throws CoreException {
       if (proof.closed()) {
          IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
          if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proof.name().toString());
-            marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
+            marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
             marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber); // TODO: Add also start and end character use KeyUti#convertToSourceLocation() to convert a PositionInfo with tab size from KeY into position info with tab size from Eclipse
-            // TODO: Find out how to make marker type persistent
+            if(scl == null){
+               marker.setAttribute(IMarker.LINE_NUMBER, -1);
+            }
+            else{
+               marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
+               marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+            }
          }
       }
       else {
          IMarker marker = javaFile.createMarker(NOTCLOSEDMARKER_ID);
          if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proof.name().toString());
-            marker.setAttribute(IMarker.TEXT, proofFile.getFullPath());
+            marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proofFile.getFullPath());
             marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber); // TODO: Add also start and end character use KeyUti#convertToSourceLocation() to convert a PositionInfo with tab size from KeY into position info with tab size from Eclipse
+            if(scl == null){
+               marker.setAttribute(IMarker.LINE_NUMBER, -1);
+            }
+            else{
+               marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
+               marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+            }
          }
       }
    }
@@ -118,17 +93,5 @@ public class MarkerManager {
       for(IFile file : files){
          deleteKeYMarker(file);
       }
-   }
-   
-   
-   /**
-    * Returns the lineNumber of the given {@link IMethod}.
-    * @param method - the {@link IMethod} to use
-    * @return the lineNumber of the {@link IMethod}
-    * @throws CoreException
-    */
-   private int getLineNumberOfMethod(IMethod method) throws CoreException {
-      Position pos = KeYUtil.getCursorPositionForOffset(method, method.getNameRange().getOffset());
-      return pos.getLine();
    }
 }
