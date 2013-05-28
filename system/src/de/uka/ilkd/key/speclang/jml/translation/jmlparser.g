@@ -1999,7 +1999,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
 	|
 	    REAL
 	    {
-		raiseNotSupported("\\real");
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_REAL);
 	    }
         |   LOCSET
             {
