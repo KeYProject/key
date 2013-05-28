@@ -9,21 +9,11 @@
             id="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
             name="Load in KeY">
       </command>
-      <command
-            categoryId="org.key_project.key4eclipse.common.ui.category"
-            description="Starts a new proof in KeY."
-            id="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-            name="Start Proof in KeY">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.sed.external.key.starter.ui.commands.loadResourceCommand"
-            icon="icons/logo16.gif">
-      </image>
-      <image
-            commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
             icon="icons/logo16.gif">
       </image>
    </extension>
@@ -84,58 +74,6 @@
             </iterate>
          </enabledWhen>
       </handler>
-      <handler
-            class="org.key_project.key4eclipse.starter.ui.handler.StartProofHandler"
-            commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand">
-         <enabledWhen>
-            <or>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.jdt.core.IMethod">
-                  </instanceof>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                     <test
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
-                     </test>
-                  </adapt>
-               </iterate>
-               <and>
-                  <with
-                        variable="activePartId">
-                     <equals
-                           value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                     </equals>
-                  </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </adapt>
-                  </with>
-                  <with
-                        variable="selection">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.jface.text.ITextSelection">
-                        </instanceof>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
-                              value="org.eclipse.jdt.core.IMethod">
-                        </test>
-                     </and>
-                  </with>
-               </and>
-            </or></enabledWhen>
-      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -144,12 +82,6 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+L">
-      </key>
-      <key
-            commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+P">
       </key>
    </extension>
    <extension
@@ -184,64 +116,6 @@
                      </instanceof>
                   </or>
                </iterate>                  
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-               icon="icons/logo16.gif"
-               id="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-               label="Start Proof in KeY"
-               mnemonic="P"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <or>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof
-                           value="org.eclipse.jdt.core.IMethod">
-                     </instanceof>
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </adapt>
-                  </iterate>
-                  <and>
-                     <with
-                           variable="activePartId">
-                        <equals
-                              value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                        </equals>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.eclipse.jdt.core.javanature">
-                           </test>
-                        </adapt>
-                     </with>
-                     <with
-                           variable="selection">
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.jface.text.ITextSelection">
-                           </instanceof>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
-                                 value="org.eclipse.jdt.core.IMethod">
-                           </test>
-                        </and>
-                     </with>
-                  </and>
-               </or>
             </visibleWhen>
          </command>
          <command
@@ -285,14 +159,6 @@
                mnemonic="L"
                style="push">
          </command>
-         <command
-               commandId="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-               icon="icons/logo16.gif"
-               id="org.key_project.sed.external.key.starter.ui.commands.startProofCommand"
-               label="Start Proof in KeY"
-               mnemonic="P"
-               style="push">
-         </command>
       </menuContribution>
    </extension>
    <extension
@@ -322,6 +188,15 @@
             class="org.key_project.key4eclipse.starter.ui.starter.KeYGlobalStarter"
             description="Original user interface of KeY."
             id="org.key_project.key4eclipse.starter.ui.starter.KeYGlobalStarter"
+            name="KeY">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.methodStarter">
+      <starter
+            class="org.key_project.key4eclipse.starter.ui.starter.KeYMethodStarter"
+            description="Original user interface of KeY."
+            id="org.key_project.key4eclipse.starter.ui.starter.KeYMethodStarter"
             name="KeY">
       </starter>
    </extension>

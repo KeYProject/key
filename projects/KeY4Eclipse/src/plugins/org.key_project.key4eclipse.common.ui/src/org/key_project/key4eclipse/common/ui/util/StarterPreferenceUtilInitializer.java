@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.common.ui.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
+import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 
@@ -28,11 +29,19 @@ public class StarterPreferenceUtilInitializer extends AbstractPreferenceInitiali
     */
    @Override
    public void initializeDefaultPreferences() {
-      ImmutableList<StarterDescription<IGlobalStarter>> starters = StarterUtil.getGlobalStarters();
-      if (!starters.isEmpty()) {
-         StarterPreferenceUtil.setDefaultSelectedGlobalStarterID(starters.head().getId());
+      // Global starter
+      ImmutableList<StarterDescription<IGlobalStarter>> globalStarters = StarterUtil.getGlobalStarters();
+      if (!globalStarters.isEmpty()) {
+         StarterPreferenceUtil.setDefaultSelectedGlobalStarterID(globalStarters.head().getId());
       }
       StarterPreferenceUtil.setDefaultDontAskForGlobalStarter(false);
       StarterPreferenceUtil.setDefaultGlobalStarterDisabled(false);
+      // Method starter
+      ImmutableList<StarterDescription<IMethodStarter>> methodStarters = StarterUtil.getMethodStarters();
+      if (!methodStarters.isEmpty()) {
+         StarterPreferenceUtil.setDefaultSelectedMethodStarterID(methodStarters.head().getId());
+      }
+      StarterPreferenceUtil.setDefaultDontAskForMethodStarter(false);
+      StarterPreferenceUtil.setDefaultMethodStarterDisabled(false);
    }
 }

@@ -19,7 +19,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 
 /**
- * Handler to start a global application.
+ * Handler to start a global application via {@link StarterUtil#openGlobalStarter(Shell)}.
  */
 public class GlobalStarterHandler extends AbstractSaveExecutionHandler {
    /**

@@ -5,8 +5,10 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
+import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -27,9 +29,19 @@ public final class StarterUtil {
    public static final String GLOBAL_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.globalStarter";
    
    /**
-    * Contains all available {@link StarterDescription}s of  {@link IGlobalStarter}s.
+    * ID of the used extension point.
+    */
+   public static final String METHOD_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.methodStarter";
+   
+   /**
+    * Contains all available {@link StarterDescription}s of {@link IGlobalStarter}s.
     */
    private static ImmutableList<StarterDescription<IGlobalStarter>> globalStarters;
+   
+   /**
+    * Contains all available {@link StarterDescription}s of {@link IMethodStarter}s.
+    */
+   private static ImmutableList<StarterDescription<IMethodStarter>> methodStarters;
 
    /**
     * Forbid instances.
@@ -44,22 +56,37 @@ public final class StarterUtil {
    public static ImmutableList<StarterDescription<IGlobalStarter>> getGlobalStarters() {
       // Lazy loading if needed
       if (globalStarters == null) {
-         globalStarters = createGlobalStarters();
+         globalStarters = createStarters(GLOBAL_STARTER_EXTENSION_POINT, IGlobalStarter.class);
       }
       return globalStarters;
    }
    
    /**
-    * Reads all available {@link StarterDescription}s of  {@link IGlobalStarter} from the extension point.
-    * @return The created {@link StarterDescription}s of  {@link IGlobalStarter} instances.
+    * Returns all available {@link StarterDescription}s of {@link IMethodStarter}s.
+    * @return The available {@link StarterDescription}s of  {@link IMethodStarter}s.
     */
-   private static ImmutableList<StarterDescription<IGlobalStarter>> createGlobalStarters() {
+   public static ImmutableList<StarterDescription<IMethodStarter>> getMethodStarters() {
+      // Lazy loading if needed
+      if (methodStarters == null) {
+         methodStarters = createStarters(METHOD_STARTER_EXTENSION_POINT, IMethodStarter.class);
+      }
+      return methodStarters;
+   }
+   
+   /**
+    * Reads all available {@link StarterDescription}s from the extension point.
+    * @param extensionPoint The extension point to read from.
+    * @param expectedClass The expected {@link Class} of the registered instances.
+    * @return The created {@link StarterDescription}s instances.
+    */
+   private static <I> ImmutableList<StarterDescription<I>> createStarters(String extensionPoint, 
+                                                                          Class<I> expectedClass) {
       // Create result list
-      ImmutableList<StarterDescription<IGlobalStarter>> result = ImmutableSLList.nil();
+      ImmutableList<StarterDescription<I>> result = ImmutableSLList.nil();
       // Add drivers registered by the extension point
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       if (registry != null) {
-         IExtensionPoint point = registry.getExtensionPoint(GLOBAL_STARTER_EXTENSION_POINT);
+         IExtensionPoint point = registry.getExtensionPoint(extensionPoint);
          if (point != null) {
             // Analyze the extension point
             IExtension[] extensions = point.getExtensions();
@@ -79,11 +106,12 @@ public final class StarterUtil {
                         throw new IllegalStateException("Name of starter with ID \"" + id + "\" is not defined.");
                      }
                      Object instance = configElement.createExecutableExtension("class");
-                     if (!(instance instanceof IGlobalStarter)) {
+                     if (!(expectedClass.isInstance(instance))) {
                         throw new IllegalStateException("Unsupported class of starter with ID \"" + id + "\" found.");
                      }
                      String description = configElement.getAttribute("description");
-                     result = result.append(new StarterDescription<IGlobalStarter>(id, name, (IGlobalStarter)instance, description));
+                     
+                     result = result.append(new StarterDescription<I>(id, name, expectedClass.cast(instance), description));
                   }
                   catch (Exception e) {
                      LogUtil.getLogger().logError(e);
@@ -92,7 +120,7 @@ public final class StarterUtil {
             }
          }
          else {
-            LogUtil.getLogger().logError("Extension point \"" + GLOBAL_STARTER_EXTENSION_POINT + "\" doesn't exist.");
+            LogUtil.getLogger().logError("Extension point \"" + extensionPoint + "\" doesn't exist.");
          }
       }
       else {
@@ -143,6 +171,36 @@ public final class StarterUtil {
                                                                             StarterPreferenceUtil.GLOBAL_STARTER_DISABLED);
       if (starter != null && starter.getInstance() != null) {
          starter.getInstance().open();
+      }
+   }
+   
+   /**
+    * Checks if method starter are available or not.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public static boolean areMethodStartersAvailable() {
+      ImmutableList<StarterDescription<IMethodStarter>> starter = getMethodStarters();
+      return !starter.isEmpty() && !StarterPreferenceUtil.isMethodStarterDisabled();
+   }
+   
+   /**
+    * Opens the method starter.
+    * @param parentShell The parent {@link Shell} to use.
+    * @param method The {@link IMethod} to load.
+    * @throws Exception Occurred Exception.
+    */
+   public static void openMethodStarter(Shell parentShell, IMethod method) throws Exception {
+      ImmutableList<StarterDescription<IMethodStarter>> starterDescriptions = getMethodStarters();
+      StarterDescription<IMethodStarter> starter = StarterWizard.openWizard(parentShell, 
+                                                                            "Start Proof", 
+                                                                            "Select application", 
+                                                                            "Select the application to start proof in.", 
+                                                                            starterDescriptions, 
+                                                                            StarterPreferenceUtil.SELECTED_METHOD_STARTER_ID, 
+                                                                            StarterPreferenceUtil.DONT_ASK_FOR_METHOD_STARTER, 
+                                                                            StarterPreferenceUtil.METHOD_STARTER_DISABLED);
+      if (starter != null && starter.getInstance() != null) {
+         starter.getInstance().open(method);
       }
    }
 }

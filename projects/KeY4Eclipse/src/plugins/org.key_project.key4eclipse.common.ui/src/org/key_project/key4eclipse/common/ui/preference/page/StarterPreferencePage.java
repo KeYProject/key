@@ -11,6 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -22,6 +23,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
+import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
@@ -63,15 +65,25 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
    protected void createFieldEditors() {
       TabFolder starterKindsTabFolder = new TabFolder(getFieldEditorParent(), SWT.NONE);
       starterKindsTabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
-      
+      // Global starter
       ImmutableList<StarterDescription<IGlobalStarter>> globalStarter = StarterUtil.getGlobalStarters();
       if (!globalStarter.isEmpty()) {
          createTab(starterKindsTabFolder, 
-                   "Global Starter", 
+                   "Application", 
                    globalStarter, 
                    StarterPreferenceUtil.SELECTED_GLOBAL_STARTER_ID, 
                    StarterPreferenceUtil.DONT_ASK_FOR_GLOBAL_STARTER, 
                    StarterPreferenceUtil.GLOBAL_STARTER_DISABLED);
+      }
+      // Method starter
+      ImmutableList<StarterDescription<IMethodStarter>> methodStarter = StarterUtil.getMethodStarters();
+      if (!methodStarter.isEmpty()) {
+         createTab(starterKindsTabFolder, 
+                   "Proof of selected method", 
+                   methodStarter, 
+                   StarterPreferenceUtil.SELECTED_METHOD_STARTER_ID, 
+                   StarterPreferenceUtil.DONT_ASK_FOR_METHOD_STARTER, 
+                   StarterPreferenceUtil.METHOD_STARTER_DISABLED);
       }
    }
    
@@ -90,7 +102,7 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
                                 String selectedStarterProperty,
                                 String dontAskAgainProperty,
                                 String disableProperty) {
-      Composite globalStarterTabComposite = new Composite(starterKindsTabFolder, SWT.NONE);
+      final Composite globalStarterTabComposite = new Composite(starterKindsTabFolder, SWT.NONE);
       globalStarterTabComposite.setLayout(new GridLayout(1, false));
       
       final String[][] globalStarterEntries = new String[starterDescriptions.size()][];
@@ -99,7 +111,7 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
          globalStarterEntries[i] = new String[] {sd.getName(), sd.getId()};
          i++;
       }
-      ComboFieldEditor selectedGlobalStarterEditor = new ComboFieldEditor(selectedStarterProperty, "Selected Application", globalStarterEntries, globalStarterTabComposite);
+      final ComboFieldEditor selectedGlobalStarterEditor = new ComboFieldEditor(selectedStarterProperty, "Selected Application", globalStarterEntries, globalStarterTabComposite);
       addField(selectedGlobalStarterEditor);
       
       Group descriptionGroup = new Group(globalStarterTabComposite, SWT.NONE);
@@ -136,15 +148,35 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
          LogUtil.getLogger().logError(e);
       }
       
-      BooleanFieldEditor dontAskAgain = new BooleanFieldEditor(dontAskAgainProperty, "&Do not ask", globalStarterTabComposite);
-      addField(dontAskAgain);
+      final BooleanFieldEditor dontAskEditor = new BooleanFieldEditor(dontAskAgainProperty, "&Do not ask", globalStarterTabComposite);
+      addField(dontAskEditor);
 
-      BooleanFieldEditor disabled = new BooleanFieldEditor(disableProperty, "D&isable functionality", globalStarterTabComposite);
-      addField(disabled);
+      BooleanFieldEditor disabledEditor = new BooleanFieldEditor(disableProperty, "D&isable functionality", globalStarterTabComposite);
+      addField(disabledEditor);
+      try {
+         final Button button = (Button)ObjectUtil.get(disabledEditor, "checkBox");
+         button.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               boolean disabled = button.getSelection();
+               selectedGlobalStarterEditor.setEnabled(!disabled, globalStarterTabComposite);
+               descriptionText.setEnabled(!disabled);
+               dontAskEditor.setEnabled(!disabled, globalStarterTabComposite);
+            }
+         });
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+      }
 
       TabItem globalStarterTabItem = new TabItem(starterKindsTabFolder, SWT.NONE);
       globalStarterTabItem.setText(tabTitle);
       globalStarterTabItem.setControl(globalStarterTabComposite);
+      
+      boolean disabled = getPreferenceStore().getBoolean(disableProperty);
+      selectedGlobalStarterEditor.setEnabled(!disabled, globalStarterTabComposite);
+      descriptionText.setEnabled(!disabled);
+      dontAskEditor.setEnabled(!disabled, globalStarterTabComposite);
    }
 
    /**

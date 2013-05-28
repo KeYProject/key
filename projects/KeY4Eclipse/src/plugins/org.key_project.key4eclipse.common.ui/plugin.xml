@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="org.key_project.key4eclipse.common.ui.globalStarter" name="Global Starter" schema="schema/org.key_project.key4eclipse.common.ui.globalStarter.exsd"/>
+   <extension-point id="org.key_project.key4eclipse.common.ui.methodStarter" name="Method Starter" schema="schema/org.key_project.key4eclipse.common.ui.methodStarter.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
@@ -79,11 +80,21 @@
             id="org.key_project.key4eclipse.common.ui.globalStarterCommand"
             name="Open Application">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Starts a new proof."
+            id="org.key_project.key4eclipse.common.ui.startProofCommand"
+            name="Start Proof">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.key4eclipse.common.ui.globalStarterCommand"
+            icon="icons/logo16.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.common.ui.startProofCommand"
             icon="icons/logo16.gif">
       </image>
    </extension>
@@ -99,6 +110,76 @@
             </test>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.key4eclipse.common.ui.handler.MethodStarterHandler"
+            commandId="org.key_project.key4eclipse.common.ui.startProofCommand">
+         <enabledWhen>
+            <or>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.jdt.core.IMethod">
+                  </instanceof>
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test>
+                  </adapt>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.methodStarterAvailable">
+                  </test>
+               </iterate>
+               <and>
+                  <with
+                        variable="activePartId">
+                     <equals
+                           value="org.eclipse.jdt.ui.CompilationUnitEditor">
+                     </equals>
+                  </with>
+                  <with
+                        variable="activeEditorInput">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.eclipse.jdt.core.javanature">
+                        </test>
+                     </adapt>
+                  </with>
+                  <with
+                        variable="selection">
+                     <and>
+                        <instanceof
+                              value="org.eclipse.jface.text.ITextSelection">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
+                              value="org.eclipse.jdt.core.IMethod">
+                        </test>
+                     </and>
+                  </with>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.methodStarterAvailable">
+                  </test>
+               </and>
+            </or>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.key_project.key4eclipse.common.ui.startProofCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+P">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -121,6 +202,21 @@
                   <test
                         forcePluginActivation="true"
                         property="org.key_project.key4eclipse.common.ui.globalStarterAvailable">
+                  </test>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.key_project.key4eclipse.common.ui.startProofCommand"
+                  icon="icons/logo16.gif"
+                  id="org.key_project.key4eclipse.common.ui.startProofCommand"
+                  label="Start Proof"
+                  mnemonic="P"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.key4eclipse.common.ui.methodStarterAvailable">
                   </test>
                </visibleWhen>
             </command>
@@ -149,6 +245,76 @@
             </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="org.key_project.key4eclipse.common.ui.startProofCommand"
+               icon="icons/logo16.gif"
+               id="org.key_project.key4eclipse.common.ui.startProofCommand"
+               label="Start Proof"
+               mnemonic="P"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.jdt.core.IMethod">
+                     </instanceof>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.eclipse.jdt.core.javanature">
+                        </test>
+                     </adapt>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.key4eclipse.common.ui.methodStarterAvailable">
+                     </test>
+                  </iterate>
+                  <and>
+                     <with
+                           variable="activePartId">
+                        <equals
+                              value="org.eclipse.jdt.ui.CompilationUnitEditor">
+                        </equals>
+                     </with>
+                     <with
+                           variable="activeEditorInput">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.jdt.core.javanature">
+                           </test>
+                        </adapt>
+                     </with>
+                     <with
+                           variable="selection">
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.jface.text.ITextSelection">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
+                                 value="org.eclipse.jdt.core.IMethod">
+                           </test>
+                        </and>
+                     </with>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.key4eclipse.common.ui.methodStarterAvailable">
+                     </test>
+                  </and>
+               </or>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -163,6 +329,13 @@
             id="org.key_project.key4eclipse.common.ui.expression.GlobalStarterAvailablePropertyTester"
             namespace="org.key_project.key4eclipse.common.ui"
             properties="globalStarterAvailable"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.key4eclipse.common.ui.expression.MethodStarterAvailablePropertyTester"
+            id="org.key_project.key4eclipse.common.ui.expression.MethodStarterAvailablePropertyTester"
+            namespace="org.key_project.key4eclipse.common.ui"
+            properties="methodStarterAvailable"
             type="java.lang.Object">
       </propertyTester>
    </extension>
