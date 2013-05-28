@@ -1448,7 +1448,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    result = new SLExpression(TB.var(resultVar), resultVar.getKeYJavaType());
 	}
     |
-	(LPAREN QUANTIFIER) => t=specquantifiedexpression { result = new SLExpression(t); }
+	(LPAREN QUANTIFIER) => result=specquantifiedexpression
     |
         (LPAREN BSUM) => result=bsumterm
     |
@@ -1601,9 +1601,9 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    result = new SLExpression(typ);
 	}
 
-    |   LOCKSET
+    |   lockset:LOCKSET
 	{
-	    raiseNotSupported("\\lockset");
+	    result = translator.createSkolemExprObject(lockset,services);
 	}
 
     |   IS_INITIALIZED LPAREN typ=referencetype RPAREN
@@ -1761,7 +1761,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |   LPAREN result=expression RPAREN
 ;
 
-specquantifiedexpression returns [Term result = null] throws SLTranslationException
+specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
 {
     SLExpression expr;
     Term p = TB.tt();
@@ -1783,7 +1783,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    resolverManager.popLocalVariablesNamespace();
 
 	    p = TB.convertToFormula(p, services);
-	    result = translator.translate(q.getText(), Term.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
+	    result = translator.translate(q.getText(), SLExpression.class, p, expr.getTerm(), declVars.first, declVars.second, nullable, services);
 	}
 	RPAREN
 ;

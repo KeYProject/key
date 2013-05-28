@@ -1620,7 +1620,7 @@ final class JMLTranslator {
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(intSort);
         final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(999); // function is unique anyway
+        final int x = (new Random()).nextInt(1000); // function is unique anyway
         final Function sk = new Function(new Name(shortName+x),intSort);
         final Term t = TB.func(sk);
         return new SLExpression(t,intType);
@@ -1633,9 +1633,10 @@ final class JMLTranslator {
         addUnderspecifiedWarning(jmlKeyWord);
         assert services != null;
         final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
-        final Sort objSort = services.getTypeConverter().getPrimitiveSort(objType);
+        final Sort objSort = objType.getSort();
+        assert objSort != null;
         final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(999); // function is unique anyway
+        final int x = (new Random()).nextInt(1000); // function is unique anyway
         final Function sk = new Function(new Name(shortName+x),objSort);
         final Term t = TB.func(sk);
         return new SLExpression(t,objType);
@@ -1647,7 +1648,7 @@ final class JMLTranslator {
     public SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
         final String shortName = jmlKeyWord.getText().replace("\\", "");
-        final int x = (new Random()).nextInt(999); // function is unique anyway
+        final int x = (new Random()).nextInt(1000); // function is unique anyway
         final Function sk = new Function(new Name(shortName+x),Sort.FORMULA);
         final Term t = TB.func(sk);
         return new SLExpression(t);
@@ -1784,7 +1785,7 @@ final class JMLTranslator {
          */
         @SuppressWarnings("unchecked")
         @Override
-        public Term translate(SLTranslationExceptionManager excManager,
+        public SLExpression translate(SLTranslationExceptionManager excManager,
                               Object... params)
                 throws SLTranslationException {
             checkParameters(params,
@@ -1811,13 +1812,13 @@ final class JMLTranslator {
                 }
             }
 
-            Term res = isGeneralized()? translateGeneralizedQuantifiers(declVars,preTerm,bodyTerm)
+            final SLExpression res = isGeneralized()? translateGeneralizedQuantifiers(declsType,declVars,preTerm,bodyTerm)
                     :translateQuantifiers(declVars, preTerm, bodyTerm);
             return res;
         }
 
 
-        public Term translateQuantifiers(Iterable<LogicVariable> qvs,
+        public SLExpression translateQuantifiers(Iterable<LogicVariable> qvs,
                                          Term t1,
                                          Term t2)
                 throws SLTranslationException {
@@ -1826,10 +1827,10 @@ final class JMLTranslator {
             for (LogicVariable qv : qvs) {
                 result = translateQuantifier(qv, result);
             }
-            return result;
+            return new SLExpression(result);
         }
 
-        public Term translateGeneralizedQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2)
+        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs, Term t1, Term t2)
         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable qv = it.next();
@@ -1837,7 +1838,8 @@ final class JMLTranslator {
                 throw new SLTranslationException("Only one quantified variable is allowed in this context.");
             }
             Term cond = TB.convertToBoolean(TB.and(t1, t2),services);
-            return translateQuantifier(qv, cond);
+            final KeYJavaType resultType = declsType; // TODO: should be type of t2
+            return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
 
         public abstract Term combineQuantifiedTerms(Term t1,
@@ -1925,7 +1927,7 @@ final class JMLTranslator {
 
 
         @Override
-        public Term translate(SLTranslationExceptionManager excManager, Object... params)
+        public SLExpression translate(SLTranslationExceptionManager excManager, Object... params)
                 throws SLTranslationException {
             checkParameters(params,
                     Term.class, Term.class, KeYJavaType.class,
@@ -1934,35 +1936,39 @@ final class JMLTranslator {
                     ((KeYJavaType) params[2]).getJavaType();
             services = (Services) params[5];
             assert services != null;
+            final KeYJavaType bigintType = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
             if (!declsType.equals(PrimitiveType.JAVA_INT)
                     && !declsType.equals(PrimitiveType.JAVA_BIGINT))
-                return createSkolemTerm();
+                return new SLExpression(createSkolemTerm(),bigintType); // safe in this context
             else return super.translate(excManager, params);
         }
 
         @Override
         @Deprecated
-        public Term translateQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2) {
+        public SLExpression translateQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2) {
             assert false;
             return null;
         }
 
         @Override
-        public Term translateGeneralizedQuantifiers(Iterable<LogicVariable> qvs,
+        public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, Iterable<LogicVariable> qvs,
                 Term t1,
                 Term t2)
                         throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable lv = it.next();
+            Term t;
+            KeYJavaType resultType = declsType; // TODO: should be type of t2
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 // not interval range, create skolem term
-                return createSkolemTerm();
+                t = createSkolemTerm();
             } else {
-                return translateBoundedNumericalQuantifier(lv,
+                t = translateBoundedNumericalQuantifier(lv,
                         lowerBound(t1, lv),
                         upperBound(t1, lv),
                         t2);
             }
+            return new SLExpression(t, resultType);
         }
 
         protected abstract Term createSkolemTerm();
