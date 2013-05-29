@@ -1695,10 +1695,15 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             }
             result = new SLExpression(TB.allFields(services, e1.getTerm()),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }
-
+        }        
+        
+    |  ALLOBJECTS LPAREN t=storeref RPAREN
+        {          
+            result = new SLExpression(TB.allObjects(services, t.sub(1)),
+                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+        }                
     |   UNIONINF
-        LPAREN
+        LPAREN 
         declVars=quantifiedvardecls
         SEMI
         {
