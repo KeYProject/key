@@ -129,13 +129,13 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="org.key_project.keyide.ui.menus.keymenu"
-               label="KeY"
+               label="KeYIDE"
                mnemonic="K">
             <command
                   commandId="org.key_project.keyide.ui.commands.startProofCommand"
                   icon="icons/logo16.gif"
                   id="org.key_project.keyide.ui.commands.startProofCommand"
-                  label="Start Proof"
+                  label="Start Proof in KeYIDE"
                   mnemonic="P"
                   style="push">
             </command>
@@ -148,7 +148,7 @@
                commandId="org.key_project.keyide.ui.commands.startProofCommand"
                icon="icons/logo16.gif"
                id="org.key_project.keyide.ui.commands.startProofCommand"
-               label="Start Proof"
+               label="Start Proof in KeYIDE"
                mnemonic="P"
                style="push">
             <visibleWhen

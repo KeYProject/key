@@ -251,5 +251,6 @@ public class StarterWizardPage<I> extends WizardPage {
     */
    public void setFunctionalityDisabled(boolean disabled) {
       disableButton.setSelection(disabled);
+      updateEnablement();
    }
 }

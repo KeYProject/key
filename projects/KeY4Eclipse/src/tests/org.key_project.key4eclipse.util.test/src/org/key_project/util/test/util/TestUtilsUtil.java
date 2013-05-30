@@ -139,8 +139,13 @@ public class TestUtilsUtil {
     * Closes the welcome view if it is opened. Otherwise nothing is done.
     */
    public static void closeWelcomeView() {
-      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager(); 
-      introManager.closeIntro(introManager.getIntro());
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager();
+            introManager.closeIntro(introManager.getIntro());
+         }
+      });
    }
    
    /**

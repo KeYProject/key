@@ -60,7 +60,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -68,7 +68,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -86,7 +86,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -104,7 +104,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -118,7 +118,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofSwitchPerspectiveDialogNoRememberTest("SWTBotStartProofHandlerTest_testStartProofInEditorPerspectiveNeverChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -126,7 +126,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -145,7 +145,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -164,7 +164,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -178,7 +178,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofSwitchPerspectiveDialogYesRememberTest("SWTBotStartProofHandlerTest_testStartProofInEditorPerspectiveAlwaysChangedPerspectiveAlwaysChanged", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-         // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+         // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -186,7 +186,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }   
@@ -205,7 +205,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -225,7 +225,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "OK", KeYEditor.EDITOR_ID);
    }
@@ -241,7 +241,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesAlwaysStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -249,7 +249,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "OK", MessageDialogWithToggle.ALWAYS, KeYEditor.EDITOR_ID);
    }
@@ -269,7 +269,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "OK", MessageDialogWithToggle.ALWAYS, KeYEditor.EDITOR_ID);
    }
@@ -289,7 +289,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "OK", MessageDialogWithToggle.ALWAYS, KeYEditor.EDITOR_ID);
       
@@ -305,7 +305,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testSetPerspectiveChangedPreferencesNeverStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -313,7 +313,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "OK", MessageDialogWithToggle.NEVER, KeYEditor.EDITOR_ID);
    }
@@ -333,7 +333,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "OK", MessageDialogWithToggle.NEVER, KeYEditor.EDITOR_ID);
    }
@@ -353,7 +353,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "OK", MessageDialogWithToggle.NEVER, KeYEditor.EDITOR_ID);
       
@@ -370,7 +370,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesAlwaysStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -378,7 +378,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "Cancel", MessageDialogWithToggle.ALWAYS, "org.eclipse.jdt.ui.CompilationUnitEditor");
    }
@@ -399,7 +399,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "Cancel", MessageDialogWithToggle.ALWAYS, "org.eclipse.jdt.ui.CompilationUnitEditor");
    }
@@ -420,7 +420,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "Cancel", MessageDialogWithToggle.ALWAYS, "org.eclipse.jdt.ui.CompilationUnitEditor");
       
@@ -437,7 +437,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofWithoutSwitchToPerspectiveDialogTest("SWTBotStartProofHandlerTest_testCancelProofPerspectiveChangedPreferencesNeverStartProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -445,7 +445,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "Cancel", MessageDialogWithToggle.NEVER, "org.eclipse.jdt.ui.CompilationUnitEditor");
    }
@@ -466,7 +466,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "Cancel", MessageDialogWithToggle.NEVER, "org.eclipse.jdt.ui.CompilationUnitEditor");
    }
@@ -487,7 +487,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "Cancel", MessageDialogWithToggle.NEVER, "org.eclipse.jdt.ui.CompilationUnitEditor");
    
@@ -502,7 +502,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       doStartProofSwitchPerspectiveDialogYesTest("SWTBotStartProofHandlerTest_testCancelProofInEditor", new IStartProofTestRunnable() {
          @Override
          public void startProof(String projectName, SWTWorkbenchBot bot, IEditorPart editorPart) {
-            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof" menu item
+            // Set focus to outline view because otherwise the context menu of the editor does not contain the "Start Proof in KeYIDE" menu item
             SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
             outlineView.setFocus();
             // Select method "charge(int) : boolean" in text editor
@@ -510,7 +510,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotStyledText styledText = editor.bot().styledText();
             styledText.selectRange(54, 18, 6);
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(styledText, "Start Proof");
+            TestUtilsUtil.clickContextMenu(styledText, "Start Proof in KeYIDE");
          }
       }, "Cancel", "org.eclipse.jdt.ui.CompilationUnitEditor");
    }
@@ -529,7 +529,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree outlineTree = outlineView.bot().tree();
             TestUtilsUtil.selectInTree(outlineTree, "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(outlineTree, "Start Proof in KeYIDE");
          }
       }, "Cancel", "org.eclipse.jdt.ui.CompilationUnitEditor");
    }
@@ -548,7 +548,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       }, "Cancel", "org.eclipse.jdt.ui.CompilationUnitEditor");
    }

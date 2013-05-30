@@ -9,11 +9,16 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.key4eclipse.common.ui.expression.FileStarterAvailablePropertyTester;
+import org.key_project.key4eclipse.common.ui.expression.GlobalStarterAvailablePropertyTester;
+import org.key_project.key4eclipse.common.ui.expression.MethodStarterAvailablePropertyTester;
+import org.key_project.key4eclipse.common.ui.expression.ProjectStarterAvailablePropertyTester;
 import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -310,5 +315,17 @@ public final class StarterUtil {
       if (starter != null && starter.getInstance() != null) {
          starter.getInstance().open(project);
       }
+   }
+
+   /**
+    * Re-evaluates all properties defined by {@link GlobalStarterAvailablePropertyTester},
+    * {@link MethodStarterAvailablePropertyTester}, {@link FileStarterAvailablePropertyTester}
+    * and {@link ProjectStarterAvailablePropertyTester}.
+    */
+   public static void updatePropertyTester() {
+      WorkbenchUtil.updatePropertyTesters("org.key_project.key4eclipse.common.ui.globalStarterAvailable",
+                                          "org.key_project.key4eclipse.common.ui.methodStarterAvailable",
+                                          "org.key_project.key4eclipse.common.ui.fileStarterAvailable",
+                                          "org.key_project.key4eclipse.common.ui.projectStarterAvailable");
    }
 }

@@ -56,7 +56,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       };
       // Store original SWTBot timeout and increase it
@@ -134,7 +134,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "isValid() : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       };
       // Store original SWTBot timeout and increase it
@@ -213,7 +213,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       };
       // Store original SWTBot timeout and increase it
@@ -306,7 +306,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       };
       // Store original SWTBot timeout and increase it

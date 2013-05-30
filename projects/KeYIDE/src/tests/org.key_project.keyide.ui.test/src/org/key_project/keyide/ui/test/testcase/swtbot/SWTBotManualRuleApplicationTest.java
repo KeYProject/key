@@ -41,7 +41,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "isValid() : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testCloseFalse_ProofClosed", 
@@ -63,7 +63,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "isValid() : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
          }
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 

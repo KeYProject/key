@@ -406,6 +406,7 @@
                      <adapt
                            type="org.eclipse.core.resources.IResource">
                         <test
+                              forcePluginActivation="true"
                               property="org.eclipse.core.resources.projectNature"
                               value="org.eclipse.jdt.core.javanature">
                         </test>
@@ -474,10 +475,12 @@
                      </instanceof>
                      <or>
                         <test
+                              forcePluginActivation="true"
                               property="org.eclipse.core.resources.extension"
                               value="key">
                         </test>
                         <test
+                              forcePluginActivation="true"
                               property="org.eclipse.core.resources.extension"
                               value="proof">
                         </test>
@@ -509,6 +512,7 @@
                                  value="org.eclipse.core.resources.IProject">
                            </instanceof>
                            <test
+                                 forcePluginActivation="true"
                                  property="org.eclipse.core.resources.projectNature"
                                  value="org.eclipse.jdt.core.javanature">
                            </test>
