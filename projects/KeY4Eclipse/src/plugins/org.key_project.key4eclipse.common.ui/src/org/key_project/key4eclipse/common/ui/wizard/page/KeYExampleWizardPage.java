@@ -17,11 +17,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
 
 /**
@@ -74,7 +74,7 @@ public class KeYExampleWizardPage extends WizardPage {
          }
       });
       examplesViewer.setContentProvider(ArrayContentProvider.getInstance());
-      File examplesDir = new File(KeYExampleUtil.getLocalExampleDirectory());
+      File examplesDir = new File(Main.getExamplesDir());
       List<ShortFile> examples = ExampleChooser.listExamples(examplesDir);
       examplesViewer.setInput(examples);
       if (!examples.isEmpty()) {
