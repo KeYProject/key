@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KeY Resources Ui Test
+Bundle-Name: KeY Resources UI Test
 Bundle-SymbolicName: org.key_project.key4eclipse.resources.ui.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.key4eclipse.resources.ui.test.Activator
