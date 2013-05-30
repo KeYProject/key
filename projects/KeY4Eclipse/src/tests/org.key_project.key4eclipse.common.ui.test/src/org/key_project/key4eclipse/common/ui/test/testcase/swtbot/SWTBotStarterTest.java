@@ -2,9 +2,12 @@ package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -20,21 +23,30 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTabItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.preference.page.StarterPreferencePage;
+import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 import org.key_project.key4eclipse.common.ui.test.Activator;
+import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingFileStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingGlobalStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingMethodStarter;
+import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProjectStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.ITestedStarter;
+import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingFileStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingGlobalStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingMethodStarter;
+import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProjectStarter;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.key4eclipse.common.ui.wizard.page.StarterWizardPage;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -47,6 +59,217 @@ import de.uka.ilkd.key.collection.ImmutableList;
  * @author Martin Hentschel
  */
 public class SWTBotStarterTest extends TestCase {
+   /**
+    * Tests {@link StarterUtil#openProjectStarter(org.eclipse.swt.widgets.Shell, IProject)}
+    * starter via context menu in the navigator.
+    */
+   @SuppressWarnings("deprecation")
+   @Test
+   public void testOpenProjectStarter_Navigator() throws Exception {
+      doProjectStarterTest("SWTBotStarterTest_testOpenProjectStarter_Navigator", 
+                           IPageLayout.ID_RES_NAV);
+   }
+   
+   /**
+    * Tests {@link StarterUtil#openProjectStarter(org.eclipse.swt.widgets.Shell, IProject)}
+    * starter via context menu in the package explorer.
+    */
+   @Test
+   public void testOpenProjectStarter_PackageExplorer() throws Exception {
+      doProjectStarterTest("SWTBotStarterTest_testOpenProjectStarter_PackageExplorer", 
+                           JavaUI.ID_PACKAGES);
+   }
+   
+   /**
+    * Tests {@link StarterUtil#openProjectStarter(org.eclipse.swt.widgets.Shell, IProject)}
+    * starter via context menu in the project explorer.
+    */
+   @Test
+   public void testOpenProjectStarter_ProjectExplorer() throws Exception {
+      doProjectStarterTest("SWTBotStarterTest_testOpenProjectStarter_ProjectExplorer",
+                           IPageLayout.ID_PROJECT_EXPLORER);
+   }
+   
+   /**
+    * Executes the test steps to test the {@link IProjectStarter} API.
+    * @param projectName The project name.
+    * @param fileName The file name.
+    * @param viewId The ID of the view to select file in.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doProjectStarterTest(String projectName,
+                                       final String viewId) throws Exception {
+      // Close welcome view
+      TestUtilsUtil.closeWelcomeView();
+      // Create test project
+      final IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+      // Open view
+      IViewPart alreadyOpenedView = TestUtilsUtil.findView(viewId);
+      if (alreadyOpenedView == null) {
+         TestUtilsUtil.openView(viewId);
+      }
+      try {
+         // Do test
+         ITestHelper<FirstLoggingProjectStarter, SecondLoggingProjectStarter> helper = new AbstractProjectTestHelper() {
+            @Override
+            public void openStarter(SWTWorkbenchBot bot) {
+               // Select file in view
+               SWTBotView view = bot.viewById(viewId);
+               SWTBotTree tree = view.bot().tree();
+               TestUtilsUtil.selectInTree(tree, project.getProject().getName());
+               // Start proof via context menu
+               TestUtilsUtil.clickContextMenu(tree, "Load Project");
+            }
+
+            @Override
+            public void openStarterDirectly() throws Exception {
+               StarterUtil.openProjectStarter(null, project.getProject());
+            }
+            
+            @Override
+            public void assertStarterAfterFinish(FirstLoggingProjectStarter firstStarter,
+                                                 SecondLoggingProjectStarter secondStarter,
+                                                 boolean firstStarterSelected) {
+               ImmutableList<IProject> firstLog = firstStarter.getAndResetLog(); 
+               ImmutableList<IProject> secondLog = secondStarter.getAndResetLog(); 
+               if (firstStarterSelected) {
+                  assertEquals(1, firstLog.size());
+                  assertEquals(project.getProject(), firstLog.head());
+                  assertEquals(0, secondLog.size());
+               }
+               else {
+                  assertEquals(0, firstLog.size());
+                  assertEquals(1, secondLog.size());
+                  assertEquals(project.getProject(), secondLog.head());
+               }
+            }
+         };
+         ImmutableList<StarterDescription<IProjectStarter>> starters = StarterUtil.getProjectStarters();
+         StarterDescription<IProjectStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingProjectStarter.ID);
+         StarterDescription<IProjectStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingProjectStarter.ID);
+         assertTrue(firstSD.getInstance() instanceof FirstLoggingProjectStarter);
+         assertTrue(secondSD.getInstance() instanceof SecondLoggingProjectStarter);
+         doStarterTest(helper, 
+                       "Load Project", 
+                       "Load Project",
+                       (FirstLoggingProjectStarter)firstSD.getInstance(),
+                       (SecondLoggingProjectStarter)secondSD.getInstance());
+      }
+      finally {
+         if (alreadyOpenedView == null) {
+            TestUtilsUtil.closeView(viewId);
+         }
+      }
+   }
+   
+   /**
+    * Tests {@link StarterUtil#openFileStarter(org.eclipse.swt.widgets.Shell, IFile)}
+    * starter via context menu in the navigator.
+    */
+   @SuppressWarnings("deprecation")
+   @Test
+   public void testOpenFileStarter_Navigator() throws Exception {
+      doFileStarterTest("SWTBotStarterTest_testOpenFileStarter_Navigator", 
+                        "Test." + KeYUtil.PROOF_FILE_EXTENSION,
+                        IPageLayout.ID_RES_NAV);
+   }
+   
+   /**
+    * Tests {@link StarterUtil#openFileStarter(org.eclipse.swt.widgets.Shell, IFile)}
+    * starter via context menu in the package explorer.
+    */
+   @Test
+   public void testOpenFileStarter_PackageExplorer() throws Exception {
+      doFileStarterTest("SWTBotStarterTest_testOpenFileStarter_PackageExplorer", 
+                        "Test." + KeYUtil.KEY_FILE_EXTENSION,
+                        JavaUI.ID_PACKAGES);
+   }
+   
+   /**
+    * Tests {@link StarterUtil#openFileStarter(org.eclipse.swt.widgets.Shell, IFile)}
+    * starter via context menu in the project explorer.
+    */
+   @Test
+   public void testOpenFileStarter_ProjectExplorer() throws Exception {
+      doFileStarterTest("SWTBotStarterTest_testOpenFileStarter_ProjectExplorer", 
+                        "Test." + KeYUtil.PROOF_FILE_EXTENSION,
+                        IPageLayout.ID_PROJECT_EXPLORER);
+   }
+   
+   /**
+    * Executes the test steps to test the {@link IFileStarter} API.
+    * @param projectName The project name.
+    * @param fileName The file name.
+    * @param viewId The ID of the view to select file in.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doFileStarterTest(String projectName, 
+                                    String fileName, 
+                                    final String viewId) throws Exception {
+      // Close welcome view
+      TestUtilsUtil.closeWelcomeView();
+      // Create test project
+      final IProject project = TestUtilsUtil.createProject(projectName);
+      final IFile file = TestUtilsUtil.createFile(project, fileName, "Hello World!");
+      // Open view
+      IViewPart alreadyOpenedView = TestUtilsUtil.findView(viewId);
+      if (alreadyOpenedView == null) {
+         TestUtilsUtil.openView(viewId);
+      }
+      try {
+         // Do test
+         ITestHelper<FirstLoggingFileStarter, SecondLoggingFileStarter> helper = new AbstractFileTestHelper() {
+            @Override
+            public void openStarter(SWTWorkbenchBot bot) {
+               // Select file in view
+               SWTBotView view = bot.viewById(viewId);
+               SWTBotTree tree = view.bot().tree();
+               TestUtilsUtil.selectInTree(tree, project.getName(), file.getName());
+               // Start proof via context menu
+               TestUtilsUtil.clickContextMenu(tree, "Load File");
+            }
+
+            @Override
+            public void openStarterDirectly() throws Exception {
+               StarterUtil.openFileStarter(null, file);
+            }
+            
+            @Override
+            public void assertStarterAfterFinish(FirstLoggingFileStarter firstStarter,
+                                                 SecondLoggingFileStarter secondStarter,
+                                                 boolean firstStarterSelected) {
+               ImmutableList<IFile> firstLog = firstStarter.getAndResetLog(); 
+               ImmutableList<IFile> secondLog = secondStarter.getAndResetLog(); 
+               if (firstStarterSelected) {
+                  assertEquals(1, firstLog.size());
+                  assertEquals(file, firstLog.head());
+                  assertEquals(0, secondLog.size());
+               }
+               else {
+                  assertEquals(0, firstLog.size());
+                  assertEquals(1, secondLog.size());
+                  assertEquals(file, secondLog.head());
+               }
+            }
+         };
+         ImmutableList<StarterDescription<IFileStarter>> starters = StarterUtil.getFileStarters();
+         StarterDescription<IFileStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingFileStarter.ID);
+         StarterDescription<IFileStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingFileStarter.ID);
+         assertTrue(firstSD.getInstance() instanceof FirstLoggingFileStarter);
+         assertTrue(secondSD.getInstance() instanceof SecondLoggingFileStarter);
+         doStarterTest(helper, 
+                       "Load File", 
+                       "Load File",
+                       (FirstLoggingFileStarter)firstSD.getInstance(),
+                       (SecondLoggingFileStarter)secondSD.getInstance());
+      }
+      finally {
+         if (alreadyOpenedView == null) {
+            TestUtilsUtil.closeView(viewId);
+         }
+      }
+   }
+   
    /**
     * Tests {@link StarterUtil#openMethodStarter(org.eclipse.swt.widgets.Shell, org.eclipse.jdt.core.IMethod)}
     * starter via context menu in the project explorer.
@@ -635,6 +858,138 @@ public class SWTBotStarterTest extends TestCase {
       SWTBotCheckBox disableBox = wizardShell.bot().checkBox("D&isable functionality");
       assertEquals(expectedDisabled, disableBox.isChecked());
       assertTrue(disableBox.isEnabled());
+   }
+
+   /**
+    * Provides a basic functionality of {@link ITestHelper} which tests {@link IProjectStarter}s.
+    * @author Martin Hentschel
+    */
+   protected static abstract class AbstractProjectTestHelper implements ITestHelper<FirstLoggingProjectStarter, SecondLoggingProjectStarter> {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void assertStarterAfterCancel(FirstLoggingProjectStarter firstStarter,
+                                           SecondLoggingProjectStarter secondStarter) {
+         ImmutableList<IProject> firstLog = firstStarter.getAndResetLog(); 
+         ImmutableList<IProject> secondLog = secondStarter.getAndResetLog(); 
+         assertEquals(0, firstLog.size());
+         assertEquals(0, secondLog.size());
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDisabled() {
+         return StarterPreferenceUtil.isProjectStarterDisabled();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setDisabled(boolean disabled) {
+         StarterPreferenceUtil.setProjectStarterDisabled(disabled);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDontAsk() {
+         return StarterPreferenceUtil.isDontAskForProjectStarter();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setDontAsk(boolean dontAsk) {
+         StarterPreferenceUtil.setDontAskForProjectStarter(dontAsk);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSelectedId() {
+         return StarterPreferenceUtil.getSelectedProjectStarterID();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setSelectedId(String id) {
+         StarterPreferenceUtil.setSelectedProjectStarterID(id);
+      }
+   }
+
+   /**
+    * Provides a basic functionality of {@link ITestHelper} which tests {@link IFileStarter}s.
+    * @author Martin Hentschel
+    */
+   protected static abstract class AbstractFileTestHelper implements ITestHelper<FirstLoggingFileStarter, SecondLoggingFileStarter> {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void assertStarterAfterCancel(FirstLoggingFileStarter firstStarter,
+                                           SecondLoggingFileStarter secondStarter) {
+         ImmutableList<IFile> firstLog = firstStarter.getAndResetLog(); 
+         ImmutableList<IFile> secondLog = secondStarter.getAndResetLog(); 
+         assertEquals(0, firstLog.size());
+         assertEquals(0, secondLog.size());
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDisabled() {
+         return StarterPreferenceUtil.isFileStarterDisabled();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setDisabled(boolean disabled) {
+         StarterPreferenceUtil.setFileStarterDisabled(disabled);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDontAsk() {
+         return StarterPreferenceUtil.isDontAskForFileStarter();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setDontAsk(boolean dontAsk) {
+         StarterPreferenceUtil.setDontAskForFileStarter(dontAsk);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSelectedId() {
+         return StarterPreferenceUtil.getSelectedFileStarterID();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void setSelectedId(String id) {
+         StarterPreferenceUtil.setSelectedFileStarterID(id);
+      }
    }
 
    /**
