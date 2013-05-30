@@ -2505,4 +2505,23 @@ public final class SymbolicExecutionUtil {
          return false;
       }
    }
+   
+   /**
+    * Returns the path to the source file defined by the given {@link PositionInfo}.
+    * @param posInfo The {@link PositionInfo} to extract source file from.
+    * @return The source file name or {@code null} if not available.
+    */
+   public static String getSourcePath(PositionInfo posInfo) {
+      String result = null;
+      if (posInfo.getFileName() != null) {
+         result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
+      }
+      else if (posInfo.getParentClass() != null) {
+         result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
+      }
+      if (result != null && result.startsWith("FILE:")) {
+         result = result.substring("FILE:".length());
+      }
+      return result;
+   }
 }
