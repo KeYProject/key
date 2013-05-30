@@ -15,6 +15,7 @@ package org.key_project.util.test.util;
 
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1461,6 +1462,27 @@ public class TestUtilsUtil {
       while (!ui.getMediator().autoMode()) {
          sleep(10);
       }
+   }
+   
+   /**
+    * Opens the view available under the given path in the "Show View" dialog.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param pathInOpenViewDialog The path to the view in the "Show View" dialog.
+    * @return The opened {@link SWTBotView}.
+    */
+   public static SWTBotView openView(SWTWorkbenchBot bot, String... pathInOpenViewDialog) {
+      assertNotNull(pathInOpenViewDialog);
+      assertTrue(pathInOpenViewDialog.length >= 1);
+      // Open view
+      bot.menu("Window").menu("Show View").menu("Other...").click();
+      SWTBotShell shell = bot.shell("Show View");
+      TestUtilsUtil.selectInTree(shell.bot().tree(), pathInOpenViewDialog);
+      shell.bot().button("OK").click();
+      // Find opened view
+      SWTBotView viewBot = bot.viewByTitle(pathInOpenViewDialog[pathInOpenViewDialog.length - 1]);
+      viewBot.show();
+      viewBot.setFocus();
+      return viewBot;
    }
 
    /**

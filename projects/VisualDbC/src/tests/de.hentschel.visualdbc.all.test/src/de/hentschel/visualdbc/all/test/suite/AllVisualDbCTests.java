@@ -25,7 +25,6 @@ import de.hentschel.visualdbc.example.test.suite.AllExampleTests;
 import de.hentschel.visualdbc.generation.test.suite.AllGenerationTests;
 import de.hentschel.visualdbc.generation.ui.test.suite.AllGenerationUiTests;
 import de.hentschel.visualdbc.interactive.proving.ui.test.suite.AllInteractiveProvingUiTests;
-import de.hentschel.visualdbc.key.ui.test.suite.AllKeYUiTests;
 
 /**
  * <p>
@@ -50,8 +49,7 @@ import de.hentschel.visualdbc.key.ui.test.suite.AllKeYUiTests;
    AllKeyDataSourceTests.class,
    AllDiagramCustomTests.class,
    AllInteractiveProvingUiTests.class,
-   AllExampleTests.class,
-   AllKeYUiTests.class
+   AllExampleTests.class
 })
    // TODO: Add unit 3 suite DbcModelAllTests
 public class AllVisualDbCTests {
