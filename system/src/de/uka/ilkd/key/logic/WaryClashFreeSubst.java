@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.logic;
@@ -33,13 +33,13 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /** variables occurring within the original term and within the
      * term to be substituted */
     private ImmutableSet<QuantifiableVariable> warysvars            = null;
-   
+
     public WaryClashFreeSubst ( QuantifiableVariable v, Term s ) {
 	super ( v, s );
 	warysvars = null;
     }
 
-    /** 
+    /**
      * substitute <code>s</code> for <code>v</code> in <code>t</code>,
      * avoiding collisions by replacing bound variables in
      * <code>t</code> if necessary.
@@ -58,7 +58,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	} finally { --depth; }
 
 	if ( createQuantifier && depth == 0 ) res = addWarySubst ( res );
-    
+
 	return res;
     }
 
@@ -76,7 +76,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
 	vcv   = new VariableCollectVisitor ();
 	t.execPostOrder ( vcv );
-	warysvars = warysvars.union ( vcv.vars () );	
+	warysvars = warysvars.union ( vcv.vars () );
     }
 
     /**
@@ -86,7 +86,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     private void createVariable () {
 	if ( !createQuantifier ) {
 	    createQuantifier = true;
-	    
+
 	    if ( getSubstitutedTerm ().freeVars ().contains ( getVariable () ) )
                 // in this case one might otherwise get collisions, as the
                 // substitution might be carried out partially within the scope
@@ -95,7 +95,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	    else
 	        newVar = getVariable ();
 	    newVarTerm = TB.var ( newVar );
-	}	
+	}
     }
 
     /**
@@ -109,7 +109,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	// don't move to a different modality level
 	if ( !getSubstitutedTerm ().isRigid () ) {
 	    if ( t.op () instanceof Modality )
-		return applyOnModality ( t );		
+		return applyOnModality ( t );
 	    if ( t.op () instanceof UpdateApplication )
 		return applyOnUpdate   ( t );
 	}
@@ -139,14 +139,15 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * PRECONDITION: <code>warysvars != null</code>
      */
     private Term applyOnUpdate ( Term t ) {
-        
+
 	// only the last child is below the update
 	final Term target = UpdateApplication.getTarget ( t );
 	if ( !target.freeVars ().contains ( getVariable () ) )
 	    return super.apply1 ( t );
 
 	final Term[] newSubterms = new Term[t.arity()];
-	final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+	@SuppressWarnings("unchecked")
+    final ImmutableArray<QuantifiableVariable>[] newBoundVars =
 	    new ImmutableArray[t.arity()];
 
 	for ( int i = 0; i < t.arity (); i++ ) {
@@ -186,7 +187,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     }
 
     /**
-     * Rename the original variable to be substituted to <code>newVar</code> 
+     * Rename the original variable to be substituted to <code>newVar</code>
      */
     private Term substWithNewVar (Term t) {
         createVariable ();

@@ -68,7 +68,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
 -&gt;   array.length &lt;= i
    &amp; (  i_0 &gt;= 0
       &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;result_1_0&apos; as result of ArraySumWhile.sum(array);&gt;" isReturnValueComputed="true">
+         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false" isReturnValueComputed="false">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   array.length &lt;= i

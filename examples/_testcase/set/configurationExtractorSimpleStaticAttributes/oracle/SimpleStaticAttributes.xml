@@ -9,9 +9,7 @@
                      <branchCondition name="!SimpleStaticAttributes.finalInstance = null" pathCondition="  !newInstance = null
 &amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="true" branchCondition="!SimpleStaticAttributes.finalInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <methodReturn name="&lt;return of SimpleStaticAttributes.compute(newInstance);&gt;" pathCondition="  !newInstance = null
-&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  43
-+ newInstance.x
-+ SimpleStaticAttributes.finalInstance.x&apos; as result of SimpleStaticAttributes.compute(newInstance);&gt;" isReturnValueComputed="true">
+&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" isReturnValueComputed="false">
                            <termination name="&lt;end&gt;" pathCondition="  !newInstance = null
 &amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>

@@ -244,7 +244,7 @@
                            </variable>
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                         <variable name="i" arrayIndex="-1" isArrayIndex="false">
                            <value name="i {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="value" arrayIndex="-1" isArrayIndex="false">
@@ -503,7 +503,7 @@
                                              <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
-                                          <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;18&apos; as result of self.main(param);&gt;" isReturnValueComputed="true">
+                                          <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="a" arrayIndex="-1" isArrayIndex="false">

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -88,7 +88,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return filterAppliedContracts(collectedContracts, block, goal);
     }
-    
+
     private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
                                                                       final StatementBlock block,
                                                                       final Goal goal)
@@ -120,7 +120,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return false;
     }
-    
+
     private BlockContractRule() {
     }
 
@@ -210,7 +210,7 @@ public class BlockContractRule implements BuiltInRule {
 
     private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final boolean isStrictlyPure, final Services services)
     {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
+        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         if (!isStrictlyPure) {
             for (LocationVariable variable : variables) {
                 final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());

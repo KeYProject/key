@@ -14,7 +14,7 @@
                                     <statement name="this.next.instanceWrapper=new InstanceCreationTestWrapper (3);" pathCondition="!self.next = null" pathConditionChanged="false">
                                        <methodCall name="InstanceCreationTestWrapper(var_2);" pathCondition="!self.next = null" pathConditionChanged="false">
                                           <statement name="this.value=var_2;" pathCondition="!self.next = null" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_2);&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var_2);&gt;" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_2);&gt;" pathCondition="!self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                 <statement name="InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);" pathCondition="!self.next = null" pathConditionChanged="false">
                                                    <methodCall name="InstanceCreationTestWrapper(var_3);" pathCondition="!self.next = null" pathConditionChanged="false">
                                                       <statement name="this.value=var_3;" pathCondition="!self.next = null" pathConditionChanged="false">
@@ -55,7 +55,7 @@
                                  </branchCondition>
                                  <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute();&gt;" isReturnValueComputed="true">
+                                       <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
                                           <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
                                           </termination>
                                        </methodReturn>

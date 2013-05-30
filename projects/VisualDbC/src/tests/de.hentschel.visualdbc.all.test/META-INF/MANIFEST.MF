@@ -14,8 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  de.hentschel.visualdbc.generation.ui.test;bundle-version="1.0.0",
  de.hentschel.visualdbc.dbcmodel.diagram.custom.test;bundle-version="1.0.0",
  de.hentschel.visualdbc.interactive.proving.ui.test;bundle-version="1.0.0",
- de.hentschel.visualdbc.example.test;bundle-version="1.0.0",
- de.hentschel.visualdbc.key.ui.test;bundle-version="1.0.0"
+ de.hentschel.visualdbc.example.test;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Martin Hentschel

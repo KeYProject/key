@@ -151,6 +151,7 @@ UNION : "\\set_union";
 INTERSECT : "\\intersect";
 SETMINUS : "\\set_minus";
 ALLFIELDS : "\\all_fields";
+ALLOBJECTS : "\\all_objects";
 UNIONINF: "\\infinite_union";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";
