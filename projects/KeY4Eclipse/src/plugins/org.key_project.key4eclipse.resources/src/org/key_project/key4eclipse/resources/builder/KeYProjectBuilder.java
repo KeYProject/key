@@ -18,8 +18,6 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
 
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
    
-   private ProofManager proofManager;
-   
    /**
     * {@inheritDoc}
     */
@@ -27,18 +25,24 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IResourceDelta delta = getDelta(getProject());
       if (delta != null) {
-         try{
+         ProofManager proofManager = null;
+         try {
             proofManager = new ProofManager(getProject());
-            if(!KeYProjectProperties.isEnableEfficientProofManagement(getProject())) {
+            if (!KeYProjectProperties.isEnableEfficientProofManagement(getProject())) {
                proofManager.runAllProofs(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
             }
-            else{
+            else {
                //Do not use. Not working right now.
-               runProofsEfficient(delta);
+               runProofsEfficient(proofManager, delta);
             }
-            
-         } catch (Exception e){
+         }
+         catch (Exception e){
            LogUtil.getLogger().createErrorStatus(e);
+         }
+         finally {
+            if (proofManager != null) {
+               proofManager.dispose();
+            }
          }
       }
       return null;
@@ -50,6 +54,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     */
    @Override
    protected void clean(IProgressMonitor monitor) throws CoreException {
+      ProofManager proofManager = null;
       try {
          proofManager = new ProofManager(getProject());
          proofManager.clean(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
@@ -58,10 +63,15 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       catch (Exception e) {
          LogUtil.getLogger().createErrorStatus(e);
       }
+      finally {
+         if (proofManager != null) {
+            proofManager.dispose();
+         }
+      }
    }
    
    
-   private void runProofsEfficient(IResourceDelta delta) throws Exception{      
+   private void runProofsEfficient(ProofManager proofManager, IResourceDelta delta) throws Exception{      
       KeYProjectResourceDeltaVisitor deltaVisitor = new KeYProjectResourceDeltaVisitor();
       delta.accept(deltaVisitor);
       
@@ -72,19 +82,19 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          try{
             switch(aDelta.getKind()){
             case IResourceDelta.ADDED:
-               file = handleAdded(aDelta.getResource());
+               file = handleAdded(proofManager, aDelta.getResource());
                if(file != null && !deltasFiles.contains(file)){
                   deltasFiles.add(file);
                }
                break;
             case IResourceDelta.REMOVED:
-               file = handleRemoved(aDelta.getResource());
+               file = handleRemoved(proofManager, aDelta.getResource());
                if(file != null && !deltasFiles.contains(file)){
                   deltasFiles.add(file);
                }
                break;
             case IResourceDelta.CHANGED:
-               file = handleChanged(aDelta.getResource());
+               file = handleChanged(proofManager, aDelta.getResource());
                if(file != null && !deltasFiles.contains(file)){
                   deltasFiles.add(file);
                }
@@ -100,10 +110,11 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    
    /**
     * Handles the proofManagement for added {@link IResource}s
+    * @param proofManager The {@link ProofManager} to use.
     * @param res - the added {@link IResource}
     * @throws Exception
     */
-   private IFile handleAdded(IResource res) throws Exception{
+   private IFile handleAdded(ProofManager proofManager, IResource res) throws Exception{
       if(res.exists()){
          IPath resourcePath = res.getFullPath();
          IPath proofFolderPath = res.getProject().getFullPath().append("Proofs");
@@ -130,10 +141,11 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    
    /**
     * Handles the proofManagement for removed {@link IResource}s
+    * @param proofManager The {@link ProofManager} to use.
     * @param res - the removed {@link IResource}
     * @throws Exception
     */
-   private IFile handleRemoved(IResource res) throws Exception{
+   private IFile handleRemoved(ProofManager proofManager, IResource res) throws Exception{
       
       //removedResoure is a File
       if(res.getType() == IResource.FILE){
@@ -154,10 +166,11 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    
    /**
     * Handles the proofManagement for changed {@link IResource}s
+    * @param proofManager The {@link ProofManager} to use.
     * @param res - the changed {@link IResource}
     * @throws Exception
     */
-   private IFile handleChanged(IResource res) throws Exception{
+   private IFile handleChanged(ProofManager proofManager, IResource res) throws Exception{
       if(res.exists()){
          //changedResoure is a File
          if(res.getType() == IResource.FILE){

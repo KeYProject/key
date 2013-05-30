@@ -56,6 +56,7 @@ public class ProofManager {
    private MarkerManager markerManager;
    private IFolder mainProofFolder;
    private IProject project;   
+   private List<Proof> proofs = new LinkedList<Proof>();
    
    /**
     * The Constructor - sets up the {@link MarkerManager}, the main Proof{@link IFolder} and tries 
@@ -77,6 +78,18 @@ public class ProofManager {
       catch (ProblemLoaderException e) {
          handleProblemLoaderException(e);
          throw e;
+      }
+   }
+   
+   /**
+    * Disposes this {@link ProofManager}.
+    */
+   public void dispose() {
+      if (environment != null) {
+         environment.dispose();
+      }
+      for (Proof proof : proofs) {
+         proof.dispose();
       }
    }
    
@@ -374,6 +387,7 @@ public class ProofManager {
    private Proof createProof(ProofOblInput obl){
       try{
          Proof proof = environment.createProof(obl);
+         proofs.add(proof);
          environment.getUi().startAndWaitForAutoMode(proof);
          return proof;
       }catch(ProofInputException e){
@@ -390,10 +404,13 @@ public class ProofManager {
     */
    private Proof loadProof(File file){
       try{
-         environment = KeYEnvironment.load(file, null, null);
+         KeYEnvironment<?> environment = KeYEnvironment.load(file, null, null);
          Proof proof = environment.getLoadedProof();
-         if(!proof.closed()){
-            environment.getUi().startAndWaitForAutoMode(proof);
+         if (proof != null) {
+            proofs.add(proof);
+            if (!proof.closed()){
+               environment.getUi().startAndWaitForAutoMode(proof);
+            }
          }
          return proof;
       }catch(ProblemLoaderException e){
