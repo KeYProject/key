@@ -5,9 +5,6 @@ import java.util.LinkedList;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.key_project.keyide.ui.providers.BranchFolder;
-
-import de.uka.ilkd.key.proof.Node;
 
 public class TreeViewerIterator {
 

@@ -37,7 +37,6 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 public class OutlineContentAndLabelProviderTest extends TestCase {
-   // TODO Comments
    /**
     * Creates a proof and the viewer of the proof for the tests.
     * @throws Exception

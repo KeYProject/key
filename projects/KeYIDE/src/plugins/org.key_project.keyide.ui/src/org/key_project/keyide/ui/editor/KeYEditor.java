@@ -3,10 +3,7 @@ package org.key_project.keyide.ui.editor;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,6 +29,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
+import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategyPropertiesView;
@@ -39,14 +37,11 @@ import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -154,23 +149,24 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    protected void doSetInput(IEditorInput input) throws CoreException {
       try {
          super.doSetInput(input);
-         if (input instanceof ProofEditorInput) {
-            ProofEditorInput in = (ProofEditorInput) input;
-            this.proof = in.getProof();
-            this.environment = in.getEnvironment();
-            // TODO: Environment updaten.
+         if (this.environment == null || this.proof == null) {
+            if (input instanceof ProofEditorInput) {
+               ProofEditorInput in = (ProofEditorInput) input;
+               this.proof = in.getProof();
+               this.environment = in.getEnvironment();
+            }
+            else if (input instanceof FileEditorInput) {
+               FileEditorInput fileInput = (FileEditorInput) input;
+               File file = ResourceUtil.getLocation(fileInput.getFile());
+               Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
+               this.environment = KeYEnvironment.load(file, null, null);
+               this.environment.getMediator().setStupidMode(true);
+               Assert.isTrue(getKeYEnvironment().getLoadedProof() != null, "No proof loaded.");
+               this.proof = getKeYEnvironment().getLoadedProof();
+            }
          }
-         else if (input instanceof FileEditorInput) {
-            FileEditorInput fileInput = (FileEditorInput) input;
-            File file = ResourceUtil.getLocation(fileInput.getFile());
-            Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
-            // TODO: After save as the editor should be restored when eclipse is
-            // reopened.
-            Assert.isTrue(this.environment == null, "Environment already exist.");
-            this.environment = KeYEnvironment.load(file, null, null);
-            this.environment.getMediator().setStupidMode(true);
-            Assert.isTrue(getKeYEnvironment().getLoadedProof() != null, "No proof loaded.");
-            this.proof = getKeYEnvironment().getLoadedProof();
+         else {
+            setShowNode(showNode);
          }
       }
       catch (Exception e) {
@@ -251,13 +247,6 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       }
       dialog.create();
       dialog.open();
-      // TODO: Funktionalität nutzen um dateiendung zu definieren
-      // TODO: Container = IMethod's container
-      // TODO: Name = Name des beweises
-      
-
-            
-      
       IPath path = dialog.getResult();
       save(path);
    }
@@ -287,59 +276,21 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       else{
          doSaveAs();
       }
-      
-      //         IPath path = new Path(savedFile.getPath());
-//         save(path);
-//      }
    }
 
    
    private void save(IPath path){
+      try{
       if(path != null){         
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-         String name = file.getLocation().toOSString();
-         // Create proof file content
-         // TODO: Refactor functionality to save a Proof into an IFile into a static utility method of KeYUtil#saveProof(Proof proof, IFile) and use this method also in SaveProofHandler
-         ProofSaver saver = new ProofSaver(showNode.proof(), name, Main.INTERNAL_VERSION);
-         ByteArrayOutputStream out = new ByteArrayOutputStream();
-         try {
-            String errorMessage = saver.save(out);
-            if (errorMessage != null) {
-               throw new CoreException(LogUtil.getLogger().createErrorStatus(errorMessage));
-            }
-            // Save proof file content
-            if (file.exists()) {
-               file.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
-            }
-            else {
-               file.create(new ByteArrayInputStream(out.toByteArray()), true, null);
-            }
+         KeYIDEUtil.saveProof(showNode.proof(), file);
+         setDirtyFlag(false);
+         FileEditorInput fileInput = new FileEditorInput(file);
+         doSetInput(fileInput);
          }
-         catch (IOException e){
-            // TODO: Only one try catch in this method
-            LogUtil.getLogger().logError(e);
-            LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
-         }
-         catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-         
-         setDirtyFlag(false);   
       
-         
-         if(getEditorInput() instanceof ProofEditorInput){ // TODO: Always
-            FileEditorInput fileInput = new FileEditorInput(file);
-            try {
-//               this.proof = ((ProofEditorInput)getEditorInput()).getProof();
-//               this.environment = ((ProofEditorInput)getEditorInput()).getEnvironment();
-               doSetInput(fileInput);
-            }
-            catch (CoreException e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-            }
-         }
+      } catch (Exception e) {
+         LogUtil.getLogger().createErrorStatus(e);
       }
       
    }
@@ -363,6 +314,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     */
    public void setShowNode(Node showNode) {
       this.showNode=showNode;
+      getKeYEnvironment().getMediator().setStupidMode(true);
       textViewer.setDocumentForNode(showNode, getKeYEnvironment().getMediator());
       if(showNode.getAppliedRuleApp() != null){
          PosInOccurrence posInOcc = showNode.getAppliedRuleApp().posInOccurrence();

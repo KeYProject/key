@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -33,58 +32,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
    private Viewer viewer;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    private Proof proof;
-   private Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();
-   
-   /**
-    * The ProofTreeListener
-    */
-   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
-      @Override
-      public void proofExpanded(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofIsBeingPruned(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofPruned(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofStructureChanged(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofClosed(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofGoalRemoved(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofGoalsAdded(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void proofGoalsChanged(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }
-
-      @Override
-      public void smtDataUpdate(ProofTreeEvent e) {
-//         updateNodes(e); // TODO: Is this required, if not remove
-      }      
-   };
-   
+   private Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();   
    
    
    /**
@@ -108,14 +56,10 @@ public class ProofTreeLabelProvider extends LabelProvider {
     * @param environment
     * @param proof
     */
-   // TODO Comment
    public ProofTreeLabelProvider(Viewer viewer, KeYEnvironment<?> environment, Proof proof) {
       super();
       this.viewer = viewer;
       this.proof = proof;
-      if (proof != null) {
-         proof.addProofTreeListener(proofTreeListener);
-      }
       if (environment != null) {
          environment.getMediator().addAutoModeListener(autoModeListener);
       }
@@ -127,7 +71,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
     */
    protected void updateLeafs(ProofEvent e) {
       final List<Object> possibleChangedLeaves = new LinkedList<Object>();
-      proof.breadthFirstSearch(proof.root(), new ProofVisitor() { // TODO: Implement event Goal removed in the future in KeY to remove this iteration with a direct backward iteration from the closed leaf node on which the goal was removed.
+      proof.breadthFirstSearch(proof.root(), new ProofVisitor() {
          @Override
          public void visit(Proof proof, Node visitedNode) {
             if (visitedNode.isClosed()) {
@@ -158,9 +102,6 @@ public class ProofTreeLabelProvider extends LabelProvider {
    @Override
    public void dispose() {
       super.dispose();
-      if (proof != null) {
-         proof.removeProofTreeListener(proofTreeListener);
-      }
       if (environment != null) {
          environment.getMediator().removeAutoModeListener(autoModeListener);
       }

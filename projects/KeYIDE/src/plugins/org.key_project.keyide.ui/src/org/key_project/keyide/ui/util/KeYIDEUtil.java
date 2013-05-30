@@ -1,12 +1,16 @@
 package org.key_project.keyide.ui.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -17,12 +21,10 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.services.IEvaluationService;
 import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
@@ -43,11 +45,13 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -89,8 +93,6 @@ public class KeYIDEUtil {
                                           // Open selection dialog
                                           Proof proof = openDialog(operationContracts, environment);
                                           environment.getMediator().setProof(proof);
-                                          //TODO: Stupid Mode wirklich hier?
-                                          environment.getMediator().setStupidMode(true); // TODO: In Editor nicht hier
                                           //Open proof in Editor if correctly selected
                                           if(proof != null){
                                              KeYIDEUtil.openEditor(proof, environment, method);
@@ -249,5 +251,32 @@ public class KeYIDEUtil {
          }
       }
       return switchPerspective;
+   }
+   
+   
+   /**
+    * Saves the given {@link Proof} into the given {@link IFile}
+    * @param proof - the {@link Proof} to be stored
+    * @param file - the {@link IFile} to store the {@link Proof} at
+    * @throws CoreException
+    * @throws IOException
+    */
+   public static void saveProof(Proof proof, IFile file) throws CoreException, IOException{
+      String name = file.getLocation().toOSString();
+      // Create proof file content
+      ProofSaver saver = new ProofSaver(proof, name, Main.INTERNAL_VERSION);
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      
+         String errorMessage = saver.save(out);
+         if (errorMessage != null) {
+            throw new CoreException(LogUtil.getLogger().createErrorStatus(errorMessage));
+         }
+         // Save proof file content
+         if (file.exists()) {
+            file.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
+         }
+         else {
+            file.create(new ByteArrayInputStream(out.toByteArray()), true, null);
+         }
    }
 }

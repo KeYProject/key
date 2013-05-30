@@ -8,10 +8,6 @@ import de.uka.ilkd.key.proof.Node;
 
 public class PruneProofTester extends PropertyTester {
 
-   public PruneProofTester() {
-      // TODO Auto-generated constructor stub
-   }
-
    @Override
    public boolean test(Object receiver, String property, Object[] args,
          Object expectedValue) {
