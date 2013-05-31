@@ -99,10 +99,10 @@ public class ProofManager {
 
    /**
     * Runs all {@link Proof}s available in the {@link IProject} and saves them into the proof{@link IFolder}.
-    * @param autoDisableProofFiles - enables or disables the automatically proof{@link IFile} deletion
+    * @param autoDeleteProofFiles - enables or deletes the automatically proof{@link IFile} deletion
     * @throws Exception
     */
-   public void runAllProofs(boolean autoDisableProofFiles) throws Exception{
+   public void runAllProofs(boolean autoDeleteProofFiles) throws Exception{
       LinkedList<ProofElement> proofElements = getAllProofElements();
       LinkedList<IFile> javaFiles = getAllJavaFilesFromProofElements(proofElements);
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
@@ -118,13 +118,13 @@ public class ProofManager {
             KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
             
             ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
-            metaFileWriter.writeMetaFile(proofFile, proof, environment);
+            IFile metaFile = metaFileWriter.writeMetaFile(proofFile, proof, environment);
+            proofFiles.add(metaFile);
          }
       }
-      if(autoDisableProofFiles){
+      if(autoDeleteProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
       }
-      printMetaToJavaFileTest();
    }
    
 
@@ -188,6 +188,65 @@ public class ProofManager {
    }
    
    
+   public void runProofsSelective(LinkedList<IFile> changedJavaFiles, boolean autoDeleteProofFiles) throws Exception{
+      LinkedList<IFile> proofFiles = new LinkedList<IFile>();
+      LinkedList<ProofElement> proofElements = getAllProofElements();
+      for(ProofElement pe : proofElements){
+         //check if Proof exists
+         boolean runProof = false;
+         IFolder proofFolder = createProofFolder(pe.getJavaFile());
+         IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
+         IFile metaFile = getProofMetaFile(proofFile); 
+         if(proofFile.exists() && metaFile.exists()){
+            ProofMetaFileReader pmfr = new ProofMetaFileReader();
+            pmfr.readProofMetaFile(metaFile);
+            int metaFilesProofHashCode = pmfr.getProofFileHashCode();
+            int proofFileHasCode = proofFile.hashCode();
+            if(proofFileHasCode != metaFilesProofHashCode){
+               runProof = true;
+            }
+         }
+         else{ 
+            runProof = true;
+         }
+         if(!runProof){
+            ProofMetaFileReader pmfr = new ProofMetaFileReader();
+            pmfr.readProofMetaFile(metaFile);
+            LinkedHashSet<String> kjts = pmfr.getTypes();
+            LinkedList<IType> javaTypes = collectAllJavaITypes();
+            for(String kjt : kjts){
+               IFile javaFile = getJavaFileForType(kjt, javaTypes);
+               if(changedJavaFiles.contains(javaFile)){
+                  runProof = true;
+                  break;
+               }
+            }
+         }
+         if(runProof){
+            //check the case if the sourceLocation is null!!
+            markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
+            
+            Proof proof = processProof(pe.getProofObl(), proofFile);
+            markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+            if(proof != null){
+               KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
+               
+               ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
+               metaFile = metaFileWriter.writeMetaFile(proofFile, proof, environment);
+            }
+         }
+         //add to proofFileList
+         if(autoDeleteProofFiles){
+            proofFiles.add(proofFile);
+            proofFiles.add(getProofMetaFile(proofFile));
+         }
+      }
+      if(autoDeleteProofFiles){
+         cleanProofFolder(proofFiles, mainProofFolder);  
+      }
+   }
+   
+   
    /**
     * Deletes the main Proof{@link IFolder} and runs all {@link Proof}s for the {@link IProject}.
     * @throws Exception
@@ -224,39 +283,6 @@ public class ProofManager {
    
    
    /**
-    * Cleans the proof{@link IFolder} selective. Just the {@link IFolder} in which proof{@link IFiles} 
-    * were created, changed or removed will be cleaned.
-    * @param proofElementsByFile - the files to keep
-    */
-   private void cleanProofFolderSelective(LinkedList<LinkedList<ProofElement>> proofElementsByFile){
-//      for(LinkedList<ProofElement> pel : proofElementsByFile){
-//         ProofElement proofElement = pel.get(0);
-//         IFolder proofFolder = null;
-//         LinkedList<IFile> proofFiles = new LinkedList<IFile>();
-//         if(proofElement.hasProof()){
-//            IContainer container = proofElement.getProofFile().getParent();
-//            if(container.getType() == IResource.FOLDER){
-//               proofFolder = (IFolder) container;
-//               for(ProofElement pe : pel){
-//                  proofFiles.add(pe.getProofFile());
-//               }
-//            }
-//            
-//         }
-//         else{
-//            proofFolder = getProofFolderForJavaFile(proofElement.getJavaFile());
-//         }
-//         //delete proof files which don't belong to any method
-//         try{
-//            deleteUnnecessaryProofFiles(proofFolder, proofFiles);
-//         } catch (CoreException e){
-//            LogUtil.getLogger().createErrorStatus(e);
-//         }
-//      }
-   }
-   
-   
-   /**
     * Deletes the given {@link IResource} and every empty {@link IFolder} above.
     * @param res - the {@link IResource} to be deleted
     * @throws CoreException
@@ -269,39 +295,6 @@ public class ProofManager {
             IFolder folder = (IFolder) container;
             deleteUnnecessaryFolders(folder);
          }
-      }
-   }
-   
-   
-   /**
-    * Deletes the Proof-{@link IFolder} for the given Java-{@link IResource}.
-    * @param res - the Java-{@link IResource}
-    * @throws CoreException
-    */
-   public void deleteProofFolderForJavaFile(IResource res) throws CoreException{
-      IFolder folder = getProofFolderForJavaFile(res);
-      deleteResource(folder);
-   }
-
-   
-   /**
-    * Deletes all not longer required Proof-{@link IFile}s from the given {@link IFolder}. After that all empty {@link IFolder}s above will be deleted.
-    * @param folder - the Proof-{@link IFolder}
-    * @param files - the {@link IFile}s to keep
-    * @throws CoreException
-    */
-   private void deleteUnnecessaryProofFiles(IFolder folder, LinkedList<IFile> files) throws CoreException{
-      IResource[] members = folder.members();
-      for(IResource member : members){
-         if(member.getType() == IResource.FILE){
-            if(!files.contains(member)){
-               member.delete(true, null);
-            }
-         }
-      }
-      members = folder.members();
-      if(members.length == 0){
-         deleteUnnecessaryFolders(folder);
       }
    }
    
@@ -432,6 +425,15 @@ public class ProofManager {
    }
    
    
+   private IFile getProofMetaFile(IFile proofFile){
+      IPath proofFilePath = proofFile.getFullPath();
+      IPath proofMetaFilePath = proofFilePath.addFileExtension("meta");
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFile proofMetaFile = root.getFile(proofMetaFilePath);
+      return proofMetaFile;
+   }
+   
+   
    /**
     * Replaces invalid characters in the given {@link String} with '_' and returns a valid {@link String}.
     * @param str - the {@link String} to be made valid.
@@ -449,26 +451,6 @@ public class ProofManager {
          }
       }
       return str;
-   }
-   
-   
-   /**
-    * Returns the Proof-{@link IFolder} for a given Java-{@link IResource}
-    * @param res - the given Java-{@link IResource}
-    * @return - the Proof-{@link IFolder}
-    */
-   private IFolder getProofFolderForJavaFile(IResource res){
-      IPath proofFolderPath = mainProofFolder.getFullPath();
-      IPath innerProofFolderPath = javaToProofPath(res.getFullPath());
-      proofFolderPath = proofFolderPath.append(innerProofFolderPath);
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFolder folder = root.getFolder(proofFolderPath);
-      if(folder.exists()){
-         return folder;
-      }
-      else{
-         return null;
-      }
    }
    
    
@@ -573,64 +555,6 @@ public class ProofManager {
    }
    
    
-   private void printMetaToJavaFileTest() throws CoreException, SAXException, IOException, ParserConfigurationException{
-      ProofMetaFileReader metaFileReader = new ProofMetaFileReader();
-      LinkedList<IFile> metaFiles = collectAllMetaFiles();
-      LinkedList<IType> allJavaTypes = collectAllJavaITypes();
-      for(IFile metaFile : metaFiles){
-         System.out.println("METAFILE: " + metaFile.getFullPath());
-         metaFileReader.readProofMetaFile(metaFile);
-         LinkedHashSet<String> types = metaFileReader.getTypes();
-         for(String type : types){
-            IFile javaFileForType = getJavaFileForType(type, allJavaTypes);
-            System.out.println(javaFileForType.exists());
-            System.out.println(javaFileForType.getFullPath());
-         }
-      }
-   }
-   
-   
-   private LinkedList<IFile> collectAllMetaFiles() throws CoreException{
-      LinkedList<IFile> metaFiles = new LinkedList<IFile>();
-      IResource[] members = mainProofFolder.members();
-      if(members.length != 0){
-         for(IResource member : members){
-            if(member.getType() == IResource.FOLDER){
-               IFolder folder = (IFolder) member;
-               metaFiles.addAll(collectMetaFilesForFolder(folder));
-            }
-            else if(member.getType() == IResource.FILE){
-               IFile file = (IFile) member;
-               if(file.getFileExtension() == "meta"){
-                  metaFiles.add(file);
-               }
-            }
-         }
-      }
-      return metaFiles;
-   }
-   
-   private LinkedList<IFile> collectMetaFilesForFolder(IFolder folder) throws CoreException{
-      LinkedList<IFile> metaFiles = new LinkedList<IFile>();
-      IResource[] members = folder.members();
-      if(members.length != 0){
-         for(IResource member : members){
-            if(member.getType() == IResource.FOLDER){
-               IFolder subFolder = (IFolder) member;
-               metaFiles.addAll(collectMetaFilesForFolder(subFolder));
-            }
-            else if(member.getType() == IResource.FILE){
-               IFile file = (IFile) member;
-               if(file.getFileExtension().equalsIgnoreCase("meta")){
-                  metaFiles.add(file);
-               }
-            }
-         }
-      }
-      return metaFiles;
-   }
-   
-   
    private IFile getJavaFileForType(String metaType, LinkedList<IType> typeList) throws JavaModelException{
       for(IType iType : typeList){
          String typeName = iType.getFullyQualifiedName('.');
@@ -672,42 +596,4 @@ public class ProofManager {
       }
       return types;
    }
-   
-//   private IFile checkTypes(IType[] types, String metaType) throws JavaModelException{
-//      IFile javaFile = null;
-//      for(IType type : types){
-//         String typeName = type.getFullyQualifiedName('.');
-//         if(typeName.equalsIgnoreCase(metaType)){
-//            IPath filePath = type.getResource().getFullPath();
-//            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(filePath);
-//            return javaFile;
-//         }
-//         else{
-//            IType[] subTypes = type.getTypes();
-//            if(subTypes.length != 0){
-//               javaFile = checkTypes(subTypes, metaType);
-//            }
-//         }
-//      }
-//      return javaFile;
-//   }
-   
-   
-//   private IFile getJavaFileForType(String type){
-//      IPath javaFilePath = project.getFullPath().append("src");
-//      
-//      StringBuffer sb = new StringBuffer(type);
-//      String segment = null;
-//      int splitIndex = sb.indexOf(".");
-//      while(splitIndex != -1){
-//         segment = sb.substring(0, splitIndex);
-//         sb.delete(0, splitIndex+1);
-//         splitIndex = sb.indexOf(".");
-//         javaFilePath = javaFilePath.append(segment);
-//      }
-//      javaFilePath = javaFilePath.append(sb.toString()).addFileExtension("java");
-//      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-//      IFile javaFile = root.getFile(javaFilePath);
-//      return javaFile;
-//   }
 }

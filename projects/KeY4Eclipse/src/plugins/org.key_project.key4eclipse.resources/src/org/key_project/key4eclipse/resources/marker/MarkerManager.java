@@ -71,6 +71,36 @@ public class MarkerManager {
       }
    }
    
+   private LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
+      LinkedList<IMarker> markerList = new LinkedList<IMarker>();
+      markerList.addAll(markerArrayToList(res.findMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
+      markerList.addAll(markerArrayToList(res.findMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
+      return markerList;
+   }
+   
+   private LinkedList<IMarker> markerArrayToList(IMarker[] markerArr){
+      LinkedList<IMarker> markerList = new LinkedList<IMarker>();
+      for(IMarker marker : markerArr){
+         markerList.add(marker);
+      }
+      return markerList;
+   }
+   
+   
+   public void deleteMarkerForSourceLocation(IFile javaFile, SourceLocation scl) throws CoreException{
+      if(scl != null){
+         LinkedList<IMarker> markerList = getAllKeYMarker(javaFile);
+         for(IMarker marker : markerList){
+            Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+            Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+            if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
+               marker.delete();
+               return;
+            }
+         }
+      }
+   }
+   
    
    /**
     * Removes all KeYResource {@link IMarker} from the given {@link IFile}.

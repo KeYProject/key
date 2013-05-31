@@ -37,12 +37,12 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class ProofMetaFileWriter {
-   private LinkedHashSet<KeYJavaType> addedTypes = new LinkedHashSet<KeYJavaType>();
+   private LinkedHashSet<KeYJavaType> addedTypes;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
-   public void writeMetaFile(IFile proofFile, Proof proof, KeYEnvironment<CustomConsoleUserInterface> env) throws ParserConfigurationException, TransformerException, CoreException{
+   public IFile writeMetaFile(IFile proofFile, Proof proof, KeYEnvironment<CustomConsoleUserInterface> env) throws ParserConfigurationException, TransformerException, CoreException{
       this.environment = env;
-      
+      this.addedTypes = new LinkedHashSet<KeYJavaType>();
 //      Document doc = createDoument(proofFile, proof);
       Document doc = createDocumentSimple(proofFile, proof);
       
@@ -54,6 +54,8 @@ public class ProofMetaFileWriter {
       StreamResult result = new StreamResult(metaFile);
       transformer.transform(source, result);
       metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+      metaIFile.setHidden(true);
+      return metaIFile;
    }
    
    
@@ -194,8 +196,19 @@ public class ProofMetaFileWriter {
             kjt = classAx.getKJT();
          }
          if(kjt != null){
-            kjts.add(kjt);
+            if(!kjts.contains(kjt)){
+               kjts.add(kjt);
+            }
+//            if(proofRef.getKind().equals(IProofReference.CALL_METHOD)){
+//               ImmutableList<KeYJavaType> subTypes = environment.getServices().getJavaInfo().getAllSubtypes(kjt);
+//               for(KeYJavaType subType : subTypes){
+//                  if(!kjts.contains(subType)){
+//                     kjts.add(subType);
+//                  }
+//               }
+//            }
          }
+         
       }
       
       return KeY4EclipseResourcesUtil.sortKeYJavaTypes(kjts);
