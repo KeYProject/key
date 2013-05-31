@@ -1,9 +1,7 @@
 class ForReferenceArray {
 
-  Object[] as;
-
   //@ ensures true;
-  void foo() {
+  void foo(Object[] as) {
     //@ maintaining 0 <= \index && \index <= as.length; 
     //@ decreasing as.length-\index;
     //@ assignable \strictly_nothing;

@@ -1,11 +1,9 @@
 class For implements Iterable {
 
-  int[] a;
   Trivial it;
-  For f;
 
   //@ ensures \result == (\sum int j; 0 <= j && j < a.length; a[j]);
-  int sum () {
+  int sum (int[] a) {
     int s = 0;
     int z = a.length;
 
@@ -22,7 +20,7 @@ class For implements Iterable {
     @ diverges true;
     @ ensures false;
     @*/
-  void infiniteLoop() {
+  void infiniteLoop(For f) {
     //@ maintaining \invariant_for(f);
     //@ assignable \strictly_nothing;
     for (Object o: f);
