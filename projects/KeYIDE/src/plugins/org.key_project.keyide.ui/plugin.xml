@@ -11,6 +11,15 @@
       </starter>
    </extension>
    <extension
+         point="org.key_project.key4eclipse.common.ui.fileStarter">
+      <starter
+            class="org.key_project.keyide.ui.starter.KeYIDEFileStarter"
+            description="An alternative user interface for KeY directly integrated into Eclipse."
+            id="org.key_project.keyide.ui.starter.KeYIDEFileStarter"
+            name="KeYIDE">
+      </starter>
+   </extension>
+   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="org.key_project.keyide.ui.editor.KeYEditor"
