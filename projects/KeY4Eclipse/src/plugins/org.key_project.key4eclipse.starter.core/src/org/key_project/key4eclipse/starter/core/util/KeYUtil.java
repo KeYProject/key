@@ -14,6 +14,8 @@
 package org.key_project.key4eclipse.starter.core.util;
 
 import java.awt.Component;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -28,6 +30,7 @@ import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -73,6 +76,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
@@ -1222,6 +1226,38 @@ public final class KeYUtil {
        */
       public int getCharEnd() {
          return charEnd;
+      }
+   }
+   
+   public static void saveProof(Proof proof, IPath path) throws CoreException {
+      Assert.isNotNull(proof);
+      Assert.isNotNull(path);
+      IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+      saveProof(proof, file);
+   }
+   
+   public static void saveProof(Proof proof, IFile file) throws CoreException {
+      Assert.isNotNull(proof);
+      Assert.isNotNull(file);
+      try {
+         File location = ResourceUtil.getLocation(file);
+         // Create proof file content
+         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), Main.INTERNAL_VERSION);
+         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         String errorMessage = saver.save(out);
+         if (errorMessage != null) {
+            throw new CoreException(LogUtil.getLogger().createErrorStatus(errorMessage));
+         }
+         // Save proof file content
+         if (file.exists()) {
+            file.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
+         }
+         else {
+            file.create(new ByteArrayInputStream(out.toByteArray()), true, null);
+         }
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e.getMessage(), e));
       }
    }
 }

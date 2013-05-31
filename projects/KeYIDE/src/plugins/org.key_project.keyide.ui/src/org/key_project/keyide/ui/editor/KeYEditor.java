@@ -42,11 +42,11 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
-import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -350,20 +350,19 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       }
    }
    
-   private void save(IPath path){
-      try{
-      if(path != null){         
-         IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-         KeYIDEUtil.saveProof(showNode.proof(), file);
-         setDirtyFlag(false);
-         FileEditorInput fileInput = new FileEditorInput(file);
-         doSetInput(fileInput);
+   private void save(IPath path) {
+      try {
+         if (path != null) {
+            IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+            KeYUtil.saveProof(showNode.proof(), file);
+            setDirtyFlag(false);
+            FileEditorInput fileInput = new FileEditorInput(file);
+            doSetInput(fileInput);
          }
-      
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
          LogUtil.getLogger().createErrorStatus(e);
       }
-      
    }
 
    private void setDirtyFlag(boolean dirtyFlag){
