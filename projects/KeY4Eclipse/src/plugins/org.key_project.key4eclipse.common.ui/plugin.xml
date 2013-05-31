@@ -564,5 +564,17 @@
             type="java.lang.Object">
       </propertyTester>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.ui.editors.text.TextEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+            default="false"
+            extensions="proof, key"
+            icon="icons/logo16.gif"
+            id="org.key_project.key4eclipse.common.ui.keyTextEditor"
+            name="KeY Text Editor">
+      </editor>
+   </extension>
 
 </plugin>
