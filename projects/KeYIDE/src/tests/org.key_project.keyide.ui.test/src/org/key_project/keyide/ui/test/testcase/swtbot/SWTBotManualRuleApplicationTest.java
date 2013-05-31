@@ -25,8 +25,14 @@ import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class SWTBotManualRuleApplicationTest extends TestCase {
@@ -46,7 +52,34 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testCloseFalse_ProofClosed", 
                        starter,
-                       92,
+                       new IStopCondition() {
+                          @Override
+                          public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                              return false;
+                          }
+                        
+                          @Override
+                          public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                             return !"closeFalse".equals(MiscTools.getRuleName(ruleApp)) ||
+                                    proof.openEnabledGoals().size() >= 2; // Stop before last goal is closed with closeFalse
+                          }
+                        
+                          @Override
+                          public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                              return null;
+                          }
+                        
+                          @Override
+                          public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                              return 0;
+                          }
+                        
+                          @Override
+                          public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                             return null;
+                          }
+                       },
                        28,
                        108,
                        "closeFalse",
@@ -68,7 +101,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        starter,
-                       0,
+                       null,
                        114,
                        161,
                        "assignment",
@@ -87,7 +120,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
     */
    protected void doStartProofTest(String projectName, 
                                    IStartProofTestRunnable startProofRunnable,
-                                   int numOfRulesToApplyAutomatically,
+                                   IStopCondition stopCondition,
                                    int x,
                                    int y,
                                    String ruleNameToApply,
@@ -135,9 +168,9 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          // Start auto mode if required
-         if (numOfRulesToApplyAutomatically >= 1) {
+         if (stopCondition != null) {
             StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
-            ss.setMaxSteps(numOfRulesToApplyAutomatically);
+            ss.setCustomApplyStrategyStopCondition(stopCondition);
             keyEditor.getEnvironment().getUi().startAndWaitForAutoMode(keyEditor.getCurrentProof());
          }
          // Get node to apply rule on
