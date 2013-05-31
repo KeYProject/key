@@ -71,7 +71,7 @@ public class SWTBotKeYIDEPreferencePageTest extends TestCase {
       try {
          // Close welcome view if available
          TestUtilsUtil.closeWelcomeView(bot);
-         SWTBotShell preferencePage = TestUtilsUtil.openPreferencePage(bot, "General", "Perspectives", "KeY preferences");
+         SWTBotShell preferencePage = TestUtilsUtil.openPreferencePage(bot, "KeY", "KeY Perspective");
          TestUtilsUtil.clickDirectly(preferencePage.bot().radio(radioButton));
          preferencePage.bot().button("OK").click();
          // tests if KeY Preference is set

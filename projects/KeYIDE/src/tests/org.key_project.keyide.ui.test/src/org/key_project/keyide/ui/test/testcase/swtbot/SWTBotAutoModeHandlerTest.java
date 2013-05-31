@@ -15,11 +15,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
+import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartAutoModeHandler;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
+import org.key_project.keyide.ui.starter.KeYIDEMethodStarter;
 import org.key_project.keyide.ui.test.Activator;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTest.IStartProofTestRunnable;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest.IStartProofTestRunnable;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -56,9 +58,16 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -114,6 +123,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
@@ -134,9 +146,16 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "isValid() : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -192,6 +211,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
@@ -213,9 +235,16 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "charge(int) : boolean");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -285,6 +314,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
@@ -306,9 +338,16 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             SWTBotTree projectTree = projectView.bot().tree();
             TestUtilsUtil.selectInTree(projectTree, projectName, "src", "(default package)", "PayCard.java", "PayCard", "chargeAndRecord(int) : void");
             // Start proof via context menu
-            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof in KeYIDE");
+            TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -364,6 +403,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
