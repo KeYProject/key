@@ -44,7 +44,7 @@ import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorato
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
-import org.key_project.keyide.ui.editor.input.ProofEditorInput;
+import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -208,10 +208,18 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       try {
          super.doSetInput(input);
          if (this.environment == null || this.proof == null) {
-            if (input instanceof ProofEditorInput) {
-               ProofEditorInput in = (ProofEditorInput) input;
-               this.proof = in.getProof();
+            if (input instanceof ProofOblInputEditorInput) {
+               ProofOblInputEditorInput in = (ProofOblInputEditorInput) input;
+               if (in.isInUse()) {
+                  throw new CoreException(LogUtil.getLogger().createErrorStatus("Multiple editors of the same proof are currently not supported."));
+               }
+               else {
+                  in.setInUse(true);
+               }
                this.environment = in.getEnvironment();
+               this.proof = environment.createProof(in.getProblem());
+               this.environment.getMediator().setProof(proof);
+               this.environment.getMediator().setStupidMode(true);
             }
             else if (input instanceof FileEditorInput) {
                FileEditorInput fileInput = (FileEditorInput) input;
@@ -226,6 +234,9 @@ public class KeYEditor extends TextEditor implements IProofProvider {
          else {
             setShowNode(showNode);
          }
+      }
+      catch (CoreException e) {
+         throw e;
       }
       catch (Exception e) {
          throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
@@ -273,6 +284,12 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       if (outline != null) {
          outline.dispose();         
       }
+      if (proof != null) {
+         proof.dispose();
+      }
+      if (environment != null) {
+         environment.dispose();
+      }
       super.dispose();
    }
    
@@ -286,8 +303,8 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       dialog.setTitle("Save Proof");
       
       IEditorInput input = getEditorInput();
-      if(input instanceof ProofEditorInput){
-         IMethod method = ((ProofEditorInput)input).getMethod();
+      if(input instanceof ProofOblInputEditorInput){
+         IMethod method = ((ProofOblInputEditorInput)input).getMethod();
          IPath methodPath = method.getPath();
          methodPath = methodPath.removeLastSegments(1);
          String name = getCurrentProof().name().toString();
