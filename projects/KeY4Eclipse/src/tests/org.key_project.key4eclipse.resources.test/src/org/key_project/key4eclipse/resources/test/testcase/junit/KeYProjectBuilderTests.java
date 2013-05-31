@@ -400,7 +400,6 @@ public class KeYProjectBuilderTests extends TestCase{
       //delete whole proofFolder
       proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       assertTrue(proofFolder.exists());
-      //TODO: warum kann der das folder nicht löschen? bei manueller ausführung geht es
       proofFolder.delete(true, null);
       //build
       KeY4EclipseResourcesTestUtil.build(project);

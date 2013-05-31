@@ -23,13 +23,17 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     */
    @Override
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
-      IResourceDelta delta = getDelta(getProject());
+      IProject project = getProject();
+      IResourceDelta delta = getDelta(project);
       if (delta != null) {
          ProofManager proofManager = null;
          try {
-            proofManager = new ProofManager(getProject());
-            if (!KeYProjectProperties.isEnableEfficientProofManagement(getProject())) {
-               proofManager.runAllProofs(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
+            proofManager = new ProofManager(project);
+            
+            boolean enableEfficientProofManagement = KeYProjectProperties.isEnableEfficientProofManagement(project);
+            if (!enableEfficientProofManagement) {
+               boolean autoDeleteProofFiles = KeYProjectProperties.isAutoDeleteProofFiles(project); 
+               proofManager.runAllProofs(autoDeleteProofFiles);
             }
             else {
                //Do not use. Not working right now.
@@ -54,10 +58,11 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     */
    @Override
    protected void clean(IProgressMonitor monitor) throws CoreException {
+      IProject project = getProject();
       ProofManager proofManager = null;
       try {
-         proofManager = new ProofManager(getProject());
-         proofManager.clean(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
+         proofManager = new ProofManager(project);
+         proofManager.clean(KeYProjectProperties.isAutoDeleteProofFiles(project));
          super.clean(monitor);
       }
       catch (Exception e) {

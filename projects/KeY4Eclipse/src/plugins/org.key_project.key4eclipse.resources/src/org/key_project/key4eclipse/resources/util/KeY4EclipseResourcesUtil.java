@@ -4,12 +4,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -58,5 +66,25 @@ public class KeY4EclipseResourcesUtil {
             file.create(new ByteArrayInputStream(out.toByteArray()), true, null);
          }
       }
+   }
+   
+   
+   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){
+      Iterator<KeYJavaType> it = kjts.iterator();
+      while (it.hasNext()) {
+         KeYJavaType kjt = it.next();
+         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+               kjt.getJavaType() instanceof InterfaceDeclaration) || 
+             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+            it.remove();
+         }
+      }
+      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+         public int compare(KeYJavaType o1, KeYJavaType o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+         }
+      });
+      return kjtsarr;
    }
 }

@@ -1,12 +1,13 @@
 package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -22,8 +23,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.builder.meta.ProofMetaFileReader;
+import org.key_project.key4eclipse.resources.builder.meta.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
@@ -31,14 +35,12 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -114,12 +116,18 @@ public class ProofManager {
          if(proof != null){
             proofFiles.add(proofFile);
             KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
+            
+            ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
+            metaFileWriter.writeMetaFile(proofFile, proof, environment);
          }
       }
       if(autoDisableProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
       }
+      printMetaToJavaFileTest();
    }
+   
+
    
    
    /**
@@ -130,21 +138,7 @@ public class ProofManager {
     */
    private LinkedList<ProofElement> getAllProofElements() {
       Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
-      Iterator<KeYJavaType> it = kjts.iterator();
-      while (it.hasNext()) {
-         KeYJavaType kjt = it.next();
-         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-               kjt.getJavaType() instanceof InterfaceDeclaration) || 
-             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
-            it.remove();
-         }
-      }
-      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
-      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
-         public int compare(KeYJavaType o1, KeYJavaType o2) {
-            return o1.getFullName().compareTo(o2.getFullName());
-         }
-      });
+      KeYJavaType[] kjtsarr = KeY4EclipseResourcesUtil.sortKeYJavaTypes(kjts);
       LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
       for (KeYJavaType type : kjtsarr) {
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
@@ -169,7 +163,7 @@ public class ProofManager {
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
                ProofOblInput obl = contract.createProofObl(environment.getInitConfig(), contract);
-               proofElements.add(new ProofElement(obl, javaFile, scl));
+               proofElements.add(new ProofElement(obl, javaFile, scl, type));
             }
          }
       }
@@ -577,4 +571,143 @@ public class ProofManager {
       //add the ProblemExceptionMarker
       markerManager.setProblemLoaderExceptionMarker(project, e.getMessage());
    }
+   
+   
+   private void printMetaToJavaFileTest() throws CoreException, SAXException, IOException, ParserConfigurationException{
+      ProofMetaFileReader metaFileReader = new ProofMetaFileReader();
+      LinkedList<IFile> metaFiles = collectAllMetaFiles();
+      LinkedList<IType> allJavaTypes = collectAllJavaITypes();
+      for(IFile metaFile : metaFiles){
+         System.out.println("METAFILE: " + metaFile.getFullPath());
+         metaFileReader.readProofMetaFile(metaFile);
+         LinkedHashSet<String> types = metaFileReader.getTypes();
+         for(String type : types){
+            IFile javaFileForType = getJavaFileForType(type, allJavaTypes);
+            System.out.println(javaFileForType.exists());
+            System.out.println(javaFileForType.getFullPath());
+         }
+      }
+   }
+   
+   
+   private LinkedList<IFile> collectAllMetaFiles() throws CoreException{
+      LinkedList<IFile> metaFiles = new LinkedList<IFile>();
+      IResource[] members = mainProofFolder.members();
+      if(members.length != 0){
+         for(IResource member : members){
+            if(member.getType() == IResource.FOLDER){
+               IFolder folder = (IFolder) member;
+               metaFiles.addAll(collectMetaFilesForFolder(folder));
+            }
+            else if(member.getType() == IResource.FILE){
+               IFile file = (IFile) member;
+               if(file.getFileExtension() == "meta"){
+                  metaFiles.add(file);
+               }
+            }
+         }
+      }
+      return metaFiles;
+   }
+   
+   private LinkedList<IFile> collectMetaFilesForFolder(IFolder folder) throws CoreException{
+      LinkedList<IFile> metaFiles = new LinkedList<IFile>();
+      IResource[] members = folder.members();
+      if(members.length != 0){
+         for(IResource member : members){
+            if(member.getType() == IResource.FOLDER){
+               IFolder subFolder = (IFolder) member;
+               metaFiles.addAll(collectMetaFilesForFolder(subFolder));
+            }
+            else if(member.getType() == IResource.FILE){
+               IFile file = (IFile) member;
+               if(file.getFileExtension().equalsIgnoreCase("meta")){
+                  metaFiles.add(file);
+               }
+            }
+         }
+      }
+      return metaFiles;
+   }
+   
+   
+   private IFile getJavaFileForType(String metaType, LinkedList<IType> typeList) throws JavaModelException{
+      for(IType iType : typeList){
+         String typeName = iType.getFullyQualifiedName('.');
+         if(typeName.equalsIgnoreCase(metaType)){
+            IPath filePath = iType.getResource().getFullPath();
+            IFile javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(filePath);
+            return javaFile;
+         }
+      }
+      
+      return null;
+   }
+   
+   
+   private LinkedList<IType> collectAllJavaITypes() throws JavaModelException{
+      LinkedList<IType> typeList = new LinkedList<IType>();
+      IJavaProject javaProject = JavaCore.create(project);
+      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
+      for(IPackageFragment packageFragment : packageFragments){
+         ICompilationUnit[] units = packageFragment.getCompilationUnits();
+         for(ICompilationUnit unit : units){
+            IType[] types = unit.getTypes();
+            for(IType type : types){
+               typeList.add(type);
+               typeList.addAll(collectAllJavaITypesForIType(type));
+            }
+         }
+      }
+      return typeList;
+   }
+   
+   
+   private LinkedList<IType> collectAllJavaITypesForIType(IType type) throws JavaModelException{
+      LinkedList<IType> types = new LinkedList<IType>();
+      IType[] subTypes = type.getTypes();
+      for(IType subType : subTypes){
+         types.add(subType);
+         types.addAll(collectAllJavaITypesForIType(subType));
+      }
+      return types;
+   }
+   
+//   private IFile checkTypes(IType[] types, String metaType) throws JavaModelException{
+//      IFile javaFile = null;
+//      for(IType type : types){
+//         String typeName = type.getFullyQualifiedName('.');
+//         if(typeName.equalsIgnoreCase(metaType)){
+//            IPath filePath = type.getResource().getFullPath();
+//            javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(filePath);
+//            return javaFile;
+//         }
+//         else{
+//            IType[] subTypes = type.getTypes();
+//            if(subTypes.length != 0){
+//               javaFile = checkTypes(subTypes, metaType);
+//            }
+//         }
+//      }
+//      return javaFile;
+//   }
+   
+   
+//   private IFile getJavaFileForType(String type){
+//      IPath javaFilePath = project.getFullPath().append("src");
+//      
+//      StringBuffer sb = new StringBuffer(type);
+//      String segment = null;
+//      int splitIndex = sb.indexOf(".");
+//      while(splitIndex != -1){
+//         segment = sb.substring(0, splitIndex);
+//         sb.delete(0, splitIndex+1);
+//         splitIndex = sb.indexOf(".");
+//         javaFilePath = javaFilePath.append(segment);
+//      }
+//      javaFilePath = javaFilePath.append(sb.toString()).addFileExtension("java");
+//      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+//      IFile javaFile = root.getFile(javaFilePath);
+//      return javaFile;
+//   }
 }
