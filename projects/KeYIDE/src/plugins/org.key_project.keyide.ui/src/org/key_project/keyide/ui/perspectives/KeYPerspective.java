@@ -16,6 +16,7 @@ package org.key_project.keyide.ui.perspectives;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
 import de.uka.ilkd.key.proof.Proof;
 
@@ -43,7 +44,7 @@ public class KeYPerspective implements IPerspectiveFactory {
       leftFolder.addView(IPageLayout.ID_PROJECT_EXPLORER);
       // Put the properties view on bottom left.
       IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f, "left");
-      bottomLeftFolder.addView("org.key_project.keyide.ui.view.StrategyProperties");
+      bottomLeftFolder.addView(StrategyPropertiesView.VIEW_ID);
       bottomLeftFolder.addView(IPageLayout.ID_PROP_SHEET);
       // Put the out line on the right.
       IFolderLayout rightFolder = layout.createFolder("right", IPageLayout.RIGHT, 0.8f, editorArea);
@@ -54,7 +55,9 @@ public class KeYPerspective implements IPerspectiveFactory {
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaBrowsingPerspective");
       layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
       // View Shortcuts
+      layout.addShowViewShortcut(StrategyPropertiesView.VIEW_ID);
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
       layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
+      layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
    }
 }
