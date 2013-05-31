@@ -14,13 +14,18 @@
 package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
+import org.eclipse.ui.editors.text.TextEditor;
+import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -31,25 +36,43 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class ProofEditorInput extends PlatformObject implements IStorageEditorInput {
-   private IStorage storage;
-   
+   /**
+    * The {@link Proof}.
+    */
    private Proof proof;
    
+   /**
+    * The {@link KeYEnvironment} in which the {@link Proof} lives.
+    */
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
-   private IMethod method;
-   
-
-   
    /**
-    * Constructor
-    * @param storage The storage for this {@link IStorageEditorInput}
+    * The optional {@link IMethod} from which the proof was started.
     */
-   public ProofEditorInput(IStorage storage, Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method){
-      this.storage=storage;
+   private IMethod method;
+
+   /**
+    * The {@link IStorage} which is used by {@link TextEditor}s to show the initial content
+    * which is always an empty string because the {@link KeYEditor} computes it based
+    * on the selected {@link Node} itself.
+    */
+   private IStorage storage;
+
+   /**
+    * Constructor.
+    * @param proof The {@link Proof}.
+    * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
+    * @param method An optional {@link IMethod} from which the {@link Proof} was started.
+    */
+   public ProofEditorInput(Proof proof, 
+                           KeYEnvironment<CustomConsoleUserInterface> environment, 
+                           IMethod method) {
+      Assert.isNotNull(proof);
+      Assert.isNotNull(environment);
       this.proof = proof;
       this.environment = environment;
       this.method = method;
+      this.storage = new TextStorage(StringUtil.EMPTY_STRING, proof.name().toString());
    }
 
    /** 
@@ -100,6 +123,10 @@ public class ProofEditorInput extends PlatformObject implements IStorageEditorIn
       return storage;
    }
    
+   /**
+    * Returns the optional {@link IMethod} from which the proof was started.
+    * @return The optional {@link IMethod} from which the proof was started.
+    */
    public IMethod getMethod(){
       return method;
    }

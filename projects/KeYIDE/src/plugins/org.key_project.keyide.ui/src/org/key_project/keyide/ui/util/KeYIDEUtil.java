@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,7 +43,6 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
-import org.key_project.keyide.ui.editor.input.ProofStorage;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -54,7 +52,6 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -144,9 +141,7 @@ public class KeYIDEUtil {
     * @param ui The UserInterface that holds the KeYMediator
     */
    public static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
-      String inputText = InnerNodeView.getTacletDescription(environment.getMediator(), proof.root(), null);
-      IStorage storage = new ProofStorage(inputText, proof.name().toString());
-      IStorageEditorInput input = new ProofEditorInput(storage, proof, environment, method);
+      IStorageEditorInput input = new ProofEditorInput(proof, environment, method);
       WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
    }
    
