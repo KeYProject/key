@@ -2,18 +2,15 @@ package org.key_project.key4eclipse.resources.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.keyide.ui.util.KeYIDEUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 
 
@@ -21,14 +18,12 @@ public class KeY4EclipseResourcesUtil {
    
    
    /**
-    * Opens the given {@link File} in a {@link KeYEditor}.
-    * @param file - the {@link File} to use
+    * Opens the given {@link IFile} in a {@link KeYEditor}.
+    * @param file - the {@link IFile} to use
     * @throws Exception
     */
-   public static void openProofFileInKeYIDE(File file) throws Exception{
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(file, null, null);
-      Proof proof = environment.getLoadedProof();
-      KeYIDEUtil.openEditor(proof, environment, null);
+   public static void openProofFileInKeYIDE(IFile file) throws Exception {
+      WorkbenchUtil.openEditor(file);
    }
    
    
