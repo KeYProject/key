@@ -37,6 +37,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       builderSettingsComposite.setLayout(new GridLayout(1, false));
       enableEfficentProofManagementButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableEfficentProofManagementButton.setText("Efficient proof management enabled");
+enableEfficentProofManagementButton.setEnabled(false); // TODO@Stefan: Remove this line it is only added to disable the functionality on the master branch where it is not available yet
       setSelectionForEnableEfficientProofManagementButton();
       autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
       autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
