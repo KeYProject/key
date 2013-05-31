@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.key_project.key4eclipse.resources.feature"
-      label="KeY Resources"
+      label="KeY Resources Feature"
       version="1.0.0.qualifier"
       provider-name="KeY Project"
       plugin="org.key_project.key4eclipse.resources.ui">
