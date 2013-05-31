@@ -1,5 +1,6 @@
 class For implements Iterable {
 
+  // This example has been refactored pending solution to bug #1288
   Trivial it;
 
   //@ ensures \result == (\sum int j; 0 <= j && j < a.length; a[j]);
