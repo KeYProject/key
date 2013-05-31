@@ -36,28 +36,28 @@ public class StarterPreferenceUtilInitializer extends AbstractPreferenceInitiali
       if (!globalStarters.isEmpty()) {
          StarterPreferenceUtil.setDefaultSelectedGlobalStarterID(globalStarters.head().getId());
       }
-      StarterPreferenceUtil.setDefaultDontAskForGlobalStarter(false);
+      StarterPreferenceUtil.setDefaultDontAskForGlobalStarter(globalStarters.size() == 1);
       StarterPreferenceUtil.setDefaultGlobalStarterDisabled(false);
       // Method starter
       ImmutableList<StarterDescription<IMethodStarter>> methodStarters = StarterUtil.getMethodStarters();
       if (!methodStarters.isEmpty()) {
          StarterPreferenceUtil.setDefaultSelectedMethodStarterID(methodStarters.head().getId());
       }
-      StarterPreferenceUtil.setDefaultDontAskForMethodStarter(false);
+      StarterPreferenceUtil.setDefaultDontAskForMethodStarter(methodStarters.size() == 1);
       StarterPreferenceUtil.setDefaultMethodStarterDisabled(false);
       // File starter
       ImmutableList<StarterDescription<IFileStarter>> fileStarters = StarterUtil.getFileStarters();
       if (!fileStarters.isEmpty()) {
          StarterPreferenceUtil.setDefaultSelectedFileStarterID(fileStarters.head().getId());
       }
-      StarterPreferenceUtil.setDefaultDontAskForFileStarter(false);
+      StarterPreferenceUtil.setDefaultDontAskForFileStarter(fileStarters.size() == 1);
       StarterPreferenceUtil.setDefaultFileStarterDisabled(false);
       // Project starter
       ImmutableList<StarterDescription<IProjectStarter>> projectStarters = StarterUtil.getProjectStarters();
       if (!projectStarters.isEmpty()) {
          StarterPreferenceUtil.setDefaultSelectedProjectStarterID(projectStarters.head().getId());
       }
-      StarterPreferenceUtil.setDefaultDontAskForProjectStarter(false);
+      StarterPreferenceUtil.setDefaultDontAskForProjectStarter(projectStarters.size() == 1);
       StarterPreferenceUtil.setDefaultProjectStarterDisabled(false);
    }
 }
