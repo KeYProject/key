@@ -198,7 +198,7 @@
       <menuContribution
             allPopups="false"
             class="org.key_project.keyide.ui.editor.TacletContextMenu"
-            locationURI="popup:#KeYEditorContext?after=additions">
+            locationURI="popup:#KeYEditorContext?before=group.undo">
       </menuContribution>
    </extension>
    <extension
