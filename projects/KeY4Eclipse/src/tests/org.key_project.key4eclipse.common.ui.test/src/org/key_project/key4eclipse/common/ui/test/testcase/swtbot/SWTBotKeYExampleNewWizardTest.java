@@ -30,6 +30,7 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * SWTBot tests for {@link KeYExampleNewWizard}.
@@ -154,7 +155,8 @@ public class SWTBotKeYExampleNewWizardTest extends TestCase {
                   Assert.isNotNull(location);
                   Assert.isTrue(location.exists());
                   try {
-                     KeYEnvironment.load(location, classPaths, bootClassPath);
+                     KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(location, classPaths, bootClassPath);
+                     env.dispose();
                   }
                   catch (Exception e) {
                      fail("Loading of " + resource + " failed in example \"" + example + "\".");

@@ -13,7 +13,6 @@
 
 package org.key_project.key4eclipse.common.ui.preference.page;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,7 +22,7 @@ import org.key_project.key4eclipse.util.KeYExampleUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -60,7 +59,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
          loadChoiceSettings();
       }
       catch (Exception e) {
-         throw new InvocationTargetException(e);
+         throw new InvocationTargetException(e, e.getMessage());
       }
       finally {
          monitor.done();
@@ -73,19 +72,8 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * @throws ProblemLoaderException
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
-      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(getExampleProof(), null, null);
-      if (env.getLoadedProof() != null) {
-         env.getLoadedProof().dispose();
-      }
-   }
-   
-   /**
-    * Returns a *.key with a fast and simple proof.
-    * @return A *.key with a fast and simple proof.
-    */
-   public static File getExampleProof() {
-      String exampleDir = KeYExampleUtil.getLocalExampleDirectory();
-      return new File(exampleDir, "list" + File.separator + "ArrayList_add.key");
+      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+      env.dispose();
    }
    
    /**

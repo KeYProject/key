@@ -86,6 +86,9 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
             Taclet tac = (Taclet) userObj;
             contentPane.setText(toString(tac));
         } else {
+            final int parenIdx = displayName.lastIndexOf("(");
+            if (parenIdx >= 0) // strip number of taclets
+                displayName = displayName.substring(0, parenIdx-1).intern();
             contentPane.setText(getRuleDescription(displayName));
         }
 
@@ -125,6 +128,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
         ruleViewModel = model;
 
         if (ruleViewModel != null) {
+            ruleViewModel.updateTacletCount();
             ruleTree.setModel(ruleViewModel);
         }
     }

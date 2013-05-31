@@ -22,10 +22,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -97,7 +99,8 @@ public class DLEmbeddedExpression extends Operator {
         p.printDLEmbeddedExpression(this);
     }
 
-    public void check(Services javaServ) throws ConvertException {
+    public void check(Services javaServ, 
+		      KeYJavaType containingClass) throws ConvertException {
         
         if(functionSymbol == null)
             throw new ConvertException("null function symbol");
@@ -118,13 +121,22 @@ public class DLEmbeddedExpression extends Operator {
                     + " requires " + expected
                     + " arguments, but received only " + actual);
         }
-        
+
+        String name = containingClass.getSort().name().toString();	    
+        String qualifier = name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
+        name = name.substring(name.lastIndexOf('.')+1);
+        TypeRef tr = 
+        		new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
+        ExecutionContext ec = new ExecutionContext(tr, null, null);
+
         for (int i = 0; i < actual; i++) {
             Sort argSort = functionSymbol.argSort(i + implicitOffset);
             KeYJavaType kjtExpected = getKeYJavaType(javaServ, argSort);
                 
             Expression child = children.get(i);
-            KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child);
+
+
+            KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
             
             if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
                 throw new ConvertException("Received " + child

@@ -97,7 +97,8 @@ public class ProofMacroMenu extends JMenu {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                macro.applyTo(mediator, posInOcc);
+                ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
+                worker.start();
             }
         });
 

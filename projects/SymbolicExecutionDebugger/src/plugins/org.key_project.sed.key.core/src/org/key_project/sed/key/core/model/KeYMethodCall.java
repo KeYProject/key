@@ -19,17 +19,19 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDMethodCall} for the symbolic execution debugger (SED)
@@ -143,7 +145,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourcePath(executionNode.getProgramMethod().getPositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getProgramMethod().getPositionInfo());
       }
       return sourceName;
    }
@@ -189,7 +191,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
       IProgramMethod explicitConstructor = executionNode.getExplicitConstructorProgramMethod();
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(explicitConstructor != null ?
+      SourceLocation location = KeYUtil.convertToSourceLocation(explicitConstructor != null ?
                                                                      explicitConstructor.getPositionInfo() :
                                                                      executionNode.getProgramMethod().getPositionInfo());
       // Try to update the position info with the position of the method name provided by JDT.
@@ -229,9 +231,14 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return !executionNode.isDisposed() && 
-             super.hasVariables() && 
-             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 
    /**

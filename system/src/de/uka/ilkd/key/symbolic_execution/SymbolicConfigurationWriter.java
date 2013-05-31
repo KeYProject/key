@@ -88,6 +88,12 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    public static final String ATTRIBUTE_VALUE = "value";
 
    /**
+    * Attribute name to store {@link ISymbolicValue#getConditionString()} and
+    * {@link ISymbolicAssociation#getConditionString()}.
+    */
+   public static final String ATTRIBUTE_CONDITION = "condition";
+
+   /**
     * Attribute name to store {@link ISymbolicAssociation#getTarget()}.
     */
    public static final String ATTRIBUTE_TARGET = "target";
@@ -262,6 +268,9 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, value.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_VALUE, value.getValueString());
       attributeValues.put(ATTRIBUTE_TYPE, value.getTypeString());
+      if (value.getConditionString() != null) {
+         attributeValues.put(ATTRIBUTE_CONDITION, value.getConditionString());
+      }
       appendEmptyTag(level, TAG_VALUE, attributeValues, sb);
    }
 
@@ -279,6 +288,9 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, association.isArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, association.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_TARGET, computeObjectId(model, association.getTarget()));
+      if (association.getConditionString() != null) {
+         attributeValues.put(ATTRIBUTE_CONDITION, association.getConditionString());
+      }
       appendEmptyTag(level, TAG_ASSOCIATION, attributeValues, sb);
    }
 

@@ -102,6 +102,7 @@ import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
@@ -321,7 +322,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnAllFields(AllFields x) {
 	doDefaultAction(x);
     }
-    
+
+    @Override
+    public void performActionOnAllObjects(AllObjects x) {
+	doDefaultAction(x);
+    }
+
     @Override
     public void performActionOnEmptySeqLiteral(EmptySeqLiteral x) {
 	doDefaultAction(x);

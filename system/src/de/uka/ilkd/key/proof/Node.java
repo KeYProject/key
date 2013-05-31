@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.proof;
@@ -25,13 +25,25 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class Node {
+public class Node implements Iterable<Node> {
+    private static final String RULE_WITHOUT_NAME = "rule without name";
+
+    private static final String RULE_APPLICATION_WITHOUT_RULE = "rule application without rule";
+
+    private static final String INTERACTIVE_GOAL = "INTERACTIVE GOAL";
+
+    private static final String OPEN_GOAL = "OPEN GOAL";
+
+    private static final String CLOSED_GOAL = "Closed goal";
+
+    private static final String NODES = "nodes";
+
     /** the proof the node belongs to */
     private Proof               proof;
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private List<Node>           children            = new LinkedList<Node>();
+    private List<Node>           children            = new ArrayList<Node>(5);
 
     private Node                 parent              = null;
 
@@ -46,26 +58,28 @@ public class Node {
     /** contains non-logical content, used for user feedback */
     private NodeInfo             nodeInfo;
 
-    int                          serialNr;
+    private int                  serialNr;
 
     private int                  siblingNr = -1;
 
     private ImmutableList<RenamingTable>  renamings;
-    
+
+    private String cachedName = null;
+
     /**
      * If the rule base has been extended e.g. by loading a new taclet as
      * lemma or by applying a taclet with an addrule section on this node,
      * then these taclets are stored in this set
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
-    
-    
+
+
     /** creates an empty node that is root and leaf.
      */
 
     public Node(Proof proof) {
 	this.proof = proof;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);        
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -74,7 +88,7 @@ public class Node {
     public Node(Proof proof, Sequent seq) {
 	this ( proof );
 	this.seq=seq;
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
     }
 
 
@@ -85,10 +99,10 @@ public class Node {
     public Node(Proof proof, Sequent seq, List<Node> children,
 		Node parent) {
 	this.proof = proof;
-	this.seq=seq;	
+	this.seq=seq;
 	this.parent=parent;
 	if (children!=null) {this.children=children;}
-        serialNr = proof.getServices().getCounter("nodes").getCountPlusPlus(this);
+        serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
         nodeInfo = new NodeInfo(this);
     }
 
@@ -96,17 +110,17 @@ public class Node {
      */
     public void setSequent(Sequent seq) {
 	this.seq=seq;
-   } 
+   }
 
     /** returns the sequent of this node */
     public Sequent sequent() {
 	return seq;
     }
-    
+
     /**
      * the node information object encapsulates non-logical information
-     * of the node, e.g.  
-     * 
+     * of the node, e.g.
+     *
      * @return the NodeInfo containing non-logical information
      */
     public NodeInfo getNodeInfo() {
@@ -116,11 +130,16 @@ public class Node {
     /** returns the proof the Node belongs to */
     public Proof proof() {
 	return proof;
-    }    
+    }
 
     public void setAppliedRuleApp(RuleApp ruleApp) {
         this.nodeInfo.updateNoteInfo();
-        this.appliedRuleApp = ruleApp;        
+        this.appliedRuleApp = ruleApp;
+        clearNameCache();
+    }
+
+    public void clearNameCache() {
+        cachedName = null;
     }
 
     public NameRecorder getNameRecorder() {
@@ -142,7 +161,7 @@ public class Node {
     public RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
-    
+
     /** Returns the set of NoPosTacletApps at this node */
     public ImmutableSet<NoPosTacletApp> getLocalIntroducedRules() {
 	return localIntroducedRules;
@@ -157,7 +176,7 @@ public class Node {
     }
 
      /**
-      * adds a new NoPosTacletApp to the set of available NoPosTacletApps 
+      * adds a new NoPosTacletApp to the set of available NoPosTacletApps
       * at this node
       */
      public void addNoPosTacletApp(NoPosTacletApp s) {
@@ -195,6 +214,7 @@ public class Node {
      * containing <code>this</code> and <code>p_node</code>; we assume
      * that the two nodes are part of the same proof tree
      */
+    // XXX this method is never used
     public Node commonAncestor ( Node p_node ) {
 	if ( root () )
 	    return this;
@@ -230,8 +250,8 @@ public class Node {
      */
     public boolean root() {
 	return parent==null;
-    }  
-        
+    }
+
     /**
      *  makes the given node a child of this node.
      */
@@ -244,11 +264,12 @@ public class Node {
 
     /** removes child/parent relationship between this node and its
      * parent; if this node is root nothing happens.
+     * This is only used for testing purposes.
      */
     void remove() {
 	if (parent != null) {
 	    parent.remove(this);
-	} 
+	}
     }
 
     /** removes child/parent relationship between the given node and
@@ -259,24 +280,24 @@ public class Node {
      */
     boolean remove(Node child) {
 	if (children.remove(child)) {
-	    child.parent = null;            
+	    child.parent = null;
             final ListIterator<Node> it = children.listIterator(child.siblingNr);
             while (it.hasNext()) {
-                it.next().siblingNr--;                
+                it.next().siblingNr--;
             }
             child.siblingNr = -1;
 	    return true;
 	} else {
 	    return false;
 	}
-    } 
+    }
 
 
     /**
      * computes the leaves of the current subtree and returns them
      */
     private List<Node> leaves() {
-	final List<Node> leaves = new LinkedList<Node>();       
+	final List<Node> leaves = new LinkedList<Node>();
 	final LinkedList<Node> nodesToCheck = new LinkedList<Node>();
 	nodesToCheck.add(this);
 	while (!nodesToCheck.isEmpty()) {
@@ -291,7 +312,7 @@ public class Node {
     }
 
 
-    /** 
+    /**
      * returns an iterator for the leaves of the subtree below this
      * node. The computation is called at every call!
      */
@@ -303,6 +324,12 @@ public class Node {
      */
     public NodeIterator childrenIterator() {
 	return new NodeIterator(children.iterator());
+    }
+
+    /** returns an iterator for all nodes in the subtree.
+     */
+    public NodeIterator subtreeIterator() {
+        return new SubtreeIterator(this);
     }
 
     /** returns number of children */
@@ -323,7 +350,7 @@ public class Node {
     public int getChildNr ( Node p_node ) {
 	int            res = 0;
 	final Iterator<Node> it  = childrenIterator ();
-	
+
 	while ( it.hasNext () ) {
 	    if ( it.next () == p_node )
 		return res;
@@ -333,60 +360,74 @@ public class Node {
 	return -1;
     }
 
+    private int getIntroducedRulesCount() {
+        int c = 0;
+        Node n = this;
 
-    /** helps toString method 
+        while (n != null) {
+            c += n.localIntroducedRules.size();
+            n = n.parent;
+        }
+        return c;
+    }
+
+    public int getUniqueTacletNr() {
+        return getIntroducedRulesCount();
+    }
+
+    /** helps toString method
      * @param prefix needed to keep track if a line has to be printed
      * @param tree the tree representation we want to add this subtree
      " @param preEnumeration the enumeration of the parent without the
      * last number
-     * @param postNr the last number of the parents enumeration 
+     * @param postNr the last number of the parents enumeration
      * @param maxNr the number of nodes at this level
      * @param ownNr the place of this node at this level
      */
- 
-    private StringBuffer toString(String prefix, 
-				  StringBuffer tree, 
+
+    private StringBuffer toString(String prefix,
+				  StringBuffer tree,
 				  String preEnumeration,
 				  int postNr,
 				  int maxNr,
 				  int ownNr
-				  ) {       
-	Iterator<Node> childrenIt = childrenIterator(); 	
+				  ) {
+	Iterator<Node> childrenIt = childrenIterator();
 	// Some constants
 	String frontIndent=(maxNr>1 ? " " : "");
 	String backFill="   "; // same length as connectNode without
-			       // frontIndent 
-	String connectNode=(maxNr>1 ? frontIndent+"+--" : "");	
+			       // frontIndent
+	String connectNode=(maxNr>1 ? frontIndent+"+--" : "");
 	String verticalLine=(maxNr>1 ? frontIndent+"|"+backFill : " |");
-	
+
 
 	// get enumeration
 	String newEnumeration=preEnumeration;
 	int newPostNr=0;
 	if (maxNr>1) {
-	    newEnumeration+=postNr+"."+ownNr+".";	    
+	    newEnumeration+=postNr+"."+ownNr+".";
 	    newPostNr=1;
 	} else {
 	    newPostNr=postNr+ownNr;
 	}
-		
+
 	// node is printed
-	
+
 	if (postNr!=0) { // not starting node (usually not root)
 	    // prefix is appended twice in order to get an
 	    // empty line between two nodes
-	    tree.append(prefix); 
+	    tree.append(prefix);
 	    tree.append(verticalLine);
 	    tree.append("\n");
-       	    tree.append(prefix);	    
+       	    tree.append(prefix);
 	    // indent node
 	    tree.append(connectNode);
-	} 
-       
-	tree.append("("+newEnumeration+newPostNr+") "+sequent().toString()+"\n");	
+	}
+
+	tree.append("("+newEnumeration+newPostNr+") "+sequent().toString()+"\n");
 
 	// create new prefix
-	if (ownNr<maxNr) { 
+	if (ownNr<maxNr) {
 	    // connect node with next node of same level
 	    prefix+=verticalLine;
 	} else if (ownNr==maxNr && maxNr>1) {
@@ -398,9 +439,9 @@ public class Node {
 
 	// print subtrees
 	int childId=0;
-	while (childrenIt.hasNext()) {		    
+	while (childrenIt.hasNext()) {
 	    childId++;
-	    childrenIt.next().toString(prefix, tree, newEnumeration, 
+	    childrenIt.next().toString(prefix, tree, newEnumeration,
 				       newPostNr,
 				       children.size(), childId);
 	}
@@ -411,35 +452,41 @@ public class Node {
 
     public String toString() {
 	StringBuffer tree=new StringBuffer();
-	return "\n"+toString("",tree,"",0,0,1); 
+	return "\n"+toString("",tree,"",0,0,1);
     }
-    
-    
-    public String name() { // XXX this is called way too often -- cache stuff!
 
-	RuleApp rap = getAppliedRuleApp();
-        if (rap == null) {
-	    Goal goal = proof().getGoal(this);
-	    if ( goal == null || this.isClosed() )
-                return "Closed goal";
-            else if(goal.isAutomatic())
-                return "OPEN GOAL";
-            else
-                return "INTERACTIVE GOAL";
-        }
-        if (rap.rule() == null) return "rule application without rule";
 
-        if (nodeInfo.getFirstStatementString() != null) {
-            return nodeInfo.getFirstStatementString();
+    public String name() {
+        if (cachedName == null) {
+
+            RuleApp rap = getAppliedRuleApp();
+            if (rap == null) {
+                Goal goal = proof().getGoal(this);
+                if ( goal == null || this.isClosed() )
+                    return CLOSED_GOAL; // don't cache this
+                else if(goal.isAutomatic())
+                    cachedName = OPEN_GOAL;
+                else
+                    cachedName = INTERACTIVE_GOAL;
+                return cachedName;
+            }
+            if (rap.rule() == null) {
+                cachedName = RULE_APPLICATION_WITHOUT_RULE;
+                return cachedName;
+            }
+
+            if (nodeInfo.getFirstStatementString() != null) {
+                return nodeInfo.getFirstStatementString();
+            }
+
+            cachedName = rap.rule().displayName();
+            if (cachedName == null) {
+                cachedName = RULE_WITHOUT_NAME;
+            }
         }
-        
-        String text = rap.rule().displayName();       
-        if (text == null) { 
-            text = "rule without name";
-        }
-        return text;
-    }   
-    
+        return cachedName;
+    }
+
 
     /**
      * checks if the parent has this node as child and continues recursively
@@ -466,10 +513,10 @@ public class Node {
 	return true;
     }
 
- 
+
     /** marks a node as closed */
     Node close() {
-	closed = true;
+        closed = true;
         Node tmp = parent;
         Node result = this;
         while (tmp != null && tmp.isCloseable()) {
@@ -477,14 +524,15 @@ public class Node {
             result = tmp;
             tmp = tmp.parent();
         }
+        clearNameCache();
         return result;
     }
 
     /** checks if an inner node is closeable */
     private boolean isCloseable() {
 	assert childrenCount() > 0;
-	for (int i = 0; i<childrenCount(); i++) {
-	    if ( !child (i).isClosed() ) {
+	for (Node child: this) {
+	    if ( !child.isClosed() ) {
 		return false;
 	    }
 	}
@@ -499,14 +547,10 @@ public class Node {
      * retrieves number of nodes
      */
     public int countNodes() {
-	int nodes = 1 + children.size();
-	final LinkedList<Node> nodesToAdd = new LinkedList<Node>(children);
-	while (!nodesToAdd.isEmpty()) {
-	    final Node n = nodesToAdd.removeFirst();
-	    nodesToAdd.addAll(n.children);
-	    nodes += n.children.size();
-	}
-	return nodes;
+        NodeIterator it = subtreeIterator();
+        int res = 0;
+        for (; it.hasNext(); it.next()) res++;
+        return res;
     }
 
     /**
@@ -515,11 +559,11 @@ public class Node {
     public int countBranches() {
 	return leaves().size();
     }
-    
+
     public int serialNr() {
         return serialNr;
     }
-    
+
     /**
      * returns the sibling number of this node or <tt>-1</tt> if
      * it is the root node
@@ -529,14 +573,41 @@ public class Node {
     public int siblingNr() {
         return siblingNr;
     }
-   
 
-    // inner iterator class 
+
+    /** Iterator over children.
+     * Use <code>leavesIterator()</code> if you need to iterate over leaves instead.
+     */
+    @Override
+    public Iterator<Node> iterator() {
+        return childrenIterator();
+    }
+
+    // inner iterator class
     public static class NodeIterator implements Iterator<Node> {
-	private Iterator<Node> it;
-	
+	protected Iterator<Node> it;
+
 	NodeIterator(Iterator<Node> it) {
 	    this.it=it;
+	}
+
+	/** Mock-up iterator for testing purposes. */
+	private NodeIterator() {
+	    it = new Iterator<Node>(){
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public Node next() {
+                return null;
+            }
+
+            @Override
+            public void remove() {
+            }};
 	}
 
 	public boolean hasNext() {
@@ -553,17 +624,48 @@ public class Node {
 	}
     }
 
-    private int getIntroducedRulesCount() {
-        int c = 0;
+    /** Iterator over subtree.
+     * Current implementation iteratively traverses the tree depth-first.
+     * @author bruns
+     */
+    private static class SubtreeIterator extends NodeIterator {
+        private Node n;
+        private boolean atRoot = true; // special handle
 
-        if (parent != null) {
-            c = parent.getIntroducedRulesCount();
+        private SubtreeIterator(Node root) {
+            assert root != null;
+            n = root;
         }
 
-        return c + localIntroducedRules.size();
-    }
+        private static Node nextSibling(Node m) {
+            Node p = m.parent;
+            while (p != null) {
+                final int c = p.childrenCount();
+                final int x = p.getChildNr(m);
+                if (x+1 < c) return p.child(x+1);
+                m = p; p = m.parent;
+            }
+            return null;
+        }
 
-    public int getUniqueTacletNr() {
-        return getIntroducedRulesCount();
-    }    
+        @Override
+        public boolean hasNext(){
+            if (atRoot) return true;
+            if (!n.leaf()) return true;
+            return nextSibling(n) != null;
+        }
+
+        @Override
+        public Node next() {
+            if (atRoot) { // stay at root once
+                atRoot = false;
+                return n;
+            }
+            if (n.leaf()) {
+                Node s = nextSibling(n);
+                if (s != null) n = s;
+            } else n = n.child(0);
+            return n;
+        }
+    }
  }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel">
+  <proofs target="//@types.0/@axioms.0/@axiomContracts.0" obligation="ContractPO">
+    <proofReferences target="//@types.0/@axioms.0" kind="Use Axiom"/>
+    <proofReferences target="//@types.0/@invariants.0" kind="Use Invariant"/>
+  </proofs>
+  <types xsi:type="dbcmodel:DbcClass" name="test.B" visibility="default">
+    <invariants name="JML class invariant nr 0 in B" condition="self.c.&lt;inv>"/>
+    <axioms name="Class invariant axiom for test.B" definition="equiv(java.lang.Object::&lt;inv>(heap,self),java.lang.Object::&lt;inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))">
+      <axiomContracts name="test.B[java.lang.Object::&lt;inv>()].JML accessible clause.0" pre="self.&lt;inv>" dep="allFields(self) \cup allFields(self.c)"/>
+    </axioms>
+  </types>
+</dbcmodel:DbcModel>

@@ -2,8 +2,8 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.complicatedMethod(i,a,b,x,o,ac,acArray);" pathCondition="true" pathConditionChanged="false">
       <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-         <methodReturn name="&lt;return of self.complicatedMethod(i,a,b,x,o,ac,acArray);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.complicatedMethod(i,a,b,x,o,ac,acArray);&gt;" isReturnValueComputed="true">
-            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+         <methodReturn name="&lt;return of self.complicatedMethod(i,a,b,x,o,ac,acArray);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
             </termination>
          </methodReturn>
       </statement>

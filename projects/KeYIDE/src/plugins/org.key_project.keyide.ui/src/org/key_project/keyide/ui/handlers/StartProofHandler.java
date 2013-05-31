@@ -27,8 +27,6 @@ import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandle
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.proof.Proof;
-
 /**
  * An {@link AbstractSaveExecutionHandler} for the Start Proof command.
  * Safely selects a contract and initialize a {@link Proof} for the current selection.

@@ -9,19 +9,11 @@
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                  <value name="next {  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null">
+                  <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
                <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                  <value name="previous {  self.previous = null &amp; self.previous = null
-| !self.previous = null
-&amp; !self.previous = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  self.previous = null &amp; self.previous = null
-| !self.previous = null
-&amp; !self.previous = null">
+                  <value name="previous {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
             </value>
@@ -34,11 +26,7 @@
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                     <value name="next {  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  self.next = null &amp; self.next = null
-| !self.next = null
-&amp; !self.next = null">
+                     <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                      </value>
                   </variable>
                   <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -55,11 +43,11 @@
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                        <value name="next {  !u_2 = self &amp; (self.next = null &amp; self.next = null)
+                        <value name="next {  !u_2 = self &amp; self.next = null
 | !u_2 = self
-&amp; (!self.next = null &amp; !self.next = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="  !u_2 = self &amp; (self.next = null &amp; self.next = null)
+&amp; !self.next = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  !u_2 = self &amp; self.next = null
 | !u_2 = self
-&amp; (!self.next = null &amp; !self.next = null)">
+&amp; !self.next = null">
                         </value>
                      </variable>
                      <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -84,7 +72,7 @@
                      </variable>
                   </value>
                </variable>
-               <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                   <variable name="u" arrayIndex="-1" isArrayIndex="false">
                      <value name="u {true}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -175,7 +163,7 @@
                               </variable>
                            </value>
                         </variable>
-                        <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                            <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
                               <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -325,67 +313,31 @@
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;\if (  \if (u_2 = self)
-           \then (u_7)
-           \else (\if (u_7 = self)
-                      \then (null)
-                      \else (u_2))
-     = u_2)
-    \then (u_7)
-    \else (\if (  u_2 = self
-                |   \if (u_7 = self)
-                        \then (null)
-                        \else (u_2)
-                  = u_7)
-               \then (null)
-               \else (\if (  \if (u_2 = self)
-                                 \then (u_7)
-                                 \else (\if (u_7 = self)
-                                            \then (null)
-                                            \else (u_2))
-                           = self)
-                          \then (u_2)
-                          \else (\if (  \if (u_2 = self)
-                                            \then (u_7)
-                                            \else (\if (  u_7
-                                                        = self)
-                                                       \then (null)
-                                                       \else (u_2))
-                                      = u_2)
-                                     \then (null)
-                                     \else (\if (  u_2
-                                                 = self)
-                                                \then (u_7)
-                                                \else (\if (  u_7
-                                                            = self)
-                                                           \then (null)
-                                                           \else (u_2)).next))))&apos; as result of self.main();&gt;" isReturnValueComputed="true">
+                              <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="self {    !u_7 = self
-  &amp; (!u_2 = self &amp; (u_2.next = null &amp; u_2.next = null))
+                                    <value name="self {  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
 | !u_7 = self
-&amp; (!u_2 = self &amp; (!u_2.next = null &amp; !u_2.next = null))}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="    !u_7 = self
-  &amp; (!u_2 = self &amp; (u_2.next = null &amp; u_2.next = null))
+&amp; (!u_2 = self &amp; !u_2.next = null)}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
 | !u_7 = self
-&amp; (!u_2 = self &amp; (!u_2.next = null &amp; !u_2.next = null))">
+&amp; (!u_2 = self &amp; !u_2.next = null)">
                                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="next {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+                                          <value name="next {  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+&amp; !u_2.next = null}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+&amp; !u_2.next = null">
                                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="next {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
-| !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
-| !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+                                                <value name="next {  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
+| !u_7 = self
+&amp; (!u_2 = self &amp; !u_2.next = null)}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
+| !u_7 = self
+&amp; (!u_2 = self &amp; !u_2.next = null)">
                                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="next {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+                                                      <value name="next {  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+&amp; !u_2.next = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+&amp; !u_2.next = null">
                                                       </value>
                                                    </variable>
                                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -399,34 +351,34 @@
                                                 </value>
                                              </variable>
                                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="previous {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
-| !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
-| !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+                                                <value name="previous {  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
+| !u_7 = self
+&amp; (!u_2 = self &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
+| !u_7 = self
+&amp; (!u_2 = self &amp; !u_2.next = null)">
                                                 </value>
                                              </variable>
                                           </value>
                                        </variable>
                                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="previous {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+                                          <value name="previous {  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+&amp; !u_2.next = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+&amp; !u_2.next = null">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
                                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="exc {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+                                    <value name="exc {  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+&amp; !u_2.next = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; u_2.next = null
 | !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+&amp; !u_2.next = null">
                                     </value>
                                  </variable>
-                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                  </termination>
                               </methodReturn>
                            </statement>

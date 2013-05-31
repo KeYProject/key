@@ -37,14 +37,27 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -81,8 +94,6 @@ public class KeYMediator {
     private KeYExceptionHandler defaultExceptionHandler;
 
     private boolean stupidMode; // minimize user interaction
-
-    private boolean autoMode; // autoModeStarted has been fired
     
     private TacletFilter filterForInteractiveProving;
     
@@ -102,6 +113,9 @@ public class KeYMediator {
 	
 	defaultExceptionHandler = new KeYRecoderExcHandler();
 
+	// There may be other interruption listeners, but the interaction
+	// engine listens by default.
+	addInterruptedListener(interactiveProver);
 	
 	// moved from layout main here; but does not actually belong here at all;
 	// we should get that rule to behave like a normal built-in rule
@@ -565,6 +579,14 @@ public class KeYMediator {
     public void removeAutoModeListener(AutoModeListener listener) {  
 	interactiveProver.removeAutoModeListener(listener);
     }
+    
+    public void addInterruptedListener(InterruptListener listener) {
+        listenerList.add(InterruptListener.class, listener);
+    }
+    
+    public void removeInterruptedListener(InterruptListener listener) {
+        listenerList.remove(InterruptListener.class, listener);
+    }
 
     /** sets the current goal 
      * @param goal the Goal being displayed in the view of the sequent
@@ -688,7 +710,10 @@ public class KeYMediator {
      * Stop automatic application of rules.
      */
     public void stopAutoMode() {
-        interactiveProver.stopAutoMode();
+        for (InterruptListener listener :
+               listenerList.getListeners(InterruptListener.class)) {
+            listener.interruptionPerformed();
+        }
     }
     
     public void setResumeAutoMode(boolean b) {
@@ -756,7 +781,7 @@ public class KeYMediator {
    }
     
     public boolean autoMode() {
-        return autoMode;
+        return interactiveProver.isAutoMode();
     }
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
@@ -823,13 +848,11 @@ public class KeYMediator {
 	 */
 	public void autoModeStarted(ProofEvent e) {	 
 	    resetNrGoalsClosedByHeuristics();
-	    autoMode = true;
 	}
 	
 	/** invoked if automatic execution has stopped
 	 */
 	public void autoModeStopped(ProofEvent e) {
-            autoMode = false;
 	}
     }
 
@@ -847,7 +870,10 @@ public class KeYMediator {
 	}	
     }
     
-    public void enableWhenProof(final Action a) {
+    /*
+     * Disable certain actions until a proof is loaded.
+     */
+    public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             public void selectedNodeChanged(KeYSelectionEvent e) {}
@@ -907,13 +933,13 @@ public class KeYMediator {
 
     
     
-    /** 
-     * returns the prover task listener of the main frame
-     */
-    // TODO used 1 time, drop it? (MU)
-    public ProverTaskListener getProverTaskListener() {
-        return ui;
-    }
+//    /** 
+//     * returns the prover task listener of the main frame
+//     */
+//    // TODO used 1 time, drop it? (MU)
+//    public ProverTaskListener getProverTaskListener() {
+//        return ui;
+//    }
 
     public boolean processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {

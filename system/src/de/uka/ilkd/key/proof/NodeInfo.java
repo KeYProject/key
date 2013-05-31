@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.proof;
@@ -53,15 +53,15 @@ public class NodeInfo {
     private final Node    node;
 
     /** has the rule app of the node been applied interactively? */
-    private boolean interactiveApplication = false;    
-     
+    private boolean interactiveApplication = false;
+
 
     public NodeInfo(Node node) {
         this.node = node;
     }
 
 
-    private static List<Name> symbolicExecNames = new ArrayList<Name>(5);
+    private static List<Name> symbolicExecNames = new ArrayList<Name>(10);
     static {
         symbolicExecNames.add(new Name("method_expand"));
         symbolicExecNames.add(new Name("simplify_prog"));
@@ -77,7 +77,7 @@ public class NodeInfo {
 
     /**
      * determines the first and active statement if the applied
-     * taclet worked on a modality     
+     * taclet worked on a modality
      */
     private void determineFirstAndActiveStatement() {
         if (determinedFstAndActiveStatement)
@@ -156,7 +156,7 @@ public class NodeInfo {
        }
        return activeStatement;
     }
-    
+
     void updateNoteInfo(){
         determinedFstAndActiveStatement = false;
         firstStatement = null;
@@ -164,8 +164,8 @@ public class NodeInfo {
         activeStatement = null;
         determineFirstAndActiveStatement();
     }
-  
-    
+
+
     public static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
 	RuleSet       rs;
@@ -178,7 +178,7 @@ public class NodeInfo {
 	return false;
     }
 
-    /** 
+    /**
      * returns the active statement of the JavaBlock the applied
      * rule has been matched against or null if no rule has been applied yet
      * or the applied rule was no taclet or program transformation rule
@@ -197,9 +197,9 @@ public class NodeInfo {
 
     /**
      * returns the name of the source file where the active statement
-     * occurs or the string <tt>NONE</tt> if the statement does not originate from a 
-     * source file (e.g. created by a taclet application or part of a 
-     * generated implicit method)    
+     * occurs or the string <tt>NONE</tt> if the statement does not originate from a
+     * source file (e.g. created by a taclet application or part of a
+     * generated implicit method)
      */
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
@@ -210,8 +210,8 @@ public class NodeInfo {
     }
 
     /**
-     * returns the position of the executed statement in its source code 
-     * or Position.UNDEFINED 
+     * returns the position of the executed statement in its source code
+     * or Position.UNDEFINED
      */
     public Position getExecStatementPosition() {
         determineFirstAndActiveStatement();
@@ -247,7 +247,7 @@ public class NodeInfo {
             return;
         if(node.parent() == null){ return;}
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
-        if (ruleApp instanceof TacletApp) { 
+        if (ruleApp instanceof TacletApp) {
             TacletApp tacletApp = (TacletApp) ruleApp; // XXX
 
             Pattern p = Pattern.compile("#\\w+");
@@ -277,24 +277,24 @@ public class NodeInfo {
             Matcher whiteSpaceMatcher = whiteSpacePattern.matcher(sb);
             branchLabel = whiteSpaceMatcher.replaceAll(" ");
         } else {
-            branchLabel = s; 
+            branchLabel = s;
         }
     }
 
     /**
      * parameter indicated if the rule has been applied interactively or
      * not
-     * @param b a boolean indicating interactive application 
+     * @param b a boolean indicating interactive application
      */
     public void setInteractiveRuleApplication(boolean b) {
         interactiveApplication = b;
     }
-    
+
     /**
      * returns true if the rule applied on this node has been performed
      * manually by the user
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
-    }   
+    }
 }

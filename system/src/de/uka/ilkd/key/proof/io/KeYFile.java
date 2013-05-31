@@ -466,7 +466,7 @@ public class KeYFile implements EnvInput {
     
     @Override    
     public boolean equals(Object o) {
-        if(!(o instanceof KeYFile)) {
+        if(o == null || o.getClass() != this.getClass()) {
             return false;
         }
         KeYFile kf = (KeYFile) o;

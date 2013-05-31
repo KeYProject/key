@@ -17,7 +17,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
-import org.key_project.keyide.ui.editor.IProofEnvironmentProvider;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 
 // TODO: Document class StopAutoModeHandler
 public class StopAutoModeHandler extends AbstractSaveExecutionHandler {
@@ -28,9 +28,9 @@ public class StopAutoModeHandler extends AbstractSaveExecutionHandler {
    protected Object doExecute(ExecutionEvent event) throws Exception {
       IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
       if (editorPart != null) {
-         IProofEnvironmentProvider proofProvider = (IProofEnvironmentProvider)editorPart.getAdapter(IProofEnvironmentProvider.class);
-         if (proofProvider != null && proofProvider.getKeYEnvironment().getMediator().autoMode()) {
-            proofProvider.getKeYEnvironment().getUi().stopAutoMode();
+         IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
+         if (proofProvider != null && proofProvider.getEnvironment().getMediator().autoMode()) {
+            proofProvider.getEnvironment().getUi().stopAutoMode();
          }
       }
       return null;

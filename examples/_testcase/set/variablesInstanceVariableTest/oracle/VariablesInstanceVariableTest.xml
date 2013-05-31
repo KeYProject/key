@@ -2,68 +2,42 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(param);" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-         <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="int x = 5;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
-            <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+            <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                  <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                  <value name="a {true}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                  <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                  <value name="b {true}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                  <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                  <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                   </value>
                </variable>
             </value>
          </variable>
          <variable name="param" arrayIndex="-1" isArrayIndex="false">
-            <value name="param {param = null &amp; param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null &amp; param = null">
+            <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
             </value>
-            <value name="param {!param = null &amp; !param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null &amp; !param = null">
+            <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                <variable name="value" arrayIndex="-1" isArrayIndex="false">
                   <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
@@ -71,68 +45,42 @@
             </value>
          </variable>
          <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-            <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <statement name="a=x;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
-               <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+               <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                     <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                     <value name="a {true}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                     <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                     <value name="b {true}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                     <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                     <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                      </value>
                   </variable>
                </value>
             </variable>
             <variable name="param" arrayIndex="-1" isArrayIndex="false">
-               <value name="param {param = null &amp; param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null &amp; param = null">
+               <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
                </value>
-               <value name="param {!param = null &amp; !param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null &amp; !param = null">
+               <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
                      <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
@@ -140,76 +88,46 @@
                </value>
             </variable>
             <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-               <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <variable name="x" arrayIndex="-1" isArrayIndex="false">
-               <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+               <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="b=3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                  <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                  <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                        <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                        <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                        <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                        <value name="b {true}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                        <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                        <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                  <value name="param {param = null &amp; param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null &amp; param = null">
+                  <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
                   </value>
-                  <value name="param {!param = null &amp; !param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null &amp; !param = null">
+                  <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
                         <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
@@ -217,76 +135,46 @@
                   </value>
                </variable>
                <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                  <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                  <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                  <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <statement name="param=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                     <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                     <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                           <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                           <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                           <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                           <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                           <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                           <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                     <value name="param {param = null &amp; param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null &amp; param = null">
+                     <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
                      </value>
-                     <value name="param {!param = null &amp; !param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null &amp; !param = null">
+                     <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
                            <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
@@ -294,76 +182,46 @@
                      </value>
                   </variable>
                   <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                     <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                     <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                     <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <methodCall name="IntWrapper();" pathCondition="true" pathConditionChanged="false">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                        <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                        <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                              <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                              <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                              <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                              <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                        <value name="param {param = null &amp; param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null &amp; param = null">
+                        <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
                         </value>
-                        <value name="param {!param = null &amp; !param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null &amp; !param = null">
+                        <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
                               <value name="value {!param = i_2}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="!param = i_2">
                               </value>
@@ -371,419 +229,221 @@
                         </value>
                      </variable>
                      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                        <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                        <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                        <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="i" arrayIndex="-1" isArrayIndex="false">
-                        <value name="i {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                        <value name="i {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                              <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                         <variable name="i" arrayIndex="-1" isArrayIndex="false">
-                           <value name="i {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                           <value name="i {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                 <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                           <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                           <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                           <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <statement name="param.value=1;" pathCondition="true" pathConditionChanged="false">
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                              <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                                    <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                            <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                              <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                              <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                              <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                              <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <statement name="wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                 <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                                       <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
                               <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                 <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
                               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                 <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <methodCall name="IntWrapper();" pathCondition="true" pathConditionChanged="false">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="wrapper {    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+                                          <value name="wrapper {  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    param = null
-  &amp; param = null
-  &amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
 | param = null
-&amp; param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)
+&amp; !self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (self.wrapper = null &amp; self.wrapper = null)
+&amp; self.wrapper = null
 | !param = null
-&amp; !param = null
-&amp; (!self.wrapper = null &amp; !self.wrapper = null)">
+&amp; !self.wrapper = null">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
                                  <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
                                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="i_3" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="i_3 {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                    <value name="i_3 {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
-                                 <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                     <variable name="i_3" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="i_3 {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="i_3 {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                             <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
                                     </variable>
                                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                       <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                             <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
                                     </variable>
                                     <statement name="wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
                                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                              <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                              <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="wrapper {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                      <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>
@@ -791,72 +451,36 @@
                                           </value>
                                        </variable>
                                        <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                           </value>
                                        </variable>
                                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                          <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <statement name="return a+b+x+wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
                                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                             <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                   <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                                 <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                   <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                                 <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="wrapper {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                   <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                         <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                         <value name="value {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                          </value>
                                                       </variable>
                                                    </value>
@@ -864,72 +488,36 @@
                                              </value>
                                           </variable>
                                           <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                             <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                   <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                    </value>
                                                 </variable>
                                              </value>
                                           </variable>
                                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                           <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="x {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                             <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
-                                          <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;18&apos; as result of self.main(param);&gt;" isReturnValueComputed="true">
+                                          <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="self {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="a {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                      <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                    <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="b {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                      <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                    <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="wrapper {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                      <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                            <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                            <value name="value {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                             </value>
                                                          </variable>
                                                       </value>
@@ -937,30 +525,18 @@
                                                 </value>
                                              </variable>
                                              <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="param {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="value {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                      <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
                                                    </variable>
                                                 </value>
                                              </variable>
                                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="exc {  param = null &amp; param = null
-| !param = null
-&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  param = null &amp; param = null
-| !param = null
-&amp; !param = null">
+                                                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
-                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                              </termination>
                                           </methodReturn>
                                        </statement>

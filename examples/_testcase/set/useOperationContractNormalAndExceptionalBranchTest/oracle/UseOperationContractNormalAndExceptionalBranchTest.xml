@@ -18,22 +18,20 @@ post: (   x &lt; 0 &amp; x &gt;= javaUnaryMinusInt(10)
 &amp; (x &gt;= 10 -&gt; result = 84 &amp; exc = null)
 mod: allLocs \cup allLocs \cup allLocs \cup allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="value &gt;= 0 &amp; value &lt; 10 | value &gt;= 10" pathCondition="!value &lt;= -1" pathConditionChanged="true" branchCondition="value &gt;= 0 &amp; value &lt; 10 | value &gt;= 10" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="!value &lt;= -1" pathCondition="!value &lt;= -1" pathConditionChanged="true" branchCondition="!value &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="!value &lt;= -1" pathConditionChanged="false">
                   <statement name="return magicNumber+magicNumberCopy;" pathCondition="!value &lt;= -1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="!value &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;result_0 * 2&apos; as result of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="!value &lt;= -1" pathConditionChanged="false" exceptionalTermination="false">
+                     <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="!value &lt;= -1" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="!value &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="  value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
-| value &lt; javaUnaryMinusInt(10)" pathCondition="!value &gt;= 0" pathConditionChanged="true" branchCondition="  value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
-| value &lt; javaUnaryMinusInt(10)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="!value &gt;= 0" pathCondition="!value &gt;= 0" pathConditionChanged="true" branchCondition="!value &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
                <statement name="return -1;" pathCondition="!value &gt;= 0" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="!value &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-1&apos; as result of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" isReturnValueComputed="true">
-                     <termination name="&lt;end&gt;" pathCondition="!value &gt;= 0" pathConditionChanged="false" exceptionalTermination="false">
+                  <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="!value &gt;= 0" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="!value &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>

@@ -16,16 +16,18 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchNode;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDBranchNode} for the symbolic execution debugger (SED)
@@ -139,7 +141,7 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getActivePositionInfo());
       }
       return sourceName;
    }
@@ -184,7 +186,7 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
+      SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
       return KeYModelUtil.updateLocationFromAST(this, location);
    }
 
@@ -206,9 +208,14 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return !executionNode.isDisposed() && 
-             super.hasVariables() && 
-             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 
    /**

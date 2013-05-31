@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel">
+  <proofs target="//@types.0/@methods.0/@operationContracts.0" obligation="ContractPO">
+    <proofReferences target="//@types.0/@methods.0" kind="Inline Method"/>
+    <proofReferences target="//@types.0/@types.0/@types.0/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.0/@types.1/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.0/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.1/@types.0/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.1/@types.1/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.1/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.2/@types.0/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.2/@types.1/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.2/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@types.3/@methods.0" kind="Call Method"/>
+    <proofReferences target="//@types.0/@types.4/@methods.0" kind="Inline Method"/>
+  </proofs>
+  <types xsi:type="dbcmodel:DbcClass" name="Main">
+    <types xsi:type="dbcmodel:DbcEnum" name="Main.InnerEnum" visibility="default">
+      <types xsi:type="dbcmodel:DbcClass" name="Main.InnerEnum.InnerEnumInterface">
+        <attributes name="VALUE" type="int" visibility="default" static="true"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="Main.InnerEnum.InnerEnumClass">
+        <attributes name="VALUE" type="int" visibility="default" static="true"/>
+      </types>
+      <attributes name="VALUE" type="int" visibility="default" static="true"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="Main.InnerClass">
+      <types xsi:type="dbcmodel:DbcClass" name="Main.InnerClass.InnerClassClass">
+        <attributes name="VALUE" type="int" visibility="default" static="true"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="Main.InnerClass.InnerClassInterface">
+        <attributes name="VALUE" type="int" visibility="default" static="true"/>
+      </types>
+      <attributes name="VALUE" type="int" visibility="default" static="true"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="Main.InnerInterface">
+      <types xsi:type="dbcmodel:DbcClass" name="Main.InnerInterface.InnerInterfaceClass">
+        <attributes name="VALUE" type="int" visibility="default" static="true"/>
+      </types>
+      <types xsi:type="dbcmodel:DbcClass" name="Main.InnerInterface.InnerInterfaceInterface">
+        <attributes name="VALUE" type="int" visibility="default" static="true"/>
+      </types>
+      <attributes name="VALUE" type="int" visibility="default" static="true"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcInterface" name="Main.IGetter">
+      <methods signature="getValue()" returnType="int" abstract="true"/>
+    </types>
+    <types xsi:type="dbcmodel:DbcClass" name="Main.33187268.4843653" visibility="default" anonymous="true">
+      <methods signature="getValue()" returnType="int"/>
+    </types>
+    <methods signature="main()" returnType="int">
+      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> self.&lt;inv>) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+  </types>
+</dbcmodel:DbcModel>

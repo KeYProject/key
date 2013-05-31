@@ -190,9 +190,8 @@
                               value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
                         </instanceof>
                         <test
-                              args="notDisposed"
                               forcePluginActivation="true"
-                              property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
+                              property="org.key_project.sed.key.ui.canVisualizeConfigurations">
                         </test>
                      </and>
                   </or>
@@ -336,9 +335,8 @@
                                  value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
                            </instanceof>
                            <test
-                                 args="notDisposed"
                                  forcePluginActivation="true"
-                                 property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
+                                 property="org.key_project.sed.key.ui.canVisualizeConfigurations">
                            </test>
                         </and>
                      </or>
@@ -396,6 +394,13 @@
                namespace="org.key_project.sed.key.ui"
                properties="isSingleKeyDebugTarget"
                type="org.eclipse.debug.core.model.IDebugElement">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.CanVisualizeConfigurationsPropertyTester"
+               id="org.key_project.sed.key.ui.canVisualizeConfigurationsPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="canVisualizeConfigurations"
+               type="java.lang.Object">
          </propertyTester>
       </extension>
       <extension

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_1e811ad4-75b6-4121-8ce1-307580f89a0a" name="returnValue(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_288d14b2-23ed-45f3-a62c-6d5d8df1ad5f" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_43c2e08d-8701-4339-aa5f-d0772066c704" name="self.returnValue(value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-            <sedStatement xml:id="_31bd4cf3-69df-42c6-9950-27682ee19e07" name="return value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
-               <sedMethodReturn xml:id="_e7ab82e9-780d-410d-b9a5-52ec27103c71" name="&lt;return &apos;42&apos; as result of self.returnValue(value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-                  <sedTermination xml:id="_32f55273-6bc1-48e2-80d2-a50fa3c3aae7" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_b218f406-a77a-4126-89ee-19bcfd3f1123" name="returnValue(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_54df0280-ff12-4252-b586-2a34e6c932e9" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0613181f-9a83-4deb-9b2c-494b9e1181ed" name="self.returnValue(value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+            <sedStatement xml:id="_f3778f00-34bd-4177-900d-434276b4d900" name="return value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
+               <sedMethodReturn xml:id="_c8e371b7-647a-4e37-8213-c6c58dcc9274" name="&lt;return 42 as result of self.returnValue(value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+                  <sedTermination xml:id="_017b9954-6b96-4b8c-af48-f387d72e902a" name="&lt;end&gt;" pathCondition="true">
                   </sedTermination>
                </sedMethodReturn>
             </sedStatement>

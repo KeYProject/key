@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Proof References UI
+Bundle-SymbolicName: de.hentschel.visualdbc.key.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.hentschel.visualdbc.key.ui.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.ide;bundle-version="3.7.0",
+ org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.5.0",
+ org.eclipse.gmf.runtime.diagram.ui.resources.editor;bundle-version="1.4.1",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse;bundle-version="1.0.0",
+ org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel.editor;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dbcmodel.diagram;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource;bundle-version="1.0.0",
+ de.hentschel.visualdbc.dataSource.key;bundle-version="1.0.0",
+ de.hentschel.visualdbc.interactive.proving.ui;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Martin Hentschel
+Export-Package: de.hentschel.visualdbc.key.ui.adapter,
+ de.hentschel.visualdbc.key.ui.editor,
+ de.hentschel.visualdbc.key.ui.util,
+ de.hentschel.visualdbc.key.ui.view
