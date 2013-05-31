@@ -16,6 +16,7 @@ package org.key_project.key4eclipse.starter.core.util;
 import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -33,10 +34,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -1009,6 +1012,50 @@ public final class KeYUtil {
       else {
          return -1;
       }
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static LinkedList<IMethod> getResourceMethods(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      LinkedList<IMethod> methods = new LinkedList<IMethod>();
+      IType[] types = unit.getAllTypes();
+      for(IType type : types){
+         IMethod[] tmp = type.getMethods();
+         for(IMethod method : tmp){
+            methods.add(method);
+         }
+      }
+      return methods;
+   }
+
+
+   /**
+    * Returns the lineNumber of the given {@link IMethod}.
+    * @param method - the {@link IMethod} to use
+    * @return the lineNumber of the {@link IMethod}
+    * @throws CoreException
+    */
+   public static int getLineNumberOfMethod(IMethod method, int offset) throws CoreException {
+      Position pos = KeYUtil.getCursorPositionForOffset(method, offset);
+      return pos.getLine();
+   }
+   
+
+   public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {
+      LinkedList<IMethod>methods = getResourceMethods(resource);
+      for(IMethod method : methods){
+         int start = getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = getLineNumberOfMethod(method, method.getSourceRange().getOffset()+method.getSourceRange().getLength());
+         if(lineNumber>start&&lineNumber<end){
+            return method;
+         }
+      }
+      return null;
    }
    
    /**

@@ -129,6 +129,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          createOracleFile(oracleDirectory, target, expectedModelPathInBundle, saveVariables, saveCallStack);
       }
    }
+
    
    /**
     * Creates a new oracle file for the given {@link ISEDDebugTarget}.
@@ -154,6 +155,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       // Print message to the user.
       printOracleDirectory();
    }
+   
    
    /**
     * Prints {@link #oracleDirectory} to the user via {@link System#out}.
@@ -237,6 +239,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables, includeCallStack);
       }
    }
+   
    
    /**
     * Makes sure that one test step is correctly done.

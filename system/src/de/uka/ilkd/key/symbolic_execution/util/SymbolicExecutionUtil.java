@@ -1205,9 +1205,21 @@ public final class SymbolicExecutionUtil {
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
    public static Node findMethodCallNode(Node node) {
-      if (node != null && node.getAppliedRuleApp() != null) {
+      return findMethodCallNode(node, node != null ? node.getAppliedRuleApp() : null);
+   }
+
+   /**
+    * Searches for the given {@link Node} the parent node
+    * which also represents a symbolic execution tree node
+    * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+    * @param node The {@link Node} to start search in.
+    * @param ruleApp The {@link RuleApp} to use.
+    * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
+    */
+   public static Node findMethodCallNode(Node node, RuleApp ruleApp) {
+      if (node != null && ruleApp != null) {
          // Get current program method
-         Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
          term = TermBuilder.DF.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
@@ -1624,7 +1636,20 @@ public final class SymbolicExecutionUtil {
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node,
                                                               Term newSuccedent) {
-      return createSequentToProveWithNewSuccedent(node, null, newSuccedent);
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp(), newSuccedent);
+   }
+   
+   /**
+    * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
+    * of the given {@link Node} which contains the same information but a different succedent.
+    * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param newSuccedent The new succedent.
+    * @return The created {@link Sequent}.
+    */
+   public static Sequent createSequentToProveWithNewSuccedent(Node node,
+                                                              RuleApp ruleApp,
+                                                              Term newSuccedent) {
+      return createSequentToProveWithNewSuccedent(node, ruleApp, null, newSuccedent);
    }
 
    /**
@@ -1638,11 +1663,26 @@ public final class SymbolicExecutionUtil {
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
                                                               Term additionalAntecedent,
                                                               Term newSuccedent) {
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp(), additionalAntecedent, newSuccedent);
+   }
+
+   /**
+    * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
+    * of the given {@link Node} which contains the same information but a different succedent.
+    * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param additionalAntecedent An optional additional antecedents.
+    * @param newSuccedent The new succedent.
+    * @return The created {@link Sequent}.
+    */
+   public static Sequent createSequentToProveWithNewSuccedent(Node node, 
+                                                              RuleApp ruleApp,
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent) {
       // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term originalModifiedFormula = ruleApp.posInOccurrence().constrainedFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Create new sequent
-      return createSequentToProveWithNewSuccedent(node, additionalAntecedent, newSuccedent, originalUpdates);
+      return createSequentToProveWithNewSuccedent(node, ruleApp, additionalAntecedent, newSuccedent, originalUpdates);
    }
    
    /**
@@ -1658,10 +1698,27 @@ public final class SymbolicExecutionUtil {
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates) {
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp(), additionalAntecedent, newSuccedent, updates);
+   }
+   
+   /**
+    * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
+    * of the given {@link Node} which contains the same information but a different succedent.
+    * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param additionalAntecedent An optional additional antecedents.
+    * @param newSuccedent The new succedent.
+    * @param updates The updates to use.
+    * @return The created {@link Sequent}.
+    */
+   public static Sequent createSequentToProveWithNewSuccedent(Node node, 
+                                                              RuleApp ruleApp,
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent,
+                                                              ImmutableList<Term> updates) {
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(updates, newSuccedent);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+      PosInOccurrence pio = ruleApp.posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
       Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
       if (additionalAntecedent != null) {

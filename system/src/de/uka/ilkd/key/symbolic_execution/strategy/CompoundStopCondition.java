@@ -156,4 +156,8 @@ public class CompoundStopCondition implements IStopCondition {
              lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, goalChooser, startTime, countApplied, singleRuleApplicationInfo) :
              null;
    }
+
+   public List<IStopCondition> getChildren() {
+      return children;
+   }
 }

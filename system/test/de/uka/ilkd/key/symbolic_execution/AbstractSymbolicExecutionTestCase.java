@@ -616,6 +616,44 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
    }
    
+   
+   
+   /**
+    * Executes an "step return" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
+    * @param ui The {@link CustomConsoleUserInterface} to use.
+    * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
+    * @param oraclePathInBaseDirFile The oracle path.
+    * @param oracleIndex The index of the current step.
+    * @param oracleFileExtension The oracle file extension
+    * @param baseDir The base directory for oracles.
+    * @throws IOException Occurred Exception
+    * @throws ProofInputException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected static void stepReturnWithBreakpoints(CustomConsoleUserInterface ui, 
+                                    SymbolicExecutionTreeBuilder builder, 
+                                    String oraclePathInBaseDirFile, 
+                                    int oracleIndex, 
+                                    String oracleFileExtension, 
+                                    File baseDir,
+                                    CompoundStopCondition lineBreakpoints) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+      Proof proof = builder.getProof();
+      CompoundStopCondition stopCondition = new CompoundStopCondition();
+      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+      stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
+      stopCondition.addChildren(lineBreakpoints);
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      // Run proof
+      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
+      ui.startAndWaitForAutoMode(proof);
+      // Update symbolic execution tree 
+      builder.analyse();
+      // Test result
+      assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
+   }
+   
    /**
     * Executes an "step over" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
     * @param ui The {@link CustomConsoleUserInterface} to use.

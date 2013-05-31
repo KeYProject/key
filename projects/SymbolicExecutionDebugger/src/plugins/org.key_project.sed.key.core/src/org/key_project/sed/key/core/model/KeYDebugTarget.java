@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
@@ -25,6 +26,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
@@ -35,15 +37,17 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
@@ -495,16 +499,30 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       if(breakpoint instanceof JavaLineBreakpoint){
          JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
          try {
-            LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(lineBreakpoint.getMarker().getResource().getLocation(), lineBreakpoint.getLineNumber(), lineBreakpoint.getHitCount(), lineBreakpoint.getCondition(), lineBreakpoint.isEnabled());
-            breakpointStopConditions.addChildren(stopCondition);
-            breakpointMap.put(lineBreakpoint, stopCondition);
+            IResource resource = lineBreakpoint.getMarker().getResource();
+            if(resource.getFileExtension()!=null && resource.getFileExtension().equalsIgnoreCase("java")) {
+            IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
+            IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+            
+               LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(lineBreakpoint.getMarker().getResource().getLocation(), lineBreakpoint.getLineNumber(), lineBreakpoint.getHitCount(), environment, pm, lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(), lineBreakpoint.isConditionEnabled());
+               breakpointStopConditions.addChildren(stopCondition);
+               breakpointMap.put(lineBreakpoint, stopCondition);
+            }           
+            
+            
+            
          }
          catch (CoreException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
          }
+         catch (ProofInputException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
       }
    }
+
 
    /**
     * {@inheritDoc}
@@ -526,16 +544,24 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
       if(breakpoint instanceof JavaLineBreakpoint){
          JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-         LineBreakpointStopCondition stopCondition = breakpointMap.get(lineBreakpoint);
-         try {
-            stopCondition.setCondition(lineBreakpoint.getCondition());
-            stopCondition.setHitCount(lineBreakpoint.getHitCount());
-            stopCondition.setEnabled(lineBreakpoint.isEnabled());
+         if(breakpointMap.containsKey(lineBreakpoint)){
+            LineBreakpointStopCondition stopCondition = breakpointMap.get(lineBreakpoint);
+            try {
+               stopCondition.setHitCount(lineBreakpoint.getHitCount());
+               stopCondition.setEnabled(lineBreakpoint.isEnabled());
+               stopCondition.setConditionEnabled(lineBreakpoint.isConditionEnabled());
+               stopCondition.setCondition(lineBreakpoint.getCondition());
+            }
+            catch (CoreException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            }
+            catch (ProofInputException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            }
+            }
          }
-         catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      }
-   }
+   }   
+  
 }

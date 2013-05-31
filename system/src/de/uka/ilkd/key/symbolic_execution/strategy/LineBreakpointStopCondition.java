@@ -1,16 +1,58 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.RenamingTable;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * This{@link LineBreakpointStopCondition} represents a line breakpoint and is responsible to tell the debugger to stop execution when the respective
@@ -20,13 +62,16 @@ import de.uka.ilkd.key.proof.Proof;
  */
 
 
-public class LineBreakpointStopCondition implements IStopCondition {
+public class LineBreakpointStopCondition extends ExecutedSymbolicExecutionTreeNodesStopCondition {
    
+
+
    /**
     * The {@link IPath} of the class this {@link LineBreakpointStopCondition} is associated with.
     */
    private IPath classPath;
-   
+
+
    /**
     * The line of the Breakpoint in the respective class.
     */
@@ -45,72 +90,53 @@ public class LineBreakpointStopCondition implements IStopCondition {
    /**
     * The condition  for this Breakpoint (set by user).
     */
-   private String condition;
+   private Term condition;
    
    /**
     * The flag if the Breakpoint is enabled.
     */
    private boolean enabled;
+   
+   private boolean conditionEnabled;
 
 
-   /**
-    * Constructor to generate a new {@link LineBreakpointStopCondition} with the given parameters.
-    * and their respective Hitcounts.
-    * 
-    * @param classPath the path of the breakpoints javaclass
-    * @param lineNumber the line of the breakpoint
-    * @param hitCount of the breakpoint
-    * @param condition the condition the user stated for this breakpoint
-    * @param enabled the flag if the breakpoint is enabled
-    */
-   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, String condition, boolean enabled) {
+   private ProgramVariable selfVar;
+   
+   private IProgramMethod pm;
+   
+   private KeYEnvironment<?> environment;
+   
+   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, String condition, boolean enabled, boolean conditionEnabled) throws SLTranslationException {
+      super();
+      this. environment = environment;
+      this.pm = pm;
+      
+      this.condition = conditionEnabled ? computeTermForCondition(condition):TermBuilder.DF.tt();
       this.classPath=classPath;
       this.lineNumber=lineNumber;
       this.hitCount=hitCount;
-      this.setCondition(condition);
       this.enabled=enabled;
-      // TODO: Einmalig JML-String parsen
+      this.conditionEnabled = conditionEnabled;
       
-      // Breakpoints
-//      String className; // TODO: Defined by breakpiont
-//      IProgramMethod pm = KeYUtil.getProgramMethod(IMethod, services.getJavaInfo());
-//      
-//      ProgramVariable selfVar = new ProgramVariable(TermBuilder.DF.newName(services, "self"), pm.sort(), pm.getType(), pm.getContainerType(), false, false, false);
-//      // TODO: create paramVars like selfVar
-//      PositionedString ps = new PositionedString(precondition);
-//      KeYJMLParser parser = new KeYJMLParser(ps, 
-//                                             services, 
-//                                             getCalleeKeYJavaType(), 
-//                                             selfVar, 
-//                                             paramVars, 
-//                                             null, 
-//                                             null, 
-//                                             null);
-//      Term result = parser.parseExpression();
-//      
-//      // TODO: Im check program variablen ersetzen, key = alt, wert = neu
-//      IExecutionContext ec = JavaTools.getInnermostExecutionContext(jb, services);
-//      
-//      Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-//      map.put(selfVar, ec.getRuntimeInstance()); // TODO arguments
-//      OpReplacer replacer = new OpReplacer(map);
-//      Term termForSideProof = replacer.replace(result);
-//      
-//      Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
-//      ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(toProof), false, true));
-//      boolean result = info.getProof().closed();
+      
+   }
+   
+   
+   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, String condition, boolean enabled, boolean conditionEnabled) throws SLTranslationException {
+      super();
+      this. environment = environment;
+      
+    
+      
+      this.condition = conditionEnabled ? computeTermForCondition(condition):TermBuilder.DF.tt();
+      this.classPath=classPath;
+      this.lineNumber=lineNumber;
+      this.hitCount=hitCount;
+      this.enabled=enabled;
+      
+      
    }
 
-
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getMaximalWork(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser) {
-      return 0;
-   }
 
    /**
     * {@inheritDoc}
@@ -118,36 +144,54 @@ public class LineBreakpointStopCondition implements IStopCondition {
    @Override
    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
          IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+      
+         
+         
+         if(goal!=null){
+            Node node = goal.node();
+            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+               if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
+                  // Check if the result for the current node was already computed.
+                  Boolean value = getGoalAllowedResultPerSetNode().get(node);
+                  if (value == null) {
+                     // Get the number of executed set nodes on the current goal
+                     Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
+                     if (executedNumberOfSetNodes == null) {
+                        executedNumberOfSetNodes = Integer.valueOf(0);
+                     }
+                     // Check if limit of set nodes of the current goal is exceeded
+                     if (executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal()) {
+                        getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
+                        return false; // Limit of set nodes of this goal exceeded
+                     }
+                     else {
+                        SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
+                        if (activeStatement != null && activeStatement.getEndPosition().getLine() != -1) {
+                           IPath path = new Path(activeStatement.getPositionInfo().getParentClass());
+                           int line = activeStatement.getEndPosition().getLine();
+                           if(shouldStopInLine(line, path)&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
+                           // Increase number of set nodes on this goal and allow rule application
+                              executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+                              getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
+                              getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                           }
+                        }
+                        return true; 
+                     }
+                  }
+                  else {
+                     // Reuse already computed result.
+                     return value.booleanValue();
+                  }
+               }
+            
+         }
+      
       return true;
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getGoalNotAllowedMessage(int maxApplications, long timeout,
-         Proof proof, IGoalChooser goalChooser, long startTime,
-         int countApplied, Goal goal) {
-      return null;
-   }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      if (singleRuleApplicationInfo != null) {
-         SourceElement activeStatement = NodeInfo.computeActiveStatement(singleRuleApplicationInfo.getAppliedRuleApp());
-         if (activeStatement != null && activeStatement.getEndPosition().getLine() != -1) {
-            IPath path = new Path(activeStatement.getPositionInfo().getParentClass());
-            int line = activeStatement.getEndPosition().getLine();
-            return shouldStopInLine(line, path);
-         }
-      }
-      return false;
-   }
+
    
 
 
@@ -187,25 +231,47 @@ public class LineBreakpointStopCondition implements IStopCondition {
       }
       return false;
    }
+   
+   private boolean conditionMet(RuleApp ruleApp, Proof proof, Node node){
+      try {
+         PosInOccurrence pio = ruleApp.posInOccurrence();
+         Term term = pio.subTerm();
+         term = TermBuilder.DF.goBelowUpdates(term);
+         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+         
+         
+         Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
+         
+         map.put(selfVar, ec.getRuntimeInstance());
+         OpReplacer replacer = new OpReplacer(map);
+         Term termForSideProof = replacer.replace(condition);
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getStopMessage(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied,
-         SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      return null;
+         
+         Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+
+         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+         
+         return info.getProof().closed();
+      }
+      catch (ProofInputException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      
+
+      return true;
    }
 
-   public String getCondition() {
+
+   public Term getCondition() {
       return condition;
    }
 
-   public void setCondition(String condition) {
-      this.condition = condition;
+   public void setCondition(String condition) throws SLTranslationException {
+      this.condition = conditionEnabled? computeTermForCondition(condition) : TermBuilder.DF.tt();
    }
-   
+
    public int getHitCount() {
       return hitCount;
    }
@@ -221,5 +287,61 @@ public class LineBreakpointStopCondition implements IStopCondition {
    public void setEnabled(boolean enabled) {
       this.enabled = enabled;
    }
+   
+   public void setConditionEnabled(boolean conditionEnabled) {
+      this.conditionEnabled = conditionEnabled;
+   }
+   
+   public int getLineNumber() {
+      return lineNumber;
+   }
 
+
+   public boolean isConditionEnabled() {
+      return conditionEnabled;
+   }
+   
+   
+   public IPath getClassPath() {
+      return classPath;
+   }
+   
+   private Term computeTermForCondition(String condition) throws SLTranslationException {
+      selfVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(environment.getServices(), "self")), pm.getContainerType(), null, false, false);
+      ImmutableList<ProgramVariable> paramVars = ImmutableSLList.nil();
+      for (ParameterDeclaration pd : pm.getParameters()) {
+         for (VariableSpecification vs : pd.getVariables()) {
+            ProgramVariable paramVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(environment.getServices(), vs.getName())), (KeYJavaType) vs.getType(), pm.getContainerType(), false, false);
+            paramVars = paramVars.append(paramVar);
+         }
+      }
+      
+
+    
+      
+      // TODO: Add to paramVars previously declared local variables like in ProgramMethodSubseetPO
+      
+
+//            TermBuilder.DF.paramVars(environment.getServices(), pm, true);
+      // TODO: create paramVars like selfVar
+      PositionedString ps = new PositionedString(condition);
+      KeYJMLParser parser = new KeYJMLParser(ps, 
+                                             environment.getServices(), 
+                                             pm.getContainerType(), 
+                                             selfVar, 
+                                             paramVars, 
+                                             null, 
+                                             null, 
+                                             null);
+      
+      return parser.parseExpression();
+   }
+
+   protected final void register(ProgramVariable pv) {
+      Namespace progVarNames = environment.getServices().getNamespaces().programVariables();
+      if (pv != null && progVarNames.lookup(pv.name()) == null) {
+          progVarNames.addSafely(pv);
+      }
+ }
+   
 }
