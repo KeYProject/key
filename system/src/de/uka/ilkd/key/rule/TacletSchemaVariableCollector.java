@@ -1,28 +1,41 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvRuleWrapper;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
  * Collects all schemavariables occurring in the 
@@ -36,7 +49,7 @@ import de.uka.ilkd.key.rule.metaconstruct.WhileInvRuleWrapper;
  * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class 
  * to determine all uninstantiated schemavariables.
  */
-public class TacletSchemaVariableCollector extends Visitor {
+public class TacletSchemaVariableCollector extends DefaultVisitor {
 
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;
@@ -75,17 +88,6 @@ public class TacletSchemaVariableCollector extends Visitor {
 	return prgSVColl.getSchemaVariables();
     }
     
-
-    private ImmutableList<SchemaVariable> collectSVInProgram
-	(Term t, ImmutableList<SchemaVariable> vars) {
-
-	ProgramSVCollector prgSVColl = new 
-	    ProgramSVCollector(new WhileInvRuleWrapper(t), 
-			       vars, instantiations);
-	prgSVColl.start();
-	return prgSVColl.getSchemaVariables();
-    }
-    
     
     /** 
      * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
@@ -100,9 +102,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	    varList = collectSVInProgram(t.javaBlock(), varList);
 	} else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate)op, varList);
-        } else if (op instanceof WhileInvRule) {
- 	    varList = collectSVInProgram(t, varList);
- 	}
+        } 
         
 	for (int j=0, ar = t.arity(); j<ar; j++) {
 	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {

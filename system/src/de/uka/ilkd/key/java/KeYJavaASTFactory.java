@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -20,10 +24,19 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -36,6 +49,13 @@ public abstract class KeYJavaASTFactory {
      */
     public static Statement assign(Expression lhs, Expression rhs) {
 	return new CopyAssignment(lhs, rhs);
+    }
+
+    /** 
+     * creates an assignment <code> lhs:=rhs </code>
+     */
+    public static Statement assign(Expression lhs, Expression rhs, PositionInfo posInfo) {
+       return new CopyAssignment(new ExtList(new Object[] {lhs, rhs, posInfo}));
     }
 
     /**
@@ -194,6 +214,10 @@ public abstract class KeYJavaASTFactory {
 
     public static Break breakStatement(Label l) {
 	return new Break(l);
+    }
+
+    public static Statement breakStatement(Label label, PositionInfo positionInfo) {
+       return new Break(new ExtList(new Object[] {label, positionInfo}));
     }
 
     public static Continue continueStatement(Label label) {

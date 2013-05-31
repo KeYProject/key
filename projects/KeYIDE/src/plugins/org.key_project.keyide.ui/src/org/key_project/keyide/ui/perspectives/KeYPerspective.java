@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.perspectives;
 
 import org.eclipse.ui.IFolderLayout;
@@ -6,7 +19,6 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 import de.uka.ilkd.key.proof.Proof;
 
-
 /**
  * This class defines the layout of the KeY-View.
  * This view should be used whenever a {@link Proof} is started or a KeY-associated file is opened.
@@ -14,7 +26,6 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class KeYPerspective implements IPerspectiveFactory {
-
    /**
     * The ID of this perspective.
     */
@@ -46,5 +57,4 @@ public class KeYPerspective implements IPerspectiveFactory {
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
       layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
    }
-
 }

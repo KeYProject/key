@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt;
 
@@ -22,6 +26,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
 
     private static StringBuffer INTSTRING = new StringBuffer("Int");
+    
+    private static StringBuffer BOOL = new StringBuffer("Bool");
 
     private static StringBuffer FALSESTRING = new StringBuffer("false");
 
@@ -96,6 +102,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     protected StringBuffer translateNullSort() {
 	return NULLSORTSTRING;
+    }
+    
+    protected StringBuffer getBoolSort() {
+        return BOOL;
     }
 
     @Override

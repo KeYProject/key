@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -12,8 +25,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
-
-import de.uka.ilkd.key.proof.Proof;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * An {@link AbstractSaveExecutionHandler} for the Start Proof command.
@@ -23,7 +35,6 @@ import de.uka.ilkd.key.proof.Proof;
  */
 @SuppressWarnings({ "restriction" })
 public class StartProofHandler extends AbstractSaveExecutionHandler {
-
    /** 
     * {@inheritDoc}
     */
@@ -31,7 +42,7 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
    protected Object doExecute(final ExecutionEvent event) throws Exception {
        ISelection selection = HandlerUtil.getCurrentSelection(event);
        if (selection instanceof IStructuredSelection) {
-           Object[] elements = ((IStructuredSelection)selection).toArray();
+           Object[] elements = SWTUtil.toArray(selection);
            for (Object element : elements) {
                if (element instanceof IMethod) {
                    KeYIDEUtil.openProofEditor((IMethod)element);
@@ -54,4 +65,3 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
        return null;
    }   
 }
- 

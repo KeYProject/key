@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -28,6 +32,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -86,11 +91,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * @param initConfig The {@link InitConfig} to use.
      * @param contract The {@link FunctionalOperationContractPO} to prove.
      * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
      */
     public FunctionalOperationContractPO(InitConfig initConfig,
                                          FunctionalOperationContract contract,
-                                         boolean addUninterpretedPredicate) {
-        super(initConfig, contract.getName(), addUninterpretedPredicate);
+                                         boolean addUninterpretedPredicate,
+                                         boolean addSymbolicExecutionLabel) {
+        super(initConfig, contract.getName(), addUninterpretedPredicate, addSymbolicExecutionLabel);
         this.contract = contract;
     }
 
@@ -364,7 +371,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
              if (!(contract instanceof FunctionalOperationContract)) {
                 throw new IOException("Found contract \"" + contract + "\" is no FunctionalOperationContract.");
              }
-             po = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+             po = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true, true);
           }
           else {
              po = contract.createProofObl(initConfig, contract);

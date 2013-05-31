@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.eclipse.swt;
 
 import java.io.File;
@@ -21,6 +34,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -155,6 +169,17 @@ public final class SWTUtil {
                     event.gc.drawText(text, event.x + textMargin, event.y + yOffset, true);
                 }
             });
+        }
+    }
+    
+    /**
+     * Sets the given text in the given {@link Button} control.
+     * @param control The {@link Button} control o set text in.
+     * @param text The text to set.
+     */
+    public static void setText(Button control, String text) {
+        if (control != null) {
+            control.setText(text != null ? text : StringUtil.EMPTY_STRING);
         }
     }
     

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="IdenticalTermsDuringProof.mid(x,y,z);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int mid = z;" pathCondition="true" pathConditionChanged="false">
+         <branchNode name="if (y&lt;z) {if (x&lt;=y) {     mid=y;   } }else  {   mid=y; }" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="!z &lt;= y" pathCondition="!z &lt;= y" pathConditionChanged="true" branchCondition="!z &lt;= y" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchNode name="if (x&lt;=y) {   mid=y; }" pathCondition="!z &lt;= y" pathConditionChanged="false">
+                  <branchCondition name="!y &lt;= -1 + x" pathCondition="z &gt;= 1 + y &amp; y &gt;= x" pathConditionChanged="true" branchCondition="!y &lt;= -1 + x" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="mid=y;" pathCondition="z &gt;= 1 + y &amp; y &gt;= x" pathConditionChanged="false">
+                        <statement name="return mid;" pathCondition="z &gt;= 1 + y &amp; y &gt;= x" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="z &gt;= 1 + y &amp; y &gt;= x" pathConditionChanged="false" isReturnValueComputed="false">
+                              <termination name="&lt;end&gt;" pathCondition="z &gt;= 1 + y &amp; y &gt;= x" pathConditionChanged="false" terminationKind="NORMAL">
+                              </termination>
+                           </methodReturn>
+                        </statement>
+                     </statement>
+                  </branchCondition>
+                  <branchCondition name="!y &gt;= x" pathCondition="z &gt;= 1 + y &amp; y &lt;= -1 + x" pathConditionChanged="true" branchCondition="!y &gt;= x" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <statement name="return mid;" pathCondition="z &gt;= 1 + y &amp; y &lt;= -1 + x" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="z &gt;= 1 + y &amp; y &lt;= -1 + x" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="z &gt;= 1 + y &amp; y &lt;= -1 + x" pathConditionChanged="false" terminationKind="NORMAL">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </branchCondition>
+               </branchNode>
+            </branchCondition>
+            <branchCondition name="!z &gt;= 1 + y" pathCondition="!z &gt;= 1 + y" pathConditionChanged="true" branchCondition="!z &gt;= 1 + y" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="mid=y;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false">
+                  <statement name="return mid;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </branchCondition>
+         </branchNode>
+      </statement>
+   </methodCall>
+</startNode>

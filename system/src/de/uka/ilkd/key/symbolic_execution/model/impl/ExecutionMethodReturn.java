@@ -1,38 +1,45 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -51,14 +58,9 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    private String nameIncludingReturnValue;
    
    /**
-    * The return value.
+    * The possible return values.
     */
-   private Term returnValue;
-   
-   /**
-    * The return value formated for the user.
-    */
-   private String formatedReturnValue;
+   private IExecutionMethodReturnValue[] returnValues;
    
    /**
     * Constructor.
@@ -106,30 +108,49 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * @throws Occurred Exception.
     */
    protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
-      return createMethodReturnName(getFormatedReturnValue(), getMethodCall().getName());
+      IExecutionMethodReturnValue[] returnValues = getReturnValues();
+      if (returnValues.length == 0) {
+         return createMethodReturnName(null, getMethodCall().getName());
+      }
+      else if (returnValues.length == 1) {
+         return createMethodReturnName(returnValues[0].getName() + " ", getMethodCall().getName());
+      }
+      else {
+         StringBuilder sb = new StringBuilder();
+         sb.append('\n');
+         boolean afterFirst = false;
+         for (IExecutionMethodReturnValue value : returnValues) {
+            if (afterFirst) {
+               sb.append(", \n");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append('\t');
+            sb.append(value.getName());
+         }
+         sb.append('\n');
+         return createMethodReturnName(sb.toString(), getMethodCall().getName());
+      }
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public String getFormatedReturnValue() throws ProofInputException {
-      if (returnValue == null) {
-         lazyComputeReturnValue();
+   public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
+      if (returnValues == null) {
+         returnValues = lazyComputeReturnValues();
       }
-      return formatedReturnValue;
+      return returnValues;
    }
-
+   
    /**
     * {@inheritDoc}
     */
    @Override
-   // TODO: Return value can be unknown in SET, e.g. quotient in TryCatchFinally test
-   public Term getReturnValue() throws ProofInputException {
-      if (returnValue == null) {
-         lazyComputeReturnValue();
-      }
-      return returnValue;
+   public boolean isReturnValuesComputed() {
+      return returnValues != null;
    }
    
    /**
@@ -138,7 +159,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * @return The return value.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void lazyComputeReturnValue() throws ProofInputException {
+   protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
       // Check if a result variable is available
       MethodBodyStatement mbs = getMethodCall().getActiveStatement();
       IProgramVariable resultVar = mbs.getResultVariable();
@@ -147,19 +168,66 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
          Node methodReturnNode = findMethodReturnNode(getProofNode());
          if (methodReturnNode != null) {
             // Start site proof to extract the value of the result variable.
-            de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
-                                                                                                                                                                                     mbs.getBodySourceAsTypeReference(),
-                                                                                                                                                                                     mbs.getProgramMethod(getServices()),
-                                                                                                                                                                                     mbs.getDesignatedContext(), 
-                                                                                                                                                                                     methodReturnNode, 
-                                                                                                                                                                                     resultVar);
-            ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
-            returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
-            assert returnValue != null;
-            // Format return vale
-            StringBuffer sb = ProofSaver.printTerm(returnValue, getServices(), true);
-            formatedReturnValue = sb.toString();
+            SiteProofVariableValueInput input = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
+                                                                                                              mbs.getBodySourceAsTypeReference(),
+                                                                                                              mbs.getProgramMethod(getServices()),
+                                                                                                              mbs.getDesignatedContext(), 
+                                                                                                              methodReturnNode,
+                                                                                                              getProofNode(),
+                                                                                                              resultVar);
+            ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), input.getSequentToProve(), StrategyProperties.SPLITTING_NORMAL);
+            try {
+               if (info.getProof().openGoals().size() == 1) {
+                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(info.getProof().openGoals().head(), input.getOperator());
+                  assert returnValue != null;
+                  return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getMediator(), getProofNode(), returnValue, null)};
+               }
+               else {
+                  // Group equal values of different branches
+                  Map<Term, List<Node>> valueNodeMap = new LinkedHashMap<Term, List<Node>>();
+                  for (Goal goal : info.getProof().openGoals()) {
+                     Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
+                     assert returnValue != null;
+                     List<Node> nodeList = valueNodeMap.get(returnValue);
+                     if (nodeList == null) {
+                        nodeList = new LinkedList<Node>();
+                        valueNodeMap.put(returnValue, nodeList);
+                     }
+                     nodeList.add(goal.node());
+                  }
+                  // Create result
+                  if (valueNodeMap.size() == 1) {
+                     Term returnValue = valueNodeMap.keySet().iterator().next();
+                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getMediator(), getProofNode(), returnValue, null)};
+                  }
+                  else {
+                     IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
+                     int i = 0;
+                     for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
+                        List<Term> conditions = new LinkedList<Term>();
+                        for (Node node : entry.getValue()) {
+                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
+                           conditions.add(condition);
+                        }
+                        Term condition = TermBuilder.DF.or(conditions);
+                        condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                        result[i] = new ExecutionMethodReturnValue(getMediator(), getProofNode(), entry.getKey(), condition);
+                        i++;
+                     }
+                     return result;
+                  }
+               }
+            }
+            finally {
+               info.getProof().dispose();
+            }
          }
+         else {
+            return new IExecutionMethodReturnValue[0];
+         }
+      }
+      else {
+         return new IExecutionMethodReturnValue[0];
       }
    }
    
@@ -188,93 +256,9 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    public static String createMethodReturnName(Object returnValue, String methodName) {
       return INTERNAL_NODE_NAME_START + "return" +
-             (returnValue != null ? " '" + returnValue + "' as result" : "") +
+             (returnValue != null ? " " + returnValue + "as result" : "") +
              (!JavaUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
              INTERNAL_NODE_NAME_END;
-   }
-
-   /**
-    * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
-    * sequent of the given {@link Node}.
-    * @param context The {@link IExecutionContext} that defines the current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
-    * @param variable The {@link IProgramVariable} of the value which is interested.
-    * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
-    */
-   protected SiteProofVariableValueInput createExtractVariableValueSequent(IExecutionContext context,
-                                                                           Node node,
-                                                                           IProgramVariable variable) {
-      // Make sure that correct parameters are given
-      assert context != null;
-      assert node != null;
-      assert variable instanceof ProgramVariable;
-      // Create method frame which will be executed in site proof
-      Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
-      MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
-      JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
-      // Create predicate which will be used in formulas to store the value interested in.
-      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(getServices(), "ResultPredicate")), Sort.FORMULA, variable.sort());
-      // Create formula which contains the value interested in.
-      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
-      // Combine method frame with value formula in a modality.
-      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
-      // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
-      // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
-      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
-      // Return created sequent and the used predicate to identify the value interested in.
-      return new SiteProofVariableValueInput(sequentToProve, newPredicate);
-   }
-   
-   /**
-    * Helper class which represents the return value of
-    * {@link ExecutionMethodReturn#createExtractVariableValueSequent(TypeReference, ReferencePrefix, Node, IProgramVariable)} and
-    * {@link ExecutionMethodReturn#createExtractVariableValueSequent(IExecutionContext, Node, IProgramVariable)}.
-    * @author Martin Hentschel
-    */
-   protected static class SiteProofVariableValueInput {
-      /**
-       * The sequent to prove.
-       */
-      private Sequent sequentToProve;
-      
-      /**
-       * The {@link Operator} which is the predicate that contains the value interested in.
-       */
-      private Operator operator;
-      
-      /**
-       * Constructor.
-       * @param sequentToProve he sequent to prove.
-       * @param operator The {@link Operator} which is the predicate that contains the value interested in.
-       */
-      public SiteProofVariableValueInput(Sequent sequentToProve, Operator operator) {
-         super();
-         this.sequentToProve = sequentToProve;
-         this.operator = operator;
-      }
-      
-      /**
-       * Returns the sequent to prove.
-       * @return The sequent to prove.
-       */
-      public Sequent getSequentToProve() {
-         return sequentToProve;
-      }
-      
-      /**
-       * Returns the {@link Operator} which is the predicate that contains the value interested in.
-       * @return The {@link Operator} which is the predicate that contains the value interested in.
-       */
-      public Operator getOperator() {
-         return operator;
-      }
    }
    
    /**

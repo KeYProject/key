@@ -1,18 +1,33 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDStatement;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDStatement} for the symbolic execution debugger (SED)
@@ -124,9 +139,9 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getActivePositionInfo());
       }
       return sourceName;
    }
@@ -171,7 +186,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
+      SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
       return KeYModelUtil.updateLocationFromAST(this, location);
    }
 
@@ -193,7 +208,14 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 
    /**

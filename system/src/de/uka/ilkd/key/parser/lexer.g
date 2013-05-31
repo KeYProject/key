@@ -1,20 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
 
 /* -*-Antlr-*- */
 
@@ -545,6 +540,13 @@ options {
       :   '>' '='
       ;
 
+RGUILLEMETS
+options {
+  paraphrase = "`>>'";
+}
+      :   '>' '>'
+      ;
+
 
 WS
 options {
@@ -572,6 +574,8 @@ LESS_DISPATCH
     |
      ('<' '=' ) => LESSEQUAL {$setType(LESSEQUAL);}
     |
+     ('<' '<' ) => LGUILLEMETS {$setType(LGUILLEMETS);}
+    |
      LESS {$setType(LESS);}
     ;
 
@@ -590,6 +594,15 @@ options {
 :
   '<' '='
     ;
+
+protected LGUILLEMETS
+options {
+  paraphrase = "'<<'";
+}
+:
+  '<' '<'
+    ;
+
 
 protected IMPLICIT_IDENT
 options {

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /**
  * KeYResourceManager controls the access to the properties
@@ -25,6 +29,8 @@ import java.nio.channels.ReadableByteChannel;
 import javax.swing.ImageIcon;
 
 public class KeYResourceManager {
+
+    private static final String DEFAULT_VERSION = "x.z.y";
 
     /** the unique instance */
     private static final KeYResourceManager instance 
@@ -59,10 +65,10 @@ public class KeYResourceManager {
 		}
 	    } catch (IOException ioe) {
 		// who cares it is just a version number
-		result = "x.z.y";
+		result = DEFAULT_VERSION;
 	    }
 	} else {
-	    result = "x.z.y";
+	    result = DEFAULT_VERSION;
 	}
 	return result.trim();
     }

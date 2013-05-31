@@ -1,9 +1,24 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.editor;
 
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -27,12 +42,15 @@ import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
-import org.key_project.keyide.ui.views.StrategyPropertiesView;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -45,6 +63,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 
 
@@ -53,14 +72,19 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
+public class KeYEditor extends TextEditor implements IProofProvider {
    public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
    
    private ProofTreeContentOutlinePage outline;
    
    private Node showNode; 
    
-   private ProofSourceViewerDecorator textViewer;
+   private ProofSourceViewerDecorator textViewer; // TODO: Rename, into proofDecorator. And also its getter
+   
+   /**
+    * Contains the registered {@link IProofProviderListener}.
+    */
+   private List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
   
    private boolean dirtyFlag = false;
       
@@ -131,6 +155,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       @Override
       public void proofClosed(ProofTreeEvent e) {
          handleProofChanged(e);
+         handleProofClosed(e);
       }
    };
    
@@ -138,6 +163,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
       @Override
       public void mouseMove(MouseEvent e) {
+         // TODO: Refactor functionality into KeYEditor#handleMouseMoved(MouseEvent) which is called here
          if (showNode.getAppliedRuleApp() == null){
             textViewer.setBackgroundColorForHover();
          }
@@ -161,8 +187,8 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
                Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
                this.environment = KeYEnvironment.load(file, null, null);
                this.environment.getMediator().setStupidMode(true);
-               Assert.isTrue(getKeYEnvironment().getLoadedProof() != null, "No proof loaded.");
-               this.proof = getKeYEnvironment().getLoadedProof();
+               Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
+               this.proof = getEnvironment().getLoadedProof();
             }
          }
          else {
@@ -185,6 +211,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       
       @Override
       public void selectedProofChanged(final KeYSelectionEvent e) {
+         // TODO: Refactor functionality into KeYEditor#handleSelectedProofChanged(KeYSelectionEvent) which is called here
          getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -198,6 +225,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       
       @Override
       public void selectedNodeChanged(final KeYSelectionEvent e) {
+         // TODO: Refactor functionality into KeYEditor#handleSelectedNodeChanged(KeYSelectionEvent) which is called here
          getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -233,7 +261,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
          IMethod method = ((ProofEditorInput)input).getMethod();
          IPath methodPath = method.getPath();
          methodPath = methodPath.removeLastSegments(1);
-         String name = getProof().name().toString();
+         String name = getCurrentProof().name().toString();
          name = makePathValid(name);
          name = name + ".proof";
          methodPath = methodPath.append(name);
@@ -303,7 +331,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
 
    
-   public Node getShowNode() {
+   public Node getShowNode() { // TODO: Document method getShowNode()
       return showNode;
    }
 
@@ -314,8 +342,8 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     */
    public void setShowNode(Node showNode) {
       this.showNode=showNode;
-      getKeYEnvironment().getMediator().setStupidMode(true);
-      textViewer.setDocumentForNode(showNode, getKeYEnvironment().getMediator());
+      getEnvironment().getMediator().setStupidMode(true);
+      textViewer.setDocumentForNode(showNode, getEnvironment().getMediator());
       if(showNode.getAppliedRuleApp() != null){
          PosInOccurrence posInOcc = showNode.getAppliedRuleApp().posInOccurrence();
          textViewer.setGreenBackground(posInOcc);
@@ -325,9 +353,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
    /**
     * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
-    * of the {@link ConsoleUserInterface} provided via {@link #getKeYEnvironment()}.
+    * of the {@link ConsoleUserInterface} provided via {@link #getEnvironment()}.
     */
-   private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() {
+   private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() { // TODO: Move to the top of the class, order is attributes, constructors, methods like in UML
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
          AutoModeTester.updateProperties();
@@ -340,8 +368,8 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    @Override
    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
       super.init(site, input);
-      getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
    }
+
 
    /**
     * {@inheritDoc}
@@ -349,11 +377,11 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    @Override
    public void createPartControl(Composite parent) {
       super.createPartControl(parent);
-      getKeYEnvironment().getMediator().addKeYSelectionListener(keySelectionListener);
-      getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      getEnvironment().getMediator().addKeYSelectionListener(keySelectionListener);
+      getUI().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       ISourceViewer sourceViewer = getSourceViewer();
       textViewer = new ProofSourceViewerDecorator(sourceViewer);
-      getProof().addProofTreeListener(proofTreeListener);
+      getCurrentProof().addProofTreeListener(proofTreeListener);
       sourceViewer.setEditable(false);
       sourceViewer.getTextWidget().addMouseMoveListener(mouseMoveListener);
       if (this.getShowNode() != null) {
@@ -361,7 +389,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       }
       else {
          Node mediatorNode = environment.getMediator().getSelectedNode();
-         setShowNode(mediatorNode != null ? mediatorNode : getProof().root());
+         setShowNode(mediatorNode != null ? mediatorNode : getCurrentProof().root());
       }
    }
 
@@ -378,9 +406,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     */
    @Override
    public void dispose() {
-      getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-      getKeYEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
-      getProof().removeProofTreeListener(proofTreeListener);
+      getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      getEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
+      getCurrentProof().removeProofTreeListener(proofTreeListener);
       if (outline != null) {
          outline.dispose();         
       }
@@ -391,7 +419,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     * {@inheritDoc}
     */
    @Override
-   public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment() {
+   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
       return environment;
    }
    
@@ -399,10 +427,25 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     * {@inheritDoc}
     */
    @Override
-   public Proof getProof() {
+   public Proof getCurrentProof() {
       return proof;
    }
 
+
+   @Override
+   public Proof[] getCurrentProofs() {
+      Proof proof = getCurrentProof();
+      return proof != null ? new Proof[] {proof} : new Proof[0];
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public CustomConsoleUserInterface getUI() {
+      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+      return environment != null ? environment.getUi() : null;
+   }
    
    /**
     * {@inheritDoc}
@@ -412,19 +455,64 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       if (IContentOutlinePage.class.equals(adapter)) {
          synchronized (this) {
             if (outline == null) {
-               outline = new ProofTreeContentOutlinePage(getProof(), getKeYEnvironment());
+               outline = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment());
             }
          }
          return outline;
       }
-      else if(StrategyPropertiesView.class.equals(adapter)){
-         return getProof();
+      else if (Proof.class.equals(adapter)){
+         return getCurrentProof();
       }
-      else if (IProofEnvironmentProvider.class.equals(adapter)) {
+      else if (KeYEnvironment.class.equals(adapter)){
+         return getEnvironment();
+      }
+      else if (UserInterface.class.equals(adapter)) {
+         return getUI();
+      }
+      else if (IProofProvider.class.equals(adapter)) {
          return this;
       }
       else {
          return super.getAdapter(adapter);
+      }
+   }
+
+   /**
+    * This method is called when the proof is closed.
+    * @param e The {@link ProofTreeEvent}.
+    */
+   protected void handleProofClosed(ProofTreeEvent e) {
+      AutoModeTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
+   }
+   
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
       }
    }
 }

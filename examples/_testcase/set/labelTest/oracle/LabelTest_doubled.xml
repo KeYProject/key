@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="LabelTest.doubled();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+         <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+            <statement name="return i;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of LabelTest.doubled();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

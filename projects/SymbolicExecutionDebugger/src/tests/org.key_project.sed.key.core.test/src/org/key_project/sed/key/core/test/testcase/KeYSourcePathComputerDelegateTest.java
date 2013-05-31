@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.test.testcase;
 
 import java.io.File;
@@ -21,6 +34,7 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
@@ -59,7 +73,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Compute and test container
          KeYSourcePathComputerDelegate computer = new KeYSourcePathComputerDelegate();
          ISourceContainer[] result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
-         assertSourceContainer(result, new ProjectSourceContainer(project.getProject(), true));
+         assertSourceContainer(result, new JavaProjectSourceContainer(project));
          // Set class path entries
          tempFile = File.createTempFile("KeYSourcePathComputerDelegateTest", ".jar");
          IFile workspaceFile = (IFile)method.getResource();
@@ -73,12 +87,12 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
-                               new ExternalArchiveSourceContainer(tempFile.getAbsolutePath(), true),
-                               new DirectorySourceContainer(tempFile.getParentFile(), true), 
-                               new ArchiveSourceContainer(workspaceFile, true),
-                               new FolderSourceContainer(workspaceFile.getParent(), true),
-                               new ProjectSourceContainer(project.getProject(), true),
-                               new ProjectSourceContainer(project.getProject(), true));
+                               new ExternalArchiveSourceContainer(tempFile.getAbsolutePath(), false),
+                               new DirectorySourceContainer(tempFile.getParentFile(), false), 
+                               new ArchiveSourceContainer(workspaceFile, false),
+                               new FolderSourceContainer(workspaceFile.getParent(), false),
+                               new ProjectSourceContainer(project.getProject(), false),
+                               new JavaProjectSourceContainer(project));
       }
       finally {
          if (tempFile != null) {
@@ -109,7 +123,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Compute and test container
          KeYSourcePathComputerDelegate computer = new KeYSourcePathComputerDelegate();
          ISourceContainer[] result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
-         assertSourceContainer(result, new ProjectSourceContainer(project.getProject(), true));
+         assertSourceContainer(result, new JavaProjectSourceContainer(project));
          // Set boot class path to external file
          tempFile = File.createTempFile("KeYSourcePathComputerDelegateTest", ".jar");
          KeYResourceProperties.setBootClassPath(project.getProject(), tempFile.getAbsolutePath());
@@ -117,16 +131,16 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
-                               new ExternalArchiveSourceContainer(tempFile.getAbsolutePath(), true), 
-                               new ProjectSourceContainer(project.getProject(), true));
+                               new ExternalArchiveSourceContainer(tempFile.getAbsolutePath(), false), 
+                               new JavaProjectSourceContainer(project));
          // Set boot class path to external folder
          KeYResourceProperties.setBootClassPath(project.getProject(), tempFile.getParent());
          KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM);
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
-                               new DirectorySourceContainer(tempFile.getParentFile(), true), 
-                               new ProjectSourceContainer(project.getProject(), true));
+                               new DirectorySourceContainer(tempFile.getParentFile(), false), 
+                               new JavaProjectSourceContainer(project));
          // Set boot class path to workspace file
          IFile workspaceFile = (IFile)method.getResource();
          KeYResourceProperties.setBootClassPath(project.getProject(), workspaceFile.getFullPath().toString());
@@ -134,8 +148,8 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
-                               new ArchiveSourceContainer(workspaceFile, true), 
-                               new ProjectSourceContainer(project.getProject(), true));
+                               new ArchiveSourceContainer(workspaceFile, false), 
+                               new JavaProjectSourceContainer(project));
          // Set boot class path to workspace folder
          IFolder workspaceFolder = (IFolder)workspaceFile.getParent();
          KeYResourceProperties.setBootClassPath(project.getProject(), workspaceFolder.getFullPath().toString());
@@ -143,16 +157,16 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
-                               new FolderSourceContainer(workspaceFolder, true), 
-                               new ProjectSourceContainer(project.getProject(), true));
+                               new FolderSourceContainer(workspaceFolder, false), 
+                               new JavaProjectSourceContainer(project));
          // Set boot class path to workspace project
          KeYResourceProperties.setBootClassPath(project.getProject(), project.getProject().getFullPath().toString());
          KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.WORKSPACE);
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
-                               new ProjectSourceContainer(project.getProject(), true), 
-                               new ProjectSourceContainer(project.getProject(), true));
+                               new ProjectSourceContainer(project.getProject(), false), 
+                               new JavaProjectSourceContainer(project));
       }
       finally {
          if (tempFile != null) {
@@ -179,7 +193,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
       // Compute and test container
       KeYSourcePathComputerDelegate computer = new KeYSourcePathComputerDelegate();
       ISourceContainer[] result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
-      assertSourceContainer(result, new ProjectSourceContainer(project.getProject(), true));
+      assertSourceContainer(result, new JavaProjectSourceContainer(project));
    }
    
    /**
@@ -223,6 +237,13 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
             FolderSourceContainer expectedContainer = (FolderSourceContainer)expected[i];
             FolderSourceContainer currentContainer = (FolderSourceContainer)current[i];
             assertEquals(expectedContainer.getContainer(), currentContainer.getContainer());
+            assertEquals(expectedContainer.isComposite(), currentContainer.isComposite());
+         }
+         else if (expected[i] instanceof JavaProjectSourceContainer) {
+            assertTrue(current[i] instanceof JavaProjectSourceContainer);
+            JavaProjectSourceContainer expectedContainer = (JavaProjectSourceContainer)expected[i];
+            JavaProjectSourceContainer currentContainer = (JavaProjectSourceContainer)current[i];
+            assertEquals(expectedContainer.getJavaProject(), currentContainer.getJavaProject());
             assertEquals(expectedContainer.isComposite(), currentContainer.isComposite());
          }
          else {

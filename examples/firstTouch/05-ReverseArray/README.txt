@@ -1,0 +1,1 @@
+An array is reversed.

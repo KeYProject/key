@@ -1,6 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -36,6 +50,7 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilterWithException;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -66,7 +81,7 @@ import org.key_project.util.java.StringUtil;
  *          <li>
  *             Center whole sub tree starting from its branches leaf nodes via {@link #centerChildren(Set, IProgressMonitor)}.
  *             <ol>
- *                <li>Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)})</li>
+ *                <li>Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)} and continue with nodes which children are completly centered)</li>
  *                <li>
  *                   If leaf node has children (added during step 4) compute x offset to center branch under his children.
  *                </li>
@@ -80,6 +95,9 @@ import org.key_project.util.java.StringUtil;
  *                </li>
  *                <li>
  *                   Go back to starting child (leaf node) and center each element with the computed maximal width.
+ *                </li>
+ *                <li>
+ *                   If parents maximal width is greater than the maximal width of the children move the children again to the right to center them.
  *                </li>
  *             </ol>
  *          </li>
@@ -558,15 +576,31 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected void centerChildren(Set<ISEDDebugNode> leafs, 
+   protected void centerChildren(final Set<ISEDDebugNode> leafs, 
                                  IProgressMonitor monitor) throws DebugException {
+      final Set<ISEDDebugNode> doneNodes = new HashSet<ISEDDebugNode>(); // Contains all already centered nodes
       while (!leafs.isEmpty() && !monitor.isCanceled()) {
-         // Get leaf to center
-         ISEDDebugNode next = CollectionUtil.removeFirst(leafs);
-         PictogramElement nextPE = getPictogramElementForBusinessObject(next);
+         // Get leaf to center which is the first one which children are already centered (all children are contained in doneNodes) or if no centering of the child is required (not part of leafs)
+         final ISEDDebugNode next = CollectionUtil.searchAndRemoveWithException(leafs, new IFilterWithException<ISEDDebugNode, DebugException>() {
+            @Override
+            public boolean select(ISEDDebugNode element) throws DebugException {
+               boolean allChildrenDone = true;
+               ISEDDebugNode[] children = element.getChildren();
+               int i = 0;
+               while (allChildrenDone && i < children.length) {
+                  if (!doneNodes.contains(children[i]) && leafs.contains(children[i])) {
+                     allChildrenDone = false;
+                  }
+                  i++;
+               }
+               return allChildrenDone;
+            }
+         });
+         final PictogramElement nextPE = getPictogramElementForBusinessObject(next);
          // Compute new x margin to center current branch under his children 
          int xMargin;
          int xStart;
+         boolean removeChildrenRequired = false;
          if (!ArrayUtil.isEmpty(next.getChildren())) {
             ISEDDebugNode firstChild = ArrayUtil.getFirst(next.getChildren());
             ISEDDebugNode lastChild = ArrayUtil.getLast(next.getChildren());
@@ -576,20 +610,31 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                              firstChildPE.getGraphicsAlgorithm().getX(); 
             xMargin = (childWidth - nextPE.getGraphicsAlgorithm().getWidth()) / 2;
             xStart = firstChildPE.getGraphicsAlgorithm().getX();
+            // Make sure that the new position is not "lefter" as the old one because this area is reserved for the previous branch and they should not collapse  
+            if (xMargin + xStart < nextPE.getGraphicsAlgorithm().getX()) {
+               // Collapse possible, so keep old xStart 
+               xMargin = 0;
+               xStart = nextPE.getGraphicsAlgorithm().getX();
+               removeChildrenRequired = true;
+            }
          }
          else {
             xMargin = 0;
             xStart = nextPE.getGraphicsAlgorithm().getX();
          }
+         
          // Go back to root or branch split and collect descendants while computing max width
          // If a parent node has more than one child it is treated as leaf node in a further iteration by adding it to leafs
          List<PictogramElement> descendantsPE = new LinkedList<PictogramElement>();
          int maxWidth = 0;
          boolean maxInitialised = false;
+         ISEDDebugNode current = next;
+         PictogramElement currentPE = nextPE;
          do {
-            nextPE = getPictogramElementForBusinessObject(next);
-            descendantsPE.add(nextPE);
-            int currentWidth = nextPE.getGraphicsAlgorithm().getWidth();
+            doneNodes.add(current); // Mark element as centered because it will be done before the next leaf node will be treated in outer most loop 
+            currentPE = getPictogramElementForBusinessObject(current);
+            descendantsPE.add(currentPE);
+            int currentWidth = currentPE.getGraphicsAlgorithm().getWidth();
             if (maxInitialised) {
                if (currentWidth > maxWidth) {
                   maxWidth = currentWidth;
@@ -599,15 +644,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                maxWidth = currentWidth;
                maxInitialised = true;
             }
-            ISEDDebugNode child = next;
-            next = child.getParent();
-            if (next != null && next.getChildren().length != 1) {
-               if (ArrayUtil.isLast(next.getChildren(), child)) {  // Update parent only if all of his branches are correctly centered
-                  leafs.add(next);
+            ISEDDebugNode child = current;
+            current = child.getParent();
+            if (current != null && current.getChildren().length != 1) {
+               if (ArrayUtil.isLast(current.getChildren(), child)) {  // Update parent only if all of his branches are correctly centered
+                  leafs.add(current);
                }
-               next = null;
+               current = null;
             }
-         } while (next != null && !monitor.isCanceled());
+         } while (current != null && !monitor.isCanceled());
          // Center collected descendants based on the computed maximal element width
          Iterator<PictogramElement> descendantIter = descendantsPE.iterator();
          while (descendantIter.hasNext() && !monitor.isCanceled()) {
@@ -616,6 +661,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             ga.setX(xMargin + xStart + (maxWidth - ga.getWidth()) / 2);
          }
          monitor.worked(1);
+         // Center children again if required
+         if (removeChildrenRequired && !ArrayUtil.isEmpty(next.getChildren())) {
+            ISEDDebugNode lastChild = ArrayUtil.getLast(next.getChildren());
+            int mostRightX = findMostRightXInSubtree(lastChild);
+            int offset = (maxWidth - (mostRightX - xStart)) / 2;
+            // Center children again only if offset is positive, because otherwise an overlap with the branch next to the left is possible
+            if (offset > 0) {
+               SEDPreorderIterator iter = new SEDPreorderIterator(next);
+               while (iter.hasNext()) {
+                  ISEDDebugElement nextChild = iter.next();
+                  if (nextChild != next) {
+                     PictogramElement nextChildPE = getPictogramElementForBusinessObject(nextChild);
+                     if (nextChildPE != null) {
+                        nextChildPE.getGraphicsAlgorithm().setX(nextChildPE.getGraphicsAlgorithm().getX() + offset);
+                     }
+                  }
+               }
+            }
+         }
       }
    }
 

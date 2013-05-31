@@ -1,6 +1,6 @@
 		*********************************
 		* KeY Source Code Installation  * 
-		*        Version 1.7.x         *
+		*        Version 2.1.x         *
 		*        Nightly Builds        *
                 *     (Development Version)    *
 		********************************
@@ -10,14 +10,13 @@
 
 Operating System: Linux/Unix, MacOSX, Windows (untested) 
 
-Java 2 SDK, Version 1.5.x or newer (already installed)
+Java SE 6 or newer (already installed)
 
 Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	javacc.jar Version >= 3.0 : parser generator
 	recoderKey.jar 
                  a transformation framework for java patched by the KeY group
-	junit.jar version 3.8.1: test framework
 
 Optionally, KeY can make use of the following binaries:
 	SMT Solvers: bindings exist currently for Z3, Simplify, Yices and CVC3
@@ -32,8 +31,7 @@ Optionally, KeY can make use of the following binaries:
    * README.xxx-src.txt: this file
    * KeY-xxx-src.tgz: the source code version of KeY-system
    * KeYExtLib_xxx.tgz: contains the external libraries
-   * quicktour_xxx.ps.gz: a short tutorial
-   * KeYDemo_xxx.tgz: example for KeY used in the tutorial
+   * quicktour_xxx.zip or quicktour_xxx.tgz: a short tutorial
 
 
 (3) Installation (Source Code)
@@ -104,16 +102,6 @@ Optionally, KeY can make use of the following binaries:
 	Assuming you are still in the 'system' directory, run:
 
 		../bin/runProver
-
-
-(5) Alternatively to (4): Start KeY in Test Generation Mode
--------------------------------------
-
-	Run 'startProver unit' or if you wish a simpler GUI run 'startProver testing'
-	  (Windows: 'startProver.bat unit' or 'startProver.bat testing')
-	
-	The library objenesis.jar may be required to run the generated tests.
-
 
 -------------------------------
 

@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
@@ -48,14 +61,21 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * Contains the merged branch conditions.
     */
    private Term[] mergedBranchCondtions;
+
+   /**
+    * The optional additional branch label.
+    */
+   private String additionalBranchLabel;
    
    /**
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param additionalBranchLabel The optional additional branch label.
     */
-   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode) {
+   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode, String additionalBranchLabel) {
       super(mediator, proofNode);
+      this.additionalBranchLabel = additionalBranchLabel;
    }
 
    /**
@@ -83,6 +103,14 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          lazyComputeBranchCondition();
       }
       return formatedBranchCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isBranchConditionComputed() {
+      return branchCondition != null;
    }
 
    /**
@@ -226,5 +254,13 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    @Override
    public boolean isMergedBranchCondition() {
       return mergedProofNodes != null && !mergedProofNodes.isEmpty();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getAdditionalBranchLabel() {
+      return additionalBranchLabel;
    }
 }

@@ -1,6 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.monkey.product.ui.composite;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +28,9 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -32,7 +48,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
 import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.monkey.product.ui.provider.MonKeYProofLabelProvider;
@@ -41,15 +60,20 @@ import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil.MonKeYProofSums;
 import org.key_project.monkey.product.ui.view.MonKeYView;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Content in the {@link MonKeYView} that contains the whole
  * program logic.
  * @author Martin Hentschel
  */
-public class MonKeYComposite extends Composite {
+public class MonKeYComposite extends Composite implements IProofProvider {
     /**
      * Key to store the location in an {@link IMemento}.
      */
@@ -221,6 +245,11 @@ public class MonKeYComposite extends Composite {
     private String proofDirectory;
     
     /**
+     * Contains the registered {@link IProofProviderListener}.
+     */
+    private List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
+    
+    /**
      * Constructor.
      * @param parent The parent {@link Composite}.
      * @param style The style to use.
@@ -354,6 +383,13 @@ public class MonKeYComposite extends Composite {
         labelProvider = new MonKeYProofLabelProvider();
         labelProvider.addListener(labelProviderListener);
         proofViewer.setLabelProvider(labelProvider);
+        
+        proofViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+           @Override
+           public void selectionChanged(SelectionChangedEvent event) {
+              handleSelectedProofChanged(event);
+           }
+        });
         // Accumulated values
         Composite sumComposite = new Composite(proofGroup, SWT.NONE);
         sumComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -423,9 +459,30 @@ public class MonKeYComposite extends Composite {
      */
     @Override
     public void dispose() {
+       // Dispose proofs
+       try {
+           removeProofs();
+       }
+       catch (Exception e) {
+           LogUtil.getLogger().logError(e);
+       }
+       // Dispose UI
        labelProvider.removeListener(labelProviderListener);
        labelProvider.dispose();
        super.dispose();
+    }
+
+    /**
+     * Removes all {@link MonKeYProof}s.
+     * @throws InterruptedException Occurred Exception
+     * @throws InvocationTargetException Occurred Exception
+     */
+    protected void removeProofs() throws InterruptedException, InvocationTargetException {
+       if (proofs != null) {
+          for (MonKeYProof proof : proofs) {
+             proof.removeProof();
+          }
+       }
     }
 
     /**
@@ -526,6 +583,12 @@ public class MonKeYComposite extends Composite {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof MonKeYProof) {
                                 ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
+                                getDisplay().syncExec(new Runnable() {
+                                 @Override
+                                 public void run() {
+                                    fireCurrentProofsChanged();
+                                 }
+                              });
                             }
                             monitor.worked(1);
                         }
@@ -709,11 +772,7 @@ public class MonKeYComposite extends Composite {
                         try {
                             SWTUtil.checkCanceled(monitor);
                             // Remove old proofs
-                            if (proofs != null) {
-                               for (MonKeYProof proof : proofs) {
-                                  proof.removeProof();
-                               }
-                            }
+                            removeProofs();
                             // Unload old source
                             getDisplay().syncExec(new Runnable() {
                                @Override
@@ -738,6 +797,7 @@ public class MonKeYComposite extends Composite {
                                     public void run() {
                                         if (!proofViewer.getTable().isDisposed()) {
                                             proofViewer.setInput(proofs);
+                                            fireCurrentProofsChanged();
                                         }
                                     }
                                 });
@@ -824,4 +884,104 @@ public class MonKeYComposite extends Composite {
             memento.putString(MEMENTO_KEY_PROOF_DIRECTORY, proofDirectory);
         }
     }
+
+    /**
+     * When the selected proof has changed.
+     * @param event The event.
+     */
+    protected void handleSelectedProofChanged(SelectionChangedEvent event) {
+       fireCurrentProofsChanged();
+    }
+
+   /**
+     * {@inheritDoc}
+     */
+   @Override
+   public Proof getCurrentProof() {
+      Proof[] proofs = getCurrentProofs();
+      if (!ArrayUtil.isEmpty(proofs)) {
+         return proofs[0];
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public UserInterface getUI() {
+      Object selectedProof = SWTUtil.getFirstElement(proofViewer.getSelection());
+      if (selectedProof instanceof MonKeYProof) {
+         return ((MonKeYProof) selectedProof).getUi();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYEnvironment<?> getEnvironment() {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof[] getCurrentProofs() {
+      List<Proof> result = new LinkedList<Proof>();
+      Object[] selectedProofs = SWTUtil.toArray(proofViewer.getSelection());
+      for (Object obj : selectedProofs) {
+         if (obj instanceof MonKeYProof) {
+            Proof proof = ((MonKeYProof)obj).getProof();
+            if (proof != null && !proof.isDisposed()) {
+               result.add(proof);
+            }
+         }
+      }
+      return result.toArray(new Proof[result.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
+   }
+
+   /**
+    * Informs all registered {@link IProofProviderListener} about a {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged() {
+      fireCurrentProofsChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
+   }
+
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
+      }
+   }
 }

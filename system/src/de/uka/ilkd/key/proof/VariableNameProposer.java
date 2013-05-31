@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.proof;
@@ -160,7 +164,7 @@ public class VariableNameProposer implements InstantiationProposer {
 	final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
 	do {
 	    name = basename + services.getCounter(SKOLEMTERMVARCOUNTER_PREFIX + name)
-		.getCountPlusPlusWithParent(undoAnchor);	    
+		.getCountPlusPlus();	    
 	    l_name = new Name(name);
 	} while (nss.lookup(l_name) != null &&
                 !previousProposals.contains(name));
@@ -180,7 +184,7 @@ public class VariableNameProposer implements InstantiationProposer {
             if (name.length() > 0) {
                 name = basename + 
                 services.getCounter(GENERALNAMECOUNTER_PREFIX + name)
-                .getCountPlusPlusWithParent(undoAnchor);
+                .getCountPlusPlus();
             } else {
                 name = basename.length() > 0 ? basename : "gen";
             }
@@ -245,7 +249,7 @@ public class VariableNameProposer implements InstantiationProposer {
         String proposal;         
         do {
             proposal = LABEL_NAME_PREFIX + services.getCounter(LABELCOUNTER_NAME)
-            .getCountPlusPlusWithParent(undoAnchor);
+            .getCountPlusPlus();
         } while (lc.contains(new ProgramElementName(proposal)) ||
                 previousProposals.contains(proposal));
         

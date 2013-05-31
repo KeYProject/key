@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.gui;
 
 import javax.swing.SwingUtilities;
@@ -119,13 +123,15 @@ public abstract class SwingWorker {
                 }
                 finally {
                     threadVar.clear();
+                    // !! MU has moved this from behind the finally into the 
+                    // finally ... Cleanup should be performed also in case of failure.
+                    SwingUtilities.invokeLater(doFinished);
                 }
 
-                SwingUtilities.invokeLater(doFinished);
             }
         };
 
-        Thread t = new Thread(doConstruct);
+        Thread t = new Thread(doConstruct, getClass().getName());
         threadVar = new ThreadVar(t);
     }
 
@@ -136,6 +142,19 @@ public abstract class SwingWorker {
         Thread t = threadVar.get();
         if (t != null) {
             t.start();
+        }
+    }
+    
+    /**
+     * Join the worker thread.
+     * 
+     * Does nothing if no thread has been created.
+     * @throws InterruptedException if waiting is interrupted
+     */
+    public void join() throws InterruptedException {
+        Thread t = threadVar.get();
+        if (t != null) {
+            t.join();
         }
     }
 }

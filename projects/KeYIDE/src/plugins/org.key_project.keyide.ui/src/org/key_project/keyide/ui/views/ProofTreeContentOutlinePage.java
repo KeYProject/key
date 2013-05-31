@@ -1,8 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.views;
 
 import java.util.Deque;
 import java.util.LinkedList;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -32,11 +46,14 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class ProofTreeContentOutlinePage extends ContentOutlinePage {
-   
+   // TODO: Document members of ProofTreeContentOutlinePage
    private Proof proof;
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
+
+   private LazyProofTreeContentProvider contentProvider;
    
+   private ProofTreeLabelProvider labelProvider;
    
    /**
     * {@link KeYSelectionListener} to sync the KeYSelection with the treeselection.
@@ -64,10 +81,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
          handleAutoModeStopped(e);
       }
    };
-   
-   private LazyProofTreeContentProvider contentProvider;
-   
-   private ProofTreeLabelProvider labelProvider;
    
    /**
     * Constructor.
@@ -148,12 +161,16 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
     * Executes {@link #updateSelectedNode()} asynchronously and thread safe.
     */
    protected void updateSelectedNodeThreadSafe() {
-      getControl().getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            updateSelectedNode();
-         }
-      });
+      if (!getControl().getDisplay().isDisposed()) {
+         getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!getControl().isDisposed()) {
+                  updateSelectedNode();
+               }
+            }
+         });
+      }
    }
    
    /**
@@ -167,7 +184,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
          // Make sure that Node to select is loaded in lazy TreeViewer
          makeSureElementIsLoaded(mediatorNode);
          // Select Node in lazy TreeViewer
-         setSelection(SWTUtil.createSelection(mediatorNode));
+         getTreeViewer().setSelection(SWTUtil.createSelection(mediatorNode), true);
       }
    }
 
@@ -193,6 +210,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       for (Object unknownElement : unknownParents) {
          Object parent = contentProvider.getParent(unknownElement);
          int viewIndex = contentProvider.getIndexOf(parent, unknownElement);
+         Assert.isTrue(viewIndex >= 0, "Content provider returned wrong parents or child index computation is buggy.");
          contentProvider.updateChildCount(parent, 0);
          contentProvider.updateElement(parent, viewIndex);
       }

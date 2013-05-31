@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
@@ -46,6 +59,7 @@ public class SWTBotKeYUtilTest extends TestCase {
     */
    @Test
    public void testGetRuleDisplayName() throws Exception {
+      Proof proof = null;
       try {
          // Test null
          assertNull(KeYUtil.getRuleDisplayName(null));
@@ -55,18 +69,15 @@ public class SWTBotKeYUtilTest extends TestCase {
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Instantiate proof and try to close it in automatic mode
-         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, true);
          // Collect applied rule names
          List<String> ruleNames = collectRuleNames(proof);
          assertTrue(CollectionUtil.toString(ruleNames), ruleNames.contains("methodCallEmpty"));
       }
       finally {
-         // Remove proof
-         KeYUtil.clearProofList(MainWindow.getInstance());
-         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-         // Close main window
-         TestUtilsUtil.keyCloseMainWindow();
+         if (proof != null) {
+            proof.dispose();
+         }
       }
    }
    
@@ -84,28 +95,22 @@ public class SWTBotKeYUtilTest extends TestCase {
     */
    @Test
    public void testRunProofInAutomaticModeWithoutResultDialog() throws Exception {
+      Proof proof = null;
       try {
-         // Test null
-         assertNull(KeYUtil.getRuleDisplayName(null));
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testRunProofInAutomaticModeWithoutResultDialog");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements", project.getProject().getFolder("src"));
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Instantiate proof and try to close it in automatic mode
-         Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-         assertFalse(proof.closed());
-         // Close proof in automatic mode
-         KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
+         proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, true);
          // Make sure that the proof is closed
          assertTrue(proof.closed());
       }
       finally {
-         // Remove proof
-         KeYUtil.clearProofList(MainWindow.getInstance());
-         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-         // Close main window
-         TestUtilsUtil.keyCloseMainWindow();
+         if (proof != null) {
+            proof.dispose();
+         }
       }
    }
 

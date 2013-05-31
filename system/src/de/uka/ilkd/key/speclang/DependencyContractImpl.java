@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.speclang;
 
@@ -281,23 +285,41 @@ public final class DependencyContractImpl implements DependencyContract {
    
     
     @Override
+    public String getPlainText(Services services) {
+       return getText(false, services);
+    }
+    
+    @Override
     public String getHTMLText(Services services) {
-	final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
+       return getText(true, services);
+    }
+    
+    private String getText(boolean includeHtmlMarkup, Services services) {
+	     final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
         final String mby = hasMby() 
         	           ? LogicPrinter.quickPrintTerm(originalMby, services)
         	           : null;
         final String dep = LogicPrinter.quickPrintTerm(originalDep, services);
-                      
-        return "<html>"
-                + "<b>pre</b> "
-                + LogicPrinter.escapeHTML(pre, false)
-                + "<br><b>dep</b> "
-                + LogicPrinter.escapeHTML(dep, false)
-                + (hasMby() 
-                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
-                	   						 false)
-                   : "")                
-                + "</html>";
+        
+        if (includeHtmlMarkup) {
+           return "<html>"
+                 + "<b>pre</b> "
+                 + LogicPrinter.escapeHTML(pre, false)
+                 + "<br><b>dep</b> "
+                 + LogicPrinter.escapeHTML(dep, false)
+                 + (hasMby() 
+                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
+                                         false)
+                    : "")                
+                 + "</html>";
+        }
+        else {
+           return "pre: "
+                 + pre
+                 + "\ndep: "
+                 + dep
+                 + (hasMby() ? "\nmeasured-by: " + mby : "");
+        }
     }    
     
     

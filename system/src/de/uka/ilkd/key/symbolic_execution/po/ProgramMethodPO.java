@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -17,6 +30,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -71,9 +85,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * @param precondition An optional precondition to use.
     */
    public ProgramMethodPO(InitConfig initConfig, 
-                  String name, 
-                  IProgramMethod pm, 
-                  String precondition) {
+                          String name, 
+                          IProgramMethod pm, 
+                          String precondition) {
       super(initConfig, name);
       assert pm != null;
       this.pm = pm;
@@ -87,13 +101,15 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * @param pm The {@link IProgramMethod} to execute code parts from.
     * @param precondition An optional precondition to use.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
     */
    public ProgramMethodPO(InitConfig initConfig, 
-                       String name, 
-                       IProgramMethod pm, 
-                       String precondition,
-                       boolean addUninterpretedPredicate) {
-      super(initConfig, name, addUninterpretedPredicate);
+                          String name, 
+                          IProgramMethod pm, 
+                          String precondition,
+                          boolean addUninterpretedPredicate,
+                          boolean addSymbolicExecutionLabel) {
+      super(initConfig, name, addUninterpretedPredicate, addSymbolicExecutionLabel);
       assert pm != null;
       this.pm = pm;
       this.precondition = precondition;
@@ -316,7 +332,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
                                                        getName(properties), 
                                                        getProgramMethod(initConfig, properties), 
                                                        getPrecondition(properties),
-                                                       isAddUninterpretedPredicate(properties)));
+                                                       isAddUninterpretedPredicate(properties),
+                                                       isAddSymbolicExecutionLabel(properties)));
    }
    
    /**

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
+         <useOperationContract name="result = magic(x) catch(exc)
+pre: x &lt; 0 | x &gt;= 0
+post: (   x &lt; 0
+   -&gt;   !exc = null
+      &amp; java.lang.Exception::instance(exc) = TRUE)
+&amp; (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
+mod: allLocs \cup allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </useOperationContract>
+      </statement>
+   </methodCall>
+</startNode>

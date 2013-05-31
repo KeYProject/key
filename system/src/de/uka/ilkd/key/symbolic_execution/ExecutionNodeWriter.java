@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -16,11 +29,14 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -44,9 +60,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE = "nameIncludingReturnValue";
 
    /**
-    * Attribute exceptional termination to store {@link IExecutionTermination#isExceptionalTermination()}.
+    * Attribute exceptional termination to store {@link IExecutionTermination#getTerminationKind()}.
     */
-   public static final String ATTRIBUTE_EXCEPTIONAL_TERMINATION = "exceptionalTermination";
+   public static final String ATTRIBUTE_TERMINATION_KIND = "terminationKind";
    
    /**
     * Attribute name to store {@link IExecutionVariable#getTypeString()}.
@@ -62,6 +78,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionValue#getConditionString()}.
     */
    public static final String ATTRIBUTE_CONDITION_STRING = "conditionString";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturnValue#getReturnValueString()}.
+    */
+   public static final String ATTRIBUTE_RETURN_VALUE_STRING = "returnValueString";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturnValue#hasCondition()}.
+    */
+   public static final String ATTRIBUTE_HAS_CONDITION = "hasCondition";
 
    /**
     * Attribute name to store {@link IExecutionVariable#getArrayIndex()}.
@@ -107,6 +133,41 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionVariable#isValueUnknown()}.
     */
    public static final String ATTRIBUTE_IS_VALUE_UNKNOWN = "isValueUnknown";
+
+   /**
+    * Attribute name to store {@link IExecutionUseOperationContract#isPreconditionComplied()}.
+    */
+   public static final String ATTRIBUTE_PRECONDITION_COMPLIED = "preconditionComplied";
+
+   /**
+    * Attribute name to store {@link IExecutionUseOperationContract#hasNotNullCheck()}.
+    */
+   public static final String ATTRIBUTE_HAS_NOT_NULL_CHECK = "hasNotNullCheck";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#isReturnValuesComputed()}.
+    */
+   public static final String ATTRIBUTE_RETURN_VALUE_COMPUTED = "isReturnValueComputed";
+
+   /**
+    * Attribute name to store {@link IExecutionBranchCondition#isBranchConditionComputed()}.
+    */
+   public static final String ATTRIBUTE_BRANCH_CONDITION_COMPUTED = "isBranchConditionComputed";
+   
+   /**
+    * Attribute name to store {@link IExecutionUseOperationContract#isNotNullCheckComplied()}.
+    */
+   public static final String ATTRIBUTE_NOT_NULL_CHECK_COMPLIED = "notNullCheckComplied";
+
+   /**
+    * Attribute name to store {@link IExecutionUseLoopInvariant#isInitiallyValid()}.
+    */
+   public static final String ATTRIBUTE_INITIALLY_VALID = "initiallyValid";
+
+   /**
+    * Attribute name to store {@link IExecutionBranchCondition#getAdditionalBranchLabel()}.
+    */
+   public static final String ATTRIBUTE_ADDITIONAL_BRANCH_LABEL = "additionalBranchLabel";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -144,6 +205,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_METHOD_RETURN = "methodReturn";
 
    /**
+    * Tag name to store {@link IExecutionMethodReturnValue}s.
+    */
+   public static final String TAG_METHOD_RETURN_VALUE = "methodReturnValue";
+
+   /**
     * Tag name to store {@link IExecutionStatement}s.
     */
    public static final String TAG_STATEMENT = "statement";
@@ -152,6 +218,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store {@link IExecutionTermination}s.
     */
    public static final String TAG_TERMINATION = "termination";
+
+   /**
+    * Tag name to store {@link IExecutionUseOperationContract}s.
+    */
+   public static final String TAG_USE_OPERATION_CONTRACT = "useOperationContract";
+
+   /**
+    * Tag name to store {@link IExecutionUseLoopInvariant}s.
+    */
+   public static final String TAG_USE_LOOP_INVARIANT = "useLoopInvariant";
 
    /**
     * Tag name to store {@link IExecutionVariable}s.
@@ -180,6 +256,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param file The {@link File} to save to.
     * @param saveVariables Save variables?
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
@@ -187,8 +264,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
                      String encoding, 
                      File file, 
                      boolean saveVariables,
-                     boolean saveCallStack) throws IOException, ProofInputException {
-      write(node, encoding, new FileOutputStream(file), saveVariables, saveCallStack);
+                     boolean saveCallStack,
+                     boolean saveReturnValues) throws IOException, ProofInputException {
+      write(node, encoding, new FileOutputStream(file), saveVariables, saveCallStack, saveReturnValues);
    }
    
    /**
@@ -198,6 +276,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param out The {@link OutputStream} to save to. The {@link OutputStream} will be closed by this method.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
@@ -205,11 +284,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
                      String encoding, 
                      OutputStream out, 
                      boolean saveVariables,
-                     boolean saveCallStack) throws IOException, ProofInputException {
+                     boolean saveCallStack,
+                     boolean saveReturnValues) throws IOException, ProofInputException {
       if (out != null) {
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(node, charset.displayName(), saveVariables, saveCallStack);
+            String xml = toXML(node, charset.displayName(), saveVariables, saveCallStack, saveReturnValues);
             out.write(xml.getBytes(charset));
          }
          finally {
@@ -224,16 +304,18 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param encoding The encoding to use.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @return The created XML content.
     * @throws ProofInputException Occurred Exception.
     */
    public String toXML(IExecutionNode node, 
                        String encoding, 
                        boolean saveVariables,
-                       boolean saveCallStack) throws ProofInputException {
+                       boolean saveCallStack,
+                       boolean saveReturnValues) throws ProofInputException {
       StringBuffer sb = new StringBuffer();
       appendXmlHeader(encoding, sb);
-      appendExecutionNode(0, node, saveVariables, saveCallStack, sb);
+      appendExecutionNode(0, node, saveVariables, saveCallStack, saveReturnValues, sb);
       return sb.toString();
    }
    
@@ -243,6 +325,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionNode} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -250,33 +333,40 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                       IExecutionNode node, 
                                       boolean saveVariables, 
                                       boolean saveCallStack,
+                                      boolean saveReturnValues,
                                       StringBuffer sb) throws ProofInputException {
       if (node instanceof IExecutionBranchCondition) {
-         appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, saveCallStack, sb);
+         appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionStartNode) {
-         appendExecutionStartNode(level, (IExecutionStartNode)node, saveVariables, saveCallStack, sb);
+         appendExecutionStartNode(level, (IExecutionStartNode)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionBranchNode) {
-         appendExecutionBranchNode(level, (IExecutionBranchNode)node, saveVariables, saveCallStack, sb);
+         appendExecutionBranchNode(level, (IExecutionBranchNode)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionLoopCondition) {
-         appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, saveCallStack, sb);
+         appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionLoopNode) {
-         appendExecutionLoopNode(level, (IExecutionLoopNode)node, saveVariables, saveCallStack, sb);
+         appendExecutionLoopNode(level, (IExecutionLoopNode)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionMethodCall) {
-         appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, saveCallStack, sb);
+         appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionMethodReturn) {
-         appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, saveCallStack, sb);
+         appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionStatement) {
-         appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, saveCallStack, sb);
+         appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionTermination) {
-         appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, saveCallStack, sb);
+         appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      }
+      else if (node instanceof IExecutionUseOperationContract) {
+         appendExecutionUseOperationContract(level, (IExecutionUseOperationContract)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      }
+      else if (node instanceof IExecutionUseLoopInvariant) {
+         appendExecutionUseLoopInvariant(level, (IExecutionUseLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -289,6 +379,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionBranchCondition} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -296,6 +387,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                  IExecutionBranchCondition node, 
                                                  boolean saveVariables, 
                                                  boolean saveCallStack, 
+                                                 boolean saveReturnValues,
                                                  StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -303,9 +395,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION, node.getFormatedBranchCondition());
       attributeValues.put(ATTRIBUTE_MERGED_BRANCH_CONDITION, node.isMergedBranchCondition() + "");
+      attributeValues.put(ATTRIBUTE_BRANCH_CONDITION_COMPUTED, node.isBranchConditionComputed() + "");
+      attributeValues.put(ATTRIBUTE_ADDITIONAL_BRANCH_LABEL, node.getAdditionalBranchLabel());
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_BRANCH_CONDITION, sb);
    }
 
@@ -315,6 +409,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionStartNode} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -322,6 +417,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                            IExecutionStartNode node, 
                                            boolean saveVariables, 
                                            boolean saveCallStack,
+                                           boolean saveReturnValues,
                                            StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -329,7 +425,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_START_NODE, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_START_NODE, sb);
    }
 
@@ -339,6 +435,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionLoopCondition} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -346,6 +443,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                             IExecutionBranchNode node, 
                                             boolean saveVariables, 
                                             boolean saveCallStack, 
+                                            boolean saveReturnValues,
                                             StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -354,7 +452,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_BRANCH_NODE, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_BRANCH_NODE, sb);
    }
 
@@ -364,6 +462,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionLoopCondition} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -371,6 +470,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                IExecutionLoopCondition node, 
                                                boolean saveVariables, 
                                                boolean saveCallStack, 
+                                               boolean saveReturnValues,
                                                StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -379,7 +479,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_LOOP_CONDITION, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_LOOP_CONDITION, sb);
    }
 
@@ -389,6 +489,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionLoopNode} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -396,6 +497,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                           IExecutionLoopNode node, 
                                           boolean saveVariables, 
                                           boolean saveCallStack,
+                                          boolean saveReturnValues,
                                           StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -404,7 +506,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_LOOP_NODE, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_LOOP_NODE, sb);
    }
 
@@ -414,6 +516,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionMethodCall} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -421,6 +524,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                             IExecutionMethodCall node, 
                                             boolean saveVariables, 
                                             boolean saveCallStack,
+                                            boolean saveReturnValues,
                                             StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -429,7 +533,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_METHOD_CALL, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_METHOD_CALL, sb);
    }
 
@@ -439,24 +543,54 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionMethodReturn} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
    protected void appendExecutionMethodReturn(int level, 
                                               IExecutionMethodReturn node, 
                                               boolean saveVariables,
-                                              boolean saveCallStack, 
+                                              boolean saveCallStack,
+                                              boolean saveReturnValues,
                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
-      attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
+      if (saveReturnValues) {
+         attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
+      }
+      attributeValues.put(ATTRIBUTE_RETURN_VALUE_COMPUTED, node.isReturnValuesComputed() + "");
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
+      if (saveReturnValues) {
+         IExecutionMethodReturnValue[] returnValues = node.getReturnValues();
+         for (IExecutionMethodReturnValue returnValue : returnValues) {
+            appendExecutionMethodReturnValue(level + 1, returnValue, sb);
+         }
+      }
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_METHOD_RETURN, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionMethodReturnValue} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param returnValue The {@link IExecutionMethodReturnValue} to convert.
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionMethodReturnValue(int level, 
+                                                   IExecutionMethodReturnValue returnValue, 
+                                                   StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, returnValue.getName());
+      attributeValues.put(ATTRIBUTE_RETURN_VALUE_STRING, returnValue.getReturnValueString());
+      attributeValues.put(ATTRIBUTE_HAS_CONDITION, returnValue.hasCondition() + "");
+      attributeValues.put(ATTRIBUTE_CONDITION_STRING, returnValue.getConditionString());
+      appendStartTag(level, TAG_METHOD_RETURN_VALUE, attributeValues, sb);
+      appendEndTag(level, TAG_METHOD_RETURN_VALUE, sb);
    }
 
    /**
@@ -465,6 +599,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionStatement} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -472,6 +607,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                            IExecutionStatement node, 
                                            boolean saveVariables, 
                                            boolean saveCallStack, 
+                                           boolean saveReturnValues,
                                            StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -480,8 +616,70 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_STATEMENT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_STATEMENT, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionUseOperationContract} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionUseOperationContract} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionUseOperationContract(int level, 
+                                                     IExecutionUseOperationContract node, 
+                                                     boolean saveVariables, 
+                                                     boolean saveCallStack, 
+                                                     boolean saveReturnValues,
+                                                     StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+
+      attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, node.isPreconditionComplied() + "");
+      attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, node.hasNotNullCheck() + "");
+      attributeValues.put(ATTRIBUTE_NOT_NULL_CHECK_COMPLIED, node.isNotNullCheckComplied() + "");
+      
+      appendStartTag(level, TAG_USE_OPERATION_CONTRACT, attributeValues, sb);
+      appendVariables(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendEndTag(level, TAG_USE_OPERATION_CONTRACT, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionUseLoopInvariant} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionUseLoopInvariant} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionUseLoopInvariant(int level, 
+                                         IExecutionUseLoopInvariant node, 
+                                         boolean saveVariables, 
+                                         boolean saveCallStack, 
+                                         boolean saveReturnValues,
+                                         StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+
+      attributeValues.put(ATTRIBUTE_INITIALLY_VALID, node.isInitiallyValid() + "");
+
+      appendStartTag(level, TAG_USE_LOOP_INVARIANT, attributeValues, sb);
+      appendVariables(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendEndTag(level, TAG_USE_LOOP_INVARIANT, sb);
    }
 
    /**
@@ -490,6 +688,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionTermination} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -497,15 +696,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                              IExecutionTermination node, 
                                              boolean saveVariables,
                                              boolean saveCallStack,
+                                             boolean saveReturnValues,
                                              StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
-      attributeValues.put(ATTRIBUTE_EXCEPTIONAL_TERMINATION, Boolean.valueOf(node.isExceptionalTermination()).toString());
+      attributeValues.put(ATTRIBUTE_TERMINATION_KIND, node.getTerminationKind().toString());
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_TERMINATION, sb);
    }
 
@@ -587,6 +787,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param parent The parent {@link IExecutionNode} which provides the children.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -594,10 +795,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                  IExecutionNode parent, 
                                  boolean saveVariables, 
                                  boolean saveCallStack,
+                                 boolean saveReturnValues,
                                  StringBuffer sb) throws ProofInputException {
       IExecutionNode[] children = parent.getChildren();
       for (IExecutionNode child : children) {
-         appendExecutionNode(childLevel, child, saveVariables, saveCallStack, sb);
+         appendExecutionNode(childLevel, child, saveVariables, saveCallStack, saveReturnValues, sb);
       }
    }
 

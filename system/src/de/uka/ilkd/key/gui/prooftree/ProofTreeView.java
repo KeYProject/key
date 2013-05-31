@@ -1,19 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,16 +38,19 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
+import java.awt.BorderLayout;
 
 public class ProofTreeView extends JPanel {
     
     private static final long serialVersionUID = 3732875161168302809L;
     private static final Color PASTEL_COLOR = new Color(255,255,204);
+    private static final Color GRAY_COLOR = Color.DARK_GRAY;
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
     private static final Color LIGHT_BLUE_COLOR = new Color(230,230,255);
@@ -70,8 +77,11 @@ public class ProofTreeView extends JPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
-    /** KeYStroke for the search panel */
-    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
+    /** KeYStroke for the search panel: STRG+SHIFT+F */
+    public final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK
+            | java.awt.event.InputEvent.SHIFT_DOWN_MASK
+            | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {
@@ -86,34 +96,35 @@ public class ProofTreeView extends JPanel {
     private HashSet<Node>    modifiedSubtreesCache = null;
     
     /** the search dialog */
-    private ProofTreeSearchPanel proofTreeSearchPanel;
+    private ProofTreeSearchBar proofTreeSearchPanel;
+    
+    // Taclet info can be shown for inner nodes.
+    public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
+    
 
     /** creates a new proof tree */
     public ProofTreeView (KeYMediator mediator) {
 
 	proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
-	delegateView = new JTree(
-		     new DefaultMutableTreeNode("No proof loaded")) {
-		/**
-                 * 
-                 */
-                private static final long serialVersionUID = 6555955929759162324L;
+        delegateView = new JTree(
+                new DefaultMutableTreeNode("No proof loaded")) {
+            private static final long serialVersionUID = 6555955929759162324L;
 
-        public void updateUI() {
-		    super.updateUI();
-		    /* we want plus/minus signs to expand/collapse tree nodes */
-		    final TreeUI ui = getUI();
-		    if (ui instanceof BasicTreeUI) {
-			final BasicTreeUI treeUI = (BasicTreeUI)ui;
-			treeUI.setExpandedIcon(IconFactory.expandedIcon());
-			treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
-		    }
-                    if(ui instanceof CacheLessMetalTreeUI){
-                        ((CacheLessMetalTreeUI) ui).clearDrawingCache();
-                    }
-		}
-	    };
+            public void updateUI() {
+                super.updateUI();
+                /* we want plus/minus signs to expand/collapse tree nodes */
+                final TreeUI ui = getUI();
+                if (ui instanceof BasicTreeUI) {
+                    final BasicTreeUI treeUI = (BasicTreeUI) ui;
+                    treeUI.setExpandedIcon(IconFactory.expandedIcon());
+                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
+                }
+                if (ui instanceof CacheLessMetalTreeUI) {
+                    ((CacheLessMetalTreeUI) ui).clearDrawingCache();
+                }
+            }
+        };
             
         delegateView.setUI(new CacheLessMetalTreeUI());
 
@@ -159,12 +170,18 @@ public class ProofTreeView extends JPanel {
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
 
-	updateUI();
+        updateUI();
 
-	this.setLayout(new BorderLayout());
-	this.add(new JScrollPane(delegateView), BorderLayout.CENTER);
-	this.proofTreeSearchPanel = new ProofTreeSearchPanel(this);
-	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);	
+        setLayout(new BorderLayout());
+        
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(tacletInfoToggle, BorderLayout.NORTH);
+        proofTreeSearchPanel = new ProofTreeSearchBar(this);
+        bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
+        
+        add(new JScrollPane(delegateView), BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 	
 	layoutKeYComponent();	
 	
@@ -172,7 +189,7 @@ public class ProofTreeView extends JPanel {
 	if (selProof != null) {
 	    setProof(selProof);
 	}
-	
+
 	
 	final ActionListener keyboardAction = new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
@@ -206,7 +223,6 @@ public class ProofTreeView extends JPanel {
 	ProofRenderer renderer= new ProofRenderer();	
 	delegateView.setCellRenderer(renderer);
 	delegateView.putClientProperty("JTree.lineStyle", "Angled");
-
 	delegateView.setVisible(true);	
     }
 
@@ -308,7 +324,7 @@ public class ProofTreeView extends JPanel {
     public void makeNodeVisible(Node n) {
         if (n == null) return;
 	
-        final GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+        final GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
         if (node==null) return;
  	
         TreeNode[] obs=node.getPath();
@@ -322,7 +338,7 @@ public class ProofTreeView extends JPanel {
 
 
     protected void makeNodeExpanded(Node n) {
-	GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+	GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
  	if (node==null) return;
  	TreeNode[] obs=node.getPath();
  	TreePath tp = new TreePath(obs);
@@ -435,15 +451,11 @@ public class ProofTreeView extends JPanel {
 	}
     }
 
-
-
-    // INNER CLASSES 
-
     public void showSearchPanel() {
         proofTreeSearchPanel.setVisible(true);
     }
 
-
+    // INNER CLASSES 
 
     // listens to gui events
     class GUIProofTreeGUIListener implements GUIListener,
@@ -581,19 +593,20 @@ public class ProofTreeView extends JPanel {
 
 	    
 	    GUIAbstractTreeNode treeNode = 
-		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
-		 getLastPathComponent());
-	    if (treeNode instanceof GUIProofTreeNode) {		
-		Node node = treeNode.getNode();
-		Goal selected = proof.getGoal(node);
-		if (selected != null) {
-		    mediator.goalChosen(selected);
-		} else {
-		    mediator.nonGoalNodeChosen(node);
-		}
-	    } else if (treeNode instanceof GUIBranchNode) {
-                selectBranchNode((GUIBranchNode)treeNode);
-            }
+	            ((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
+	                    getLastPathComponent());
+	    if (treeNode instanceof GUIBranchNode) {
+	        selectBranchNode((GUIBranchNode)treeNode);
+	    } else {
+	        Node node = treeNode.getNode();
+	        Goal selected = proof.getGoal(node);
+	        if (selected != null) {
+	            mediator.goalChosen(selected);
+	        } else {
+	            mediator.nonGoalNodeChosen(node);
+	        }
+	    }
+
 	    // catching NullPointerException occurring when renaming root node
 	    if (treeNode instanceof GUIBranchNode && treeNode
 			.getNode().parent() != null) {
@@ -612,7 +625,7 @@ public class ProofTreeView extends JPanel {
          * 
          */
         private static final long serialVersionUID = -4990023575036168279L;
-    private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
+        private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
             
 	public Component getTreeCellRendererComponent(JTree tree,
 						      Object value,
@@ -626,24 +639,31 @@ public class ProofTreeView extends JPanel {
 	        return super.getTreeCellRendererComponent(tree, value, sel, 
 	                expanded, leaf, row, hasFocus);
 	    }
-	    
-            if (!(value instanceof GUIProofTreeNode)) {
-		super.getTreeCellRendererComponent
-		    (tree, value, sel, expanded, leaf, row, hasFocus);
-		setBackgroundNonSelectionColor(BISQUE_COLOR);
-		if (value instanceof GUIBranchNode) {
-		    if ( ((GUIBranchNode)value).getNode().isClosed() ) {
-			// all goals below this node are closed
-			this.setIcon(IconFactory.provedFolderIcon());
-		    }
-		}
-		return this;
-	    }
-	    Node node = ((GUIProofTreeNode)value).getNode();
+
+	    if (value instanceof GUIBranchNode) {
+	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                setBackgroundNonSelectionColor(BISQUE_COLOR);
+                if ( ((GUIBranchNode)value).getNode().isClosed() ) {
+                    // all goals below this node are closed
+                    this.setIcon(IconFactory.provedFolderIcon());
+                }
+                return this;
+            }
+
+	    if (value instanceof GUIOneStepChildTreeNode) {
+	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                setForeground(GRAY_COLOR);
+                setIcon(IconFactory.oneStepSimplifier(16));
+                setText(value.toString());
+                return this;
+            }
+
+            // now GUIProofTreeNode / GUIOneStepSimpTreeNode
+	    Node node = ((GUIAbstractTreeNode)value).getNode();
 	    String nodeText = node.serialNr()+":"+node.name();
 	    boolean isBranch = false;
 	    {
-                final Node child = ((GUIProofTreeNode)value).findChild( node );
+                final Node child = ((GUIAbstractTreeNode)value).findChild( node );
                 if ( child != null && child.getNodeInfo()
                     .getBranchLabel () != null ) {
                     isBranch = true;
@@ -671,7 +691,7 @@ public class ProofTreeView extends JPanel {
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(Color.red);
+			tree_cell.setForeground(new Color(250, 90, 90));
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
@@ -799,8 +819,6 @@ public class ProofTreeView extends JPanel {
 	    
 	    this.add(new JSeparator());
 
-	    
-
 	    this.add(expandAll);
 	    expandAll.addActionListener(this);
 	    this.add(expandAllBelow);
@@ -903,7 +921,7 @@ public class ProofTreeView extends JPanel {
 		Node n;
 		while ( it.hasNext () ) {
 		    n = it.next ().node ();		  
-		    GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+		    GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
 		    if (node==null) break;
 		    TreeNode[] obs=node.getPath();
 		    TreePath tp = new TreePath(obs);
@@ -972,7 +990,7 @@ public class ProofTreeView extends JPanel {
 			selectBranchNode((GUIBranchNode)sibling);
 		}
             } else if (e.getSource() == search) {
-		proofTreeSearchPanel.setVisible(true);
+		showSearchPanel();
             } 
 	}
 

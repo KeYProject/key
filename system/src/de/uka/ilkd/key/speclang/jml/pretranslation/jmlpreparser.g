@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 header {
     package de.uka.ilkd.key.speclang.jml.pretranslation;
@@ -1148,27 +1152,6 @@ decreasing_keyword
 //unsupported methodlevel stuff
 //-----------------------------------------------------------------------------
 
-assert_statement[ImmutableList<String> mods] 
-	returns [ImmutableList<TextualJMLConstruct> result = null] 
-	throws SLTranslationException
-{
-    PositionedString ps;
-}
-:
-    assert_keyword ps=expression
-    {
-        raiseNotSupported("JML assert statements");
-    	result = ImmutableSLList.<TextualJMLConstruct>nil();        
-    } 
-;
-
-
-assert_keyword
-:
-	ASSERT
-    |	ASSERT_REDUNDANTLY
-;
-
 
 assume_statement[ImmutableList<String> mods] 
 	returns [ImmutableList<TextualJMLConstruct> result = null] 
@@ -1206,7 +1189,7 @@ expression returns [PositionedString result = null]
 }
 :
     t:EXPRESSION
-    { 
+    {   
     	result = createPositionedString(t.getText(), t);
     }
 ;
@@ -1223,6 +1206,27 @@ block_specification[ImmutableList<String> mods]
 :
     
     result=method_specification[mods]
+;
+
+
+assert_statement[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException
+{
+    PositionedString ps;
+}
+:
+    assert_keyword ps=expression
+    {
+    	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));				       
+    } 
+;
+
+
+assert_keyword
+:
+	ASSERT
+    |	ASSERT_REDUNDANTLY
 ;
 
 breaks_clause

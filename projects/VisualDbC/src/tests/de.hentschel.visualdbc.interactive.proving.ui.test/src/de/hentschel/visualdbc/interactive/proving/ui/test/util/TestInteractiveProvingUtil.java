@@ -1,12 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.interactive.proving.ui.test.util;
@@ -22,6 +24,8 @@ import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditPart;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSAttribute;
 import de.hentschel.visualdbc.datasource.model.IDSAxiom;
@@ -59,6 +63,9 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 import de.hentschel.visualdbc.generation.test.util.TestGenerationUtil;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDSFinder;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDbcFinder;
+import de.hentschel.visualdbc.interactive.proving.ui.job.StartProofJob;
+import de.hentschel.visualdbc.interactive.proving.ui.job.event.IStartProofJobListener;
+import de.hentschel.visualdbc.interactive.proving.ui.job.event.StartProofJobEvent;
 import de.hentschel.visualdbc.interactive.proving.ui.util.FinderUtil;
 
 /**
@@ -531,5 +538,94 @@ public final class TestInteractiveProvingUtil {
          result.addAll(getEditPartsByModelClass(child, expectedClass));
       }
       return result;
+   }
+   
+   /**
+    * Opens a proof.
+    * @param startProofListener The {@link LogStartProofJobListener} to use.
+    * @param tree The tree that provides the context menu to open a proof.
+    * @param pathToProofElement The element to select in the tree.
+    */
+   public static void openProof(LogStartProofJobListener startProofListener, SWTBotTree tree, String[] pathToProofElement) {
+      TestUtilsUtil.selectInTree(tree, pathToProofElement);
+      openProof(startProofListener, tree, 1);
+   }
+
+   /**
+    * Opens a proof.
+    * @param startProofListener The {@link LogStartProofJobListener} to use.
+    * @param tree The tree that provides the context menu to open a proof.
+    * @param waitCount The number of started proofs to wait for.
+    */
+   public static void openProof(LogStartProofJobListener startProofListener, SWTBotTree tree, int waitCount) {
+      int oldCount = startProofListener.getFinishCount();
+      tree.contextMenu("Open Proof").click();
+      waitForProofOpening(startProofListener, oldCount, waitCount);
+   }
+   
+   /**
+    * Opens the proof.
+    * @param startProofListener The {@link LogStartProofJobListener} to use.
+    * @param editor The editor to open the proof in.
+    * @param proofEditPart The element to select in the editor for that a proof should be opened. 
+    */
+   public static void openProof(LogStartProofJobListener startProofListener, SWTBotGefEditor editor, SWTBotGefEditPart proofEditPart) {
+      editor.select(proofEditPart);
+      openProof(startProofListener, editor, 1);
+   }
+   
+   /**
+    * Opens the proof.
+    * @param startProofListener The {@link LogStartProofJobListener} to use.
+    * @param editor The editor to open the proof in.
+    * @param waitCount The number of started proofs to wait for.
+    */
+   public static void openProof(LogStartProofJobListener startProofListener, SWTBotGefEditor editor, int waitCount) {
+      int oldCount = startProofListener.getFinishCount();
+      editor.clickContextMenu("Open Proof");
+      waitForProofOpening(startProofListener, oldCount, waitCount);
+   }
+   
+   /**
+    * Waits until at least one more proof is opened.
+    * @param startProofListener The {@link LogStartProofJobListener} to use.
+    * @param oldCount The old number of opened proofs.
+    * @param waitCount The number of started proofs to wait for.
+    */
+   public static void waitForProofOpening(LogStartProofJobListener startProofListener, int oldCount, int waitCount) {
+      while (startProofListener.getFinishCount() < oldCount + waitCount) {
+         TestUtilsUtil.sleep(100);
+      }
+   }
+   
+   /**
+    * Counts the number of loaded proofs via {@link StartProofJob}.
+    * @author Martin Hentschel
+    */
+   public static class LogStartProofJobListener implements IStartProofJobListener {
+      /**
+       * The number of events.
+       */
+      private int finishCount = 0;
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void jobFinished(StartProofJobEvent e) {
+         synchronized (this) {
+            finishCount++;
+         }
+      }
+
+      /**
+       * Returns the number of events.
+       * @return The number of events.
+       */
+      public int getFinishCount() {
+         synchronized (this) {
+            return finishCount;
+         }
+      }
    }
 }

@@ -1,8 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -10,6 +24,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 
 /**
  * <p>
@@ -74,6 +90,41 @@ public interface IExecutionTreeImageConstants {
     */
    public static final String IMG_TERMINATION = PREFIX + "termination";
 
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT = PREFIX + "useOperationContract";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_NPC = PREFIX + "useOperationContractNotNpc";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_PRE = PREFIX + "useOperationContractNotPre";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC = PREFIX + "useOperationContractNotPreAndNotNpc";
+
+   /**
+    * Key of the image for {@link ISEDUseLoopInvariant}s.
+    */
+   public static final String IMG_USE_LOOP_INVARIANT = PREFIX + "useLoopInvariant";
+
+   /**
+    * Key of the image for {@link ISEDUseLoopInvariant}s.
+    */
+   public static final String IMG_USE_LOOP_INVARIANT_INITIALLY_INVALID = PREFIX + "useLoopInvariantInitiallyInvalid";
+
+   /**
+    * Key of the image for {@link ISEDLoopBodyTermination}s.
+    */
+   public static final String IMG_LOOP_BODY_TERMINATION = PREFIX + "loopBodyTermination";
+   
    /**
     * Key of the image for {@link ISEDThread}s.
     */

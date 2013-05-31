@@ -1,5 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.ui.property;
 
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FillLayout;
@@ -10,11 +24,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
+import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -29,9 +46,14 @@ public class KeYTabComposite extends Composite {
    private Text nodeText;
    
    /**
-    * Shows the sequent of the node in KeY's proof tree represented by the current {@link IKeYSEDDebugNode}.
+    * Shows the {@link Sequent} of the node in KeY's proof tree represented by the current {@link IKeYSEDDebugNode}.
     */
-   private Text sequentText;
+   private SourceViewer sequentViewer;
+   
+   /**
+    * The {@link ProofSourceViewerDecorator} used to decorate {@link #sequentViewer}.
+    */
+   private ProofSourceViewerDecorator sequentViewerDecorator;
    
    /**
     * Constructor.
@@ -60,19 +82,20 @@ public class KeYTabComposite extends Composite {
       data.top = new FormAttachment(nodeText, 0, SWT.CENTER);
       nodeLabel.setLayoutData(data);
 
-      sequentText = factory.createText(composite, StringUtil.EMPTY_STRING, SWT.MULTI);
-      sequentText.setEditable(false);
+      sequentViewer = new SourceViewer(composite, null, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+      sequentViewer.setEditable(false);
       data = new FormData();
       data.left = new FormAttachment(0, AbstractPropertySection.STANDARD_LABEL_WIDTH);
       data.right = new FormAttachment(100, 0);
       data.top = new FormAttachment(nodeText, 0, ITabbedPropertyConstants.VSPACE);
-      sequentText.setLayoutData(data);
+      sequentViewer.getControl().setLayoutData(data);
+      sequentViewerDecorator = new ProofSourceViewerDecorator(sequentViewer);
       
       CLabel sequentLabel = factory.createCLabel(composite, "Sequent:");
       data = new FormData();
       data.left = new FormAttachment(0, 0);
-      data.right = new FormAttachment(sequentText, -ITabbedPropertyConstants.HSPACE);
-      data.top = new FormAttachment(sequentText, 0, SWT.TOP);
+      data.right = new FormAttachment(sequentViewer.getControl(), -ITabbedPropertyConstants.HSPACE);
+      data.top = new FormAttachment(sequentViewer.getControl(), 0, SWT.TOP);
       sequentLabel.setLayoutData(data);
    }
    
@@ -82,14 +105,19 @@ public class KeYTabComposite extends Composite {
     */
    public void updateContent(IKeYSEDDebugNode<?> node) {
       String name = null;
-      String sequent = null;
+      Node keyNode = null;
+      KeYMediator mediator = null;
+      PosInOccurrence pio = null;
       if (node != null) {
-         Node keyNode = node.getExecutionNode().getProofNode();
+         keyNode = node.getExecutionNode().getProofNode();
+         pio = keyNode.getAppliedRuleApp() != null ? keyNode.getAppliedRuleApp().posInOccurrence() : null;
+         mediator = node.getExecutionNode().getMediator();
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
-         sequent = NonGoalInfoView.computeText(node.getExecutionNode().getMediator(), 
-                                               keyNode);
       }
       SWTUtil.setText(nodeText, name);
-      SWTUtil.setText(sequentText, sequent);
+      sequentViewerDecorator.setDocumentForNode(keyNode, mediator);
+      if (pio != null) {
+         sequentViewerDecorator.setGreenBackground(pio);
+      }
    }
 }

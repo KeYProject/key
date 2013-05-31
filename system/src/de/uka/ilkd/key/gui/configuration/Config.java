@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.configuration;
 
@@ -27,10 +31,8 @@ public class Config {
     /** name of different fonts */
     public static final String KEY_FONT_PROOF_TREE 
 	= "KEY_FONT_PROOF_TREE";
-    public static final String KEY_FONT_CURRENT_GOAL_VIEW 
+    public static final String KEY_FONT_SEQUENT_VIEW 
 	= "KEY_FONT_CURRENT_GOAL_VIEW";
-    public static final String KEY_FONT_INNER_NODE_VIEW 
-	= "KEY_FONT_INNER_NODE_VIEW";
     public static final String KEY_FONT_GOAL_LIST_VIEW 
 	= "KEY_FONT_GOAL_LIST_VIEW";
     public static final String KEY_FONT_PROOF_LIST_VIEW 
@@ -85,10 +87,8 @@ public class Config {
     public void setDefaultFonts() {
 	UIManager.put(KEY_FONT_PROOF_TREE, 
 		      new Font("Default", Font.PLAIN, sizes[sizeIndex]));
-	UIManager.put(KEY_FONT_CURRENT_GOAL_VIEW, 
+	UIManager.put(KEY_FONT_SEQUENT_VIEW, 
 		      new Font("Monospaced", Font.PLAIN, sizes[sizeIndex]));
-	UIManager.put(KEY_FONT_INNER_NODE_VIEW, 
-		      new Font("Monospaced", Font.ITALIC, sizes[sizeIndex]));
 	UIManager.put(KEY_FONT_GOAL_LIST_VIEW, 
 		      new Font("Default", Font.PLAIN, sizes[2]));
 	UIManager.put(KEY_FONT_PROOF_LIST_VIEW, 

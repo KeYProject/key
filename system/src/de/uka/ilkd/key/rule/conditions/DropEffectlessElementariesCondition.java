@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule.conditions;
 
@@ -48,10 +52,11 @@ public final class DropEffectlessElementariesCondition
 	    LocationVariable lhs = (LocationVariable) eu.lhs();
 	    if(relevantVars.contains(lhs)) {
 	        relevantVars.remove(lhs);
-	        // updates of the form "x:=x" can be discarded (MU,CS)
-	        if(lhs.equals(update.sub(0).op())) {
-	            return TB.skip();
-	        }
+	        // removed, see bug #1269 (MU, CS)
+//	        // updates of the form "x:=x" can be discarded (MU,CS)
+//	        if(lhs.equals(update.sub(0).op())) {
+//	            return TB.skip();
+//	        }
 		return null;
 	    } else {
 		return TB.skip();
@@ -74,7 +79,7 @@ public final class DropEffectlessElementariesCondition
 	    Term sub0 = update.sub(0);
 	    Term sub1 = update.sub(1);
 	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars);
-	    return newSub1 == null ? null : TB.apply(sub0, newSub1);
+	    return newSub1 == null ? null : TB.apply(sub0, newSub1, null);
 	} else {
 	    return null;
 	}
@@ -92,7 +97,7 @@ public final class DropEffectlessElementariesCondition
 							         varsInTarget); 
 	return simplifiedUpdate == null 
 	       ? null 
-	       : TB.apply(simplifiedUpdate, target); 
+	       : TB.apply(simplifiedUpdate, target, null); 
     }
     
     

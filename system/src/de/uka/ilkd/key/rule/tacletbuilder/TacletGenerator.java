@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -153,7 +166,8 @@ public class TacletGenerator {
         final Sequent addedSeq =
                 Sequent.createAnteSequent(
                 Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
-        final Term findTerm = target.isStatic()
+        final Term findTerm = 
+                 target.isStatic()
                               ? TB.func(target, TB.var(heapSV))
                               : TB.func(target, TB.var(heapSV), TB.var(selfSV));
         final RewriteTacletGoalTemplate axiomTemplate =
@@ -275,7 +289,7 @@ public class TacletGenerator {
         final Term replaced = or.replace(term);
         final Term update = TB.elementary(services, TB.var(heapSV));
 
-        return TB.apply(update, replaced);
+        return TB.apply(update, replaced, null);
     }
 
 
@@ -285,8 +299,8 @@ public class TacletGenerator {
             final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder tacletBuilder) {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(
-                target, services, heapSV, selfSV, schemaRepresents,
-                tacletBuilder);
+              target, services, heapSV, selfSV, schemaRepresents,
+              tacletBuilder);
         SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
         final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
                 addedCf).semisequent();
@@ -385,7 +399,7 @@ public class TacletGenerator {
                             TB.var(heapSV),
                             eqVersion
                             ? TB.var(eqSV)
-                            : TB.var(selfSV));
+                            : TB.var(selfSV));        
         tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
                 new TacletGoalTemplate(addedSeq,
@@ -650,8 +664,7 @@ public class TacletGenerator {
                                            tacletBuilder, services)
                                            : TB.tt();
         //assemble formula
-        final Term guardedAxiom =
-                TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
+        final Term guardedAxiom = TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
         final SequentFormula guardedAxiomCf =
                 new SequentFormula(guardedAxiom);
         return guardedAxiomCf;

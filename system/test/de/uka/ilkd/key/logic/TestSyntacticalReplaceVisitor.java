@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic;
 
@@ -84,7 +88,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
     }
 
     public void test1() {
-	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(null, insts);
+	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(null, insts, null);
 	rw.execPostOrder(srv);
 	assertEquals(srv.getTerm(), t_allxpxpx);
     }
@@ -95,7 +99,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	Term result=TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
 	SyntacticalReplaceVisitor v = new
 	    SyntacticalReplaceVisitor
-	    (null, SVInstantiations.EMPTY_SVINSTANTIATIONS);
+	    (null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
 	orig.execPostOrder(v);
 	assertEquals("Substitution Term not resolved correctly.",
 		     v.getTerm().sub(0), result.sub(0));

@@ -1,16 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -60,7 +63,7 @@ class TacletMenu extends JMenu {
      */
     private static final long serialVersionUID = -4659105575090816693L;
     private PosInSequent pos;
-    private SequentView sequentView;
+    private CurrentGoalView sequentView;
     private KeYMediator mediator;
     private static final Set<Name> CLUTTER_RULESETS = new HashSet<Name>();
 
@@ -72,7 +75,6 @@ class TacletMenu extends JMenu {
     private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
 
     static {
-        CLUTTER_RULES.add(new Name("cut_direct"));
         CLUTTER_RULES.add(new Name("cut_direct_r"));
         CLUTTER_RULES.add(new Name("cut_direct_l"));
         CLUTTER_RULES.add(new Name("case_distinction_r"));
@@ -104,13 +106,13 @@ class TacletMenu extends JMenu {
      * @param builtInList IList<BuiltInRule> with all applicable BuiltInRules
      * @param pos the PosInSequent
      */ 
-    TacletMenu(SequentView sequentView,
+    TacletMenu(CurrentGoalView sequentView,
 	       ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
 	       ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
 	       PosInSequent pos) {
         super();        
 	this.sequentView = sequentView;
-	this.mediator = sequentView.mediator();
+	this.mediator = sequentView.getMediator();
  	this.pos = pos;
  	findList = removeObsolete(findList);
     rewriteList = removeObsolete(rewriteList);
@@ -368,7 +370,7 @@ class TacletMenu extends JMenu {
     
     private void addClipboardItem(MenuControl control) {
 	addSeparator();
-	JMenuItem item = new JMenuItem("to clipboard");
+	JMenuItem item = new JMenuItem("copy to clipboard");
 	item.addActionListener(control);
 	add(item);
     }
@@ -464,7 +466,7 @@ class TacletMenu extends JMenu {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() instanceof TacletMenuItem) {
-		((SequentView)(getPopupMenu().getInvoker()))
+		((CurrentGoalView)(getPopupMenu().getInvoker()))
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
             }else if(e.getSource() instanceof SMTMenuItem){
@@ -505,7 +507,7 @@ class TacletMenu extends JMenu {
 	                                     mediator.getSelectedGoal () );
 	    } else {
 		if (((JMenuItem)e.getSource()).getText()
-		    .startsWith("to clipboard")){
+		    .startsWith("copy to clipboard")){
                     GuiUtilities.copyHighlightToClipboard(sequentView);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith("Pop method frame")){

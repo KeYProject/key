@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -44,6 +57,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -51,6 +65,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
@@ -66,6 +82,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTe
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeDeleteFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeRemoveFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionLayoutFeature;
@@ -94,6 +114,14 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeat
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 
 /**
@@ -132,13 +160,16 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
          return new ICreateFeature[] {new BranchConditionCreateFeature(this),
                                       new BranchNodeCreateFeature(this),
                                       new ExceptionalTerminationCreateFeature(this),
+                                      new LoopBodyTerminationCreateFeature(this),
                                       new LoopConditionCreateFeature(this),
                                       new LoopNodeCreateFeature(this),
                                       new MethodCallCreateFeature(this),
                                       new MethodReturnCreateFeature(this),
                                       new StatementCreateFeature(this),
                                       new TerminationCreateFeature(this),
-                                      new ThreadCreateFeature(this)};
+                                      new ThreadCreateFeature(this),
+                                      new UseLoopInvariantCreateFeature(this),
+                                      new UseOperationContractCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];
@@ -158,6 +189,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDLoopBodyTermination) {
+         return new LoopBodyTerminationAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDLoopCondition) {
          return new LoopConditionAddFeature(this);
@@ -179,6 +213,12 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEDThread) {
          return new ThreadAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDUseOperationContract) {
+         return new UseOperationContractAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDUseLoopInvariant) {
+         return new UseLoopInvariantAddFeature(this);
       }
       else {
          return super.getAddFeature(context);
@@ -203,6 +243,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationUpdateFeature(this);
       }
+      else if (bo instanceof ISEDLoopBodyTermination) {
+         return new LoopBodyTerminationUpdateFeature(this);
+      }
       else if (bo instanceof ISEDLoopCondition) {
          return new LoopConditionUpdateFeature(this);
       }
@@ -223,6 +266,12 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEDThread) {
          return new ThreadUpdateFeature(this);
+      }
+      else if (bo instanceof ISEDUseOperationContract) {
+         return new UseOperationContractUpdateFeature(this);
+      }
+      else if (bo instanceof ISEDUseLoopInvariant) {
+         return new UseLoopInvariantUpdateFeature(this);
       }
       else {
          return super.getUpdateFeature(context);
@@ -248,6 +297,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDLoopCondition) {
          return new LoopConditionLayoutFeature(this);
       }
+      else if (bo instanceof ISEDLoopBodyTermination) {
+         return new LoopBodyTerminationLayoutFeature(this);
+      }
       else if (bo instanceof ISEDLoopNode) {
          return new LoopNodeLayoutFeature(this);
       }
@@ -265,6 +317,12 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEDThread) {
          return new ThreadLayoutFeature(this);
+      }
+      else if (bo instanceof ISEDUseOperationContract) {
+         return new UseOperationContractLayoutFeature(this);
+      }
+      else if (bo instanceof ISEDUseLoopInvariant) {
+         return new UseLoopInvariantLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

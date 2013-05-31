@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.init;
 
@@ -26,6 +30,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -36,6 +41,7 @@ public class JavaProfile extends AbstractProfile {
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
 
+    private final static StrategyFactory SYMBOLIC_EXECUTION_FACTORY = new SymbolicExecutionStrategy.Factory();
 
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
         super(standardRules, gcb);
@@ -52,6 +58,7 @@ public class JavaProfile extends AbstractProfile {
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(DEFAULT);
+        set = set.add(SYMBOLIC_EXECUTION_FACTORY);
         return set;
     }
 

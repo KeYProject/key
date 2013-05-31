@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.test.example.fixed_launch_content;
 
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +34,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
@@ -206,8 +220,8 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnPositiveVar2.setValue(returnPositiveVar2value);
        returnPositive.addVariable(returnPositiveVar2);
        
-       SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
-       terminationPositive.setName("<end>");
+       SEDMemoryLoopBodyTermination terminationPositive = new SEDMemoryLoopBodyTermination(target, returnPositive, thread);
+       terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
     }

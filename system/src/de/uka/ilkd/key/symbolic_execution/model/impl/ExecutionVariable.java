@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
@@ -152,65 +165,70 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          if (lengthValue != null) {
             siteProofCondition = TermBuilder.DF.and(siteProofCondition, lengthValue.getCondition());
          }
-         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); 
+         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
       }
       else {
          sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
       }
       ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
-      List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
-      // Group values of the branches
-      Map<Term, List<Goal>> valueMap = new HashMap<Term, List<Goal>>();
-      List<Goal> unknownValues = new LinkedList<Goal>();
-      groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
-      // Instantiate child values
-      for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
-         Term value = valueEntry.getKey();
-         // Format return vale
-         StringBuffer sb = ProofSaver.printTerm(value, getServices(), true);
-         String valueString = sb.toString();
-         // Determine type
-         String typeString = value.sort().toString();
-         // Compute value condition
-         Term condition = computeValueCondition(valueEntry.getValue());
-         String conditionString = null;
-         if (condition != null) {
-            StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
-            conditionString = conditionSB.toString();
+      try {
+         List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
+         // Group values of the branches
+         Map<Term, List<Goal>> valueMap = new HashMap<Term, List<Goal>>();
+         List<Goal> unknownValues = new LinkedList<Goal>();
+         groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
+         // Instantiate child values
+         for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
+            Term value = valueEntry.getKey();
+            // Format return vale
+            StringBuffer sb = ProofSaver.printTerm(value, getServices(), true);
+            String valueString = sb.toString();
+            // Determine type
+            String typeString = value.sort().toString();
+            // Compute value condition
+            Term condition = computeValueCondition(valueEntry.getValue());
+            String conditionString = null;
+            if (condition != null) {
+               StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
+               conditionString = conditionSB.toString();
+            }
+            // Update result
+            result.add(new ExecutionValue(getMediator(),
+                                          getProofNode(),
+                                          this,
+                                          false,
+                                          value,
+                                          valueString,
+                                          typeString,
+                                          condition,
+                                          conditionString));
          }
-         // Update result
-         result.add(new ExecutionValue(getMediator(),
-                                       getProofNode(),
-                                       this,
-                                       false,
-                                       value,
-                                       valueString,
-                                       typeString,
-                                       condition,
-                                       conditionString));
-      }
-      // Instantiate unknown child values
-      if (!unknownValues.isEmpty()) {
-         // Compute value condition
-         Term condition = computeValueCondition(unknownValues);
-         String conditionString = null;
-         if (condition != null) {
-            StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
-            conditionString = conditionSB.toString();
+         // Instantiate unknown child values
+         if (!unknownValues.isEmpty()) {
+            // Compute value condition
+            Term condition = computeValueCondition(unknownValues);
+            String conditionString = null;
+            if (condition != null) {
+               StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
+               conditionString = conditionSB.toString();
+            }
+            // Update result
+            result.add(new ExecutionValue(getMediator(),
+                                          getProofNode(),
+                                          this,
+                                          true,
+                                          null,
+                                          null,
+                                          null,
+                                          condition,
+                                          conditionString));
          }
-         // Update result
-         result.add(new ExecutionValue(getMediator(),
-                                       getProofNode(),
-                                       this,
-                                       true,
-                                       null,
-                                       null,
-                                       null,
-                                       condition,
-                                       conditionString));
+         // Return child values as result
+         return result.toArray(new ExecutionValue[result.size()]);
       }
-      // Return child values as result
-      return result.toArray(new ExecutionValue[result.size()]);
+      finally {
+         info.getProof().dispose();
+      }
    }
 
    /**
@@ -261,18 +279,15 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @throws ProofInputException Occurred Exception.
     */
    protected Term computeValueCondition(List<Goal> valueGoals) throws ProofInputException {
-      final boolean SIMPLIFY = false; // TODO: Enable simlification if identified why it sometimes simplifies to false
       if (!valueGoals.isEmpty()) {
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), SIMPLIFY));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), false));
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = TermBuilder.DF.or(pathConditions);
-         if (SIMPLIFY) {
-            comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
-         }
+         comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
          return comboundPathCondition;
       }
       else {

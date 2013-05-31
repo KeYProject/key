@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 
@@ -109,6 +113,7 @@ import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
@@ -826,7 +831,12 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);	
 	return new AllFields(children);
     }
-    
+
+    public AllObjects convert(de.uka.ilkd.key.java.recoderext.adt.AllObjects e) {
+        ExtList children = collectChildren(e);	
+	return new AllObjects(children);
+    }
+
     public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral e) {
         return EmptySeqLiteral.INSTANCE;
     }    
@@ -873,11 +883,12 @@ public class Recoder2KeYConverter {
             throw new ConvertException("In an embedded DL expression, " + name 
                     + " is not a known DL function name. Line/Col:" + e.getStartPosition());
         }
-        
-        Function f = (Function) named;
+
+	        Function f = (Function) named;
         DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
         
-        expression.check(services);
+        expression.check(services, getKeYJavaType(getServiceConfiguration().getCrossReferenceSourceInfo()
+						  .getContainingClassType(e)));
         
         return expression;
     }

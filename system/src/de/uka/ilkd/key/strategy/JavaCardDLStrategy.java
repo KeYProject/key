@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.strategy;
 
@@ -30,7 +34,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.SetRuleFilter;
+import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
@@ -119,7 +123,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
     
     
-    private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
+    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         
@@ -2162,7 +2166,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    private Feature setupApprovalF(Proof p_proof) {
+    protected Feature setupApprovalF(Proof p_proof) {
         final Feature depSpecF;
         final String depProp
         	= strategyProperties.getProperty(

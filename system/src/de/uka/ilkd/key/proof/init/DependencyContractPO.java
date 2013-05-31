@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.init;
 
@@ -131,9 +135,9 @@ public final class DependencyContractPO extends AbstractPO
 	}
 	
 	//prepare variables
-	final ProgramVariable selfVar 
-		= !contract.getTarget().isStatic() 
-                  ? TB.selfVar(services, contract.getKJT(), true) : null;
+	final ProgramVariable selfVar
+                = !contract.getTarget().isStatic() 
+                ? TB.selfVar(services, contract.getKJT(), true) : null;
 	final ImmutableList<ProgramVariable> paramVars
 		= TB.paramVars(services, target, true);
 
@@ -189,7 +193,7 @@ public final class DependencyContractPO extends AbstractPO
 	//build po
 	final Term po = TB.imp(pre,
                                TB.equals(targetTerm, 
-                        	         TB.apply(update, targetTerm)));
+                        	         TB.apply(update, targetTerm, null)));
 	
         //save in field
         assignPOTerms(po);

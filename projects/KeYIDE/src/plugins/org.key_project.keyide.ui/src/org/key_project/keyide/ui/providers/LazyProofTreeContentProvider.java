@@ -1,16 +1,26 @@
-package org.key_project.keyide.ui.providers;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
+package org.key_project.keyide.ui.providers;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.TreeItem;
-import org.key_project.keyide.ui.util.TreeViewerIterator;
+import org.eclipse.swt.widgets.Display;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
@@ -38,19 +48,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * Flag which indicates that the viewer is currently refreshed when the auto mode has stopped.
     */
    private boolean refreshAfterAutoModeStopped = false;
-
-   /**
-    * The Constructor
-    * @param viewer - the {@link TreeViewer}
-    * @param environment - the {@link KeYEnvironment}
-    * @param proof - the {@link Proof}
-    */
-   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
-      this.viewer=viewer;
-      this.proof = proof;
-      this.environment = environment;
-   }
-   
    
    /**
     * The AutoModeListener
@@ -58,23 +55,27 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    private AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStopped(ProofEvent e) {
-         viewer.getControl().getDisplay().asyncExec(new Runnable() {
-            
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void run() {
-               try {
-                  refreshAfterAutoModeStopped = true;
-                  viewer.refresh(); // Refresh structure
-                  viewer.refresh(); // Referesh labels and icons
+         Display display = viewer.getControl().getDisplay();
+         if (!display.isDisposed()) {
+            display.asyncExec(new Runnable() {
+               /**
+                * {@inheritDoc}
+                */
+               @Override
+               public void run() {
+                  try {
+                     refreshAfterAutoModeStopped = true;
+                     if (!viewer.getControl().isDisposed()) {
+                        viewer.refresh(); // Refresh structure
+                        viewer.refresh(); // Refresh labels and icons                        
+                     }
+                  }
+                  finally {
+                     refreshAfterAutoModeStopped = false;
+                  }
                }
-               finally {
-                  refreshAfterAutoModeStopped = false;
-               }
-            }
-         });
+            });
+         }
       }
       
       /**
@@ -110,14 +111,19 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofPruned(final ProofTreeEvent e) {
+         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofPruned(MouseEvent) which is called here
          if(!environment.getMediator().autoMode()){
-            viewer.getControl().getDisplay().asyncExec(new Runnable() {
-               
-               @Override
-               public void run() {
-                  prune(e.getNode());
-               }
-            });
+            Display display = viewer.getControl().getDisplay();
+            if (!display.isDisposed()) {
+               display.asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     if (!viewer.getControl().isDisposed()) {
+                        prune(e.getNode());
+                     }
+                  }
+               });
+            }
          }
       }
       
@@ -154,17 +160,18 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofExpanded(final ProofTreeEvent e) {
+         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofExpanded(MouseEvent) which is called here
          if(!environment.getMediator().autoMode()){
-            viewer.getControl().getDisplay().asyncExec(new Runnable() {
-               
+            Display display = viewer.getControl().getDisplay();
+            display.asyncExec(new Runnable() {
                @Override
                public void run() {
-                  viewer.refresh();
-
+                  if (!viewer.getControl().isDisposed()) {
+                     viewer.refresh(); // TODO: Update viewer directly, will increase performance?
+                  }
                }
             });
          }
-         
       }
       
       /**
@@ -174,7 +181,19 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       public void proofClosed(final ProofTreeEvent e) {
       }
    };
-   
+
+
+   /**
+    * The Constructor
+    * @param viewer - the {@link TreeViewer}
+    * @param environment - the {@link KeYEnvironment}
+    * @param proof - the {@link Proof}
+    */
+   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
+      this.viewer=viewer;
+      this.proof = proof;
+      this.environment = environment;
+   }
 
    /**
     * {@inheritDoc}
@@ -197,7 +216,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
           }
        }
    }
-   
    
    /**
     * {@inheritDoc}
@@ -239,17 +257,17 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     */
    @Override
    public void updateChildCount(Object element, int currentChildCount) {
-      if(element instanceof Proof){
+      if (element instanceof Proof){
          Proof proof = (Proof) element;
          Node branchNode = proof.root();
          int childCount = getBranchFolderChildCount(branchNode);
          int folderCount = getFolderCountInBranch(proof);
          viewer.setChildCount(element, childCount + folderCount);
       }
-      if(element instanceof Node){
+      if (element instanceof Node){
          viewer.setChildCount(element, 0);
       }
-      if(element instanceof BranchFolder) {
+      if (element instanceof BranchFolder) {
          BranchFolder branchFolder = (BranchFolder) element;
          Node branchNode = branchFolder.getChild();
          int childCount = getBranchFolderChildCount(branchNode);
@@ -367,6 +385,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @return The child index of the element or {@code -1} if it is not a child of the parent.
     */
    public int getIndexOf(Object parent, Object element) {
+      // Make sure that parameters are valid
+      Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element + "\".");
+      Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent + "\".");
       // Find first shown child node of the given parent
       Node current = null;
       if (parent instanceof Proof) {
@@ -396,10 +417,24 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
                found = true;
             }
             else {
-               if(current.childrenCount()==0&&current.parent().childrenCount()==2){
-                  current=current.parent().child(1);
-                  index++;
-               }else{
+               if (current.childrenCount() != 1) {
+                  Node node;
+                  if (element instanceof BranchFolder) {
+                     node = ((BranchFolder) element).getChild();
+                  }
+                  else {
+                     node = (Node)element;
+                  }
+                  int childIndex = current.getChildNr(node);
+                  if (childIndex >= 0) {
+                     found = true;
+                     index += childIndex + 1;
+                  }
+                  else {
+                     current = null; // Stop search, because element is not a child of parent
+                  }
+               }
+               else {
                   current = current.child(0);
                   index++;
                }

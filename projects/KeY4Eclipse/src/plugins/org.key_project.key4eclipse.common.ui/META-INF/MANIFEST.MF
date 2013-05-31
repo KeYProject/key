@@ -7,14 +7,20 @@ Bundle-Activator: org.key_project.key4eclipse.common.ui.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.ui,
+ org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.jdt.core;bundle-version="3.7.3";resolution:=optional,
+ org.eclipse.jdt.ui;bundle-version="3.7.2";resolution:=optional,
  org.key_project.key4eclipse;bundle-version="1.0.0",
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.key4eclipse.starter.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.key4eclipse.common.ui.dialog,
+Export-Package: org.key_project.key4eclipse.common.ui.decorator,
+ org.key_project.key4eclipse.common.ui.dialog,
  org.key_project.key4eclipse.common.ui.handler,
+ org.key_project.key4eclipse.common.ui.preference.page,
  org.key_project.key4eclipse.common.ui.property,
- org.key_project.key4eclipse.common.ui.provider
+ org.key_project.key4eclipse.common.ui.provider,
+ org.key_project.key4eclipse.common.ui.wizard,
+ org.key_project.key4eclipse.common.ui.wizard.page

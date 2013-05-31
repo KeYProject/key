@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.*;
@@ -63,6 +67,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
+    }
+    
+    static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
+        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
+        res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
+        res.addRequires(assertStm);
+        res.addEnsures(assertStm);
+        res.addAssignable(new PositionedString("assignable \\strictly_nothing;",assertStm.fileName,assertStm.pos));
+        return res;
     }
 
 

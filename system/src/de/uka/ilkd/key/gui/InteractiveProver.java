@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -28,21 +32,21 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
-public class InteractiveProver {
+public class InteractiveProver implements InterruptListener {
 
     /** the proof the interactive prover works on */
     private Proof proof;
@@ -72,6 +76,8 @@ public class InteractiveProver {
 
     private AutoModeWorker worker;
 
+    private boolean autoMode; // autoModeStarted has been fired
+
 
     /** creates a new interactive prover object 
      */
@@ -83,7 +89,7 @@ public class InteractiveProver {
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
         applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
-        applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
+        applyStrategy.addProverTaskObserver(mediator().getUI());
     }
 
     /** returns the KeYMediator */
@@ -108,6 +114,7 @@ public class InteractiveProver {
 
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
+        autoMode = true; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStarted(e);
         }
@@ -115,6 +122,7 @@ public class InteractiveProver {
 
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
+        autoMode = false; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStopped(e);
         }
@@ -154,6 +162,14 @@ public class InteractiveProver {
 	return proof;
     }
     
+    /**
+     * Checks if the auto mode is currently running.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
+     */
+    public boolean isAutoMode() {
+        return autoMode;
+    }
+    
     /** starts the execution of rules with active strategy. The
      * strategy will only be applied on the goals of the list that
      * is handed over and on the new goals an applied rule adds
@@ -169,9 +185,8 @@ public class InteractiveProver {
         worker.start();
     }
     
-    
     /** stops the execution of rules */
-    public void stopAutoMode () {
+    public void interruptionPerformed () {
         if (worker != null) worker.stop();
     }
     

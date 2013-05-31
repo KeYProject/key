@@ -1,4 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.test.util;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -59,6 +74,7 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -66,6 +82,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
@@ -343,7 +361,7 @@ public final class TestSedCoreUtil {
       // Assert termination positive
       SWTBotTreeItem[] positiveTerminationItems = positiveItems[0].getItems();
       TestCase.assertEquals(1, positiveTerminationItems.length);
-      TestCase.assertEquals("<end>", positiveTerminationItems[0].getText());
+      TestCase.assertEquals("<loop body end>", positiveTerminationItems[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveTerminationItems[0]) instanceof ISEDTermination);
       // Assert termination positive empty
       SWTBotTreeItem[] positiveTerminationEmptyItems = positiveTerminationItems[0].getItems();
@@ -434,7 +452,7 @@ public final class TestSedCoreUtil {
       TestCase.assertEquals("return 1", positiveItems[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveItems[0]) instanceof ISEDMethodReturn);
       TestCase.assertEquals(0, positiveItems[0].getItems().length);
-      TestCase.assertEquals("<end>", positiveItems[1].getText());
+      TestCase.assertEquals("<loop body end>", positiveItems[1].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveItems[1]) instanceof ISEDTermination);
       TestCase.assertEquals(0, positiveItems[1].getItems().length);
    }
@@ -818,6 +836,14 @@ public final class TestSedCoreUtil {
             TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDThread);
             compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId);
          }
+         else if (expectedNext instanceof ISEDUseOperationContract) {
+            TestCase.assertTrue("Expected ISEDUseOperationContract on " + ((ISEDUseOperationContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDUseOperationContract);
+            compareUseOperationContract((ISEDUseOperationContract)expectedNext, (ISEDUseOperationContract)currentNext, true, compareId, compareVariables, compareCallStack);
+         }
+         else if (expectedNext instanceof ISEDUseLoopInvariant) {
+            TestCase.assertTrue("Expected ISEDUseLoopInvariant on " + ((ISEDUseLoopInvariant)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDUseLoopInvariant);
+            compareUseLoopInvariant((ISEDUseLoopInvariant)expectedNext, (ISEDUseLoopInvariant)currentNext, true, compareId, compareVariables, compareCallStack);
+         }
          else {
             TestCase.fail("Unknown node type \"" + (expectedNext != null ? expectedNext.getClass() : null) + "\".");
          }
@@ -875,7 +901,7 @@ public final class TestSedCoreUtil {
          // Compare node
          TestCase.assertNotNull(current);
          TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
-         TestCase.assertEquals(expected.getPathCondition(), current.getPathCondition());
+         TestCase.assertTrue(expected.getPathCondition() + " does not match " + current.getPathCondition(), StringUtil.equalIgnoreWhiteSpace(expected.getPathCondition(), current.getPathCondition()));
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
          // Compare call stack
@@ -901,6 +927,10 @@ public final class TestSedCoreUtil {
                else if (expectedChildren[i] instanceof ISEDExceptionalTermination) {
                   TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEDExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDExceptionalTermination);
                   compareExceptionalTermination((ISEDExceptionalTermination)expectedChildren[i], (ISEDExceptionalTermination)currentChildren[i], false, compareId, compareVariables, compareCallStack);
+               }
+               else if (expectedChildren[i] instanceof ISEDLoopBodyTermination) {
+                  TestCase.assertTrue("Expected ISEDLoopBodyTermination on " + ((ISEDLoopBodyTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopBodyTermination);
+                  compareLoopBodyTermination((ISEDLoopBodyTermination)expectedChildren[i], (ISEDLoopBodyTermination)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else if (expectedChildren[i] instanceof ISEDLoopCondition) {
                   TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopCondition);
@@ -937,6 +967,14 @@ public final class TestSedCoreUtil {
                else if (expectedChildren[i] instanceof ISEDThread) {
                   TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDThread);
                   compareThread((ISEDThread)expectedChildren[i], (ISEDThread)currentChildren[i], true, compareVariables);
+               }
+               else if (expectedChildren[i] instanceof ISEDUseOperationContract) {
+                  TestCase.assertTrue("Expected ISEDUseOperationContract on " + ((ISEDUseOperationContract)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDUseOperationContract);
+                  compareUseOperationContract((ISEDUseOperationContract)expectedChildren[i], (ISEDUseOperationContract)currentChildren[i], false, compareId, compareVariables, compareCallStack);
+               }
+               else if (expectedChildren[i] instanceof ISEDUseLoopInvariant) {
+                  TestCase.assertTrue("Expected ISEDUseLoopInvariant on " + ((ISEDUseLoopInvariant)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDUseLoopInvariant);
+                  compareUseLoopInvariant((ISEDUseLoopInvariant)expectedChildren[i], (ISEDUseLoopInvariant)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else {
                   TestCase.fail("Unknown node type \"" + (expectedChildren[i] != null ? expectedChildren[i].getClass() : null) + "\".");
@@ -1243,6 +1281,25 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Compares the given {@link ISEDLoopBodyTermination}s with each other.
+    * @param expected The expected {@link ISEDLoopBodyTermination}.
+    * @param current The current {@link ISEDLoopBodyTermination}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareLoopBodyTermination(ISEDLoopBodyTermination expected, 
+                                                    ISEDLoopBodyTermination current, 
+                                                    boolean compareReferences, 
+                                                    boolean compareId, 
+                                                    boolean compareVariables,
+                                                    boolean compareCallStack) throws DebugException {
+      compareTermination(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+   }
+
+   /**
     * Compares the given {@link ISEDExceptionalTermination}s with each other.
     * @param expected The expected {@link ISEDExceptionalTermination}.
     * @param current The current {@link ISEDExceptionalTermination}.
@@ -1342,6 +1399,50 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Compares the given {@link ISEDUseOperationContract}s with each other.
+    * @param expected The expected {@link ISEDUseOperationContract}.
+    * @param current The current {@link ISEDUseOperationContract}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareUseOperationContract(ISEDUseOperationContract expected, 
+                                                     ISEDUseOperationContract current, 
+                                                     boolean compareReferences, 
+                                                     boolean compareId, 
+                                                     boolean compareVariables,
+                                                     boolean compareCallStack) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      assertEquals(expected.isPreconditionComplied(), current.isPreconditionComplied());
+      assertEquals(expected.hasNotNullCheck(), current.hasNotNullCheck());
+      assertEquals(expected.isNotNullCheckComplied(), current.isNotNullCheckComplied());
+   }
+
+   /**
+    * Compares the given {@link ISEDUseLoopInvariant}s with each other.
+    * @param expected The expected {@link ISEDUseLoopInvariant}.
+    * @param current The current {@link ISEDUseLoopInvariant}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareUseLoopInvariant(ISEDUseLoopInvariant expected, 
+                                                 ISEDUseLoopInvariant current, 
+                                                 boolean compareReferences, 
+                                                 boolean compareId, 
+                                                 boolean compareVariables,
+                                                 boolean compareCallStack) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      assertEquals(expected.isInitiallyValid(), current.isInitiallyValid());
+   }
+
+   /**
     * Compares the given {@link ISEDTermination}s with each other.
     * @param expected The expected {@link ISEDTermination}.
     * @param current The current {@link ISEDTermination}.
@@ -1381,7 +1482,9 @@ public final class TestSedCoreUtil {
       for (int i = 1; i < indexPathToItem.length + 1; i++) {
          int[] subPath = Arrays.copyOf(indexPathToItem, i);
          item = TestUtilsUtil.selectInTree(debugTree, subPath);
-         item.expand();
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          TestUtilsUtil.waitForJobs();
       }
       return item;

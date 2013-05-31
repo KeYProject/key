@@ -135,5 +135,12 @@
                id="org.key_project.sed.ui.preference.page.symbolic_debug"
                name="Symbolic Execution Debugger (SED)">
          </page>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views">
+         <category
+               id="org.key_project.sed.ui.category"
+               name="Symbolic Execution Debugger (SED)">
+         </category>
       </extension>  
 </plugin>

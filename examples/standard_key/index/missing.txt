@@ -1,6 +1,0 @@
-./pred_log/tptp/PUZ/PUZ001p1-eq.key
-./pred_log/tptp/PUZ/PUZ001p1.key 
-
-
-./pred_log/tptp/SYN/SYN007p1.014.key
-

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.mgt;
 
@@ -107,6 +111,20 @@ public final class SpecificationRepository {
 		= new LinkedHashMap<IObserverFunction,IObserverFunction>();
     private final Map<IObserverFunction,ImmutableSet<Taclet>> unlimitedToLimitTaclets
 		= new LinkedHashMap<IObserverFunction,ImmutableSet<Taclet>>();
+    
+    /**
+     * <p>
+     * This {@link Map} is used to store the result of {@link #getClassAxioms(KeYJavaType)} to
+     * avoid that {@link RepresentsAxiom} and {@link QueryAxiom} are instantiated multiple times.
+     * </p>
+     * <p>
+     * It is strongly required that always the same instances are returned because 
+     * {@link Object#equals(Object)} and {@link Object#hashCode()} is not implemented in instances of {@link ClassAxiom} 
+     * and such the default reference check is done which off cause always fails in case of different references.
+     * </p>
+     */
+    private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> allClassAxiomsCache = new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
+    
     private final Services services;
     
     private final Map<String, Integer> contractCounters
@@ -258,8 +276,8 @@ public final class SpecificationRepository {
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         //TODO: package information not yet available
-        // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
-        final boolean visibleToPackage = true;
+        // BUGFIX: package-private is understood as private (see bug #1268)
+        final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
         if (VisibilityModifier.isPublic(visibility))
             return true;
@@ -797,57 +815,61 @@ public final class SpecificationRepository {
      * the axioms induced by invariant declarations.
      */
     public ImmutableSet<ClassAxiom> getClassAxioms(KeYJavaType kjt) {
-	//get visible registered axioms of other classes
-	ImmutableSet<ClassAxiom> result = getVisibleAxiomsOfOtherClasses(kjt);	
-	
-	//add registered axioms of own class
-	ImmutableSet<ClassAxiom> ownAxioms = axioms.get(kjt);
-	if(ownAxioms != null) {
-	    for(ClassAxiom ax : ownAxioms) {
-		result = result.add(ax);
-	    }
-	}
-	
-	//add invariant axiom for own class
-	final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-	final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
-	Term invDef = TB.tt();
-	for(ClassInvariant inv : myInvs) {
-	    invDef = TB.and(invDef, inv.getInv(selfVar, services));
-	}
-	invDef = TB.tf().createTerm(Equality.EQV, 
-		                    TB.inv(services, TB.var(selfVar)), 
-		                    invDef);
-	final IObserverFunction invSymbol = services.getJavaInfo().getInv();
-	final ClassAxiom invRepresentsAxiom 
-		= new RepresentsAxiom("Class invariant axiom for " 
-			                 + kjt.getFullName(),
-			              invSymbol,
-				      kjt,	
-				      new Private(),
-				      invDef,
-				      selfVar);
-	result = result.add(invRepresentsAxiom);
-		
-	//add query axioms for own class
-	for(IProgramMethod pm : services.getJavaInfo()
-		                       .getAllProgramMethods(kjt)) {
-	    if(!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()) {
-		pm = services.getJavaInfo().getToplevelPM(kjt, pm);		
-		final ClassAxiom queryAxiom 
-		    = new QueryAxiom("Query axiom for " + pm.getName() 
-			    	     + " in " + kjt.getFullName(),
-			    	     pm, 
-			             kjt);
-		result = result.add(queryAxiom);
-	    }
-	}
-	//add axioms for enclosing class, if applicable
-	final KeYJavaType enclosingKJT = getEnclosingKJT(kjt);
-	if(enclosingKJT != null) {
-	    result = result.union(getClassAxioms(enclosingKJT));
-	}
-	return result;
+       ImmutableSet<ClassAxiom> result = allClassAxiomsCache.get(kjt);
+       if (result == null) {
+          //get visible registered axioms of other classes
+          result = getVisibleAxiomsOfOtherClasses(kjt);   
+          
+          //add registered axioms of own class
+          ImmutableSet<ClassAxiom> ownAxioms = axioms.get(kjt);
+          if(ownAxioms != null) {
+              for(ClassAxiom ax : ownAxioms) {
+             result = result.add(ax);
+              }
+          }
+          
+          //add invariant axiom for own class
+          final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+          final ProgramVariable selfVar = TB.selfVar(services, kjt, false);
+          Term invDef = TB.tt();
+          for(ClassInvariant inv : myInvs) {
+              invDef = TB.and(invDef, inv.getInv(selfVar, services));
+          }
+          invDef = TB.tf().createTerm(Equality.EQV, 
+                                 TB.inv(services, TB.var(selfVar)), 
+                                 invDef);
+          final IObserverFunction invSymbol = services.getJavaInfo().getInv();
+          final ClassAxiom invRepresentsAxiom 
+             = new RepresentsAxiom("Class invariant axiom for " 
+                                 + kjt.getFullName(),
+                              invSymbol,
+                         kjt,  
+                         new Private(),
+                         invDef,
+                         selfVar);
+          result = result.add(invRepresentsAxiom);
+             
+          //add query axioms for own class
+          for(IProgramMethod pm : services.getJavaInfo()
+                                    .getAllProgramMethods(kjt)) {
+              if(!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()) {
+             pm = services.getJavaInfo().getToplevelPM(kjt, pm);      
+             final ClassAxiom queryAxiom 
+                 = new QueryAxiom("Query axiom for " + pm.getName() 
+                           + " in " + kjt.getFullName(),
+                           pm, 
+                             kjt);
+             result = result.add(queryAxiom);
+              }
+          }
+          //add axioms for enclosing class, if applicable
+          final KeYJavaType enclosingKJT = getEnclosingKJT(kjt);
+          if(enclosingKJT != null) {
+              result = result.union(getClassAxioms(enclosingKJT));
+          }
+          allClassAxiomsCache.put(kjt, result);
+       }
+       return result;
     }
     
     

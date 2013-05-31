@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /**
  * tests if match checks the variable conditions in Taclets. 
@@ -25,6 +29,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -164,8 +169,8 @@ public class TestSchemaModalOperators extends TestCase {
 	 Debug.out("Find: ", find);
 	 Debug.out("Replace: ", replace);
 	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.syntacticalReplace(replace, null, mc);
-	 Term instfind = t.syntacticalReplace(replace, null, mc);
+	 Term instreplace = t.syntacticalReplace(replace, null, mc, null);
+	 Term instfind = t.syntacticalReplace(replace, null, mc, null);
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
     }

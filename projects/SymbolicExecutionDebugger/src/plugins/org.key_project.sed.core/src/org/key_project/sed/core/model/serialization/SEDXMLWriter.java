@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.model.serialization;
 
 import java.io.ByteArrayInputStream;
@@ -22,6 +35,7 @@ import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -29,6 +43,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.util.LogUtil;
@@ -92,6 +108,11 @@ public class SEDXMLWriter {
    public static final String TAG_EXCEPTIONAL_TERMINATION = "sedExceptionalTermination";
 
    /**
+    * Tag name to store {@link ISEDLoopBodyTermination}s.
+    */
+   public static final String TAG_LOOP_BODY_TERMINATION = "sedLoopBodyTermination";
+
+   /**
     * Tag name to store {@link ISEDLoopCondition}s.
     */
    public static final String TAG_LOOP_CONDITION = "sedLoopCondition";
@@ -140,6 +161,16 @@ public class SEDXMLWriter {
     * Tag name to store one entry of {@link ISEDDebugNode#getCallStack()}.
     */
    public static final String TAG_CALL_STACK_ENTRY = "sedCallStackEntry";
+
+   /**
+    * Tag name to store {@link ISEDUseOperationContract}s.
+    */
+   public static final String TAG_USE_OPERATION_CONTRACT = "sedUseOperationContract";
+
+   /**
+    * Tag name to store {@link ISEDUseLoopInvariant}s.
+    */
+   public static final String TAG_USE_LOOP_INVARIANT = "sedUseLoopInvariant";
 
    /**
     * Attribute name to store encodings.
@@ -210,6 +241,26 @@ public class SEDXMLWriter {
     * Refers to an existing {@link ISEDDebugNode} with the defined id.
     */
    public static final String ATTRIBUTE_NODE_ID_REF = "nodeIdRef";
+
+   /**
+    * Attribute name to store {@link ISEDUseOperationContract#isPreconditionComplied()}.
+    */
+   public static final String ATTRIBUTE_PRECONDITION_COMPLIED = "preconditionComplied";
+
+   /**
+    * Attribute name to store {@link ISEDUseOperationContract#hasNotNullCheck()}.
+    */
+   public static final String ATTRIBUTE_HAS_NOT_NULL_CHECK = "hasNotNullCheck";
+
+   /**
+    * Attribute name to store {@link ISEDUseOperationContract#isNotNullCheckComplied()}.
+    */
+   public static final String ATTRIBUTE_NOT_NULL_CHECK_COMPLIED = "notNullCheckComplied";
+
+   /**
+    * Attribute name to store {@link ISEDUseLoopInvariant#isInitiallyValid()}.
+    */
+   public static final String ATTRIBUTE_INITIALLY_VALID = "initiallyValid";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -459,6 +510,9 @@ public class SEDXMLWriter {
       else if (node instanceof ISEDExceptionalTermination) {
          return toXML(level, (ISEDExceptionalTermination)node, saveVariables, saveCallStack);
       }
+      else if (node instanceof ISEDLoopBodyTermination) {
+         return toXML(level, (ISEDLoopBodyTermination)node, saveVariables, saveCallStack);
+      }
       else if (node instanceof ISEDLoopCondition) {
          return toXML(level, (ISEDLoopCondition)node, saveVariables, saveCallStack);
       }
@@ -480,6 +534,12 @@ public class SEDXMLWriter {
       else if (node instanceof ISEDThread) {
          return toXML(level, (ISEDThread)node, saveVariables, saveCallStack);
       }
+      else if (node instanceof ISEDUseOperationContract) {
+         return toXML(level, (ISEDUseOperationContract)node, saveVariables, saveCallStack);
+      }
+      else if (node instanceof ISEDUseLoopInvariant) {
+         return toXML(level, (ISEDUseLoopInvariant)node, saveVariables, saveCallStack);
+      }
       else {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Unknown node type of node \"" + node + "\"."));
       }
@@ -488,7 +548,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDBranchCondition} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDBranchCondition} to serialize.
+    * @param branchCondition The {@link ISEDBranchCondition} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -506,7 +566,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDBranchNode} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDBranchNode} to serialize.
+    * @param branchNode The {@link ISEDBranchNode} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -524,7 +584,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDExceptionalTermination} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDExceptionalTermination} to serialize.
+    * @param exceptionalTermination The {@link ISEDExceptionalTermination} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -540,9 +600,27 @@ public class SEDXMLWriter {
    }
    
    /**
+    * Serializes the given {@link ISEDLoopBodyTermination} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param loopBodyTermination The {@link ISEDLoopBodyTermination} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEDLoopBodyTermination loopBodyTermination, 
+                          boolean saveVariables,
+                          boolean saveCallStack) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_LOOP_BODY_TERMINATION, loopBodyTermination, saveVariables, saveCallStack, sb);
+      return sb.toString();
+   }
+   
+   /**
     * Serializes the given {@link ISEDLoopCondition} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDLoopCondition} to serialize.
+    * @param loopCondition The {@link ISEDLoopCondition} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -560,7 +638,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDLoopNode} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDLoopNode} to serialize.
+    * @param loopNode The {@link ISEDLoopNode} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -578,7 +656,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDMethodCall} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDMethodCall} to serialize.
+    * @param methodCall The {@link ISEDMethodCall} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -596,7 +674,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDMethodReturn} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDMethodReturn} to serialize.
+    * @param methodReturn The {@link ISEDMethodReturn} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -614,7 +692,7 @@ public class SEDXMLWriter {
    /**
     * Serializes the given {@link ISEDStatement} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
-    * @param target The {@link ISEDStatement} to serialize.
+    * @param statement The {@link ISEDStatement} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
     * @return The serialized {@link String}.
@@ -626,6 +704,48 @@ public class SEDXMLWriter {
                           boolean saveCallStack) throws DebugException {
       StringBuffer sb = new StringBuffer();
       appendNode(level, TAG_STATEMENT, statement, saveVariables, saveCallStack, sb);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEDUseOperationContract} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param useOperationContract The {@link ISEDUseOperationContract} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEDUseOperationContract useOperationContract, 
+                          boolean saveVariables,
+                          boolean saveCallStack) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      Map<String, String> attributeValues = createDefaultNodeAttributes(useOperationContract);
+      attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, useOperationContract.isPreconditionComplied() + "");
+      attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, useOperationContract.hasNotNullCheck() + "");
+      attributeValues.put(ATTRIBUTE_NOT_NULL_CHECK_COMPLIED, useOperationContract.isNotNullCheckComplied() + "");
+      appendNode(level, TAG_USE_OPERATION_CONTRACT, useOperationContract, saveVariables, saveCallStack, attributeValues, sb);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEDUseLoopInvariant} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param useLoopInvariant The {@link ISEDUseLoopInvariant} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEDUseLoopInvariant useLoopInvariant, 
+                          boolean saveVariables,
+                          boolean saveCallStack) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      Map<String, String> attributeValues = createDefaultNodeAttributes(useLoopInvariant);
+      attributeValues.put(ATTRIBUTE_INITIALLY_VALID, useLoopInvariant.isInitiallyValid() + "");
+      appendNode(level, TAG_USE_LOOP_INVARIANT, useLoopInvariant, saveVariables, saveCallStack, attributeValues, sb);
       return sb.toString();
    }
    
@@ -681,9 +801,18 @@ public class SEDXMLWriter {
                              boolean saveVariables, 
                              boolean saveCallStack,
                              StringBuffer sb) throws DebugException {
+      appendNode(level, tagName, node, saveVariables, saveCallStack, createDefaultNodeAttributes(node), sb);
+   }
+   
+   /**
+    * Creates the default {@link ISEDDebugNode} attributes.
+    * @param node The {@link ISEDDebugNode} to save.
+    * @return The created attributes.
+    * @throws DebugException Occurred Exception.
+    */
+   protected Map<String, String> createDefaultNodeAttributes(ISEDDebugNode node) throws DebugException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       if (node != null) {
-         // Append start tag
-         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
          attributeValues.put(ATTRIBUTE_ID, node.getId());
          attributeValues.put(ATTRIBUTE_NAME, node.getName());
          attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getPathCondition());
@@ -693,6 +822,30 @@ public class SEDXMLWriter {
             attributeValues.put(ATTRIBUTE_CHAR_START, frame.getCharStart() + "");
             attributeValues.put(ATTRIBUTE_CHAR_END, frame.getCharEnd() + "");
          }
+      }
+      return attributeValues;
+   }
+   
+   /**
+    * Adds an {@link ISEDDebugNode} to the given {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param tagName The tag name to use.
+    * @param node The {@link ISEDDebugNode} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param attributeValues The attributes to save.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendNode(int level, 
+                             String tagName, 
+                             ISEDDebugNode node, 
+                             boolean saveVariables, 
+                             boolean saveCallStack,
+                             Map<String, String> attributeValues,
+                             StringBuffer sb) throws DebugException {
+      if (node != null) {
+         // Append start tag
          appendStartTag(level, tagName, attributeValues, sb);
          // Append variables
          if (node instanceof IStackFrame) {

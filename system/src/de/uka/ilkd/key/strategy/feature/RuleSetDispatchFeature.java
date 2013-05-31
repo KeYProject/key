@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.strategy.feature;
@@ -78,5 +82,14 @@ public class RuleSetDispatchFeature implements Feature {
      */
     public void clear(RuleSet ruleSet) {
         rulesetToFeature.remove ( ruleSet );
+    }
+    
+    /**
+     * Returns the used {@link Feature} for the given {@link RuleSet}.
+     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
+     * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not available.
+     */
+    public Feature get(RuleSet ruleSet) {
+       return rulesetToFeature.get(ruleSet);
     }
 }

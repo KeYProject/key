@@ -6,7 +6,14 @@ final class PrefixSumRec {
     //@ invariant isPow2(a.length);
     //@ accessible \inv: \singleton(a);
     
-    //@ axiom (\forall int x, y; even(x); even(x+y) == even(y));
+    //@ axiom lemma();
+    
+    /*@ normal_behavior
+      @ ensures (\forall int x, y; even(x); even(x+y) == even(y));
+      @ accessible \nothing;
+      @ strictly_pure helper
+      @*/
+    private static boolean lemma() { return true; }
 
     PrefixSumRec(int [] a) {
 	this.a = a;
@@ -51,20 +58,27 @@ final class PrefixSumRec {
     private static boolean even (int x) {
         return x%2==0;
     }
-    
+
+    //@ strictly_pure
+    private /*@ helper @*/ static int leftMost(int left, int right) {
+	return 2*left - right + 1;
+    }
+
     /*@ public normal_behavior
       @   requires right > left;
-      @   requires 2*left-right+1 >= 0;
+      @   requires leftMost(left, right) >= 0;
       @   requires right < a.length;
       @   requires isPow2(right-left);
       @   requires !even(right);
       @   requires !even(left) || right-left==1;
-      @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && !even(k); 
-      @            a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; \old(a[i])));
-      @   ensures !(\exists int k; 2*left-right+1 <= k && k <= right && even(k);
+      @   ensures (\forall int k; leftMost(left, right) <= k && k <= right && !even(k); 
+      @            a[k] == (\sum int i; leftMost(left, right) <= i && i < k+1; \old(a[i])));
+      @   ensures !(\exists int k; leftMost(left, right) <= k && k <= right && even(k);
       @             a[k] != \old(a[k]));
       @   measured_by right - left + 1;
-      @   assignable a[*];
+      @   assignable \infinite_union(int k; 
+      @                  (2*left-right+1 <= k && k <= right && !even(k)) ?
+      @                      \singleton(a[k]): \empty);
       @*/
     public void upsweep(int left, int right) {
         int space = right - left;
@@ -74,20 +88,19 @@ final class PrefixSumRec {
         }
         a[right] = a[left]+a[right];
     }
-    
 
     /*@ normal_behavior
       @   requires right > left;
-      @   requires 2*left-right+1 >= 0;
+      @   requires leftMost(left, right) >= 0;
       @   requires right < a.length;
       @   requires isPow2(right-left);
       @   requires !even(right);
       @   requires !even(left) || right-left==1;
-      @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && even(k);
-      @                        a[k] == (\sum int i; left <= i && i < k+1;
+      @   ensures (\forall int k; leftMost(left, right) <= k && k <= right && even(k);
+      @                        a[k] == (\sum int i; leftMost(left,right) <= i && i < k+1;
       @                        ((isPow2(k-i+1) && k-i != 1) || i == right)? \old(a[i]) : 0));
-      @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && !even(k); 
-      @                        a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; 
+      @   ensures (\forall int k; leftMost(left, right) <= k && k <= right && !even(k); 
+      @                        a[k] == (\sum int i; leftMost(left, right) <= i && i < k+1; 
       @                        (isPow2(k-i) || k == i)? \old(a[i]) : 0 ));
       @   measured_by right - left + 1;
       @   assignable a[*];
@@ -101,7 +114,6 @@ final class PrefixSumRec {
             downsweep(left-div2(space),left);
             downsweep(right-div2(space),right);
         }
-    
     }
     
     /*@ normal_behavior

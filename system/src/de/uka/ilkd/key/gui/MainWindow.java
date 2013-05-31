@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -53,13 +57,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -70,6 +72,7 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
@@ -81,10 +84,12 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
@@ -93,15 +98,17 @@ import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
 import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
+import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
-import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -111,7 +118,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -128,11 +134,15 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-
+import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
-
+    
+    // Search bar for Sequent Views.
+    public SequentSearchBar sequentSearchBar;
+    
     /**
      * The maximum number of recent files displayed.
      */
@@ -151,16 +161,16 @@ public final class MainWindow extends JFrame  {
     private JToolBar fileOpToolBar;
     
     /** the current goal view */
-    private JScrollPane goalView;
+    public MainFrame goalView;
 
     /** the current proof tree*/
-    private ProofTreeView proofTreeView;
+    public ProofTreeView proofTreeView;
 
     /** the list of current open goals*/
     private JScrollPane openGoalsView;
-    
+
     /** the view of a sequent */
-    private SequentView sequentView;
+    public CurrentGoalView leafNodeView;
     
     /** the rule view */
     private RuleView ruleView = null;
@@ -184,9 +194,6 @@ public final class MainWindow extends JFrame  {
     
     /** the status line */
     private MainStatusLine statusLine;
-    
-    /** the main progress monitor */
-//    private ProgressMonitor progressMonitor = new MainProgressMonitor();
     
     /** listener to global proof events */
     private MainProofListener proofListener;
@@ -242,9 +249,7 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    private static MainWindow instance = null;    
-    
-//    private ProverTaskListener taskListener;
+    private static MainWindow instance = null;
     
     private NotificationManager notificationManager;
     
@@ -259,6 +264,8 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
 
     private ShowActiveSettingsAction showActiveSettingsAction;
+    
+    private UnicodeToggleAction unicodeToggleAction;
 
     /**
      * creates prover -- private, use {@link #createInstance(String)}
@@ -342,13 +349,6 @@ public final class MainWindow extends JFrame  {
         mediator.addGUIListener(guiListener);
     }
     
-//    /** unregister several listeners */
-//    private void unregisterMediatorListeners() {
-//        mediator.removeKeYSelectionListener(proofListener);
-//        mediator.removeAutoModeListener(proofListener);
-//        mediator.removeGUIListener(guiListener);
-//    }
-    
     /**
      * return the mediator
      * 
@@ -366,7 +366,10 @@ public final class MainWindow extends JFrame  {
     private void layoutMain() {
         // set overall layout manager
         getContentPane().setLayout(new BorderLayout());
-        
+
+        // default size
+        setSize(1000, 750);
+
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -397,12 +400,8 @@ public final class MainWindow extends JFrame  {
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
+        unicodeToggleAction = new UnicodeToggleAction(this);
         
-
-	
-	
-        
-
 	// create empty views
 	createViews();
 	
@@ -435,8 +434,15 @@ public final class MainWindow extends JFrame  {
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
-        
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, goalView);
+
+        this.sequentSearchBar = new SequentSearchBar(leafNodeView);
+        JPanel rightPane = new JPanel();
+        rightPane.setLayout(new BorderLayout());
+	rightPane.add(goalView, BorderLayout.CENTER);
+	rightPane.add(sequentSearchBar, 
+                BorderLayout.SOUTH);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
@@ -447,21 +453,8 @@ public final class MainWindow extends JFrame  {
                 + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
         
-     // FIXME put this somewhere descent
-        goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 
-        "copy");
-        goalView.getActionMap().put("copy", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                GuiUtilities.copyHighlightToClipboard(sequentView);
-            }
-        });
-        
-        // default size
-        setSize(1000, 750);
-        setName("mainWindow");
-        
         // load preferred sizes from system preferences
+        setName("mainWindow");
         prefSaver.load(this);
     }
 
@@ -473,7 +466,7 @@ public final class MainWindow extends JFrame  {
 	        "The currently open goals");
 	pane.addTab("Proof Search Strategy", null, strategySelectionView,
 	        "Select strategy for automated proof search");
-	pane.addTab("Rules", null, new JScrollPane(ruleView),
+	pane.addTab("Rules", null, ruleView,
 	        "All available rules");
 	
         pane.setSelectedIndex(0);
@@ -517,7 +510,8 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new UndoLastStepAction(this, false));
+        toolBar.add(new GoalBackAction(this, false));
+        toolBar.add(new PruneProofAction(this, false));
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
@@ -526,13 +520,7 @@ public final class MainWindow extends JFrame  {
     }
     
     private void createViews() {
-	goalView = new JScrollPane();
-	GuiUtilities.paintEmptyViewComponent(goalView, "Current Goal");	
-
-//	proofView = new JPanel();
-//        proofView.setLayout(new BorderLayout(0,0));
-       
-//	paintEmptyViewComponent(proofView, "Proof");
+	goalView = new MainFrame();
 
 	openGoalsView = new JScrollPane();
 	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
@@ -550,7 +538,7 @@ public final class MainWindow extends JFrame  {
 	}
 	
         Config.DEFAULT.setDefaultFonts();
-        sequentView = new SequentView(mediator);
+        leafNodeView = new CurrentGoalView(mediator);
     }
     
     private ComplexButton createSMTComponent() {
@@ -587,10 +575,6 @@ public final class MainWindow extends JFrame  {
         p.add(b);
         return p;    
     }
-    
-//    public ProverTaskListener getProverTaskListener() {
-//        return taskListener;
-//    }
     
     /**
      * @return the status line object
@@ -646,12 +630,9 @@ public final class MainWindow extends JFrame  {
 	setStatusLine(s, 0);
     }
     
-//    /**
-//     * Get the progress monitor that will update a progress bar in a corner of the main window.
-//     */
-//    public ProgressMonitor getProgressMonitor() {
-//        return progressMonitor;
-//    }
+    public void selectTab(int tab) {
+    	this.tabbedPane.setSelectedIndex(0);
+    }
     
     /**
      * Freeze the main window by blocking all input events, except those for the status line (i.e.
@@ -777,7 +758,7 @@ public final class MainWindow extends JFrame  {
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
-        view.add(new JCheckBoxMenuItem(new UnicodeToggleAction(this)));
+        view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         
         view.addSeparator();
         {
@@ -801,6 +782,7 @@ public final class MainWindow extends JFrame  {
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
+        proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
 	proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
@@ -824,19 +806,6 @@ public final class MainWindow extends JFrame  {
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;
-        
-//	// dnd direction sensitive		
-//        final boolean dndDirectionSensitivity = 
-//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isDndDirectionSensitive();
-//        final JMenuItem dndDirectionSensitivityOption =
-//            new JCheckBoxMenuItem("DnD Direction Sensitive", dndDirectionSensitivity);
-//        dndDirectionSensitivityOption.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();           
-//                ProofSettings.DEFAULT_SETTINGS.
-//                getGeneralSettings().setDnDDirectionSensitivity(b);           
-//        }});
-//        registerAtMenu(options, dndDirectionSensitivityOption);
         
     }
     
@@ -872,8 +841,6 @@ public final class MainWindow extends JFrame  {
 	}else{
 	    updateDPSelectionMenu(solverUnions);
 	}
-	
-
 
     }
     
@@ -962,60 +929,9 @@ public final class MainWindow extends JFrame  {
         return result;
     }
     
-    public ProofTreeView getProofView(){
+    public ProofTreeView getProofView() {
         return proofTreeView;
     }
-    
-    
-    /**
-     * Sets the content of the current goal view. Do not use this method from outside, take method
-     * {@link #updateGoalView(String, JComponent)} instead (thread safe)
-     */
-    private void paintGoalView(String borderTitle, JComponent goalViewPane) {
-        JViewport vp = goalView.getViewport();
-        if(vp!=null){
-            vp.removeAll();
-        }
-        goalView.setViewportView(goalViewPane);
-        goalView.setBorder(new TitledBorder(borderTitle));
-        goalView.setBackground(goalViewPane.getBackground());
-        goalView.validate();
-        validate();
-    }
-    
-    /**
-     * updates the view of the sequent being displayed in the main frame
-     */
-    private synchronized void updateGoalView(final String borderTitle, final JComponent goalViewPane) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            paintGoalView(borderTitle, goalViewPane);
-        } else {
-            Runnable sequentUpdater = new Runnable() {
-                public void run() {
-                    paintGoalView(borderTitle, goalViewPane);
-                }
-            };
-            SwingUtilities.invokeLater(sequentUpdater);
-        }
-    }
-    
-    
-    /**
-     * prints the content of the sequent view
-     */
-    private void printSequentView(Sequent sequent) {
-        SequentPrintFilter filter = new IdentitySequentPrintFilter ( sequent );
-        final LogicPrinter printer = new LogicPrinter
-        (new ProgramPrinter(null), 
-                getMediator().getNotationInfo(),
-                mediator.getServices());
-                
-        sequentView.setPrinter(printer, filter, null);
-        sequentView.printSequent();
-        
-        updateGoalView("Current Goal", sequentView);
-    }
-    
     
     /** saves a proof */
     public void saveProof(File proofFile) {
@@ -1051,7 +967,7 @@ public final class MainWindow extends JFrame  {
                 addToProofList(plist);
                 setUpNewProof(plist.getFirstProof());
                 disableCurrentGoalView = false;
-                setProofNodeDisplay();
+                updateSequentView();
                 popup();
             }
         };
@@ -1063,24 +979,6 @@ public final class MainWindow extends JFrame  {
         getMediator().setProof(proof);
         return proof;
     }
-    
-    
-    /**
-     * The progress monitor that displays a progress bar in a corner of the main window.
-     */
-//    class MainProgressMonitor implements ProgressMonitor {
-//	public void setProgress(final int progress) {
-//	    KeYMediator.invokeOnEventQueue(new Runnable() {
-//		public void run() {
-//		    statusLine.setProgress(progress);
-//		}
-//	    });
-//	}
-//        
-//        public void setMaximum(int maximum) {
-//            statusLine.setProgressBarMaximum(maximum);
-//        }
-//    }
     
     /** invoked if a frame that wants modal access is opened */
     class MainGUIListener implements GUIListener {
@@ -1099,7 +997,7 @@ public final class MainWindow extends JFrame  {
         
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
+	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
 	    doNotReenable = new HashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
@@ -1120,7 +1018,8 @@ public final class MainWindow extends JFrame  {
         
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            assert doNotReenable != null : "toolbar enabled w/o prior disable";
+            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
+            if (doNotReenable == null) return; // XXX ignore this problem for the moment XXX
             
             Component[] cs = controlToolBar.getComponents();
             for (int i = 0; i < cs.length; i++) {
@@ -1184,41 +1083,65 @@ public final class MainWindow extends JFrame  {
      */
     private boolean disableCurrentGoalView = false;
 
-   
+    /*
+     * Updates the sequent displayed in the main frame.
+     */
+    private synchronized void updateSequentView() {
 
-    private synchronized void setProofNodeDisplay() {
-        // FIXME
-        if (!disableCurrentGoalView) {
-            Goal goal;
-            if(getMediator()!=null && getMediator().getSelectedProof()!=null){
-                goal = getMediator().getSelectedGoal();
-            } else{//There is no proof. Either not loaded yet or it is abandoned 
-                final LogicPrinter printer = new LogicPrinter
-                (new ProgramPrinter(null), null,null);
-                sequentView.setPrinter(printer, null);
-                return;
-            }
-            if ( goal != null && !goal.node ().isClosed() ){
-                printSequentView(goal.sequent());
-            } else {
-                NonGoalInfoView innerNodeView = 
-                    new NonGoalInfoView(getMediator().getSelectedNode(), 
-                            getMediator());
-                updateGoalView("Inner Node", innerNodeView);
-            }
+        if (disableCurrentGoalView) {
+            return;
         }
+
+        if (getMediator() == null
+                || getMediator().getSelectedProof() == null) {
+            //There is no proof. Either not loaded yet or it is abandoned 
+            final LogicPrinter printer =
+                    new LogicPrinter(new ProgramPrinter(null), null, null);
+            leafNodeView.setPrinter(printer, null);
+            return;
+        }
+
+        Goal goal = getMediator().getSelectedGoal();
+        final SequentView sequentViewLocal;
+        if (goal != null && !goal.node().isClosed()) {
+            SequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
+            final LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
+                    getMediator().getNotationInfo(),
+                    mediator.getServices());
+
+            leafNodeView.setPrinter(printer, filter, null);
+            leafNodeView.printSequent();
+            sequentViewLocal = leafNodeView;
+        } else {
+            InnerNodeView innerNodeView =
+                    new InnerNodeView(getMediator().getSelectedNode(),
+                    getMediator());
+            sequentViewLocal = innerNodeView;
+        }
+        sequentSearchBar.setSequentView(sequentViewLocal);
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            goalView.setSequentView(sequentViewLocal);
+        } else {
+            Runnable sequentUpdater = new Runnable() {
+                public void run() {
+                    goalView.setSequentView(sequentViewLocal);
+                }
+            };
+            SwingUtilities.invokeLater(sequentUpdater);
+        }
+
     }
-    
+ 
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
     	SettingsListener {	
         
         Proof proof = null;
         
-        
         /** focused node has changed */
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
             if (getMediator().autoMode()) return;
-            setProofNodeDisplay();	    
+            updateSequentView();	    
         }
         
         /**
@@ -1236,9 +1159,9 @@ public final class MainWindow extends JFrame  {
             }
             
             disableCurrentGoalView = false;	    
-            goalView.setViewportView(null);
+            goalView.setSequentView(new EmptySequent());
             
-            setProofNodeDisplay();
+            updateSequentView();
            
             makePrettyView();
         }
@@ -1264,7 +1187,7 @@ public final class MainWindow extends JFrame  {
 	    }
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
-            setProofNodeDisplay();
+            updateSequentView();
             getMediator().addKeYSelectionListener(proofListener);
         }
         
@@ -1276,151 +1199,30 @@ public final class MainWindow extends JFrame  {
         }        
     }        
     
-    /** displays some status information */
-    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
-        String message;       
-        String timeString = "" + (time/1000)+"."+((time%1000)/100);        
-                
-        // display message in the status bar
-        
-        if ( appliedRules != 0 ) {
-            message = "Strategy: Applied " + appliedRules + " rule";
-            if ( appliedRules != 1 ) message += "s";
-            message += " (" + timeString + " sec), ";
-            message += " closed " + closedGoals + " goal";
-            if ( closedGoals != 1 ) message += "s";             
-            message += ", " + openGoals;
-            message += " remaining"; 
-            setStatusLine ( message );
-        }                              
-    }
+//    /** displays some status information */
+// MU: I moved this to DefaultTaskFinishedInfo.toString()
+//    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
+//        String message;       
+//        String timeString = "" + (time/1000)+"."+((time%1000)/100);        
+//                
+//        // display message in the status bar
+//        
+//        if ( appliedRules != 0 ) {
+//            message = "Strategy: Applied " + appliedRules + " rule";
+//            if ( appliedRules != 1 ) message += "s";
+//            message += " (" + timeString + " sec), ";
+//            message += " closed " + closedGoals + " goal";
+//            if ( closedGoals != 1 ) message += "s";             
+//            message += ", " + openGoals;
+//            message += " remaining"; 
+//            setStatusLine ( message );
+//        }                              
+//    }
     
     void displayResults(String message){
             setStatusLine(message);
     }
-    
-//    /**
-//     * called when the batch mode has been finished 
-//     * @param result the Object encapsulating informtation about the result, e.g.
-//     * String "Error" if an error has occurred. 
-//     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
-//     * applied requiring <tt>time</tt> ms
-//     * @param time the long giving the needed time in ms 
-//     * @param appliedRules the int giving the number of applied rules
-//     */
-//    private void finishedBatchMode (Object result, 
-//            Proof proof, long time, int appliedRules) {
-//
-//        if ( Main.getStatisticsFile() != null )
-//            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
-//
-//        if ("Error".equals ( result ) ) {
-//            // Error in batchMode. Terminate with status -1.
-//            System.exit ( -1 );
-//        }
-//
-//        // Save the proof before exit.
-//
-//        String baseName = Main.getFileNameOnStartUp();
-//        int idx = baseName.indexOf(".key");        
-//        if (idx == -1) {
-//            idx = baseName.indexOf(".proof");
-//        }        
-//        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
-//
-//        File f; 
-//        int counter = 0;
-//        do {           
-//
-//            f = new File(baseName + ".auto."+ counter +".proof");
-//            counter++;
-//        } while (f.exists());
-//
-//        MainWindow.getInstance ().saveProof ( f.getAbsolutePath() );
-//        if (proof.openGoals ().size () == 0) {
-//            // Says that all Proofs have succeeded
-//            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-//                // Says that the proof is closed by depends on (unproved) lemmas                
-//                System.exit ( 0 ); //XXX, was: 2 
-//            }
-//            System.exit ( 0 ); 
-//        } else {
-//            // Says that there is at least one open Proof
-//            System.exit ( 1 );
-//        }
-//    }
 
-//    class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
-//        public void taskStarted(String message, int size) {
-//            System.out.print(message+" ... ");
-//        }
-//        
-//        public void setProgress(int position) {
-//        }
-//        
-//        public void taskFinished(TaskFinishedInfo info) {
-//            System.out.println("[ DONE ]");
-//            if (info.getSource() instanceof ApplyStrategy) {
-//                finishedBatchMode ( info.getResult(), 
-//                        info.getProof(), info.getTime(), 
-//                        info.getAppliedRules());
-//                Debug.fail ( "Control flow should not reach this point." );
-//            } else if (info.getSource() instanceof ProblemLoader) {
-//                if (!"".equals(info.getResult())) {
-//                        System.exit(-1);
-//                } 
-//                if(info.getProof().openGoals().size()==0) {
-//                    System.out.println("proof.openGoals.size=" + 
-//                            info.getProof().openGoals().size());              
-//                    System.exit(0);
-//                }
-//                mediator.startAutoMode();
-//            }
-//        }
-//    }
-    
-//    class MainTaskListener implements ProverTaskListener { // XXX
-//        public void taskStarted(String message, int size) {
-//            final MainStatusLine sl = getStatusLine();
-//            sl.reset();
-//            if (size > 0) {
-//                sl.setProgressPanelVisible(true);
-//                getStatusLine().setProgressBarMaximum(size);
-//            }
-//            sl.setStatusText(message);
-//        }
-//        
-//        public void setProgress(int position) {
-//            getStatusLine().setProgress(position);
-//        }
-//        
-//        public void taskFinished(TaskFinishedInfo info) {
-//            final MainStatusLine sl = getStatusLine();
-//            
-//            if (info.getSource() instanceof ApplyStrategy) {
-//        	sl.reset();
-//                displayResults(info.getTime(), 
-//                	       info.getAppliedRules(), 
-//                	       info.getClosedGoals());                
-//            } else if (info.getSource() instanceof ProblemLoader) {
-//                if (!"".equals(info.getResult())) {
-//                    final KeYExceptionHandler exceptionHandler = 
-//                        ((ProblemLoader)info.getSource()).getExceptionHandler();
-//                            new ExceptionDialog(MainWindow.this,     
-//                                    exceptionHandler.getExceptions());
-//                            exceptionHandler.clear();
-//                } else {
-//                    sl.reset();                    
-//                    mediator.getNotationInfo().refresh(mediator.getServices());
-//                }
-//            } else {
-//        	sl.reset();
-//            }
-//        }
-//    }
-    
-    
-    
     /** Glass pane that only delivers events for the status line (i.e. the abort button)
      * 
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial 
@@ -1611,10 +1413,7 @@ public final class MainWindow extends JFrame  {
 	        }
 	    });
 	    thread.start();
-	    
-	
-	    
-
+            
 	}
 	
 	public String toString(){
@@ -1745,6 +1544,10 @@ public final class MainWindow extends JFrame  {
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+    
+    public Action getUnicodeToggleAction() {
+    	return unicodeToggleAction;
     }
 
     public void savePreferences() {

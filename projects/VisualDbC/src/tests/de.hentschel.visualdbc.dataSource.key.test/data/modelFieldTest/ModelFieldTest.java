@@ -1,4 +1,3 @@
-
 public class ModelFieldTest {
 	//@ model int f;
 	//@ accessible f : this.x;

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.eclipse.swt.view;
 
 import org.eclipse.ui.IPartListener;
@@ -77,9 +90,14 @@ public abstract class AbstractViewBasedView extends ViewPart {
       IViewReference view = ArrayUtil.search(site.getPage().getViewReferences(), new IFilter<IViewReference>() {
          @Override
          public boolean select(IViewReference view) {
-            if (!ObjectUtil.equals(view.getId(), site.getId())) { // Avoid warning: Warning: Detected recursive attempt by part org.key_project.sed.ui.graphiti.view.ExecutionTreeView to create itself (this is probably, but not necessarily, a bug) 
-               IViewPart part = view.getView(true);
-               return part instanceof IViewPart && shouldHandleBaseView((IViewPart)part);
+            if (!ObjectUtil.equals(view.getId(), site.getId())) { // Avoid warning: Warning: Detected recursive attempt by part org.key_project.sed.ui.graphiti.view.ExecutionTreeView to create itself (this is probably, but not necessarily, a bug)
+               if (shouldHandleBaseViewReference(view)) {
+                  IViewPart part = view.getView(true);
+                  return part instanceof IViewPart && shouldHandleBaseView((IViewPart)part);
+               }
+               else {
+                  return false;
+               }
             }
             else {
                return false;
@@ -88,6 +106,14 @@ public abstract class AbstractViewBasedView extends ViewPart {
       });
       setBaseView(view != null ? (IViewPart)view.getView(true) : null);
    }
+   
+   /**
+    * Checks if the given {@link IViewReference} should be handled by this
+    * {@link IViewSite}.
+    * @param baseViewReference The {@link IViewReference} to check.
+    * @return {@code true} = handle {@link IViewReference}, {@code false} do not handle {@link IViewReference}.
+    */
+   protected abstract boolean shouldHandleBaseViewReference(IViewReference baseViewReference);
    
    /**
     * Checks if the given {@link IViewPart} should be handled by this

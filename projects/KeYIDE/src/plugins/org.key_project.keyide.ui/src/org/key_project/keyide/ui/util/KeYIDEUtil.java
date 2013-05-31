@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.util;
 
 import java.io.ByteArrayInputStream;
@@ -25,7 +38,6 @@ import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.services.IEvaluationService;
 import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -34,19 +46,15 @@ import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofStorage;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
-import org.key_project.keyide.ui.tester.AutoModeTester;
-import org.key_project.keyide.ui.visualization.KeYIDEPreferences;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -56,9 +64,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
+// TODO: Document class KeYIDEUtil
 public class KeYIDEUtil {
-   
-   
    /**
     * Opens a dialog to select a contract for the specified method, furthermore creates the proof for that method
     * @param method The method to create the proof for.
@@ -76,7 +83,8 @@ public class KeYIDEUtil {
                   @Override
                     protected IStatus run(IProgressMonitor monitor) {
                        try {
-                          monitor.beginTask("Loading Proof", 1);
+                          SWTUtil.checkCanceled(monitor);
+                          monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
                           final KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
 
                           if (environment.getInitConfig() != null) {
@@ -85,7 +93,6 @@ public class KeYIDEUtil {
                              if (pm != null) {
                                  KeYJavaType type = pm.getContainerType();
                                  final ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(type, pm);
-                                 final Display display = Display.getDefault();
                                  Runnable run = new Runnable() {
                                     @Override
                                     public void run() {
@@ -104,25 +111,24 @@ public class KeYIDEUtil {
                                        }  
                                     }
                                  };
-                                 display.asyncExec(run);  
+                                 Display.getDefault().asyncExec(run);  
                              }
                              else {
                                 return LogUtil.getLogger().createErrorStatus("Can't find method \"" + JDTUtil.getQualifiedMethodLabel(method) + "\" in KeY.");
                              }
                           }
-                          SWTUtil.checkCanceled(monitor);
-                          monitor.worked(1);
-                          monitor.done();
-                          done(Status.OK_STATUS);
                           return Status.OK_STATUS;                          
                        }
                        catch (OperationCanceledException e) {
                           return Status.CANCEL_STATUS;
                        }
-                     catch (Exception e) {
-                        LogUtil.getLogger().logError(e);
-                        return Status.CANCEL_STATUS;
-                     }
+                       catch (Exception e) {
+                          LogUtil.getLogger().logError(e);
+                          return LogUtil.getLogger().createErrorStatus(e);
+                       }
+                       finally {
+                          monitor.done();
+                       }
                   }
               }.schedule();
           }
@@ -132,36 +138,18 @@ public class KeYIDEUtil {
        }
    }
 
-
-   
-   
-   
    /**
     * Opens the currently selected {@link Proof} into the KeY-Editor.
     * @param name The  name to display at the editor-tab
     * @param ui The UserInterface that holds the KeYMediator
     */
-   private static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
-      String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
+   public static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
+      String inputText = InnerNodeView.getTacletDescription(environment.getMediator(), proof.root(), null);
       IStorage storage = new ProofStorage(inputText, proof.name().toString());
       IStorageEditorInput input = new ProofEditorInput(storage, proof, environment, method);
-         WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
+      WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
    }
    
-   
-   
-   /**
-    * Asks the user if he wants to switch into the KeY-perspective and opens it if necessary
-    */
-   public static void switchPerspective() {
-      if(KeYIDEUtil.shouldSwitchToKeyPerspective(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage())){
-         WorkbenchUtil.openPerspective(KeYPerspective.PERSPECTIVE_ID);
-      }
-      
-   }
-   
-   
-
    /**
     * Opens a dialog to select the {@link FunctionalOperationContract} for the selected {@link IMethod}. For the selected contract a {@link Proof} will be created and returned.
     * @param operationContracts - Set of available {@link FunctionalOperationContract}s
@@ -169,8 +157,7 @@ public class KeYIDEUtil {
     * @return the created {@link Proof}
     * @throws ProofInputException
     */
-   private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException 
-   {
+   private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException {
       Assert.isNotNull(operationContracts);
       Assert.isNotNull(environment);
       Shell parent = WorkbenchUtil.getActiveShell();
@@ -198,30 +185,14 @@ public class KeYIDEUtil {
       }
    }
 
-   public static void refreshUI(IEvaluationService evaluationService) {
-      if (evaluationService != null) {
-         evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_START);
-         evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_STOP);
-      }      
-   } 
-   
-   
    /**
-    * Searches a {@link FunctionalOperationContract} with the given name.
-    * @param operationContracts The available {@link FunctionalOperationContract} to search in.
-    * @param contractName The name of the {@link FunctionalOperationContract} to search.
-    * @return The found {@link FunctionalOperationContract} or {@code null} if no one was found.
+    * Asks the user if he wants to switch into the KeY-perspective and opens it if necessary
     */
-   public static FunctionalOperationContract findContract(ImmutableSet<FunctionalOperationContract> operationContracts, 
-                                                          final String contractName) {
-       return CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
-           @Override
-           public boolean select(FunctionalOperationContract element) {
-               return element != null && ObjectUtil.equals(element.getName(), contractName);
-           }
-       });
+   public static void switchPerspective() {
+      if(KeYIDEUtil.shouldSwitchToKeyPerspective(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage())){
+         WorkbenchUtil.openPerspective(KeYPerspective.PERSPECTIVE_ID);
+      }
    }
-   
    
    /**
     * Checks if a perspective switch to the state visualization perspective should be done.
@@ -252,7 +223,6 @@ public class KeYIDEUtil {
       }
       return switchPerspective;
    }
-   
    
    /**
     * Saves the given {@link Proof} into the given {@link IFile}

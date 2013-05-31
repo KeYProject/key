@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.proof;
@@ -19,27 +23,28 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -6398875364204732175L;
+    private static final long serialVersionUID = -7536362498647498639L;
+    private static final String LEMMAS = "Lemmas";
+    private static final String TACLET_BASE = "Taclet Base";
     protected Goal goal;
     protected MutableTreeNode builtInRoot 
     = new DefaultMutableTreeNode("Built-In");
     protected MutableTreeNode axiomTacletRoot 
-    = new DefaultMutableTreeNode("Taclet Base");
+    = new DefaultMutableTreeNode(TACLET_BASE);
     protected MutableTreeNode proveableTacletsRoot 
-    = new DefaultMutableTreeNode("Lemmas");
+    = new DefaultMutableTreeNode(LEMMAS);
     
     public RuleTreeModel(Goal g) {
         super(new DefaultMutableTreeNode("Rule Base"));
@@ -92,9 +97,10 @@ public class RuleTreeModel extends DefaultTreeModel {
         for (final BuiltInRule br : getBuiltInIndex().rules()) {
             insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
         }
-        final List<NoPosTacletApp> apps = 
-            sort(getTacletIndex().allNoPosTacletApps());
-        for (final NoPosTacletApp app : apps) {
+        ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
+        set = set.union(OneStepSimplifier.INSTANCE.getCapturedTaclets());
+
+        for (final NoPosTacletApp app : sort(set)) {
             RuleJustification just = mgt().getJustification(app);
             if (just==null) continue; // do not break system because of this
             if (just.isAxiomJustification()) {
@@ -144,5 +150,29 @@ public class RuleTreeModel extends DefaultTreeModel {
     
     public Goal getGoal() {
         return goal;
+    }
+    
+    public void updateTacletCount() {
+        axiomTacletRoot.setUserObject(TACLET_BASE+" ("+getAxiomTacletCount()+")");
+        proveableTacletsRoot.setUserObject(LEMMAS+" ("+getLemmaTacletCount()+")");
+    }
+    
+    public int getAxiomTacletCount(){
+        return getChildCount(axiomTacletRoot);
+    }
+    
+    public int getLemmaTacletCount(){
+        return getChildCount(proveableTacletsRoot);
+    }
+
+    private static int getChildCount(MutableTreeNode root) {
+        int res = 0;
+        for (int i= 0; i < root.getChildCount(); i++) {
+            final TreeNode child = root.getChildAt(i);
+            // there is no deeper nesting
+            final int grandchildren = child.getChildCount();
+            res += grandchildren==0? 1: grandchildren;
+        }
+        return res;
     }
 }

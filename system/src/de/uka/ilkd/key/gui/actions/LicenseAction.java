@@ -1,10 +1,23 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.swing.JButton;
@@ -40,8 +53,11 @@ public class LicenseAction extends MainWindowAction {
             "LICENSE.TXT"); 
         StringBuffer sb=new StringBuffer();
         try {
-            FileInputStream inp=new FileInputStream(lic.getFile());
-            while (inp.available()>0) sb.append((char)inp.read());	   
+            InputStreamReader inp = new InputStreamReader(lic.openStream(), "utf8");
+            int c;
+            while ((c=inp.read()) > 0) {
+                sb.append((char)c);
+            }
             inp.close();
         } catch (IOException ioe) {
             System.out.println("License file cannot be loaded or is missing: \n"+
@@ -68,6 +84,7 @@ public class LicenseAction extends MainWindowAction {
         fr.getContentPane().add(ok, BorderLayout.SOUTH);
         fr.setSize(600,900);
         fr.getContentPane().add(scroll);
+        fr.setLocationRelativeTo(null);
         fr.setVisible(true);
     }
     

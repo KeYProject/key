@@ -1,25 +1,33 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import junit.framework.TestCase;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 
@@ -192,6 +200,20 @@ public class TestTerm extends TestCase {
 		      t4 ().isRigid () );
     }
 
-   
-
+   /**
+    * Tests {@link TermImpl#isContainsJavaBlockRecursive()}.
+    */
+   public void testIsContainsJavaBlockRecursive() {
+      Term noJB = tf.createTerm(Junctor.TRUE);
+      Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
+      JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
+      Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlock);
+      Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
+      Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
+      assertFalse(noJB.isContainsJavaBlockRecursive());
+      assertFalse(noJBWithChild.isContainsJavaBlockRecursive());
+      assertTrue(withJB.isContainsJavaBlockRecursive());
+      assertTrue(withJBChild.isContainsJavaBlockRecursive());
+      assertTrue(withJBChildChild.isContainsJavaBlockRecursive());
+   }
 }

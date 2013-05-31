@@ -1,6 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.util;
 
+import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -19,6 +34,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobManager;
@@ -32,21 +48,36 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
+import org.eclipse.swtbot.swt.finder.results.WidgetResult;
+import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
@@ -69,18 +100,29 @@ import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -148,20 +190,40 @@ public class TestUtilsUtil {
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
       IProject project = createProject(name);
-      IFolder bin = project.getFolder("bin");
+      final IFolder bin = project.getFolder("bin");
       if (!bin.exists()) {
          bin.create(true, true, null);
       }
-      IFolder src = project.getFolder("src");
+      final IFolder src = project.getFolder("src");
       if (!src.exists()) {
          src.create(true, true, null);
       }
-      IJavaProject javaProject = JavaCore.create(project); 
-      JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-      IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-      entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-      page.init(javaProject, bin.getFullPath(), entries, false);
-      page.configureJavaProject(null);
+      final IJavaProject javaProject = JavaCore.create(project); 
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
+               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
+               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               page.init(javaProject, bin.getFullPath(), entries, false);
+               page.configureJavaProject(null);
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() instanceof CoreException) {
+         throw (CoreException)run.getException();
+      }
+      else if (run.getException() instanceof InterruptedException) {
+         throw (InterruptedException)run.getException();
+      }
+      else if (run.getException() != null) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
+      }
       return javaProject;
    }
    
@@ -281,10 +343,16 @@ public class TestUtilsUtil {
       SWTBotTreeItem lastItem = null;
       for (String segment : toSelects) {
          if (lastItem == null) {
-            lastItem = treeBot.expandNode(segment);
+            lastItem = treeBot.getTreeItem(segment);
+            if (!lastItem.isExpanded()) {
+               lastItem.expand();
+            }
          }
          else {
-            lastItem = lastItem.expandNode(segment);
+            lastItem = lastItem.getNode(segment);
+            if (!lastItem.isExpanded()) {
+               lastItem.expand();
+            }
          }
       }
       treeBot.select(lastItem);
@@ -786,7 +854,9 @@ public class TestUtilsUtil {
     */
    public static void expandAll(SWTBotTreeItem item) {
       if (!item.widget.isDisposed()) {
-         item.expand();
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          SWTBotTreeItem[] children = item.getItems();
          for (SWTBotTreeItem child : children) {
             expandAll(child);
@@ -1058,6 +1128,369 @@ public class TestUtilsUtil {
     * @param texts The path to the context menu item to click on.
     */
    public static void clickContextMenu(AbstractSWTBot<?> bot, String... texts) {
-      ContextMenuHelper.clickContextMenu(bot, texts);
+      clickContextMenu(bot, 0, 0, texts);
+   }
+   
+   /**
+    * <p>
+    * Performs a click on a menu item of the context menu of the given {@link AbstractSWTBot}.
+    * </p>
+    * <p>
+    * This utility method solves some SWTBot issues on context menu like missing
+    * support for structured context menus and widget is disposed exceptions o
+    * items provided to context menus via extension points.
+    * </p>
+    * @param bot The {@link AbstractSWTBot} to execute a context menu click on it.
+    * @param x The x-coordinate on the {@link AbstractSWTBot} to open context menu at.
+    * @param x The y-coordinate on the {@link AbstractSWTBot} to open context menu at.
+    * @param texts The path to the context menu item to click on.
+    */
+   public static void clickContextMenu(AbstractSWTBot<?> bot, int x, int y, String... texts) {
+      ContextMenuHelper.clickContextMenu(bot, x, y, texts);
+   }
+   
+   /**
+    * Waits until the selection of the given {@link SWTBotTree} contains the given element. 
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param tree The {@link SWTBotTree} to check selection.
+    * @param element The element to check if it is contained in the selection of the tree.
+    */
+   public static void waitUntilSelected(SWTWorkbenchBot bot, SWTBotTree tree, Object element) {
+      WaitForSelectedCondition condition = new WaitForSelectedCondition(tree, element);
+      bot.waitUntil(condition);
+   }
+   
+   /**
+    * {@link ICondition} to check if the given element is selected.
+    * @author Martin Hentschel
+    */
+   private static class WaitForSelectedCondition implements ICondition {
+      /**
+       * The {@link SWTBotTree} to check selection.
+       */
+      private SWTBotTree tree;
+      
+      /**
+       * The element to check if it is contained in the selection of {@link #tree}.
+       */
+      private Object element;
+
+      /**
+       * Constructor.
+       * @param tree The {@link SWTBotTree} to check selection.
+       * @param element The element to check if it is contained in the selection of the tree.
+       */
+      public WaitForSelectedCondition(SWTBotTree tree, Object element) {
+         this.tree = tree;
+         this.element = element;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         return syncExec(new BoolResult() {
+            @Override
+            public Boolean run() {
+               boolean containsElement = false;
+               TreeItem[] selection = tree.widget.getSelection();
+               if (selection != null) {
+                  int i = 0;
+                  while (!containsElement && i < selection.length) {
+                     if (ObjectUtil.equals(selection[i].getData(), element)) {
+                        containsElement = true;
+                     }
+                     i++;
+                  }
+               }
+               return containsElement;
+            }
+         });
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Element \"" + element + "\" is not selected.";
+      }
+   }
+
+   /**
+    * Clicks on the button with the given text provided by the given
+    * {@link SWTBot} directly without any other events.
+    * @param bot The {@link SWTBot} which provides the button.
+    * @param buttonText The text of the button to click directly on.
+    */
+   public static void clickDirectly(SWTBot bot, String buttonText) {
+      assertNotNull(bot);
+      assertNotNull(buttonText);
+      SWTBotButton button = bot.button(buttonText);
+      clickDirectly(button);
+   }
+   
+   /**
+    * Clicks on the given {@link SWTBotButton} directly without
+    * any other events.
+    * @param button The {@link SWTBotButton} to perform a direct click on.
+    */
+   public static void clickDirectly(SWTBotButton button) {
+      assertNotNull(button);
+      new SWTBotSimpleClickButton(button.widget).click();
+   }
+   
+   /**
+    * Utility method used in {@link TestUtilsUtil#clickDirectly(SWTBotButton)}
+    * to perform a direct click without other events.
+    * @author Martin Hentschel
+    */
+   private static final class SWTBotSimpleClickButton extends SWTBotButton {
+      /**
+       * Constructor.
+       * @param button The {@link Button}.
+       */
+      public SWTBotSimpleClickButton(Button button) {
+         super(button);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public SWTBotButton click() {
+         log.debug(MessageFormat.format("Clicking on {0}", SWTUtils.getText(widget)));
+         waitForEnabled();
+         notify(SWT.Selection);
+         log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
+         return this;
+      }
+   }
+   
+   /**
+    * Performs a click on the given {@link SWTBotRadio} to change the
+    * selected radio {@link Button} without any additional events.
+    * @param radio The {@link SWTBotRadio} to click on.
+    */
+   public static void clickDirectly(SWTBotRadio radio) {
+      assertNotNull(radio);
+      new SWTBotSimpleRadio(radio.widget).click();
+   }
+   
+   /**
+    * Utility class used in {@link TestUtilsUtil#clickDirectly(SWTBotRadio)}
+    * to change the selected radio {@link Button} without any additional events.
+    * @author Martin Hentschel
+    */
+   private static final class SWTBotSimpleRadio extends SWTBotRadio {
+      /** 
+       * Constructor.
+       * @param radio The radio {@link Button}.
+       * @throws WidgetNotFoundException Occurred Exception
+       */
+      public SWTBotSimpleRadio(Button radio) throws WidgetNotFoundException {
+         super(radio);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public SWTBotRadio click() {
+         if (isSelected()) {
+            log.debug(MessageFormat.format("Widget {0} is already selected, not clicking again.", this)); //$NON-NLS-1$
+            return this;
+         }
+         waitForEnabled();
+
+         log.debug(MessageFormat.format("Clicking on {0}", this)); //$NON-NLS-1$
+
+         final SWTBotSimpleRadio otherSelectedButton = otherSelectedButton();
+
+         if (otherSelectedButton != null) {
+            asyncExec(new VoidResult() {
+               public void run() {
+                  otherSelectedButton.widget.setSelection(false);
+               }
+            });
+         }
+
+         asyncExec(new VoidResult() {
+            public void run() {
+               widget.setSelection(true);
+            }
+         });
+         notify(SWT.Selection);
+         log.debug(MessageFormat.format("Clicked on {0}", this)); //$NON-NLS-1$
+         return this;
+      }
+      
+      /**
+       * Copied code from {@link SWTBotRadio#otherSelectedButton()}.
+       */
+      private SWTBotSimpleRadio otherSelectedButton() {
+         Button button = syncExec(new WidgetResult<Button>() {
+            public Button run() {
+               if (hasStyle(widget.getParent(), SWT.NO_RADIO_GROUP))
+                  return null;
+               Widget[] siblings = SWTUtils.siblings(widget);
+               for (Widget widget : siblings) {
+                  if ((widget instanceof Button) && hasStyle(widget, SWT.RADIO))
+                     if (((Button) widget).getSelection())
+                        return (Button) widget;
+               }
+               return null;
+            }
+         });
+
+         if (button != null)
+            return new SWTBotSimpleRadio(button);
+         return null;
+      }
+      
+   }
+   
+   /**
+    * Clicks on the given {@link SWTBotToolbarButton} directly without
+    * any other events.
+    * @param button The {@link SWTBotToolbarButton} to perform a direct click on.
+    */
+   public static void clickDirectly(SWTBotToolbarButton button) {
+      assertNotNull(button);
+      new SWTBotSimpleClickToolbarButton(button.widget).click();
+   }
+   
+   /**
+    * Utility method used in {@link TestUtilsUtil#clickDirectly(SWTBotToolbarButton)}
+    * to perform a direct click without other events.
+    * @author Martin Hentschel
+    */
+   private static final class SWTBotSimpleClickToolbarButton extends SWTBotToolbarButton {
+      /**
+       * Constructor.
+       * @param toolItem The {@link ToolItem}.
+       */
+      public SWTBotSimpleClickToolbarButton(ToolItem toolItem) {
+         super(toolItem);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public SWTBotToolbarButton click() {
+         log.debug(MessageFormat.format("Clicking on {0}", SWTUtils.getText(widget)));
+         waitForEnabled();
+         notify(SWT.Selection);
+         log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
+         return this;
+      }
+   }
+   
+   /**
+    * Searches a {@link IProgramMethod} in the given {@link Services}.
+    * @param services The {@link Services} to search in.
+    * @param containerTypeName The name of the type which contains the method.
+    * @param methodFullName The method name to search.
+    * @return The first found {@link IProgramMethod} in the type.
+    */
+   public static IProgramMethod searchProgramMethod(Services services, 
+                                                    String containerTypeName, 
+                                                    final String methodFullName) {
+      JavaInfo javaInfo = services.getJavaInfo();
+      KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
+      assertNotNull(containerKJT);
+      ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+      IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+         @Override
+         public boolean select(IProgramMethod element) {
+            return methodFullName.equals(element.getFullName());
+         }
+      });
+      assertNotNull(pm);
+      return pm;
+   }
+   
+   /**
+    * Sets the cursor location in the given {@link AbstractSWTBot}.
+    * @param widget The {@link AbstractSWTBot} to set cursor location in,.
+    * @param x The x coordinate inside the widget to set.
+    * @param y The y coordinate inside the widget to set.
+    */
+   public static <W extends Control> void setCursorLocation(final AbstractSWTBot<W> widget, 
+                                                            final int x, 
+                                                            final int y) {
+      Assert.isNotNull(widget);
+      // Change display location
+      final Display display = widget.widget.getDisplay();
+      display.syncExec(new Runnable() {
+         @Override
+         public void run() {
+            Point point = widget.widget.toDisplay(x, y);
+            display.setCursorLocation(point);
+         }
+      });
+      // Simulate mouse move event.
+      new AbstractSWTBot<W>(widget.widget) {
+         public void notifyMouseMove(int x, int y) {
+            Event event = createEvent();
+            event.x = x;
+            event.y = y;
+            notify(SWT.MouseMove, event, widget);
+         }
+      }.notifyMouseMove(x, y);
+   }
+
+   /**
+    * Blocks the current thread until a auto mode is started.
+    * @param ui The {@link UserInterface} to wait for its auto mode.
+    */
+   public static void waitUntilAutoMode(UserInterface ui) {
+      while (!ui.getMediator().autoMode()) {
+         sleep(10);
+      }
+   }
+   
+   /**
+    * Opens the view available under the given path in the "Show View" dialog.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param pathInOpenViewDialog The path to the view in the "Show View" dialog.
+    * @return The opened {@link SWTBotView}.
+    */
+   public static SWTBotView openView(SWTWorkbenchBot bot, String... pathInOpenViewDialog) {
+      assertNotNull(pathInOpenViewDialog);
+      assertTrue(pathInOpenViewDialog.length >= 1);
+      // Open view
+      bot.menu("Window").menu("Show View").menu("Other...").click();
+      SWTBotShell shell = bot.shell("Show View");
+      TestUtilsUtil.selectInTree(shell.bot().tree(), pathInOpenViewDialog);
+      shell.bot().button("OK").click();
+      // Find opened view
+      SWTBotView viewBot = bot.viewByTitle(pathInOpenViewDialog[pathInOpenViewDialog.length - 1]);
+      viewBot.show();
+      viewBot.setFocus();
+      return viewBot;
+   }
+
+   /**
+    * Closes the given {@link IViewPart}.
+    * @param view The {@link IViewPart} to close.
+    */
+   public static void closeView(final IViewPart view) {
+      assertNotNull(view);
+      view.getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            WorkbenchUtil.closeView(view);
+         }
+      });
    }
 }

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.java;
@@ -1095,6 +1099,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
     
+    
     public void printAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
@@ -1104,7 +1109,17 @@ public class PrettyPrinter {
         write(")");
         printFooter(x);
     }
-    
+
+    public void printAllObjects(de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\all_objects", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }
+
     public void printEmptySeqLiteral(EmptySeqLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);

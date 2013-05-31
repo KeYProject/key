@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.test.testcase;
 
 import java.lang.reflect.Field;
@@ -54,10 +67,13 @@ public class ObjectUtilTest extends TestCase {
    }
    
    /**
-    * Tests {@link ObjectUtil#get(Object, Field)}
+    * Tests {@link ObjectUtil#get(Object, Field)},
+    * {@link ObjectUtil#set(Object, Field, Object)} and
+    * {@link ObjectUtil#set(Object, Field, boolean)} and
+    * {@link ObjectUtil#set(Object, Field, int)}.
     */
    @Test
-   public void testGet_Object_Field() {
+   public void testGetAndSet_Object_Field() {
       ClassA a = new ClassA();
       ClassB b = new ClassB();
       // Test null object
@@ -72,6 +88,40 @@ public class ObjectUtilTest extends TestCase {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      try {
+         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "privateField"), null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "privateField"), true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "privateField"), 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      
       // Test null field
       try {
          ObjectUtil.get(a, (Field)null);
@@ -85,23 +135,111 @@ public class ObjectUtilTest extends TestCase {
          fail(e.getMessage());
       }
       try {
+         ObjectUtil.set(a, (Field)null, null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, (Field)null, true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, (Field)null, 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      
+      try {
          // Test returned values in A
          assertEquals(1, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
          assertEquals(2, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
          assertEquals(3, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
          assertEquals(4, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("A", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
+         assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
+         // Change values in A
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "privateField"), 42);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "protectedField"), 43);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "publicField"), 44);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "defaultField"), 45);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "onlyInA"), "Changed");
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "booleanField"), false);
+         // Test returned values in A again
+         assertEquals(42, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(43, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(44, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(45, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals("Changed", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
+         assertEquals(false, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
+         // Change values in A second time
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "privateField"), -42);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "protectedField"), -43);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "publicField"), -44);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "defaultField"), -45);
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "onlyInA"), "ChangedAgain");
+         ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "booleanField"), true);
+         // Test returned values in A again
+         assertEquals(-42, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(-43, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(-44, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(-45, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals("ChangedAgain", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
+         assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
          // Test returned values in B
          assertEquals(1, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "privateField")));
          assertEquals(2, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "protectedField")));
          assertEquals(3, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "publicField")));
          assertEquals(4, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("A", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInA")));
+         assertEquals(true, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "booleanField")));
          assertEquals(42, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "privateField")));
          assertEquals(43, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "protectedField")));
          assertEquals(44, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "publicField")));
          assertEquals(45, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "defaultField")));
          assertEquals("B", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInB")));
+         // Change values in B
+         ObjectUtil.set(b, ObjectUtil.findField(ClassA.class, "privateField"), 42);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassA.class, "protectedField"), 43);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassA.class, "publicField"), 44);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassA.class, "defaultField"), 45);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "onlyInA"), "ChangedA");
+         ObjectUtil.set(b, ObjectUtil.findField(ClassA.class, "booleanField"), false);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "privateField"), 46);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "protectedField"), 47);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "publicField"), 48);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "defaultField"), 49);
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "onlyInB"), "ChangedB");
+         // Test returned values in B again
+         assertEquals(42, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "privateField")));
+         assertEquals(43, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "protectedField")));
+         assertEquals(44, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "publicField")));
+         assertEquals(45, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "defaultField")));
+         assertEquals("ChangedA", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInA")));
+         assertEquals(false, ObjectUtil.get(b, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(46, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "privateField")));
+         assertEquals(47, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "protectedField")));
+         assertEquals(48, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "publicField")));
+         assertEquals(49, ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "defaultField")));
+         assertEquals("ChangedB", ObjectUtil.get(b, ObjectUtil.findField(ClassB.class, "onlyInB")));
       }
       catch (Exception e) {
          e.printStackTrace();
@@ -117,13 +255,43 @@ public class ObjectUtilTest extends TestCase {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      try {
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "INVALID"), null);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "INVALID"), true);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, ObjectUtil.findField(ClassB.class, "INVALID"), 42);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
    }
    
    /**
-    * Tests {@link ObjectUtil#get(Object, String)}
+    * Tests {@link ObjectUtil#get(Object, String)},
+    * {@link ObjectUtil#set(Object, String, Object)} and
+    * {@link ObjectUtil#set(Object, String, boolean)} and
+    * {@link ObjectUtil#set(Object, String, int)}.
     */
    @Test
-   public void testGet_Object_String() {
+   public void testGetAndSet_Object_String() {
       ClassA a = new ClassA();
       ClassB b = new ClassB();
       // Test null object
@@ -138,6 +306,40 @@ public class ObjectUtilTest extends TestCase {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      try {
+         ObjectUtil.set(null, "privateField", null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(null, "privateField", true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(null, "privateField", 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      
       // Test null field
       try {
          ObjectUtil.get(a, (String)null);
@@ -151,12 +353,75 @@ public class ObjectUtilTest extends TestCase {
          fail(e.getMessage());
       }
       try {
+         ObjectUtil.set(a, (String)null, null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, (String)null, true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, (String)null, 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      
+      try {
          // Test returned values in A
          assertEquals(1, ObjectUtil.get(a, "privateField"));
          assertEquals(2, ObjectUtil.get(a, "protectedField"));
          assertEquals(3, ObjectUtil.get(a, "publicField"));
          assertEquals(4, ObjectUtil.get(a, "defaultField"));
          assertEquals("A", ObjectUtil.get(a, "onlyInA"));
+         assertEquals(true, ObjectUtil.get(a, "booleanField"));
+         // Change values in A
+         ObjectUtil.set(a, "privateField", 42);
+         ObjectUtil.set(a, "protectedField", 43);
+         ObjectUtil.set(a, "publicField", 44);
+         ObjectUtil.set(a, "defaultField", 45);
+         ObjectUtil.set(a, "onlyInA", "Changed");
+         ObjectUtil.set(a, "booleanField", false);
+         // Test returned values in A again
+         assertEquals(42, ObjectUtil.get(a, "privateField"));
+         assertEquals(43, ObjectUtil.get(a, "protectedField"));
+         assertEquals(44, ObjectUtil.get(a, "publicField"));
+         assertEquals(45, ObjectUtil.get(a, "defaultField"));
+         assertEquals("Changed", ObjectUtil.get(a, "onlyInA"));
+         assertEquals(false, ObjectUtil.get(a, "booleanField"));
+         // Change values in A again
+         ObjectUtil.set(a, "privateField", -42);
+         ObjectUtil.set(a, "protectedField", -43);
+         ObjectUtil.set(a, "publicField", -44);
+         ObjectUtil.set(a, "defaultField", -45);
+         ObjectUtil.set(a, "onlyInA", "ChangedAgain");
+         ObjectUtil.set(a, "booleanField", true);
+         // Test returned values in A again
+         assertEquals(-42, ObjectUtil.get(a, "privateField"));
+         assertEquals(-43, ObjectUtil.get(a, "protectedField"));
+         assertEquals(-44, ObjectUtil.get(a, "publicField"));
+         assertEquals(-45, ObjectUtil.get(a, "defaultField"));
+         assertEquals("ChangedAgain", ObjectUtil.get(a, "onlyInA"));
+         assertEquals(true, ObjectUtil.get(a, "booleanField"));
          // Test returned values in B
          assertEquals("A", ObjectUtil.get(b, "onlyInA"));
          assertEquals(42, ObjectUtil.get(b, "privateField"));
@@ -164,6 +429,20 @@ public class ObjectUtilTest extends TestCase {
          assertEquals(44, ObjectUtil.get(b, "publicField"));
          assertEquals(45, ObjectUtil.get(b, "defaultField"));
          assertEquals("B", ObjectUtil.get(b, "onlyInB"));
+         // Change values in B
+         ObjectUtil.set(b, "onlyInA", "ChangedInA");
+         ObjectUtil.set(b, "privateField", -43);
+         ObjectUtil.set(b, "protectedField", -44);
+         ObjectUtil.set(b, "publicField", -45);
+         ObjectUtil.set(b, "defaultField", -46);
+         ObjectUtil.set(b, "onlyInB", "ChangedInB");
+         // Test returned values in B again
+         assertEquals("ChangedInA", ObjectUtil.get(b, "onlyInA"));
+         assertEquals(-43, ObjectUtil.get(b, "privateField"));
+         assertEquals(-44, ObjectUtil.get(b, "protectedField"));
+         assertEquals(-45, ObjectUtil.get(b, "publicField"));
+         assertEquals(-46, ObjectUtil.get(b, "defaultField"));
+         assertEquals("ChangedInB", ObjectUtil.get(b, "onlyInB"));
       }
       catch (Exception e) {
          e.printStackTrace();
@@ -179,13 +458,43 @@ public class ObjectUtilTest extends TestCase {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      try {
+         ObjectUtil.set(b, "INVALID", null);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, "INVALID", true);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, "INVALID", 42);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
    }
    
    /**
-    * Tests {@link ObjectUtil#get(Object, Class, String)}
+    * Tests {@link ObjectUtil#get(Object, Class, String)},
+    * {@link ObjectUtil#set(Object, Class, String, Object)} and
+    * {@link ObjectUtil#set(Object, Class, String, boolean)} and
+    * {@link ObjectUtil#set(Object, Class, String, int)}.
     */
    @Test
-   public void testGet_Object_Class_String() {
+   public void testGetAndSet_Object_Class_String() {
       ClassA a = new ClassA();
       ClassB b = new ClassB();
       // Test null object
@@ -200,6 +509,40 @@ public class ObjectUtilTest extends TestCase {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      try {
+         ObjectUtil.set(null, a.getClass(), "privateField", null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(null, a.getClass(), "privateField", true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(null, a.getClass(), "privateField", 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Object is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+
       // Test null class
       try {
          ObjectUtil.get(a, null, "privateField");
@@ -212,6 +555,40 @@ public class ObjectUtilTest extends TestCase {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      try {
+         ObjectUtil.set(a, null, "privateField", null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Class is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, null, "privateField", true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Class is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, null, "privateField", 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Class is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+
       // Test null field
       try {
          ObjectUtil.get(a, a.getClass(), null);
@@ -225,31 +602,147 @@ public class ObjectUtilTest extends TestCase {
          fail(e.getMessage());
       }
       try {
+         ObjectUtil.set(a, a.getClass(), null, null);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, a.getClass(), null, true);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(a, a.getClass(), null, 42);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Field is undefined (null).", e.getMessage());
+      }      
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      
+      try {
          // Test returned values in A
          assertEquals(1, ObjectUtil.get(a, ClassA.class, "privateField"));
          assertEquals(2, ObjectUtil.get(a, ClassA.class, "protectedField"));
          assertEquals(3, ObjectUtil.get(a, ClassA.class, "publicField"));
          assertEquals(4, ObjectUtil.get(a, ClassA.class, "defaultField"));
          assertEquals("A", ObjectUtil.get(a, ClassA.class, "onlyInA"));
+         assertEquals(true, ObjectUtil.get(a, ClassA.class, "booleanField"));
+         // Change values in A
+         ObjectUtil.set(a, ClassA.class, "privateField", 42);
+         ObjectUtil.set(a, ClassA.class, "protectedField", 43);
+         ObjectUtil.set(a, ClassA.class, "publicField", 44);
+         ObjectUtil.set(a, ClassA.class, "defaultField", 45);
+         ObjectUtil.set(a, ClassA.class, "onlyInA", "Changed");
+         ObjectUtil.set(a, ClassA.class, "booleanField", false);
+         // Test returned values in A again
+         assertEquals(42, ObjectUtil.get(a, ClassA.class, "privateField"));
+         assertEquals(43, ObjectUtil.get(a, ClassA.class, "protectedField"));
+         assertEquals(44, ObjectUtil.get(a, ClassA.class, "publicField"));
+         assertEquals(45, ObjectUtil.get(a, ClassA.class, "defaultField"));
+         assertEquals("Changed", ObjectUtil.get(a, ClassA.class, "onlyInA"));
+         assertEquals(false, ObjectUtil.get(a, ClassA.class, "booleanField"));
+         // Change values in A again
+         ObjectUtil.set(a, ClassA.class, "privateField", -42);
+         ObjectUtil.set(a, ClassA.class, "protectedField", -43);
+         ObjectUtil.set(a, ClassA.class, "publicField", -44);
+         ObjectUtil.set(a, ClassA.class, "defaultField", -45);
+         ObjectUtil.set(a, ClassA.class, "onlyInA", "ChangedAgain");
+         ObjectUtil.set(a, ClassA.class, "booleanField", true);
+         // Test returned values in A again
+         assertEquals(-42, ObjectUtil.get(a, ClassA.class, "privateField"));
+         assertEquals(-43, ObjectUtil.get(a, ClassA.class, "protectedField"));
+         assertEquals(-44, ObjectUtil.get(a, ClassA.class, "publicField"));
+         assertEquals(-45, ObjectUtil.get(a, ClassA.class, "defaultField"));
+         assertEquals("ChangedAgain", ObjectUtil.get(a, ClassA.class, "onlyInA"));
+         assertEquals(true, ObjectUtil.get(a, ClassA.class, "booleanField"));
          // Test returned values in B
          assertEquals(1, ObjectUtil.get(b, ClassA.class, "privateField"));
          assertEquals(2, ObjectUtil.get(b, ClassA.class, "protectedField"));
          assertEquals(3, ObjectUtil.get(b, ClassA.class, "publicField"));
          assertEquals(4, ObjectUtil.get(b, ClassA.class, "defaultField"));
          assertEquals("A", ObjectUtil.get(b, ClassA.class, "onlyInA"));
+         assertEquals(true, ObjectUtil.get(b, ClassA.class, "booleanField"));
          assertEquals(42, ObjectUtil.get(b, ClassB.class, "privateField"));
          assertEquals(43, ObjectUtil.get(b, ClassB.class, "protectedField"));
          assertEquals(44, ObjectUtil.get(b, ClassB.class, "publicField"));
          assertEquals(45, ObjectUtil.get(b, ClassB.class, "defaultField"));
          assertEquals("B", ObjectUtil.get(b, ClassB.class, "onlyInB"));
+         // Change values in B
+         ObjectUtil.set(b, ClassA.class, "privateField", 42);
+         ObjectUtil.set(b, ClassA.class, "protectedField", 43);
+         ObjectUtil.set(b, ClassA.class, "publicField", 44);
+         ObjectUtil.set(b, ClassA.class, "defaultField", 45);
+         ObjectUtil.set(b, ClassA.class, "onlyInA", "ChangedInA");
+         ObjectUtil.set(b, ClassA.class, "booleanField", false);
+         ObjectUtil.set(b, ClassB.class, "privateField", 46);
+         ObjectUtil.set(b, ClassB.class, "protectedField", 47);
+         ObjectUtil.set(b, ClassB.class, "publicField", 48);
+         ObjectUtil.set(b, ClassB.class, "defaultField", 49);
+         ObjectUtil.set(b, ClassB.class, "onlyInB", "ChangedInB");
+         // Test returned values in B again
+         assertEquals(42, ObjectUtil.get(b, ClassA.class, "privateField"));
+         assertEquals(43, ObjectUtil.get(b, ClassA.class, "protectedField"));
+         assertEquals(44, ObjectUtil.get(b, ClassA.class, "publicField"));
+         assertEquals(45, ObjectUtil.get(b, ClassA.class, "defaultField"));
+         assertEquals("ChangedInA", ObjectUtil.get(b, ClassA.class, "onlyInA"));
+         assertEquals(false, ObjectUtil.get(b, ClassA.class, "booleanField"));
+         assertEquals(46, ObjectUtil.get(b, ClassB.class, "privateField"));
+         assertEquals(47, ObjectUtil.get(b, ClassB.class, "protectedField"));
+         assertEquals(48, ObjectUtil.get(b, ClassB.class, "publicField"));
+         assertEquals(49, ObjectUtil.get(b, ClassB.class, "defaultField"));
+         assertEquals("ChangedInB", ObjectUtil.get(b, ClassB.class, "onlyInB"));
       }
       catch (Exception e) {
          e.printStackTrace();
          fail(e.getMessage());
       }
+      
       // Test invalid fields
       try {
          ObjectUtil.get(b, ClassB.class, "INVALID");
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, ClassB.class, "INVALID", null);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, ClassB.class, "INVALID", true);
+      }
+      catch (NoSuchFieldException e) {
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+         fail(e.getMessage());
+      }
+      try {
+         ObjectUtil.set(b, ClassB.class, "INVALID", 42);
       }
       catch (NoSuchFieldException e) {
       }

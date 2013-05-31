@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.util.install;
 
 import java.awt.BorderLayout;
@@ -317,17 +321,19 @@ public class KeYInstallerGUI extends KeYInstallerUI {
  		    "and redo the installation afterwards.\nDetail: " + kie );
  	}
 
+	File examplesFile = new File(keyJarPath(), EXAMPLES_JAR_FILE);
 	try {
-	    extractExamples( keyJarFile );
- 	} catch ( KeYInstallerException kie ) {
- 	    abortError ( "Could not unpack the examples. Please " + 
-			 "resolve the problem first " + 
-			 "and redo the installation afterwards.\nDetail:" + kie );	    
- 	}
+		JarFile examplesJarFile = new JarFile(examplesFile);
+		extractExamples( examplesJarFile );
+ 	} catch (IOException e) {
+ 		abortError ( "Could not unpack the examples. Please " + 
+ 				"resolve the problem first " + 
+ 				"and redo the installation afterwards.\nDetail:" + e );	    
+        }
 	
 	if ( "linux".equals ( os () ) ) {
 	    try {
-		Runtime.getRuntime ().exec ( "chmod a+x " + startProverScriptFilePath () );
+		Runtime.getRuntime ().exec ( new String[]{"chmod", "a+x", startProverScriptFilePath ()});
 	    } catch ( IOException e) { 
 		todo.append ( "Please set " + startProverScriptFilePath () +  
 			      " executable : chmod a+x " + startProverScriptFilePath ());
@@ -370,7 +376,9 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 		( null, trim 
 		  ( "To start KeY, change directory to "
 		    + binaryPath () +  " and execute " + 
-		    startProverScriptFileName (), 60 ),
+		    startProverScriptFileName () +
+		    ". Examples can be found using 'Load " +
+		    "Examples' from the 'File' menu.", 60 ),
 		  "Installation successfully completed",
 		  JOptionPane.INFORMATION_MESSAGE );
 	}

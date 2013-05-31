@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic;
 
@@ -135,7 +139,32 @@ public interface Term extends SVSubstitute, Sorted {
     public boolean equalsModRenaming(Object o);  
     
     /**
+     * returns true if the term is labeled
+     */
+    public boolean hasLabels();
+    
+    /**
+     * checks if the given label is attached to the term
+     * @param label the ITermLabel for which to look (must not be null)
+     */
+    public boolean containsLabel(ITermLabel label);
+    
+    /**
+     * returns list of labels attached to this term
+     * @return list of labels (maybe be empty but never <code>null</code>
+     */
+    public ImmutableArray<ITermLabel> getLabels();
+    
+    /**
      * Returns a serial number for a term. The serial number is not persistent.
-     *  */
+     */
     public int serialNumber();
+    
+    
+    /**
+     * Checks if the {@link Term} or one of its direct or indirect children
+     * contains a non empty {@link JavaBlock}. 
+     * @return {@code true} The {@link Term} or one of its direct or indirect children contains a non empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
+     */
+    public boolean isContainsJavaBlockRecursive();
 }

@@ -1,7 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.starter.core.util;
 
 import java.awt.Component;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -32,6 +46,7 @@ import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.IOUtil.LineInformation;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -49,17 +64,19 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -1076,6 +1093,135 @@ public final class KeYUtil {
        */
       public int getOffset() {
          return offset;
+      }
+   }
+
+   /**
+    * Converts the given {@link PositionInfo} into a {@link SourceLocation}.
+    * This includes to convert position information defined via row and column
+    * of the {@link PositionInfo} into character offset from file beginning
+    * for the {@link SourceLocation}.
+    * @param posInfo The {@link PositionInfo} to convert.
+    * @return The created {@link PositionInfo}.
+    */
+   public static SourceLocation convertToSourceLocation(PositionInfo posInfo) {
+      try {
+         if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
+            // Try to find the source file.
+            String path = SymbolicExecutionUtil.getSourcePath(posInfo);
+            File file = path != null ? new File(path) : null;
+            // Check if a source file is available
+            int charStart = -1;
+            int charEnd = -1;
+            int lineNumber = -1;
+            if (file != null) {
+               // Set source location
+               LineInformation[] infos = IOUtil.computeLineInformation(file);
+               if (posInfo.getStartPosition() != null) {
+                  int line = posInfo.getStartPosition().getLine() - 1;
+                  int column = posInfo.getStartPosition().getColumn();
+                  if (line >= 0 && line < infos.length) {
+                     LineInformation info = infos[line];
+                     int offset = info.getOffset() + KeYUtil.normalizeRecorderColumn(column, info.getTabIndices());
+                     charStart = offset;
+                  }
+               }
+               if (posInfo.getEndPosition() != null) {
+                  int line = posInfo.getEndPosition().getLine() - 1;
+                  int column = posInfo.getEndPosition().getColumn();
+                  if (line >= 0 && line < infos.length) {
+                     LineInformation info = infos[line];
+                     int offset = info.getOffset() + KeYUtil.normalizeRecorderColumn(column, info.getTabIndices());
+                     charEnd = offset;
+                  }
+               }
+               // Check if source start and end is defined.
+               if (charStart < 0 || charEnd < 0) {
+                  // Unset start and end indices
+                  charStart = -1;
+                  charEnd = -1;
+                  // Try to set a line number as backup
+                  if (posInfo.getEndPosition() != null) {
+                     lineNumber = posInfo.getEndPosition().getLine();
+                  }
+               }
+               return new SourceLocation(lineNumber, charStart, charEnd);
+            }
+            else {
+               return SourceLocation.UNDEFINED;
+            }
+         }
+         else {
+            return SourceLocation.UNDEFINED;
+         }
+      }
+      catch (IOException e) {
+         LogUtil.getLogger().logError(e);
+         return SourceLocation.UNDEFINED;
+      }
+   }
+
+   
+   /**
+    * Represents a location in a source file.
+    * @author Martin Hentschel
+    */
+   public static class SourceLocation {
+      /**
+       * Location which indicates that no location is defined.
+       */
+      public static final SourceLocation UNDEFINED = new SourceLocation(-1, -1, -1);
+      
+      /**
+       * The line number to select.
+       */
+      private int lineNumber;
+      
+      /**
+       * The index of the start character to select.
+       */
+      private int charStart;
+      
+      /**
+       * The index of the end character to select.
+       */
+      private int charEnd;
+      
+      /**
+       * Constructor.
+       * @param lineNumber The line number to select.
+       * @param charStart The index of the start character to select.
+       * @param charEnd The index of the end character to select.
+       */
+      public SourceLocation(int lineNumber, int charStart, int charEnd) {
+         super();
+         this.lineNumber = lineNumber;
+         this.charStart = charStart;
+         this.charEnd = charEnd;
+      }
+      
+      /**
+       * Returns The line number to select.
+       * @return The line number to select.
+       */
+      public int getLineNumber() {
+         return lineNumber;
+      }
+      
+      /**
+       * Returns The index of the start character to select.
+       * @return The index of the start character to select.
+       */
+      public int getCharStart() {
+         return charStart;
+      }
+      
+      /**
+       * Returns The index of the end character to select.
+       * @return The index of the end character to select.
+       */
+      public int getCharEnd() {
+         return charEnd;
       }
    }
 }

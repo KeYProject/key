@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import org.eclipse.graphiti.ui.platform.AbstractImageProvider;
@@ -21,6 +34,7 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
     * Path to the folder which contains the provided images.
     */
    private static final String ROOT_FOLDER_FOR_IMG = "icons/";
+   
    /**
     * Path to the folder which contains the provided images.
     */
@@ -41,6 +55,13 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_STATEMENT, ROOT_FOLDER_FOR_IMG + "statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATION, ROOT_FOLDER_FOR_IMG + "termination.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_THREAD, ROOT_FOLDER_FOR_IMG + "thread.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_USE_OPERATION_CONTRACT, ROOT_FOLDER_FOR_IMG + "use_operation_contract.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_USE_OPERATION_CONTRACT_NOT_NPC, ROOT_FOLDER_FOR_IMG + "use_operation_contract_not_npc.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_USE_OPERATION_CONTRACT_NOT_PRE, ROOT_FOLDER_FOR_IMG + "use_operation_contract_not_pre.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC, ROOT_FOLDER_FOR_IMG + "use_operation_contract_not_pre_not_npc.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_USE_LOOP_INVARIANT, ROOT_FOLDER_FOR_IMG + "use_loop_invariant.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_USE_LOOP_INVARIANT_INITIALLY_INVALID, ROOT_FOLDER_FOR_IMG + "use_loop_invariant _initially_invalid.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_BODY_TERMINATION, ROOT_FOLDER_FOR_IMG + "loop_body_termination.gif");
 
        addImageFilePath(IExecutionTreeImageConstants.IMG_RESUME, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "resume_co.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_SUSPEND, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "suspend_co.gif");

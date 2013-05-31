@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="UseOperationContractNoPreconditionTest.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
+         <useOperationContract name="result = magic(x) catch(exc)
+pre: true
+post: result = 42 &amp; exc = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of UseOperationContractNoPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </useOperationContract>
+      </statement>
+   </methodCall>
+</startNode>

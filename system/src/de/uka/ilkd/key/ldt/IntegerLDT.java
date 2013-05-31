@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.ldt;
 
@@ -59,8 +63,8 @@ public final class IntegerLDT extends LDT {
     private final Function mod;
     private final Function bsum;
     private final Function bprod;
-    private final Function min;
-    private final Function max;
+//    private final Function min; // handled by the \ifEx operator
+//    private final Function max;
     private final Function jdiv;
     private final Function jmod;
     private final Function unaryMinusJint;
@@ -160,8 +164,6 @@ public final class IntegerLDT extends LDT {
         mod                 = addFunction(services, "mod");
         bsum                = addFunction(services, "bsum");
         bprod               = addFunction(services, "bprod");
-        min                 = addFunction(services, "min");
-        max                 = addFunction(services, "max");
         jdiv                = addFunction(services, "jdiv");
         jmod                = addFunction(services, "jmod");                  
         unaryMinusJint      = addFunction(services, "unaryMinusJint");
@@ -324,14 +326,6 @@ public final class IntegerLDT extends LDT {
     
     public Function getBprod() {
     return bprod;
-    }
-    
-    public Function getMin() {
-        return min;
-    }
-    
-    public Function getMax() {
-        return max;
     }
     
     public Function getLessThan() {

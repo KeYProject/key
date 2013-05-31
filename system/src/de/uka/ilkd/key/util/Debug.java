@@ -1,15 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
 
-/** this class offers some methods for assertions, debug output and so
- * on */
+
+/**
+ * this class offers some methods for assertions, debug output and so on
+ */
 package de.uka.ilkd.key.util;
 
 import java.lang.management.ManagementFactory;
@@ -18,9 +23,6 @@ import javax.management.ObjectName;
 import javax.swing.JOptionPane;
 
 public final class Debug implements DebugMBean {
-
-//    private Debug() {
-//    }
 
     /** has to be set in order to enable assertion */
     public static boolean ENABLE_ASSERTION =

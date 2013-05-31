@@ -1,18 +1,24 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.strategy;
 
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import de.uka.ilkd.key.gui.macros.TryCloseMacro;
 
 
 public final class StrategyProperties extends Properties {
@@ -25,6 +31,11 @@ public final class StrategyProperties extends Properties {
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
     public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
     
+    /**
+     * RETREAT MODE WILL BE REMOVED SOON. Its functionality can be found
+     * in {@link TryCloseMacro} now.
+     */
+    @Deprecated
     public final static String RETREAT_MODE_OPTIONS_KEY = "RETREAT_MODE_OPTIONS_KEY";
     public final static String RETREAT_MODE_NONE = "RETREAT_MODE_NONE";
     public final static String RETREAT_MODE_RETREAT = "RETREAT_MODE_RETREAT";

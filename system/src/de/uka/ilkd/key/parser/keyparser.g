@@ -1,20 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
 
 /* -*-antlr-*- */
 header {
@@ -2125,7 +2120,7 @@ sortId_check [boolean checkSort] returns [Sort s = null]
 }
     :
         p = sortId_check_help[checkSort]
-        s = array_decls[p]
+        s = array_decls[p, checkSort]
     ;
 
 // Generic and non-generic sorts, array sorts allowed
@@ -2135,7 +2130,7 @@ any_sortId_check [boolean checkSort] returns [Sort s = null]
 }
     :   
         p = any_sortId_check_help[checkSort]
-        s = array_decls[p]
+        s = array_decls[p, checkSort]
     ;
     
     
@@ -2184,6 +2179,9 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             } else if(name.equals(PrimitiveType.JAVA_SHORT.getName())) {
                 t = PrimitiveType.JAVA_SHORT;
                 name = PrimitiveType.JAVA_INT.getName();
+            } else if(name.equals(PrimitiveType.JAVA_INT.getName())) {
+                t = PrimitiveType.JAVA_INT;
+                name = PrimitiveType.JAVA_INT.getName();
             } else if(name.equals(PrimitiveType.JAVA_LONG.getName())) {
                 t = PrimitiveType.JAVA_LONG;
                 name = PrimitiveType.JAVA_INT.getName();
@@ -2209,13 +2207,13 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
     ;
 
 
-array_decls[Pair<Sort,Type> p] returns [Sort s = null]                
+array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]                
 {
     int n = 0;    
 }
     :
      (EMPTYBRACKETS {n++;})*
-        { 
+        {   if (!checksort) return s;
             if(n != 0) {
                 final JavaInfo ji = getJavaInfo();
                 s = ArraySort.getArraySortForDim(p.first,
@@ -2898,8 +2896,11 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
 
 
 atom returns [Term a = null]
+{
+  ImmutableArray<ITermLabel> labels;
+}
     :
-        {isTermTransformer()}? a = specialTerm
+(        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
@@ -2910,8 +2911,41 @@ atom returns [Term a = null]
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }   
+    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } RGUILLEMETS)?
     ; exception
         catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
+
+label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+{
+  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
+  ITermLabel label;
+}
+:
+   label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
+   {
+   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   }
+;
+
+single_label returns [ITermLabel label=null]
+{
+  String labelName = "";
+  ITermLabel left = null;
+  ITermLabel right = null;
+  List<String> parameters = new LinkedList<String>();
+}
+:
+  (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
+  {
+  	label = LabelFactory.createLabel(labelName, parameters);
+  }
+ 
+;  exception
+        catch [UnknownLabelException ex] {
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
@@ -3397,7 +3431,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN
+        ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
@@ -3410,7 +3444,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
             b.setIfSequent(ifSeq);
         }
         ( VARCOND LPAREN varexplist[b] RPAREN ) ?
-        goalspecs[b]
+        goalspecs[b, find != null]
         modifiers[b]
         RBRACE
         { 
@@ -3443,7 +3477,7 @@ modifiers[TacletBuilder b]
     ;
 
 seq returns [Sequent s] {Semisequent ant,suc; s = null; } : 
-        ant=semisequent SEQARROW suc=semisequent 
+        ant=semisequent SEQARROW suc=semisequent
         { s = Sequent.createSequent(ant, suc); }
     ;
 exception
@@ -3464,7 +3498,7 @@ termorseq returns [Object o]
 }
     :
         head=term ( COMMA s=seq | SEQARROW ss=semisequent ) ?
-        {
+        {        
             if ( s == null ) {
                 if ( ss == null ) {
                     // Just a term
@@ -3499,7 +3533,9 @@ semisequent returns [Semisequent ss]
     :
         /* empty */ | 
         head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new SequentFormula(head)).semisequent(); }
+        { 
+          ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
+        }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -4000,20 +4036,20 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
 ;
 
 
-goalspecs[TacletBuilder b] :
+goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
-    | goalspecwithoption[b] ( SEMI goalspecwithoption[b] )* ;
+    | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
 
-goalspecwithoption[TacletBuilder b]
+goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
 {
     ImmutableSet<Choice> soc = DefaultImmutableSet.<Choice>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
-                goalspec[b,soc] 
+                goalspec[b,soc,ruleWithFind] 
                 RBRACE)
         |  
-            goalspec[b,null] 
+            goalspec[b,null,ruleWithFind] 
         )
     ;
 
@@ -4040,7 +4076,7 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, ImmutableSet<Choice> soc] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 {
     Object rwObj = null;
     Sequent addSeq = Sequent.EMPTY_SEQUENT;
