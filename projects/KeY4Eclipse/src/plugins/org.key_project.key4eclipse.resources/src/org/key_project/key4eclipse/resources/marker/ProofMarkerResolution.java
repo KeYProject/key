@@ -1,7 +1,5 @@
 package org.key_project.key4eclipse.resources.marker;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -63,9 +61,8 @@ public class ProofMarkerResolution implements IMarkerResolution2{
             KeYUtil.loadAsync(file);
          }
          else if(openIn.equals("KeYIDE")){
-            IFile file= getProofFile(marker);
-            File proofFile = file.getLocation().toFile();
-            KeY4EclipseResourcesUtil.openProofFileInKeYIDE(proofFile);
+            IFile file = getProofFile(marker);
+            KeY4EclipseResourcesUtil.openProofFileInKeYIDE(file);
          }
       }
       catch (Exception e) {

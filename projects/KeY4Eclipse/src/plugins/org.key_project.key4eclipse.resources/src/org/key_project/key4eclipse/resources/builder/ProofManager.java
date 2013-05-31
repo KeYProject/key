@@ -25,7 +25,6 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
-import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -113,7 +112,7 @@ public class ProofManager {
          markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
          if(proof != null){
             proofFiles.add(proofFile);
-            KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
+            KeYUtil.saveProof(proof, proofFile);
          }
       }
       if(autoDisableProofFiles){

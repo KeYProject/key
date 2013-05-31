@@ -63,6 +63,10 @@ public class ProofSourceViewerDecorator {
    private TextPresentation textPresentation;
    
    private ISourceViewer viewer;
+   
+   public ISourceViewer getISourceViewer(){
+      return this.viewer;
+   }
 
    public ProofSourceViewerDecorator(ISourceViewer viewer) {
       this.viewer = viewer;
