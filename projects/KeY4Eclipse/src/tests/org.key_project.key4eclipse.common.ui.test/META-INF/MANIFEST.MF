@@ -1,13 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KeY 4 Eclipse Common UI Test
-Bundle-SymbolicName: org.key_project.key4eclipse.common.ui.test
+Bundle-SymbolicName: org.key_project.key4eclipse.common.ui.test;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.key4eclipse.common.ui.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.7.101",
  org.eclipse.jdt.core;bundle-version="3.7.3",
+ org.eclipse.jdt.ui;bundle-version="3.7.2",
  org.junit4;bundle-version="4.8.1",
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.key_project.util.test;bundle-version="1.0.0",

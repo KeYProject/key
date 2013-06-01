@@ -18,8 +18,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
@@ -298,44 +296,15 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    }
    
    
+   /**
+    * Refreshes the prooftree after a pruned event was fired.
+    * @param node
+    */
    private void prune(Node node){
-      ISelection selection = viewer.getSelection(); // TODO: Content provider should do nothing with selection, find another way, maybe just use the node as element?
-      if (selection instanceof TreeSelection){
-         TreeSelection treeSelection = (TreeSelection) selection;
-         Object element = treeSelection.getFirstElement();
-         if (element instanceof BranchFolder){
-            BranchFolder branchFolder = (BranchFolder) element;
-            viewer.refresh(branchFolder);
-         }
-         else if (element instanceof Node){
-            Node branchNode = getBranchNode((Node) element);
-            BranchFolder branchFolder = branchFolders.get(branchNode);
-            viewer.refresh(branchFolder);
-         }
-      }
+      Node branchNode = getBranchNode(node);
+      BranchFolder branchFolder = branchFolders.get(branchNode);
+      viewer.refresh(branchFolder);
    }
-   
-// private void prune(Node node){
-// TreeViewerIterator it = new TreeViewerIterator(viewer);
-// boolean notFound = true;
-// TreeItem element;
-// while(it.hasNext() && notFound){
-//    element = it.next();
-//    System.out.println(element.getData().g);
-//    if(element.getData() instanceof BranchFolder){
-//       if(((BranchFolder)element.getData()).getChild().equals(node)){
-//          viewer.refresh(element);
-//          notFound = false;
-//       }
-//    }
-//    if(element.getData() instanceof Node){
-//       if(element.getData().equals(node)){
-//          viewer.refresh(element);
-//          notFound = false;
-//       }
-//    }
-// }
-//}
    
    
    /**
@@ -360,11 +329,14 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @return the branch{@link Node} respectively the first child {@link Node} in its branch.
     */
    private Node getBranchNode(Node node){
-      if(node.equals(node.proof().root()))
-         return node.proof().root();
-      else if(node.parent().childrenCount() > 1)
-         return node;
-      else return getBranchNode(node.parent()); // TODO: Proof tree can be a very long which is not treatable with recursive method calls, use while loop instead
+      while(true){
+         if(node.equals(node.proof().root())  || node.parent().childrenCount() > 1){
+            return node;
+         }
+         else{
+            node = node.parent();
+         }
+      }
    }
    
    

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
@@ -113,7 +126,7 @@ public class ProofManager {
          markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
          if(proof != null){
             proofFiles.add(proofFile);
-            KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
+            KeYUtil.saveProof(proof, proofFile);
             
             IFile metaFile = saveMetaFile(proofFile, proof);
             if(metaFile != null){
@@ -126,7 +139,7 @@ public class ProofManager {
          }
       }
       if(autoDeleteProofFiles){
-         cleanProofFolder(proofFiles, mainProofFolder); 
+         cleanProofFolder(proofFiles, mainProofFolder);  
       }
    }
    
@@ -235,22 +248,18 @@ public class ProofManager {
             Proof proof = processProof(pe.getProofObl(), proofFile);
             markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
             if(proof != null){
-               KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
-               
+               KeYUtil.saveProof(proof, proofFile);
                metaFile = saveMetaFile(proofFile, proof);
-               if(metaFile != null){
-                  proofFiles.add(metaFile);
-               }
-               else{
-                  //TODO: solve this problem
+               if(metaFile == null){
                   System.out.println("Warning: no meta file created for " + proofFile.getName());
                }
             }
          }
-         //add to proofFileList
          if(autoDeleteProofFiles){
             proofFiles.add(proofFile);
-            proofFiles.add(getProofMetaFile(proofFile));
+            if(metaFile.exists()){
+               proofFiles.add(metaFile);
+            }
          }
       }
       if(autoDeleteProofFiles){
@@ -452,6 +461,7 @@ public class ProofManager {
     * @return the valid {@link String}
     */
    private String makePathValid(String str){
+
 //      String tmp;
 //      for(int i = 1; i<=str.length();i++){
 //         tmp = str.substring(0, i);
