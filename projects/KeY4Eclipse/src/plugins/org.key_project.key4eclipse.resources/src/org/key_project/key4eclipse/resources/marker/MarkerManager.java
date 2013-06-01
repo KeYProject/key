@@ -27,29 +27,21 @@ public class MarkerManager {
     * @throws CoreException
     */
    public void setMarker(Proof proof, SourceLocation scl, IFile javaFile, IFile proofFile) throws CoreException {
-      if (proof.closed()) {
-         IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
-         if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
-            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-            if(scl == null){
-               marker.setAttribute(IMarker.LINE_NUMBER, -1);
-            }
-            else{
+      if(scl != null){
+         if (proof.closed()) {
+            IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
+            if (marker.exists()) {
+               marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
+               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
             }
          }
-      }
-      else {
-         IMarker marker = javaFile.createMarker(NOTCLOSEDMARKER_ID);
-         if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proofFile.getFullPath());
-            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-            if(scl == null){
-               marker.setAttribute(IMarker.LINE_NUMBER, -1);
-            }
-            else{
+         else {
+            IMarker marker = javaFile.createMarker(NOTCLOSEDMARKER_ID);
+            if (marker.exists()) {
+               marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proofFile.getFullPath());
+               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
             }

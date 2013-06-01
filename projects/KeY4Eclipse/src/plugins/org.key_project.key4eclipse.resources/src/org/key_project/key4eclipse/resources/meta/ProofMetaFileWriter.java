@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.resources.builder.meta;
+package org.key_project.key4eclipse.resources.meta;
 
 import java.io.File;
 import java.util.LinkedHashSet;
@@ -8,7 +8,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -40,22 +39,24 @@ public class ProofMetaFileWriter {
    private LinkedHashSet<KeYJavaType> addedTypes;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
-   public IFile writeMetaFile(IFile proofFile, Proof proof, KeYEnvironment<CustomConsoleUserInterface> env) throws ParserConfigurationException, TransformerException, CoreException{
-      this.environment = env;
-      this.addedTypes = new LinkedHashSet<KeYJavaType>();
-//      Document doc = createDoument(proofFile, proof);
-      Document doc = createDocumentSimple(proofFile, proof);
-      
-      TransformerFactory transFactory = TransformerFactory.newInstance();
-      Transformer transformer = transFactory.newTransformer();
-      DOMSource source = new DOMSource(doc);
-      IFile metaIFile = createMetaFile(proofFile);
-      File metaFile = metaIFile.getLocation().toFile();
-      StreamResult result = new StreamResult(metaFile);
-      transformer.transform(source, result);
-      metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
-      metaIFile.setHidden(true);
-      return metaIFile;
+   public IFile writeMetaFile(IFile proofFile, Proof proof, KeYEnvironment<CustomConsoleUserInterface> env) {
+      try{
+         this.environment = env;
+         this.addedTypes = new LinkedHashSet<KeYJavaType>();
+         Document doc = createDocumentSimple(proofFile, proof);
+         
+         TransformerFactory transFactory = TransformerFactory.newInstance();
+         Transformer transformer = transFactory.newTransformer();
+         DOMSource source = new DOMSource(doc);
+         IFile metaIFile = createMetaFile(proofFile);
+         File metaFile = metaIFile.getLocation().toFile();
+         StreamResult result = new StreamResult(metaFile);
+         transformer.transform(source, result);
+         metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+         return metaIFile;
+      } catch (Exception e) {
+         return null;
+      }
    }
    
    
@@ -122,7 +123,7 @@ public class ProofMetaFileWriter {
    }
 
    
-   public IFile createMetaFile(IFile proofFile) throws CoreException{
+   private IFile createMetaFile(IFile proofFile) throws CoreException{
       IPath proofFilePath = proofFile.getFullPath();
       IPath metaFilePath = proofFilePath.addFileExtension("meta");
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

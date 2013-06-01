@@ -1,13 +1,12 @@
 package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -26,16 +25,15 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.key4eclipse.resources.builder.meta.ProofMetaFileReader;
-import org.key_project.key4eclipse.resources.builder.meta.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.meta.ProofMetaFileReader;
+import org.key_project.key4eclipse.resources.meta.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaSourceElement;
@@ -117,16 +115,26 @@ public class ProofManager {
             proofFiles.add(proofFile);
             KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
             
-            ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
-            IFile metaFile = metaFileWriter.writeMetaFile(proofFile, proof, environment);
-            proofFiles.add(metaFile);
+            IFile metaFile = saveMetaFile(proofFile, proof);
+            if(metaFile != null){
+               proofFiles.add(metaFile);
+            }
+            else{
+               //TODO: solve this problem
+               System.out.println("Warning: no meta file created for " + proofFile.getName());
+            }
          }
       }
       if(autoDeleteProofFiles){
-         cleanProofFolder(proofFiles, mainProofFolder);  
+         cleanProofFolder(proofFiles, mainProofFolder); 
       }
    }
    
+   
+   private IFile saveMetaFile(IFile proofFile, Proof proof) throws  TransformerException, CoreException{
+      ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
+      return metaFileWriter.writeMetaFile(proofFile, proof, environment);
+   }
 
    
    
@@ -223,16 +231,20 @@ public class ProofManager {
             }
          }
          if(runProof){
-            //check the case if the sourceLocation is null!!
             markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
-            
             Proof proof = processProof(pe.getProofObl(), proofFile);
             markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
             if(proof != null){
                KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
                
-               ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
-               metaFile = metaFileWriter.writeMetaFile(proofFile, proof, environment);
+               metaFile = saveMetaFile(proofFile, proof);
+               if(metaFile != null){
+                  proofFiles.add(metaFile);
+               }
+               else{
+                  //TODO: solve this problem
+                  System.out.println("Warning: no meta file created for " + proofFile.getName());
+               }
             }
          }
          //add to proofFileList
@@ -440,17 +452,19 @@ public class ProofManager {
     * @return the valid {@link String}
     */
    private String makePathValid(String str){
-      String tmp;
-      for(int i = 1; i<=str.length();i++){
-         tmp = str.substring(0, i);
-         Path path = new Path(tmp);
-         if(!path.isValidSegment(tmp)){
-            StringBuilder strbuilder = new StringBuilder(str);
-            strbuilder.setCharAt(i-1, '_');
-            str = strbuilder.toString();
-         }
-      }
-      return str;
+//      String tmp;
+//      for(int i = 1; i<=str.length();i++){
+//         tmp = str.substring(0, i);
+//         Path path = new Path(tmp);
+//         if(!path.isValidSegment(tmp)){
+//            StringBuilder strbuilder = new StringBuilder(str);
+//            strbuilder.setCharAt(i-1, '_');
+//            str = strbuilder.toString();
+//         }
+//      }
+//      return str;
+
+      return str.replaceAll("[:\\\\/*?|<>]", "_");
    }
    
    

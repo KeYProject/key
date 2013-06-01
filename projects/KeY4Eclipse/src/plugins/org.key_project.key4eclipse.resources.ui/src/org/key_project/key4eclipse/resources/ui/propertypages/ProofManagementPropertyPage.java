@@ -18,6 +18,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    private Button enableEfficentProofManagementButton;
    
    private Button autoDeleteProofFilesButton;
+   
+   private Button hideMefaFiles;
 
    
    /**
@@ -41,6 +43,9 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
       autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
       setSelectionForAutoDeleteProofFilesButton();
+      hideMefaFiles = new Button(builderSettingsComposite, SWT.CHECK);
+      hideMefaFiles.setText("Hide meta files");
+      setSelectionForHideMetaFilesButton();
       
       return root;
    }
@@ -79,6 +84,22 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
    
    /**
+    * Sets the selection for the HideMetaFilesButton CheckBox.
+    */
+   private void setSelectionForHideMetaFilesButton(){
+      try {
+         IProject project = getProject();
+         hideMefaFiles.setSelection(KeYProjectProperties.isHideMetaFiles(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         hideMefaFiles.setEnabled(false);
+      }
+   }
+   
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -87,6 +108,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          IProject project = getProject();
          KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
+         KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
          return super.performOk();
       }
       catch (CoreException e) {
@@ -104,6 +126,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    protected void performDefaults() {
       enableEfficentProofManagementButton.setSelection(false);
       autoDeleteProofFilesButton.setSelection(false);
+      hideMefaFiles.setSelection(false);
       super.performDefaults();
    }
 }

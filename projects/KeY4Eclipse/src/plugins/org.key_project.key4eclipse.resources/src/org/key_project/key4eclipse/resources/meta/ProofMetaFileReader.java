@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.resources.builder.meta;
+package org.key_project.key4eclipse.resources.meta;
 
 import java.io.File;
 import java.io.IOException;
