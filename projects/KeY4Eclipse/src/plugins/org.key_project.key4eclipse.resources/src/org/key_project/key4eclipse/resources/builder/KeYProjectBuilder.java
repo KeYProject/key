@@ -39,7 +39,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
       IResourceDelta delta = getDelta(project);
-      if (delta != null) {
+      if (delta != null && KeYProjectProperties.isBuildProofs(project)) {
          ProofManager proofManager = null;
          try {
             proofManager = new ProofManager(project);

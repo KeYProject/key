@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,6 +53,7 @@ public class ProofMetaFileWriter {
          File metaFile = metaIFile.getLocation().toFile();
          StreamResult result = new StreamResult(metaFile);
          transformer.transform(source, result);
+         metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
          metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
          return metaIFile;
       } catch (Exception e) {
