@@ -13,14 +13,20 @@
 
 package org.key_project.monkey.product.ui.view;
 
+import java.io.File;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.monkey.product.ui.composite.MonKeYComposite;
+import org.key_project.util.eclipse.ResourceUtil;
 
 /**
  * Implementation of the view "MonKeY".
@@ -91,6 +97,20 @@ public class MonKeYView extends ViewPart {
         }
         else {
             return super.getAdapter(adapter);
+        }
+    }
+
+    /**
+     * Loads the given {@link IProject} in MonKeY.
+     * @param project The {@link IProject} to load.
+     * @throws CoreException Occurred Exception.
+     */
+    public void loadProject(IProject project) throws CoreException {
+        if (composite != null && !composite.isDisposed()) {
+           File location = ResourceUtil.getLocation(project);
+           composite.setLocation(location != null ? location.getAbsolutePath() : null);
+           composite.setBootClassPath(KeYResourceProperties.getBootClassPath(project));
+           composite.loadSource();
         }
     }
 }

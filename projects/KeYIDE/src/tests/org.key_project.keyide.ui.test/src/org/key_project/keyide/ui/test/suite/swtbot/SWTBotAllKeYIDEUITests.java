@@ -18,7 +18,7 @@ import org.junit.runners.Suite;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotAutoModeHandlerTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEPreferencePageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicationTest;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTes
    SWTBotAutoModeHandlerTest.class,
    SWTBotKeYIDEPreferencePageTest.class,
    SWTBotManualRuleApplicationTest.class,
-   SWTBotStartProofHandlerTest.class
+   SWTBotKeYIDEMethodStarterTest.class
 })
 public class SWTBotAllKeYIDEUITests {
 }

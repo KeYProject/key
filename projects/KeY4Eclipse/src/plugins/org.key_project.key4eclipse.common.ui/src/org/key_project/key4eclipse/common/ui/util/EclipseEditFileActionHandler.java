@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.starter.ui.util;
+package org.key_project.key4eclipse.common.ui.util;
 
 import java.io.File;
 import java.io.IOException;
