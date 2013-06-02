@@ -278,9 +278,15 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     */
    @Override
    public void dispose() {
-      getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-      getEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
-      getCurrentProof().removeProofTreeListener(proofTreeListener);
+      if (getUI() != null) {
+         getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      }
+      if (environment != null) {
+         environment.getMediator().removeKeYSelectionListener(keySelectionListener);
+      }
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
       if (outline != null) {
          outline.dispose();         
       }

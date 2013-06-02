@@ -984,4 +984,20 @@ public class MonKeYComposite extends Composite implements IProofProvider {
          l.currentProofsChanged(e);
       }
    }
+   
+   /**
+    * Sets the location.
+    * @param location The location to set.
+    */
+   public void setLocation(String location) {
+      SWTUtil.setText(locationText, location);
+   }
+   
+   /**
+    * Sets the boot class path.
+    * @param bootClassPath The boot class path to set.
+    */
+   public void setBootClassPath(String bootClassPath) {
+      SWTUtil.setText(bootClassPathText, bootClassPath);
+   }
 }

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.resources.ui.propertypages;
 
 import org.eclipse.core.resources.IProject;
@@ -37,6 +50,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       builderSettingsComposite.setLayout(new GridLayout(1, false));
       enableEfficentProofManagementButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableEfficentProofManagementButton.setText("Efficient proof management enabled");
+enableEfficentProofManagementButton.setEnabled(false); // TODO@Stefan: Remove this line it is only added to disable the functionality on the master branch where it is not available yet
       setSelectionForEnableEfficientProofManagementButton();
       autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
       autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");

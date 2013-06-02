@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 // TODO: Document class StrategyPropertiesView
 public class StrategyPropertiesView extends AbstractViewBasedView {
+   public static final String VIEW_ID = "org.key_project.keyide.ui.view.StrategyProperties";
 
    private StrategyPropertiesScrolledForm form;
    
