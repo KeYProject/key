@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
@@ -25,7 +38,6 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
-import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -113,7 +125,7 @@ public class ProofManager {
          markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
          if(proof != null){
             proofFiles.add(proofFile);
-            KeY4EclipseResourcesUtil.saveProof(proof, proofFile);
+            KeYUtil.saveProof(proof, proofFile);
          }
       }
       if(autoDisableProofFiles){
