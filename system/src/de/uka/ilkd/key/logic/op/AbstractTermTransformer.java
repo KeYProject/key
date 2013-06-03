@@ -28,7 +28,7 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /**
- * Abstract class factoring out commonalities of typcial term transformer implementations. 
+ * Abstract class factoring out commonalities of typical term transformer implementations.
  * The available singletons of term transformers are kept here.
  */
 public abstract class AbstractTermTransformer extends AbstractSortedOperator 

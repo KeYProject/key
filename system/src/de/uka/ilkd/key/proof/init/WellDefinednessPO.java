@@ -9,7 +9,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
-    protected static final WellDefinednessOperator WD = WellDefinednessOperator.WD;
+    protected final WellDefinednessOperator WD = new WellDefinednessOperator.Serviced(services);
 
     protected static final TermBuilder TB = TermBuilder.DF;
 
