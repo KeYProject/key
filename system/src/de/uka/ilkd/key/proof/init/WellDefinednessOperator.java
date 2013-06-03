@@ -5,7 +5,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -13,11 +12,15 @@ import de.uka.ilkd.key.logic.op.Operator;
 
 public class WellDefinednessOperator {
 
-    public static final WellDefinednessOperator WD = new WellDefinednessOperator();
-
     public static final TermBuilder TB = TermBuilder.DF;
-    
-    public WellDefinednessOperator() {
+
+    private final Services services;
+    private final IntegerLDT intLDT;
+
+    public WellDefinednessOperator(final Services services) {
+        assert services != null;
+        this.services = services;
+        this.intLDT = services.getTypeConverter().getIntegerLDT();
     }
 
     // TODO: What about change of system state after valuation?
@@ -42,10 +45,6 @@ public class WellDefinednessOperator {
         } else if (op.equals(Junctor.IMP)) {
             assert subs == 2;
             return imp(t.sub(0), t.sub(1));
-        } else if (op.equals(AbstractTermTransformer.META_INT_XOR)
-                || op.equals(AbstractTermTransformer.META_LONG_XOR)) {
-        assert subs == 2;
-        return wd(t.sub(0), t.sub(1));
         } else if (op.equals(Equality.EQV)) {
             assert subs == 2;
             return wd(t.sub(0), t.sub(1));
@@ -61,10 +60,11 @@ public class WellDefinednessOperator {
             return num(t.sub(0));
         } else if (isNumericalOp(t)) {
             assert subs == 2;
-            if (notDivOrModOp(t) || valueNotZero(t.sub(1))) {
-                return wd(t.sub(0), t.sub(1));
+            if (isDivision(t) || isModulo(t)) {
+                return TB.and(TB.not(TB.equals(t.sub(1), TB.zero(services))),
+                              wd(t.sub(0), t.sub(1)));
             } else {
-                return TB.ff();
+                return wd(t.sub(0), t.sub(1));
             }
         }
         // TODO: Floating point types, \bigint and \real
@@ -73,14 +73,13 @@ public class WellDefinednessOperator {
 
         // TODO: Reference Expressions ...
 
-        else if (op.name().toString().endsWith("<inv>")) {
-            // FIXME: What shall we do with <inv>?
+        else if (isInv(t)) {
             return inv(t);
         } // TODO: How to test if t is a fresh variable?
         else {
             throw new TermCreationException("Unknown term!" + '\n' +
-                                            "Operator: " + op.toString() + '\n' +
-                                            "Term: " + t.toString());
+                    "Operator: " + op.toString() + '\n' +
+                    "Term: " + t.toString());
         }
     }
 
@@ -99,8 +98,11 @@ public class WellDefinednessOperator {
         int subs = t.arity();
         Operator op = t.op();
         assert subs <= 1;
+        assert op instanceof Function;
+        Function f = (Function)op;
 
-        if (op.toString().equalsIgnoreCase("Z")) {
+        if (op.toString().equalsIgnoreCase("Z")
+                || intLDT.hasLiteralFunction(f)) {
             return TB.tt();
         } else {
             return wd(t);
@@ -123,169 +125,161 @@ public class WellDefinednessOperator {
 
     // a ==> b
     private Term imp(Term a, Term b) {
-        // What about a <== b ?
         Term guard = TB.and(wd(a), TB.equals(a, TB.ff()));
         Term wd = TB.and(wd(a), wd(b));
         return TB.or(guard, wd);
     }
 
     private Term inv(Term a) {
+        // FIXME: What shall we do with <inv>?
         return TB.tt();
     }
 
-    boolean isEqualityPredicateOp(Term t) {
-        throw new UnsupportedOperationException("Equality predicate operators not supported." +
-                                                '\n' + "The operator was " + t.op().toString() +
-                                                ".");
+    private boolean isInv(Term t) {
+        Operator op = t.op();
+        return op.name().toString().endsWith("<inv>");
     }
 
-    boolean isUnaryNumericalOp(Term t) {
-        throw new UnsupportedOperationException("Unary numerical operators not supported." +
-                                                '\n' + "The operator was " + t.op().toString() +
-                                                ".");
+    private boolean isEqualityPredicateOp(Term t) {
+        Operator op = t.op();
+        if (op.equals(op.equals(Equality.EQUALS))) {
+            return true;
+        } else if (!(op instanceof Function)) {
+            return false;
+        } else if (op.equals(intLDT.getLessThan())) {
+            return true;
+        } else if (op.equals(intLDT.getLessOrEquals())) {
+            return true;
+        } else if (op.equals(intLDT.getGreaterThan())) {
+            return true;
+        } else if (op.equals(intLDT.getGreaterOrEquals())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    boolean isNumericalOp(Term t) {
-        throw new UnsupportedOperationException("Numerical operators not supported." +
-                                                '\n' + "The operator was " + t.op().toString() +
-                                                ".");
+    private boolean isUnaryNumericalOp(Term t) {
+        Operator op = t.op();
+
+        if (op.equals(intLDT.getJavaUnaryMinusInt())
+                || op.equals(intLDT.getJavaUnaryMinusLong())) {
+            return true;
+        } else if (op.equals(intLDT.getJavaBitwiseNegation())) {
+            return true;
+        } else if(op.toString().equalsIgnoreCase("Z")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    boolean notDivOrModOp(Term t) {
-        throw new UnsupportedOperationException("Numerical operators not supported." +
-                                                '\n' + "The operator was " + t.op().toString() +
-                                                ".");
+    private boolean isNumericalOp(Term t) {
+        if (isAddition(t) || isSubtraction(t)
+                || isMultiplication(t) || isDivision(t) || isModulo(t)
+                || isShiftOp(t) || isBitwiseAnd(t) || isBitwiseOr(t) || isBitwiseXOr(t)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    boolean valueNotZero(Term t) {
-        throw new UnsupportedOperationException("Numerical operators not supported." +
-                                                '\n' + "The operator was " + t.op().toString() +
-                                                ".");
+    private boolean isAddition(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getAdd())
+                || op.equals(intLDT.getJavaAddInt())
+                || op.equals(intLDT.getJavaAddLong())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public static class Serviced extends WellDefinednessOperator {
-        protected final Services services;
-
-        public Serviced(final Services services) {
-            assert services != null;
-            this.services = services;
+    private boolean isSubtraction(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getSub())
+                || op.equals(intLDT.getJavaSubInt())
+                || op.equals(intLDT.getJavaSubLong())) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        @Override
-        boolean isEqualityPredicateOp(Term t) {
-            Operator op = t.op();
-            if (op.equals(op.equals(Equality.EQUALS))) {
-                return true;
-            }
-            assert op instanceof Function;
-            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
-
-            if (op.equals(ldt.getLessThan())) {
-                return true;
-            } else if (op.equals(ldt.getLessOrEquals())) {
-                return true;
-            } else if (op.equals(ldt.getGreaterThan())) {
-                return true;
-            } else if (op.equals(ldt.getGreaterOrEquals())) {
-                return true;
-            } else {
-                return false;
-            }
+    private boolean isMultiplication(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getMul())
+                || op.equals(intLDT.getJavaMulInt())
+                || op.equals(intLDT.getJavaMulLong())) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        @Override
-        boolean isUnaryNumericalOp(Term t) {
-            Operator op = t.op();
-            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
-
-            if (op.equals(ldt.getJavaUnaryMinusInt())
-                    || op.equals(ldt.getJavaUnaryMinusLong())) {
-                return true;
-            } else if (op.equals(ldt.getJavaBitwiseNegation())) {
-                return true;
-            } else if(op.toString().equalsIgnoreCase("Z")) {
-                return true;
-            } else {
-                return false;
-            }
+    private boolean isDivision(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getDiv())
+                || op.equals(intLDT.getJavaDivInt())
+                || op.equals(intLDT.getJavaDivLong())) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        @Override
-        boolean isNumericalOp(Term t) {
-            Operator op = t.op();
-            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
-
-            if (op.equals(ldt.getAdd())
-                    || op.equals(ldt.getJavaAddInt())
-                    || op.equals(ldt.getJavaAddLong())) {
-                return true;
-            } else if (op.equals(ldt.getSub())
-                    || op.equals(ldt.getJavaSubInt())
-                    || op.equals(ldt.getJavaSubLong())) {
-                return true;
-            } else if (op.equals(ldt.getMul())
-                    || op.equals(ldt.getJavaMulInt())
-                    || op.equals(ldt.getJavaMulLong())) {
-                return true;
-            } else if (op.equals(ldt.getDiv())
-                    || op.equals(ldt.getJavaDivInt())
-                    || op.equals(ldt.getJavaDivLong())) {
-                return true;
-            } else if (op.equals(ldt.getMod())
-                    || op.equals(ldt.getJavaMod())) {
-                return true;
-            } else if (op.equals(ldt.getJavaShiftLeftInt())
-                    || op.equals(ldt.getJavaShiftLeftLong())) {
-                return true;
-            } else if (op.equals(ldt.getJavaShiftRightInt())
-                    || op.equals(ldt.getJavaShiftRightLong())) {
-                return true;
-            } else if (op.equals(ldt.getJavaUnsignedShiftRightInt())
-                    || op.equals(ldt.getJavaUnsignedShiftRightLong())) {
-                return true;
-            } else if (op.equals(ldt.getJavaBitwiseAndInt())
-                    || op.equals(ldt.getJavaBitwiseAndLong())) {
-                return true;
-            } else if (op.equals(ldt.getJavaBitwiseOrInt())
-                    || op.equals(ldt.getJavaBitwiseOrLong())) {
-                return true;
-            } else if (op.equals(ldt.getJavaBitwiseXOrInt())
-                    || op.equals(ldt.getJavaBitwiseXOrLong())) {
-                return true;
-            } else {
-                return false;
-            }
+    private boolean isModulo(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getMod())
+                || op.equals(intLDT.getJavaMod())) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        @Override
-        boolean notDivOrModOp(Term t) {
-            Operator op = t.op();
-            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
+    private boolean isShiftOp(Term t) {
+        Operator op = t.op();
 
-            if (op.equals(ldt.getDiv())
-                    || op.equals(ldt.getJavaDivInt())
-                    || op.equals(ldt.getJavaDivLong())) {
-                return false;
-            } else if (op.equals(ldt.getMod())
-                    || op.equals(ldt.getJavaMod())) {
-                return false;
-            } else {
-                return true;
-            }
+        if (op.equals(intLDT.getJavaShiftLeftInt())
+                || op.equals(intLDT.getJavaShiftLeftLong())
+                || op.equals(intLDT.getJavaShiftRightInt())
+                || op.equals(intLDT.getJavaShiftRightLong())
+                || op.equals(intLDT.getJavaUnsignedShiftRightInt())
+                || op.equals(intLDT.getJavaUnsignedShiftRightLong())) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        @Override
-        boolean valueNotZero(Term t) {
-            int subs = t.arity();
-            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
-            assert subs == 1;
+    private boolean isBitwiseAnd(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getJavaBitwiseAndInt())
+                || op.equals(intLDT.getJavaBitwiseAndLong())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-            ldt.zero();
-            if (t.equals(ldt.zero())) {
-                return false;
-            } else {
-                return true;
-            }
+    private boolean isBitwiseOr(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getJavaBitwiseOrInt())
+                || op.equals(intLDT.getJavaBitwiseOrLong())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isBitwiseXOr(Term t) {
+        Operator op = t.op();
+        if (op.equals(intLDT.getJavaBitwiseXOrInt())
+                || op.equals(intLDT.getJavaBitwiseXOrLong())) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
