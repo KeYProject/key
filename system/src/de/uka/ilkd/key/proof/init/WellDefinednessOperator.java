@@ -58,11 +58,14 @@ public class WellDefinednessOperator {
         // Numerical operators
         else if (isUnaryNumericalOp(t)) {
             assert subs == 1;
-            return wd(t.sub(0));
+            return num(t.sub(0));
         } else if (isNumericalOp(t)) {
             assert subs == 2;
-            assert notDivOrModOp(t) || valueNotZero(t.sub(1));
-            return wd(t.sub(0), t.sub(1));
+            if (notDivOrModOp(t) || valueNotZero(t.sub(1))) {
+                return wd(t.sub(0), t.sub(1));
+            } else {
+                return TB.ff();
+            }
         }
         // TODO: Floating point types, \bigint and \real
 
@@ -90,6 +93,18 @@ public class WellDefinednessOperator {
         int subs = a.arity();
         assert subs == 0;
         return TB.tt();
+    }
+
+    private Term num(Term t) {
+        int subs = t.arity();
+        Operator op = t.op();
+        assert subs <= 1;
+
+        if (op.toString().equalsIgnoreCase("Z")) {
+            return TB.tt();
+        } else {
+            return wd(t);
+        }
     }
 
     // a || b
@@ -187,6 +202,8 @@ public class WellDefinednessOperator {
                     || op.equals(ldt.getJavaUnaryMinusLong())) {
                 return true;
             } else if (op.equals(ldt.getJavaBitwiseNegation())) {
+                return true;
+            } else if(op.toString().equalsIgnoreCase("Z")) {
                 return true;
             } else {
                 return false;
