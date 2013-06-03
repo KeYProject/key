@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.resources.meta;
+package org.key_project.key4eclipse.resources.io;
 
 import java.io.File;
 import java.util.LinkedHashSet;
@@ -15,6 +15,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 public class ProofMetaFileWriter {
+   
    private LinkedHashSet<KeYJavaType> addedTypes;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    

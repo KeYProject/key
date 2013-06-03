@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -38,9 +39,9 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
-import org.key_project.key4eclipse.resources.meta.ProofMetaFileReader;
-import org.key_project.key4eclipse.resources.meta.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -113,13 +114,16 @@ public class ProofManager {
     * @param autoDeleteProofFiles - enables or deletes the automatically proof{@link IFile} deletion
     * @throws Exception
     */
-   public void runAllProofs(boolean autoDeleteProofFiles) throws Exception{
+   public void runAllProofs(boolean autoDeleteProofFiles, IProgressMonitor monitor) throws Exception{
       LinkedList<ProofElement> proofElements = getAllProofElements();
       LinkedList<IFile> javaFiles = getAllJavaFilesFromProofElements(proofElements);
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
       markerManager.deleteKeYMarker(javaFiles);
       markerManager.deleteKeYMarker(project);
+      //set up monitor
+      monitor.beginTask("Build all proofs", proofElements.size());
       for(ProofElement pe : proofElements){
+         monitor.subTask("Build " + pe.getProofObl().name());
          IFolder proofFolder = createProofFolder(pe.getJavaFile());
          IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
          Proof proof = processProof(pe.getProofObl(), proofFile);
@@ -137,18 +141,76 @@ public class ProofManager {
                System.out.println("Warning: no meta file created for " + proofFile.getName());
             }
          }
+         monitor.worked(1);
       }
       if(autoDeleteProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
       }
+      monitor.done();
    }
    
    
-   private IFile saveMetaFile(IFile proofFile, Proof proof) throws  TransformerException, CoreException{
-      ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
-      return metaFileWriter.writeMetaFile(proofFile, proof, environment);
+   public void runProofsSelective(LinkedList<IFile> changedJavaFiles, boolean autoDeleteProofFiles, IProgressMonitor monitor) throws Exception{
+      LinkedList<IFile> proofFiles = new LinkedList<IFile>();
+      LinkedList<ProofElement> proofElements = getAllProofElements();
+      monitor.beginTask("Build all proofs", proofElements.size());
+      for(ProofElement pe : proofElements){
+         monitor.subTask("Build " + pe.getProofObl().name());
+         //check if Proof exists
+         boolean runProof = false;
+         IFolder proofFolder = createProofFolder(pe.getJavaFile());
+         IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
+         IFile metaFile = getProofMetaFile(proofFile); 
+         if(proofFile.exists() && metaFile.exists()){
+            ProofMetaFileReader pmfr = new ProofMetaFileReader();
+            pmfr.readProofMetaFile(metaFile);
+            int metaFilesProofHashCode = pmfr.getProofFileHashCode();
+            int proofFileHasCode = proofFile.hashCode();
+            if(proofFileHasCode != metaFilesProofHashCode){
+               runProof = true;
+            }
+         }
+         else{ 
+            runProof = true;
+         }
+         if(!runProof){
+            ProofMetaFileReader pmfr = new ProofMetaFileReader();
+            pmfr.readProofMetaFile(metaFile);
+            LinkedHashSet<String> kjts = pmfr.getTypes();
+            LinkedList<IType> javaTypes = collectAllJavaITypes();
+            for(String kjt : kjts){
+               IFile javaFile = getJavaFileForType(kjt, javaTypes);
+               if(changedJavaFiles.contains(javaFile)){
+                  runProof = true;
+                  break;
+               }
+            }
+         }
+         if(runProof){
+            markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
+            Proof proof = processProof(pe.getProofObl(), proofFile);
+            markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+            if(proof != null){
+               KeYUtil.saveProof(proof, proofFile);
+               metaFile = saveMetaFile(proofFile, proof);
+               if(metaFile == null){
+                  System.out.println("Warning: no meta file created for " + proofFile.getName());
+               }
+            }
+         }
+         if(autoDeleteProofFiles){
+            proofFiles.add(proofFile);
+            if(metaFile != null && metaFile.exists()){
+               proofFiles.add(metaFile);
+            }
+         }
+         monitor.worked(1);
+      }
+      if(autoDeleteProofFiles){
+         cleanProofFolder(proofFiles, mainProofFolder);  
+      }
+      monitor.done();
    }
-
    
    
    /**
@@ -209,72 +271,13 @@ public class ProofManager {
    }
    
    
-   public void runProofsSelective(LinkedList<IFile> changedJavaFiles, boolean autoDeleteProofFiles) throws Exception{
-      LinkedList<IFile> proofFiles = new LinkedList<IFile>();
-      LinkedList<ProofElement> proofElements = getAllProofElements();
-      for(ProofElement pe : proofElements){
-         //check if Proof exists
-         boolean runProof = false;
-         IFolder proofFolder = createProofFolder(pe.getJavaFile());
-         IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
-         IFile metaFile = getProofMetaFile(proofFile); 
-         if(proofFile.exists() && metaFile.exists()){
-            ProofMetaFileReader pmfr = new ProofMetaFileReader();
-            pmfr.readProofMetaFile(metaFile);
-            int metaFilesProofHashCode = pmfr.getProofFileHashCode();
-            int proofFileHasCode = proofFile.hashCode();
-            if(proofFileHasCode != metaFilesProofHashCode){
-               runProof = true;
-            }
-         }
-         else{ 
-            runProof = true;
-         }
-         if(!runProof){
-            ProofMetaFileReader pmfr = new ProofMetaFileReader();
-            pmfr.readProofMetaFile(metaFile);
-            LinkedHashSet<String> kjts = pmfr.getTypes();
-            LinkedList<IType> javaTypes = collectAllJavaITypes();
-            for(String kjt : kjts){
-               IFile javaFile = getJavaFileForType(kjt, javaTypes);
-               if(changedJavaFiles.contains(javaFile)){
-                  runProof = true;
-                  break;
-               }
-            }
-         }
-         if(runProof){
-            markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
-            Proof proof = processProof(pe.getProofObl(), proofFile);
-            markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
-            if(proof != null){
-               KeYUtil.saveProof(proof, proofFile);
-               metaFile = saveMetaFile(proofFile, proof);
-               if(metaFile == null){
-                  System.out.println("Warning: no meta file created for " + proofFile.getName());
-               }
-            }
-         }
-         if(autoDeleteProofFiles){
-            proofFiles.add(proofFile);
-            if(metaFile.exists()){
-               proofFiles.add(metaFile);
-            }
-         }
-      }
-      if(autoDeleteProofFiles){
-         cleanProofFolder(proofFiles, mainProofFolder);  
-      }
-   }
-   
-   
    /**
     * Deletes the main Proof{@link IFolder} and runs all {@link Proof}s for the {@link IProject}.
     * @throws Exception
     */
-   public void clean(boolean autoDeleteProofFiles) throws Exception{
+   public void clean(boolean autoDeleteProofFiles, IProgressMonitor monitor) throws Exception{
       deleteResource(mainProofFolder);
-      runAllProofs(autoDeleteProofFiles);
+      runAllProofs(autoDeleteProofFiles, monitor);
    }
    
    
@@ -619,5 +622,11 @@ public class ProofManager {
          types.addAll(collectAllJavaITypesForIType(subType));
       }
       return types;
+   }
+   
+   
+   private IFile saveMetaFile(IFile proofFile, Proof proof) throws  TransformerException, CoreException{
+      ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
+      return metaFileWriter.writeMetaFile(proofFile, proof, environment);
    }
 }

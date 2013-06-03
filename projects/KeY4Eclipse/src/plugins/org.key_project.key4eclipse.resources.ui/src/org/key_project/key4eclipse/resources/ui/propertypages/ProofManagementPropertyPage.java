@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
-import org.key_project.key4eclipse.resources.ui.util.KeY4EclipseResourcesUiUtil;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
@@ -183,7 +183,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
-         KeY4EclipseResourcesUiUtil.hideMetaFiles(project, KeYProjectProperties.isHideMetaFiles(project));
+         KeY4EclipseResourcesUtil.hideMetaFiles(project, KeYProjectProperties.isHideMetaFiles(project));
          return super.performOk();
       }
       catch (CoreException e) {
