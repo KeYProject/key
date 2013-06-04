@@ -862,6 +862,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             return methodFullName.equals(element.getFullName());
          }
       });
+      if (pm == null) {
+         pms = javaInfo.getConstructors(containerKJT);
+         pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+            @Override
+            public boolean select(IProgramMethod element) {
+               return methodFullName.equals(element.getFullName());
+            }
+         });
+      }
       assertNotNull(pm);
       return pm;
    }
