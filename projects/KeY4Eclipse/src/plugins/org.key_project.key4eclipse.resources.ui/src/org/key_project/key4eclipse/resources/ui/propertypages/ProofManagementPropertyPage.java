@@ -82,7 +82,7 @@ enableEfficentProofManagementButton.setEnabled(false); // TODO@Stefan: Remove th
    private void setSelectionForAutoDeleteProofFilesButton(){
       try {
          IProject project = getProject();
-         autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isEnableEfficientProofManagement(project));
+         autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isAutoDeleteProofFiles(project));
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
