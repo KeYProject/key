@@ -7,8 +7,6 @@
     <proofReferences target="//@types.2/@attributes.0" kind="Access"/>
     <proofReferences target="//@types.0/@attributes.0" kind="Access"/>
     <proofReferences target="//@types.0/@attributes.1" kind="Access"/>
-    <proofReferences target="//@types.3/@attributes.0" kind="Access"/>
-    <proofReferences target="//@types.3/@attributes.1" kind="Access"/>
   </proofs>
   <types xsi:type="dbcmodel:DbcClass" name="Main">
     <methods signature="main(c : MyClass, e : MyEnum)" returnType="int">
@@ -23,9 +21,5 @@
   </types>
   <types xsi:type="dbcmodel:DbcClass" name="MyClass">
     <attributes name="classValue" type="int" visibility="default"/>
-  </types>
-  <types xsi:type="dbcmodel:DbcClass" name="java.lang.Throwable">
-    <attributes name="cause" type="java.lang.Throwable" visibility="default"/>
-    <attributes name="message" type="java.lang.String" visibility="default"/>
   </types>
 </dbcmodel:DbcModel>
