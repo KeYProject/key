@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -41,7 +41,7 @@ import de.uka.ilkd.key.ui.UserInterface;
 /**
  * <p>
  * This class provides the functionality to load something it KeY.
- * The loading process is done in the current {@link Thread} and 
+ * The loading process is done in the current {@link Thread} and
  * no user interaction is required.
  * </p>
  * <p>
@@ -58,12 +58,12 @@ public class DefaultProblemLoader {
     * The file or folder to load.
     */
    private File file;
-   
+
    /**
     * The optional class path entries to use.
     */
    private List<File> classPath;
-   
+
    /**
     * An optional boot class path.
     */
@@ -73,22 +73,22 @@ public class DefaultProblemLoader {
     * The {@link KeYMediator} to use.
     */
    private KeYMediator mediator;
-   
+
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
     */
    private EnvInput envInput;
-   
+
    /**
     * The instantiated {@link ProblemInitializer} used during the loading process.
     */
    private ProblemInitializer problemInitializer;
-   
+
    /**
     * The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
     */
    private InitConfig initConfig;
-   
+
    /**
     * The instantiate proof or {@code null} if no proof was instantiated during loading process.
     */
@@ -111,7 +111,7 @@ public class DefaultProblemLoader {
 
    /**
     * Executes the loading process and tries to instantiate a proof
-    * and to re-apply rules on it if possible. 
+    * and to re-apply rules on it if possible.
     * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
     * @return An error message or {@code ""} (empty string) if everything is fine.
     * @throws ProofInputException Occurred Exception.
@@ -144,10 +144,13 @@ public class DefaultProblemLoader {
             getMediator().resetNrGoalsClosedByHeuristics();
             if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
                ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-            }  
+            }
          }
       }
-      catch (Exception e) {
+      catch (ProblemLoaderException e) {
+          throw(e);
+      }
+      catch (Exception e) { // TODO give more specific exception message
          throw new ProblemLoaderException(this, e);
       }
    }
@@ -195,7 +198,7 @@ public class DefaultProblemLoader {
          }
       }
    }
-   
+
    /**
     * Instantiates the {@link ProblemInitializer} to use.
     * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
@@ -203,13 +206,13 @@ public class DefaultProblemLoader {
     */
    protected ProblemInitializer createProblemInitializer(boolean registerProof) {
       UserInterface ui = mediator.getUI();
-      return new ProblemInitializer(ui, 
-                                    mediator.getProfile(), 
-                                    new Services(mediator.getExceptionHandler()), 
-                                    registerProof, 
+      return new ProblemInitializer(ui,
+                                    mediator.getProfile(),
+                                    new Services(mediator.getExceptionHandler()),
+                                    registerProof,
                                     ui);
    }
-   
+
    /**
     * Creates the {@link InitConfig}.
     * @return The created {@link InitConfig}.
@@ -218,7 +221,7 @@ public class DefaultProblemLoader {
    protected InitConfig createInitConfig() throws ProofInputException {
       return problemInitializer.prepare(envInput);
    }
-   
+
    /**
     * Creates a {@link LoadedPOContainer} if available which contains
     * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
@@ -310,7 +313,7 @@ public class DefaultProblemLoader {
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
       return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
    }
-   
+
    protected void replayProof(Proof proof) throws ProofInputException {
       mediator.setProof(proof);
 
@@ -318,7 +321,7 @@ public class DefaultProblemLoader {
 
       String status = "";
       if (envInput instanceof KeYUserProblemFile) {
-         IProofFileParser parser = new DefaultProofFileParser(proof,
+         IProofFileParser parser = new DefaultProofFileParser(this, proof,
                                                               mediator);
          problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
          status = parser.getStatus();
@@ -367,7 +370,7 @@ public class DefaultProblemLoader {
    public EnvInput getEnvInput() {
       return envInput;
    }
-   
+
    /**
     * Returns the instantiated {@link ProblemInitializer} used during the loading process.
     * @return The instantiated {@link ProblemInitializer} used during the loading process.
