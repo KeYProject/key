@@ -120,7 +120,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false, false);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), 
+                                                                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
    }
 
    /**
@@ -181,7 +182,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof), isLoopTreatmentInvariant(proof), isAliasChecks(proof));
+      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
@@ -194,38 +195,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       }
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       environment.getUi().startAutoMode(proof, goals);
-   }
-   
-   /**
-    * Checks if the given {@link Proof} uses method treatment "Contract" right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} Contract, {@code false} Expand
-    */
-   protected boolean isMethodTreatmentContract(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return StrategyProperties.METHOD_CONTRACT.equals(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
-   }
-   
-   /**
-    * Checks if the given {@link Proof} uses loop treatment "Invariant" right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} Invariant, {@code false} Expand
-    */
-   protected boolean isLoopTreatmentInvariant(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return StrategyProperties.LOOP_INVARIANT.equals(sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
-   }
-   
-   /**
-    * Checks if the given {@link Proof} uses alias checks right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} alias checks immediately, {@code false} alias checks never.
-    */
-   protected boolean isAliasChecks(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
    }
 
    /**

@@ -345,10 +345,13 @@ public class Main {
 	UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
+            ensureSplashScreenInvisible();
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);
         } else {
+            updateSplashScreen();
+
             GuiUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     MainWindow key = MainWindow.getInstance();
@@ -372,6 +375,23 @@ public class Main {
 
         return ui;
 
+    }
+
+    private static void ensureSplashScreenInvisible() {
+        try {
+            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
+            if (sp == null) return;
+            else sp.close();
+        } catch (Exception e) {}
+    }
+
+    private static void updateSplashScreen() {
+        try {
+            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
+            if (sp == null) return;
+            // insert customization code here
+            // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
+        } catch (Exception e) {}
     }
 
     private static void evaluateLemmataOptions(CommandLine options){
