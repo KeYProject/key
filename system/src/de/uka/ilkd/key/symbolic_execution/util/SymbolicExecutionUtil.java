@@ -121,7 +121,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -1985,21 +1984,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * This method should be called before the auto mode is started in
-    * context of symbolic execution. The method sets {@link StrategyProperties}
-    * of the auto mode which are not supported in context of symbolic execution
-    * to valid default values.
-    * @param proof The {@link Proof} to configure its {@link StrategyProperties} for symbolic execution.
-    */
-   public static void updateStrategyPropertiesForSymbolicExecution(Proof proof) {
-      if (proof != null) {
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
-         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-      }
-   }
-
-   /**
     * Checks if the given {@link Term} is null in the {@link Sequent} of the given {@link Node}. 
     * @param services The {@link Services} to use.
     * @param node The {@link Node} which provides the original {@link Sequent}
@@ -2324,33 +2308,44 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Configures the proof to use operation contracts or to expand methods instead.
+    * Configures the proof to use the given settings.
     * @param proof The {@link Proof} to configure.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
+    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
     */
-   public static void setUseOperationContracts(Proof proof, boolean useOperationContracts) {
+   public static void updateStrategySettings(Proof proof, 
+                                             boolean useOperationContracts,
+                                             boolean useLoopInvariants,
+                                             boolean aliasChecksImmediately) {
       if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
                                        StrategyProperties.METHOD_CONTRACT : 
                                        StrategyProperties.METHOD_EXPAND;
+         String loopTreatmentValue = useLoopInvariants ? 
+                                     StrategyProperties.LOOP_INVARIANT : 
+                                     StrategyProperties.LOOP_EXPAND;
+         String aliasChecksValue = aliasChecksImmediately ? 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
+         updateStrategySettings(proof, sp);
       }
    }
 
    /**
-    * Configures the proof to use loop invariants or to expand loops instead.
+    * Configures the proof to use the given {@link StrategyProperties}.
     * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param sb The {@link StrategyProperties} to set.
     */
-   public static void setUseLoopInvariants(Proof proof, boolean useLoopInvariants) {
+   public static void updateStrategySettings(Proof proof, 
+                                             StrategyProperties sp) {
       if (proof != null && !proof.isDisposed()) {
-         String loopTreatmentValue = useLoopInvariants ? 
-                                     StrategyProperties.LOOP_INVARIANT : 
-                                     StrategyProperties.LOOP_EXPAND;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         assert sp != null;
+         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
@@ -2366,22 +2361,6 @@ public final class SymbolicExecutionUtil {
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
-      }
-   }
-   
-   /**
-    * Configures the proof to do alias checks or not.
-    * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
-    */
-   public static void setAliasChecks(Proof proof, boolean immediately) {
-      if (proof != null && !proof.isDisposed()) {
-         String aliasChecksValue = immediately ? 
-                                   SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY : 
-                                   SymbolicExecutionStrategy.ALIAS_CHECK_NEVER;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
    

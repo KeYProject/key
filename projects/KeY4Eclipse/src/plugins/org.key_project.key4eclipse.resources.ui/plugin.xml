@@ -38,6 +38,7 @@
                   <adapt
                         type="org.eclipse.core.resources.IResource">
                      <test
+                           forcePluginActivation="true"
                            property="org.eclipse.core.resources.projectNature"
                            value="org.eclipse.jdt.core.javanature">
                      </test>
@@ -46,6 +47,7 @@
                      <adapt
                            type="org.eclipse.core.resources.IResource">
                         <test
+                              forcePluginActivation="true"
                               property="org.eclipse.core.resources.projectNature"
                               value="org.key_project.key4eclipse.resources.KeYProjectNature">
                         </test>
@@ -88,6 +90,7 @@
                <adapt
                      type="org.eclipse.core.resources.IResource">
                   <test
+                        forcePluginActivation="true"
                         property="org.eclipse.core.resources.projectNature"
                         value="org.eclipse.jdt.core.javanature">
                   </test>
@@ -96,6 +99,7 @@
                   <adapt
                         type="org.eclipse.core.resources.IResource">
                      <test
+                           forcePluginActivation="true"
                            property="org.eclipse.core.resources.projectNature"
                            value="org.key_project.key4eclipse.resources.KeYProjectNature">
                      </test>
@@ -116,6 +120,7 @@
             <adapt
                   type="org.eclipse.core.resources.IResource">
                <test
+                     forcePluginActivation="true"
                      property="org.eclipse.core.resources.projectNature"
                      value="org.key_project.key4eclipse.resources.KeYProjectNature">
                </test>
