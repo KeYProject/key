@@ -32,6 +32,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -39,7 +40,9 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileContentException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
@@ -49,6 +52,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -56,8 +60,10 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -88,6 +94,7 @@ public class ProofManager {
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
          List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
          environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+         markerManager.deleteKeYMarker(project);
       }
       catch (ProblemLoaderException e) {
          handleProblemLoaderException(e);
@@ -150,6 +157,91 @@ public class ProofManager {
    }
    
    
+   private boolean sameHashCode(IFile proofFile, ProofMetaFileReader pmfr) throws Exception{
+      if(proofFile.exists()){
+         int metaFilesProofHashCode = pmfr.getProofFileHashCode();
+         int proofFileHasCode = proofFile.hashCode();
+         if(proofFileHasCode == metaFilesProofHashCode){
+            return true;
+         }
+         else{
+            return false;
+         }
+      }
+      else{
+         return false;
+      }
+   }
+   
+   
+   private boolean typeChanged(ProofMetaFileReader pmfr, LinkedList<IFile> changedJavaFiles) throws Exception{
+      LinkedList<IType> javaTypes = collectAllJavaITypes();
+      LinkedList<ProofMetaFileTypeElement> typeElements = pmfr.getTypeElements();
+      for(ProofMetaFileTypeElement te : typeElements){
+         String type = te.getType();
+         IFile javaFile = getJavaFileForType(type, javaTypes);
+         //check if type has changed itself
+         if(changedJavaFiles.contains(javaFile)){
+            return true;
+         }
+      }
+      return false;
+   }
+  
+   
+   private boolean subTypesChanged(ProofMetaFileReader pmfr) throws ProofMetaFileContentException{
+      LinkedList<ProofMetaFileTypeElement> typeElements = pmfr.getTypeElements();
+      for(ProofMetaFileTypeElement te : typeElements){
+         LinkedList<String> subTypes = te.getSubTypes();
+         Set<KeYJavaType> envKjts = environment.getServices().getJavaInfo().getAllKeYJavaTypes();
+         KeYJavaType equiKjt = null;
+         for(KeYJavaType kjt : envKjts){
+            if(te.getType().equals(kjt.getFullName())){
+               equiKjt = kjt;
+            }
+         }
+         if(equiKjt == null){
+            return true;
+         }
+         else{
+            ImmutableList<KeYJavaType> envSubTypes = environment.getServices().getJavaInfo().getAllSubtypes(equiKjt);
+            for(KeYJavaType kjt: envSubTypes){
+               System.out.println(kjt.getFullName());
+            }
+            if(envSubTypes.size() == subTypes.size()){
+               for(KeYJavaType envSubType : envSubTypes){
+                  String envSubTypeName = envSubType.getFullName();
+                  if(!subTypes.contains(envSubTypeName)){
+                     return true;
+                  }
+               }
+            }
+            else{
+               return true;
+            }
+         }
+      }
+      return false;
+   }
+   
+   
+   private void runProof(ProofElement pe, IFile proofFile) throws Exception{
+      markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
+      Proof proof = processProof(pe.getProofObl(), proofFile);
+      markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+      if(proof != null){
+         KeYUtil.saveProof(proof, proofFile);
+         IFile metaFile = saveMetaFile(proofFile, proof);
+         if(metaFile == null){
+            System.out.println("Warning: no meta file created for " + proofFile.getName());
+         }
+      }
+   }
+      
+      
+      
+   
+   
    public void runProofsSelective(LinkedList<IFile> changedJavaFiles, boolean autoDeleteProofFiles, IProgressMonitor monitor) throws Exception{
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
       LinkedList<ProofElement> proofElements = getAllProofElements();
@@ -157,52 +249,33 @@ public class ProofManager {
       for(ProofElement pe : proofElements){
          monitor.subTask("Build " + pe.getProofObl().name());
          //check if Proof exists
-         boolean runProof = false;
          IFolder proofFolder = createProofFolder(pe.getJavaFile());
          IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
-         IFile metaFile = getProofMetaFile(proofFile); 
-         if(proofFile.exists() && metaFile.exists()){
-            ProofMetaFileReader pmfr = new ProofMetaFileReader();
-            pmfr.readProofMetaFile(metaFile);
-            int metaFilesProofHashCode = pmfr.getProofFileHashCode();
-            int proofFileHasCode = proofFile.hashCode();
-            if(proofFileHasCode != metaFilesProofHashCode){
-               runProof = true;
-            }
-         }
-         else{ 
-            runProof = true;
-         }
-         if(!runProof){
-            ProofMetaFileReader pmfr = new ProofMetaFileReader();
-            pmfr.readProofMetaFile(metaFile);
-            LinkedHashSet<String> kjts = pmfr.getTypes();
-            LinkedList<IType> javaTypes = collectAllJavaITypes();
-            for(String kjt : kjts){
-               IFile javaFile = getJavaFileForType(kjt, javaTypes);
-               if(changedJavaFiles.contains(javaFile)){
-                  runProof = true;
-                  break;
+         IFile metaFile = getProofMetaFile(proofFile);
+         if(metaFile.exists()){
+            ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
+            if(sameHashCode(proofFile, pmfr)){
+               if(typeChanged(pmfr, changedJavaFiles)){
+                runProof(pe, proofFile);
+               }
+               else{
+                  if(subTypesChanged(pmfr)){
+                     runProof(pe, proofFile);
+                  }
                }
             }
-         }
-         if(runProof){
-            markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
-            Proof proof = processProof(pe.getProofObl(), proofFile);
-            markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
-            if(proof != null){
-               KeYUtil.saveProof(proof, proofFile);
-               metaFile = saveMetaFile(proofFile, proof);
-               if(metaFile == null){
-                  System.out.println("Warning: no meta file created for " + proofFile.getName());
-               }
+            else{
+               runProof(pe, proofFile);
             }
          }
+         else{
+            runProof(pe, proofFile);
+         }
+                              
+         
          if(autoDeleteProofFiles){
             proofFiles.add(proofFile);
-            if(metaFile != null && metaFile.exists()){
-               proofFiles.add(metaFile);
-            }
+            proofFiles.add(metaFile);
          }
          monitor.worked(1);
       }
@@ -415,8 +488,11 @@ public class ProofManager {
     */
    private Proof loadProof(File file){
       try{
-         KeYEnvironment<?> environment = KeYEnvironment.load(file, null, null);
-         Proof proof = environment.getLoadedProof();
+         KeYEnvironment<?> loadEnvironment = KeYEnvironment.load(file, null, null);
+         Proof proof = loadEnvironment.getLoadedProof();
+         
+//         KeYEnvironment<?> environment = KeYEnvironment.load(file, null, null);
+//         Proof proof = environment.getLoadedProof();
          if (proof != null) {
             proofs.add(proof);
             if (!proof.closed()){
@@ -465,19 +541,17 @@ public class ProofManager {
     */
    private String makePathValid(String str){
 
-//      String tmp;
-//      for(int i = 1; i<=str.length();i++){
-//         tmp = str.substring(0, i);
-//         Path path = new Path(tmp);
-//         if(!path.isValidSegment(tmp)){
-//            StringBuilder strbuilder = new StringBuilder(str);
-//            strbuilder.setCharAt(i-1, '_');
-//            str = strbuilder.toString();
-//         }
-//      }
-//      return str;
-
-      return str.replaceAll("[:\\\\/*?|<>]", "_");
+      String tmp;
+      for(int i = 1; i<=str.length();i++){
+         tmp = str.substring(0, i);
+         IStatus validStatus = ResourcesPlugin.getWorkspace().validateName(tmp, IResource.FILE);
+         if(!validStatus.isOK()){
+            StringBuilder strbuilder = new StringBuilder(str);
+            strbuilder.setCharAt(i-1, '_');
+            str = strbuilder.toString();
+         }
+      }
+      return str;
    }
    
    

@@ -3,6 +3,7 @@ package org.key_project.key4eclipse.resources.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,37 +18,99 @@ import org.xml.sax.SAXException;
 
 public class ProofMetaFileReader {
    
+   private Element rootElement;
    private int proofFileHashCode;
-   private LinkedHashSet<String> types;
+   LinkedList<ProofMetaFileTypeElement> typeElemens;
    
-   public int getProofFileHashCode(){
-      return proofFileHashCode;
-   }
    
-   public LinkedHashSet<String> getTypes(){
-      return types;
-   }
-   
-   public void readProofMetaFile(IFile metaIFile) throws SAXException, IOException, ParserConfigurationException{
-      proofFileHashCode = -1;
-      types = new LinkedHashSet<String>();
+   public ProofMetaFileReader(IFile metaIFile) throws Exception{
       File metaFile = metaIFile.getLocation().toFile();
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
       Document doc = dBuilder.parse(metaFile);
-      Element rootElement = doc.getDocumentElement();
+      this.rootElement = doc.getDocumentElement();
+      this.proofFileHashCode = readHashCode();
+      this.typeElemens = readAllTypeElements();
+   }
+   
+   
+   
+   
+   public int getProofFileHashCode() {
+      return proofFileHashCode;
+   }
+
+
+
+
+   public LinkedList<ProofMetaFileTypeElement> getTypeElements() {
+      return typeElemens;
+   }
+
+
+
+
+   private LinkedList<ProofMetaFileTypeElement> readAllTypeElements() throws ProofMetaFileContentException{
+      LinkedList<ProofMetaFileTypeElement> typeElements = new LinkedList<ProofMetaFileTypeElement>();
       NodeList nodeList = rootElement.getChildNodes();
       for(int i = 0; i < nodeList.getLength(); i++){
          Node node = nodeList.item(i);
-         String nodeName = node.getNodeName();
-         if(nodeName.equals("proofFileHashCode")){
-            String value = node.getTextContent();
-            proofFileHashCode = Integer.valueOf(value);
+         if(i == 0){
+            if(!"proofFileHashCode".equals(node.getNodeName())){
+               throw new ProofMetaFileContentException("No prooffile-hashCode found in this file");
+            }
          }
-         else if(nodeName.equals("type")){
-            String value = node.getTextContent();
-            types.add(value);
+         else if("type".equals(node.getNodeName())){
+            typeElements.add(new ProofMetaFileTypeElement(node.getFirstChild().getTextContent(), readAllSubTypes(node)));
+         }
+         else{
+            throw new ProofMetaFileContentException("Illegal entry in file");
          }
       }
+      if(!typeElements.isEmpty()){
+         return typeElements;
+      }
+      else{
+         throw new ProofMetaFileContentException("No types found in this file");
+      }
+         
+   }
+   
+   
+   private int readHashCode() throws ProofMetaFileContentException{
+      NodeList nodeList = rootElement.getElementsByTagName("proofFileHashCode");
+      if(nodeList.getLength() == 1){
+         Node node = nodeList.item(0);
+         String textContext = node.getTextContent();
+         Integer hashCode = Integer.valueOf(textContext);
+         return hashCode;
+      }
+      else if(nodeList.getLength() > 1){
+         throw new ProofMetaFileContentException("More then one prooffile-hashcode found in this file");
+      }
+      else{
+         throw new ProofMetaFileContentException("No prooffile-hashCode found in this file");
+      }
+   }
+   
+   
+   private LinkedList<String> readAllSubTypes(Node node) throws ProofMetaFileContentException{
+      LinkedList<String> subTypeList = new LinkedList<String>();
+      NodeList nodeList = node.getChildNodes();
+      for(int i = 0; i < nodeList.getLength(); i++){
+         Node subNode = nodeList.item(i);
+         if(i == 0){
+            if(!"#text".equals(subNode.getNodeName())){
+               throw new ProofMetaFileContentException("Illegal entry in this file");
+            }
+         }
+         else if("subType".equals(subNode.getNodeName())){
+            subTypeList.add(subNode.getTextContent());
+         }
+         else{
+            throw new ProofMetaFileContentException("Illegal entry in this file");
+         }
+      }
+      return subTypeList;
    }
 }

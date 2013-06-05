@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,7 +31,6 @@ import org.key_project.key4eclipse.resources.util.LogUtil;
 public class KeYProjectBuilder extends IncrementalProjectBuilder {
 
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
-   private static boolean initialBuildDone = false;
    
    /**
     * {@inheritDoc}
@@ -47,12 +47,11 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             boolean enableEfficientProofManagement = KeYProjectProperties.isEnableEfficientProofManagement(project);
             boolean autoDeleteProofFiles = KeYProjectProperties.isAutoDeleteProofFiles(project); 
             
-            if (!enableEfficientProofManagement || !initialBuildDone) {
+            if (!enableEfficientProofManagement) {
                proofManager.runAllProofs(autoDeleteProofFiles, monitor);
-               initialBuildDone = true;
                System.out.println("ALL");
             }
-            else if(enableEfficientProofManagement && initialBuildDone){
+            else if(enableEfficientProofManagement){
                //Do not use. Not working right now.
 //               runProofsEfficient(proofManager, delta);
                LinkedList<IFile> changedJavaFiles = collectChangedJavaFiles(delta);

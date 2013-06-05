@@ -32,10 +32,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
-
-import sun.net.ProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -65,27 +65,53 @@ public class KeY4EclipseResourcesUtil {
    }
    
    
+   public static boolean filterKeYJavaType(KeYJavaType kjt){
+      if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+            kjt.getJavaType() instanceof InterfaceDeclaration) || 
+          ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+         return true;
+      }
+      return false;
+   }
+   
+   
    /**
     * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
     * @param project - the {@link IProject} to use
     * @throws CoreException
     */
-   public static void cleanBuildProject(IProject project) throws CoreException{
+   public static void cleanBuildProject(final IProject project) throws CoreException{
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       IWorkspaceDescription desc = workspace.getDescription();
-      if(desc.isAutoBuilding()){
-         desc.setAutoBuilding(false);
-         workspace.setDescription(desc);
-         //build
-         project.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
-         //reset auto build
-         desc.setAutoBuilding(true);
-         workspace.setDescription(desc);
+      if(desc.isAutoBuilding()){ // TODO: Is die Unterschiedung wirklich nötig?
+         try {
+            desc.setAutoBuilding(false);
+            workspace.setDescription(desc);
+            //build
+            project.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
+            //reset auto build
+         }
+         finally {
+            desc.setAutoBuilding(true);
+            workspace.setDescription(desc);
+         }
       }
       else{
          //build
-         
-         project.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
+         new Job("Converting into KeY project") {
+
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+               try {
+                  project.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+                  return Status.OK_STATUS;
+               }
+               catch (CoreException e) {
+                  return LogUtil.getLogger().createErrorStatus(e);
+               }
+            }
+            
+         }.schedule();
       }
    }
    

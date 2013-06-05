@@ -2,7 +2,6 @@ package org.key_project.key4eclipse.resources.io;
 
 import java.io.File;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,7 +14,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -46,7 +44,7 @@ public class ProofMetaFileWriter {
       try{
          this.environment = env;
          this.addedTypes = new LinkedHashSet<KeYJavaType>();
-         Document doc = createDocumentSimple(proofFile, proof);
+         Document doc = createDoument(proofFile, proof);
          
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
@@ -59,6 +57,7 @@ public class ProofMetaFileWriter {
          metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
          return metaIFile;
       } catch (Exception e) {
+         e.printStackTrace();
          return null;
       }
    }
@@ -77,53 +76,53 @@ public class ProofMetaFileWriter {
       String hashCode = String.valueOf(proofFile.hashCode());
       proofFileHashCode.appendChild(doc.createTextNode(hashCode));
       rootElement.appendChild(proofFileHashCode);
-      
-      KeYJavaType[] kjts = collectTypesForProof(proof);
-      int id = 0;
-      for(KeYJavaType kjt : kjts){
-         if(!addedTypes.contains(kjt)){
+      LinkedHashSet<IProofReference<?>> proofReferences = ProofReferenceUtil.computeProofReferences(proof);
+      for(IProofReference<?> proofRef : proofReferences){
+         KeYJavaType kjt = getKeYJavaType(proofRef);
+         if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt)){
             addedTypes.add(kjt);
-            Element type = doc.createElement("type");
-            type.setAttribute("ID", id+"");
-            type.appendChild(doc.createTextNode(kjt.getFullName()));
-            id++;
-            
-            type = addSubTypes(doc, type, kjt, 1);
-            
-            rootElement.appendChild(type);
+            Element typeElement = doc.createElement("type");
+            typeElement.appendChild(doc.createTextNode(kjt.getFullName()));
+            if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){
+               ImmutableList<KeYJavaType> subTypes = environment.getServices().getJavaInfo().getAllSubtypes(kjt);
+               for(KeYJavaType subType : subTypes){
+                  Element subTypeElement = doc.createElement("subType");
+                  subTypeElement.appendChild(doc.createTextNode(subType.getFullName()));
+                  typeElement.appendChild(subTypeElement);
+               }
+            }
+            rootElement.appendChild(typeElement);
          }
       }
       return doc;
    }
    
    
-   private Document createDocumentSimple(IFile proofFile, Proof proof) throws ParserConfigurationException{
-      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-      
-      Document doc = docBuilder.newDocument();
-      
-      Element rootElement = doc.createElement("ProofMetaFile");
-      doc.appendChild(rootElement);
-      
-      Element proofFileHashCode = doc.createElement("proofFileHashCode");
-      String hashCode = String.valueOf(proofFile.hashCode());
-      proofFileHashCode.appendChild(doc.createTextNode(hashCode));
-      rootElement.appendChild(proofFileHashCode);
-      
-      KeYJavaType[] kjts = collectTypesForProof(proof);
-      int id = 0;
-      for(KeYJavaType kjt : kjts){
-         if(!addedTypes.contains(kjt)){
-            addedTypes.add(kjt);
-            Element element = doc.createElement("type");
-            element.setAttribute("id", id+"");
-            element.appendChild(doc.createTextNode(kjt.getFullName()));
-            id++;
-            rootElement.appendChild(element);
-         }
+   private KeYJavaType getKeYJavaType(IProofReference<?> proofRef){
+      KeYJavaType kjt = null;
+      Object target = proofRef.getTarget();
+      if(target instanceof IProgramMethod){
+         IProgramMethod progMeth = (IProgramMethod) target;
+         kjt = progMeth.getContainerType();
       }
-      return doc;
+      else if(target instanceof IProgramVariable){
+         IProgramVariable progVar = (IProgramVariable) target;
+         kjt = progVar.getKeYJavaType();
+      }
+      else if(target instanceof Contract){
+         Contract contract = (Contract) target;
+         kjt = contract.getKJT();
+         System.out.println("Contract");
+      }
+      else if(target instanceof ClassInvariant){
+         ClassInvariant classInv = (ClassInvariant) target;
+         kjt = classInv.getKJT();
+      }
+      else if(target instanceof ClassAxiom){
+         ClassAxiom classAx = (ClassAxiom) target;
+         kjt = classAx.getKJT();
+      }
+      return kjt;
    }
 
    
@@ -136,86 +135,5 @@ public class ProofMetaFileWriter {
          metaFile.create(null, true, null);
       }
       return metaFile;
-   }
-   
-   
-   private Element addSubTypes(Document doc, Element element, KeYJavaType kjt, int subCount){
-      ImmutableList<KeYJavaType> subTypes = environment.getServices().getJavaInfo().getAllSubtypes(kjt);
-      int subId = 0;
-      for(KeYJavaType subType : subTypes){
-         if(!addedTypes.contains(subType)){
-            addedTypes.add(subType);
-            String subString = computeSubString(subCount);
-            Element subElement = doc.createElement(subString + "Type");
-            subElement.appendChild(doc.createTextNode(subType.getFullName()));
-            subElement.setAttribute(subString + "Id", subId+"");
-            subId++;
-            
-            subElement = addSubTypes(doc, subElement, subType, subCount+1);
-            
-            element.appendChild(subElement);
-         }
-      }
-      return element;
-   }
-   
-   
-   private String computeSubString(int subCount){
-      String str = "";
-      for(int i = 0; i < subCount; i++){
-         if(i == 0){
-            str = str + "sub";
-         }
-         else{
-            str = str + "Sub";
-         }
-      }
-      return str;
-   }
-   
-   
-   private KeYJavaType[] collectTypesForProof(Proof proof){
-      Set<KeYJavaType> kjts = new LinkedHashSet<KeYJavaType>();
-      LinkedHashSet<IProofReference<?>> proofRefs = ProofReferenceUtil.computeProofReferences(proof);
-      for(IProofReference<?> proofRef : proofRefs){
-         KeYJavaType kjt = null;
-         Object target = proofRef.getTarget();
-         if(target instanceof IProgramMethod){
-            IProgramMethod progMeth = (IProgramMethod) target;
-            kjt = progMeth.getContainerType();
-         }
-         else if(target instanceof IProgramVariable){
-            IProgramVariable progVar = (IProgramVariable) target;
-            kjt = progVar.getKeYJavaType();
-         }
-         else if(target instanceof Contract){
-            Contract contract = (Contract) target;
-            kjt = contract.getKJT();
-         }
-         else if(target instanceof ClassInvariant){
-            ClassInvariant classInv = (ClassInvariant) target;
-            kjt = classInv.getKJT();
-         }
-         else if(target instanceof ClassAxiom){
-            ClassAxiom classAx = (ClassAxiom) target;
-            kjt = classAx.getKJT();
-         }
-         if(kjt != null){
-            if(!kjts.contains(kjt)){
-               kjts.add(kjt);
-            }
-//            if(proofRef.getKind().equals(IProofReference.CALL_METHOD)){
-//               ImmutableList<KeYJavaType> subTypes = environment.getServices().getJavaInfo().getAllSubtypes(kjt);
-//               for(KeYJavaType subType : subTypes){
-//                  if(!kjts.contains(subType)){
-//                     kjts.add(subType);
-//                  }
-//               }
-//            }
-         }
-         
-      }
-      
-      return KeY4EclipseResourcesUtil.sortKeYJavaTypes(kjts);
    }
 }
