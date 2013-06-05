@@ -417,7 +417,9 @@ public class ProofManager {
     */
    private Proof loadProof(File file){
       try{
-         KeYEnvironment<?> environment = KeYEnvironment.load(file, null, null);
+         File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+         List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+         KeYEnvironment<?> environment = KeYEnvironment.load(file, classPaths, bootClassPath);
          Proof proof = environment.getLoadedProof();
          if (proof != null) {
             proofs.add(proof);
@@ -426,7 +428,7 @@ public class ProofManager {
             }
          }
          return proof;
-      }catch(ProblemLoaderException e){
+      }catch(Exception e){
          LogUtil.getLogger().createErrorStatus(e);
          return null;
       }
