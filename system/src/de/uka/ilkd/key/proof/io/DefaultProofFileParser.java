@@ -558,6 +558,9 @@ public class DefaultProofFileParser implements IProofFileParser {
    }
 
     private static class SkipSMTRuleException extends Exception {
+
+        private static final long serialVersionUID = -2932282883810135168L;
+
     }
 
 }
