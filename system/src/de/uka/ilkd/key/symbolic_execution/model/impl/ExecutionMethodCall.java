@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -53,7 +54,7 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     */
    @Override
    public boolean isImplicitConstructor() {
-      return SymbolicExecutionUtil.isImplicitConstructor(getProgramMethod());
+      return KeYTypeUtil.isImplicitConstructor(getProgramMethod());
    }
 
    /**
@@ -77,8 +78,8 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
    @Override
    public IProgramMethod getExplicitConstructorProgramMethod() {
       IProgramMethod pm = getProgramMethod();
-      if (SymbolicExecutionUtil.isImplicitConstructor(pm)) {
-         return SymbolicExecutionUtil.findExplicitConstructor(getServices(), pm);
+      if (KeYTypeUtil.isImplicitConstructor(pm)) {
+         return KeYTypeUtil.findExplicitConstructor(getServices(), pm);
       }
       else {
          return null;

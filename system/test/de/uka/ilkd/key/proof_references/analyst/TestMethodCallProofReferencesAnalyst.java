@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.proof_references.analyst;
 
 import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
@@ -8,6 +21,25 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
  * @author Martin Hentschel
  */
 public class TestMethodCallProofReferencesAnalyst extends AbstractProofReferenceTestCase {
+   /**
+    * Tests "constructorTest".
+    */
+   public void testConstructorTest() throws Exception {
+      doReferenceMethodTest(keyRepDirectory, 
+                            "examples/_testcase/proofReferences/constructorTest/ConstructorTest.java", 
+                            "ConstructorTest", 
+                            "ConstructorTest", 
+                            false,
+                            new MethodCallProofReferencesAnalyst(),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<createObject>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<allocate>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<prepareEnter>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<prepare>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<init>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "A::magic"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "B::staticMagic"));
+   }
+   
    /**
     * Tests "methodCall".
     */

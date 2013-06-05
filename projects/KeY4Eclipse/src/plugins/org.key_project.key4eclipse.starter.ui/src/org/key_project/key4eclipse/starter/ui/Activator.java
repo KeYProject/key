@@ -15,7 +15,6 @@ package org.key_project.key4eclipse.starter.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.key_project.key4eclipse.starter.ui.util.EclipseEditFileActionHandler;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -42,8 +41,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		// Exchange the handler that is responsible to edit files
-		EclipseEditFileActionHandler.setInstance(new EclipseEditFileActionHandler());
 	}
 
 	/*
