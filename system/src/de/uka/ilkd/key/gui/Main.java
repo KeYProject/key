@@ -186,16 +186,6 @@ public class Main {
         }
     }
 
-
-    /**
-     * Returns the used title. This information is required in other
-     * projects which instantiates the {@link MainWindow} manually.
-     * @return The title of {@link MainWindow} to use.
-     */
-    public static String getMainWindowTitle() {
-        return "KeY " + KeYResourceManager.getManager().getVersion();
-    }
-
     /**
      * Register commandline options with command line object
      * @return commandline object
