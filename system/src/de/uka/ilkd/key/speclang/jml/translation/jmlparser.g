@@ -737,8 +737,24 @@ impliesexpr returns [SLExpression result=null] throws SLTranslationException
 	    (
 		IMPLIESBACKWARD expr=logicalorexpr
 		{
-		    result = new SLExpression(TB.imp(TB.convertToFormula(expr.getTerm(), services),
-		                                     TB.convertToFormula(result.getTerm(), services)));
+                    if (expr.isType()) {
+                        raiseError("Cannot negate type " + expr.getType().getName() + ".");
+                    }
+
+                    Term t = expr.getTerm();
+                    assert t != null;
+
+                    if (t.sort() == Sort.FORMULA) {
+                        result = new SLExpression(TB.or(TB.convertToFormula(result.getTerm(), services),
+                                                        TB.convertToFormula(TB.not(t), services)));
+                    } else if(t.sort() == booleanLDT.targetSort()) {
+                        result = new SLExpression(TB.or(TB.convertToFormula(result.getTerm(), services),
+                                                        TB.convertToFormula(
+                                                                TB.not(TB.equals(t, TB.TRUE(services))),
+                                                                services)));
+                    } else {
+                        raiseError("Wrong type in not-expression: " + t);
+                    }
 		}
 	    )+
 	)?

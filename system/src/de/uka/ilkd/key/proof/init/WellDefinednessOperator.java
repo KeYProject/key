@@ -24,12 +24,12 @@ public class WellDefinednessOperator {
     }
 
     // TODO: What about change of system state after valuation?
+    // TODO: select-terms? variables?
     public Term wd(Term t) {
         Operator op = t.op();
-        int subs = t.arity();
+        int subs = t.arity(); // number of subterms
         // Primary expressions
-        if (op.equals(Junctor.TRUE) || op.equals(Junctor.FALSE)) {
-            assert subs == 0;
+        if (subs == 0) {
             return primaryExpr(t);
         }
         // Logical operators
@@ -56,9 +56,9 @@ public class WellDefinednessOperator {
         }
         // Numerical operators
         else if (isUnaryNumericalOp(t)) {
-            assert subs == 1;
-            return num(t.sub(0));
-        } else if (isNumericalOp(t)) {
+            return num(t);
+        }
+        else if (isNumericalOp(t)) {
             assert subs == 2;
             if (isDivision(t) || isModulo(t)) {
                 return TB.and(TB.not(TB.equals(t.sub(1), TB.zero(services))),
@@ -90,23 +90,12 @@ public class WellDefinednessOperator {
     // true, false
     private Term primaryExpr(Term a) {
         int subs = a.arity();
-        assert subs == 0;
-        return TB.tt();
-    }
-
-    private Term num(Term t) {
-        int subs = t.arity();
-        Operator op = t.op();
-        assert subs <= 1;
-        assert op instanceof Function;
-        Function f = (Function)op;
-
-        if (op.toString().equalsIgnoreCase("Z")
-                || intLDT.hasLiteralFunction(f)) {
+        Operator op = a.op();
+        if (op.equals(Junctor.TRUE) || op.equals(Junctor.FALSE)) {
+            assert subs == 0;
             return TB.tt();
-        } else {
-            return wd(t);
         }
+        return TB.ff();
     }
 
     // a || b
@@ -138,6 +127,32 @@ public class WellDefinednessOperator {
     private boolean isInv(Term t) {
         Operator op = t.op();
         return op.name().toString().endsWith("<inv>");
+    }
+
+    private Term num(Term t) {
+        int subs = t.arity();
+        Operator op = t.op();
+        String s = t.toString();
+
+        assert subs <= 1;
+        assert op instanceof Function;
+        Function f = (Function)op;
+
+        if (f.equals(intLDT.getNumberSymbol())
+                || f.equals(intLDT.getJavaUnaryMinusInt())
+                || f.equals(intLDT.getJavaUnaryMinusLong())
+                || f.equals(intLDT.getJavaBitwiseNegation())) {
+            assert subs == 1;
+            return num(t.sub(0));
+        } else if (intLDT.hasLiteralFunction(f)
+                && !f.equals(intLDT.getNumberTerminator())) {
+            assert subs == 1;
+            return num(t.sub(0));
+        } else {
+            assert f.equals(intLDT.getNumberTerminator());
+            assert subs == 0;
+            return TB.tt();
+        }
     }
 
     private boolean isEqualityPredicateOp(Term t) {
