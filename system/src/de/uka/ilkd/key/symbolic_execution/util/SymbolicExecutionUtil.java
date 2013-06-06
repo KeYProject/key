@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,10 +40,8 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -100,6 +97,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.ITermLabelWorker;
@@ -123,7 +121,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -851,10 +848,10 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = findExplicitConstructor(node.proof().getServices(), pm);
+               if (KeYTypeUtil.isImplicitConstructor(pm)) {
+                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
                   return explicitConstructor != null && 
-                         !isLibraryClass(explicitConstructor.getContainerType());
+                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
                }
                else {
                   return !pm.isImplicit(); // Do not include implicit methods, but always constructors
@@ -867,61 +864,6 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
-      }
-   }
-   
-   /**
-    * Checks if the given {@link KeYJavaType} is a library class.
-    * @param kjt The {@link KeYJavaType} to check.
-    * @return {@code true} is library class, {@code false} is no library class.
-    */
-   public static boolean isLibraryClass(KeYJavaType kjt) {
-      return kjt != null && 
-             kjt.getJavaType() instanceof TypeDeclaration && 
-             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass();
-   }
-   
-   /**
-    * Checks if the given {@link IProgramMethod} is an implicit constructor.
-    * @param pm The {@link IProgramMethod} to check.
-    * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g. method or explicit construcotr).
-    */
-   public static boolean isImplicitConstructor(IProgramMethod pm) {
-      return pm != null && ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER.equals(pm.getName());
-   }
-
-   /**
-    * Returns the {@link IProgramMethod} of the explicit constructor for
-    * the given implicit constructor.
-    * @param services The {@link Services} to use.
-    * @param implicitConstructor The implicit constructor.
-    * @return The found explicit constructor or {@code null} if not available.
-    */
-   public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
-      if (services != null && implicitConstructor != null) {
-         ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
-         return JavaUtil.search(pms, new IFilter<IProgramMethod>() {
-            @Override
-            public boolean select(IProgramMethod element) {
-               if (implicitConstructor.getParameterDeclarationCount() == element.getParameterDeclarationCount()) {
-                  Iterator<ParameterDeclaration> implicitIter = implicitConstructor.getParameters().iterator();
-                  Iterator<ParameterDeclaration> elementIter = element.getParameters().iterator();
-                  boolean sameTypes = true;
-                  while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
-                     ParameterDeclaration implicitNext = implicitIter.next();
-                     ParameterDeclaration elementNext = elementIter.next();
-                     sameTypes = implicitNext.getTypeReference().equals(elementNext.getTypeReference());
-                  }
-                  return sameTypes;
-               }
-               else {
-                  return false;
-               }
-            }
-         });
-      }
-      else {
-         return null;
       }
    }
    
@@ -2042,21 +1984,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * This method should be called before the auto mode is started in
-    * context of symbolic execution. The method sets {@link StrategyProperties}
-    * of the auto mode which are not supported in context of symbolic execution
-    * to valid default values.
-    * @param proof The {@link Proof} to configure its {@link StrategyProperties} for symbolic execution.
-    */
-   public static void updateStrategyPropertiesForSymbolicExecution(Proof proof) {
-      if (proof != null) {
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
-         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-      }
-   }
-
-   /**
     * Checks if the given {@link Term} is null in the {@link Sequent} of the given {@link Node}. 
     * @param services The {@link Services} to use.
     * @param node The {@link Node} which provides the original {@link Sequent}
@@ -2381,33 +2308,44 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Configures the proof to use operation contracts or to expand methods instead.
+    * Configures the proof to use the given settings.
     * @param proof The {@link Proof} to configure.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
+    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
     */
-   public static void setUseOperationContracts(Proof proof, boolean useOperationContracts) {
+   public static void updateStrategySettings(Proof proof, 
+                                             boolean useOperationContracts,
+                                             boolean useLoopInvariants,
+                                             boolean aliasChecksImmediately) {
       if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
                                        StrategyProperties.METHOD_CONTRACT : 
                                        StrategyProperties.METHOD_EXPAND;
+         String loopTreatmentValue = useLoopInvariants ? 
+                                     StrategyProperties.LOOP_INVARIANT : 
+                                     StrategyProperties.LOOP_EXPAND;
+         String aliasChecksValue = aliasChecksImmediately ? 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
+         updateStrategySettings(proof, sp);
       }
    }
 
    /**
-    * Configures the proof to use loop invariants or to expand loops instead.
+    * Configures the proof to use the given {@link StrategyProperties}.
     * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param sb The {@link StrategyProperties} to set.
     */
-   public static void setUseLoopInvariants(Proof proof, boolean useLoopInvariants) {
+   public static void updateStrategySettings(Proof proof, 
+                                             StrategyProperties sp) {
       if (proof != null && !proof.isDisposed()) {
-         String loopTreatmentValue = useLoopInvariants ? 
-                                     StrategyProperties.LOOP_INVARIANT : 
-                                     StrategyProperties.LOOP_EXPAND;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         assert sp != null;
+         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
@@ -2423,22 +2361,6 @@ public final class SymbolicExecutionUtil {
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
-      }
-   }
-   
-   /**
-    * Configures the proof to do alias checks or not.
-    * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
-    */
-   public static void setAliasChecks(Proof proof, boolean immediately) {
-      if (proof != null && !proof.isDisposed()) {
-         String aliasChecksValue = immediately ? 
-                                   SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY : 
-                                   SymbolicExecutionStrategy.ALIAS_CHECK_NEVER;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
    

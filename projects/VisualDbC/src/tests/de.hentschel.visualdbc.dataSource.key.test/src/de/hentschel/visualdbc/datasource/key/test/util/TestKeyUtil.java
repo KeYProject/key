@@ -1085,6 +1085,40 @@ public final class TestKeyUtil {
       con.addInterface(interfaceA);
       return con;
    }
+
+   /**
+    * Creates the expected model for the constructor example with
+    * {@link DSPackageManagement#FLAT_LIST}
+    * @return The expected model.
+    */
+   public static IDSConnection createExpectedConstructorTestModel() {
+      MemoryConnection con = new MemoryConnection();
+      MemoryClass classA = new MemoryClass("A", DSVisibility.PUBLIC);
+      classA.getExtendsFullnames().add("java.lang.Object");
+      MemoryMethod classAmagic = new MemoryMethod("magic()", "int", DSVisibility.PUBLIC);
+      MemoryMethod classAstaticMagic = new MemoryMethod("staticMagic()", "int", DSVisibility.PUBLIC, true);
+      classA.addMethod(classAmagic);
+      classA.addMethod(classAstaticMagic);
+      classA.addConstructor(createDefaultConstructor("A()", null, false));
+      MemoryClass classB = new MemoryClass("B", DSVisibility.PUBLIC);
+      classB.getExtendsFullnames().add("A");
+      classB.getExtends().add(classA);
+      MemoryMethod classBstaticMagic = new MemoryMethod("staticMagic()", "int", DSVisibility.PUBLIC, true);
+      classB.addMethod(classBstaticMagic);
+      classB.addConstructor(createDefaultConstructor("B()", null, false));
+      MemoryClass classConstructor = new MemoryClass("ConstructorTest", DSVisibility.PUBLIC);
+      classConstructor.getExtendsFullnames().add("java.lang.Object");
+      classConstructor.addAttribute(new MemoryAttribute("value", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
+      MemoryConstructor classConstructorConstructor = new MemoryConstructor("ConstructorTest(x : int, a : B)", DSVisibility.PUBLIC);
+      classConstructor.addConstructor(classConstructorConstructor);
+      MemoryOperationContract classConstructorConstructorOC = new MemoryOperationContract("ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML operation contract.0", "!a = null", "(   exc = null\n   -> self.value = javaSubInt(42, 4711) & self.<inv>)\n& exc = null", "mod[heap]: allLocs", "diamond");
+      addAllOperationContractObligations(classConstructorConstructorOC);
+      classConstructorConstructor.addOperationContract(classConstructorConstructorOC);
+      con.addClass(classA);
+      con.addClass(classB);
+      con.addClass(classConstructor);
+      return con;
+   }
    
    /**
     * Creates the expected model for the generalization example with
