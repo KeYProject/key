@@ -656,7 +656,8 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
-    |   NOT_SPECIFIED
+    |   n:NOT_SPECIFIED 
+        { result = translator.createSkolemExprBool(n).getTerm(); }
     |   SAME
     ;
 
