@@ -407,14 +407,14 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
 
 requiresclause returns [Term result = null] throws SLTranslationException
 :
-    req:REQUIRES result=termexpression
+    req:REQUIRES result=predornot
             { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
-    ens:ENSURES result=termexpression
+    ens:ENSURES result=predornot
             { result = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
