@@ -274,7 +274,7 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
        */
       protected void fireCurrentProofsChangedThreadSave() {
          final Shell shell = editor.getSite().getShell();
-         if (!shell.isDisposed()) {
+         if (shell != null && !shell.isDisposed()) {
             shell.getDisplay().syncExec(new Runnable() {
                @Override
                public void run() {

@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.w3c.dom.Document;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -40,11 +42,11 @@ public class ProofMetaFileWriter {
    private LinkedHashSet<KeYJavaType> addedTypes;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
-   public IFile writeMetaFile(IFile proofFile, Proof proof, KeYEnvironment<CustomConsoleUserInterface> env) {
+   public IFile writeMetaFile(IFile proofFile, ProofElement pe) {
       try{
-         this.environment = env;
+         this.environment = pe.getKeYEnvironment();
          this.addedTypes = new LinkedHashSet<KeYJavaType>();
-         Document doc = createDoument(proofFile, proof);
+         Document doc = createDoument(proofFile, pe);
          
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
@@ -63,7 +65,7 @@ public class ProofMetaFileWriter {
    }
    
    
-   private Document createDoument(IFile proofFile, Proof proof) throws ParserConfigurationException{
+   private Document createDoument(IFile proofFile, ProofElement pe) throws ParserConfigurationException{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
@@ -76,7 +78,7 @@ public class ProofMetaFileWriter {
       String hashCode = String.valueOf(proofFile.hashCode());
       proofFileHashCode.appendChild(doc.createTextNode(hashCode));
       rootElement.appendChild(proofFileHashCode);
-      LinkedHashSet<IProofReference<?>> proofReferences = ProofReferenceUtil.computeProofReferences(proof);
+      LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          KeYJavaType kjt = getKeYJavaType(proofRef);
          if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt)){

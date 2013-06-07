@@ -65,6 +65,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -133,13 +134,13 @@ public class ProofManager {
          monitor.subTask("Build " + pe.getProofObl().name());
          IFolder proofFolder = createProofFolder(pe.getJavaFile());
          IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
-         Proof proof = processProof(pe.getProofObl(), proofFile);
-         markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
-         if(proof != null){
+         pe = processProof(pe, proofFile);
+         markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+         if(pe.getProof() != null){
             proofFiles.add(proofFile);
-            KeYUtil.saveProof(proof, proofFile);
+            KeYUtil.saveProof(pe.getProof(), proofFile);
             
-            IFile metaFile = saveMetaFile(proofFile, proof);
+            IFile metaFile = saveMetaFile(proofFile, pe);
             if(metaFile != null){
                proofFiles.add(metaFile);
             }
@@ -225,17 +226,18 @@ public class ProofManager {
    }
    
    
-   private void runProof(ProofElement pe, IFile proofFile) throws Exception{
+   private ProofElement runProof(ProofElement pe, IFile proofFile) throws Exception{
       markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
-      Proof proof = processProof(pe.getProofObl(), proofFile);
-      markerManager.setMarker(proof, pe.getSourceLocation(), pe.getJavaFile(), proofFile);
-      if(proof != null){
-         KeYUtil.saveProof(proof, proofFile);
-         IFile metaFile = saveMetaFile(proofFile, proof);
+      pe = processProof(pe, proofFile);
+      markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+      if(pe.getProof() != null){
+         KeYUtil.saveProof(pe.getProof(), proofFile);
+         IFile metaFile = saveMetaFile(proofFile, pe);
          if(metaFile == null){
             System.out.println("Warning: no meta file created for " + proofFile.getName());
          }
       }
+      return pe;
    }
       
       
@@ -260,7 +262,7 @@ public class ProofManager {
                }
                else{
                   if(subTypesChanged(pmfr)){
-                     runProof(pe, proofFile);
+                     pe = runProof(pe, proofFile);
                   }
                }
             }
@@ -271,7 +273,6 @@ public class ProofManager {
          else{
             runProof(pe, proofFile);
          }
-                              
          
          if(autoDeleteProofFiles){
             proofFiles.add(proofFile);
@@ -279,10 +280,25 @@ public class ProofManager {
          }
          monitor.worked(1);
       }
+      
+      for(ProofElement pe : proofElements){
+         checkContractRecursion(pe, proofElements);
+      }
+      
       if(autoDeleteProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
       }
       monitor.done();
+   }
+   
+   
+   private void checkContractRecursion(ProofElement pe, LinkedList<ProofElement> proofElements){
+      LinkedList<Contract> proofRefContracts = getProofRefContracts(pe);
+   }
+   
+   
+   private LinkedList<Contract> getProofRefContracts(ProofElement pe){
+      return null;
    }
    
    
@@ -319,7 +335,7 @@ public class ProofManager {
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
                ProofOblInput obl = contract.createProofObl(environment.getInitConfig(), contract);
-               proofElements.add(new ProofElement(obl, javaFile, scl, type));
+               proofElements.add(new ProofElement(obl, javaFile, scl, type, environment, contract));
             }
          }
       }
@@ -447,19 +463,18 @@ public class ProofManager {
     * @return - the created {@link Proof}
     * @throws Exception
     */
-   private Proof processProof(ProofOblInput obl, IFile file) throws Exception{      
-      Proof proof;
+   private ProofElement processProof(ProofElement pe, IFile file) throws Exception{      
       if(!file.exists()){
-         proof = createProof(obl);
+         pe = createProof(pe);
       }
       else{
          File proofFile = file.getLocation().toFile();
-         proof = loadProof(proofFile);
-         if(proof == null){
-            proof = createProof(obl);
+         pe = loadProof(pe, proofFile);
+         if(pe.getProof() == null){
+            pe = createProof(pe);
          }
       }
-      return proof;  
+      return pe;  
    }
    
    
@@ -468,12 +483,13 @@ public class ProofManager {
     * @param obl - the given {@link ProofOblInput}
     * @return the created {@link Proof}
     */
-   private Proof createProof(ProofOblInput obl){
+   private ProofElement createProof(ProofElement pe){
       try{
-         Proof proof = environment.createProof(obl);
+         Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
          proofs.add(proof);
-         environment.getUi().startAndWaitForAutoMode(proof);
-         return proof;
+         pe.getKeYEnvironment().getUi().startAndWaitForAutoMode(proof);
+         pe.setProof(proof);
+         return pe;
       }catch(ProofInputException e){
          LogUtil.getLogger().createErrorStatus(e);
          return null;
@@ -486,22 +502,22 @@ public class ProofManager {
     * @param file - the given {@link IFile}
     * @return the loaded {@link Proof}
     */
-   private Proof loadProof(File file){
+   private ProofElement loadProof(ProofElement pe, File file){
       try{
-         KeYEnvironment<?> loadEnvironment = KeYEnvironment.load(file, null, null);
-         Proof proof = loadEnvironment.getLoadedProof();
-         
-//         KeYEnvironment<?> environment = KeYEnvironment.load(file, null, null);
-//         Proof proof = environment.getLoadedProof();
+         KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(file, null, null);
+         Proof proof = loadEnv.getLoadedProof();
+         pe.setKeYEnvironment(loadEnv);
+         pe.setProof(proof);
          if (proof != null) {
             proofs.add(proof);
             if (!proof.closed()){
                environment.getUi().startAndWaitForAutoMode(proof);
             }
          }
-         return proof;
-      }catch(ProblemLoaderException e){
+         return pe;
+      }catch(Exception e){
          LogUtil.getLogger().createErrorStatus(e);
+         e.printStackTrace();
          return null;
       }
    }
@@ -699,8 +715,8 @@ public class ProofManager {
    }
    
    
-   private IFile saveMetaFile(IFile proofFile, Proof proof) throws  TransformerException, CoreException{
+   private IFile saveMetaFile(IFile proofFile, ProofElement pe) throws  TransformerException, CoreException{
       ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
-      return metaFileWriter.writeMetaFile(proofFile, proof, environment);
+      return metaFileWriter.writeMetaFile(proofFile, pe);
    }
 }
