@@ -608,7 +608,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=breaks_clause         { sc.addBreaks(ps); }
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }
-    |   ps=respects_clause       { sc.addRespects(ps); }
+        |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
     )
     {
     	if(b == Behavior.EXCEPTIONAL_BEHAVIOR 
@@ -640,11 +640,11 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 
 
-respects_clause
+separates_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    (RESPECTS | SEPARATES) result=expression { result = result.prepend("respects "); }
+    (RESPECTS | SEPARATES) result=expression { result = result.prepend("separates "); }
 ;
 
 
@@ -1122,7 +1122,7 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
             ps=loop_invariant       { ls.addInvariant(ps); }
-        |   ps=respects_clause      { ls.addRespects(ps); }
+        |   ps=separates_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )*

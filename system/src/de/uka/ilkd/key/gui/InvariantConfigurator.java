@@ -130,7 +130,7 @@ public class InvariantConfigurator {
             private Term variantTerm = null;
             private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
             private Map<LocationVariable,
-                        ImmutableList<InfFlowSpec>> respectsInfFlowSpecs
+                        ImmutableList<InfFlowSpec>> infFlowSpecs
                     = new LinkedHashMap<LocationVariable,
                                         ImmutableList<InfFlowSpec>>();
             private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
@@ -138,7 +138,7 @@ public class InvariantConfigurator {
             private static final String INVARIANTTITLE = "Invariant%s: ";
             private static final String VARIANTTITLE = "Variant%s: ";
             private static final String MODIFIESTITLE = "Modifies%s: ";
-            private static final String RESPECTSTITLE = "Respects%s: ";
+            private static final String INFFLOWSPECTITLE = "InfFlowSpec%s: ";
 
 
             /**
@@ -297,9 +297,9 @@ public class InvariantConfigurator {
                   if (infFlowSpecs == null) {
                     loopInvTexts[RSP_IDX].put(heap.toString(), "noInfFlowSpec");
                   } else {
-                      // XXX why only for seperates? (CS)
+                      // XXX why only for separates? (CS)
                       for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                          for (Term t : infFlowSpec.seperates) {
+                          for (Term t : infFlowSpec.separates) {
                               loopInvTexts[RSP_IDX].put(heap.toString(), printTerm(t, false));
                           }
                       }                                        
@@ -371,9 +371,9 @@ public class InvariantConfigurator {
                 JTabbedPane respPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 Map<String,String> resps = invariants.get(i)[RSP_IDX];
                 for(String k : resps.keySet()) {
-                   String title = String.format(RESPECTSTITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                   String title = String.format(INFFLOWSPECTITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    JTextArea textArea = createInputTextArea(title, resps.get(k), i);
-                   setRespectsListener(textArea, k, i);
+                   setInfFlowSpecListener(textArea, k, i);
                    respPane.add(k, textArea);
                 }
 
@@ -466,7 +466,7 @@ public class InvariantConfigurator {
                 });
             }
             
-            private void setRespectsListener(JTextArea ta, final String key, int i) {
+            private void setInfFlowSpecListener(JTextArea ta, final String key, int i) {
                 index = i;
                 ta.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -716,7 +716,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, respectsInfFlowSpecs, variantTerm, loopInv
+                            invariantTerm, modifiesTerm, infFlowSpecs, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv.getLocalIns(),
                                     loopInv.getLocalOuts(), loopInv.getInternalAtPres());
                     return true;
@@ -750,7 +750,7 @@ public class InvariantConfigurator {
                 }
                 LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 try {
-                    respectsInfFlowSpecs.put(baseHeap, parseRespects(baseHeap));
+                    infFlowSpecs.put(baseHeap, parseInfFlowSpec(baseHeap));
                     setOK(respErrors,respCols,baseHeap.toString());
                   } catch (Exception e) {
                       setError(respErrors,respCols,baseHeap.toString(),e.getMessage());
@@ -870,7 +870,7 @@ public class InvariantConfigurator {
                 return result;
             }
             
-            protected ImmutableList<InfFlowSpec> parseRespects(LocationVariable heap) throws Exception {
+            protected ImmutableList<InfFlowSpec> parseInfFlowSpec(LocationVariable heap) throws Exception {
                 Term res = null;
                 //ImmutableList<ImmutableList<Term>> result = null;
                 index = inputPane.getSelectedIndex();

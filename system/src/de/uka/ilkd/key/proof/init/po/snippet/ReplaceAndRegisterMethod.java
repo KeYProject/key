@@ -81,9 +81,9 @@ abstract class ReplaceAndRegisterMethod {
     final InfFlowSpec replace(InfFlowSpec terms,
                               StateVars origVars,
                               StateVars poVars) {
-        ImmutableList<Term> resultSeperates = ImmutableSLList.<Term>nil();
-        for (Term t : terms.seperates) {
-            resultSeperates = resultSeperates.append(replace(t, origVars, poVars));
+        ImmutableList<Term> resultSeparates = ImmutableSLList.<Term>nil();
+        for (Term t : terms.separates) {
+            resultSeparates = resultSeparates.append(replace(t, origVars, poVars));
         }
         ImmutableList<Term> resultDeclassifies = ImmutableSLList.<Term>nil();
         for (Term t : terms.declassifies) {
@@ -97,7 +97,7 @@ abstract class ReplaceAndRegisterMethod {
         for (Term t : terms.newObjects) {
             resultErases = resultErases.append(replace(t, origVars, poVars));
         }
-        return new InfFlowSpec(resultSeperates, resultDeclassifies,
+        return new InfFlowSpec(resultSeparates, resultDeclassifies,
                                resultErases, resultNewObjecs);
     }
 

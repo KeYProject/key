@@ -48,7 +48,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
 
-    private ImmutableList<PositionedString> respects =
+    private ImmutableList<PositionedString> infFlowSpecs =
             ImmutableSLList.<PositionedString>nil();
     
     private Map<String, ImmutableList<PositionedString>>
@@ -198,13 +198,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public void addRespects(PositionedString ps) {
-        respects = respects.append(ps);
+    public void addInfFlowSpecs(PositionedString ps) {
+        infFlowSpecs = infFlowSpecs.append(ps);
     }
 
 
-    public void addRespects(ImmutableList<PositionedString> l) {
-        respects = respects.append(l);
+    public void addInfFlowSpecs(ImmutableList<PositionedString> l) {
+        infFlowSpecs = infFlowSpecs.append(l);
     }
 
 
@@ -293,8 +293,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public ImmutableList<PositionedString> getRespects() {
-        return respects;
+    public ImmutableList<PositionedString> getInfFlowSpecs() {
+        return infFlowSpecs;
     }
 
 
@@ -354,9 +354,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("returns: ").append(it.next()).append("\n");
         }
-        it = respects.iterator();
+        it = infFlowSpecs.iterator();
         while (it.hasNext()) {
-            sb.append("respects: ").append(it.next()).append("\n");
+            sb.append("separates: ").append(it.next()).append("\n");
         }
         return sb.toString();
     }
@@ -381,7 +381,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
-               && respects.equals(sc.respects);
+               && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
 
@@ -400,6 +400,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + breaks.hashCode()
                + continues.hashCode()
                + returns.hashCode()
-               + respects.hashCode();
+               + infFlowSpecs.hashCode();
     }
 }

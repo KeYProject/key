@@ -347,7 +347,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = ensuresclause
     |   result = representsclause
     |   result = requiresclause
-    |   result = respectsclause
+    |   result = separatesclause
     |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
@@ -457,7 +457,7 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
 
 
-respectsclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
     ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
     ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
     ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
@@ -465,22 +465,22 @@ respectsclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] t
     ImmutableList<Term> tmp;
 }
 :
-    (RESPECTS | SEPARATES) (NOTHING | sep = respectslist)
-    (   (DECLASSIFIES (NOTHING | tmp = respectslist {decl = decl.append(tmp);})) |
-        (ERASES (NOTHING | tmp = respectslist {erases = erases.append(tmp);})) |
-        (NEW_OBJECTS (NOTHING | tmp = respectslist {new = new.append(tmp);}))
+    (RESPECTS | SEPARATES) (NOTHING | sep = separateslist)
+    (   (DECLASSIFIES (NOTHING | tmp = separateslist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = separateslist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = separateslist {new = new.append(tmp);}))
     )*
     {result = new InfFlowSpec(sep, decl, erases, new);}
     ;
 
 
-respectslist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+separateslist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
-        { result = translator.translate("respects", ImmutableList.class, result, services); }
+        { result = translator.translate("separates", ImmutableList.class, result, services); }
     ;
 
 

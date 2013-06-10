@@ -377,7 +377,7 @@ public class JMLSpecFactory {
         clauses.infFlowSpecs =
                 translateInfFlowSpecClauses(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar,
-                                            textualSpecCase.getRespects());
+                                            textualSpecCase.getInfFlowSpecs());
         return clauses;
     }
 
@@ -1216,14 +1216,14 @@ public class JMLSpecFactory {
                                                 Map<String,ImmutableList<PositionedString>>
                                                         originalAssignables,
                                                 ImmutableList<PositionedString>
-                                                        originalRespects,
+                                                        originalInfFlowSpecs,
                                                 PositionedString originalVariant)
             throws SLTranslationException {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
         assert originalAssignables != null;
-        assert originalRespects != null;
+        assert originalInfFlowSpecs != null;
 
         //create variables for self, parameters, other relevant local variables 
         //(disguised as parameters to the translator) and the map for 
@@ -1294,20 +1294,19 @@ public class JMLSpecFactory {
            mods.put(services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h)), a);
         }
         
-        //translateToListOfTermLists respects
         ImmutableList<InfFlowSpec>
                 infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        if(!originalRespects.isEmpty()) {
+        if(!originalInfFlowSpecs.isEmpty()) {
             infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, paramVars,
-                                                           resultVar, originalRespects);
+                                                           resultVar, originalInfFlowSpecs);
         }
         
         Map<LocationVariable,
             ImmutableList<InfFlowSpec>>
-                respects = new LinkedHashMap<LocationVariable,
+                infFlowSpecs = new LinkedHashMap<LocationVariable,
                                              ImmutableList<InfFlowSpec>>();
-        respects.put(baseHeap, infFlowSpecTermList);
+        infFlowSpecs.put(baseHeap, infFlowSpecTermList);
 
         //translateToTerm variant
         Term variant;
@@ -1332,7 +1331,7 @@ public class JMLSpecFactory {
                                      null,
                                      invariants,
                                      mods,
-                                     respects,
+                                     infFlowSpecs,
                                      variant,
                                      selfTerm,
                                      localIns,
@@ -1349,7 +1348,7 @@ public class JMLSpecFactory {
                                       loop,
                                       textualLoopSpec.getInvariants(),
                                       textualLoopSpec.getAssignables(),
-                                      textualLoopSpec.getRespects(),
+                                      textualLoopSpec.getInfFlowSpecs(),
                                       textualLoopSpec.getVariant());
     }
 

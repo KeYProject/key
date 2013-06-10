@@ -425,14 +425,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
             infFlowSpecs =
                     infFlowSpecs.tail()
                         .prepend(new InfFlowSpec
-                        (baseInfFlowSpec.seperates.removeFirst(oldGuard).append(guardTerm),
+                        (baseInfFlowSpec.separates.removeFirst(oldGuard).append(guardTerm),
                          baseInfFlowSpec.declassifies,
                          baseInfFlowSpec.erases,
                          baseInfFlowSpec.newObjects));
         } else {
             infFlowSpecs =
                     infFlowSpecs.tail().prepend(new InfFlowSpec
-                                            (baseInfFlowSpec.seperates.append(guardTerm),
+                                            (baseInfFlowSpec.separates.append(guardTerm),
                                              baseInfFlowSpec.declassifies,
                                              baseInfFlowSpec.erases,
                                              baseInfFlowSpec.newObjects));

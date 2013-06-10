@@ -400,11 +400,11 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newPreconditions,
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
-                                final ImmutableList<InfFlowSpec> newRespects,
+                                final ImmutableList<InfFlowSpec> newinfFlowSpecs,
                                 final Variables newVariables) {
         return new SimpleBlockContract(newBlock, labels, method, modality,
                                        newPreconditions, newPostconditions,
-                                       newModifiesClauses, newRespects,
+                                       newModifiesClauses, newinfFlowSpecs,
                                        newVariables,
                                        transactionApplicable, hasMod);
     }

@@ -396,23 +396,23 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private String getHTMLFor(ImmutableList<InfFlowSpec> originalInfFlowSpecs,
                               String htmlName,
                               Services services) {
-        String respects = "";
+        String infFlowSpecString = "";
         if (hasInfFlowSpec()) {
-            respects = "<br><b>" + htmlName + "</b> ";
+            infFlowSpecString = "<br><b>" + htmlName + "</b> ";
             for (InfFlowSpec infFlowSpec : originalInfFlowSpecs) {
-                respects += "(" + getHTMLFor(infFlowSpec.seperates, services) + ")";
+                infFlowSpecString += "(" + getHTMLFor(infFlowSpec.separates, services) + ")";
                 if (!infFlowSpec.declassifies.isEmpty()) {
-                    respects += ", declassifies (" + getHTMLFor(infFlowSpec.declassifies, services) + ")";
+                    infFlowSpecString += ", declassifies (" + getHTMLFor(infFlowSpec.declassifies, services) + ")";
                 }
                 if (!infFlowSpec.erases.isEmpty()) {
-                    respects += ", erases (" + getHTMLFor(infFlowSpec.erases, services) + ")";
+                    infFlowSpecString += ", erases (" + getHTMLFor(infFlowSpec.erases, services) + ")";
                 }
                 if (!infFlowSpec.newObjects.isEmpty()) {
-                    respects += ", new objects (" + getHTMLFor(infFlowSpec.newObjects, services) + ")";
+                    infFlowSpecString += ", new objects (" + getHTMLFor(infFlowSpec.newObjects, services) + ")";
                 }
             }
         }
-        return respects;
+        return infFlowSpecString;
     }
     
 

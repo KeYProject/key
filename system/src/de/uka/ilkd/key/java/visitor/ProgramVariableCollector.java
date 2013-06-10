@@ -116,7 +116,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                    x.getInfFlowSpecs(heap, selfTerm, atPres, services);
             if (infFlowSpecs != null) {
                 for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                    for (Term t: infFlowSpec.seperates) {
+                    for (Term t: infFlowSpec.separates) {
                         t.execPostOrder(tpvc);
                     }
                     for (Term t: infFlowSpec.declassifies) {
@@ -165,7 +165,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
         for (InfFlowSpec ts : infFlowSpecs) {
-            for (Term t : ts.seperates) {
+            for (Term t : ts.separates) {
                 t.execPostOrder(collector);
             }
             for (Term t : ts.declassifies) {

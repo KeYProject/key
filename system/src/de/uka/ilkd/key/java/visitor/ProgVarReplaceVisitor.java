@@ -214,8 +214,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableList<InfFlowSpec>
                     res = ImmutableSLList.<InfFlowSpec>nil();
         for (final InfFlowSpec innerTerms : terms) {
-            final ImmutableList<Term> renamedSeperates =
-                    replaceVariablesInTerms(innerTerms.seperates);
+            final ImmutableList<Term> renamedSeparates =
+                    replaceVariablesInTerms(innerTerms.separates);
             final ImmutableList<Term> renamedDeclassifies =
                     replaceVariablesInTerms(innerTerms.declassifies);
             final ImmutableList<Term> renamedErases =
@@ -223,7 +223,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final ImmutableList<Term> renamedNewObjects =
                     replaceVariablesInTerms(innerTerms.newObjects);
             res = res.append(
-                    new InfFlowSpec(renamedSeperates, renamedDeclassifies,
+                    new InfFlowSpec(renamedSeparates, renamedDeclassifies,
                                     renamedErases, renamedNewObjects));
         }
         return res;
@@ -270,10 +270,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                    replaceVariablesInTerm(
                                            oldContract.getModifiesClause(heap, services)));
         }
-        final ImmutableList<InfFlowSpec> newRespects =
+        final ImmutableList<InfFlowSpec> newInfFlowSpecs =
                 replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
         return oldContract.update(newBlock, newPreconditions, newPostconditions,
-                                  newModifiesClauses, newRespects, newVariables);
+                                  newModifiesClauses, newInfFlowSpecs, newVariables);
     }
 
     private BlockContract.Variables replaceBlockContractVariables(
