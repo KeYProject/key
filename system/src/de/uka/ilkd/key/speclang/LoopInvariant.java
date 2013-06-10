@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 
@@ -64,24 +65,18 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
 
     /**
-     * Returns the respects clause.
+     * Returns the information flow specification clause.
      */
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects(LocationVariable heap);
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap);
 
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects(Services services);
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services);
 
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects(LocationVariable heap,
-                                                                  Term selfTerm,
-                                                                  Map<LocationVariable,Term> atPres,
-                                                                  Services services);
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap,
+                                                      Term selfTerm,
+                                                      Map<LocationVariable, Term> atPres,
+                                                      Services services);
 
-    public boolean hasRespects(Services services);
+    public boolean hasInfFlowSpec(Services services);
 
     /**
      * Returns the variant term. 
@@ -122,9 +117,7 @@ public interface LoopInvariant extends SpecificationElement {
     public Map<LocationVariable,Term> getInternalModifies();
 
     public Map<LocationVariable,
-               ImmutableList<Triple<ImmutableList<Term>,
-                                    ImmutableList<Term>,
-                                    ImmutableList<Term>>>> getInternalRespects();
+               ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
 
     /**
      * Returns a new loop invariant where the loop reference has been

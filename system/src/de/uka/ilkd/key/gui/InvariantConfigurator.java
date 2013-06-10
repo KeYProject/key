@@ -48,6 +48,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -129,13 +130,9 @@ public class InvariantConfigurator {
             private Term variantTerm = null;
             private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
             private Map<LocationVariable,
-                        ImmutableList<Triple<ImmutableList<Term>,
-                                             ImmutableList<Term>,
-                                             ImmutableList<Term>>>> respectsTermList
+                        ImmutableList<InfFlowSpec>> respectsInfFlowSpecs
                     = new LinkedHashMap<LocationVariable,
-                                        ImmutableList<Triple<ImmutableList<Term>,
-                                                             ImmutableList<Term>,
-                                                             ImmutableList<Term>>>>();
+                                        ImmutableList<InfFlowSpec>>();
             private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
 
             private static final String INVARIANTTITLE = "Invariant%s: ";
@@ -294,16 +291,15 @@ public class InvariantConfigurator {
                 loopInvTexts[RSP_IDX] = new LinkedHashMap<String,String>();
 
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                  final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
-                          respects = loopInv.getRespects(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                  final ImmutableList<InfFlowSpec>
+                          infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
-                  if (respects == null) {                    
-                    loopInvTexts[RSP_IDX].put(heap.toString(), "noRespects");
+                  if (infFlowSpecs == null) {
+                    loopInvTexts[RSP_IDX].put(heap.toString(), "noInfFlowSpec");
                   } else {
-                      for (Triple<ImmutableList<Term>,
-                                  ImmutableList<Term>,
-                                  ImmutableList<Term>> trip : respects) {
-                          for (Term t : trip.first) {
+                      // XXX why only for seperates? (CS)
+                      for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                          for (Term t : infFlowSpec.seperates) {
                               loopInvTexts[RSP_IDX].put(heap.toString(), printTerm(t, false));
                           }
                       }                                        
@@ -720,7 +716,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, respectsTermList, variantTerm, loopInv
+                            invariantTerm, modifiesTerm, respectsInfFlowSpecs, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv.getLocalIns(),
                                     loopInv.getLocalOuts(), loopInv.getInternalAtPres());
                     return true;
@@ -754,7 +750,7 @@ public class InvariantConfigurator {
                 }
                 LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 try {
-                    respectsTermList.put(baseHeap, parseRespects(baseHeap));
+                    respectsInfFlowSpecs.put(baseHeap, parseRespects(baseHeap));
                     setOK(respErrors,respCols,baseHeap.toString());
                   } catch (Exception e) {
                       setError(respErrors,respCols,baseHeap.toString(),e.getMessage());
@@ -874,10 +870,7 @@ public class InvariantConfigurator {
                 return result;
             }
             
-            protected ImmutableList<Triple<ImmutableList<Term>,
-                                           ImmutableList<Term>,
-                                           ImmutableList<Term>>>
-            parseRespects(LocationVariable heap) throws Exception {
+            protected ImmutableList<InfFlowSpec> parseRespects(LocationVariable heap) throws Exception {
                 Term res = null;
                 //ImmutableList<ImmutableList<Term>> result = null;
                 index = inputPane.getSelectedIndex();
@@ -887,16 +880,11 @@ public class InvariantConfigurator {
                 res = parser.parse(
                       new StringReader(respAsString), Sort.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
-                ImmutableList<Triple<ImmutableList<Term>,
-                                     ImmutableList<Term>,
-                                     ImmutableList<Term>>> result =
-                    ImmutableSLList.<Triple<ImmutableList<Term>,
-                                            ImmutableList<Term>,
-                                            ImmutableList<Term>>>nil()
-                                   .append(new Triple<ImmutableList<Term>,
-                                                      ImmutableList<Term>,
-                                                      ImmutableList<Term>>
-                                   (ImmutableSLList.<Term>nil().append(res),
+                ImmutableList<InfFlowSpec> result =
+                    ImmutableSLList.<InfFlowSpec>nil()
+                                   .append(new InfFlowSpec
+                                                     (ImmutableSLList.<Term>nil().append(res),
+                                                      ImmutableSLList.<Term>nil(),
                                                       ImmutableSLList.<Term>nil(),
                                                       ImmutableSLList.<Term>nil()));
                 return result;

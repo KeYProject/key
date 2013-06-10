@@ -329,7 +329,7 @@ public class BlockContractRule implements BuiltInRule {
                                          final Instantiation instantiation) {
         if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) &&
-            contract.hasModifiesClause() && contract.getRespects() != null) {
+            contract.hasModifiesClause() && contract.getInfFlowSpecs() != null) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +

@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 public final class SimpleBlockContract implements BlockContract {
@@ -50,9 +51,7 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> preconditions;
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
-    private ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>> respects;
+    private ImmutableList<InfFlowSpec> infFlowSpecs;
 
 
     private final Variables variables;
@@ -68,9 +67,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> preconditions,
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
-                               final ImmutableList<Triple<ImmutableList<Term>,
-                                                          ImmutableList<Term>,
-                                                          ImmutableList<Term>>> respects,
+                               final ImmutableList<InfFlowSpec> infFlowSpecs,
                                final Variables variables,
                                final boolean transactionApplicable,
                                final boolean hasMod)
@@ -94,7 +91,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.preconditions = preconditions;
         this.postconditions = postconditions;
         this.modifiesClauses = modifiesClauses;        
-        this.respects = respects;
+        this.infFlowSpecs = infFlowSpecs;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
@@ -294,10 +291,8 @@ public final class SimpleBlockContract implements BlockContract {
 
 
     @Override
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects() {
-        return respects;
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs() {
+        return infFlowSpecs;
     }
 
 
@@ -405,9 +400,7 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newPreconditions,
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
-                                final ImmutableList<Triple<ImmutableList<Term>,
-                                                           ImmutableList<Term>,
-                                                           ImmutableList<Term>>> newRespects,
+                                final ImmutableList<InfFlowSpec> newRespects,
                                 final Variables newVariables) {
         return new SimpleBlockContract(newBlock, labels, method, modality,
                                        newPreconditions, newPostconditions,
@@ -419,7 +412,7 @@ public final class SimpleBlockContract implements BlockContract {
     @Override 
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
-                      respects, variables);
+                      infFlowSpecs, variables);
     }
 
 
@@ -602,9 +595,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Variables variables;
         private final Map<LocationVariable, Term> requires;
         private final Map<LocationVariable, Term> ensures;
-        private final ImmutableList<Triple<ImmutableList<Term>,
-                                           ImmutableList<Term>,
-                                           ImmutableList<Term>>> respects;
+        private final ImmutableList<InfFlowSpec> infFlowSpecs;
         private final Map<Label, Term> breaks;
         private final Map<Label, Term> continues;
         private final Term returns;
@@ -622,9 +613,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Variables variables,
                        final Map<LocationVariable, Term> requires,
                        final Map<LocationVariable, Term> ensures,
-                       final ImmutableList<Triple<ImmutableList<Term>,
-                                                  ImmutableList<Term>,
-                                                  ImmutableList<Term>>> respects,
+                       final ImmutableList<InfFlowSpec> infFlowSpecs,
                        final Map<Label, Term> breaks,
                        final Map<Label, Term> continues,
                        final Term returns,
@@ -642,7 +631,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.variables = variables;
             this.requires = requires;
             this.ensures = ensures;
-            this.respects = respects;
+            this.infFlowSpecs = infFlowSpecs;
             this.breaks = breaks;
             this.continues = continues;
             this.returns = returns;
@@ -656,7 +645,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         public ImmutableSet<BlockContract> create() {
             return create(buildPreconditions(), buildPostconditions(),
-                          buildModifiesClauses(), respects);
+                          buildModifiesClauses(), infFlowSpecs);
         }
 
         private Map<LocationVariable, Term> buildPreconditions() {
@@ -847,9 +836,7 @@ public final class SimpleBlockContract implements BlockContract {
                     create(final Map<LocationVariable, Term> preconditions,
                            final Map<LocationVariable, Term> postconditions,
                            final Map<LocationVariable, Term> modifiesClauses,
-                           final ImmutableList<Triple<ImmutableList<Term>,
-                                                      ImmutableList<Term>,
-                                                      ImmutableList<Term>>> respects) {
+                           final ImmutableList<InfFlowSpec> infFlowSpecs) {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable =
                     modifiesClauses.get(
@@ -858,14 +845,14 @@ public final class SimpleBlockContract implements BlockContract {
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
-                    respects, variables, transactionApplicable, hasMod)
+                    infFlowSpecs, variables, transactionApplicable, hasMod)
                 );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
                         block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions),
-                        postconditions, modifiesClauses, respects,
+                        postconditions, modifiesClauses, infFlowSpecs,
                         variables, transactionApplicable, hasMod)
                     );
             }
@@ -955,7 +942,7 @@ public final class SimpleBlockContract implements BlockContract {
 
             return new SimpleBlockContract(
                     head.getBlock(), head.getLabels(), head.getMethod(), head.getModality(),
-                    preconditions, postconditions, modifiesClauses, head.getRespects(),
+                    preconditions, postconditions, modifiesClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod);
         }
 

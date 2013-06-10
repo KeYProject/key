@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -111,21 +112,20 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
       //respect (TODO: does this really belong here?)
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>> resp =
-                   x.getRespects(heap, selfTerm, atPres, services);
-            if (resp != null) {
-                for (Triple<ImmutableList<Term>,
-                            ImmutableList<Term>,
-                            ImmutableList<Term>> trip : resp) {
-                    for (Term t: trip.first) {
+            ImmutableList<InfFlowSpec> infFlowSpecs =
+                   x.getInfFlowSpecs(heap, selfTerm, atPres, services);
+            if (infFlowSpecs != null) {
+                for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                    for (Term t: infFlowSpec.seperates) {
                         t.execPostOrder(tpvc);
                     }
-                    for (Term t: trip.second) {
+                    for (Term t: infFlowSpec.declassifies) {
                         t.execPostOrder(tpvc);
                     }
-                    for (Term t: trip.third) {
+                    for (Term t: infFlowSpec.erases) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: infFlowSpec.newObjects) {
                         t.execPostOrder(tpvc);
                     }
                 }
@@ -163,15 +163,18 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 modifiesClause.execPostOrder(collector);
             }
         }
-        ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects = x.getRespects();
-        for (Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> ts : respects) {
-            for (Term t : ts.first) {
+        ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
+        for (InfFlowSpec ts : infFlowSpecs) {
+            for (Term t : ts.seperates) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.second) {
+            for (Term t : ts.declassifies) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.third) {
+            for (Term t : ts.erases) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.newObjects) {
                 t.execPostOrder(collector);
             }
         }

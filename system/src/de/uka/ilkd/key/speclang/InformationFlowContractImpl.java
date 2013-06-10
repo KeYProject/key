@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 import java.util.Iterator;
@@ -53,9 +54,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<Triple<ImmutableList<Term>,
-                                       ImmutableList<Term>,
-                                       ImmutableList<Term>>> origRespects;
+    private final ImmutableList<InfFlowSpec> origInfFlowSpecs;
 
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -85,9 +84,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term exc,
                                           Term heapAtPre,
                                           Term dep,
-                                          ImmutableList<Triple<ImmutableList<Term>,
-                                                               ImmutableList<Term>,
-                                                               ImmutableList<Term>>> respects,
+                                          ImmutableList<InfFlowSpec> infFlowSpecs,
                                           boolean toBeSaved,
                                           int id) {
         assert baseName != null;
@@ -110,7 +107,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         }
         assert exc != null;
 //        assert dep != null;
-        assert respects != null;
+        assert infFlowSpecs != null;
 
         this.baseName = baseName;
         this.name = name != null
@@ -132,7 +129,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.hasRealModifiesClause  = hasRealMod;
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
-        this.origRespects = respects;
+        this.origInfFlowSpecs = infFlowSpecs;
     }
 
 
@@ -151,12 +148,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term exc,
                                        Term heapAtPre,
                                        Term dep,
-                                       ImmutableList<Triple<ImmutableList<Term>,
-                                                            ImmutableList<Term>,
-                                                            ImmutableList<Term>>> respects,
+                                       ImmutableList<InfFlowSpec> infFlowSpecs,
                                        boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
-             hasRealMod, self, params, result, exc, heapAtPre, dep, respects,
+             hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs,
              toBeSaved, INVALID_ID);
     }
 
@@ -169,7 +164,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
              ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
              bc.getVariablesAsTerms().exception, TB.var(bc.getVariables()
                      .combineRemembranceVariables().get(services.getTypeConverter()
-                             .getHeapLDT().getHeap())), null, bc.getRespects(),
+                             .getHeapLDT().getHeap())), null, bc.getInfFlowSpecs(),
              false, bc.getBlock().getStartPosition().getLine());
     }
     
@@ -182,7 +177,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
              ImmutableSLList.<Term>nil(), null,
              TB.var(TB.excVar(services, li.getTarget(), true)),
              li.getInternalAtPres().get(services.getTypeConverter().getHeapLDT().getHeap()),
-             null, li.getRespects(services), false, li.getLoop().getStartPosition().getLine());
+             null, li.getInfFlowSpecs(services), false, li.getLoop().getStartPosition().getLine());
     }
 
 
@@ -305,8 +300,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
     
     @Override
-    public boolean hasRespects() {
-        return !origRespects.isEmpty();
+    public boolean hasInfFlowSpec() {
+        return !(origInfFlowSpecs == InfFlowSpec.EMPTY_INF_FLOW_SPEC);
     }
 
 
@@ -326,7 +321,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
                + getHTMLFor(origMby, "measured-by", services)
                + "<br><b>termination</b> " + modality
-               + getHTMLFor(origRespects, "separates", services)
+               + getHTMLFor(origInfFlowSpecs, "separates", services)
                + "</html>";
     }
 
@@ -398,23 +393,22 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     
-    private String getHTMLFor(ImmutableList<Triple<ImmutableList<Term>,
-                                                   ImmutableList<Term>,
-                                                   ImmutableList<Term>>> originalTerms,
+    private String getHTMLFor(ImmutableList<InfFlowSpec> originalInfFlowSpecs,
                               String htmlName,
                               Services services) {
         String respects = "";
-        if (hasRespects()) {
+        if (hasInfFlowSpec()) {
             respects = "<br><b>" + htmlName + "</b> ";
-            for (Triple<ImmutableList<Term>,
-                        ImmutableList<Term>,
-                        ImmutableList<Term>> pair : originalTerms) {
-                respects += "(" + getHTMLFor(pair.first, services) + ")";
-                if (!pair.second.isEmpty()) {
-                    respects += ", declassifies (" + getHTMLFor(pair.second, services) + ")";
+            for (InfFlowSpec infFlowSpec : originalInfFlowSpecs) {
+                respects += "(" + getHTMLFor(infFlowSpec.seperates, services) + ")";
+                if (!infFlowSpec.declassifies.isEmpty()) {
+                    respects += ", declassifies (" + getHTMLFor(infFlowSpec.declassifies, services) + ")";
                 }
-                if (!pair.third.isEmpty()) {
-                    respects += ", erases (" + getHTMLFor(pair.third, services) + ")";
+                if (!infFlowSpec.erases.isEmpty()) {
+                    respects += ", erases (" + getHTMLFor(infFlowSpec.erases, services) + ")";
+                }
+                if (!infFlowSpec.newObjects.isEmpty()) {
+                    respects += ", new objects (" + getHTMLFor(infFlowSpec.newObjects, services) + ")";
                 }
             }
         }
@@ -482,7 +476,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origAtPre, origDep, origRespects,
+                                               origAtPre, origDep, origInfFlowSpecs,
                                                toBeSaved, newId);
     }
 
@@ -497,7 +491,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origAtPre, origDep, origRespects,
+                                               origAtPre, origDep, origInfFlowSpecs,
                                                toBeSaved, id);
     }
 
@@ -509,7 +503,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origAtPre, origDep, origRespects,
+                                               origAtPre, origDep, origInfFlowSpecs,
                                                toBeSaved, id);
     }
 
@@ -521,7 +515,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origAtPre, origDep, origRespects,
+                                               origAtPre, origDep, origInfFlowSpecs,
                                                toBeSaved, id);
     }
 
@@ -533,7 +527,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                origMby, modifies,
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
-                                               origAtPre, origDep, origRespects,
+                                               origAtPre, origDep, origInfFlowSpecs,
                                                toBeSaved, id);
     }
 
@@ -545,10 +539,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects() {
-        return origRespects;
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs() {
+        return origInfFlowSpecs;
     }
 
 
@@ -565,7 +557,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert origMod != null;
         assert origParams != null;
         assert origDep != null;
-        assert origRespects != null;
+        assert origInfFlowSpecs != null;
         InformationFlowContract ifc = (InformationFlowContract) c;
         return name.equals(ifc.getName())
                && forClass.equals(ifc.getKJT())
@@ -588,7 +580,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                && id == ifc.id()
                && toBeSaved == ifc.toBeSaved()
                && origDep.equals(ifc.getDep())
-               && origRespects.equals(ifc.getRespects());
+               && origInfFlowSpecs.equals(ifc.getInfFlowSpecs());
     }
     
     

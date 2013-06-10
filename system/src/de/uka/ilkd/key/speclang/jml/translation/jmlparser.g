@@ -35,7 +35,8 @@ header {
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
-    import de.uka.ilkd.key.util.Triple; 
+    import de.uka.ilkd.key.util.Triple;
+    import de.uka.ilkd.key.util.InfFlowSpec;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -456,18 +457,20 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
 
 
-respectsclause returns  [Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> result = null] throws SLTranslationException {
-    ImmutableList<Term> seg = ImmutableSLList.<Term>nil();
+respectsclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
     ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
     ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> new = ImmutableSLList.<Term>nil();
     ImmutableList<Term> tmp;
 }
 :
-    (RESPECTS | SEPARATES) (NOTHING | seg = respectslist)
+    (RESPECTS | SEPARATES) (NOTHING | sep = respectslist)
     (   (DECLASSIFIES (NOTHING | tmp = respectslist {decl = decl.append(tmp);})) |
-        (ERASES (NOTHING | tmp = respectslist {erases = erases.append(tmp);}))
+        (ERASES (NOTHING | tmp = respectslist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = respectslist {new = new.append(tmp);}))
     )*
-    {result = new Triple(seg, decl, erases);}
+    {result = new InfFlowSpec(sep, decl, erases, new);}
     ;
 
 

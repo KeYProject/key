@@ -136,7 +136,8 @@ final class JMLTranslator {
         RETURNS ("returns"),
 
         // information flow
-        RESPECTS ("respects");
+        SEPERATES ("seperates"),
+        RESPECTS ("respects");  // the old name for seperates
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -1520,7 +1521,8 @@ final class JMLTranslator {
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
 				return new SLExpression(TB.values((Services)params[0]),t);
 			}});
-        translationMethods.put(JMLKeyWord.RESPECTS, new JMLTranslationMethod() {
+        
+        JMLTranslationMethod seperatesTM = new JMLTranslationMethod() {
 
             @Override
             public ImmutableList translate(
@@ -1528,10 +1530,12 @@ final class JMLTranslator {
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
-                ImmutableList respectsList = (ImmutableList) params[0];
-                return respectsList;
+                ImmutableList infFlowSpecList = (ImmutableList) params[0];
+                return infFlowSpecList;
             }
-        });
+        };
+        translationMethods.put(JMLKeyWord.SEPERATES, seperatesTM);
+        translationMethods.put(JMLKeyWord.RESPECTS, seperatesTM);
     }
 
 

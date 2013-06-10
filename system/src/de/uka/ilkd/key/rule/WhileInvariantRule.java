@@ -672,7 +672,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
 
-        if (isInfFlowProof && inst.inv.hasRespects(services)) {
+        if (isInfFlowProof && inst.inv.hasInfFlowSpec(services)) {
             // prepare information flow validity goal
 
             assert anonUpdateDatas.size() == 1 : "information flow " +
@@ -809,7 +809,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             useGoal = result.head();
             initGoal.setBranchLabel("Invariant Initially Valid");
             useGoal.setBranchLabel("Use Case");
-            if (inst.inv.hasRespects(services)) {
+            if (inst.inv.hasInfFlowSpec(services)) {
                 // add information flow validity goal
                 result = result.append(infFlowGoal);
 

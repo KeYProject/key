@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
@@ -217,9 +218,7 @@ public class ContractFactory {
             boolean hasMod,
             ProgramVariableCollection progVars,
             Term accessible,
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>> respects,
+            ImmutableList<InfFlowSpec> infFlowSpecs,
             boolean toBeSaved) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
@@ -231,7 +230,7 @@ public class ContractFactory {
         return new InformationFlowContractImpl(
                 INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
                 modality, requires, measuredBy, modifies, hasMod, self, params,
-                result, exc, atPre, accessible, respects, toBeSaved);
+                result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
     }
 
     @Override

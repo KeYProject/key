@@ -33,8 +33,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 public interface BlockContract extends SpecificationElement {
 
@@ -86,9 +86,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPreconditions,
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
-                                final ImmutableList<Triple<ImmutableList<Term>,
-                                                           ImmutableList<Term>,
-                                                           ImmutableList<Term>>> newRespects,
+                                final ImmutableList<InfFlowSpec> newInfFlowSpecs,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);
@@ -124,11 +122,9 @@ public interface BlockContract extends SpecificationElement {
 
 
     /**
-     * Returns the original respects clause of the contract.
+     * Returns the original information flow specification clause of the contract.
      */
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects();
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs();
 
 
     /**

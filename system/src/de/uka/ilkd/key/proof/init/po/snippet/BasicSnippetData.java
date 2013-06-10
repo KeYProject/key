@@ -89,7 +89,7 @@ class BasicSnippetData {
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
         MODALITY(Modality.class),
-        RESPECTS(ImmutableList.class),
+        INF_FLOW_SPECS(ImmutableList.class),
         /**
          * Variables originally used during parsing.
          */
@@ -141,7 +141,7 @@ class BasicSnippetData {
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
         contractContents.put(Key.MODALITY, Modality.BOX);
-        contractContents.put(Key.RESPECTS, invariant.getRespects(services));
+        contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         final ImmutableSet<ProgramVariable> localInVariables =
@@ -181,7 +181,7 @@ class BasicSnippetData {
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
-        contractContents.put(Key.RESPECTS, contract.getRespects());
+        contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
@@ -203,7 +203,7 @@ class BasicSnippetData {
         contractContents.put(Key.POSTCONDITION, contract.getPost(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
-        contractContents.put(Key.RESPECTS, contract.getRespects());
+        contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();
         contractContents.put(Key.LABELS,
                              labels.toArray(new Label[labels.size()]));

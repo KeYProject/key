@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -43,9 +44,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
     private Map<LocationVariable,
-                ImmutableList<Triple<ImmutableList<Term>,
-                                     ImmutableList<Term>,
-                                     ImmutableList<Term>>>> originalRespects;
+                ImmutableList<InfFlowSpec>> originalInfFlowSpecs;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final ImmutableList<Term> localIns;
@@ -62,7 +61,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * @param loop the loop to which the invariant belongs
      * @param invariant the invariant formula
      * @param modifies the modifier set
-     * @param respects low variables for information flow
+     * @param infFlowSpecs low variables for information flow
      * @param variant the variant term
      * @param selfTerm the term used for the receiver object
      * @param heapAtPre the term used for the at pre heap
@@ -73,9 +72,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,
                              Map<LocationVariable,
-                             ImmutableList<Triple<ImmutableList<Term>,
-                                                  ImmutableList<Term>,
-                                                  ImmutableList<Term>>>> respects,
+                             ImmutableList<InfFlowSpec>> infFlowSpecs,
                              Term variant, 
                              Term selfTerm,
                              ImmutableList<Term> localIns,
@@ -93,12 +90,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.originalVariant            = variant;
         this.originalModifies           =
                 modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
-        this.originalRespects           =
-                respects == null ? new LinkedHashMap<LocationVariable,
-                                                     ImmutableList<Triple<ImmutableList<Term>,
-                                                                          ImmutableList<Term>,
-                                                                          ImmutableList<Term>>>>()
-                                 : respects;
+        this.originalInfFlowSpecs       =
+                infFlowSpecs == null ? new LinkedHashMap<LocationVariable,
+                                                         ImmutableList<InfFlowSpec>>()
+                                     : infFlowSpecs;
         this.originalSelfTerm           = selfTerm;
         this.localIns                   = localIns;
         this.localOuts                  = localOuts;
@@ -110,15 +105,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,
                              Map<LocationVariable,
-                             ImmutableList<Triple<ImmutableList<Term>,
-                             ImmutableList<Term>,
-                             ImmutableList<Term>>>> respects,
+                                 ImmutableList<InfFlowSpec>> infFlowSpecs,
                              Term variant, 
                              Term selfTerm,
                              ImmutableList<Term> localIns,
                              ImmutableList<Term> localOuts,
                              Map<LocationVariable,Term> atPres) {
-        this(loop, null, null, invariants, modifies, respects, variant, selfTerm,
+        this(loop, null, null, invariants, modifies, infFlowSpecs, variant, selfTerm,
              localIns, localOuts, atPres);
     }
 
@@ -283,38 +276,27 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects(LocationVariable heap,
-                                                                  Term selfTerm,
-                                                                  Map<LocationVariable,Term> atPres,
-                                                                  Services services) {
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap,
+                                                      Term selfTerm,
+                                                      Map<LocationVariable, Term> atPres,
+                                                      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replaceTriples(originalRespects.get(heap));
+        return or.replaceInfFlowSpec(originalInfFlowSpecs.get(heap));
     }
 
     @Override
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects(LocationVariable heap) {
-        ImmutableList<Triple<ImmutableList<Term>,
-                             ImmutableList<Term>,
-                             ImmutableList<Term>>>
-            respects = ImmutableSLList.<Triple<ImmutableList<Term>,
-                                               ImmutableList<Term>,
-                                               ImmutableList<Term>>>nil();
-        return respects.append(originalRespects.get(heap)); // apparently respects can be null
+    public ImmutableList<InfFlowSpec>getInfFlowSpecs(LocationVariable heap) {
+        ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
+        return infFlowSpecs.append(originalInfFlowSpecs.get(heap)); // apparently infFlowSpecs can be null
     }
     
     @Override
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> getRespects(Services services) {
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services) {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        return getRespects(baseHeap);
+        return getInfFlowSpecs(baseHeap);
     }
 
     @Override
@@ -345,10 +327,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     @Override
     public Map<LocationVariable,
-               ImmutableList<Triple<ImmutableList<Term>,
-                                    ImmutableList<Term>,
-                                    ImmutableList<Term>>>> getInternalRespects(){
-        return originalRespects;
+               ImmutableList<InfFlowSpec>> getInternalInfFlowSpec(){
+        return originalInfFlowSpecs;
     }
     
     @Override
@@ -388,7 +368,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
-                                     originalRespects,
+                                     originalInfFlowSpecs,
                                      originalVariant,
                                      originalSelfTerm,
                                      localIns,
@@ -403,7 +383,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
-                                     originalRespects,
+                                     originalInfFlowSpecs,
                                      originalVariant, 
                                      originalSelfTerm,
                                      localIns,
@@ -418,7 +398,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      execCont,
                                      originalInvariants,
                                      originalModifies,
-                                     originalRespects,
+                                     originalInfFlowSpecs,
                                      originalVariant, 
                                      originalSelfTerm,
                                      localIns,
@@ -434,39 +414,30 @@ public final class LoopInvariantImpl implements LoopInvariant {
         }
         this.guard = guardTerm;
         
-        ImmutableList<Triple<ImmutableList<Term>,
-                             ImmutableList<Term>,
-                             ImmutableList<Term>>> respects = getRespects(services);
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        originalRespects.remove(baseHeap);
-        Triple<ImmutableList<Term>,
-               ImmutableList<Term>,
-               ImmutableList<Term>> baseRespects = !respects.isEmpty() ?
-                       respects.head() :
-                           new Triple<ImmutableList<Term>,
-                                      ImmutableList<Term>,
-                                      ImmutableList<Term>> (ImmutableSLList.<Term>nil(),
-                                                            ImmutableSLList.<Term>nil(),
-                                                            ImmutableSLList.<Term>nil());
+        ImmutableList<InfFlowSpec> infFlowSpecs = getInfFlowSpecs(services);
+        final LocationVariable baseHeap =
+                services.getTypeConverter().getHeapLDT().getHeap();
+        originalInfFlowSpecs.remove(baseHeap);
+        InfFlowSpec baseInfFlowSpec = !infFlowSpecs.isEmpty() ?
+                                   infFlowSpecs.head() :
+                                   InfFlowSpec.EMPTY_INF_FLOW_SPEC;
         if (oldGuard != null) {
-            respects =
-                    respects.tail()
-                        .prepend(new Triple<ImmutableList<Term>,
-                                            ImmutableList<Term>,
-                                            ImmutableList<Term>>
-                        (baseRespects.first.removeFirst(oldGuard).append(guardTerm),
-                         baseRespects.second,
-                         baseRespects.third));
+            infFlowSpecs =
+                    infFlowSpecs.tail()
+                        .prepend(new InfFlowSpec
+                        (baseInfFlowSpec.seperates.removeFirst(oldGuard).append(guardTerm),
+                         baseInfFlowSpec.declassifies,
+                         baseInfFlowSpec.erases,
+                         baseInfFlowSpec.newObjects));
         } else {
-            respects =
-                    respects.tail().prepend(new Triple<ImmutableList<Term>,
-                                                ImmutableList<Term>,
-                                                ImmutableList<Term>>
-                                            (baseRespects.first.append(guardTerm),
-                                             baseRespects.second,
-                                             baseRespects.third));
+            infFlowSpecs =
+                    infFlowSpecs.tail().prepend(new InfFlowSpec
+                                            (baseInfFlowSpec.seperates.append(guardTerm),
+                                             baseInfFlowSpec.declassifies,
+                                             baseInfFlowSpec.erases,
+                                             baseInfFlowSpec.newObjects));
         }
-        originalRespects.put(baseHeap, respects);
+        originalInfFlowSpecs.put(baseHeap, infFlowSpecs);
     }
 
     @Override
@@ -487,7 +458,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      innermostExecCont,
                                      newInvariants,
                                      originalModifies,
-                                     originalRespects,
+                                     originalInfFlowSpecs,
                                      originalVariant,
                                      originalSelfTerm,
                                      localIns,
@@ -507,8 +478,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalInvariants
                 + "; modifies: " 
                 + originalModifies
-                + "; respects: " 
-                + originalRespects
+                + "; information flow specification: "
+                + originalInfFlowSpecs
                 + "; variant: "
                 + originalVariant
                 + "; guard: "
@@ -565,7 +536,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
 
     @Override
-    public boolean hasRespects(Services services) {
-        return !getRespects(services).isEmpty();
+    public boolean hasInfFlowSpec(Services services) {
+        return !getInfFlowSpecs(services).isEmpty();
     }
 }

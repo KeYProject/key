@@ -171,6 +171,7 @@ MEASURED_BY : "\\measured_by";
 
 DECLASSIFIES : "\\declassifies";
 ERASES : "\\erases";
+NEW_OBJECTS: "\\new_objects";
 
 
 DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;

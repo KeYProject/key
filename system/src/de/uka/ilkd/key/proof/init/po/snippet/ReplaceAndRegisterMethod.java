@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import java.util.Iterator;
 
 
@@ -77,69 +78,35 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final Triple<Term[], Term[], Term[]> replace(Triple<Term[], Term[], Term[]> terms,
-            Term[] origVars,
-            Term[] poVars) {
-        final Term[] result1 = new Term[terms.first.length];
-        for (int i = 0; i < terms.first.length; i++) {
-            result1[i] = replace(terms.first[i], origVars, poVars);
+    final InfFlowSpec replace(InfFlowSpec terms,
+                              StateVars origVars,
+                              StateVars poVars) {
+        ImmutableList<Term> resultSeperates = ImmutableSLList.<Term>nil();
+        for (Term t : terms.seperates) {
+            resultSeperates = resultSeperates.append(replace(t, origVars, poVars));
         }
-        final Term[] result2 = new Term[terms.second.length];
-        for (int i = 0; i < terms.second.length; i++) {
-            result2[i] = replace(terms.second[i], origVars, poVars);
+        ImmutableList<Term> resultDeclassifies = ImmutableSLList.<Term>nil();
+        for (Term t : terms.declassifies) {
+            resultDeclassifies = resultDeclassifies.append(replace(t, origVars, poVars));
         }
-        final Term[] result3 = new Term[terms.third.length];
-        for (int i = 0; i < terms.third.length; i++) {
-            result3[i] = replace(terms.third[i], origVars, poVars);
+        ImmutableList<Term> resultErases = ImmutableSLList.<Term>nil();
+        for (Term t : terms.erases) {
+            resultErases = resultErases.append(replace(t, origVars, poVars));
         }
-        return new Triple<Term[], Term[], Term[]>(result1, result2, result3);
+        ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
+        for (Term t : terms.newObjects) {
+            resultErases = resultErases.append(replace(t, origVars, poVars));
+        }
+        return new InfFlowSpec(resultSeperates, resultDeclassifies,
+                               resultErases, resultNewObjecs);
     }
 
 
-    final Triple<Term[], Term[], Term[]> replace(
-            Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>> terms,
-            StateVars origVars,
-            StateVars poVars) {
-        final Term[] result1 = new Term[terms.first.size()];
-        Iterator<Term> termIt1 = terms.first.iterator();
-        for (int i = 0; termIt1.hasNext(); i++) {
-            result1[i] = replace(termIt1.next(), origVars, poVars);
-        }
-        final Term[] result2 = new Term[terms.second.size()];
-        Iterator<Term> termIt2 = terms.second.iterator();
-        for (int i = 0; termIt2.hasNext(); i++) {
-            result2[i] = replace(termIt2.next(), origVars, poVars);
-        }
-        final Term[] result3 = new Term[terms.third.size()];
-        Iterator<Term> termIt3 = terms.third.iterator();
-        for (int i = 0; termIt3.hasNext(); i++) {
-            result3[i] = replace(termIt3.next(), origVars, poVars);
-        }
-        return new Triple<Term[], Term[], Term[]>(result1, result2, result3);
-    }
-
-
-    final Triple<Term[], Term[], Term[]>[] replace(Triple<Term[], Term[], Term[]>[] termss,
-            Term[] origVars,
-            Term[] poVars) {
-        final Triple<Term[], Term[], Term[]>[] result =
-                (Triple<Term[], Term[], Term[]>[]) new Triple[termss.length];
-        for (int i = 0; i < termss.length; i++) {
-            result[i] = replace(termss[i], origVars, poVars);
-        }
-        return result;
-    }
-
-
-    final Triple<Term[], Term[], Term[]>[] replace(ImmutableList<Triple<ImmutableList<Term>,
-                                                                        ImmutableList<Term>,
-                                                                        ImmutableList<Term>>> termss,
-            StateVars origVars,
-            StateVars poVars) {
-        final Triple<Term[], Term[], Term[]>[] result =
-                (Triple<Term[], Term[], Term[]>[]) new Triple[termss.size()];
-        Iterator<Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>>> it =
-                termss.iterator();
+    final InfFlowSpec[] replace(ImmutableList<InfFlowSpec> termss,
+                                StateVars origVars,
+                                StateVars poVars) {
+        final InfFlowSpec[] result = new InfFlowSpec[termss.size()];
+        Iterator<InfFlowSpec> it = termss.iterator();
         for (int i = 0; it.hasNext(); i++) {
             result[i] = replace(it.next(), origVars, poVars);
         }
@@ -166,29 +133,6 @@ abstract class ReplaceAndRegisterMethod {
         OpReplacer or = new OpReplacer(map);
         Term result = or.replace(term);
 
-        return result;
-    }
-
-
-    final Term[] replace(Term[] terms,
-                         Term[] origVars,
-                         Term[] poVars) {
-        final Term[] result = new Term[terms.length];
-        for (int i = 0; i < terms.length; i++) {
-            result[i] = replace(terms[i], origVars, poVars);
-
-        }
-        return result;
-    }
-
-
-    final Term[][] replace(Term[][] termss,
-                           Term[] origVars,
-                           Term[] poVars) {
-        final Term[][] result = new Term[termss.length][];
-        for (int i = 0; i < termss.length; i++) {
-            result[i] = replace(termss[i], origVars, poVars);
-        }
         return result;
     }
 

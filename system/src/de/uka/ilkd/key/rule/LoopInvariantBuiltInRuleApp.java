@@ -206,7 +206,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                                      rawInv.getExecutionContext(),
                                      newInvs,
                                      rawInv.getInternalModifies(),
-                                     rawInv.getInternalRespects(),
+                                     rawInv.getInternalInfFlowSpec(),
                                      var,
                                      rawInv.getInternalSelfTerm(),
                                      rawInv.getLocalIns(),

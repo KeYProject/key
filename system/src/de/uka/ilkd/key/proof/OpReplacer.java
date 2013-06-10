@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Triple;
 
 
@@ -144,31 +145,19 @@ public class OpReplacer {
     /**
      * Replaces in a list of triples of lists of terms.
      */
-    public ImmutableList<Triple<ImmutableList<Term>,
-                                ImmutableList<Term>,
-                                ImmutableList<Term>>> replaceTriples(
-                                        ImmutableList<Triple<ImmutableList<Term>,
-                                                             ImmutableList<Term>,
-                                                             ImmutableList<Term>>> terms) {
-        ImmutableList<Triple<ImmutableList<Term>,
-                             ImmutableList<Term>,
-                             ImmutableList<Term>>>
-                result = ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                 ImmutableList<Term>,
-                                                 ImmutableList<Term>>>nil();
+    public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
+        ImmutableList<InfFlowSpec>
+                result = ImmutableSLList.<InfFlowSpec>nil();
         if (terms == null) {
             return result;
         }
         
-        for(final Triple<ImmutableList<Term>,
-                         ImmutableList<Term>,
-                         ImmutableList<Term>> trip : terms) {
-            final ImmutableList<Term> res1 = replace(trip.first);
-            final ImmutableList<Term> res2 = replace(trip.second);
-            final ImmutableList<Term> res3 = replace(trip.third);
-            result = result.append(new Triple<ImmutableList<Term>,
-                                              ImmutableList<Term>,
-                                              ImmutableList<Term>> (res1, res2, res3));
+        for(final InfFlowSpec infFlowSpec : terms) {
+            final ImmutableList<Term> seperates = replace(infFlowSpec.seperates);
+            final ImmutableList<Term> declassifies = replace(infFlowSpec.declassifies);
+            final ImmutableList<Term> erases = replace(infFlowSpec.erases);
+            final ImmutableList<Term> newObjects = replace(infFlowSpec.newObjects);
+            result = result.append(new InfFlowSpec(seperates, declassifies, erases, newObjects));
         }
         return result;
     }

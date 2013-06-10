@@ -37,6 +37,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
@@ -208,27 +209,22 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
 
-    private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
-    replaceVariablesInTermListTriples(ImmutableList<Triple<ImmutableList<Term>,
-                                                           ImmutableList<Term>,
-                                                           ImmutableList<Term>>> terms) {
-        ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
-                    res = ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                  ImmutableList<Term>,
-                                                  ImmutableList<Term>>>nil();
-        for (final Triple<ImmutableList<Term>,
-                          ImmutableList<Term>,
-                          ImmutableList<Term>> innerTerms : terms) {
-            final ImmutableList<Term> renamed1 =
-                    replaceVariablesInTerms(innerTerms.first);
-            final ImmutableList<Term> renamed2 =
-                    replaceVariablesInTerms(innerTerms.second);
-            final ImmutableList<Term> renamed3 =
-                    replaceVariablesInTerms(innerTerms.third);
+    private ImmutableList<InfFlowSpec>
+    replaceVariablesInTermListTriples(ImmutableList<InfFlowSpec> terms) {
+        ImmutableList<InfFlowSpec>
+                    res = ImmutableSLList.<InfFlowSpec>nil();
+        for (final InfFlowSpec innerTerms : terms) {
+            final ImmutableList<Term> renamedSeperates =
+                    replaceVariablesInTerms(innerTerms.seperates);
+            final ImmutableList<Term> renamedDeclassifies =
+                    replaceVariablesInTerms(innerTerms.declassifies);
+            final ImmutableList<Term> renamedErases =
+                    replaceVariablesInTerms(innerTerms.erases);
+            final ImmutableList<Term> renamedNewObjects =
+                    replaceVariablesInTerms(innerTerms.newObjects);
             res = res.append(
-                    new Triple<ImmutableList<Term>,
-                               ImmutableList<Term>,
-                               ImmutableList<Term>> (renamed1, renamed2, renamed3));
+                    new InfFlowSpec(renamedSeperates, renamedDeclassifies,
+                                    renamedErases, renamedNewObjects));
         }
         return res;
     }
@@ -274,10 +270,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                    replaceVariablesInTerm(
                                            oldContract.getModifiesClause(heap, services)));
         }
-        final ImmutableList<Triple<ImmutableList<Term>,
-                                   ImmutableList<Term>,
-                                   ImmutableList<Term>>> newRespects =
-                replaceVariablesInTermListTriples(oldContract.getRespects());
+        final ImmutableList<InfFlowSpec> newRespects =
+                replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
         return oldContract.update(newBlock, newPreconditions, newPostconditions,
                                   newModifiesClauses, newRespects, newVariables);
     }
@@ -370,29 +364,23 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>>> newRespects
+            ImmutableList<InfFlowSpec>> newInfFlowSpecs
             = new LinkedHashMap<LocationVariable,
-                                ImmutableList<Triple<ImmutableList<Term>,
-                                                     ImmutableList<Term>,
-                                                     ImmutableList<Term>>>>();
+                                ImmutableList<InfFlowSpec>>();
         //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (inv.getRespects(heap) != null) {
+            if (inv.getInfFlowSpecs(heap) != null) {
                 final Term m =
                         replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
                                                                atPres,
                                                                services));
                 newMods.put(heap, m);
-                final ImmutableList<Triple<ImmutableList<Term>,
-                                           ImmutableList<Term>,
-                                           ImmutableList<Term>>> r =
-                        replaceVariablesInTermListTriples(inv.getRespects(heap, selfTerm,
-                                                                          atPres,
-                                                                          services));
-                newRespects.put(heap, r);
+                final ImmutableList<InfFlowSpec> infFlowSpecs =
+                        replaceVariablesInTermListTriples(inv.getInfFlowSpecs(heap, selfTerm,
+                                                                              atPres,
+                                                                              services));
+                newInfFlowSpecs.put(heap, infFlowSpecs);
                 final Term i =
                         replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
                                                                 atPres,
@@ -424,7 +412,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     inv.getExecutionContext(),
                                     newInvariants,
                                     newMods,
-                                    newRespects,
+                                    newInfFlowSpecs,
                                     newVariant,
                                     newSelfTerm,
                                     newLocalIns,

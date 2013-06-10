@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 
@@ -146,8 +146,8 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the set of views.
      */
-    ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> getRespects();
+    ImmutableList<InfFlowSpec> getInfFlowSpecs();
 
 
-    public boolean hasRespects();
+    public boolean hasInfFlowSpec();
 }

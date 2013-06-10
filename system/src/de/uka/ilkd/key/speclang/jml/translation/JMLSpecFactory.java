@@ -48,6 +48,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -92,7 +93,7 @@ public class JMLSpecFactory {
         // create contracts
         ImmutableSet<Contract> symbDatas =
                 DefaultImmutableSet.<Contract>nil();
-        if (clauses.respects != null && !clauses.respects.isEmpty()) {
+        if (clauses.infFlowSpecs != null && !clauses.infFlowSpecs.isEmpty()) {
             if (clauses.diverges.equals(TB.ff())) {
                 InformationFlowContract symbData =
                         cf.createInformationFlowContract(pm.getContainerType(), pm,
@@ -104,7 +105,7 @@ public class JMLSpecFactory {
                                                          !clauses.strictlyPure,
                                                          progVars,
                                                          clauses.accessible,
-                                                         clauses.respects,
+                                                         clauses.infFlowSpecs,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(TB.tt())) {
@@ -118,7 +119,7 @@ public class JMLSpecFactory {
                                                          !clauses.strictlyPure,
                                                          progVars,
                                                          clauses.accessible,
-                                                         clauses.respects,
+                                                         clauses.infFlowSpecs,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
             } else {
@@ -133,7 +134,7 @@ public class JMLSpecFactory {
                                                          !clauses.strictlyPure,
                                                          progVars,
                                                          clauses.accessible,
-                                                         clauses.respects,
+                                                         clauses.infFlowSpecs,
                                                          false);
                 InformationFlowContract symbData2 =
                         cf.createInformationFlowContract(pm.getContainerType(), pm,
@@ -145,7 +146,7 @@ public class JMLSpecFactory {
                                                          !clauses.strictlyPure,
                                                          progVars,
                                                          clauses.accessible,
-                                                         clauses.respects,
+                                                         clauses.infFlowSpecs,
                                                          false);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
             }
@@ -171,9 +172,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public boolean strictlyPure;
-        public ImmutableList<Triple<ImmutableList<Term>,
-                                    ImmutableList<Term>,
-                                    ImmutableList<Term>>> respects;
+        public ImmutableList<InfFlowSpec> infFlowSpecs;
     }
 
     //-------------------------------------------------------------------------
@@ -375,41 +374,31 @@ public class JMLSpecFactory {
                 progVars.atPres,
                 originalBehavior,
                 textualSpecCase.getReturns());
-        clauses.respects =
-                translateRespectsClauses(pm, progVars.selfVar,
-                                          progVars.paramVars, progVars.resultVar,
-                                          textualSpecCase.getRespects());
+        clauses.infFlowSpecs =
+                translateInfFlowSpecClauses(pm, progVars.selfVar,
+                                            progVars.paramVars, progVars.resultVar,
+                                            textualSpecCase.getRespects());
         return clauses;
     }
 
 
-    private ImmutableList<Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>>>
-        translateRespectsClauses(IProgramMethod pm,
-                                 ProgramVariable selfVar,
-                                 ImmutableList<ProgramVariable> paramVars,
-                                 ProgramVariable resultVar,
-                                 ImmutableList<PositionedString> originalClauses)
+    private ImmutableList<InfFlowSpec>
+        translateInfFlowSpecClauses(IProgramMethod pm,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
-            return ImmutableSLList.
-                    <Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
+            return ImmutableSLList.<InfFlowSpec>nil();
         } else {
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>> result =
-                                     ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                             ImmutableList<Term>,
-                                                             ImmutableList<Term>>>nil();
+            ImmutableList<InfFlowSpec> result =
+                                     ImmutableSLList.<InfFlowSpec>nil();
             for (PositionedString expr : originalClauses) {
-                Triple<ImmutableList<Term>,
-                       ImmutableList<Term>,
-                       ImmutableList<Term>> translated =
-                            (Triple<ImmutableList<Term>,
-                                    ImmutableList<Term>,
-                                    ImmutableList<Term>>) JMLTranslator
-                                            .translate(expr, pm.getContainerType(),
-                                                       selfVar, paramVars, resultVar,
-                                                       null, null, Triple.class, services);
+                InfFlowSpec translated =
+                            JMLTranslator.translate(expr, pm.getContainerType(),
+                                                    selfVar, paramVars, resultVar,
+                                                    null, null, InfFlowSpec.class, services);
                 result = result.append(translated);
             }
             return result;
@@ -1122,7 +1111,7 @@ public class JMLSpecFactory {
                 translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires,
-            clauses.ensures, clauses.respects,
+            clauses.ensures, clauses.infFlowSpecs,
             clauses.breaks, clauses.continues, clauses.returns, clauses.signals,
             clauses.signalsOnly, clauses.diverges, clauses.assignables,
             !clauses.strictlyPure, services).create();
@@ -1306,27 +1295,19 @@ public class JMLSpecFactory {
         }
         
         //translateToListOfTermLists respects
-        ImmutableList<Triple<ImmutableList<Term>,
-                             ImmutableList<Term>,
-                             ImmutableList<Term>>>
-                respectsTermList = ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                            ImmutableList<Term>,
-                                                            ImmutableList<Term>>>nil();
+        ImmutableList<InfFlowSpec>
+                infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         if(!originalRespects.isEmpty()) {
-            respectsTermList = translateRespectsClauses(pm, selfVar, paramVars,
-                                                        resultVar, originalRespects);
+            infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, paramVars,
+                                                           resultVar, originalRespects);
         }
         
         Map<LocationVariable,
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>>>
+            ImmutableList<InfFlowSpec>>
                 respects = new LinkedHashMap<LocationVariable,
-                                             ImmutableList<Triple<ImmutableList<Term>,
-                                                                  ImmutableList<Term>,
-                                                                  ImmutableList<Term>>>>();        
-        respects.put(baseHeap, respectsTermList);
+                                             ImmutableList<InfFlowSpec>>();
+        respects.put(baseHeap, infFlowSpecTermList);
 
         //translateToTerm variant
         Term variant;

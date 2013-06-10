@@ -18,7 +18,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
@@ -142,24 +142,18 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,
-                    ImmutableList<Triple<ImmutableList<Term>,
-                                         ImmutableList<Term>,
-                                         ImmutableList<Term>>>> newRespects
+                    ImmutableList<InfFlowSpec>> newInfFlowSpecs
                                  = new LinkedHashMap<LocationVariable,
-                                                     ImmutableList<Triple<ImmutableList<Term>,
-                                                                          ImmutableList<Term>,
-                                                                          ImmutableList<Term>>>>();
+                                                     ImmutableList<InfFlowSpec>>();
                 //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
                 for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
-                  final ImmutableList<Triple<ImmutableList<Term>,
-                                             ImmutableList<Term>,
-                                             ImmutableList<Term>>> r =
-                                 inv.getRespects(heap, selfTerm, atPres, services);
+                  final ImmutableList<InfFlowSpec> infFlowSpecs =
+                                 inv.getInfFlowSpecs(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
-                  newRespects.put(heap, r);
+                  newInfFlowSpecs.put(heap, infFlowSpecs);
                   newInvariants.put(heap, i);
                 }
                 ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
@@ -170,7 +164,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                ec,
                                newInvariants,
                                newMods,
-                               newRespects,
+                               newInfFlowSpecs,
                                newVariant, 
                                selfTerm,
                                newLocalIns,
