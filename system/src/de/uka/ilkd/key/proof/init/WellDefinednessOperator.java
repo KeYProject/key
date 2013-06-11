@@ -1,12 +1,16 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -27,7 +31,7 @@ public class WellDefinednessOperator {
     // TODO: select-terms? variables?
     public Term wd(Term t) {
         Operator op = t.op();
-        int subs = t.arity(); // number of subterms
+        int subs = t.arity(); // number of sub terms
         // Primary expressions
         if (subs == 0) {
             return primaryExpr(t);
@@ -43,6 +47,8 @@ public class WellDefinednessOperator {
             assert subs == 2;
             return and(t.sub(0), t.sub(1));
         } else if (op.equals(Junctor.IMP)) {
+            // Reverse implication is parsed to an equivalent disjunction and thus
+            // does not have to be considered separately
             assert subs == 2;
             return imp(t.sub(0), t.sub(1));
         } else if (op.equals(Equality.EQV)) {
@@ -57,19 +63,22 @@ public class WellDefinednessOperator {
         // Numerical operators
         else if (isUnaryNumericalOp(t)) {
             return num(t);
-        }
-        else if (isNumericalOp(t)) {
+        } else if (isNumericalOp(t)) {
             assert subs == 2;
-            if (isDivision(t) || isModulo(t)) {
+            if ((isDivision(t) || isModulo(t)) && !isFloatOrDouble(t)) {
                 return TB.and(TB.not(TB.equals(t.sub(1), TB.zero(services))),
                               wd(t.sub(0), t.sub(1)));
             } else {
                 return wd(t.sub(0), t.sub(1));
             }
         }
-        // TODO: Floating point types, \bigint and \real
-
-        // TODO: Conditional Expression, Type Expression, Type Cast
+        // Conditional expression
+        else if (op.equals(IfThenElse.IF_THEN_ELSE)
+                || op.equals(IfExThenElse.IF_EX_THEN_ELSE)) {
+            assert subs == 3;
+            return cond(t.sub(0), t.sub(1), t.sub(2));
+        }
+        // TODO: Type Expression
 
         // TODO: Reference Expressions ...
 
@@ -84,6 +93,7 @@ public class WellDefinednessOperator {
     }
 
     private Term wd(Term a, Term b) {
+        assert a.sort().equals(b.sort());
         return TB.and(wd(a), wd(b));
     }
 
@@ -119,8 +129,13 @@ public class WellDefinednessOperator {
         return TB.or(guard, wd);
     }
 
+    private Term cond(Term a, Term b, Term c) {
+        return TB.or(wd(TB.equals(a, TB.tt()), wd(a, b)),
+                     wd(TB.equals(a, TB.ff()), wd(a, c)));
+    }
+
     private Term inv(Term a) {
-        // FIXME: What shall we do with <inv>?
+        // The implicit invariant (self != null) is ignored, since it is implicit
         return TB.tt();
     }
 
@@ -132,26 +147,66 @@ public class WellDefinednessOperator {
     private Term num(Term t) {
         int subs = t.arity();
         Operator op = t.op();
-        String s = t.toString();
 
         assert subs <= 1;
         assert op instanceof Function;
         Function f = (Function)op;
 
-        if (f.equals(intLDT.getNumberSymbol())
-                || f.equals(intLDT.getJavaUnaryMinusInt())
-                || f.equals(intLDT.getJavaUnaryMinusLong())
-                || f.equals(intLDT.getJavaBitwiseNegation())) {
-            assert subs == 1;
-            return num(t.sub(0));
-        } else if (intLDT.hasLiteralFunction(f)
+        if (isUnaryNumericalOp(t)
                 && !f.equals(intLDT.getNumberTerminator())) {
             assert subs == 1;
-            return num(t.sub(0));
+            // Type cast
+            if (isCastOp(t)) {
+                final String min;
+                final String max;
+                if (f.equals(intLDT.getJavaCastByte())) {
+                    min = (new Byte(Byte.MIN_VALUE)).toString();
+                    max = (new Byte(Byte.MAX_VALUE)).toString();
+                } else if (f.equals(intLDT.getJavaCastChar())) {
+                    min = (new Character(Character.MIN_VALUE)).toString();
+                    max = (new Character(Character.MAX_VALUE)).toString();
+                } else if (f.equals(intLDT.getJavaCastInt())) {
+                    min = (new Integer(Integer.MIN_VALUE)).toString();
+                    max = (new Integer(Integer.MAX_VALUE)).toString();
+                } else if (f.equals(intLDT.getJavaCastLong())) {
+                    min = (new Long(Long.MIN_VALUE)).toString();
+                    max = (new Long(Long.MAX_VALUE)).toString();
+                } else if (f.equals(intLDT.getJavaCastShort())) {
+                    min = (new Short(Short.MIN_VALUE)).toString();
+                    max = (new Short(Short.MAX_VALUE)).toString();
+                } else {
+                    assert false; // Unknown cast
+                    min = "";
+                    max = "";
+                }
+                return TB.and(num(t.sub(0)),
+                              TB.and(TB.lt(TB.zTerm(services, min), t, services),
+                                     TB.gt(TB.zTerm(services, max), t, services)));
+            } else {
+                return num(t.sub(0));
+            }
         } else {
             assert f.equals(intLDT.getNumberTerminator());
             assert subs == 0;
             return TB.tt();
+        }
+    }
+
+    private boolean isCastOp(Term t) {
+        int subs = t.arity();
+        Operator op = t.op();
+
+        if (subs > 1 || !(op instanceof Function)) {
+            return false;
+        }
+        Function f = (Function)op;
+
+        if (f.equals(intLDT.getJavaCastByte()) || f.equals(intLDT.getJavaCastChar())
+                || f.equals(intLDT.getJavaCastInt()) || f.equals(intLDT.getJavaCastLong())
+                || f.equals(intLDT.getJavaCastShort())) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -176,23 +231,75 @@ public class WellDefinednessOperator {
 
     private boolean isUnaryNumericalOp(Term t) {
         Operator op = t.op();
-
+        // Floating point operations not supported
         if (op.equals(intLDT.getJavaUnaryMinusInt())
-                || op.equals(intLDT.getJavaUnaryMinusLong())) {
+                || op.equals(intLDT.getJavaUnaryMinusLong())
+                || op.equals(intLDT.getNegativeNumberSign())) {
+            assert isIntegerOrChar(t) || isBigIntOrReal(t);
             return true;
         } else if (op.equals(intLDT.getJavaBitwiseNegation())) {
+            assert isIntegerOrChar(t);
             return true;
-        } else if(op.toString().equalsIgnoreCase("Z")) {
+        } else if (op.equals(intLDT.getJavaCastByte())) {
+            assert intLDT.getType(t).equals(PrimitiveType.JAVA_BYTE);
+            return true;
+        } else if (op.equals(intLDT.getJavaCastChar())) {
+            assert intLDT.getType(t).equals(PrimitiveType.JAVA_CHAR);
+            return true;
+        } else if (op.equals(intLDT.getJavaCastInt())) {
+            assert intLDT.getType(t).equals(PrimitiveType.JAVA_INT);
+            return true;
+        } else if (op.equals(intLDT.getJavaCastLong())) {
+            assert intLDT.getType(t).equals(PrimitiveType.JAVA_LONG);
+            return true;
+        } else if (op.equals(intLDT.getJavaCastShort())) {
+            assert intLDT.getType(t).equals(PrimitiveType.JAVA_SHORT);
+            return true;
+        } else if (op.equals(intLDT.getNumberSymbol())) {
+            return true;
+        } else if (op instanceof Function
+                && intLDT.hasLiteralFunction((Function)op)) {
             return true;
         } else {
             return false;
         }
     }
 
+    private boolean isIntegerOrChar(Term a) {
+        Type t = intLDT.getType(a);
+        if (t.equals(PrimitiveType.JAVA_INT) || t.equals(PrimitiveType.JAVA_LONG)
+                || t.equals(PrimitiveType.JAVA_BYTE) || t.equals(PrimitiveType.JAVA_SHORT)
+                || t.equals(PrimitiveType.JAVA_CHAR)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isFloatOrDouble(Term a) {
+        Type t = services.getTypeConverter().getModelFor(a.sort()).getType(a);
+        if (t.equals(PrimitiveType.JAVA_FLOAT) || t.equals(PrimitiveType.JAVA_DOUBLE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isBigIntOrReal(Term a) {
+        // \real is not supported
+        Type t = intLDT.getType(a);
+        return t.equals(PrimitiveType.JAVA_BIGINT);
+    }
+
     private boolean isNumericalOp(Term t) {
+        // Floating point operations not supported
         if (isAddition(t) || isSubtraction(t)
-                || isMultiplication(t) || isDivision(t) || isModulo(t)
-                || isShiftOp(t) || isBitwiseAnd(t) || isBitwiseOr(t) || isBitwiseXOr(t)) {
+                || isMultiplication(t) || isDivision(t) || isModulo(t)) {
+            assert isIntegerOrChar(t) || isBigIntOrReal(t);
+            return true;
+        } else if (isShiftOp(t) || isBitwiseAnd(t)
+                || isBitwiseOr(t) || isBitwiseXOr(t)) {
+            assert isIntegerOrChar(t);
             return true;
         } else {
             return false;
