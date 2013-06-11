@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel">
+  <proofs target="//@types.0/@constructors.0/@operationContracts.0" obligation="ContractPO">
+    <proofReferences target="//@types.0/@constructors.0" kind="Inline Method"/>
+  </proofs>
+  <types xsi:type="dbcmodel:DbcClass" name="ConstructorTest">
+    <constructors signature="ConstructorTest(x : int, a : B)">
+      <operationContracts name="ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML operation contract.0" pre="!a = null" post="(exc = null -> self.&lt;inv>) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </constructors>
+  </types>
+</dbcmodel:DbcModel>

@@ -42,6 +42,22 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelCreatorTest {
    /**
+    * Tests "ConstructorTest".
+    * @throws Exception Occurred Exception.
+    */
+   @Test
+   public void testConstructorTest() throws Exception {
+      doTest("ProofReferenceModelCreatorTest_testConstructorTest", 
+             "data/ConstructorTest/test", 
+             "ConstructorTest.java", 
+             "ConstructorTest", 
+             "ConstructorTest::ConstructorTest",
+             "data/ConstructorTest/oracle/Initial.xml",
+             false,
+             "data/ConstructorTest/oracle/Final.xml");
+   }
+   
+   /**
     * Tests "InnerAndAnonymousTypeTest".
     * @throws Exception Occurred Exception.
     */

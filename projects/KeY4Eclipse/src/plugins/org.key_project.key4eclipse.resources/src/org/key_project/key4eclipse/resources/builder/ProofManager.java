@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -416,7 +417,9 @@ public class ProofManager {
     */
    private Proof loadProof(File file){
       try{
-         KeYEnvironment<?> environment = KeYEnvironment.load(file, null, null);
+         File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+         List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+         KeYEnvironment<?> environment = KeYEnvironment.load(file, classPaths, bootClassPath);
          Proof proof = environment.getLoadedProof();
          if (proof != null) {
             proofs.add(proof);
@@ -425,7 +428,7 @@ public class ProofManager {
             }
          }
          return proof;
-      }catch(ProblemLoaderException e){
+      }catch(Exception e){
          LogUtil.getLogger().createErrorStatus(e);
          return null;
       }
@@ -459,8 +462,8 @@ public class ProofManager {
       String tmp;
       for(int i = 1; i<=str.length();i++){
          tmp = str.substring(0, i);
-         Path path = new Path(tmp);
-         if(!path.isValidSegment(tmp)){
+         IStatus status = ResourcesPlugin.getWorkspace().validateName(tmp, IResource.FILE);
+         if(!status.isOK()){
             StringBuilder strbuilder = new StringBuilder(str);
             strbuilder.setCharAt(i-1, '_');
             str = strbuilder.toString();

@@ -22,6 +22,25 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
  */
 public class TestMethodCallProofReferencesAnalyst extends AbstractProofReferenceTestCase {
    /**
+    * Tests "constructorTest".
+    */
+   public void testConstructorTest() throws Exception {
+      doReferenceMethodTest(keyRepDirectory, 
+                            "examples/_testcase/proofReferences/constructorTest/ConstructorTest.java", 
+                            "ConstructorTest", 
+                            "ConstructorTest", 
+                            false,
+                            new MethodCallProofReferencesAnalyst(),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<createObject>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<allocate>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<prepareEnter>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<prepare>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<init>"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "A::magic"),
+                            new ExpectedProofReferences(IProofReference.CALL_METHOD, "B::staticMagic"));
+   }
+   
+   /**
     * Tests "methodCall".
     */
    public void testMethodCall() throws Exception {

@@ -689,7 +689,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -723,7 +722,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -755,7 +753,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -785,7 +782,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -862,6 +858,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             return methodFullName.equals(element.getFullName());
          }
       });
+      if (pm == null) {
+         pms = javaInfo.getConstructors(containerKJT);
+         pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+            @Override
+            public boolean select(IProgramMethod element) {
+               return methodFullName.equals(element.getFullName());
+            }
+         });
+      }
       assertNotNull(pm);
       return pm;
    }
@@ -1358,7 +1363,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             // Store the number of nodes before start of the auto mode 
             nodeCount = env.getProof().countNodes();
             // Run proof
-            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(env.getProof());
             env.getUi().startAndWaitForAutoMode(env.getProof());
             // Update symbolic execution tree 
             env.getBuilder().analyse();
