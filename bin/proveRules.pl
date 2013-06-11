@@ -228,14 +228,21 @@ sub remove_stale_files {
 	close IN;
     }
 
-    foreach (<$path_to_obligs/*/*.key>) {
-	if($taggedrules{$_}) {
+    # print join("\n", %taggedrules);
+
+    foreach (<$path_to_obligs/*/*.key $path_to_obligs/*/*.proof>) {
+	my $base = $_;
+	$base =~ s/.[^\.]*$//;
+	if($taggedrules{$base}) {
 	    print "$_ is still valid.\n";
 	} else {
 	    print "$_ is a stale proof obligation/proof. It will be removed.\n";
-	    # unlink($_);
+	    unlink($_);
 	}
     }
+
+
+
 }
 
 #
