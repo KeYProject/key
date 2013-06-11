@@ -198,6 +198,11 @@ while [ $# -ne 0 ]; do
 	    shift
 	    continue;;
 	    
+	--splash)
+	    JAVA_OPTIONS="${JAVA_OPTIONS} -splash:$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-color.gif" 
+	    shift
+	    continue;;
+
          # key options beginning with a minus or filenames  
          *) break;;
 
@@ -227,7 +232,6 @@ export PATH
 
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
--splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-color.gif" \
 -Dkey.home="$KEY_HOME" \
 -Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
 -Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \

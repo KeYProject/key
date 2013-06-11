@@ -186,16 +186,6 @@ public class Main {
         }
     }
 
-
-    /**
-     * Returns the used title. This information is required in other
-     * projects which instantiates the {@link MainWindow} manually.
-     * @return The title of {@link MainWindow} to use.
-     */
-    public static String getMainWindowTitle() {
-        return "KeY " + KeYResourceManager.getManager().getVersion();
-    }
-
     /**
      * Register commandline options with command line object
      * @return commandline object
@@ -345,7 +335,6 @@ public class Main {
 	UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
-            ensureSplashScreenInvisible();
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);
@@ -375,14 +364,6 @@ public class Main {
 
         return ui;
 
-    }
-
-    private static void ensureSplashScreenInvisible() {
-        try {
-            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) return;
-            else sp.close();
-        } catch (Exception e) {}
     }
 
     private static void updateSplashScreen() {
