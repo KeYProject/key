@@ -108,4 +108,22 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.globalStarter">
+      <starter
+            class="org.key_project.monkey.product.ui.starter.MonKeYGlobalStarter"
+            description="Batch verification of all proof obligations."
+            id="org.key_project.monkey.product.ui.starter.MonKeYGlobalStarter"
+            name="MonKeY">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.projectStarter">
+      <starter
+            class="org.key_project.monkey.product.ui.starter.MonKeYProjectStarter"
+            description="Batch verification of all proof obligations."
+            id="org.key_project.monkey.product.ui.starter.MonKeYProjectStarter"
+            name="MonKeY">
+      </starter>
+   </extension>
 </plugin>

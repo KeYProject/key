@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.LinkedList;
@@ -15,10 +28,37 @@ public class FileHeaderChecker {
     * @param args The program start parameters.
     */
    public static void main(String[] args) {
+      checkSystem();
+      checkProjects();
+   }
+   
+   /**
+    * Lists all files with different header in the "projects" folder of the KeY repository.
+    */
+   protected static void checkProjects() {
+      File projectDir = new File("D:\\Forschung\\GIT\\KeY\\projects");
+      File headerFile = new File("data/ProjectsHeader.txt");
+      check(headerFile, projectDir);
+   }
+   
+   /**
+    * Lists all files with different header in the "system" folder of the KeY repository.
+    */
+   protected static void checkSystem() {
+      File srcDir = new File("D:\\Forschung\\GIT\\KeY\\system\\src");
+      File testDir = new File("D:\\Forschung\\GIT\\KeY\\system\\test");
+      File headerFile = new File("data/KeyHeader.txt");
+      check(headerFile, srcDir, testDir);
+   }
+   
+   /**
+    * Lists all files with different header.
+    * @param headerFile The header.
+    * @param workingDirs The directories to check.
+    */
+   protected static void check(File headerFile, File... workingDirs) {
       try {
          // Define settings
-         File workingDir = new File("D:\\Forschung\\GIT\\KeY_Master\\system");
-         File newHeaderFile = new File("data/KeyHeader.txt");
          FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
@@ -32,14 +72,16 @@ public class FileHeaderChecker {
             }
          };
          // Write settings into console
-         System.out.println("Working Directory: " + workingDir);
-         System.out.println("New Header File: " + newHeaderFile);
+         System.out.println("Working Directories: " + workingDirs);
+         System.out.println("New Header File: " + headerFile);
          System.out.println();
          // List files to check
          List<File> filesToModify = new LinkedList<File>();
-         FileHeaderModifier.listFiles(workingDir, filter, filesToModify);
+         for (File workingDir : workingDirs) {
+            FileHeaderModifier.listFiles(workingDir, filter, filesToModify);
+         }
          // Read headers
-         String newHeader = IOUtil.readFrom(newHeaderFile).trim();
+         String newHeader = IOUtil.readFrom(headerFile).trim();
          // List files without header
          List<File> foundFiles = new LinkedList<File>();
          for (File file : filesToModify) {

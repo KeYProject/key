@@ -65,7 +65,7 @@
                      <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;14&apos; as result of self.main();&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="VariablesStaticTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -86,7 +86,7 @@
                         <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>

@@ -113,6 +113,7 @@ import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
@@ -830,7 +831,12 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);	
 	return new AllFields(children);
     }
-    
+
+    public AllObjects convert(de.uka.ilkd.key.java.recoderext.adt.AllObjects e) {
+        ExtList children = collectChildren(e);	
+	return new AllObjects(children);
+    }
+
     public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral e) {
         return EmptySeqLiteral.INSTANCE;
     }    
@@ -877,11 +883,12 @@ public class Recoder2KeYConverter {
             throw new ConvertException("In an embedded DL expression, " + name 
                     + " is not a known DL function name. Line/Col:" + e.getStartPosition());
         }
-        
-        Function f = (Function) named;
+
+	        Function f = (Function) named;
         DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
         
-        expression.check(services);
+        expression.check(services, getKeYJavaType(getServiceConfiguration().getCrossReferenceSourceInfo()
+						  .getContainingClassType(e)));
         
         return expression;
     }

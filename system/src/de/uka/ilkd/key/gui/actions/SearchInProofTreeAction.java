@@ -13,11 +13,13 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.MainWindow;
+
+/*
+ * Menu option for showing the proof tree search bar.
+ * Keyboard shortcut: STRG+SHIFT+F.
+ */
 
 public class SearchInProofTreeAction extends MainWindowAction {
 
@@ -27,17 +29,16 @@ public class SearchInProofTreeAction extends MainWindowAction {
         super(mainWindow);
         setName("Search in proof tree");
         setTooltip("Search for rule names or node numbers in the proof tree.");
-        this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         
-        getMediator().enableWhenProof(this);
+        this.setAcceleratorKey(
+                de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
+        getMediator().enableWhenProofLoaded(this);
+        
     }
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        if (mainWindow.getMediator().getProof() != null)
-        	mainWindow.selectTab(0);
-            mainWindow.getProofView().showSearchPanel();
+        mainWindow.selectTab(0);
+        mainWindow.getProofView().showSearchPanel();
     }
-
 }

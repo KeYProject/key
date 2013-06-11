@@ -44,7 +44,6 @@ import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -54,11 +53,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Martin Hentschel
  */
 public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
-   /**
-    * Global constant to enable or disable the usage of loop invariants.
-    */
-   public static final boolean LOOP_INVARIANTS_SUPPORTED = false;
-   
    /**
     * ID of this view.
     */
@@ -152,25 +146,23 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       methodTreatmentCombo.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            methodTreatmentChanged(e);
+            updateStrategySettings();
          }
       });
       // Loop treatment
-      if (LOOP_INVARIANTS_SUPPORTED) {
-         Group loopTreatmentGroup = new Group(parent, SWT.NONE);
-         loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-         loopTreatmentGroup.setText("Loop Treatment");
-         loopTreatmentGroup.setLayout(new FillLayout());
-         loopTreatmentCombo = new Combo(loopTreatmentGroup, SWT.READ_ONLY);
-         loopTreatmentCombo.add(LOOP_TREATMENT_EXPAND);
-         loopTreatmentCombo.add(LOOP_TREATMENT_INVARIANT);
-         loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-               loopTreatmentChanged(e);
-            }
-         });
-      }
+      Group loopTreatmentGroup = new Group(parent, SWT.NONE);
+      loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      loopTreatmentGroup.setText("Loop Treatment");
+      loopTreatmentGroup.setLayout(new FillLayout());
+      loopTreatmentCombo = new Combo(loopTreatmentGroup, SWT.READ_ONLY);
+      loopTreatmentCombo.add(LOOP_TREATMENT_EXPAND);
+      loopTreatmentCombo.add(LOOP_TREATMENT_INVARIANT);
+      loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateStrategySettings();
+         }
+      });
       // Alias checks
       Group aliasChecksGroup = new Group(parent, SWT.NONE);
       aliasChecksGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -182,7 +174,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       aliasChecksCombo.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            aliasChecksChanged(e);
+            updateStrategySettings();
          }
       });
       // Set read-only if required
@@ -198,12 +190,12 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          showSettings(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY), 
                       sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY),
-                      sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
+                      sp.getProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
       }
       else {
          showSettings(StrategyProperties.METHOD_EXPAND, 
                       StrategyProperties.LOOP_EXPAND,
-                      SymbolicExecutionStrategy.ALIAS_CHECK_NEVER);
+                      StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
       }
    }
 
@@ -237,7 +229,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          loopTreatmentCombo.setText(StrategyProperties.LOOP_INVARIANT.equals(loopOptionsKey) ? LOOP_TREATMENT_INVARIANT : LOOP_TREATMENT_EXPAND);
       }
       if (aliasChecksCombo != null) {
-         aliasChecksCombo.setText(SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(aliasCheckOptionsKey) ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
+         aliasChecksCombo.setText(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(aliasCheckOptionsKey) ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
       }
    }
 
@@ -379,28 +371,15 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       this.proof = proof;
       updateShownValues();
    }
-
+   
    /**
-    * When the selected method treatment has changed.
-    * @param e The event.
+    * Updates the {@link StrategyProperties} of {@link #proof} whe
+    * a value has changed in the UI.
     */
-   protected void methodTreatmentChanged(SelectionEvent e) {
-      SymbolicExecutionUtil.setUseOperationContracts(proof, METHOD_TREATMENT_CONTRACT.equals(methodTreatmentCombo.getText()));
-   }
-
-   /**
-    * When the selected loop treatment has changed.
-    * @param e The event.
-    */
-   protected void loopTreatmentChanged(SelectionEvent e) {
-      SymbolicExecutionUtil.setUseLoopInvariants(proof, LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText()));
-   }
-
-   /**
-    * When the selected alias checks has changed.
-    * @param e The event.
-    */
-   protected void aliasChecksChanged(SelectionEvent e) {
-      SymbolicExecutionUtil.setAliasChecks(proof, ALIAS_CHECK_IMMEDIATELY.equals(aliasChecksCombo.getText()));
+   protected void updateStrategySettings() {
+      boolean useOperationContracts = METHOD_TREATMENT_CONTRACT.equals(methodTreatmentCombo.getText());
+      boolean useLoopInvariants = LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText());
+      boolean aliasChecksImmediately = ALIAS_CHECK_IMMEDIATELY.equals(aliasChecksCombo.getText());
+      SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, useLoopInvariants, aliasChecksImmediately);
    }
 }

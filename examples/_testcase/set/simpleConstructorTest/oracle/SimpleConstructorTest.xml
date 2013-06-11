@@ -8,14 +8,16 @@
             <statement name="this.x=var;" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>
                <callStackEntry path="/0/0/0"/>
-               <methodReturn name="&lt;return of SimpleConstructorTest(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleConstructorTest(var);&gt;" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of SimpleConstructorTest(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleConstructorTest(var);&gt;" isReturnValueComputed="true">
                   <callStackEntry path="/0"/>
                   <callStackEntry path="/0/0/0"/>
                   <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of SimpleConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of SimpleConstructorTest.main();&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of SimpleConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleConstructorTest.main();&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                        </methodReturnValue>
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>

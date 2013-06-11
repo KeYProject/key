@@ -13,7 +13,6 @@
 
 package org.key_project.sed.key.core.util;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
@@ -28,7 +27,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
@@ -36,6 +35,7 @@ import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchNode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
+import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
 import org.key_project.sed.key.core.model.KeYLoopNode;
 import org.key_project.sed.key.core.model.KeYMethodCall;
@@ -45,11 +45,8 @@ import org.key_project.sed.key.core.model.KeYTermination;
 import org.key_project.sed.key.core.model.KeYUseLoopInvariant;
 import org.key_project.sed.key.core.model.KeYUseOperationContract;
 import org.key_project.sed.key.core.model.KeYVariable;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.IOUtil.LineInformation;
 import org.key_project.util.jdt.JDTUtil;
 
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -60,6 +57,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -171,11 +169,17 @@ public final class KeYModelUtil {
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
-         if (terminationExecutionNode.isExceptionalTermination()) {
+         if (terminationExecutionNode.getTerminationKind() == TerminationKind.EXCEPTIONAL) {
             result = new KeYExceptionalTermination(target, parent, thread, (IExecutionTermination)executionNode);
          }
-         else {
+         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.NORMAL) {
             result = new KeYTermination(target, parent, thread, (IExecutionTermination)executionNode);
+         }
+         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
+            result = new KeYLoopBodyTermination(target, parent, thread, (IExecutionTermination)executionNode);
+         }
+         else {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
          }
       }
       else {
@@ -183,90 +187,6 @@ public final class KeYModelUtil {
       }
       target.registerDebugNode(result);
       return result;
-   }
-   
-   /**
-    * Returns the path to the source file defined by the given {@link PositionInfo}.
-    * @param posInfo The {@link PositionInfo} to extract source file from.
-    * @return The source file name or {@code null} if not available.
-    */
-   public static String getSourcePath(PositionInfo posInfo) {
-      String result = null;
-      if (posInfo.getFileName() != null) {
-         result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
-      }
-      else if (posInfo.getParentClass() != null) {
-         result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
-      }
-      if (result != null && result.startsWith("FILE:")) {
-         result = result.substring("FILE:".length());
-      }
-      return result;
-   }
-
-   /**
-    * Converts the given {@link PositionInfo} into a {@link SourceLocation}.
-    * This includes to convert position information defined via row and column
-    * of the {@link PositionInfo} into character offset from file beginning
-    * for the {@link SourceLocation}.
-    * @param posInfo The {@link PositionInfo} to convert.
-    * @return The created {@link PositionInfo}.
-    */
-   public static SourceLocation convertToSourceLocation(PositionInfo posInfo) {
-      try {
-         if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
-            // Try to find the source file.
-            String path = getSourcePath(posInfo);
-            File file = path != null ? new File(path) : null;
-            // Check if a source file is available
-            int charStart = -1;
-            int charEnd = -1;
-            int lineNumber = -1;
-            if (file != null) {
-               // Set source location
-               LineInformation[] infos = IOUtil.computeLineInformation(file);
-               if (posInfo.getStartPosition() != null) {
-                  int line = posInfo.getStartPosition().getLine() - 1;
-                  int column = posInfo.getStartPosition().getColumn();
-                  if (line >= 0 && line < infos.length) {
-                     LineInformation info = infos[line];
-                     int offset = info.getOffset() + KeYUtil.normalizeRecorderColumn(column, info.getTabIndices());
-                     charStart = offset;
-                  }
-               }
-               if (posInfo.getEndPosition() != null) {
-                  int line = posInfo.getEndPosition().getLine() - 1;
-                  int column = posInfo.getEndPosition().getColumn();
-                  if (line >= 0 && line < infos.length) {
-                     LineInformation info = infos[line];
-                     int offset = info.getOffset() + KeYUtil.normalizeRecorderColumn(column, info.getTabIndices());
-                     charEnd = offset;
-                  }
-               }
-               // Check if source start and end is defined.
-               if (charStart < 0 || charEnd < 0) {
-                  // Unset start and end indices
-                  charStart = -1;
-                  charEnd = -1;
-                  // Try to set a line number as backup
-                  if (posInfo.getEndPosition() != null) {
-                     lineNumber = posInfo.getEndPosition().getLine();
-                  }
-               }
-               return new SourceLocation(lineNumber, charStart, charEnd);
-            }
-            else {
-               return SourceLocation.UNDEFINED;
-            }
-         }
-         else {
-            return SourceLocation.UNDEFINED;
-         }
-      }
-      catch (IOException e) {
-         LogUtil.getLogger().logError(e);
-         return SourceLocation.UNDEFINED;
-      }
    }
    
    /**
@@ -374,69 +294,6 @@ public final class KeYModelUtil {
          }
       }
       return result;
-   }
-   
-   /**
-    * Represents a location in a source file.
-    * @author Martin Hentschel
-    */
-   public static class SourceLocation {
-      /**
-       * Location which indicates that no location is defined.
-       */
-      public static final SourceLocation UNDEFINED = new SourceLocation(-1, -1, -1);
-      
-      /**
-       * The line number to select.
-       */
-      private int lineNumber;
-      
-      /**
-       * The index of the start character to select.
-       */
-      private int charStart;
-      
-      /**
-       * The index of the end character to select.
-       */
-      private int charEnd;
-      
-      /**
-       * Constructor.
-       * @param lineNumber The line number to select.
-       * @param charStart The index of the start character to select.
-       * @param charEnd The index of the end character to select.
-       */
-      public SourceLocation(int lineNumber, int charStart, int charEnd) {
-         super();
-         this.lineNumber = lineNumber;
-         this.charStart = charStart;
-         this.charEnd = charEnd;
-      }
-      
-      /**
-       * Returns The line number to select.
-       * @return The line number to select.
-       */
-      public int getLineNumber() {
-         return lineNumber;
-      }
-      
-      /**
-       * Returns The index of the start character to select.
-       * @return The index of the start character to select.
-       */
-      public int getCharStart() {
-         return charStart;
-      }
-      
-      /**
-       * Returns The index of the end character to select.
-       * @return The index of the end character to select.
-       */
-      public int getCharEnd() {
-         return charEnd;
-      }
    }
 
    /**

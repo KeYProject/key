@@ -16,11 +16,12 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDLoopCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -140,9 +141,9 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourcePath(executionNode.getGuardExpressionPositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getGuardExpressionPositionInfo());
          if (sourceName == null) {
-            sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
+            sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
          }
       }
       return sourceName;
@@ -188,7 +189,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getGuardExpressionPositionInfo());
+      SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getGuardExpressionPositionInfo());
       return KeYModelUtil.updateLocationFromAST(this, location);
    }
 
