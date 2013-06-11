@@ -28,7 +28,9 @@
 use strict;
 use File::Basename;
 use Cwd 'realpath';
+use Getopt::Long;
 
+#
 # Configuration variables
 my $path_to_key = realpath(dirname($0) . "/..");
 my $path_to_examples = $path_to_key . "/examples/";
@@ -37,6 +39,29 @@ my $path_to_rules = $path_to_key . "/system/resources/de/uka/ilkd/key/proof/rule
 my $now=localtime(time);
 # time out set to 30 minutes
 my $time_limit = 30*60; 
+
+#                                                                               |
+my $helptext = <<DOC;
+Create and run/reload proofs for taclets in KeY.
+
+The proof obligation files are stored in directory 'examples/taclets' under your
+KeY top directory.
+
+To enable the creation of a proof obligation for a rule, add the comment
+  '//proved'
+to the line DIRECTLY BEFORE the declaration of the rule. The proof obligation
+will then be created by the next call to this script.
+
+Command line options:
+  -h  --help                  to get this help message
+  -x  --xml-junit <filename>  to store the result of the tests in an xml-format
+                              which can be understood by Jenkins.
+  -c  --create-only           only create proof obligation files, no proofs
+  -p  --proof-only            only run the proofs, do create proof obl. files.
+  -d  --delete-old            remove proof obligation or proof files for rules
+                              which are no longer annotated in the rules file.
+
+DOC
 
 #
 # the template file for new proof obligations:
@@ -120,7 +145,8 @@ sub system_timeout {
 
 sub runAuto {
     my $file = $_[0];
-    my $command = "'" . $path_to_key . "/bin/runProver' --auto '$file'";
+    my $mode = $_[1];  # either auto or auto-loadonly
+    my $command = "'" . $path_to_key . "/bin/runProver' --$mode '$file'";
     print "Command is: $command\n";
     my $starttime = time();
     my $result = &system_timeout($time_limit, $command);
@@ -137,7 +163,16 @@ sub run_proof_obligations {
     my $count = 0;
 
     foreach (<$path_to_obligs/*/*.key>) {
-	my $result = &runAuto($_);
+	my $proofName = $_;
+	$proofName =~ s/.key$/.proof/;
+
+	my $result;
+	if(-r "$proofName") {
+	    $result = &runAuto($proofName, "auto-loadonly");
+	} else {
+	    $result = &runAuto($_, "auto");
+	}
+
 	if ($result == 0) {
 	    print "Indeed proved\n";
 	    push @successes, $_;
@@ -171,6 +206,48 @@ sub run_proof_obligations {
     }
 
 }
-	
-&scan_for_proof_obligations;
-&run_proof_obligations;
+
+sub remove_stale_files {
+    my %taggedrules = ();
+    foreach my $ruleFile (<$path_to_rules/*.key>) {
+	open IN, "$ruleFile";
+	my $ruleset = $1 if $ruleFile =~ m#/([^/]+)\.key$#;
+	my $tagFound = 0;
+	while(<IN>) {
+	    if($tagFound) {
+		if(/\s*([a-zA-Z_0-9]+)\s*{/) {		    
+		    $taggedrules{"$path_to_obligs/$ruleset/$1"} = 1;
+		} else {
+		    print "WARNING: spurious 'proved' annotations in $ruleFile:$.\n";
+		}
+		$tagFound = 0;
+	    }
+		    
+	    $tagFound = 1 if m#^\s*//\s*proved:#;
+	}
+	close IN;
+    }
+
+    foreach (<$path_to_obligs/*/*.key>) {
+	if($taggedrules{$_}) {
+	    print "$_ is still valid.\n";
+	} else {
+	    print "$_ is a stale proof obligation/proof. It will be removed.\n";
+	    # unlink($_);
+	}
+    }
+}
+
+#
+# Command line options
+my %option = ();
+GetOptions(\%option, 'help|h', 'xml-junit|x=s', 'prove-only|p', 'create-only|c', 
+                     'delete-old|d');
+if($option{'help'}) {
+    print $helptext;
+    exit 0;
+}
+
+&remove_stale_files if $option{'delete-old'};
+&scan_for_proof_obligations unless $option{'prove-only'};
+&run_proof_obligations unless $option{'create-only'};
