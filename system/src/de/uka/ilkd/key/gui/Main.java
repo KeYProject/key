@@ -335,7 +335,6 @@ public class Main {
 	UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
-            ensureSplashScreenInvisible();
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);
@@ -365,14 +364,6 @@ public class Main {
 
         return ui;
 
-    }
-
-    private static void ensureSplashScreenInvisible() {
-        try {
-            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
-            if (sp == null) return;
-            else sp.close();
-        } catch (Exception e) {}
     }
 
     private static void updateSplashScreen() {
