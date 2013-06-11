@@ -74,8 +74,6 @@ key_ext_jars="antlr.jar recoderKey.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 
-splashimage="$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-color.gif" 
-
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
     if [ ! -f "$current_jar" ]
@@ -125,7 +123,6 @@ keyoptions=""
 #default values for Java Options Xmx and Xms
 javaOptionXmx="-Xmx2048m";
 javaOptionXms="-Xms64m";
-splash="true";
 
 while [ $# -ne 0 ]; do
     case $1 in
@@ -133,13 +130,11 @@ while [ $# -ne 0 ]; do
 # remote debugging
 	--Kh)
 # 	    set ${1} #removes the minus from the option, s.t. it can be passed to key as option
-	    splash="false"
 	    list_help
 	    exit;;
 
 	--K-help)
 # 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
-	    splash="false"
 	    list_help
 	    exit;;
 
@@ -181,20 +176,6 @@ while [ $# -ne 0 ]; do
             shift
             continue;;
 
-	# KeY options requiring special handling
-	--auto*)
-	    splash="false"
-	    keyoptions="${1}"
-            shift
-            continue;;
-
-	--help)
-	    splash="false"
-	    keyoptions="${1}"
-            shift
-            continue;;
-
-
         # -J options following conventions of Java for -J options
         #special treatment of the options which are also set with deafult 
         #values: xms and Xmx
@@ -217,16 +198,17 @@ while [ $# -ne 0 ]; do
 	    shift
 	    continue;;
 	    
+	--splash)
+	    JAVA_OPTIONS="${JAVA_OPTIONS} -splash:$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-color.gif" 
+	    shift
+	    continue;;
+
          # key options beginning with a minus or filenames  
          *) break;;
 
     esac
 done	
 
-if [ "$splash" = "true"  ]
-then
-JAVA_OPTIONS="${JAVA_OPTIONS} -splash:${splashimage}"
-fi
 
 if [ ! -d "$HOME/.key" ]
 then
@@ -248,11 +230,10 @@ export PATH
 # -ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
 
 
-
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
 -Dkey.home="$KEY_HOME" \
 -Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
 -Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$keyoptions" "$@"
+-classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$@"
