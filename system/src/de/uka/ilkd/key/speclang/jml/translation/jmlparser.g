@@ -461,16 +461,16 @@ separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
     ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
     ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
     ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> new = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
     ImmutableList<Term> tmp;
 }
 :
     (RESPECTS | SEPARATES) (NOTHING | sep = separateslist)
     (   (DECLASSIFIES (NOTHING | tmp = separateslist {decl = decl.append(tmp);})) |
         (ERASES (NOTHING | tmp = separateslist {erases = erases.append(tmp);})) |
-        (NEW_OBJECTS (NOTHING | tmp = separateslist {new = new.append(tmp);}))
+        (NEW_OBJECTS (NOTHING | tmp = separateslist {newObs = newObs.append(tmp);}))
     )*
-    {result = new InfFlowSpec(sep, decl, erases, new);}
+    {result = new InfFlowSpec(sep, decl, erases, newObs);}
     ;
 
 
