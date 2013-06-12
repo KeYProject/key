@@ -34,7 +34,7 @@ public final class ObjectOrientation {
     }
     
     //@ separates \nothing \erases \result.i \new_objects \result;
-    public ObjectOrientation insecure_object_creation() {
+    public ObjectOrientation secure_object_creation_3() {
         return new ObjectOrientation(1);
     }
     
