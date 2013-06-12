@@ -21,6 +21,8 @@ public interface InfFlowPOSnippetFactory {
         //  -> {s1_post}respects = {s2_post}respects
         INF_FLOW_INPUT_OUTPUT_RELATION (InfFlowInputOutputRelationSnippet.class),
 
+        INF_FLOW_CONTRACT_APP_INOUT_RELATION (InfFlowContractAppInOutRelationSnippet.class),
+
         //     ( {s1}pre & {s2}pre )
         //  -> (   (   {s1}respects = {s2}respects
         //          &  {s1}declassifies = {s2}declassifies )

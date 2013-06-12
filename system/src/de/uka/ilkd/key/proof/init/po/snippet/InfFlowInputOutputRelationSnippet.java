@@ -157,36 +157,47 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
         final Term eqAtLocsTerm = d.tb.and(eqAtLocs);
 
-        // default post-relation if newObjects is empty (object insensitive case)
-        Term result = eqAtLocsTerm;
-        if (!infFlowSpec1.newObjects.isEmpty()) {
-            // newObjects is not empty -> object sensitive case
-            // build equalities for newObjects terms
-            ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
-            Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
-            Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
-            for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
-                Term newObject1Term = newObjects1It.next();
-                Term newObject2Term = newObjects2It.next();
-                newObjEqs = newObjEqs.append(d.tb.equals(newObject1Term, newObject2Term));
-            }
-            final Term newObjEqsTerm = d.tb.and(newObjEqs);
-
-            // build isomorphism term for newObjects
-            final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
-            final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
-            final Services services = d.tb.getServices();
-            final Function newObjectsIso =
-                    (Function)services.getNamespaces().functions().lookup("newObjectsIsomorphic");
-            final Term isoTerm = d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap,
-                                           newObjsSeq2, vs2.pre.heap);
-
-            // build object oriented post-relation (object sensitive case)
-            result = d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, result));
+        if (infFlowSpec1.newObjects.isEmpty()) {
+            // object insensitive case
+            return eqAtLocsTerm;
+        } else {
+            // object sensitive case
+            return buildObjectSensitivePostRelation(infFlowSpec1, infFlowSpec2,
+                                                    d, vs1, vs2, eqAtLocsTerm);
         }
-
-        return result;
     }
+
+
+    protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
+                                                    InfFlowSpec infFlowSpec2,
+                                                    BasicSnippetData d,
+                                                    ProofObligationVars vs1,
+                                                    ProofObligationVars vs2,
+                                                    Term eqAtLocsTerm) {
+        // build equalities for newObjects terms
+        ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
+        Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
+        Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
+        for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
+            Term newObject1Term = newObjects1It.next();
+            Term newObject2Term = newObjects2It.next();
+            newObjEqs = newObjEqs.append(d.tb.equals(newObject1Term, newObject2Term));
+        }
+        final Term newObjEqsTerm = d.tb.and(newObjEqs);
+
+        // build isomorphism term for newObjects
+        final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
+        final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
+        final Services services = d.tb.getServices();
+        final Function newObjectsIso =
+                (Function)services.getNamespaces().functions().lookup("newObjectsIsomorphic");
+        final Term isoTerm = d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap,
+                                       newObjsSeq2, vs2.pre.heap);
+
+        // build object oriented post-relation (object sensitive case)
+        return d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, eqAtLocsTerm));
+    }
+
 
     private static class SearchVisitor extends DefaultVisitor {
 
