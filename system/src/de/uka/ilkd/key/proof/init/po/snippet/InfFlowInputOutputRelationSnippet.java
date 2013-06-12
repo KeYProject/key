@@ -6,11 +6,13 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 import java.util.Iterator;
 
 /**
@@ -135,25 +137,37 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         //        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
         //        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
 
-        Term[] eqAtLocs = new Term[infFlowSpec1.separates.size() +
-                                   infFlowSpec1.erases.size()];
+        ImmutableList<Term> eqAtLocs = ImmutableSLList.<Term>nil();
         Iterator<Term> separates1It = infFlowSpec1.separates.iterator();
         Iterator<Term> separates2It = infFlowSpec2.separates.iterator();
         for (int i = 0; i < infFlowSpec1.separates.size(); i++) {
             Term separates1Term = separates1It.next();
             Term separates2Term = separates2It.next();
-            eqAtLocs[i] = d.tb.equals(separates1Term, separates2Term);
+            eqAtLocs = eqAtLocs.append(d.tb.equals(separates1Term, separates2Term));
         }
+
         Iterator<Term> erases1It = infFlowSpec1.erases.iterator();
         Iterator<Term> erases2It = infFlowSpec2.erases.iterator();
         for (int i = 0; i < infFlowSpec1.erases.size(); i++) {
             Term erases1Term = erases1It.next();
             Term erases2Term = erases2It.next();
-            eqAtLocs[i + infFlowSpec1.separates.size()] =
-                    d.tb.equals(erases1Term, erases2Term);
+            eqAtLocs = eqAtLocs.append(d.tb.equals(erases1Term, erases2Term));
+        }
+        final Term eqAtLocsTerm = d.tb.and(eqAtLocs);
+
+        Term result = eqAtLocsTerm;
+        if (!infFlowSpec1.newObjects.isEmpty()) {
+            final Term newObjs1 = d.tb.seq(infFlowSpec1.newObjects);
+            final Term newObjs2 = d.tb.seq(infFlowSpec2.newObjects);
+            final Services services = d.tb.getServices();
+            final Function newObjectsIso =
+                    (Function)services.getNamespaces().functions().lookup("newObjectsIsomorphic");
+            final Term isoTerm = d.tb.func(newObjectsIso, newObjs1, vs1.pre.heap,
+                                           newObjs2, vs2.pre.heap);
+            result = d.tb.and(isoTerm, d.tb.imp(d.tb.equals(newObjs1, newObjs2), result));
         }
 
-        return d.tb.and(eqAtLocs);
+        return result;
     }
 
     private static class SearchVisitor extends DefaultVisitor {

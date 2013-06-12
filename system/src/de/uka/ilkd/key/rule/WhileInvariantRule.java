@@ -361,12 +361,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // create and add split-post and remove-post taclets
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-        final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+        final ArrayList<Taclet> splitPostTaclets =
+                splitPostTB.generateTaclets(post, services);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
-        final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
+        final ArrayList<Taclet> removePostTaclets =
+                removePostTB.generateTaclets(post, services);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }

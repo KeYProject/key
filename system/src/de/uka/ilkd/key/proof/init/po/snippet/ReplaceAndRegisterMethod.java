@@ -95,7 +95,7 @@ abstract class ReplaceAndRegisterMethod {
         }
         ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
         for (Term t : terms.newObjects) {
-            resultErases = resultErases.append(replace(t, origVars, poVars));
+            resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars));
         }
         return new InfFlowSpec(resultSeparates, resultDeclassifies,
                                resultErases, resultNewObjecs);

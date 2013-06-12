@@ -1763,9 +1763,15 @@ public class TermBuilder {
 
 
     public Term seqConcat(Services services, Term s, Term s2) {
-        return func(services.getTypeConverter().getSeqLDT().getSeqConcat(),
-                s,
-                s2);
+        if (s == seqEmpty(services)) {
+            return s2;
+        } else if (s2 == seqEmpty(services)) {
+            return s;
+        } else {
+            return func(services.getTypeConverter().getSeqLDT().getSeqConcat(),
+                        s,
+                        s2);
+        }
     }
 
 

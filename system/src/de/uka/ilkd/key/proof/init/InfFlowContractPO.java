@@ -86,7 +86,8 @@ public class InfFlowContractPO extends AbstractOperationPO
 
         // create and add split-post and remove-post taclets
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-        final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+        final ArrayList<Taclet> splitPostTaclets =
+                splitPostTB.generateTaclets(post, services);
         for (final Taclet t : splitPostTaclets) {
             taclets = taclets.add(NoPosTacletApp
                     .createFixedNoPosTacletApp(t,
@@ -95,7 +96,7 @@ public class InfFlowContractPO extends AbstractOperationPO
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
         }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
-        final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
+        final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post, services);
         for (final Taclet t : removePostTaclets) {
             taclets = taclets.add(NoPosTacletApp
                     .createFixedNoPosTacletApp(t,

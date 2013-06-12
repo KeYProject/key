@@ -4,8 +4,10 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -23,8 +25,8 @@ public class SplitPostTacletBuilder {
     public static final Name SPLIT_POST_RULENAME = new Name("Split_post");
 
 
-    public ArrayList<Taclet> generateTaclets(Term post) {
-        ArrayList<Term> postParts = extractPostParts(post);
+    public ArrayList<Taclet> generateTaclets(Term post, Services services) {
+        ArrayList<Term> postParts = extractPostParts(post, services);
         ArrayList<Taclet> splitPostTaclets = new ArrayList<Taclet>();
         if (postParts.size() > 1) {
             int i = 0;
@@ -51,18 +53,21 @@ public class SplitPostTacletBuilder {
     }
 
 
-    private ArrayList<Term> extractPostParts(Term post) {
+    private ArrayList<Term> extractPostParts(Term post, Services services) {
+        Function newIso =
+                (Function)services.getNamespaces().functions().lookup("newObjectsIsomorphic");
         ArrayList<Term> postParts = new ArrayList<Term>();
         if (post.op() == Junctor.IMP) {
             postParts.add(post.sub(1));
         } else if (post.op() == Junctor.AND) {
-            postParts.addAll(extractPostParts(post.sub(0)));
-            postParts.addAll(extractPostParts(post.sub(1)));
-        } else if (post.depth() == 1 || post.op() == Junctor.TRUE) {
+            postParts.addAll(extractPostParts(post.sub(0), services));
+            postParts.addAll(extractPostParts(post.sub(1), services));
+        } else if (post.depth() == 1 || post.op() == Junctor.TRUE ||
+                   post.op() == newIso) {
             // do nothing
         } else {
             throw new IllegalArgumentException("error while extracting post " +
-                                               "parts: information flowpost " +
+                                               "parts: information flow post " +
                                                "term malformed: " + post);
         }
         return postParts;
