@@ -38,24 +38,59 @@ public final class ObjectOrientation {
         return new ObjectOrientation(1);
     }
     
-    
+   
 //--------------
     
     
-    public static ObjectOrientation a0, a1, a2;
+    public static ObjectOrientation o0, o1, o2;
+    ObjectOrientation next;
+    private static ObjectOrientation high_object;
     private static boolean high;
     
-    //@ separates \nothing \new_objects a0, a1, a2;
+    //@ separates o0, o1, o2;
+    //@ also
+    //@ separates \nothing \new_objects o0, o1, o2;
+    public void insecure_object_assignment() {
+        o0 = high_object;
+    }
+
+    //@ separates \nothing \new_objects o0, o1, o2;
     public void secure_two_object_creation() {
-        a0 = new ObjectOrientation(0);
-        a1 = new ObjectOrientation(1);
-        a2 = a0;
+        o0 = new ObjectOrientation(0);
+        o1 = new ObjectOrientation(1);
+        o2 = o0;
     }
     
-    //@ separates \nothing \new_objects a0, a1, a2;
+    //@ separates \nothing \new_objects o0, o1, o2;
     public void insecure_two_object_creation() {
-        a0 = new ObjectOrientation(0);
-        a1 = new ObjectOrientation(1);
-        a2 = (high ? a0 : a1);
+        o0 = new ObjectOrientation(0);
+        o1 = new ObjectOrientation(1);
+        o2 = (high ? o0 : o1);
+    }
+
+    //@ separates \nothing \new_objects o0, o1;
+    public void secure_if_two_object_creation() {
+        if(high) {
+            o0 = new ObjectOrientation(0);
+            o1 = new ObjectOrientation(1);
+        } else {
+            o1 = new ObjectOrientation(1);
+            o0 = new ObjectOrientation(0);
+        }
+    }
+
+    //@ separates \nothing \new_objects o0, o1;
+    //@ also
+    //@ separates \nothing \new_objects o0, o1, o1.next;
+    public void if_two_object_creation_next() {
+        if(high) {
+            o0 = new ObjectOrientation(0);
+            o1 = new ObjectOrientation(1);
+            o1.next = o1;
+        } else {
+            o1 = new ObjectOrientation(1);
+            o0 = new ObjectOrientation(0);
+            o1.next = o0;
+        }
     }
 }
