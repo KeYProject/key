@@ -39,7 +39,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             c = c.append(WD.wd(t));
         }
         Term poTerms = TB.and(WD.wd(po.first),
-                              TB.imp(TB.equals(po.first, TB.tt()),
+                              TB.imp(po.first,
                                       TB.and(TB.and(c),
                                               WD.wd(po.third))));
         System.out.println(poTerms.toString());

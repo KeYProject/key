@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -21,11 +22,13 @@ public class WellDefinednessOperator {
 
     private final Services services;
     private final IntegerLDT intLDT;
+    private final LocSetLDT locSetLDT;
 
     public WellDefinednessOperator(final Services services) {
         assert services != null;
         this.services = services;
         this.intLDT = services.getTypeConverter().getIntegerLDT();
+        this.locSetLDT = services.getTypeConverter().getLocSetLDT();
     }
 
     // TODO: What about change of system state after valuation?
@@ -124,37 +127,40 @@ public class WellDefinednessOperator {
     private Term primaryExpr(Term a) {
         int subs = a.arity();
         Operator op = a.op();
+        assert subs == 0;
+
         if (op.equals(Junctor.TRUE) || op.equals(Junctor.FALSE)) {
-            assert subs == 0;
             return TB.tt();
+        } else if (op.equals(locSetLDT.getAllLocs())) {
+            return TB.tt(); // TODO: tbc ...
         }
         return TB.ff();
     }
 
     // a || b
     private Term or(Term a, Term b) {
-        Term guard = TB.and(wd(a), TB.equals(a, TB.tt()));
+        Term guard = TB.and(wd(a), a);
         Term wd = TB.and(wd(a), wd(b));
         return TB.or(guard, wd);
     }
 
     // a && b
     private Term and(Term a, Term b) {
-        Term guard = TB.and(wd(a), TB.equals(a, TB.ff()));
+        Term guard = TB.and(wd(a), TB.not(a));
         Term wd = TB.and(wd(a), wd(b));
         return TB.or(guard, wd);
     }
 
     // a ==> b
     private Term imp(Term a, Term b) {
-        Term guard = TB.and(wd(a), TB.equals(a, TB.ff()));
+        Term guard = TB.and(wd(a), TB.not(a));
         Term wd = TB.and(wd(a), wd(b));
         return TB.or(guard, wd);
     }
 
     private Term cond(Term a, Term b, Term c) {
-        return TB.or(wd(TB.equals(a, TB.tt()), wd(a, b)),
-                     wd(TB.equals(a, TB.ff()), wd(a, c)));
+        return TB.or(wd(a, wd(a, b)),
+                     wd(TB.not(a), wd(a, c)));
     }
 
     private Term inv(Term a) {
