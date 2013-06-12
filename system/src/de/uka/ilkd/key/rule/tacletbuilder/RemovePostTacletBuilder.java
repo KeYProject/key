@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
@@ -58,7 +59,7 @@ public class RemovePostTacletBuilder {
             postParts.addAll(extractPostParts(post.sub(0), services));
             postParts.addAll(extractPostParts(post.sub(1), services));
         } else if (post.depth() == 1 || post.op() == Junctor.TRUE ||
-                   post.op() == newIso) {
+                   post.op() == newIso || post.op() == Equality.EQUALS) {
             // do nothing
         } else {
             throw new IllegalArgumentException("error while extracting post " +
