@@ -93,4 +93,14 @@ public final class ObjectOrientation {
             o1.next = o0;
         }
     }
+
+
+//--------------
+
+
+    //@ separates o0, o1, o2;
+    public void secure_method_call() {
+        secure_two_object_creation();
+        o2 = o1;
+    }
 }
