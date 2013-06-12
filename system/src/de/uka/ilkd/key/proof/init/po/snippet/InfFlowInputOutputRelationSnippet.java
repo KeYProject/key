@@ -137,6 +137,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         //        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
         //        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
 
+        // build equalities for seperates terms
         ImmutableList<Term> eqAtLocs = ImmutableSLList.<Term>nil();
         Iterator<Term> separates1It = infFlowSpec1.separates.iterator();
         Iterator<Term> separates2It = infFlowSpec2.separates.iterator();
@@ -146,6 +147,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             eqAtLocs = eqAtLocs.append(d.tb.equals(separates1Term, separates2Term));
         }
 
+        // build equalities for erases terms
         Iterator<Term> erases1It = infFlowSpec1.erases.iterator();
         Iterator<Term> erases2It = infFlowSpec2.erases.iterator();
         for (int i = 0; i < infFlowSpec1.erases.size(); i++) {
@@ -155,16 +157,32 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
         final Term eqAtLocsTerm = d.tb.and(eqAtLocs);
 
+        // default post-relation if newObjects is empty (object insensitive case)
         Term result = eqAtLocsTerm;
         if (!infFlowSpec1.newObjects.isEmpty()) {
-            final Term newObjs1 = d.tb.seq(infFlowSpec1.newObjects);
-            final Term newObjs2 = d.tb.seq(infFlowSpec2.newObjects);
+            // newObjects is not empty -> object sensitive case
+            // build equalities for newObjects terms
+            ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
+            Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
+            Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
+            for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
+                Term newObject1Term = newObjects1It.next();
+                Term newObject2Term = newObjects2It.next();
+                newObjEqs = newObjEqs.append(d.tb.equals(newObject1Term, newObject2Term));
+            }
+            final Term newObjEqsTerm = d.tb.and(newObjEqs);
+
+            // build isomorphism term for newObjects
+            final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
+            final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
             final Services services = d.tb.getServices();
             final Function newObjectsIso =
                     (Function)services.getNamespaces().functions().lookup("newObjectsIsomorphic");
-            final Term isoTerm = d.tb.func(newObjectsIso, newObjs1, vs1.pre.heap,
-                                           newObjs2, vs2.pre.heap);
-            result = d.tb.and(isoTerm, d.tb.imp(d.tb.equals(newObjs1, newObjs2), result));
+            final Term isoTerm = d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap,
+                                           newObjsSeq2, vs2.pre.heap);
+
+            // build object oriented post-relation (object sensitive case)
+            result = d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, result));
         }
 
         return result;
