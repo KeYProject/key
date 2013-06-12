@@ -1,11 +1,14 @@
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.util.Triple;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
@@ -30,8 +33,17 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public void readProblem() throws ProofInputException {
         final IProgramMethod pm = getProgramMethod();
         // TODO: Build problem here
-        Term po = check.createPOTerm();
-        assignPOTerms(WD.wd(po));
+        Triple<Term, ImmutableList<Term>, Term> po = check.createPOTerm();
+        ImmutableList<Term> c = ImmutableSLList.<Term>nil();
+        for (Term t: po.second) {
+            c = c.append(WD.wd(t));
+        }
+        Term poTerms = TB.and(WD.wd(po.first),
+                              TB.imp(TB.equals(po.first, TB.tt()),
+                                      TB.and(TB.and(c),
+                                              WD.wd(po.third))));
+        System.out.println(poTerms.toString());
+        assignPOTerms(poTerms);
     }
 
     @Override

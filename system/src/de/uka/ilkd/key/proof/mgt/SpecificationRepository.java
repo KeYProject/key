@@ -1234,7 +1234,8 @@ public final class SpecificationRepository {
                                                              mc.getTarget()));
         for (Pair<KeYJavaType,IObserverFunction> pair: impls) {
             wdChecks.put(pair, getWdChecks(pair.first, pair.second)
-                                .add(new MethodWellDefinedness(mc, services)));
+                                .add(new MethodWellDefinedness(
+                                        (FunctionalOperationContract)mc, services)));
         }
     }
 

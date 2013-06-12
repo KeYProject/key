@@ -39,6 +39,9 @@ public interface FunctionalOperationContract extends OperationContract {
     public Modality getModality();
 
     public boolean isReadOnlyContract(Services services);
+
+    public Term getEnsures(LocationVariable heap);
+
     /**
      * Returns the postcondition of the contract.
      */

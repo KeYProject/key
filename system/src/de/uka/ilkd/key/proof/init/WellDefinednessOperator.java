@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.Quantifier;
 
 public class WellDefinednessOperator {
 
@@ -51,7 +52,8 @@ public class WellDefinednessOperator {
             // does not have to be considered separately
             assert subs == 2;
             return imp(t.sub(0), t.sub(1));
-        } else if (op.equals(Equality.EQV)) {
+        } else if (op.equals(Equality.EQV)
+                || op.equals(Equality.EQUALS)) {
             assert subs == 2;
             return wd(t.sub(0), t.sub(1));
         }
@@ -82,6 +84,25 @@ public class WellDefinednessOperator {
 
         // TODO: Reference Expressions ...
 
+        // Logical Quantifiers
+        else if (op.equals(Quantifier.ALL)) {
+            assert subs == 3;
+            return all(t);
+        } else if (op.equals(Quantifier.EX)) {
+            assert subs == 3;
+            return ex(t);
+        }
+
+        // Generalized Quantifiers
+        else if (op.equals(intLDT.getBsum())) {
+            assert subs == 3;
+            return bSum(t);
+        } else if (op.equals(intLDT.getBprod())) {
+            assert subs == 3;
+            return bProd(t);
+        }
+        // max, min and num_of already done in IF_EX_THEN_ELSE and bsum
+
         else if (isInv(t)) {
             return inv(t);
         } // TODO: How to test if t is a fresh variable?
@@ -93,7 +114,9 @@ public class WellDefinednessOperator {
     }
 
     private Term wd(Term a, Term b) {
-        assert a.sort().equals(b.sort());
+        assert a.sort().equals(b.sort())
+            || a.sort().extendsTrans(b.sort())
+            || b.sort().extendsTrans(a.sort());
         return TB.and(wd(a), wd(b));
     }
 
@@ -190,6 +213,26 @@ public class WellDefinednessOperator {
             assert subs == 0;
             return TB.tt();
         }
+    }
+
+    private Term all(Term t) {
+        // FIXME
+        return null;
+    }
+
+    private Term ex(Term t) {
+        // FIXME
+        return null;
+    }
+
+    private Term bSum(Term t) {
+        // FIXME
+        return null;
+    }
+
+    private Term bProd(Term t) {
+        // FIXME
+        return null;
     }
 
     private boolean isCastOp(Term t) {

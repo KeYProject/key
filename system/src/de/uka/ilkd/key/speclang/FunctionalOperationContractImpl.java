@@ -472,6 +472,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
+    public Term getEnsures(LocationVariable heap) {
+        return originalPosts.get(heap);
+    }
+
+
+    @Override
     public Term getAssignable(LocationVariable heap) {
         return originalMods.get(heap);
     }

@@ -308,7 +308,7 @@ public class JMLSpecFactory {
     }
 
 
-    private ImmutableList<ImmutableList<Term>> translateIndependetClauses(
+    private ImmutableList<ImmutableList<Term>> translateIndependentClauses(
             IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,

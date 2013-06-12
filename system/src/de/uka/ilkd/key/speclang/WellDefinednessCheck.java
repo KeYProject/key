@@ -15,6 +15,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * A contract for checking the well-definedness of a specification element
@@ -127,10 +128,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
     }
 
-    public Term createPOTerm() {
-        Term po = getRequires(heap);
-        return po;
-    }
+    abstract public Triple<Term, ImmutableList<Term>, Term> createPOTerm();
 
     @Override
     public String getDisplayName() {

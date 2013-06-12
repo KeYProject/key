@@ -3,12 +3,14 @@ package de.uka.ilkd.key.speclang;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.Triple;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
     /* accessible-clause, assignable-clause, breaks-clause, callable-clause, captures-clause,
@@ -27,12 +29,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Term signalsOnly;
     Term signals = TB.ff();
 
-    public MethodWellDefinedness(Contract contract, Services services) {
+    public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
         super(contract.getTarget(), Type.METHOD_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         this.requires = contract.getRequires(heap);
         this.assignable = contract.getAssignable(heap);
+        this.ensures = contract.getEnsures(heap);
 
         this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
         this.old = TB.tt(); // TODO: Where do we get the old-clause from?
@@ -40,7 +43,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.when = TB.tt(); // TODO: Where do we get the when-clause from?
         this.workingSpace = TB.tt(); // TODO: Where do we get the working_space-clause from?
         this.duration = TB.tt(); // TODO: Where do we get the duration-clause from?
-        this.ensures = TB.tt(); // TODO: Where do we get the ensures-clause from?
         this.signalsOnly = TB.tt(); // TODO: Where do we get the signal_only-clause from?
         this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
     }
@@ -135,4 +137,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return contract.getKJT();
     }
 
+    @Override
+    public Triple<Term, ImmutableList<Term>, Term> createPOTerm() {
+        Term pre = this.getRequires();
+        ImmutableList<Term> c = ImmutableSLList.<Term>nil();
+        c = c.append(this.getAssignable());
+        Term post = this.getEnsures();
+        return new Triple<Term, ImmutableList<Term>, Term>(pre, c, post);
+    }
 }
