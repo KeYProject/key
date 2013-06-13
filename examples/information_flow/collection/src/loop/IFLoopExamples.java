@@ -134,7 +134,7 @@ public class IFLoopExamples {
 		/*@
 		  @ loop_invariant x >= -1;
 		  @ assignable low;
-		  @ respects low;
+		  @ respects x;
 		  @ decreases x+1;
 		  @*/
 		while (x == 0) {
@@ -418,14 +418,14 @@ public class IFLoopExamples {
         /*@
           @ requires   x >= 0;
           @ assignable low;
-          @ respects   low;
+          @ respects   low, x;
           @*/
         public void secure_while_2(int x) {
                 low = low + 1;
                 /*@
                   @ loop_invariant 0 <= x;
                   @ assignable  low;
-                  @ respects    low;
+                  @ respects    low, x;
                   @ decreases   x;
                   @*/
                 while (x > 0) {
