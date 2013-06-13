@@ -650,7 +650,7 @@ public final class MiscTools {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term localIn : localIns) {
             if (!localOuts.contains(localIn)) {
-                result.append(localIn);
+                result = result.append(localIn);
             }
         }
         return result;
