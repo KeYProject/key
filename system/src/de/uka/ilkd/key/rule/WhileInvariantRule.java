@@ -43,7 +43,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -311,28 +310,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
-    }
-
-    public static FindTaclet loadFindTaclet(LoopInvariant loopInv, Services services) {
-        Taclet res = null;
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        for (int j = 0; j < 10000; j++) {
-            String name =
-                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
-                            loopInv.getUniqueName()).toString();
-            res = InfFlowContractPO.getTaclet(name);
-            if (res != null)
-                return (FindTaclet)res;
-        }
-        assert false; // This should not happen
-        return null;
-    }
-
-    public static Term loadFindTerm(LoopInvariant loopInv, Services services) {
-        return loadFindTaclet(loopInv, services).find();
     }
 
     private Goal buildInfFlowValidityGoal(Goal goal, LoopInvariant inv,
@@ -734,10 +711,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             // and associated taclet
             final Term loopInvApplPredTerm =
                     ifInvariantBuilder.buildContractApplPredTerm();
-            if (!InfFlowContractPO.hasSymbols()) {
-                InfFlowContractPO.newSymbols(
-                        services.getProof().env().getInitConfig().activatedTaclets());
-            }
             final Taclet informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet();
 

@@ -37,7 +37,6 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -181,28 +180,6 @@ public class BlockContractRule implements BuiltInRule {
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
-    }
-
-    private static FindTaclet loadFindTaclet(BlockContract contract, Services services) {
-        Taclet res = null;
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        for (int j = 0; j < 10000; j++) {
-            String prefix =
-                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
-                                                contract.getUniqueName()).toString();
-            res = InfFlowContractPO.getTaclet(prefix);
-            if (res != null)
-                return (FindTaclet)res;
-        }
-        assert false; // This should not happen
-        return null;
-    }
-
-    public static Term loadFindTerm(BlockContract contract, Services services) {
-        return loadFindTaclet(contract, services).find();
     }
 
     private static ImmutableSet<BlockContract>
@@ -386,10 +363,6 @@ public class BlockContractRule implements BuiltInRule {
             // and associated taclet
             final Term contractApplTerm =
                     ifContractBuilder.buildContractApplPredTerm();
-            if (!InfFlowContractPO.hasSymbols()) {
-                InfFlowContractPO.newSymbols(
-                        services.getProof().env().getInitConfig().activatedTaclets());
-            }
             Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
 
             // generate proof obligation variables

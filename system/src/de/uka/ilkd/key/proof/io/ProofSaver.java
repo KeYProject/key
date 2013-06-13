@@ -164,7 +164,7 @@ public class ProofSaver {
               if (po instanceof InfFlowRelatedPO) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
-                  ps.print(InfFlowContractPO.printSymbols());
+                  ps.print(proof.getIFSymbols().printProofSymbols());
               }
               final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");

@@ -46,7 +46,7 @@ public class SplitPostTacletBuilder {
                 }
                 tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
                 splitPostTaclets.add(tacletBuilder.getTaclet());
-                InfFlowContractPO.addSymbol(tacletBuilder.getTaclet());
+                services.getProof().getIFSymbols().add(tacletBuilder.getTaclet());
                 i++;
             }
         }

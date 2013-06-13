@@ -46,8 +46,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         final Function contApplPred =
                 generateContApplPredicate(nameString, termList, d.tb);
         Term result = instantiateContApplPredicate(contApplPred, termList, d.tb);
-        InfFlowContractPO.addSymbol(result, d.tb.getServices().getProof());
-        InfFlowContractPO.addSymbols(termList, d.tb.getServices().getProof());
+        d.tb.getServices().getProof().getIFSymbols().add(result);
+        d.tb.getServices().getProof().getIFSymbols().add(termList);
         return result;
     }
 

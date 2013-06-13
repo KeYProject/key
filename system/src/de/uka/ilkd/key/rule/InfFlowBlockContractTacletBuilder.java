@@ -15,8 +15,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
-import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -51,15 +49,6 @@ public final class InfFlowBlockContractTacletBuilder
     }
 
     @Override
-    Taclet loadContractApplTaclet() {
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        return InfFlowContractPO.getTaclet(generateName().toString());
-    }
-
-    @Override
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                Services services) {
         BasicPOSnippetFactory fAssumes =
@@ -83,18 +72,6 @@ public final class InfFlowBlockContractTacletBuilder
                 POSnippetFactory.getBasicFactory(blockContract, appData,
                                                  services);
         return f.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
-    }
-
-
-    @Override
-    Term loadContractApplPred() {
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        Term pred = ((FindTaclet)InfFlowContractPO.getTaclet(generateName().toString())).find();
-        assert pred.op().name().toString().startsWith("RELATED_BY_");
-        return pred;
     }
 
 

@@ -22,27 +22,28 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
 public class InfFlowProofSymbols {
 
-    private ImmutableSet<Sort> sorts
-            = DefaultImmutableSet.<Sort>nil();
+    private ImmutableSet<Pair<Sort, Boolean>> sorts
+            = DefaultImmutableSet.<Pair<Sort, Boolean>>nil();
 
-    private ImmutableSet<Function> predicates
-            = DefaultImmutableSet.<Function>nil();
+    private ImmutableSet<Pair<Function, Boolean>> predicates
+            = DefaultImmutableSet.<Pair<Function, Boolean>>nil();
 
-    private ImmutableSet<Function> functions
-            = DefaultImmutableSet.<Function>nil();
+    private ImmutableSet<Pair<Function, Boolean>> functions
+            = DefaultImmutableSet.<Pair<Function, Boolean>>nil();
 
-    private ImmutableSet<ProgramVariable> programVariables
-            = DefaultImmutableSet.<ProgramVariable>nil();
+    private ImmutableSet<Pair<ProgramVariable, Boolean>> programVariables
+            = DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil();
 
-    private ImmutableSet<SchemaVariable> schemaVariables
-            = DefaultImmutableSet.<SchemaVariable>nil();
+    private ImmutableSet<Pair<SchemaVariable, Boolean>> schemaVariables
+            = DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil();
 
-    private ImmutableSet<Taclet> taclets
-            = DefaultImmutableSet.<Taclet>nil();
+    private ImmutableSet<Pair<Taclet, Boolean>> taclets
+            = DefaultImmutableSet.<Pair<Taclet, Boolean>>nil();
 
     private static final ImmutableSet<String> tacletPrefixes
             = DefaultImmutableSet.<String>nil().add("unfold_computed_formula")
@@ -68,6 +69,236 @@ public class InfFlowProofSymbols {
         }
     }
 
+    public InfFlowProofSymbols getLabeledSymbols() {
+        InfFlowProofSymbols symbols = new InfFlowProofSymbols();
+        symbols.sorts = getLabeledSorts();
+        symbols.predicates = getLabeledPredicates();
+        symbols.functions = getLabeledFunctions();
+        symbols.programVariables = getLabeledProgramVariables();
+        symbols.schemaVariables = getLabeledSchemaVariables();
+        symbols.taclets = getLabeledTaclets();
+        return symbols;
+    }
+
+    void unLabelSymbols() {
+        unLabelSorts();
+        unLabelPredicates();
+        unLabelFunctions();
+        unLabelProgramVariables();
+        unLabelSchemaVariables();
+        unLabelTaclets();
+    }
+
+    private ImmutableSet<Pair<Sort, Boolean>> getLabeledSorts() {
+        ImmutableSet<Pair<Sort, Boolean>> labeledSorts =
+                DefaultImmutableSet.<Pair<Sort, Boolean>>nil();
+        for (Pair<Sort, Boolean> s: sorts) {
+            if (s.second) {
+                labeledSorts = labeledSorts.add(new Pair<Sort, Boolean>(s.first, false));
+            }
+        }
+        return labeledSorts;
+    }
+
+    private void unLabelSorts() {
+        for (Pair<Sort, Boolean> s: sorts) {
+            if (s.second) {
+                sorts = sorts.remove(s);
+                sorts = sorts.add(new Pair<Sort, Boolean>(s.first, false));
+            }
+        }
+    }
+
+    private ImmutableSet<Pair<Function, Boolean>> getLabeledPredicates() {
+        ImmutableSet<Pair<Function, Boolean>> labeledPredicates =
+                DefaultImmutableSet.<Pair<Function, Boolean>>nil();
+        for (Pair<Function, Boolean> p: predicates) {
+            if (p.second) {
+                labeledPredicates =
+                        labeledPredicates.add(new Pair<Function, Boolean>(p.first, false));
+            }
+        }
+        return labeledPredicates;
+    }
+
+    private void unLabelPredicates() {
+        for (Pair<Function, Boolean> p: predicates) {
+            if (p.second) {
+                predicates = predicates.remove(p);
+                predicates = predicates.add(new Pair<Function, Boolean>(p.first, false));
+            }
+        }
+    }
+
+    private ImmutableSet<Pair<Function, Boolean>> getLabeledFunctions() {
+        ImmutableSet<Pair<Function, Boolean>> labeledFunctions =
+                DefaultImmutableSet.<Pair<Function, Boolean>>nil();
+        for (Pair<Function, Boolean> f: functions) {
+            if (f.second) {
+                labeledFunctions =
+                        labeledFunctions.add(new Pair<Function, Boolean>(f.first, false));
+            }
+        }
+        return labeledFunctions;
+    }
+
+    private void unLabelFunctions() {
+        for (Pair<Function, Boolean> f: functions) {
+            if (f.second) {
+                functions = functions.remove(f);
+                functions = functions.add(new Pair<Function, Boolean>(f.first, false));
+            }
+        }
+    }
+
+    private ImmutableSet<Pair<ProgramVariable, Boolean>> getLabeledProgramVariables() {
+        ImmutableSet<Pair<ProgramVariable, Boolean>> labeledProgramVariables =
+                DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil();
+        for (Pair<ProgramVariable, Boolean> pv: programVariables) {
+            if (pv.second) {
+                labeledProgramVariables =
+                        labeledProgramVariables
+                                .add(new Pair<ProgramVariable, Boolean>(pv.first, false));
+            }
+        }
+        return labeledProgramVariables;
+    }
+
+    private void unLabelProgramVariables() {
+        for (Pair<ProgramVariable, Boolean> pv: programVariables) {
+            if (pv.second) {
+                programVariables = programVariables.remove(pv);
+                programVariables =
+                        programVariables.add(new Pair<ProgramVariable, Boolean>(pv.first, false));
+            }
+        }
+    }
+
+    private ImmutableSet<Pair<SchemaVariable, Boolean>> getLabeledSchemaVariables() {
+        ImmutableSet<Pair<SchemaVariable, Boolean>> labeledSchemaVariables =
+                DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil();
+        for (Pair<SchemaVariable, Boolean> sv: schemaVariables) {
+            if (sv.second) {
+                labeledSchemaVariables =
+                        labeledSchemaVariables
+                                .add(new Pair<SchemaVariable, Boolean>(sv.first, false));
+            }
+        }
+        return labeledSchemaVariables;
+    }
+
+    private void unLabelSchemaVariables() {
+        for (Pair<SchemaVariable, Boolean> sv: schemaVariables) {
+            if (sv.second) {
+                schemaVariables = schemaVariables.remove(sv);
+                schemaVariables =
+                        schemaVariables.add(new Pair<SchemaVariable, Boolean>(sv.first, false));
+            }
+        }
+    }
+
+    private ImmutableSet<Pair<Taclet, Boolean>> getLabeledTaclets() {
+        ImmutableSet<Pair<Taclet, Boolean>> labeledTaclets =
+                DefaultImmutableSet.<Pair<Taclet, Boolean>>nil();
+        for (Pair<Taclet, Boolean> t: taclets) {
+            if (t.second) {
+                labeledTaclets = labeledTaclets.add(new Pair<Taclet, Boolean>(t.first, false));
+            }
+        }
+        return labeledTaclets;
+    }
+
+    private void unLabelTaclets() {
+        for (Pair<Taclet, Boolean> t: taclets) {
+            if (t.second) {
+                taclets = taclets.remove(t);
+                taclets = taclets.add(new Pair<Taclet, Boolean>(t.first, false));
+            }
+        }
+    }
+
+    private boolean containsSort(Sort s) {
+        ImmutableSet<Pair<Sort, Boolean>> ps =
+                DefaultImmutableSet.<Pair<Sort, Boolean>>nil()
+                .add(new Pair<Sort, Boolean> (s, true))
+                .add(new Pair<Sort, Boolean> (s, false));
+        for (Pair<Sort, Boolean> p: sorts) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsPredicate(Function f) {
+        ImmutableSet<Pair<Function, Boolean>> ps =
+                DefaultImmutableSet.<Pair<Function, Boolean>>nil()
+                .add(new Pair<Function, Boolean> (f, true))
+                .add(new Pair<Function, Boolean> (f, false));
+        if (!f.name().toString().startsWith("RELATED_BY") &&
+                !f.name().toString().startsWith("EXECUTION_OF")) {
+            return false;
+        }
+        for (Pair<Function, Boolean> p: predicates) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsFunction(Function f) {
+        ImmutableSet<Pair<Function, Boolean>> ps =
+                DefaultImmutableSet.<Pair<Function, Boolean>>nil()
+                .add(new Pair<Function, Boolean> (f, true))
+                .add(new Pair<Function, Boolean> (f, false));
+        for (Pair<Function, Boolean> p: functions) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsProgramVariable(ProgramVariable pv) {
+        ImmutableSet<Pair<ProgramVariable, Boolean>> ps =
+                DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil()
+                .add(new Pair<ProgramVariable, Boolean> (pv, true))
+                .add(new Pair<ProgramVariable, Boolean> (pv, false));
+        for (Pair<ProgramVariable, Boolean> p: programVariables) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsSchemaVariable(SchemaVariable sv) {
+        ImmutableSet<Pair<SchemaVariable, Boolean>> ps =
+                DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil()
+                .add(new Pair<SchemaVariable, Boolean> (sv, true))
+                .add(new Pair<SchemaVariable, Boolean> (sv, false));
+        for (Pair<SchemaVariable, Boolean> p: schemaVariables) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsTaclet(Taclet t) {
+        ImmutableSet<Pair<Taclet, Boolean>> ps =
+                DefaultImmutableSet.<Pair<Taclet, Boolean>>nil()
+                .add(new Pair<Taclet, Boolean> (t, true))
+                .add(new Pair<Taclet, Boolean> (t, false));
+        for (Pair<Taclet, Boolean> p: taclets) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void addTerm(Term t) {
         if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
@@ -78,39 +309,39 @@ public class InfFlowProofSymbols {
     }
 
     private void addTaclet(Taclet t) {
-        if (!taclets.contains(t)) {
-            taclets = taclets.add(t);
+        if (!containsTaclet(t)) {
+            taclets = taclets.add(new Pair<Taclet, Boolean>(t, true));
         }
     }
 
     private void addSort(Sort s) {
         if (!(s instanceof NullSort) &&
-                !sorts.contains(s)) {
-            sorts = sorts.add(s);
+                !containsSort(s)) {
+            sorts = sorts.add(new Pair<Sort, Boolean>(s, true));
         }
     }
 
     private void addFunction(Function f) {
-        if (!functions.contains(f) &&
-                !predicates.contains(f)) {
+        if (!containsFunction(f) &&
+                !containsPredicate(f)) {
             if (f.name().toString().startsWith("RELATED_BY") ||
                     f.name().toString().startsWith("EXECUTION_OF")) {
-                predicates = predicates.add(f);
+                predicates = predicates.add(new Pair<Function, Boolean>(f, true));
             } else {
-                functions = functions.add(f);
+                functions = functions.add(new Pair<Function, Boolean>(f, true));
             }
         }
     }
 
     private void addSchemaVariable(SchemaVariable sv) {
-        if (!schemaVariables.contains(sv)) {
-            schemaVariables = schemaVariables.add(sv);
+        if (!containsSchemaVariable(sv)) {
+            schemaVariables = schemaVariables.add(new Pair<SchemaVariable, Boolean>(sv, true));
         }
     }
 
     private void addProgramVariable(ProgramVariable pv) {
-        if (!programVariables.contains(pv)) {
-            programVariables = programVariables.add(pv);
+        if (!containsProgramVariable(pv)) {
+            programVariables = programVariables.add(new Pair<ProgramVariable, Boolean>(pv, true));
         }
     }
 
@@ -154,6 +385,10 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Sort> getSorts() {
+        ImmutableSet<Sort> sorts = DefaultImmutableSet.<Sort>nil();
+        for (Pair<Sort, Boolean> s: this.sorts) {
+            sorts = sorts.add(s.first);
+        }
         return sorts;
     }
 
@@ -192,14 +427,26 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Function> getPredicates() {
+        ImmutableSet<Function> predicates = DefaultImmutableSet.<Function>nil();
+        for (Pair<Function, Boolean> p: this.predicates) {
+            predicates = predicates.add(p.first);
+        }
         return predicates;
     }
 
     private ImmutableSet<Function> getFunctions() {
+        ImmutableSet<Function> functions = DefaultImmutableSet.<Function>nil();
+        for (Pair<Function, Boolean> f: this.functions) {
+            functions = functions.add(f.first);
+        }
         return functions;
     }
 
     private ImmutableSet<ProgramVariable> getProgramVariables() {
+        ImmutableSet<ProgramVariable> programVariables = DefaultImmutableSet.<ProgramVariable>nil();
+        for (Pair<ProgramVariable, Boolean> pv: this.programVariables) {
+            programVariables = programVariables.add(pv.first);
+        }
         return programVariables;
     }
 
@@ -225,15 +472,19 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<SchemaVariable> getSchemaVariables() {
+        ImmutableSet<SchemaVariable> schemaVariables = DefaultImmutableSet.<SchemaVariable>nil();
+        for (Pair<SchemaVariable, Boolean> sv: this.schemaVariables) {
+            schemaVariables = schemaVariables.add(sv.first);
+        }
         return schemaVariables;
     }
 
     public ImmutableSet<Taclet> getTaclets() {
-        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-        for (final Taclet t: taclets) {
-            res = res.add(t);
+        ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+        for (Pair<Taclet, Boolean> t: this.taclets) {
+            taclets = taclets.add(t.first);
         }
-        return res;
+        return taclets;
     }
 
     public Taclet getTaclet(String name) {

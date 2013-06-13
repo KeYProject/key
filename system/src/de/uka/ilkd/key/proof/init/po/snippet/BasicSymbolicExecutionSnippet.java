@@ -85,7 +85,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
 
-            InfFlowContractPO.addSymbol(formalParamVar, tb.getServices().getProof());
+            tb.getServices().getProof().getIFSymbols().add(formalParamVar);
         }
 
         //create java block

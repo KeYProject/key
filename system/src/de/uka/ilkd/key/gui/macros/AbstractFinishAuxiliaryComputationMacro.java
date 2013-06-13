@@ -80,7 +80,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
-        InfFlowContractPO.addSymbol(composedStates, initGoal.proof());
+        proof.getIFSymbols().add(composedStates);
         return composedStates;
     }
 
@@ -360,6 +360,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         }
     }
 
+    void addProofSymbols(Proof oldProof, Proof newProof) {
+        assert oldProof != null;
+        assert newProof != null;
+        newProof.addIFSymbols(oldProof.getIFSymbols().getLabeledSymbols());
+    }
 
     protected void saveAuxiliaryProof() {
         final MainWindow mainWindow = MainWindow.getInstance();

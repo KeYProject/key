@@ -125,7 +125,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                         + "method for snippet \"" + snippet.name() + ".");
             }
             Term result = m.produce(data, poVars);
-            InfFlowContractPO.addSymbol(result, data.tb.getServices().getProof());
+            data.tb.getServices().getProof().getIFSymbols().add(result);
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "
