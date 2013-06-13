@@ -90,7 +90,7 @@ public final class DropEffectlessElementariesCondition
 	    					   Term target,
 	    					   Services services) {
 	TermProgramVariableCollector collector 
-		= new TermProgramVariableCollector(services);
+		= services.getFactory().create(services);
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
 	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
@@ -101,7 +101,9 @@ public final class DropEffectlessElementariesCondition
     }
     
     
-    @Override
+
+
+   @Override
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 

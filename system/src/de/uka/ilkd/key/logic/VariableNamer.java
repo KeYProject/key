@@ -730,7 +730,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * ProgramElementName carrying an additional index
      */
-    private abstract static class IndProgramElementName
+    public abstract static class IndProgramElementName
     			    extends ProgramElementName {
 	private final String basename;
         private final int index;
@@ -954,5 +954,12 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected static class BasenameAndIndex {
     	public String basename;
 	public int index;
+    }
+    
+    public static Name getBasename(Name name){
+       if(name instanceof IndProgramElementName){
+          return new Name(((IndProgramElementName) name).getBaseName());
+       }
+       return name;
     }
 }

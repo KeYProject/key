@@ -1522,6 +1522,7 @@ public final class SymbolicExecutionUtil {
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
    public static Node findMethodCallNode(Node node) {
+      if (node != null && node.getAppliedRuleApp() != null) {
          // Get current program method
          Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
          term = TermBuilder.DF.goBelowUpdates(term);

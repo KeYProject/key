@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -11,29 +14,25 @@ import org.eclipse.core.runtime.Path;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.Goal;
@@ -42,9 +41,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
@@ -52,7 +51,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.ExtList;
 
 /**
  * This{@link LineBreakpointStopCondition} represents a line breakpoint and is responsible to tell the debugger to stop execution when the respective
@@ -97,59 +96,120 @@ public class LineBreakpointStopCondition extends ExecutedSymbolicExecutionTreeNo
     */
    private boolean enabled;
    
+   /**
+    * The flag if the the condition for the associated Breakpoint is enabled
+    */
    private boolean conditionEnabled;
 
-
+   /**
+    * A {@link ProgramVariable} representing the instance the class KeY is working on
+    */
    private ProgramVariable selfVar;
    
+   /**
+    * The {@link IProgramMethod} this Breakpoint lies within
+    */
    private IProgramMethod pm;
-   
+
+   /**
+    * The {@link KeYEnvironment} the proof is running in
+    */
    private KeYEnvironment<?> environment;
+  
+   /**
+    * A list of {@link ProgramVariable}s containing all variables that were parsed and have to be possibly replaced during runtime.
+    */
+   private ImmutableList<ProgramVariable> varsForCondition;
+
+   /**
+    * The {@link ITermProgramVariableCollectorFactory} for others to use when collecting variables to dismiss.
+    */
+   private ITermProgramVariableCollectorFactory programVariableCollectorFactory;
    
-   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, String condition, boolean enabled, boolean conditionEnabled) throws SLTranslationException {
+   /**
+    * The {@link CompoundStopCondition} containing all BreakpointStopConditions relevant for the current {@link KeYEnvironment}
+    */
+   private CompoundStopCondition parentCondition;
+   
+   /**
+    * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent in KeY
+    */
+   private Map<SVSubstitute, SVSubstitute> variableNamingMap;
+   
+   /**
+    * The start of the method containing the associated Breakpoint
+    */
+   private int methodStart;
+  
+   /**
+    * The end of the method containing the associated Breakpoint
+    */
+   private int methodEnd;
+
+   /**
+    * A list of variables KeY has to hold to evaluate the condition
+    */
+   private Set<LocationVariable> toKeep;
+  
+   /**
+    * The list of parameter variables of the method that contains the associated breakpoint
+    */
+   private Set<LocationVariable> paramVars;
+
+
+   private Proof proof;
+   
+
+   /**
+    * Creates a new {@link LineBreakpointStopCondition}.
+    * 
+    * @param classPath the path of the class the associated Breakpoint lies within
+    * @param lineNumber the line where the associated Breakpoint is located in the class
+    * @param hitCount the hitCount for this Breakpoint, given by user
+    * @param environment the environment the that the proof that should be stopped is working in
+    * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
+    * @param proof the {@link Proof} that will be executed and should stop
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
+    * @param condition the condition as given by the user
+    * @param enabled flag if the Breakpoint is enabled
+    * @param conditionEnabled flag if the condition is enabled
+    * @param methodStart the line the containing method of this breakpoint starts at
+    * @param methodEnd the line the containing method of this breakpoint ends at
+    * @throws SLTranslationException if the condition could not be parsed to a valid Term
+    */
+   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
       super();
+      variableNamingMap=new HashMap<SVSubstitute, SVSubstitute>();
+      toKeep = new HashSet<LocationVariable>();
+      paramVars= new HashSet<LocationVariable>();
       this. environment = environment;
       this.pm = pm;
-      
-      this.condition = conditionEnabled ? computeTermForCondition(condition):TermBuilder.DF.tt();
       this.classPath=classPath;
       this.lineNumber=lineNumber;
       this.hitCount=hitCount;
       this.enabled=enabled;
       this.conditionEnabled = conditionEnabled;
-      
-      
+      this.parentCondition=parentCondition;
+      this.methodEnd=methodEnd;
+      this.methodStart=methodStart;
+      this.proof=proof;
+      this.condition = conditionEnabled ? computeTermForCondition(condition):TermBuilder.DF.tt(); 
+      createNewFactory();
+      proof.getServices().setFactory(programVariableCollectorFactory);
    }
-   
-   
-   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, String condition, boolean enabled, boolean conditionEnabled) throws SLTranslationException {
-      super();
-      this. environment = environment;
-      
-    
-      
-      this.condition = conditionEnabled ? computeTermForCondition(condition):TermBuilder.DF.tt();
-      this.classPath=classPath;
-      this.lineNumber=lineNumber;
-      this.hitCount=hitCount;
-      this.enabled=enabled;
-      
-      
-   }
-
 
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-      
-         
-         
+         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) { 
          if(goal!=null){
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            if(varsForCondition!=null&&ruleApp!=null&&node!=null){
+               refreshVarMaps(ruleApp, node);
+            }
                if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
                   // Check if the result for the current node was already computed.
                   Boolean value = getGoalAllowedResultPerSetNode().get(node);
@@ -169,11 +229,15 @@ public class LineBreakpointStopCondition extends ExecutedSymbolicExecutionTreeNo
                         if (activeStatement != null && activeStatement.getEndPosition().getLine() != -1) {
                            IPath path = new Path(activeStatement.getPositionInfo().getParentClass());
                            int line = activeStatement.getEndPosition().getLine();
-                           if(shouldStopInLine(line, path)&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
-                           // Increase number of set nodes on this goal and allow rule application
-                              executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                              getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                              getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                           try{
+                              if(shouldStopInLine(line, path)&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
+                                 // Increase number of set nodes on this goal and allow rule application
+                                    executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+                                    getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
+                                    getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                                 }
+                           }catch(ProofInputException e){
+                              //TODO
                            }
                         }
                         return true; 
@@ -186,14 +250,33 @@ public class LineBreakpointStopCondition extends ExecutedSymbolicExecutionTreeNo
                }
             
          }
-      
       return true;
    }
 
-
-
    
 
+   
+   /**
+    * Modifies toKeep and variableNamingMap to hold the correct parameters after execution of the given ruleApp on the given node
+    * 
+    * @param ruleApp
+    * @param node
+    */
+   private void refreshVarMaps(RuleApp ruleApp, Node node) {
+      boolean inScope = isInScope(node);
+      // collect old values
+      Map<SVSubstitute, SVSubstitute> oldMap = getOldMap();
+      // put values into map which have to be replaced
+      for (ProgramVariable varForCondition : varsForCondition) {
+         // put global variables only done when a variable is instantiated by
+         // KeY for the first time
+         putValuesFromGlobalVars(varForCondition, node, inScope);
+         // put renamings into map and tokeep remove no longer need vars from
+         // tokeep
+         putValuesFromRenamings(varForCondition, node, inScope, oldMap);
+      }
+      freeVariablesAfterReturn(node, ruleApp, inScope);
+   }
 
    /**
     * Checks if the execution should stop in the given line for the given class.
@@ -232,116 +315,329 @@ public class LineBreakpointStopCondition extends ExecutedSymbolicExecutionTreeNo
       return false;
    }
    
-   private boolean conditionMet(RuleApp ruleApp, Proof proof, Node node){
-      try {
-         PosInOccurrence pio = ruleApp.posInOccurrence();
-         Term term = pio.subTerm();
-         term = TermBuilder.DF.goBelowUpdates(term);
-         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
-         
-         
-         Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-         
-         map.put(selfVar, ec.getRuntimeInstance());
-         OpReplacer replacer = new OpReplacer(map);
-         Term termForSideProof = replacer.replace(condition);
-
-         
-         Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-
-         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
-         
-         return info.getProof().closed();
-      }
-      catch (ProofInputException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-      
-
-      return true;
+   /**
+    * Checks if the condition, that was given by the user, evaluates to true with the current of the proof
+    * 
+    * @param ruleApp the {@link RuleApp} to be executed next
+    * @param proof the current {@link Proof}
+    * @param node the current {@link Node}
+    * @return true if the condition evaluates to true
+    * @throws ProofInputException 
+    */
+   private boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) throws ProofInputException{
+      //initialize values
+      PosInOccurrence pio = ruleApp.posInOccurrence();
+      Term term = pio.subTerm();
+      term = TermBuilder.DF.goBelowUpdates(term);
+      IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+      //put values into map which have to be replaced
+      variableNamingMap.put(selfVar, ec.getRuntimeInstance());
+      //replace renamings etc.
+      OpReplacer replacer = new OpReplacer(variableNamingMap);
+      Term termForSideProof = replacer.replace(condition);
+      //start side proof
+      Term toProof = TermBuilder.DF.equals(TermBuilder.DF.tt(), termForSideProof);
+      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+      ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+      return info.getProof().closed();
    }
 
-
-   public Term getCondition() {
-      return condition;
-   }
-
-   public void setCondition(String condition) throws SLTranslationException {
-      this.condition = conditionEnabled? computeTermForCondition(condition) : TermBuilder.DF.tt();
-   }
-
-   public int getHitCount() {
-      return hitCount;
-   }
-
-   public void setHitCount(int hitCount) {
-      this.hitCount = hitCount;
-   }
-   
-   public boolean isEnabled() {
-      return enabled;
-   }
-
-   public void setEnabled(boolean enabled) {
-      this.enabled = enabled;
-   }
-   
-   public void setConditionEnabled(boolean conditionEnabled) {
-      this.conditionEnabled = conditionEnabled;
-   }
-   
-   public int getLineNumber() {
-      return lineNumber;
-   }
-
-
-   public boolean isConditionEnabled() {
-      return conditionEnabled;
-   }
-   
-   
-   public IPath getClassPath() {
-      return classPath;
-   }
-   
+   /**
+    * Computes the Term that can be evaluated, from the user given condition
+    * 
+    * @param condition the condition given by the user
+    * @return the {@link Term} that represents the condition
+    * @throws SLTranslationException if the Term could not be parsed
+    */
    private Term computeTermForCondition(String condition) throws SLTranslationException {
+      //collect all variables needed to parse the condition
       selfVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(environment.getServices(), "self")), pm.getContainerType(), null, false, false);
-      ImmutableList<ProgramVariable> paramVars = ImmutableSLList.nil();
+      ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
+      //collect parameter variables
       for (ParameterDeclaration pd : pm.getParameters()) {
          for (VariableSpecification vs : pd.getVariables()) {
-            ProgramVariable paramVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(environment.getServices(), vs.getName())), (KeYJavaType) vs.getType(), pm.getContainerType(), false, false);
-            paramVars = paramVars.append(paramVar);
+            this.paramVars.add((LocationVariable) vs.getProgramVariable());
+            varsForCondition = varsForCondition.append((ProgramVariable) vs.getProgramVariable());
          }
       }
-      
-
-    
-      
-      // TODO: Add to paramVars previously declared local variables like in ProgramMethodSubseetPO
-      
-
-//            TermBuilder.DF.paramVars(environment.getServices(), pm, true);
-      // TODO: create paramVars like selfVar
+      // Collect local variables
+      StatementBlock result = getStatementBlock(pm.getBody());
+      ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, environment.getServices());
+      variableCollector.start();
+      Set<LocationVariable> undeclaredVariables = variableCollector.result();
+      for (LocationVariable x : undeclaredVariables) {
+         boolean contains = false;
+         for(ProgramVariable paramVar : varsForCondition){
+            if(paramVar.toString().equals(x.toString())){
+               contains = true;
+               break;
+            }
+         }
+         if(!contains&&!x.isMember()){
+            varsForCondition = varsForCondition.append(x);
+         }
+      }
+      this.varsForCondition=varsForCondition;
+      //parse string
       PositionedString ps = new PositionedString(condition);
       KeYJMLParser parser = new KeYJMLParser(ps, 
                                              environment.getServices(), 
                                              pm.getContainerType(), 
                                              selfVar, 
-                                             paramVars, 
+                                             varsForCondition, 
                                              null, 
                                              null, 
                                              null);
       
-      return parser.parseExpression();
+         return parser.parseExpression();
+      
    }
 
-   protected final void register(ProgramVariable pv) {
-      Namespace progVarNames = environment.getServices().getNamespaces().programVariables();
-      if (pv != null && progVarNames.lookup(pv.name()) == null) {
-          progVarNames.addSafely(pv);
+   /**
+    * For a given {@link StatementContainer} this method computes the {@link StatementBlock} that contains all lines before the line the Breakpoint is at, including the line itself.
+    * 
+    * @param statementContainer the {@link StatementContainer} to build the block from
+    * @return the {@link StatementBlock} representing the container without the line below the Breakpoint
+    */
+   private StatementBlock getStatementBlock(StatementContainer statementContainer) {
+      //list of all statements
+      ExtList nextResult=new ExtList();
+      for(int i = 0; i<statementContainer.getStatementCount();i++){
+         nextResult.add(statementContainer.getStatementAt(i));
       }
- }
+      //find last interesting statement
+      for(int i = 0;i<nextResult.size();i++){
+         if(!(((SourceElement) nextResult.get(i)).getEndPosition().getLine()<=lineNumber)){
+            if(nextResult.get(i) instanceof StatementContainer){
+               //go into inner scope
+               nextResult.set(i, getStatementBlock((StatementContainer)nextResult.get(i)));
+            }else{
+               //cut below last interesting statement
+               for(int j = nextResult.size()-1;j>=i;j--){
+                  nextResult.remove(statementContainer.getChildAt(j));
+               }
+            }
+         }
+      }
+      return new StatementBlock(nextResult);
+   }
+
+   /**
+    * removes all stored parameters in to Keep when the ruleApp on the current node would induce a method return
+    * 
+    * @param node
+    * @param ruleApp
+    * @param inScope
+    */
+   private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,boolean inScope) {
+      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)&&inScope){
+         toKeep.clear();
+      }
+   }
+
+   /**
+    * put relevant values from the current nodes renamings in toKeep and variableNamingMap
+    * 
+    * @param varForCondition
+    * @param node
+    * @param inScope
+    * @param oldMap
+    */
+   private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope, Map<SVSubstitute, SVSubstitute> oldMap) {
+      // look for renamings KeY did
+      boolean found = false;
+      //get current renaming tables
+      ImmutableList<RenamingTable> renamingTables = node.getRenamingTable();
+      if (renamingTables != null && renamingTables.size() > 0) {
+         //iterate over renaming tables
+         Iterator<RenamingTable> itr = renamingTables.iterator();
+         while (itr.hasNext() && !found) {
+            RenamingTable renamingTable = itr.next();
+            //iterate over renamings within table
+            Iterator<?> renameItr = renamingTable.getHashMap().entrySet().iterator();
+            while (renameItr.hasNext()) {
+               Map.Entry<? extends SourceElement, ? extends SourceElement> entry = (Entry<? extends SourceElement, ? extends SourceElement>) renameItr.next();
+               if (entry.getKey() instanceof LocationVariable) {
+                  if ((VariableNamer.getBasename(((LocationVariable) entry
+                        .getKey()).name())).equals(varForCondition.name())
+                        && ((LocationVariable) entry.getKey()).name().toString().contains("#")
+                        && paramVars.contains(varForCondition)) {
+                     //found relevant renaming for a parameter variable
+                     if (oldMap.get(varForCondition) != entry.getValue()) {
+                      //remove old value from toKeep
+                        toKeep.remove((LocationVariable) oldMap.get(varForCondition));
+                     }
+                     //add new value
+                     toKeep.add((LocationVariable) entry.getValue());
+                     variableNamingMap.put(varForCondition, entry.getValue());
+                     found = true;
+                     break;
+                  }
+                  else if (inScope&& ((LocationVariable) entry.getKey()).name().equals(varForCondition.name())) {
+                     //found relevant renaming for local variable
+                     if (oldMap.get(varForCondition) != entry.getValue()) {
+                        //remove old value from toKeep
+                        toKeep.remove((LocationVariable) oldMap.get(varForCondition));
+                     }
+                     //add new value
+                     toKeep.add((LocationVariable) entry.getValue());
+                     variableNamingMap.put(varForCondition, entry.getValue());
+                     found = true;
+                     break;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   /**
+    * put values in toKeep and variableNamingMap that can be found in the global variables of the node
+    * 
+    * @param varForCondition
+    * @param node
+    * @param inScope
+    */
+   private void putValuesFromGlobalVars(ProgramVariable varForCondition, Node node, boolean inScope) {
+      for(ProgramVariable progVar : node.getGlobalProgVars()){
+         if(inScope&&varForCondition.name().equals(progVar.name())&&(variableNamingMap.get(varForCondition)==null||variableNamingMap.get(varForCondition).equals(varForCondition))){
+            toKeep.add((LocationVariable) progVar);
+            variableNamingMap.put(varForCondition, progVar);
+         }
+      }
+   }
+
+   /**
+    * Returns a map containing the same entries as the variableNamingMap changes in one map do not effect the other map
+    * 
+    * @return the cloned map
+    */
+   private Map<SVSubstitute, SVSubstitute> getOldMap() {
+      Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<SVSubstitute, SVSubstitute>();
+      Iterator<?> iter = variableNamingMap.entrySet().iterator();
+      while(iter.hasNext()){
+         Map.Entry<SVSubstitute, SVSubstitute> oldEntry = (Entry<SVSubstitute, SVSubstitute>) iter.next();
+         oldMap.put(oldEntry.getKey(), oldEntry.getValue());
+      }
+      return oldMap;
+   }
+
+   private boolean isInScope(Node node) {
+      Node checkNode = node;
+      while (checkNode != null) {
+         SourceElement activeStatement = NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
+         if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
+            if (activeStatement.getStartPosition().getLine() >= methodStart && activeStatement.getEndPosition().getLine() <= methodEnd) {
+               return true;
+            }
+            break;
+         }
+         checkNode = checkNode.parent();
+      }
+      return false;
+   }
+
+   /**
+    * creates a new factory that should be used by others afterwards
+    */
+   private void createNewFactory() {
+      programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
+         @Override
+         public TermProgramVariableCollector create(Services services) {
+            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, parentCondition);
+            
+              return collector;
+         }
+      };
+   }
+
+   /**
+    * Returns the condition of the associated Breakpoint.
+    * @return the condition of the associated Breakpoint
+    */
+   public Term getCondition() {
+      return condition;
+   }
    
+   
+   /**
+    * Sets the condition to the Term that is parsed from the given String.
+    * @param condition the String to be parsed
+    * @throws SLTranslationException if the parsing failed
+    */
+   public void setCondition(String condition) throws SLTranslationException {
+      this.condition = conditionEnabled? computeTermForCondition(condition) : TermBuilder.DF.tt();
+   }
+
+   /**
+    * Returns the hitCount of the associated Breakpoint.
+    * @return the hitCount of the associated Breakpoint
+    */
+   public int getHitCount() {
+      return hitCount;
+   }
+   
+   /**
+    * Set the hitCount to the new value
+    * @param hitCount the new value
+    */
+   public void setHitCount(int hitCount) {
+      this.hitCount = hitCount;
+   }
+   
+   /**
+    * Checks if the Breakpoint is enabled.
+    * @return true if Breakpoint is enabled
+    */
+   public boolean isEnabled() {
+      return enabled;
+   }
+
+   /**
+    * Sets the new enabled value.
+    * @param enabled the new value
+    */
+   public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
+   }
+      
+   /**
+    * Sets the new conditionEnabled value.
+    * @param conditionEnabled the new value
+    */
+   public void setConditionEnabled(boolean conditionEnabled) {
+      this.conditionEnabled = conditionEnabled;
+   }
+   
+   /**
+    * Returns the line number of the associated Breakpoint.
+    * @return the line number of the associated Breakpoint
+    */
+   public int getLineNumber() {
+      return lineNumber;
+   }
+
+   /**
+    * Checks if the condition for the associated Breakpoint is enabled.
+    * @param conditionEnabled true if the condition for the associated Breakpoint is enabled
+    */
+   public boolean isConditionEnabled() {
+      return conditionEnabled;
+   }
+      
+   /**
+    * Returns the the path of the class the breakpoint is in.
+    * @return the the path of the class the breakpoint is in
+    */
+   public IPath getClassPath() {
+      return classPath;
+   }
+   
+   /**
+    * Returns the the variables KeY should keep to evaluate the condition.
+    * @return the the variables KeY should keep to evaluate the condition
+    */
+   public Set<LocationVariable> getToKeep() {
+      return toKeep;
+   }
 }

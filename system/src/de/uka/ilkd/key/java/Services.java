@@ -22,11 +22,15 @@ import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.conditions.DropEffectlessElementariesCondition;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
@@ -88,8 +92,24 @@ public class Services{
 
     private NameRecorder nameRecorder;
     
+    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
+      @Override
+      public TermProgramVariableCollector create(Services services) {
+         return new TermProgramVariableCollector(services);
+      }};
     
-    /**
+    
+    public ITermProgramVariableCollectorFactory getFactory() {
+      return factory;
+   }
+
+
+   public void setFactory(ITermProgramVariableCollectorFactory factory) {
+      this.factory = factory;
+   }
+
+
+   /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
@@ -279,6 +299,10 @@ public class Services{
      */
     public Proof getProof() {
 	return proof;
+    }
+    
+    public interface ITermProgramVariableCollectorFactory{
+       public TermProgramVariableCollector create(Services services);
     }
 
 }

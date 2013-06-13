@@ -127,6 +127,18 @@
             id="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
             name="Visualize Configurations">
       </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Adds a Watchpoint that halts the execution of the debugger, when the condition evaluates to true."
+            id="org.key_project.sed.key.ui.addWatchpointCommand"
+            name="Add Watchpoint">
+      </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Opens a dialog to edit the condition of a Watchpoint."
+            id="org.key_project.sed.key.ui.editWatchpointConditionCommand"
+            name="Edit Watchpoint condition">
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -141,6 +153,14 @@
          <image
                commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
                icon="icons/configurations_object_diagram.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand"
+               icon="icons/watchpoint.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.editWatchpointConditionCommand"
+               icon="icons/watchpoint.gif">
          </image>
       </extension>
       <extension
@@ -196,6 +216,29 @@
                      </and>
                   </or>
                </iterate>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand">
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.EditWatchpointConditionHandler"
+               commandId="org.key_project.sed.key.ui.editWatchpointConditionCommand">
+            <enabledWhen>
+               <and>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate>
+                        <adapt
+                              type="org.key_project.sed.key.ui.breakpoints.WatchPoint">
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <reference
+                        definitionId="oneElementSelected">
+                  </reference>
+               </and>
             </enabledWhen>
          </handler>
       </extension>
@@ -378,6 +421,40 @@
                </visibleWhen>
             </command>
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.eclipse.debug.ui.BreakpointView?after=additions">
+            <command
+                  commandId="org.key_project.sed.key.ui.addWatchpointCommand"
+                  icon="icons/watchpoint.gif"
+                  style="push">
+            </command>
+         </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="popup:org.eclipse.debug.ui.BreakpointView?after=additions">
+            <command
+                  commandId="org.key_project.sed.key.ui.editWatchpointConditionCommand"
+                  icon="icons/watchpoint.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <with
+                           variable="activeMenuSelection">
+                        <iterate>
+                           <adapt
+                                 type="org.key_project.sed.key.ui.breakpoints.WatchPoint">
+                           </adapt>
+                        </iterate>
+                     </with>
+                     <reference
+                           definitionId="oneElementSelected">
+                     </reference>
+                  </and>
+               </visibleWhen>
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">
@@ -456,5 +533,25 @@
                   id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView">
             </viewShortcut>
          </perspectiveExtension>
+      </extension>
+      <extension
+            point="org.eclipse.debug.core.breakpoints">
+         <breakpoint
+               class="org.key_project.sed.key.ui.breakpoints.WatchPoint"
+               id="org.key_project.sed.key.ui.breakpoints.watchPoint"
+               markerType="org.eclipse.core.resources.marker">
+         </breakpoint>
+      </extension>
+      <extension
+            point="org.eclipse.core.expressions.definitions">
+         <definition
+               id="oneElementSelected">
+            <with
+                  variable="activeMenuSelection">
+               <count
+                     value="1">
+               </count>
+            </with>
+         </definition>
       </extension>
 </plugin>

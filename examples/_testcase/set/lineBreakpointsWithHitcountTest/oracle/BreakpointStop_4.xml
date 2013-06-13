@@ -7,7 +7,7 @@
                <methodCall name="self.callee.main(a_1);" pathCondition="true" pathConditionChanged="false">
                   <statement name="x=a_1+4;" pathCondition="true" pathConditionChanged="false">
                      <statement name="return a_1*x;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.callee.main(a_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5 + a * 6 + a * a&apos; as result of self.callee.main(a_1);&gt;" isReturnValueComputed="true">
+                        <methodReturn name="&lt;return of self.callee.main(a_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                            <statement name="x++;" pathCondition="true" pathConditionChanged="false">
                            </statement>
                         </methodReturn>

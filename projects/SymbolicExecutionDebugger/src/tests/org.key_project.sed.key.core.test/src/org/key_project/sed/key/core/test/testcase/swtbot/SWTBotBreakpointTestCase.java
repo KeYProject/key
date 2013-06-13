@@ -10,7 +10,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -54,10 +53,15 @@ public class SWTBotBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
                TestUtilsUtil.openEditor(calleeFile);
                toggleBreakpoint(5, bot);
                openPerspective("Symbolic Debug", bot);
-               SWTBotView view = (SWTBotView) TestUtilsUtil.openView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
                
-               TestUtilsUtil.selectInTree(view.bot().tree(), "BreakpointStopCallerAndLoop [line: 10] - BreakpointStopCallerAndLoop");
-               TestUtilsUtil.clickContextMenu(view.bot().tree(), "Disable");
+               
+               
+               SWTBotView view = TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+               view.bot().tree().setFocus();
+               SWTBotTreeItem treeItem = TestUtilsUtil.selectInTree(view.bot().tree(), "BreakpointStopCallee [line: 6] - main(int)");
+               
+               treeItem.contextMenu("Disable");
+               
                resume(bot, item, target);
                
                
@@ -101,16 +105,7 @@ public class SWTBotBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
    
    }
    
-   private void showView(SWTWorkbenchBot bot, String... path){
-      TestUtilsUtil.menuClick(bot, "Window", "Show View", "Other...");
-      SWTBotShell showViewShell = bot.shell("Show View");
-      showViewShell.activate();
-      TestUtilsUtil.selectInTree(bot.tree(0), path);
-      TestUtilsUtil.clickDirectly(bot, "OK");
-   }
-   
    private void openPerspective(String perspective, SWTWorkbenchBot bot){
-
       TestUtilsUtil.menuClick(bot, "Window", "Open Perspective", "Other...");
       SWTBotShell openPerspectiveShell  = bot.shell("Open Perspective");
       openPerspectiveShell.activate();
@@ -123,9 +118,7 @@ public class SWTBotBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
       editor.navigateTo(line, 0);
       TestUtilsUtil.menuClick(bot, "Run", "Toggle Breakpoint");
    }
-
-
-
+   
    private List<LineBreakpointStopCondition> getLineBreakpointStopConditions(IStopCondition stopCondition) {
       List<LineBreakpointStopCondition>lineBreakpoints = new ArrayList<LineBreakpointStopCondition>();
       if(stopCondition instanceof CompoundStopCondition){

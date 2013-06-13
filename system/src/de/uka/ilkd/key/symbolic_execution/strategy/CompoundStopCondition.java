@@ -64,7 +64,7 @@ public class CompoundStopCondition implements IStopCondition {
       Collections.addAll(this.children, children);
    }
    
-   public void removeChild(IStopCondition... child){
+   public void removeChild(IStopCondition child){
       children.remove(child);
    }
 
