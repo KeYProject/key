@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -22,12 +24,14 @@ public class WellDefinednessOperator {
 
     private final Services services;
     private final IntegerLDT intLDT;
+    private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
 
     public WellDefinednessOperator(final Services services) {
         assert services != null;
         this.services = services;
         this.intLDT = services.getTypeConverter().getIntegerLDT();
+        this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
     }
 
@@ -131,9 +135,30 @@ public class WellDefinednessOperator {
 
         if (op.equals(Junctor.TRUE) || op.equals(Junctor.FALSE)) {
             return TB.tt();
-        } else if (op.equals(locSetLDT.getAllLocs())) {
+        } else if (op.equals(locSetLDT.getAllLocs()) || op.equals(locSetLDT.getAllFields())
+                || op.equals(locSetLDT.getAllObjects()) || op.equals(locSetLDT.getElementOf())
+                || op.equals(locSetLDT.getEmpty()) || op.equals(heapLDT.getNull())) {
+            System.out.println(op.toString());
             return TB.tt(); // TODO: tbc ...
+        } else if (op instanceof LocationVariable) {
+            for (LocationVariable lv: heapLDT.getAllHeaps()) {
+                if (op.equals(lv)) {
+                    return TB.tt();
+                }
+            }
         }
+//        locSetLDT.getArrayRange();
+//        locSetLDT.getCreatedInHeap();
+//        locSetLDT.getDisjoint();
+//        locSetLDT.getElementOf();
+//        locSetLDT.getEmpty();
+//        locSetLDT.getFreshLocs();
+//        locSetLDT.getIntersect();
+//        locSetLDT.getSetMinus();
+//        locSetLDT.getSingleton();
+//        locSetLDT.getSubset();
+//        locSetLDT.getUnion();
+        System.out.println("Is this primary? -> " + op.toString());
         return TB.ff();
     }
 

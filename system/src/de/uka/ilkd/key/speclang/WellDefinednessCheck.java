@@ -20,7 +20,12 @@ import de.uka.ilkd.key.util.Triple;
 /**
  * A contract for checking the well-definedness of a specification element
  * (i.e. a class invariant, a method contract, a loop invariant or a block contract),
- * consisting of bla bla bla.
+ * consisting of invariant/precondition (depending on which kind of contract it is)
+ * and assignable-clause.
+ */
+/**
+ * @author kirsten
+ *
  */
 public abstract class WellDefinednessCheck implements Contract {
 
@@ -128,6 +133,8 @@ public abstract class WellDefinednessCheck implements Contract {
         return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
     }
 
+    /* collects terms for precondition, other specification elements and postcondition &
+     * signals-clause */
     abstract public Triple<Term, ImmutableList<Term>, Term> createPOTerm();
 
     @Override
