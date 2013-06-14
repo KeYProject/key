@@ -69,6 +69,8 @@ import javax.swing.event.MouseInputAdapter;
 import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
 import de.uka.ilkd.key.gui.actions.AboutAction;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.AutoSave;
+import de.uka.ilkd.key.gui.actions.DefaultProofFolder;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
@@ -801,6 +803,8 @@ public final class MainWindow extends JFrame  {
 	options.add(new SMTOptionsAction(this));
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
+	options.add(new JCheckBoxMenuItem(new AutoSave(this)));
+	options.add(new JCheckBoxMenuItem(new DefaultProofFolder(this)));
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));

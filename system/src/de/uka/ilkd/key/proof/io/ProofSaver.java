@@ -44,7 +44,6 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -164,7 +163,7 @@ public class ProofSaver {
               if (po instanceof InfFlowRelatedPO) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
-                  ps.print(proof.getIFSymbols().printProofSymbols());
+                  ps.print(proof.getServices().getIFSymbols().printProofSymbols());
               }
               final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");

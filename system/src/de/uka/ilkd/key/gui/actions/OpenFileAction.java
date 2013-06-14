@@ -41,7 +41,7 @@ public class OpenFileAction extends MainWindowAction {
         setTooltip("Browse and load problem or proof files.");
         setAcceleratorLetter(KeyEvent.VK_O);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser keYFileChooser = 
             GuiUtilities.getFileChooser("Select file to load proof or problem");

@@ -27,7 +27,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
@@ -113,12 +112,6 @@ public class Proof implements Named {
     private Strategy activeStrategy;
 
     private SettingsListener settingsListener;
-
-    /**
-     * For saving and loading Information-Flow proofs, we need to remember the
-     * according taclets, program variables, functions and such.
-     */
-    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has
@@ -453,16 +446,6 @@ public class Proof implements Named {
     }
     public ProofIndependentSettings getProofIndependentSettings(){
     	return pis;
-    }
-
-    public InfFlowProofSymbols getIFSymbols() {
-        assert infFlowSymbols != null;
-        return infFlowSymbols;
-    }
-
-    public void addIFSymbols(InfFlowProofSymbols symbols) {
-        assert symbols != null;
-        this.infFlowSymbols = symbols;
     }
 
     /**

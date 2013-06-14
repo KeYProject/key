@@ -88,7 +88,9 @@ public class KeYFileChooser {
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public Pair<Boolean, Pair<File, Boolean>> showSaveDialog(Component parent, String defaultName) {
+    public Pair<Boolean, Pair<File, Boolean>> showSaveDialog(Component parent,
+                                                             String defaultName,
+                                                             boolean autoSave) {
         File file = fileChooser.getSelectedFile();
         String recDir = file != null ?
                 file.getParent() : fileChooser.getCurrentDirectory().toString();
@@ -110,7 +112,7 @@ public class KeYFileChooser {
         file = new File(proofDir, resetFile.getName());
         fileChooser.setSelectedFile(file);
         fileChooser.updateUI(); // Might prevent empty filename suggestion?
-	int result = fileChooser.showSaveDialog(parent);
+	int result = autoSave ? JFileChooser.APPROVE_OPTION : fileChooser.showSaveDialog(parent);
 
 	return new Pair<Boolean, Pair<File, Boolean>> ((result == JFileChooser.APPROVE_OPTION),
 	                                               new Pair<File, Boolean> (dir, newDir));
@@ -128,11 +130,18 @@ public class KeYFileChooser {
 
         final File file = fileChooser.getSelectedFile() != null ?
                 fileChooser.getSelectedFile() : fileChooser.getCurrentDirectory();
+        resetFile = fileChooser.getSelectedFile();
         fileChooser.setSelectedFile(file);
         fileChooser.updateUI();
 
 	int result = fileChooser.showOpenDialog(component);
-	return (result == JFileChooser.APPROVE_OPTION);
+	boolean res = (result == JFileChooser.APPROVE_OPTION);
+	if (!res) {
+	    this.resetPath();
+	} else {
+	    resetFile = null;
+	}
+	return res;
     }
 
     public File getSelectedFile() {

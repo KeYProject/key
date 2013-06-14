@@ -68,7 +68,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifVars, services);
-        proof.getIFSymbols().add(rwTaclet);
+        proof.getServices().getIFSymbols().add(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         addProofSymbols(proof, initiatingGoal.proof());

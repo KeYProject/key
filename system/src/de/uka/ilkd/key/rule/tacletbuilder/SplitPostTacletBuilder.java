@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -46,7 +45,7 @@ public class SplitPostTacletBuilder {
                 }
                 tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
                 splitPostTaclets.add(tacletBuilder.getTaclet());
-                services.getProof().getIFSymbols().add(tacletBuilder.getTaclet());
+                services.getIFSymbols().add(tacletBuilder.getTaclet());
                 i++;
             }
         }

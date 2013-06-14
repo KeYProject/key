@@ -67,7 +67,7 @@ public class FinishAuxiliaryComputationMacro
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifPO.getIFVars(), initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
-        proof.getIFSymbols().add(rwTaclet);
+        proof.getServices().getIFSymbols().add(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         addProofSymbols(proof, initiatingProof);

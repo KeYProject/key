@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -28,7 +29,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -80,7 +80,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
-        proof.getIFSymbols().add(composedStates);
+        proof.getServices().getIFSymbols().add(composedStates);
         return composedStates;
     }
 
@@ -363,7 +363,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     void addProofSymbols(Proof oldProof, Proof newProof) {
         assert oldProof != null;
         assert newProof != null;
-        newProof.addIFSymbols(oldProof.getIFSymbols().getLabeledSymbols());
+        newProof.getServices().addIFSymbols(
+                oldProof.getServices().getIFSymbols().getLabeledSymbols());
     }
 
     protected void saveAuxiliaryProof() {
@@ -376,8 +377,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                             .name()
                                             .toString()).toString();
 
+        boolean autoSave =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
         final Pair<Boolean, Pair<File, Boolean>> res =
-                jFC.showSaveDialog(mainWindow, defaultName + ".proof");
+                jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
         final boolean saved = res.first;
         final boolean newDir = res.second.second;
         if (saved) {

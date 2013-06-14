@@ -85,7 +85,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
 
-            tb.getServices().getProof().getIFSymbols().add(formalParamVar);
+            tb.getServices().getIFSymbols().add(formalParamVar);
         }
 
         //create java block

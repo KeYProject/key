@@ -73,7 +73,7 @@ public class InfFlowContractPO extends AbstractOperationPO
 
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                services.getProof().getIFSymbols().add(t.taclet());
+                initConfig.getServices().getIFSymbols().add(t.taclet());
             }
         }
 

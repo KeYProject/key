@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -37,7 +38,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * transform Java program elements to logic (where possible) and back.
  */
 public class Services{
-    
+
     /**
      * the proof
      */
@@ -62,7 +63,7 @@ public class Services{
      * the information object on the Java model
      */
     private final JavaInfo javainfo;
-        
+
     /**
      * variable namer for inner renaming
      */
@@ -72,7 +73,6 @@ public class Services{
      * the exception-handler
      */
     private KeYExceptionHandler exceptionHandler;
-    
 
     /**
      * map of names to counters
@@ -84,11 +84,15 @@ public class Services{
      */
     private SpecificationRepository specRepos 
     	= new SpecificationRepository(this);
-    
 
     private NameRecorder nameRecorder;
-    
-    
+
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
+
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -281,4 +285,15 @@ public class Services{
 	return proof;
     }
 
+
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+
+    public void addIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        this.infFlowSymbols = symbols;
+    }
 }
