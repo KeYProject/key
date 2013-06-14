@@ -40,10 +40,8 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -65,9 +63,13 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
+<<<<<<< HEAD
+import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
+=======
+import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
+>>>>>>> 11357674f9912269e072a8dd730eae39d7b260db
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -476,12 +478,36 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
+<<<<<<< HEAD
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
-   final Sequent applicationSequent = goal.sequent();
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
+=======
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+   final Sequent applicationSequent = goal.sequent();
+	final KeYJavaType booleanKJT = services.getTypeConverter()
+	                                       .getBooleanType();
+	final KeYJavaType intKJT 
+		= services.getJavaInfo()
+	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
+	//get instantiation
+	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
+	
+    final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
+    final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
+
+    Term invTerm = null;
+    for(LocationVariable heap : heapContext) {
+      final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+      if(invTerm == null) {
+        invTerm = i;
+      }else{
+        invTerm = TB.and(invTerm, i);
+      }
+    }
+>>>>>>> 11357674f9912269e072a8dd730eae39d7b260db
 
         //get instantiation
         final Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
@@ -601,6 +627,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         //Term anonAssumption = null;
         Term wellFormedAnon = null;
         Term frameCondition = null;
+<<<<<<< HEAD
         Term reachableState = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas =
                 ImmutableSLList.<AnonUpdateData>nil();
@@ -652,8 +679,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                                 reachableOut,
                                                                                 variantNonNeg}));
 
-
-	final WhileInvariantTransformer wir = new WhileInvariantTransformer();
+        final WhileInvRule wir = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
         SVInstantiations svInst
         = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(null, null,
                                                           inst.innermostExecutionContext,
@@ -679,6 +705,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         } else {
             invTerm2 = invTerm;
         }
+
+        Term bodyTerm = TB.tf().createTerm(wir,
+                                           inst.progPost,
+                                           TB.and(new Term[]{invTerm2, frameCondition, variantPO}));
+        bodyTerm = wir.transform(bodyTerm, svInst, services);
+	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), bodyTerm);
 
         boolean isInfFlowProof =
                 goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
@@ -794,16 +826,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             bodyGoal.setBranchLabel("Body Preserves Invariant");
             useGoal.setBranchLabel("Use Case");
 
-            Term bodyTerm = wir.transform(this,
-	                                  bodyGoal,
-	                                  applicationSequent,
-	                                  ruleApp.posInOccurrence(),
-	                                  inst.progPost,
-	                                  TB.and(new Term[]{invTerm2, frameCondition, variantPO}),
-	                                  svInst,
-	                                  services);
-            final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), bodyTerm);
-
             //"Body Preserves Invariant":
             // \replacewith (==>  #atPreEqs(anon1)
             //                       -> #introNewAnonUpdate(
@@ -846,7 +868,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // \replacewith (==> inv );
         initGoal.changeFormula(new SequentFormula(TB.apply(inst.u,
                                                            TB.and(variantNonNeg,
-                                                                  TB.and(invTerm, reachableState)), null)),
+                                                                  TB.and(invTerm, reachableState)))),
                                ruleApp.posInOccurrence());
 
         // "Use Case":
@@ -857,10 +879,189 @@ public final class WhileInvariantRule implements BuiltInRule {
         useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
-	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+
+        final Term restPsi = TB.prog((Modality)inst.progPost.op(),
+                                     JavaTools.removeActiveStatement(inst.progPost.javaBlock(),
+                                                                     services),
+                                     inst.progPost.sub(0));
         final Term guardFalseRestPsi = TB.imp(TB.box(guardJb,guardFalseTerm), restPsi);
         useGoal.changeFormula(new SequentFormula(TB.applySequential(uAnon, guardFalseRestPsi)),
+=======
+        Term reachableState = reachableIn;
+        for(LocationVariable heap : heapContext) {
+	  final Pair<Term,Term> tAnon 
+	      = createAnonUpdate(heap, inst.loop, mods.get(heap), services);
+          if(anonUpdate == null) {
+            anonUpdate = tAnon.first;
+          }else{
+            anonUpdate = TB.parallel(anonUpdate, tAnon.first);
+          }
+          if(wellFormedAnon == null) {
+            wellFormedAnon = TB.wellFormed(tAnon.second, services);
+          }else{
+            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.second, services));
+          }
+          final Term m = mods.get(heap);
+          final Term fc;
+          if(TB.strictlyNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+            fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
+          }else{
+            fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
+          }
+          if(frameCondition == null){
+            frameCondition = fc;
+          }else{
+            frameCondition = TB.and(frameCondition, fc);
+          }
+          reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
+        }
+	//prepare variant
+	final ProgramElementName variantName 
+		= new ProgramElementName(TB.newName(services, "variant"));
+	final LocationVariable variantPV = new LocationVariable(variantName, 
+								intKJT);
+	services.getNamespaces().programVariables().addSafely(variantPV);
+	
+	final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
+	final Term variantUpdate 
+		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
+	final Term variantNonNeg 
+		= dia ? TB.leq(TB.zero(services), variant, services) : TB.tt();
+	final Term variantPO
+		= dia ? TB.and(variantNonNeg, 
+			       TB.lt(variant, TB.var(variantPV), services)) 
+                      : TB.tt();
+	
+	//split goal into three branches
+	ImmutableList<Goal> result = goal.split(3);
+	Goal initGoal = result.tail().tail().head();
+	Goal bodyGoal = result.tail().head();
+	Goal useGoal = result.head();
+	initGoal.setBranchLabel("Invariant Initially Valid");
+	bodyGoal.setBranchLabel("Body Preserves Invariant");
+	useGoal.setBranchLabel("Use Case");
+
+	//prepare guard
+	final ProgramElementName guardVarName 
+		= new ProgramElementName(TB.newName(services, "b"));
+	final LocationVariable guardVar = new LocationVariable(guardVarName, 
+						               booleanKJT);
+	services.getNamespaces().programVariables().addSafely(guardVar);	
+	final VariableSpecification guardVarSpec 
+		= new VariableSpecification(guardVar, 
+					    inst.loop.getGuardExpression(), 
+					    booleanKJT);
+	final LocalVariableDeclaration guardVarDecl 
+		= new LocalVariableDeclaration(new TypeRef(booleanKJT), 
+					       guardVarSpec);
+	final Statement guardVarMethodFrame 
+		= inst.innermostExecutionContext == null 
+		  ? guardVarDecl
+		  : new MethodFrame(null, 
+			  	    inst.innermostExecutionContext,
+			  	    new StatementBlock(guardVarDecl));
+	final JavaBlock guardJb 
+		= JavaBlock.createJavaBlock(new StatementBlock(
+							guardVarMethodFrame));
+	final Term guardTrueTerm = TB.equals(TB.var(guardVar), 
+					     TB.TRUE(services));
+	final Term guardFalseTerm = TB.equals(TB.var(guardVar), 
+					      TB.FALSE(services));
+	
+	//prepare common assumption
+	final Term[] uAnon 
+		= new Term[]{inst.u, anonUpdate};
+	final Term[] uBeforeLoopDefAnonVariant 
+		= new Term[]{inst.u, 
+		             beforeLoopUpdate, 
+		             anonUpdate, 
+		             variantUpdate};
+	final Term uAnonInv 
+		= TB.applySequential(uAnon, TB.and(invTerm, reachableOut));
+	final Term uAnonInvVariantNonNeg
+		= TB.applySequential(uAnon, TB.and(new Term[]{invTerm, 
+							      reachableOut, 
+			                                      variantNonNeg}));
+	
+	//"Invariant Initially Valid":
+	// \replacewith (==> inv );
+	initGoal.changeFormula(new SequentFormula(
+		                 TB.apply(inst.u, TB.and(variantNonNeg, 
+                       TB.and(invTerm, reachableState)), null)),
+			         ruleApp.posInOccurrence());
+
+	//"Body Preserves Invariant":
+        // \replacewith (==>  #atPreEqs(anon1) 
+ 	//                       -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv -> 
+        //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+        //                          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
+        //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
+	bodyGoal.addFormula(new SequentFormula(wellFormedAnon), 
+		 	    true, 
+		 	    false);		
+
+	bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg), 
+			    true, 
+			    false);
+
+	final WhileInvariantTransformer wir = new WhileInvariantTransformer();
+	SVInstantiations svInst 
+		= SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
+					null, 
+					null, 
+					inst.innermostExecutionContext, 
+					null, 
+					services);
+	for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
+	    assert sv instanceof ProgramSV;
+	    svInst = svInst.addInteresting(sv, 
+		                           (Name) new ProgramElementName(sv.name().toString()), 
+		                           services);
+	}
+	
+	final Term invTerm2;
+	final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+	final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
+	if(queryTreatmenIsOn || 
+	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
+	   invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
+	}else{
+	   invTerm2 = invTerm;
+	}
+	
+	Term bodyTerm = wir.transform(this, 
+	                              bodyGoal, 
+	                              applicationSequent, 
+	                              ruleApp.posInOccurrence(), 
+	                              inst.progPost, 
+	                              TB.and(new Term[]{invTerm2, frameCondition, variantPO}), 
+	                              svInst, 
+	                              services);
+	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 
+					  bodyTerm); 
+
+	bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
+						uBeforeLoopDefAnonVariant, 
+						guardTrueBody)), 
+                               ruleApp.posInOccurrence());
+
+	// "Use Case":
+	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+	useGoal.addFormula(new SequentFormula(wellFormedAnon), 
+		 	   true, 
+		 	   false);		
+	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+
+	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
+	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+	Term guardFalseRestPsi = TB.box(guardJb, 
+					TB.imp(guardFalseTerm, restPsi));
+	useGoal.changeFormula(new SequentFormula(TB.applySequential(
+							uAnon,
+							guardFalseRestPsi)), 
+>>>>>>> 11357674f9912269e072a8dd730eae39d7b260db
                               ruleApp.posInOccurrence());
 
         return result;
