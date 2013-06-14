@@ -27,6 +27,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
+        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
         if (poVars.post.self != null)
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
@@ -35,7 +36,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             final JavaBlock guardJb = buildJavaBlock(d).second;
             posts = posts.append(d.tb.box(guardJb,
                                           d.tb.equals(poVars.post.guard,
-                                                      poVars.pre.guard)));
+                                                      d.tb.var((LocationVariable) inv.getGuard().op()))));
         }
         Iterator<Term> localVars = d.origVars.localVars.iterator();
         Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
@@ -73,18 +74,17 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         } else {
             symbExecMod = Modality.BOX;
         }
-        final Term guardTrueTerm = d.tb.equals(d.tb.var((LocationVariable) inv.getGuard().op()), 
-                                               d.tb.TRUE(services));
-        final Term guardFalseTerm = d.tb.equals(d.tb.var((LocationVariable) inv.getGuard().op()), 
-                d.tb.FALSE(services));
+        final Term guardPreTrueTerm = d.tb.equals(vs.pre.guard,
+                                                  d.tb.TRUE(services));
+        final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard,
+                                                   d.tb.FALSE(services));
+        final Term guardPreEqTerm = d.tb.equals(d.tb.var((LocationVariable) inv.getGuard().op()),
+                                                vs.pre.guard);
+        final Term guardPreTerm = tb.prog(modality, jb.second, guardPreEqTerm);
         final Term bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
-        final Term guardTrueBody =
-                d.tb.imp(tb.prog(modality, jb.second, guardTrueTerm),
-                         bodyTerm);
-        final Term guardFalseBody =
-                d.tb.imp(tb.prog(modality, jb.second, guardFalseTerm),
-                         postTerm);
-        final Term programTerm = d.tb.and(guardTrueBody, guardFalseBody);
+        final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
+        final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
+        final Term programTerm = d.tb.and(guardPreTerm, guardTrueBody, guardFalseBody);
 
         //create update
         Term update = tb.skip();

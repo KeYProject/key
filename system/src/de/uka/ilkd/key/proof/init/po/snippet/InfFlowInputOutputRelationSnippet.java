@@ -195,7 +195,22 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                        newObjsSeq2, vs2.pre.heap);
 
         // build object oriented post-relation (object sensitive case)
-        return d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, eqAtLocsTerm));
+        final Term ooPostRelation =
+                d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, eqAtLocsTerm));
+        if (vs1.pre.guard != null && vs1.post.guard != null
+                && vs2.pre.guard != null && vs2.post.guard != null) {
+            // Case of loop invariants.
+            // In this case newObjecs is only considered in case the
+            // loop body is entered. Otherwise no code is executed an
+            // hence also no objects can be created.
+            final Term preGuardFalse1 = d.tb.equals(vs1.pre.guard, d.tb.FALSE());
+            final Term preGuardFalse2 = d.tb.equals(vs2.pre.guard, d.tb.FALSE());
+            return d.tb.ife(d.tb.and(preGuardFalse1, preGuardFalse2),
+                            eqAtLocsTerm, ooPostRelation);
+        } else {
+            // Normal case.
+            return ooPostRelation;
+        }
     }
 
 

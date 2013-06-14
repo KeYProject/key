@@ -103,4 +103,22 @@ public final class ObjectOrientation {
         secure_two_object_creation();
         o2 = o1;
     }
+
+
+//--------------
+
+    //@ requires    \typeof(a) == \type(Object[]);
+    //@ separates   a.length \erases (\seq_def int i; 0; a.length; a[i]);
+    public void secure_while_i(Object[] a) {
+        /*@ loop_invariant 0 <= i && i <= a.length;
+            loop_invariant a != null && \typeof(a) == \type(Object[]);
+            assignable a[*];
+            decreases a.length - i;
+            separates i, a.length, (\seq_def int j; 0; i; a[j]) \new_objects a[i-1];
+          @*/
+        for (int i = 0; i < a.length; i++) {
+            a[i] = new Object();
+        }
+    }
+
 }
