@@ -339,6 +339,8 @@ provable: ./standard_key/pred_log/mv2.key
 provable: ./standard_key/pred_log/quantifiers.key
 provable: ./standard_key/pred_log/simpleEps.key
 provable: ./standard_key/pred_log/steam1.key
+provable: ./standard_key/pred_log/tptp/PUZ/PUZ001p1.key
+provable: ./standard_key/pred_log/tptp/PUZ/PUZ001p1-eq.key
 provable: ./standard_key/pred_log/tptp/PUZ/PUZ031p1.key
 provable: ./standard_key/pred_log/tptp/SET/SET027p3.key
 provable: ./standard_key/pred_log/tptp/SET/SET043p1.key
