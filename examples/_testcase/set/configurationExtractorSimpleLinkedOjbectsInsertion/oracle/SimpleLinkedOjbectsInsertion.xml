@@ -9,181 +9,13 @@
                      <branchCondition name="!x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="true" branchCondition="!x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="SimpleLinkedOjbectsInsertion y = new SimpleLinkedOjbectsInsertion ();" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                            <methodCall name="SimpleLinkedOjbectsInsertion();" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" isReturnValueComputed="false">
                                  <statement name="y.value=4;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                                     <statement name="y.next=x.next;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                                        <statement name="x.next=y;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                                           <statement name="return x.value+x.next.value+x.next.next.value+x.next.next.next.value;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion.compute(x);&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  4
-+ \if (x = s_5)
-      \then (4)
-      \else (\if (x.next.next = x)
-                 \then (3)
-                 \else (\if (x.next = x)
-                            \then (2)
-                            \else (1)))
-+ \if (  x = s_5
-       |   \if (x = s_5)  \then (null)  \else (x.next)
-         = s_5)
-      \then (4)
-      \else (\if (  \if (x = s_5)
-                        \then (s_5)
-                        \else (\if (x = s_5)
-                                   \then (null)
-                                   \else (x.next))
-                  = x.next.next)
-                 \then (3)
-                 \else (\if (  \if (x = s_5)
-                                   \then (s_5)
-                                   \else (\if (x = s_5)
-                                              \then (null)
-                                              \else (x.next))
-                             = x.next)
-                            \then (2)
-                            \else (\if (  \if (x = s_5)
-                                              \then (s_5)
-                                              \else (\if (  x
-                                                          = s_5)
-                                                         \then (null)
-                                                         \else (x.next))
-                                        = x)
-                                       \then (1)
-                                       \else (\if (  x
-                                                   = s_5)
-                                                  \then (s_5)
-                                                  \else (\if (  x
-                                                              = s_5)
-                                                             \then (null)
-                                                             \else (x.next)).value))))
-+ \if (    \if (x = s_5)
-               \then (s_5)
-               \else (\if (x = s_5)
-                          \then (null)
-                          \else (x.next))
-         = x
-       |   \if (  x = s_5
-                |   \if (x = s_5)
-                        \then (null)
-                        \else (x.next)
-                  = s_5)
-               \then (\if (x = s_5)
-                          \then (null)
-                          \else (x.next))
-               \else (\if (x = s_5)
-                          \then (s_5)
-                          \else (\if (x = s_5)
-                                     \then (null)
-                                     \else (x.next)).next)
-         = s_5)
-      \then (4)
-      \else (\if (  \if (  \if (x = s_5)
-                               \then (s_5)
-                               \else (\if (x = s_5)
-                                          \then (null)
-                                          \else (x.next))
-                         = x)
-                        \then (s_5)
-                        \else (\if (  x = s_5
-                                    |   \if (x = s_5)
-                                            \then (null)
-                                            \else (x.next)
-                                      = s_5)
-                                   \then (\if (x = s_5)
-                                              \then (null)
-                                              \else (x.next))
-                                   \else (\if (x = s_5)
-                                              \then (s_5)
-                                              \else (\if (  x
-                                                          = s_5)
-                                                         \then (null)
-                                                         \else (x.next)).next))
-                  = x.next.next)
-                 \then (3)
-                 \else (\if (  \if (  \if (x = s_5)
-                                          \then (s_5)
-                                          \else (\if (  x
-                                                      = s_5)
-                                                     \then (null)
-                                                     \else (x.next))
-                                    = x)
-                                   \then (s_5)
-                                   \else (\if (    x
-                                                 = s_5
-                                               |   \if (  x
-                                                        = s_5)
-                                                       \then (null)
-                                                       \else (x.next)
-                                                 = s_5)
-                                              \then (\if (  x
-                                                          = s_5)
-                                                         \then (null)
-                                                         \else (x.next))
-                                              \else (\if (  x
-                                                          = s_5)
-                                                         \then (s_5)
-                                                         \else (\if (  x
-                                                                     = s_5)
-                                                                    \then (null)
-                                                                    \else (x.next)).next))
-                             = x.next)
-                            \then (2)
-                            \else (\if (  \if (  \if (  x
-                                                      = s_5)
-                                                     \then (s_5)
-                                                     \else (\if (  x
-                                                                 = s_5)
-                                                                \then (null)
-                                                                \else (x.next))
-                                               = x)
-                                              \then (s_5)
-                                              \else (\if (    x
-                                                            = s_5
-                                                          |   \if (  x
-                                                                   = s_5)
-                                                                  \then (null)
-                                                                  \else (x.next)
-                                                            = s_5)
-                                                         \then (\if (  x
-                                                                     = s_5)
-                                                                    \then (null)
-                                                                    \else (x.next))
-                                                         \else (\if (  x
-                                                                     = s_5)
-                                                                    \then (s_5)
-                                                                    \else (\if (  x
-                                                                                = s_5)
-                                                                               \then (null)
-                                                                               \else (x.next)).next))
-                                        = x)
-                                       \then (1)
-                                       \else (\if (  \if (  x
-                                                          = s_5)
-                                                         \then (s_5)
-                                                         \else (\if (  x
-                                                                     = s_5)
-                                                                    \then (null)
-                                                                    \else (x.next))
-                                                   = x)
-                                                  \then (s_5)
-                                                  \else (\if (    x
-                                                                = s_5
-                                                              |   \if (  x
-                                                                       = s_5)
-                                                                      \then (null)
-                                                                      \else (x.next)
-                                                                = s_5)
-                                                             \then (\if (  x
-                                                                         = s_5)
-                                                                        \then (null)
-                                                                        \else (x.next))
-                                                             \else (\if (  x
-                                                                         = s_5)
-                                                                        \then (s_5)
-                                                                        \else (\if (  x
-                                                                                    = s_5)
-                                                                                   \then (null)
-                                                                                   \else (x.next)).next)).value))))&apos; as result of SimpleLinkedOjbectsInsertion.compute(x);&gt;" isReturnValueComputed="true">
-                                                <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" exceptionalTermination="false">
+                                             <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion.compute(x);&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" isReturnValueComputed="false">
+                                                <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                 </termination>
                                              </methodReturn>
                                           </statement>
@@ -195,19 +27,19 @@
                         </statement>
                      </branchCondition>
                      <branchCondition name="x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="true" branchCondition="x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" exceptionalTermination="true">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                         </termination>
                      </branchCondition>
                   </statement>
                </branchCondition>
                <branchCondition name="x.next = null" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="true" branchCondition="x.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" exceptionalTermination="true">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" exceptionalTermination="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
             </termination>
          </branchCondition>
       </statement>

@@ -20,8 +20,8 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -32,8 +32,8 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
@@ -47,8 +47,9 @@ import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final While loop;
+
     private final LoopInvariant inv;
-    private final List<LocationVariable> heapContext;    
+    private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
 
     public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
@@ -56,13 +57,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-                                          PosInOccurrence pio,
-                                          ImmutableList<PosInOccurrence> ifInsts,
-                                          LoopInvariant inv,
-                                          List<LocationVariable> heapContext) {
+            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
+            LoopInvariant inv, List<LocationVariable> heapContext) {
         super(rule, pio, ifInsts);
         assert pio != null;
-        this.loop = (While) JavaTools.getActiveStatement(programTerm().javaBlock());
+        this.loop = (While) JavaTools.getActiveStatement(programTerm()
+                .javaBlock());
         assert loop != null;
         this.inv = instantiateIndexValues(inv);
         this.heapContext = heapContext;
@@ -93,82 +93,79 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
     	ProgramElement guardStatement = guard.getChildAt(0);
     	skipIndex = !(guardStatement instanceof LessThan);
-    	Expression loopIndex =
-    	        skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
+    	Expression loopIndex = skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
-    	final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
-
-    	// try to retrieve a sequence of values
-    	Statement body = loop.getBody();
-    	skipValues = !(body instanceof StatementBlock);
-    	StatementBlock block = skipValues? null: ((StatementBlock)body);
-    	Statement last =
-    	        (skipValues || block.getStatementCount() < 2) ?
-    	                null: block.getStatementAt(1); // get the second statement
-    	skipValues = skipValues || !(last instanceof CopyAssignment);
-    	CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
-    	ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
-    	skipValues = skipValues || !(lhs instanceof ProgramVariable);
-    	final Term valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
+		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
+    	
+		// try to retrieve a sequence of values
+		Statement body = loop.getBody();
+		skipValues = !(body instanceof StatementBlock);
+		StatementBlock block = skipValues? null: ((StatementBlock)body);
+		Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
+		skipValues = skipValues || !(last instanceof CopyAssignment);
+		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
+		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
+		skipValues = skipValues || !(lhs instanceof ProgramVariable);
+		final Term valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
     	
     	// set up replacement visitors
     	final class IndexTermReplacementVisitor extends DefaultVisitor {
+    		
+    		private Term result;
 
-    	    private Term result;
-
-    	    @Override
-    	    public void visit(Term visited) {
-    	        result = replace(visited);
-    	    }
-
-    	    public Term getResult(){
-    	        return result;
-    	    }
-
-    	    private Term replace(Term visited){
-    	        ImmutableArray<Term> subs = visited.subs();
-    	        if (subs.isEmpty()) {
-    	            if (visited.op().name().toString().equals("index"))
-    	                return loopIdxVar;
-    	            else return visited;
-    	        } else {
-    	            Term[] newSubs = new Term[subs.size()];
-    	            for (int i= 0; i < subs.size(); i++)
-    	                newSubs[i] = replace(subs.get(i));
-    	            return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-    	                    visited.boundVars(), visited.javaBlock());
-    	        }
-    	    }
-    	};
+			@Override
+			public void visit(Term visited) {
+				result = replace(visited);
+			}
+			
+			public Term getResult(){
+				return result;
+			}
+			
+			private Term replace(Term visited){
+			    ImmutableArray<Term> subs = visited.subs();
+			    if (subs.isEmpty()) {
+			    	if (visited.op().name().toString().equals("index"))
+			    		return loopIdxVar;
+			    	else return visited;
+			    } else {
+			    	Term[] newSubs = new Term[subs.size()];
+			    	for (int i= 0; i < subs.size(); i++)
+			    		newSubs[i] = replace(subs.get(i));
+			    	return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
+			    			visited.boundVars(), visited.javaBlock());
+			    }
+			}
+		};
         final class ValuesTermReplacementVisitor extends DefaultVisitor {
+            
+            private Term result;
 
-    	    private Term result;
-
-    	    @Override
-    	    public void visit(Term visited) {
-    	        result = replace(visited);
-    	    }
-
-    	    public Term getResult(){
-    	        return result;
-    	    }
-
-    	    private Term replace(Term visited){
-    	        ImmutableArray<Term> subs = visited.subs();
-    	        if (subs.isEmpty()) {
-    	            if (visited.op().name().toString().equals("values"))
-    	                return valuesVar;
-    	            else return visited;
-    	        } else {
-    	            Term[] newSubs = new Term[subs.size()];
-    	            for (int i= 0; i < subs.size(); i++)
-    	                newSubs[i] = replace(subs.get(i));
-    	            return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-    	                    visited.boundVars(), visited.javaBlock());
-    	        }
-    	    }
-    	};
-
+            @Override
+            public void visit(Term visited) {
+                result = replace(visited);
+            }
+            
+            public Term getResult(){
+                return result;
+            }
+            
+            private Term replace(Term visited){
+                ImmutableArray<Term> subs = visited.subs();
+                if (subs.isEmpty()) {
+                    if (visited.op().name().toString().equals("values"))
+                        return valuesVar;
+                    else return visited;
+                } else {
+                    Term[] newSubs = new Term[subs.size()];
+                    for (int i= 0; i < subs.size(); i++)
+                        newSubs[i] = replace(subs.get(i));
+                    return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
+                            visited.boundVars(), visited.javaBlock());
+                }
+            }
+        };
+		
 		// replace index
         Map<LocationVariable,Term> newInvs = new HashMap<LocationVariable,Term>(invs);
 		if (!skipIndex){
@@ -264,7 +261,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext);
     }
 
-    public LoopInvariant retrieveLoopInvariantFromSpecification(Services services) {
+    public LoopInvariant retrieveLoopInvariantFromSpecification(
+            Services services) {
         return services.getSpecificationRepository().getLoopInvariant(loop);
     }
 
@@ -308,7 +306,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public List<LocationVariable> getHeapContext() {
       return heapContext;
-    }
+    }   
 
     public IFProofObligationVars getInformationFlowProofObligationVars() {
         return infFlowVars;

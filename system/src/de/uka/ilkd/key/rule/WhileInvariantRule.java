@@ -17,9 +17,10 @@ package de.uka.ilkd.key.rule;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -37,8 +38,21 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
@@ -49,7 +63,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -462,6 +476,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
+   final Sequent applicationSequent = goal.sequent();
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
@@ -635,7 +650,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                                 reachableOut,
                                                                                 variantNonNeg}));
 
-        final WhileInvRule wir = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
+
+	final WhileInvariantTransformer wir = new WhileInvariantTransformer();
         SVInstantiations svInst
         = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(null, null,
                                                           inst.innermostExecutionContext,
@@ -662,10 +678,14 @@ public final class WhileInvariantRule implements BuiltInRule {
             invTerm2 = invTerm;
         }
 
-        Term bodyTerm = TB.tf().createTerm(wir,
-                                           inst.progPost,
-                                           TB.and(new Term[]{invTerm2, frameCondition, variantPO}));
-        bodyTerm = wir.transform(bodyTerm, svInst, services);
+	Term bodyTerm = wir.transform(this, 
+	                              bodyGoal, 
+	                              applicationSequent, 
+	                              ruleApp.posInOccurrence(), 
+	                              inst.progPost, 
+	                              TB.and(new Term[]{invTerm2, frameCondition, variantPO}), 
+	                              svInst, 
+	                              services);
 	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), bodyTerm);
 
         boolean isInfFlowProof =
@@ -824,7 +844,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // \replacewith (==> inv );
         initGoal.changeFormula(new SequentFormula(TB.apply(inst.u,
                                                            TB.and(variantNonNeg,
-                                                                  TB.and(invTerm, reachableState)))),
+                                                                  TB.and(invTerm, reachableState)), null)),
                                ruleApp.posInOccurrence());
 
         // "Use Case":
@@ -835,11 +855,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
-
-        final Term restPsi = TB.prog((Modality)inst.progPost.op(),
-                                     JavaTools.removeActiveStatement(inst.progPost.javaBlock(),
-                                                                     services),
-                                     inst.progPost.sub(0));
+	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
+	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
         final Term guardFalseRestPsi = TB.imp(TB.box(guardJb,guardFalseTerm), restPsi);
         useGoal.changeFormula(new SequentFormula(TB.applySequential(uAnon, guardFalseRestPsi)),
                               ruleApp.posInOccurrence());

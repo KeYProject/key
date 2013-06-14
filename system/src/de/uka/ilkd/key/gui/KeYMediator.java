@@ -37,7 +37,14 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -45,7 +52,12 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -82,8 +94,6 @@ public class KeYMediator {
     private KeYExceptionHandler defaultExceptionHandler;
 
     private boolean stupidMode; // minimize user interaction
-
-    private boolean autoMode; // autoModeStarted has been fired
     
     private TacletFilter filterForInteractiveProving;
     
@@ -771,7 +781,7 @@ public class KeYMediator {
    }
     
     public boolean autoMode() {
-        return autoMode;
+        return interactiveProver.isAutoMode();
     }
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
@@ -838,13 +848,11 @@ public class KeYMediator {
 	 */
 	public void autoModeStarted(ProofEvent e) {	 
 	    resetNrGoalsClosedByHeuristics();
-	    autoMode = true;
 	}
 	
 	/** invoked if automatic execution has stopped
 	 */
 	public void autoModeStopped(ProofEvent e) {
-            autoMode = false;
 	}
     }
 

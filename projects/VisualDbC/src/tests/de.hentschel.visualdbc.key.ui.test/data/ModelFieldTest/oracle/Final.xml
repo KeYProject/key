@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel">
+  <proofs target="//@types.0/@methods.0/@operationContracts.0" obligation="ContractPO">
+    <proofReferences target="//@types.0/@methods.0" kind="Inline Method"/>
+    <proofReferences target="//@types.0/@attributes.0" kind="Access"/>
+    <proofReferences target="//@types.0/@axioms.0" kind="Use Axiom"/>
+  </proofs>
+  <types xsi:type="dbcmodel:DbcClass" name="test.ModelFieldTest">
+    <axioms name="JML represents clause for test.ModelFieldTest::$f" definition="equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"/>
+    <methods signature="doubleX()" returnType="int">
+      <operationContracts name="test.ModelFieldTest[test.ModelFieldTest::doubleX()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> result = self.f &amp; self.&lt;inv>)&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+    <attributes name="x" type="int" visibility="default"/>
+  </types>
+</dbcmodel:DbcModel>

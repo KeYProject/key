@@ -82,6 +82,7 @@ tokens {
 	ISOBSERVER = "\\isObserver";
 	DIFFERENT = "\\different";		
 	METADISJOINT = "\\metaDisjoint";
+	ISTHISREFERENCE="\\isThisReference";	        
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	
@@ -540,6 +541,13 @@ options {
       :   '>' '='
       ;
 
+RGUILLEMETS
+options {
+  paraphrase = "`>>'";
+}
+      :   '>' '>'
+      ;
+
 
 WS
 options {
@@ -567,6 +575,8 @@ LESS_DISPATCH
     |
      ('<' '=' ) => LESSEQUAL {$setType(LESSEQUAL);}
     |
+     ('<' '<' ) => LGUILLEMETS {$setType(LGUILLEMETS);}
+    |
      LESS {$setType(LESS);}
     ;
 
@@ -585,6 +595,15 @@ options {
 :
   '<' '='
     ;
+
+protected LGUILLEMETS
+options {
+  paraphrase = "'<<'";
+}
+:
+  '<' '<'
+    ;
+
 
 protected IMPLICIT_IDENT
 options {

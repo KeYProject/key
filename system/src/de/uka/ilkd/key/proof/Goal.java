@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
-
+// 
 
 package de.uka.ilkd.key.proof;
 
@@ -76,7 +74,7 @@ public final class Goal  {
     private AutomatedRuleApplicationManager ruleAppManager;
 
     /** goal listeners  */
-    private List<GoalListener> listeners = new ArrayList<GoalListener>();
+    private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;

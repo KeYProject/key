@@ -123,7 +123,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }    
     
     
-    private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
+    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         

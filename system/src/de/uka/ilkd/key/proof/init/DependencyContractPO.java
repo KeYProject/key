@@ -193,7 +193,7 @@ public final class DependencyContractPO extends AbstractPO
 	//build po
 	final Term po = TB.imp(pre,
                                TB.equals(targetTerm, 
-                        	         TB.apply(update, targetTerm)));
+                        	         TB.apply(update, targetTerm, null)));
 	
         //save in field
         assignPOTerms(po);

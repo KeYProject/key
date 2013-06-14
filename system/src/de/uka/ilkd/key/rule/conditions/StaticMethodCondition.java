@@ -11,7 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -50,8 +49,8 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
      * call. The flag negation allows to reuse this condition for
      * ensuring non static references.
      */
-    public StaticMethodCondition (boolean negation, 
-				  SchemaVariable caller, 
+    public StaticMethodCondition (boolean negation,
+				  SchemaVariable caller,
 				  SchemaVariable methname,
 				  SchemaVariable args) {
 	this.negation = negation;
@@ -68,31 +67,32 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 	return new ImmutableArray<Expression>(result);
     }
 
-    
+
+    @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, 
-			 SVSubstitute subst, 
+    public boolean check(SchemaVariable var,
+			 SVSubstitute subst,
 			 SVInstantiations svInst,
 			 Services services) {
-	
+
 	ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
 	MethodName mn = (MethodName) svInst.getInstantiation(methname);
-	ImmutableArray<ProgramElement> ape = 
+	ImmutableArray<ProgramElement> ape =
 	    (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
 	if (rp != null && mn != null && ape != null) {
-	    ImmutableArray<Expression> ar 
+	    ImmutableArray<Expression> ar
 		= toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
-	    if (var == args) {		
+	    if (var == args) {
 		ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
 	    }
-	    ExecutionContext ec 
+	    ExecutionContext ec
 		= svInst.getContextInstantiation().activeStatementContext();
 	    MethodReference mr =new MethodReference(ar, mn, rp);
 	    IProgramMethod method = null;
 	    KeYJavaType prefixType = services.getTypeConverter().
 		getKeYJavaType((Expression) rp, ec);
-	    if((rp instanceof LocationVariable) && 
+	    if((rp instanceof LocationVariable) &&
 	       (((LocationVariable) rp).sort() instanceof NullSort)){
 		return true;
 	    }
@@ -101,22 +101,22 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 		// we are only interested in the signature. The method
 		// must be declared in the static context.
 	    } else { //no execution context
-		method = mr.method (services, prefixType, 
+		method = mr.method (services, prefixType,
 		        mr.getMethodSignature(services, ec),
 		        prefixType);
 	    }
-	    if (method == null) {	
-		return false;		
+	    if (method == null) {
+		return false;
 	    }
 	    return negation ^ method.isStatic();
 	}
 	return true;
     }
 
-    
-    @Override    
+
+    @Override
     public String toString () {
-	return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller 
+	return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller
 	       + ", " + methname + ", " + args + ")";
     }
 }

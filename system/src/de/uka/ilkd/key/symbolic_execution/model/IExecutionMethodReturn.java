@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -40,29 +39,22 @@ public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElemen
    public IExecutionMethodCall getMethodCall();
    
    /**
-    * Returns the human readable node name including the return value ({@link #getReturnValue()}).
+    * Returns the human readable node name including the return value ({@link #getReturnValues()}).
     * @return The human readable node name including the return value.
     * @throws ProofInputException Occurred Exception.
     */
    public String getNameIncludingReturnValue() throws ProofInputException;
 
    /**
-    * Checks if the value of {@link #getReturnValue()} is already computed.
-    * @return {@code true} value of {@link #getReturnValue()} is already computed, {@code false} value of {@link #getReturnValue()} needs to be computed.
+    * Checks if the values of {@link #getReturnValues()} are already computed.
+    * @return {@code true} value of {@link #getReturnValues()} are already computed, {@code false} values of {@link #getReturnValues()} needs to be computed.
     */
-   public boolean isReturnValueComputed();
+   public boolean isReturnValuesComputed();
    
    /**
-    * Returns the return value.
-    * @return The return value.
+    * Returns the possible return values.
+    * @return The possible return values.
     * @throws ProofInputException Occurred Exception.
     */
-   public Term getReturnValue() throws ProofInputException;
-   
-   /**
-    * Returns the return value formated for the user.
-    * @return The return value formated for the user.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public String getFormatedReturnValue() throws ProofInputException;
+   public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException;
 }

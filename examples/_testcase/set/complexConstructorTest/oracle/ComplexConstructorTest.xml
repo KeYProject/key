@@ -5,21 +5,21 @@
          <callStackEntry path="/0"/>
          <methodCall name="DefaultConstructor();" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <methodReturn name="&lt;return of DefaultConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of DefaultConstructor();&gt;" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of DefaultConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of DefaultConstructor();&gt;" isReturnValueComputed="true">
                <callStackEntry path="/0"/>
                <callStackEntry path="/0/0/0"/>
                <statement name="ExplicitConstructor ec = new ExplicitConstructor ();" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <methodCall name="ExplicitConstructor();" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of ExplicitConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of ExplicitConstructor();&gt;" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of ExplicitConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of ExplicitConstructor();&gt;" isReturnValueComputed="true">
                         <callStackEntry path="/0"/>
                         <callStackEntry path="/0/0/0/0/0/0"/>
                         <statement name="ExplicitConstructorWithSuper ecws = new ExplicitConstructorWithSuper ();" pathCondition="true" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
                            <methodCall name="ExplicitConstructorWithSuper();" pathCondition="true" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <methodReturn name="&lt;return of ExplicitConstructorWithSuper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of ExplicitConstructorWithSuper();&gt;" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of ExplicitConstructorWithSuper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of ExplicitConstructorWithSuper();&gt;" isReturnValueComputed="true">
                                  <callStackEntry path="/0"/>
                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
                                  <statement name="A a = new A ();" pathCondition="true" pathConditionChanged="false">
@@ -33,11 +33,11 @@
                                              <callStackEntry path="/0"/>
                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                             <methodReturn name="&lt;return of A(a_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_4);&gt;" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of A(a_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_4);&gt;" isReturnValueComputed="true">
                                                 <callStackEntry path="/0"/>
                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                <methodReturn name="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="false">
+                                                <methodReturn name="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true">
                                                    <callStackEntry path="/0"/>
                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                    <statement name="A aCustom = new A (12);" pathCondition="true" pathConditionChanged="false">
@@ -47,7 +47,7 @@
                                                          <statement name="this.a=var;" pathCondition="true" pathConditionChanged="false">
                                                             <callStackEntry path="/0"/>
                                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                            <methodReturn name="&lt;return of A(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(var);&gt;" isReturnValueComputed="false">
+                                                            <methodReturn name="&lt;return of A(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(var);&gt;" isReturnValueComputed="true">
                                                                <callStackEntry path="/0"/>
                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                <statement name="B b = new B ();" pathCondition="true" pathConditionChanged="false">
@@ -72,13 +72,13 @@
                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                 <methodReturn name="&lt;return of A(a_8);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_8);&gt;" isReturnValueComputed="false">
+                                                                                 <methodReturn name="&lt;return of A(a_8);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_8);&gt;" isReturnValueComputed="true">
                                                                                     <callStackEntry path="/0"/>
                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                    <methodReturn name="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="false">
+                                                                                    <methodReturn name="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true">
                                                                                        <callStackEntry path="/0"/>
                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
@@ -87,11 +87,11 @@
                                                                                           <callStackEntry path="/0"/>
                                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                          <methodReturn name="&lt;return of B(b_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B(b_4);&gt;" isReturnValueComputed="false">
+                                                                                          <methodReturn name="&lt;return of B(b_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B(b_4);&gt;" isReturnValueComputed="true">
                                                                                              <callStackEntry path="/0"/>
                                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                             <methodReturn name="&lt;return of B();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B();&gt;" isReturnValueComputed="false">
+                                                                                             <methodReturn name="&lt;return of B();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B();&gt;" isReturnValueComputed="true">
                                                                                                 <callStackEntry path="/0"/>
                                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                 <statement name="B bCustomB = new B (true);" pathCondition="true" pathConditionChanged="false">
@@ -110,19 +110,19 @@
                                                                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                               <methodReturn name="&lt;return of A(a_9);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_9);&gt;" isReturnValueComputed="false">
+                                                                                                               <methodReturn name="&lt;return of A(a_9);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_9);&gt;" isReturnValueComputed="true">
                                                                                                                   <callStackEntry path="/0"/>
                                                                                                                   <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                   <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                   <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                  <methodReturn name="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="false">
+                                                                                                                  <methodReturn name="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true">
                                                                                                                      <callStackEntry path="/0"/>
                                                                                                                      <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                      <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                      <statement name="this.b=var_1;" pathCondition="true" pathConditionChanged="false">
                                                                                                                         <callStackEntry path="/0"/>
                                                                                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                        <methodReturn name="&lt;return of B(var_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B(var_1);&gt;" isReturnValueComputed="false">
+                                                                                                                        <methodReturn name="&lt;return of B(var_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B(var_1);&gt;" isReturnValueComputed="true">
                                                                                                                            <callStackEntry path="/0"/>
                                                                                                                            <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                            <statement name="B bCustomIB = new B (11,true);" pathCondition="true" pathConditionChanged="false">
@@ -136,21 +136,23 @@
                                                                                                                                        <callStackEntry path="/0"/>
                                                                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                                       <methodReturn name="&lt;return of A(a_10);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_10);&gt;" isReturnValueComputed="false">
+                                                                                                                                       <methodReturn name="&lt;return of A(a_10);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of A(a_10);&gt;" isReturnValueComputed="true">
                                                                                                                                           <callStackEntry path="/0"/>
                                                                                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                           <statement name="this.b=var_3;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                              <callStackEntry path="/0"/>
                                                                                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                                             <methodReturn name="&lt;return of B(var_2,var_3);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B(var_2,var_3);&gt;" isReturnValueComputed="false">
+                                                                                                                                             <methodReturn name="&lt;return of B(var_2,var_3);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of B(var_2,var_3);&gt;" isReturnValueComputed="true">
                                                                                                                                                 <callStackEntry path="/0"/>
                                                                                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                                 <statement name="return dc.x+ec.x+ecws.x+a.a+aCustom.a+b.a+b.a+bCustomB.a+bCustomIB.a;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                    <callStackEntry path="/0"/>
-                                                                                                                                                   <methodReturn name="&lt;return of ComplexConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;191&apos; as result of ComplexConstructorTest.main();&gt;" isReturnValueComputed="true">
+                                                                                                                                                   <methodReturn name="&lt;return of ComplexConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 191 as result of ComplexConstructorTest.main();&gt;" isReturnValueComputed="true">
+                                                                                                                                                      <methodReturnValue name="191" returnValueString="191" hasCondition="false">
+                                                                                                                                                      </methodReturnValue>
                                                                                                                                                       <callStackEntry path="/0"/>
-                                                                                                                                                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                                                                                                                                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                                                                                                                                       </termination>
                                                                                                                                                    </methodReturn>
                                                                                                                                                 </statement>

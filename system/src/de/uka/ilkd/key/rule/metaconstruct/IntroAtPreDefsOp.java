@@ -221,6 +221,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
         }*/
 
-        return TB.apply(atPreUpdate, target);
+        return TB.apply(atPreUpdate, target, null);
     }
 }

@@ -2,8 +2,8 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MethodPOTest.returnMethod(param);" pathCondition="true" pathConditionChanged="false">
       <statement name="return param.x;" pathCondition="true" pathConditionChanged="false">
-         <methodReturn name="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;param.x&apos; as result of MethodPOTest.returnMethod(param);&gt;" isReturnValueComputed="true">
-            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+         <methodReturn name="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
             </termination>
          </methodReturn>
       </statement>

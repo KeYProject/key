@@ -44,6 +44,8 @@ import org.key_project.util.java.thread.IRunnableWithException;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
+import de.hentschel.visualdbc.datasource.key.model.event.IKeYConnectionListener;
+import de.hentschel.visualdbc.datasource.key.model.event.KeYConnectionEvent;
 import de.hentschel.visualdbc.datasource.key.util.LogUtil;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 import de.hentschel.visualdbc.datasource.model.DSVisibility;
@@ -113,6 +115,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -155,11 +158,6 @@ public class KeyConnection extends MemoryConnection {
     * Array declaration
     */
    public static final String ARRAY_DECLARATION = "[]";
-
-   /**
-    * Separator between packages and types.
-    */
-   public static final String PACKAGE_SEPARATOR = ".";
    
    /**
     * The name of implicit constructors.
@@ -230,6 +228,11 @@ public class KeyConnection extends MemoryConnection {
     * Contains all instantiated {@link KeyProof}s to dispose them on disconnect.
     */
    private List<KeyProof> proofs;
+   
+   /**
+    * Contains the registered {@link IKeYConnectionListener}.
+    */
+   private List<IKeYConnectionListener> listeners = new LinkedList<IKeYConnectionListener>();
    
    /**
     * The used listener to observe {@link #main}.
@@ -390,8 +393,8 @@ public class KeyConnection extends MemoryConnection {
          String typeName = getTypeName(type, packageManagement);
          Assert.isTrue(type.getJavaType() instanceof ClassType);
          ClassType ct = (ClassType)type.getJavaType();
-         if (isInner(services, type)) {
-            String parentName = getParentName(services, type);
+         if (KeYTypeUtil.isInnerType(services, type)) {
+            String parentName = KeYTypeUtil.getParentName(services, type);
             if (ct.isInterface()) {
                MemoryInterface interfaceInstance = createInterface(services, ct, type, typeName);
                List<MemoryInterface> parentInnerInterfaces = innerInterfaces.get(parentName);
@@ -565,74 +568,6 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
-    * Checks if the given type is an inner or anonymous type.
-    * @param services The {@link Services} to use.
-    * @param type The type to check.
-    * @return {@code true} is inner or anonymous, {@code false} is not
-    */
-   protected boolean isInner(Services services, KeYJavaType type) {
-      String parentName = getParentName(services, type);
-      if (parentName != null) {
-         return !services.getJavaInfo().isPackage(parentName);
-      }
-      else {
-         return false; // Normal class in default package
-      }
-   }
-   
-   /**
-    * Returns the name of the parent package/type or {@code null} if it has no one.
-    * @param services The {@link Services} to use.
-    * @param type The type.
-    * @return The parent package/type or {@code null} if it has no one.
-    */
-   protected String getParentName(Services services, KeYJavaType type) {
-      return getParentName(services, type.getFullName());
-   }
-   
-   /**
-    * Returns the name of the parent package/type or {@code null} if it has no one.
-    * @param services The {@link Services} to use.
-    * @param fullName The name of the current package/type.
-    * @return The parent package/type or {@code null} if it has no one.
-    */
-   protected String getParentName(Services services, String fullName) {
-      int lastSeparator = fullName.lastIndexOf(PACKAGE_SEPARATOR);
-      if (lastSeparator >= 0) {
-         String parentName = fullName.substring(0, lastSeparator);
-         // Check if parentName is existing package or type (required for anonymous classes that have multiple numbers like ClassContainer.DefaultChildClass.23543334.10115480)
-         if (services.getJavaInfo().isPackage(parentName)) {
-            return parentName;
-         }
-         else if (isType(services, parentName)) {
-            return parentName;
-         }
-         else {
-            return getParentName(services, parentName);
-         }
-      }
-      else {
-         return null;
-      }
-   }
-   
-   /**
-    * Checks if the given full name is a type in KeY.
-    * @param services The services to use.
-    * @param fullName The full name to check.
-    * @return {@code true} = is type, {@code false} = is no type
-    */
-   protected boolean isType(Services services, String fullName) {
-      try {
-         KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName); 
-         return kjt != null;
-      }
-      catch (Exception e) {
-         return false; // RuntimeException is thrown if type not exist.
-      }
-   }
-
-   /**
     * <p>
     * Returns the parent package for types based on the {@link DSPackageManagement}.
     * </p>
@@ -716,7 +651,7 @@ public class KeyConnection extends MemoryConnection {
     * @param method The method.
     * @return The signature.
     */
-   protected String getSignature(IProgramMethod method) {
+   public static String getSignature(IProgramMethod method) {
       StringBuffer sb = new StringBuffer();
       sb.append(method.getFullName());
       sb.append(PARAMETER_START);
@@ -730,7 +665,7 @@ public class KeyConnection extends MemoryConnection {
     * @param method The method.
     * @return The signature parameters.
     */
-   protected String getSignatureParameters(IProgramMethod method) {
+   public static String getSignatureParameters(IProgramMethod method) {
       StringBuffer sb = new StringBuffer();
       ImmutableArray<ParameterDeclaration> parameters = method.getParameters();
       boolean firstParameter = true;
@@ -760,7 +695,7 @@ public class KeyConnection extends MemoryConnection {
     * @param packageManagement The {@link DSPackageManagement} to use.
     * @return The type name to use in the diagram model.
     */
-   protected String getTypeName(Type type, DSPackageManagement packageManagement) {
+   public static String getTypeName(Type type, DSPackageManagement packageManagement) {
       Assert.isTrue(type instanceof KeYJavaType);
       return getTypeName((KeYJavaType)type, packageManagement);
    }
@@ -771,7 +706,7 @@ public class KeyConnection extends MemoryConnection {
     * @param packageManagement The {@link DSPackageManagement} to use.
     * @return The type name to use in the diagram model.
     */
-   protected String getTypeName(TypeReference typeReference, DSPackageManagement packageManagement) {
+   public static String getTypeName(TypeReference typeReference, DSPackageManagement packageManagement) {
       return getTypeName(typeReference.getKeYJavaType(), packageManagement);
    }
 
@@ -781,8 +716,8 @@ public class KeyConnection extends MemoryConnection {
     * @param packageManagement The {@link DSPackageManagement} to use.
     * @return The type name to use in the diagram model.
     */
-   protected String getTypeName(KeYJavaType type, 
-                                DSPackageManagement packageManagement) {
+   public static String getTypeName(KeYJavaType type, 
+                                    DSPackageManagement packageManagement) {
       if (type.getJavaType() instanceof ArrayDeclaration) {
          ArrayDeclaration ad = (ArrayDeclaration)type.getJavaType();
          StringBuffer sb = new StringBuffer();
@@ -892,7 +827,7 @@ public class KeyConnection extends MemoryConnection {
     * @param classAxiom The {@link ClassAxiom} to check.
     * @return {@code true} include, {@code false} do not include
     */
-   protected boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
+   public static boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
       ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
       return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
              ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
@@ -1328,7 +1263,7 @@ public class KeyConnection extends MemoryConnection {
          result.setVisibility(DSVisibility.DEFAULT);
       }
       // Add operation contracts and obligations
-      fillOperationContractsAndObligations(result, services, type, implicitConstructor);
+      fillOperationContractsAndObligations(result, services, type, explicitConstructor);
       // Update internal mappings
       operationsMapping.put(explicitConstructor, result);
       operationsMapping.put(implicitConstructor, result);
@@ -1832,6 +1767,14 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
+    * Returns the treated {@link MainWindow}.
+    * @return The treated {@link MainWindow}.
+    */
+   public MainWindow getMain() {
+      return main;
+   }
+
+   /**
     * Closes the active task without user interaction.
     */
    public void closeTaskWithoutInteraction() {
@@ -1845,5 +1788,53 @@ public class KeyConnection extends MemoryConnection {
    public void registerProof(KeyProof proof) {
       Assert.isTrue(proofs != null, "Connection is not established.");
       proofs.add(proof);
+   }
+   
+   /**
+    * Registers the given {@link IKeYConnectionListener}.
+    * @param l The {@link IKeYConnectionListener} to register.
+    */
+   public void addKeYConnectionListener(IKeYConnectionListener l) {
+      if (l != null) {
+         listeners.add(l);
+      }
+   }
+   
+   /**
+    * Removes the given {@link IKeYConnectionListener}.
+    * @param l The {@link IKeYConnectionListener} to remove.
+    */
+   public void removeKeYConnectionListener(IKeYConnectionListener l) {
+      if (l != null) {
+         listeners.add(l);
+      }
+   }
+   
+   /**
+    * Checks if the given {@link IKeYConnectionListener} is registered.
+    * @param l The {@link IKeYConnectionListener} to check.
+    * @return {@code true} is registered, {@code false} is not registered.
+    */
+   public boolean hasKeYConnectionListener(IKeYConnectionListener l) {
+      return l != null ? listeners.contains(l) : false;
+   }
+   
+   /**
+    * Fires the event {@link IKeYConnectionListener#interactiveProofStarted(KeYConnectionEvent)} to all listeners.
+    * @param e The event to fire.
+    */
+   protected void fireInteractiveProofStarted(KeyProof proof) {
+      fireInteractiveProofStarted(new KeYConnectionEvent(this, proof));
+   }
+   
+   /**
+    * Fires the event {@link IKeYConnectionListener#interactiveProofStarted(KeYConnectionEvent)} to all listeners.
+    * @param e The event to fire.
+    */
+   protected void fireInteractiveProofStarted(KeYConnectionEvent e) {
+      IKeYConnectionListener[] toInform = listeners.toArray(new IKeYConnectionListener[listeners.size()]);
+      for (IKeYConnectionListener l : toInform) {
+         l.interactiveProofStarted(e);
+      }
    }
 }

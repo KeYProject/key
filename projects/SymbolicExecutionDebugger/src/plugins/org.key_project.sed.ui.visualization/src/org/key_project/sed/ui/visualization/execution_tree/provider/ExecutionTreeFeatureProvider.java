@@ -57,6 +57,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -81,6 +82,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTe
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeDeleteFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExecutionTreeRemoveFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopBodyTerminationUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionLayoutFeature;
@@ -155,6 +160,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
          return new ICreateFeature[] {new BranchConditionCreateFeature(this),
                                       new BranchNodeCreateFeature(this),
                                       new ExceptionalTerminationCreateFeature(this),
+                                      new LoopBodyTerminationCreateFeature(this),
                                       new LoopConditionCreateFeature(this),
                                       new LoopNodeCreateFeature(this),
                                       new MethodCallCreateFeature(this),
@@ -183,6 +189,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDLoopBodyTermination) {
+         return new LoopBodyTerminationAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDLoopCondition) {
          return new LoopConditionAddFeature(this);
@@ -234,6 +243,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationUpdateFeature(this);
       }
+      else if (bo instanceof ISEDLoopBodyTermination) {
+         return new LoopBodyTerminationUpdateFeature(this);
+      }
       else if (bo instanceof ISEDLoopCondition) {
          return new LoopConditionUpdateFeature(this);
       }
@@ -284,6 +296,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEDLoopCondition) {
          return new LoopConditionLayoutFeature(this);
+      }
+      else if (bo instanceof ISEDLoopBodyTermination) {
+         return new LoopBodyTerminationLayoutFeature(this);
       }
       else if (bo instanceof ISEDLoopNode) {
          return new LoopNodeLayoutFeature(this);
