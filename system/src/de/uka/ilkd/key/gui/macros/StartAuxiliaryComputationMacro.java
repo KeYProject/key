@@ -89,6 +89,8 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
         SymbolicExecutionPO symbExecPO =
                 new SymbolicExecutionPO(initConfig, po.getContract(),
                                         po.getIFVars().symbExecVars, goal);
+        proof.getServices().addIFSymbols(
+                symbExecPO.getInitiatingGoal().proof().getServices().getIFSymbols());
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),

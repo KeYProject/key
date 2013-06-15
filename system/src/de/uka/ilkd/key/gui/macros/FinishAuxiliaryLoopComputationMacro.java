@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
@@ -68,7 +67,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifVars, services);
-        proof.getServices().getIFSymbols().add(rwTaclet);
+        initiatingGoal.proof().getServices().getIFSymbols().add(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         addProofSymbols(proof, initiatingGoal.proof());

@@ -80,7 +80,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
-        proof.getServices().getIFSymbols().add(composedStates);
+        initGoal.proof().getServices().getIFSymbols().add(composedStates);
         return composedStates;
     }
 
@@ -363,11 +363,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     void addProofSymbols(Proof oldProof, Proof newProof) {
         assert oldProof != null;
         assert newProof != null;
-        newProof.getServices().addIFSymbols(
-                oldProof.getServices().getIFSymbols().getLabeledSymbols());
+        newProof.getServices().addIFSymbols(oldProof.getServices().getIFSymbols());
     }
 
-    protected void saveAuxiliaryProof() {
+    protected static void saveAuxiliaryProof() {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser jFC =
                 GuiUtilities.getFileChooser("Choose filename to save auxiliary proof");

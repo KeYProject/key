@@ -73,6 +73,8 @@ public class BlockExecutionPO extends AbstractOperationPO
         // symbolic execution
         final Term symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
+        services.getIFSymbols().add(pre);
+        services.getIFSymbols().add(symExec);
 
         // final symbolic execution term
         final Term finalTerm = TB.applyElementary(services, symbExecVars.pre.heap,

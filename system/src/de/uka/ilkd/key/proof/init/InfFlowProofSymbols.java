@@ -5,9 +5,7 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
@@ -15,12 +13,12 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -45,17 +43,17 @@ public class InfFlowProofSymbols {
     private ImmutableSet<Pair<Taclet, Boolean>> taclets
             = DefaultImmutableSet.<Pair<Taclet, Boolean>>nil();
 
-    private static final ImmutableSet<String> tacletPrefixes
+    /*private static final ImmutableSet<String> tacletPrefixes
             = DefaultImmutableSet.<String>nil().add("unfold_computed_formula")
                                                .add("Class_invariant_axiom")
                                                .add("Use_information_flow_contract")
                                                .add("Split_post")
-                                               .add("Remove_post");
+                                               .add("Remove_post");*/
 
     public InfFlowProofSymbols() {
     }
 
-    public InfFlowProofSymbols(ImmutableSet<Taclet> taclets) {
+    /*public InfFlowProofSymbols(ImmutableSet<Taclet> taclets) {
         this();
         String name = null;
         for (Taclet t: taclets) {
@@ -67,9 +65,9 @@ public class InfFlowProofSymbols {
                 }
             }
         }
-    }
+    }*/
 
-    public InfFlowProofSymbols getLabeledSymbols() {
+    private InfFlowProofSymbols getLabeledSymbols() {
         InfFlowProofSymbols symbols = new InfFlowProofSymbols();
         symbols.sorts = getLabeledSorts();
         symbols.predicates = getLabeledPredicates();
@@ -241,6 +239,10 @@ public class InfFlowProofSymbols {
             }
         }
         add(t.op());
+        if (t.op() instanceof UpdateApplication) {
+            addTerm(UpdateApplication.getUpdate(t));
+            addTerm(UpdateApplication.getTarget(t));
+        }
     }
 
     private void addTaclet(Taclet t) {
@@ -290,6 +292,7 @@ public class InfFlowProofSymbols {
 
     public void add(Object symb) {
         assert symb != null;
+
         if (symb instanceof Term) {
             final Term t = (Term)symb;
             addTerm(t);
@@ -320,21 +323,25 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void add(ImmutableList<?> symbs) {
+    /*public void add(ImmutableList<?> symbs) {
         assert symbs != null;
         for (final Object symb: symbs) {
             add(symb);
         }
-    }
-
-    /*public void add(InfFlowProofSymbols symbols) {
-        this.sorts = this.sorts.union(symbols.sorts);
-        this.predicates = this.predicates.union(symbols.predicates);
-        this.functions = this.functions.union(symbols.functions);
-        this.programVariables = this.programVariables.union(symbols.programVariables);
-        this.schemaVariables = this.schemaVariables.union(symbols.schemaVariables);
-        this.taclets = this.taclets.union(symbols.taclets);
     }*/
+
+    public InfFlowProofSymbols add(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        symbols = symbols.getLabeledSymbols();
+        InfFlowProofSymbols result = new InfFlowProofSymbols();
+        result.sorts = sorts.union(symbols.sorts);
+        result.predicates = predicates.union(symbols.predicates);
+        result.functions = functions.union(symbols.functions);
+        result.programVariables = programVariables.union(symbols.programVariables);
+        result.schemaVariables = schemaVariables.union(symbols.schemaVariables);
+        result.taclets = taclets.union(symbols.taclets);
+        return result;
+    }
 
     private ImmutableSet<Sort> getSorts() {
         ImmutableSet<Sort> sorts = DefaultImmutableSet.<Sort>nil();
@@ -402,27 +409,6 @@ public class InfFlowProofSymbols {
         return programVariables;
     }
 
-    public ProgramVariable getProgramVariable(String prefix) {
-        assert !getProgramVariables().isEmpty();
-        for(ProgramVariable pv: getProgramVariables()) {
-            if (pv.name().toString().startsWith(prefix)) {
-                return pv;
-            }
-        }
-        return null;
-    }
-
-    public ProgramVariable getProgramVariable(String prefix, KeYJavaType type) {
-        assert !getProgramVariables().isEmpty();
-        for(ProgramVariable pv: getProgramVariables()) {
-            if (pv.getKeYJavaType().equals(type) &&
-                    pv.name().toString().startsWith(prefix)) {
-                return pv;
-            }
-        }
-        return null;
-    }
-
     private ImmutableSet<SchemaVariable> getSchemaVariables() {
         ImmutableSet<SchemaVariable> schemaVariables = DefaultImmutableSet.<SchemaVariable>nil();
         for (Pair<SchemaVariable, Boolean> sv: this.schemaVariables) {
@@ -431,22 +417,12 @@ public class InfFlowProofSymbols {
         return schemaVariables;
     }
 
-    public ImmutableSet<Taclet> getTaclets() {
+    private ImmutableSet<Taclet> getTaclets() {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
         for (Pair<Taclet, Boolean> t: this.taclets) {
             taclets = taclets.add(t.first);
         }
         return taclets;
-    }
-
-    public Taclet getTaclet(String name) {
-        assert !getTaclets().isEmpty();
-        for(Taclet t: getTaclets()) {
-            if (t.name().toString().equalsIgnoreCase(name)) {
-                return t;
-            }
-        }
-        return null;
     }
 
     private String printSorts() {

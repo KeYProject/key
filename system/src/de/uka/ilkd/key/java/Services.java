@@ -294,6 +294,6 @@ public class Services{
 
     public void addIFSymbols(InfFlowProofSymbols symbols) {
         assert symbols != null;
-        this.infFlowSymbols = symbols;
+        infFlowSymbols = infFlowSymbols.add(symbols);
     }
 }

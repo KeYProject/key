@@ -45,9 +45,9 @@ public class OpenFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser keYFileChooser = 
             GuiUtilities.getFileChooser("Select file to load proof or problem");
-        
+
         boolean loaded = keYFileChooser.showOpenDialog(mainWindow);
-        
+
         if (loaded) {
             File file = keYFileChooser.getSelectedFile();
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() &&

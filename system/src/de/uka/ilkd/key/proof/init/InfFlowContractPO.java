@@ -66,6 +66,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
+        services.getIFSymbols().add(finalTerm);
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
@@ -73,7 +74,7 @@ public class InfFlowContractPO extends AbstractOperationPO
 
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                initConfig.getServices().getIFSymbols().add(t.taclet());
+                services.getIFSymbols().add(t.taclet());
             }
         }
 

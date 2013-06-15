@@ -43,7 +43,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         registerFactoryMethods();
     }
 
-
     InfFlowPOSnippetFactoryImpl(BlockContract contract,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
@@ -53,7 +52,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.poVars2 = vars2;
         registerFactoryMethods();
     }
-    
+
     InfFlowPOSnippetFactoryImpl(LoopInvariant invariant,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,

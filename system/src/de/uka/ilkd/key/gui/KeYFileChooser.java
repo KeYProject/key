@@ -130,7 +130,7 @@ public class KeYFileChooser {
 
         final File file = fileChooser.getSelectedFile() != null ?
                 fileChooser.getSelectedFile() : fileChooser.getCurrentDirectory();
-        resetFile = fileChooser.getSelectedFile();
+        resetFile = file;
         fileChooser.setSelectedFile(file);
         fileChooser.updateUI();
 

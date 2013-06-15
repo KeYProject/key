@@ -69,6 +69,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO
 
         // final symbolic execution term
         final Term finalTerm = TB.not(TB.and(pre, symExec));
+        services.getIFSymbols().add(finalTerm);
 
         // register final term
         assignPOTerms(finalTerm);

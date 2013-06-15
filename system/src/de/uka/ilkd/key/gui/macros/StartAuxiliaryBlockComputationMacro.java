@@ -105,16 +105,18 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
 
-        BlockExecutionPO symbExecPO =
+        BlockExecutionPO blockExecPO =
                 new BlockExecutionPO(initConfig, contract, ifVars.symbExecVars,
                                      goal, blockRuleApp.getExecutionContext());
+        proof.getServices().addIFSymbols(
+                blockExecPO.getInitiatingGoal().proof().getServices().getIFSymbols());
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
         try {
-            pi.startProver(initConfig, symbExecPO, 0);
+            pi.startProver(initConfig, blockExecPO, 0);
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

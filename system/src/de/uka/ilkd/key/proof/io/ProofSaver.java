@@ -130,6 +130,9 @@ public class ProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
+              for (SequentFormula seqForm: proof.root().sequent().succedent().toList()) {
+                  proof.getServices().getIFSymbols().add(seqForm.formula());
+              }
           } else {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
