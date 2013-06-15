@@ -285,6 +285,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     // last highlighted caret position
     private int lastHighlightedCaretPos;
     
+    @Override
+    public void highlight(Point p) {
+        super.highlight(p);
+        lastHighlightedCaretPos = correctedViewToModel(p);
+    }
+    
     /** makes the last caret position visible (if possible) */
     public void restorePosition() {
 	int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
