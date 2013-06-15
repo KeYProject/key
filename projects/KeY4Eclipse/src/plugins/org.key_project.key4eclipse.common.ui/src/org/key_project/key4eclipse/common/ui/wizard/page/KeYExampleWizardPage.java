@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.common.ui.wizard.page;
 
 import java.io.File;
@@ -17,11 +30,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
 
 /**
@@ -74,7 +87,7 @@ public class KeYExampleWizardPage extends WizardPage {
          }
       });
       examplesViewer.setContentProvider(ArrayContentProvider.getInstance());
-      File examplesDir = new File(KeYExampleUtil.getLocalExampleDirectory());
+      File examplesDir = new File(Main.getExamplesDir());
       List<ShortFile> examples = ExampleChooser.listExamples(examplesDir);
       examplesViewer.setInput(examples);
       if (!examples.isEmpty()) {

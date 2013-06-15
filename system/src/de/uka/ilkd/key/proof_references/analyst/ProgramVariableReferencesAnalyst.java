@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -13,7 +26,6 @@ import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
@@ -28,9 +40,8 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
     */
    @Override
    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-      NodeInfo info = node.getNodeInfo();
-      if (info != null) {
-         SourceElement statement = info.getActiveStatement();
+      if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
+         SourceElement statement = node.getNodeInfo().getActiveStatement();
          if (statement instanceof CopyAssignment) {
             LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
             listReferences(node, (CopyAssignment)statement, services.getJavaInfo().getArrayLength(), result, true);

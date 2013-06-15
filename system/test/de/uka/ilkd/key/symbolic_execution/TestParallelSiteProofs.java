@@ -243,7 +243,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       @Override
       public void run() {
          try {
-            setResult(returnNode.getFormatedReturnValue());
+            setResult(returnNode.getNameIncludingReturnValue());
          }
          catch (Exception e) {
             setException(e);

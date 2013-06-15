@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel">
+  <proofs target="//@types.0/@methods.0/@operationContracts.0" obligation="ContractPO">
+    <proofReferences target="//@types.0/@methods.0" kind="Inline Method"/>
+    <proofReferences target="//@types.1/@methods.0" kind="Call Method"/>
+    <proofReferences target="//@types.1/@methods.0" kind="Inline Method"/>
+    <proofReferences target="//@types.1/@methods.1" kind="Call Method"/>
+    <proofReferences target="//@types.1/@methods.1" kind="Inline Method"/>
+  </proofs>
+  <types xsi:type="dbcmodel:DbcClass" name="Main">
+    <methods signature="main()" returnType="int">
+      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> result = 84 &amp; self.&lt;inv>) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </methods>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="Util">
+    <methods signature="getMagic()" static="true" returnType="int"/>
+    <methods signature="add(a : int, b : int)" static="true" returnType="int"/>
+  </types>
+</dbcmodel:DbcModel>

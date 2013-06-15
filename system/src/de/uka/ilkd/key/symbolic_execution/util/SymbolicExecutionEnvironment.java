@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -73,6 +74,21 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
    public Proof getProof() {
       return getBuilder().getProof();
    }
+
+   /**
+    * Configures the given {@link Proof} to use the symbolic execution strategy
+    * by reusing the default {@link StrategyProperties}.
+    * @param proof The {@link Proof} to configure.
+    * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
+    */
+   public static void configureProofForSymbolicExecution(Proof proof, 
+                                                         int maximalNumberOfNodesPerBranch) {
+      StrategyProperties sp = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
+      boolean methodTreatmentContract = StrategyProperties.METHOD_CONTRACT.equals(sp.get(StrategyProperties.METHOD_OPTIONS_KEY));
+      boolean loopTreatmentInvariant = StrategyProperties.LOOP_INVARIANT.equals(sp.get(StrategyProperties.LOOP_OPTIONS_KEY));
+      boolean aliasChecks = StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
+      configureProofForSymbolicExecution(proof, maximalNumberOfNodesPerBranch, methodTreatmentContract, loopTreatmentInvariant, aliasChecks);
+   }
    
    /**
     * Configures the given {@link Proof} to use the symbolic execution strategy.
@@ -92,8 +108,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
-         SymbolicExecutionUtil.setUseLoopInvariants(proof, methodTreatmentContract);
-         SymbolicExecutionUtil.setUseLoopInvariants(proof, loopTreatmentInvariant);
+         SymbolicExecutionUtil.updateStrategySettings(proof, strategyProperties);
       }
    }
 

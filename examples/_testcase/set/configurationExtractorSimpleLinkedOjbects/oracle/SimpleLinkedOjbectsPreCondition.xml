@@ -5,12 +5,8 @@
          <statement name="x.next.value=2;" pathCondition="true" pathConditionChanged="false">
             <statement name="x.next.next.value=3;" pathCondition="true" pathConditionChanged="false">
                <statement name="return x.value+x.next.value+x.next.next.value;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
-+ \if (x.next.next = x)
-      \then (3)
-      \else (\if (x.next = x)  \then (2)  \else (1))
-+ \if (x.next.next = x.next)  \then (3)  \else (2)&apos; as result of SimpleLinkedOjbects.compute(x);&gt;" isReturnValueComputed="true">
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                  <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>

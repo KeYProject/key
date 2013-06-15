@@ -110,7 +110,7 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         LogUtil.getLogger().openErrorDialog(getControl() != null ? getShell() : null, e);
       }
    }
    

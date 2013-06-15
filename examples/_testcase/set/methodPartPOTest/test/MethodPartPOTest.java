@@ -25,7 +25,7 @@ public class MethodPartPOTest {
 			return x;
 		}
 		x = 1 * asdf;
-		int y = 2 + CONSTANT + field;
+		int y = 2 + MethodPartPOTest.CONSTANT + field;
 		int doubleValue = doubleValue(x);
 		int z = x + y + doubleValue;
 		return z;

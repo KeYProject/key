@@ -4,8 +4,8 @@
       <branchNode name="if (a) {return 1; }else if (b) {return 2;   }else  {return 3;   }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="a = TRUE" pathCondition="a = TRUE" pathConditionChanged="true" branchCondition="a = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="a = TRUE" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="a = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.main(a,b);&gt;" isReturnValueComputed="true">
-                  <termination name="&lt;end&gt;" pathCondition="a = TRUE" pathConditionChanged="false" exceptionalTermination="false">
+               <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="a = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="a = TRUE" pathConditionChanged="false" terminationKind="NORMAL">
                   </termination>
                </methodReturn>
             </statement>
@@ -14,16 +14,16 @@
             <branchNode name="if (b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE" pathConditionChanged="false">
                <branchCondition name="b = TRUE" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="true" branchCondition="b = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of self.main(a,b);&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" exceptionalTermination="false">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
                <branchCondition name="!b = TRUE" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="true" branchCondition="!b = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return 3;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;3&apos; as result of self.main(a,b);&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" exceptionalTermination="false">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
