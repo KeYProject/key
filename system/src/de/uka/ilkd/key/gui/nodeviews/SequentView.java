@@ -79,12 +79,7 @@ public abstract class SequentView extends JTextArea
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         setEditable(false);
         setBackground(new Color(249, 249, 249));
-        Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
-        if (myFont != null) {
-            setFont(myFont);
-        } else {
-            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
-        }
+        setFont();
         addKeyListener(this);
         addMouseMotionListener(this);
         addMouseListener(this);
@@ -96,6 +91,15 @@ public abstract class SequentView extends JTextArea
         dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
 
+    }
+    
+    public void setFont() {
+        Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+        if (myFont != null) {
+            setFont(myFont);
+        } else {
+            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
+        }
     }
     
     public void unregisterListener() {
@@ -406,6 +410,12 @@ public abstract class SequentView extends JTextArea
             showTermInfo = false;
             MainWindow.getInstance().setStandardStatusLine();
         }
+    }
+    
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        setFont();
     }
 
 }
