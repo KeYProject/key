@@ -15,8 +15,11 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -46,6 +49,7 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
     
+    private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     LogicPrinter printer;
     public boolean refreshHighlightning = true;
@@ -71,6 +75,8 @@ public abstract class SequentView extends JTextArea
 
     SequentView() {
 
+        configChangeListener = new ConfigChangeAdapter(this);
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
         setEditable(false);
         setBackground(new Color(249, 249, 249));
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
@@ -90,6 +96,40 @@ public abstract class SequentView extends JTextArea
         dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
 
+    }
+    
+    public void unregisterListener() {
+        if (configChangeListener != null) {
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        }
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+        updateUI();
+    }
+
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        unregisterListener();
+    }
+    
+    @Override
+    protected void finalize() {
+        try {
+            unregisterListener();
+        } catch (Throwable e) {
+            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+        } finally {
+            try {
+                super.finalize();
+            } catch (Throwable e) {
+                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            }
+        }
     }
 
     public void removeHighlight(Object highlight) {
