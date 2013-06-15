@@ -3196,6 +3196,12 @@ Expression ADTConstructor() :
         setPrefixInfo(result);
     }
     |
+    "\\all_objects" "(" expr = Expression() ")"
+    {
+        result = new AllObjects(expr);
+        setPrefixInfo(result);
+    }
+    |
     "\\seq_singleton" "(" expr = Expression() ")"
     {
         result = new SeqSingleton(expr);

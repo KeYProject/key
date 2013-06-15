@@ -195,7 +195,7 @@ public class RewriteTaclet extends FindTaclet {
                 return null;
                 } else {
                 Term update = UpdateApplication.getUpdate(t);
-                svi = svi.addUpdate ( update );
+                svi = svi.addUpdate(update, t.getLabels());
                 }
 
             } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
@@ -230,10 +230,11 @@ public class RewriteTaclet extends FindTaclet {
      * does the work for applyReplacewith (wraps recursion) 
      */
     private Term replace(Term term, 
-	    		 Term with, 
-	    		 IntIterator it,
-			 Services services, 
-			 MatchConditions mc, 
+                         Term with,
+                         PosInOccurrence posOfFind,
+                         IntIterator it,
+                         Services services, 
+                         MatchConditions mc, 
                          Sort maxSort) {
 	if (it.hasNext()) {	    
 	    int sub = it.next();
@@ -248,6 +249,7 @@ public class RewriteTaclet extends FindTaclet {
                     final Sort newMaxSort = TermHelper.getMaxSort(term, i, services);
 		    subs[i] = replace(term.sub(i), 
 			    	      with, 
+			    	      posOfFind,
 			    	      it, 
 			    	      services, 
 			    	      mc, 
@@ -258,10 +260,11 @@ public class RewriteTaclet extends FindTaclet {
 	    return TermFactory.DEFAULT.createTerm(term.op(), 
 	            				  subs, 
 	            				  term.boundVars(), 
-	            				  term.javaBlock());
+	            				  term.javaBlock(),
+	            				  term.getLabels());
 	} 
                                       
-	with = syntacticalReplace(with, services, mc);   
+	with = syntacticalReplace(with, services, mc, posOfFind);   
 
                
 	if(!with.sort().extendsTrans(maxSort)) {
@@ -283,6 +286,7 @@ public class RewriteTaclet extends FindTaclet {
 
 	Term formula = replace(term, 
 		       	       rwTemplate, 
+		       	       posOfFind,
 		       	       it, 
 		       	       services, 
 		       	       matchCond, 

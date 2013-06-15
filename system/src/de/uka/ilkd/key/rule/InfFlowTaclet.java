@@ -69,7 +69,7 @@ public class InfFlowTaclet extends RewriteTaclet {
                               Services services,
                               MatchConditions matchCond) {
         final ImmutableList<SequentFormula> replacements =
-            instantiateSemisequent(semi, services, matchCond);
+            instantiateSemisequent(semi, services, matchCond, pos);
         assert replacements.size() == 1 : "information flow taclets must have " +
                                   "exactly one add!";
         updateStrategyInfo(goal, replacements.iterator().next().formula());

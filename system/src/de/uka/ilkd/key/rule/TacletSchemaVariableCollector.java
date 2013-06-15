@@ -14,19 +14,28 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
-import de.uka.ilkd.key.rule.metaconstruct.WhileInvRuleWrapper;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
  * Collects all schemavariables occurring in the 
@@ -79,17 +88,6 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
 	return prgSVColl.getSchemaVariables();
     }
     
-
-    private ImmutableList<SchemaVariable> collectSVInProgram
-	(Term t, ImmutableList<SchemaVariable> vars) {
-
-	ProgramSVCollector prgSVColl = new 
-	    ProgramSVCollector(new WhileInvRuleWrapper(t), 
-			       vars, instantiations);
-	prgSVColl.start();
-	return prgSVColl.getSchemaVariables();
-    }
-    
     
     /** 
      * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
@@ -104,9 +102,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
 	    varList = collectSVInProgram(t.javaBlock(), varList);
 	} else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate)op, varList);
-        } else if (op instanceof WhileInvRule) {
- 	    varList = collectSVInProgram(t, varList);
- 	}
+        } 
         
 	for (int j=0, ar = t.arity(); j<ar; j++) {
 	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {

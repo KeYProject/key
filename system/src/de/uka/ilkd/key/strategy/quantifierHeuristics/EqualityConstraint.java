@@ -186,7 +186,7 @@ public class EqualityConstraint implements Constraint {
      */
     private Term instantiate ( Term p ) {
 	SyntacticalReplaceVisitor srVisitor =
-	    new SyntacticalReplaceVisitor ( this );
+	    new SyntacticalReplaceVisitor(this, null);
 	p.execPostOrder ( srVisitor );
 	return srVisitor.getTerm ();
     }

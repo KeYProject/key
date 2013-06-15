@@ -47,8 +47,20 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,6 +75,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -285,8 +298,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-
-
+    
+    
     /**
      * @return (assumption, anon update, anon heap)
      */
@@ -480,8 +493,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        ec, 
 	        services);
-	assert pm != null : "Getting program method failed.\nReference: "+mr+
-	              ", static type: "+staticType+", execution context: "+ec;
+	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
 	final Term actualSelf = getActualSelf(mr, pm, ec, services);
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
@@ -547,19 +559,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         //configure contract
         final FunctionalOperationContract contract = 
         		(FunctionalOperationContract)((AbstractContractRuleApp) ruleApp)
-                .getInstantiation();
+                .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md =
-                (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
+        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
-        final List<LocationVariable> heapContext =
-                HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars =
-                HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -575,9 +584,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
-        assert inst.pm.isConstructor()
+        assert inst.pm.isConstructor() 
                || !(inst.actualResult != null && resultVar == null);
-        final ProgramVariable excVar = TB.excVar(services, "exc", inst.pm, true);
+        final ProgramVariable excVar = TB.excVar(services, inst.pm, true);
         assert excVar != null;
         goal.addProgramVariable(excVar);
         
@@ -609,8 +618,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         				  services);
         final Term post = contract.getPost(heapContext,
                                            heapTerms,
-        	                           contractSelf, 
-        				   contractParams, 
+        	                               contractSelf, 
+        				                   contractParams, 
                                            contractResult, 
                                            TB.var(excVar), 
                                            atPres,
@@ -718,19 +727,17 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term postAssumption 
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   	     TB.and(anonAssumption,
-        		   		    TB.apply(anonUpdate,
-        		   	                     TB.and(new Term[]{excNull, 
-                                	     	                       freePost, 
-                                	     	                       post}))));
+        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull, 
+                          freePost, 
+                          post}), null)));
         final Term excPostAssumption 
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   TB.and(anonAssumption,
-                                  TB.apply(anonUpdate,
-                                           TB.and(new Term[]{TB.not(excNull),
-                                	     	             excCreated, 
-                                	     	             freeExcPost, 
-                                	     	             post}))));
-
+                                  TB.apply(anonUpdate, TB.and(new Term[]{TB.not(excNull),
+                                  excCreated, 
+                                  freeExcPost, 
+                                  post}), null)));
+       
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -738,9 +745,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = TB.and(reachableState,
 		                    TB.reachableValue(services, arg, argKJT));
 	}
-	final ContractPO po =
-	        services.getSpecificationRepository().getPOForProof(goal.proof());
-	final Term mbyOk;
+	final ContractPO po 
+		= services.getSpecificationRepository()
+		          .getPOForProof(goal.proof());
+	final Term mbyOk;	
 	if(po != null && po.getMbyAtPre() != null && mby != null ) {
     	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
     			       TB.lt(mby, po.getMbyAtPre(), services));
@@ -754,6 +762,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                                	   	     mbyOk}));
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
+        }
        
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -766,16 +777,17 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}        
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
-        final Term normalPost 
-            	= TB.apply(anonUpdate,
-                           TB.prog(inst.mod,
-                                   JavaBlock.createJavaBlock(postSB),
-                                   inst.progPost.sub(0)));
+        JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        final Term normalPost = TB.apply(anonUpdate, 
+                                         TB.prog(inst.mod, 
+                                                 postJavaBlock, 
+                                                 inst.progPost.sub(0),
+                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
+                                         null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
-        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
-        						       normalPost)),
+        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, normalPost, null)),
         	               ruleApp.posInOccurrence());
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
@@ -828,11 +840,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        final Term excPost
-            = TB.apply(anonUpdate,
-                       TB.prog(inst.mod,
-                               JavaBlock.createJavaBlock(excPostSB), 
-                               inst.progPost.sub(0)));
+        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+        final Term excPost = TB.apply(anonUpdate, 
+                                      TB.prog(inst.mod, 
+                                              excJavaBlock, 
+                                              inst.progPost.sub(0),
+                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
+                                      null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        
@@ -881,8 +895,9 @@ public final class UseOperationContractRule implements BuiltInRule {
     public String toString() {
         return displayName();
     }
-
-
+    
+    
+    
     //-------------------------------------------------------------------------
     //inner classes
     //-------------------------------------------------------------------------

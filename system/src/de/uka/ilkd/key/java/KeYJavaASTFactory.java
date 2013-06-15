@@ -24,10 +24,19 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -40,6 +49,13 @@ public abstract class KeYJavaASTFactory {
      */
     public static Statement assign(Expression lhs, Expression rhs) {
 	return new CopyAssignment(lhs, rhs);
+    }
+
+    /** 
+     * creates an assignment <code> lhs:=rhs </code>
+     */
+    public static Statement assign(Expression lhs, Expression rhs, PositionInfo posInfo) {
+       return new CopyAssignment(new ExtList(new Object[] {lhs, rhs, posInfo}));
     }
 
     /**
@@ -198,6 +214,10 @@ public abstract class KeYJavaASTFactory {
 
     public static Break breakStatement(Label l) {
 	return new Break(l);
+    }
+
+    public static Statement breakStatement(Label label, PositionInfo positionInfo) {
+       return new Break(new ExtList(new Object[] {label, positionInfo}));
     }
 
     public static Continue continueStatement(Label label) {

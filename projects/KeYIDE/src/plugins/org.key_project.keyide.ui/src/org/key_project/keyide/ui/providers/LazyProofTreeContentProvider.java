@@ -16,11 +16,11 @@ package org.key_project.keyide.ui.providers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Display;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
@@ -55,23 +55,27 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    private AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStopped(ProofEvent e) {
-         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleAutoModeStopped(MouseEvent) which is called here
-         viewer.getControl().getDisplay().asyncExec(new Runnable() {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void run() {
-               try {
-                  refreshAfterAutoModeStopped = true;
-                  viewer.refresh(); // Refresh structure
-                  viewer.refresh(); // Referesh labels and icons
+         Display display = viewer.getControl().getDisplay();
+         if (!display.isDisposed()) {
+            display.asyncExec(new Runnable() {
+               /**
+                * {@inheritDoc}
+                */
+               @Override
+               public void run() {
+                  try {
+                     refreshAfterAutoModeStopped = true;
+                     if (!viewer.getControl().isDisposed()) {
+                        viewer.refresh(); // Refresh structure
+                        viewer.refresh(); // Refresh labels and icons                        
+                     }
+                  }
+                  finally {
+                     refreshAfterAutoModeStopped = false;
+                  }
                }
-               finally {
-                  refreshAfterAutoModeStopped = false;
-               }
-            }
-         });
+            });
+         }
       }
       
       /**
@@ -109,12 +113,17 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       public void proofPruned(final ProofTreeEvent e) {
          // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofPruned(MouseEvent) which is called here
          if(!environment.getMediator().autoMode()){
-            viewer.getControl().getDisplay().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  prune(e.getNode());
-               }
-            });
+            Display display = viewer.getControl().getDisplay();
+            if (!display.isDisposed()) {
+               display.asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     if (!viewer.getControl().isDisposed()) {
+                        prune(e.getNode());
+                     }
+                  }
+               });
+            }
          }
       }
       
@@ -153,10 +162,13 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       public void proofExpanded(final ProofTreeEvent e) {
          // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofExpanded(MouseEvent) which is called here
          if(!environment.getMediator().autoMode()){
-            viewer.getControl().getDisplay().asyncExec(new Runnable() {
+            Display display = viewer.getControl().getDisplay();
+            display.asyncExec(new Runnable() {
                @Override
                public void run() {
-                  viewer.refresh(); // TODO: Update viewer directly, will increase performance?
+                  if (!viewer.getControl().isDisposed()) {
+                     viewer.refresh(); // TODO: Update viewer directly, will increase performance?
+                  }
                }
             });
          }
@@ -284,44 +296,15 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    }
    
    
+   /**
+    * Refreshes the prooftree after a pruned event was fired.
+    * @param node
+    */
    private void prune(Node node){
-      ISelection selection = viewer.getSelection(); // TODO: Content provider should do nothing with selection, find another way, maybe just use the node as element?
-      if (selection instanceof TreeSelection){
-         TreeSelection treeSelection = (TreeSelection) selection;
-         Object element = treeSelection.getFirstElement();
-         if (element instanceof BranchFolder){
-            BranchFolder branchFolder = (BranchFolder) element;
-            viewer.refresh(branchFolder);
-         }
-         else if (element instanceof Node){
-            Node branchNode = getBranchNode((Node) element);
-            BranchFolder branchFolder = branchFolders.get(branchNode);
-            viewer.refresh(branchFolder);
-         }
-      }
+      Node branchNode = getBranchNode(node);
+      BranchFolder branchFolder = branchFolders.get(branchNode);
+      viewer.refresh(branchFolder);
    }
-   
-// private void prune(Node node){
-// TreeViewerIterator it = new TreeViewerIterator(viewer);
-// boolean notFound = true;
-// TreeItem element;
-// while(it.hasNext() && notFound){
-//    element = it.next();
-//    System.out.println(element.getData().g);
-//    if(element.getData() instanceof BranchFolder){
-//       if(((BranchFolder)element.getData()).getChild().equals(node)){
-//          viewer.refresh(element);
-//          notFound = false;
-//       }
-//    }
-//    if(element.getData() instanceof Node){
-//       if(element.getData().equals(node)){
-//          viewer.refresh(element);
-//          notFound = false;
-//       }
-//    }
-// }
-//}
    
    
    /**
@@ -346,11 +329,14 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @return the branch{@link Node} respectively the first child {@link Node} in its branch.
     */
    private Node getBranchNode(Node node){
-      if(node.equals(node.proof().root()))
-         return node.proof().root();
-      else if(node.parent().childrenCount() > 1)
-         return node;
-      else return getBranchNode(node.parent()); // TODO: Proof tree can be a very long which is not treatable with recursive method calls, use while loop instead
+      while(true){
+         if(node.equals(node.proof().root())  || node.parent().childrenCount() > 1){
+            return node;
+         }
+         else{
+            node = node.parent();
+         }
+      }
    }
    
    
@@ -399,6 +385,9 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @return The child index of the element or {@code -1} if it is not a child of the parent.
     */
    public int getIndexOf(Object parent, Object element) {
+      // Make sure that parameters are valid
+      Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element + "\".");
+      Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent + "\".");
       // Find first shown child node of the given parent
       Node current = null;
       if (parent instanceof Proof) {
@@ -428,10 +417,24 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
                found = true;
             }
             else {
-               if(current.childrenCount()==0&&current.parent().childrenCount()==2){
-                  current=current.parent().child(1);
-                  index++;
-               }else{
+               if (current.childrenCount() != 1) {
+                  Node node;
+                  if (element instanceof BranchFolder) {
+                     node = ((BranchFolder) element).getChild();
+                  }
+                  else {
+                     node = (Node)element;
+                  }
+                  int childIndex = current.getChildNr(node);
+                  if (childIndex >= 0) {
+                     found = true;
+                     index += childIndex + 1;
+                  }
+                  else {
+                     current = null; // Stop search, because element is not a child of parent
+                  }
+               }
+               else {
                   current = current.child(0);
                   index++;
                }

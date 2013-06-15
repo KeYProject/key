@@ -7,7 +7,7 @@ public class ArrayInstanceCreationTest {
 	public ArrayInstanceCreationTest next;
 	
 	public int compute() {
-		classArray = new int[] {1};
+		ArrayInstanceCreationTest.classArray = new int[] {1};
 		instanceArray = new int[] {2};
 		if (next != null) {
 			next.instanceArray = new int[] {3};

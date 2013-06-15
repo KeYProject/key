@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -493,7 +494,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public String getPlainText(Services services) {
        return "invariants: " 
-             + originalInvariants
+             + JavaUtil.toSortedString(originalInvariants)
              + ";\nmodifies: " 
              + originalModifies
              + ";\nvariant: "

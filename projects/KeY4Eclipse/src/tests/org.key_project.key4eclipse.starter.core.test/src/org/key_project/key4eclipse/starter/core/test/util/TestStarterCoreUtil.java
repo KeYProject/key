@@ -69,7 +69,7 @@ public final class TestStarterCoreUtil {
       // Load environment
       KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
       IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
-      ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, null, addUninterpretedPredicate);
+      ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, null, addUninterpretedPredicate, false);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
       assertFalse(proof.closed());

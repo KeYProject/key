@@ -9,7 +9,7 @@
 //
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
+// 
 
 package de.uka.ilkd.key.rule;
 
@@ -190,19 +190,19 @@ public class BlockContractRule implements BuiltInRule {
         ImmutableSet<BlockContract> collectedContracts =
                 specifications.getBlockContracts(block, modality);
         if (modality == Modality.BOX) {
-            collectedContracts =
-                    collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA));
+            collectedContracts = collectedContracts.union(
+                    specifications.getBlockContracts(block, Modality.DIA));
         }
         else if (modality == Modality.BOX_TRANSACTION) {
-            collectedContracts =
-                    collectedContracts.union(specifications
-                            .getBlockContracts(block, Modality.DIA_TRANSACTION));
+            collectedContracts = collectedContracts.union(
+                    specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
-        return filterAppliedContracts(collectedContracts, goal);
+        return filterAppliedContracts(collectedContracts, block, goal);
     }
     
     private static ImmutableSet<BlockContract>
                         filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
+                                               final StatementBlock block,
                                                final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
@@ -278,8 +278,10 @@ public class BlockContractRule implements BuiltInRule {
         for (Term locOut: localOuts) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(outsAtPre.next(), locOut));
         }
-        Term resultEq = instVars.pre.result != null ? TB.equals(instVars.post.result, instVars.pre.result) : TB.tt();
-        Term exceptionEq = instVars.pre.exception != null ? TB.equals(instVars.post.exception, instVars.pre.exception) : TB.tt();
+        Term resultEq = instVars.pre.result != null ?
+                TB.equals(instVars.post.result, instVars.pre.result) : TB.tt();
+        Term exceptionEq = instVars.pre.exception != null ?
+                TB.equals(instVars.post.exception, instVars.pre.exception) : TB.tt();
         Term afterAssumptions = TB.and(TB.equals(instVars.post.heap, baseHeap),
                                        TB.equals(instVars.post.self, instVars.pre.self),
                                        resultEq,
@@ -335,8 +337,10 @@ public class BlockContractRule implements BuiltInRule {
             final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
             final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localIns, localOuts);
-            final ImmutableList<Term> localVarsAtPre = localInsWithoutOutDuplicates.append(localOutsAtPre);
-            final ImmutableList<Term> localVarsAtPost = localInsWithoutOutDuplicates.append(localOutsAtPost);
+            final ImmutableList<Term> localVarsAtPre =
+                    localInsWithoutOutDuplicates.append(localOutsAtPre);
+            final ImmutableList<Term> localVarsAtPost =
+                    localInsWithoutOutDuplicates.append(localOutsAtPost);
             Term resultAtPre = hasRes ? TB.var(variables.result) : TB.NULL(services);
             final Term resultAtPost =
                     hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : TB.NULL(services);
@@ -443,12 +447,13 @@ public class BlockContractRule implements BuiltInRule {
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
                                       final BlockContractBuiltInRuleApp application)
-            throws RuleAbortException {
+                                              throws RuleAbortException {
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
         assert contract.getBlock().equals(instantiation.block);
         final Term contextUpdate = instantiation.update;
+
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(instantiation.block, services);
@@ -457,19 +462,16 @@ public class BlockContractRule implements BuiltInRule {
         final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
         final Map<LocationVariable, Function> anonymisationHeaps =
                 createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
-        //final Map<LocationVariable, Function> anonymisationLocalVariables =
-        //createAndRegisterAnonymisationVariables(localOutVariables, services);
+        //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
         ).createAndRegister(instantiation.self);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-                new ConditionsAndClausesBuilder(contract, heaps, variables,
-                                                instantiation.self, services);
+                new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self, services);
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition =
-                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+        final Term wellFormedHeapsCondition = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final Term reachableInCondition =
                 conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Map<LocationVariable, Term> modifiesClauses =
@@ -477,8 +479,9 @@ public class BlockContractRule implements BuiltInRule {
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
-        final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
-                        .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
+        final Term wellFormedAnonymisationHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(
+                        anonymisationHeaps);
         final Term reachableOutCondition =
                 conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition =
@@ -488,8 +491,7 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
                 updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps,
-                                                        /*anonymisationLocalVariables, */
-                                                        modifiesClauses);
+                         /*anonymisationLocalVariables, */modifiesClauses);
 
 
         InfFlowValidityData infFlowValitidyData =
@@ -539,7 +541,7 @@ public class BlockContractRule implements BuiltInRule {
                     createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
                                                             final boolean isStrictlyPure,
                                                             final Services services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
+        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         if (!isStrictlyPure) {
             for (LocationVariable variable : variables) {
                 final String anonymisationName =
@@ -600,9 +602,9 @@ public class BlockContractRule implements BuiltInRule {
         public final StatementBlock block;
         public final ExecutionContext context;
 
-        public Instantiation(final Term update, final Term formula, final Modality modality,
-                             final Term self, final StatementBlock block,
-                             final ExecutionContext context) {
+        public Instantiation(final Term update, final Term formula,
+                             final Modality modality, final Term self,
+                             final StatementBlock block, final ExecutionContext context) {
             assert update != null;
             assert update.sort() == Sort.UPDATE;
             assert formula != null;
@@ -638,7 +640,8 @@ public class BlockContractRule implements BuiltInRule {
             this.services = services;
         }
 
-        public Instantiation instantiate() {
+        public Instantiation instantiate()
+        {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
             if (!(target.op() instanceof Modality)) {
@@ -658,7 +661,8 @@ public class BlockContractRule implements BuiltInRule {
             return new Instantiation(update, target, modality, self, block, context);
         }
 
-        private Term extractUpdate() {
+        private Term extractUpdate()
+        {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getUpdate(formula);
             }
@@ -667,7 +671,8 @@ public class BlockContractRule implements BuiltInRule {
             }
         }
 
-        private Term extractUpdateTarget() {
+        private Term extractUpdateTarget()
+        {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getTarget(formula);
             }
@@ -676,14 +681,16 @@ public class BlockContractRule implements BuiltInRule {
             }
         }
 
-        private Term extractSelf(final MethodFrame frame) {
+        private Term extractSelf(final MethodFrame frame)
+        {
             if (frame == null) {
                 return null;
             }
             return MiscTools.getSelfTerm(frame, services);
         }
 
-        private ExecutionContext extractExecutionContext(final MethodFrame frame) {
+        private ExecutionContext extractExecutionContext(final MethodFrame frame)
+        {
             if (frame == null) {
                 return null;
             }
@@ -757,9 +764,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        private Map<LocationVariable, LocationVariable>
-                        createAndRegisterRemembranceVariables(final Map<LocationVariable,
-                                                              LocationVariable> remembranceVariables) {
+        private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(
+                final Map<LocationVariable, LocationVariable> remembranceVariables) {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
@@ -770,13 +776,13 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable) {
+        private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable)
+        {
             if (placeholderVariable != null) {
-                final ProgramElementName newName =
-                        new ProgramElementName(
-                                TB.newName(services, placeholderVariable.name().toString()));
-                final LocationVariable newVariable =
-                        new LocationVariable(newName, placeholderVariable.getKeYJavaType());
+                String newName = TB.newName(services, placeholderVariable.name().toString());
+                LocationVariable newVariable =
+                        new LocationVariable(new ProgramElementName(newName),
+                                             placeholderVariable.getKeYJavaType());
                 goal.addProgramVariable(newVariable);
                 return newVariable;
             }
@@ -797,7 +803,8 @@ public class BlockContractRule implements BuiltInRule {
             this.variables = variables;
         }
 
-        public Term buildRemembranceUpdate(final List<LocationVariable> heaps) {
+        public Term buildRemembranceUpdate(final List<LocationVariable> heaps)
+        {
             Term result = skip();
             for (LocationVariable heap : heaps) {
                 final Term update = elementary(variables.remembranceHeaps.get(heap), var(heap));
@@ -805,16 +812,15 @@ public class BlockContractRule implements BuiltInRule {
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                     : variables.remembranceLocalVariables.entrySet()) {
-                result = parallel(result,
-                                  elementary(remembranceVariable.getValue(),
-                                             var(remembranceVariable.getKey())));
+                result = parallel(result, elementary(remembranceVariable.getValue(),
+                                                     var(remembranceVariable.getKey())));
             }
             return result;
         }
 
         public Term buildAnonymisationUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
                                              /*final Map<LocationVariable, Function>
-                                              anonymisationLocalVariables,*/
+                                              *                         anonymisationLocalVariables,*/
                                              final Map<LocationVariable, Term> modifiesClauses) {
             Term result = buildLocalVariablesAnonymisationUpdate(/*anonymisationLocalVariables*/);
             for (Map.Entry<LocationVariable, Function> anonymisationHeap
@@ -822,9 +828,8 @@ public class BlockContractRule implements BuiltInRule {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
                 if (!modifiesClause.equals(strictlyNothing())) {
-                    anonymisationUpdate =
-                            anonUpd(anonymisationHeap.getKey(), modifiesClause,
-                                    func(anonymisationHeap.getValue()));
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
+                                                  func(anonymisationHeap.getValue()));
                 }
                 result = parallel(result, anonymisationUpdate);
             }
@@ -839,17 +844,17 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable variable : localOutVariables) {
                 final String anonymisationName = newName(ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction =
-                        new Function(new Name(anonymisationName), variable.sort(), true);
+                        new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);
             }
             return result;
             /*Term result = skip();
-            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable :
-            anonymisationLocalVariables.entrySet()) {
+            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable
+                        : anonymisationLocalVariables.entrySet()) {
                 result = parallel(result, elementary(anonymisationLocalVariable.getKey(),
-                func(anonymisationLocalVariable.getValue())));
+                                                     func(anonymisationLocalVariable.getValue())));
             }
             return result;*/
         }
@@ -874,7 +879,8 @@ public class BlockContractRule implements BuiltInRule {
             this.terms = variables.termify(self);
         }
 
-        public Term buildPrecondition() {
+        public Term buildPrecondition()
+        {
             Term result = tt();
             for (LocationVariable heap : heaps) {
                 result = and(result,
@@ -884,7 +890,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Term buildWellFormedHeapsCondition() {
+        public Term buildWellFormedHeapsCondition()
+        {
             Term result = tt();
             for (LocationVariable heap : heaps) {
                 result = and(result, wellFormed(heap));
@@ -892,11 +899,13 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Term buildReachableInCondition(final ImmutableSet<ProgramVariable> localInVariables) {
+        public Term buildReachableInCondition(final ImmutableSet<ProgramVariable> localInVariables)
+        {
             return buildReachableCondition(localInVariables);
         }
 
-        public Term buildReachableOutCondition(final ImmutableSet<ProgramVariable> localOutVariables) {
+        public Term buildReachableOutCondition(final ImmutableSet<ProgramVariable> localOutVariables)
+        {
             final Term reachableResult =
                     (variables.result != null) ?
                     reachableValue(variables.result) : TB.tt();
@@ -907,7 +916,8 @@ public class BlockContractRule implements BuiltInRule {
             );
         }
 
-        public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables) {
+        public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables)
+        {
             Term result = tt();
             for (ProgramVariable variable : variables) {
                 result = and(result, reachableValue(variable));
@@ -915,7 +925,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Map<LocationVariable, Term> buildModifiesClauses() {
+        public Map<LocationVariable, Term> buildModifiesClauses()
+        {
             Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
@@ -923,7 +934,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Term buildPostcondition() {
+        public Term buildPostcondition()
+        {
             Term result = tt();
             for (LocationVariable heap : heaps) {
                 result = and(result, contract.getPostcondition(heap, getBaseHeap(services),
@@ -932,7 +944,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesClauses) {
+        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesClauses)
+        {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables =
                     constructRemembranceVariables();
@@ -982,7 +995,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Term buildAtMostOneFlagSetCondition() {
+        public Term buildAtMostOneFlagSetCondition()
+        {
             final List<Term> notSetConditions = new LinkedList<Term>();
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.breakFlags.values()));
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.continueFlags.values()));
@@ -1007,7 +1021,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
+        private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags)
+        {
             final List<Term> result = new LinkedList<Term>();
             for (ProgramVariable flag : flags) {
                 result.add(buildFlagNotSetCondition(flag));
@@ -1015,7 +1030,8 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        private Term buildFlagNotSetCondition(final ProgramVariable flag) {
+        private Term buildFlagNotSetCondition(final ProgramVariable flag)
+        {
             return equals(var(flag), FALSE());
         }
 
@@ -1045,12 +1061,12 @@ public class BlockContractRule implements BuiltInRule {
         public void setUpValidityGoal(final Goal goal, final Term[] updates,
                                       final Term[] assumptions, final Term[] postconditions) {
             goal.setBranchLabel("Validity");
-            goal.addFormulaToAntecedent(
-                    new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), false);
+            goal.addFormulaToAntecedent(new SequentFormula(
+                    TB.applySequential(updates, TB.and(assumptions))), false);
 
             final StatementBlock block =
-                    new ValidityProgramConstructor(labels, instantiation.block, variables, services)
-                            .construct();
+                    new ValidityProgramConstructor(labels, instantiation.block,
+                                                   variables, services).construct();
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             goal.changeFormula(new SequentFormula(
@@ -1075,19 +1091,20 @@ public class BlockContractRule implements BuiltInRule {
             goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
         }
 
-        private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
+        private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block)
+        {
             if (instantiation.context == null) {
                 return block;
             }
             return new MethodFrame(null, instantiation.context, block);
         }
 
-        private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement) {
+        private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement)
+        {
             if (instantiation.isTransactional()) {
                 return new StatementBlock(new Statement[]
-                        {statement,
-                         new TransactionStatement(de.uka.ilkd.key.java.recoderext
-                                 .TransactionStatement.FINISH)});
+                        {statement, new TransactionStatement(de.uka.ilkd.key.java
+                                        .recoderext.TransactionStatement.FINISH)});
             }
             else {
                 if (statement instanceof StatementBlock) {
@@ -1102,8 +1119,8 @@ public class BlockContractRule implements BuiltInRule {
         public void setUpPreconditionGoal(final Goal goal, final Term update,
                                           final Term[] preconditions) {
             goal.setBranchLabel("Precondition");
-            goal.changeFormula(
-                    new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
+            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions), null)),
+                               occurrence);
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
@@ -1132,7 +1149,8 @@ public class BlockContractRule implements BuiltInRule {
             }
         }
 
-        private Term buildUsageFormula() {
+        private Term buildUsageFormula()
+        {
             return TB.prog(
                 instantiation.modality,
                 replaceBlock(instantiation.formula.javaBlock(), instantiation.block,
@@ -1143,27 +1161,26 @@ public class BlockContractRule implements BuiltInRule {
 
         private JavaBlock replaceBlock(final JavaBlock java, final StatementBlock oldBlock,
                                        final StatementBlock newBlock) {
-            Statement newProgram =
-                    (Statement) new ProgramElementReplacer(java.program(), services)
-                            .replace(oldBlock, newBlock);
-            return JavaBlock.createJavaBlock(newProgram instanceof StatementBlock
-                    ? (StatementBlock) newProgram : new StatementBlock(newProgram));
+            Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services)
+                                                                       .replace(oldBlock, newBlock);
+            return JavaBlock.createJavaBlock(newProgram instanceof StatementBlock ?
+                    (StatementBlock) newProgram : new StatementBlock(newProgram));
         }
 
-        private StatementBlock constructAbruptTerminationIfCascade() {
+        private StatementBlock constructAbruptTerminationIfCascade()
+        {
             List<If> ifCascade = new ArrayList<If>();
             for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
-                ifCascade.add(KeYJavaASTFactory
-                        .ifThen(flag.getValue(), KeYJavaASTFactory.breakStatement(flag.getKey())));
+                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
+                        KeYJavaASTFactory.breakStatement(flag.getKey())));
             }
             for (Map.Entry<Label, ProgramVariable> flag : variables.continueFlags.entrySet()) {
-                ifCascade.add(KeYJavaASTFactory
-                        .ifThen(flag.getValue(), KeYJavaASTFactory.continueStatement(flag.getKey())));
+                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
+                        KeYJavaASTFactory.continueStatement(flag.getKey())));
             }
             if (variables.returnFlag != null) {
-                ifCascade.add(KeYJavaASTFactory
-                        .ifThen(variables.returnFlag,
-                                KeYJavaASTFactory.returnClause(variables.result)));
+                ifCascade.add(KeYJavaASTFactory.ifThen(variables.returnFlag,
+                        KeYJavaASTFactory.returnClause(variables.result)));
             }
             ifCascade.add(KeYJavaASTFactory.ifThen(
                 new NotEquals(new ExtList(new Expression[] {variables.exception, NullLiteral.NULL})),
@@ -1192,7 +1209,8 @@ public class BlockContractRule implements BuiltInRule {
             statements = new LinkedList<Statement>();
         }
 
-        public StatementBlock construct() {
+        public StatementBlock construct()
+        {
             declareFlagsFalse();
             declareResultDefault();
             declareExceptionNull();
@@ -1200,7 +1218,8 @@ public class BlockContractRule implements BuiltInRule {
             return new StatementBlock(statements.toArray(new Statement[statements.size()]));
         }
 
-        private void declareFlagsFalse() {
+        private void declareFlagsFalse()
+        {
             declareFlagsFalse(variables.breakFlags.values());
             declareFlagsFalse(variables.continueFlags.values());
             if (variables.returnFlag != null) {
@@ -1208,15 +1227,17 @@ public class BlockContractRule implements BuiltInRule {
             }
         }
 
-        private void declareFlagsFalse(final Collection<ProgramVariable> flags) {
+        private void declareFlagsFalse(final Collection<ProgramVariable> flags)
+        {
             for (ProgramVariable flag : flags) {
                 declareFlagFalse(flag);
             }
         }
 
-        private void declareFlagFalse(final ProgramVariable flag) {
+        private void declareFlagFalse(final ProgramVariable flag)
+        {
             statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                           services.getJavaInfo().getKeYJavaType("boolean")));
+                             services.getJavaInfo().getKeYJavaType("boolean")));
         }
 
         private void declareResultDefault()
@@ -1224,20 +1245,23 @@ public class BlockContractRule implements BuiltInRule {
             if (occursReturnAndIsReturnTypeNotVoid()) {
                 KeYJavaType resultType = variables.result.getKeYJavaType();
                 statements.add(KeYJavaASTFactory.declare(variables.result,
-                                                         resultType.getDefaultValue(), resultType));
+                                resultType.getDefaultValue(), resultType));
             }
         }
 
-        private boolean occursReturnAndIsReturnTypeNotVoid() {
+        private boolean occursReturnAndIsReturnTypeNotVoid()
+        {
             return variables.returnFlag != null && variables.result != null;
         }
 
-        private void declareExceptionNull() {
+        private void declareExceptionNull()
+        {
             statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
                                                      variables.exception.getKeYJavaType()));
         }
 
-        private void executeBlockSafely() {
+        private void executeBlockSafely()
+        {
             final Label breakOutLabel = new ProgramElementName("breakOut");
             final StatementBlock almostSafeBlock =
                     replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
@@ -1246,7 +1270,8 @@ public class BlockContractRule implements BuiltInRule {
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
         }
 
-        private Statement label(final StatementBlock block, Iterable<Label> labels) {
+        private Statement label(final StatementBlock block, Iterable<Label> labels)
+        {
             Statement result = block;
             for (Label label : labels) {
                 result = new LabeledStatement(label, result);
@@ -1258,25 +1283,27 @@ public class BlockContractRule implements BuiltInRule {
                                                                      final Label breakOutLabel) {
             return new OuterBreakContinueAndReturnReplacer(
                 block, labels, breakOutLabel, variables.breakFlags, variables.continueFlags,
-                variables.returnFlag, variables.result, services).replace();
+                variables.returnFlag, variables.result, services
+            ).replace();
         }
 
-        private Statement wrapInTryCatch(final Statement labeldBlock) {
+        private Statement wrapInTryCatch(final Statement labeldBlock)
+        {
             ProgramVariable exceptionParameter =
                     createLocalVariable("e", variables.exception.getKeYJavaType());
             Catch katch = KeYJavaASTFactory.catchClause(
-                KeYJavaASTFactory.parameterDeclaration(
-                        services.getJavaInfo(),
-                        exceptionParameter.getKeYJavaType(),
-                        exceptionParameter),
-                        new StatementBlock(KeYJavaASTFactory
-                                .assign(variables.exception, exceptionParameter)));
+                KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(),
+                                                       exceptionParameter.getKeYJavaType(),
+                                                       exceptionParameter),
+                new StatementBlock(KeYJavaASTFactory.assign(variables.exception, exceptionParameter))
+            );
             return new Try(new StatementBlock(labeldBlock), new Branch[] {katch});
         }
 
-        private ProgramVariable createLocalVariable(final String nameBase, final KeYJavaType type) {
-            return KeYJavaASTFactory.localVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
+        private ProgramVariable createLocalVariable(final String nameBase, final KeYJavaType type)
+        {
+            return KeYJavaASTFactory.localVariable(services.getVariableNamer()
+                                    .getTemporaryNameProposal(nameBase), type);
         }
 
     }

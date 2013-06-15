@@ -44,21 +44,14 @@
    &amp; !x.next[0] = null
    &amp; !(  x.next[0].next = null
        | x.next[0].next.length &lt;= 0)
-   &amp; !x.next[0].next[0] = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
-+ x.next.length
-+ \if (x.next[0].next[0] = x)
-      \then (3)
-      \else (\if (x.next[0] = x)  \then (2)  \else (1))
-+ \if (x.next[0].next[0] = x.next[0])
-      \then (3)
-      \else (2)&apos; as result of SimpleLinkedArrays.compute(x);&gt;" isReturnValueComputed="true">
+   &amp; !x.next[0].next[0] = null" pathConditionChanged="false" isReturnValueComputed="false">
                                     <termination name="&lt;end&gt;" pathCondition="   x.next[0].next.length &gt;= 0 &amp; x.next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null
    &amp; !(  x.next[0].next = null
        | x.next[0].next.length &lt;= 0)
-   &amp; !x.next[0].next[0] = null" pathConditionChanged="false" exceptionalTermination="false">
+   &amp; !x.next[0].next[0] = null" pathConditionChanged="false" terminationKind="NORMAL">
                                     </termination>
                                  </methodReturn>
                               </statement>
@@ -76,7 +69,7 @@
    &amp; !x.next[0] = null
    &amp; !(  x.next[0].next = null
        | x.next[0].next.length &lt;= 0)
-   &amp; x.next[0].next[0] = null" pathConditionChanged="false" exceptionalTermination="true">
+   &amp; x.next[0].next[0] = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                               </termination>
                            </branchCondition>
                         </branchCondition>
@@ -89,7 +82,7 @@
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null
-   &amp; x.next[0].next = null" pathConditionChanged="false" exceptionalTermination="true">
+   &amp; x.next[0].next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                            </termination>
                         </branchCondition>
                         <branchCondition name="   x.next[0].next.length &gt;= 0
@@ -105,7 +98,7 @@
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null
    &amp; (  !x.next[0].next = null
-      &amp; x.next[0].next.length &lt;= 0)" pathConditionChanged="false" exceptionalTermination="true">
+      &amp; x.next[0].next.length &lt;= 0)" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                            </termination>
                         </branchCondition>
                      </statement>
@@ -117,12 +110,12 @@
                      <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   x.next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)
-   &amp; x.next[0] = null" pathConditionChanged="false" exceptionalTermination="true">
+   &amp; x.next[0] = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                      </termination>
                   </branchCondition>
                </branchCondition>
                <branchCondition name="x.next = null" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="true" branchCondition="x.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" exceptionalTermination="true">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                   </termination>
                </branchCondition>
                <branchCondition name="   x.next.length &gt;= 0
@@ -130,13 +123,13 @@
 -&gt; !x = null &amp; (!x.next = null &amp; x.next.length &lt;= 0)" pathConditionChanged="true" branchCondition="   x.next.length &gt;= 0
 -&gt; !x.next = null &amp; x.next.length &lt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="   x.next.length &gt;= 0
--&gt; !x = null &amp; (!x.next = null &amp; x.next.length &lt;= 0)" pathConditionChanged="false" exceptionalTermination="true">
+-&gt; !x = null &amp; (!x.next = null &amp; x.next.length &lt;= 0)" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" exceptionalTermination="true">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
             </termination>
          </branchCondition>
       </statement>

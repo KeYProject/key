@@ -1200,7 +1200,7 @@ expression returns [PositionedString result = null]
 }
 :
     t:EXPRESSION
-    { 
+    {   
     	result = createPositionedString(t.getText(), t);
     }
 ;

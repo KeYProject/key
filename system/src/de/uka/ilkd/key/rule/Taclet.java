@@ -14,10 +14,10 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.omg.CORBA.ORB;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -25,6 +25,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.LabelSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -38,15 +40,25 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -153,7 +165,6 @@ public abstract class Taclet implements Rule, Named {
      */
     protected final ImmutableMap<SchemaVariable,TacletPrefix> prefixMap;
     
-
     /** cache; contains set of all bound variables */
     private ImmutableSet<QuantifiableVariable> boundVariables = null;
     
@@ -357,8 +368,6 @@ public abstract class Taclet implements Rule, Named {
      * resolved there as well, if necessary.
      * @param term the Term that has to be matched
      * @param template the Term that is checked if it can match term
-     * @param ignoreUpdates a boolean if set to true updates will be ignored as 
-     * e.g. wanted if an if-sequent is matched
      * @param matchCond the SVInstantiations/Constraint that are
      * required because of formerly matchings
      * @param services the Services object encapsulating information
@@ -368,35 +377,13 @@ public abstract class Taclet implements Rule, Named {
      */
     protected MatchConditions match(Term            term,
 				    Term            template,
-				    boolean         ignoreUpdates,
 				    MatchConditions matchCond,
 				    Services        services) {
 	Debug.out("Start Matching rule: ", name);
-	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, services);
+	matchCond = matchHelp(term, template, matchCond, services);	
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
-
-
-
-    /**
-     * same as the method above but with ignoreUpdates always false
-     * @param term the Term that has to be matched
-     * @param template the Term that is checked if it can match term
-     * @param matchCond the SVInstantiations/Constraint that are
-     * required because of formerly matchings
-     * @param services the Services object encapsulating information
-     * about the java datastructures like (static)types etc.
-     * @return the new MatchConditions needed to match template with
-     * term , if possible, null otherwise
-     */
-    protected MatchConditions match(Term            term,
-				    Term            template,
-				    MatchConditions matchCond,
-				    Services        services) {
-	return match(term, template, false, matchCond, services);
-    }
-
 
     /**
      * checks if the conditions for a correct instantiation are satisfied
@@ -423,7 +410,7 @@ public abstract class Taclet implements Rule, Named {
 		    // match(x) is not a variable, but the
 		    // corresponding template variable is bound
 		    // or declared non free (so it has to be
-		    // matched to a variable)
+		    // matched to a variable) 		
 		    return null; // FAILED
 		}
 	    }
@@ -432,12 +419,12 @@ public abstract class Taclet implements Rule, Named {
 	// check generic conditions
 	for (final VariableCondition vc : variableConditions) {
 	    matchCond = vc.check(var, instantiationCandidate, matchCond, services);	    
-	    if (matchCond == null) {
+	    if (matchCond == null) {	     
 		return null; // FAILED
 	    }
 	}
 
-	return matchCond;
+	return matchCond;	
     }
 
 
@@ -560,8 +547,6 @@ public abstract class Taclet implements Rule, Named {
      * (marked as final to help the compiler inlining methods)
      * @param term the Term the Template should match
      * @param template the Term tried to be instantiated so that it matches term
-     * @param ignoreUpdates a boolean if set to true updates will be ignored as 
-     * e.g. wanted if an if-sequent is matched
      * @param matchCond the MatchConditions to be obeyed by a
      * successfull match
      * @return the new MatchConditions needed to match template with
@@ -572,34 +557,14 @@ public abstract class Taclet implements Rule, Named {
 
     private MatchConditions matchHelp(final Term             term,
 				      final Term             template, 
-				      final boolean          ignoreUpdates,
 				      MatchConditions  	     matchCond,
 				      final Services         services) {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
 	final Operator sourceOp   = term.op ();
-        final Operator templateOp = template.op ();
-        
-        assert !(sourceOp instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";        
-        assert !(templateOp instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
-        
-        if ( ignoreUpdates
-             && sourceOp instanceof UpdateApplication
-//             &&  !( templateOp instanceof SchemaVariable )
-//                  || templateOp instanceof ModalOperatorSV  
-             && !(templateOp instanceof UpdateApplication) ) {
-	    // updates can be ignored
-            Term update = UpdateApplication.getUpdate(term);
-	    matchCond = matchCond
-		.setInstantiations ( matchCond.getInstantiations ().
-				     addUpdate (update) );
-	    return matchHelp(UpdateApplication.getTarget(term), 
-		    	     template,
-			     true, 
-			     matchCond, 
-			     services);
-	}
+    final Operator templateOp = template.op ();
+                
     
 	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
 	    return templateOp.match(term, matchCond, services);
@@ -613,7 +578,7 @@ public abstract class Taclet implements Rule, Named {
 	
 	//match java blocks:
 	matchCond = matchJavaBlock(term, template, matchCond, services);
-	if (matchCond == null) {
+	if (matchCond == null) { 
 	    Debug.out("FAILED. 9: Java Blocks not matching");
 	    return null;  //FAILED
 	}
@@ -621,7 +586,7 @@ public abstract class Taclet implements Rule, Named {
 	//match bound variables:
 	matchCond = matchBoundVariables(term, template, matchCond, 
 					services);
-	if (matchCond == null) {
+	if (matchCond == null) { 
 	    Debug.out("FAILED. 10: Bound Vars");
 	    return null;  //FAILED
 	}
@@ -630,17 +595,15 @@ public abstract class Taclet implements Rule, Named {
 	for (int i = 0, arity = term.arity(); i < arity; i++) {
 	    matchCond = matchHelp(term.sub(i), 
 		    		  template.sub(i), 
-		    		  false,
 				  matchCond, 
 				  services);
-	    if (matchCond == null) {
+	    if (matchCond == null) {		      
 	        return null; //FAILED
 	    } 
 	}	
                 
         return matchCond.shrinkRenameTable();
     }
-    
 
 
     /**
@@ -670,7 +633,7 @@ public abstract class Taclet implements Rule, Named {
 	if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
 	    updateFormula = p_template;
 	else
-	    updateFormula = TB.applySequential(p_matchCond.getInstantiations()
+	    updateFormula = TB.applyUpdatePairsSequential(p_matchCond.getInstantiations()
 		    .getUpdateContext(), p_template);
 
 	IfFormulaInstantiation cf;
@@ -679,8 +642,7 @@ public abstract class Taclet implements Rule, Named {
 	while (p_toMatch.hasNext()) {
 	    cf = p_toMatch.next();
 
-	    newMC = match(cf.getConstrainedFormula().formula(), updateFormula,
-		    false, p_matchCond, p_services);
+	    newMC = match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services);
 	    if (newMC != null) {
 		resFormulas = resFormulas.prepend(cf);
 		resMC = resMC.prepend(newMC);
@@ -856,7 +818,7 @@ public abstract class Taclet implements Rule, Named {
 
         if ( ! ( o instanceof Taclet ) ){
 	    return false;
-	}
+	}	
 	      
 	final Taclet t2 = (Taclet)o;
 
@@ -899,13 +861,37 @@ public abstract class Taclet implements Rule, Named {
      */
     protected Term syntacticalReplace(Term term,
 				      Services services,
-				      MatchConditions mc) {	
+				      MatchConditions mc,
+				      PosInOccurrence applicationPosInOccurrence) {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
-                                      mc.getInstantiations());
+                                     mc.getInstantiations(),
+                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, getLabelInstantiators(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
+    }
+    
+    /**
+     * Returns the {@link ITermLabelWorker} to use.
+     * @param services The {@link Services} to extract {@link ITermLabelWorker} from.
+     * @return The {@link ITermLabelWorker} to use or {@code null} if no {@link ITermLabelWorker} are available.
+     */
+    protected ImmutableList<ITermLabelWorker> getLabelInstantiators(Services services) {
+       ImmutableList<ITermLabelWorker> result = null;
+       if (services != null) {
+          Proof proof = services.getProof();
+          if (proof != null) {
+             ProofSettings settings = proof.getSettings();
+             if (settings != null) {
+                LabelSettings labelSettings = settings.getLabelSettings();
+                if (labelSettings != null) {
+                   result = labelSettings.getLabelInstantiators();
+                }
+             }
+          }
+       }
+       return result;
     }
     
 
@@ -940,22 +926,26 @@ public abstract class Taclet implements Rule, Named {
      * @param services the Services object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of
      * the schemavariables, constraints etc.
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @return the as far as possible instantiated SequentFormula
      */
     private SequentFormula 
 	instantiateReplacement(SequentFormula schemaFormula,
 			       Services           services,
-			       MatchConditions    matchCond) { 
+			       MatchConditions    matchCond,
+			       PosInOccurrence applicationPosInOccurrence) { 
 
 	final SVInstantiations svInst = matchCond.getInstantiations ();
 	
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
-                    services, matchCond);
-        
+                    services, matchCond, applicationPosInOccurrence);
+                
         if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = TB.applySequential(svInst.getUpdateContext(), 
+            instantiatedFormula = TB.applyUpdatePairsSequential(svInst.getUpdateContext(), 
             		           	             instantiatedFormula);         
-	} 
+	     }
+        
+        
 	        
 	return new SequentFormula(instantiatedFormula);
     }
@@ -970,14 +960,14 @@ public abstract class Taclet implements Rule, Named {
      * @return the instanted formulas of the semisquent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,
-            MatchConditions matchCond) {       
+            MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence) {       
         
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
         final Iterator<SequentFormula> it = semi.iterator();        
         
         while (it.hasNext()) {
             replacements = replacements.append
-                (instantiateReplacement(it.next(), services, matchCond));           
+                (instantiateReplacement(it.next(), services, matchCond, applicationPosInOccurrence));           
         }
         return replacements;
     }
@@ -999,7 +989,7 @@ public abstract class Taclet implements Rule, Named {
 				PosInOccurrence pos,
 				Services services, 
 				MatchConditions matchCond) {
-	goal.changeFormula(instantiateSemisequent(semi, services, matchCond),
+	goal.changeFormula(instantiateSemisequent(semi, services, matchCond, pos),
                 pos);
     }
 
@@ -1025,7 +1015,7 @@ public abstract class Taclet implements Rule, Named {
 			    Services services, 
 			    MatchConditions matchCond ) {
 	final ImmutableList<SequentFormula> replacements = 
-            instantiateSemisequent(semi, services, matchCond);
+            instantiateSemisequent(semi, services, matchCond, pos);
 	
 	if (pos != null) {
 	    goal.addFormula(replacements, pos);
@@ -1108,32 +1098,6 @@ public abstract class Taclet implements Rule, Named {
 	while (it.hasNext()) {
 	    Taclet tacletToAdd = it.next(); 
 	    String uniqueTail=""; // we need to name the new taclet uniquely
-/*
-            TacletGoalTemplate replacewithCandidate = null;
-	    Iterator<TacletGoalTemplate> actions = 
-               tacletToAdd.goalTemplates().iterator();
-            while (actions.hasNext()) {
-               replacewithCandidate = actions.next();
-               if (replacewithCandidate instanceof RewriteTacletGoalTemplate)
-                  break;
-            }
-            if ((replacewithCandidate instanceof RewriteTacletGoalTemplate) &&
-                (tacletToAdd instanceof FindTaclet)) {
-                // we have _both_ FIND and REPLACEWITH
-                Term find = ((FindTaclet)tacletToAdd).find();
-                Term replwith = 
-                   ((RewriteTacletGoalTemplate)
-                      replacewithCandidate).replaceWith();
-                      
-                SyntacticalReplaceVisitor visitor = // now instantiate them!
-                   new SyntacticalReplaceVisitor(services, matchCond.getInstantiations ());
-                visitor.visit(find);
-                uniqueTail = "_" + visitor.getTerm();
-                visitor = new SyntacticalReplaceVisitor(services, matchCond.getInstantiations ());
-                visitor.visit(replwith);
-                uniqueTail += "_" + visitor.getTerm();
-	    }
-*/
             if ("".equals(uniqueTail)) { // otherwise just number it
                de.uka.ilkd.key.proof.Node n = goal.node();
                uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.parent().siblingNr();
