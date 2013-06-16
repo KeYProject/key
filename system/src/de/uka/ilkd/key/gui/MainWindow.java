@@ -941,7 +941,8 @@ public final class MainWindow extends JFrame  {
     /** saves a proof */
     public void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();
-        ProofSaver saver = new ProofSaver(getMediator().getSelectedProof(), filename, Main.INTERNAL_VERSION);
+        ProofSaver saver =
+                new ProofSaver(getMediator().getSelectedProof(), filename, Main.INTERNAL_VERSION);
         String errorMsg ;
 
         try {
@@ -1599,16 +1600,20 @@ public final class MainWindow extends JFrame  {
         return notificationManager;
     }
 
-	protected void addRecentFile(String absolutePath) {
-		recentFiles.addRecentFile(absolutePath);
-	}
+    protected void addRecentFile(String absolutePath) {
+        recentFiles.addRecentFile(absolutePath);
+    }
 
-	public void openExamples() {
-		openExampleAction.actionPerformed(null);    }
+    public void openExamples() {
+        openExampleAction.actionPerformed(null);
+    }
 
-	public void loadProblem(File file) {
-		getUserInterface().loadProblem(file);
-	}
+    public void loadProblem(File file) {
+        KeYFileChooser fileChooser =
+                GuiUtilities.getFileChooser("Select file to load proof or problem");
+        fileChooser.selectFile(file);
+        getUserInterface().loadProblem(file);
+    }
 
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
       getUserInterface().loadProblem(file, classPath, bootClassPath);

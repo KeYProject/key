@@ -113,8 +113,9 @@ public class KeYFileChooser {
         fileChooser.setSelectedFile(file);
         fileChooser.updateUI(); // Might prevent empty filename suggestion?
 	int result = autoSave ? JFileChooser.APPROVE_OPTION : fileChooser.showSaveDialog(parent);
+	boolean res = (result == JFileChooser.APPROVE_OPTION);
 
-	return new Pair<Boolean, Pair<File, Boolean>> ((result == JFileChooser.APPROVE_OPTION),
+	return new Pair<Boolean, Pair<File, Boolean>> (res,
 	                                               new Pair<File, Boolean> (dir, newDir));
     }
 

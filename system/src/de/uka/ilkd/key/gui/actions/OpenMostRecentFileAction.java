@@ -46,11 +46,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
         	mainWindow.getRecentFiles().getMostRecent() != null) {
             final String recentFile = mainWindow.getRecentFiles().getMostRecent().getAbsolutePath();
             if (recentFile != null) {
-                KeYFileChooser fileChooser =
-                        GuiUtilities.getFileChooser("Select file to load proof or problem");
-                File file = new File(recentFile);
-                fileChooser.selectFile(file);
-                mainWindow.loadProblem(file);
+                mainWindow.loadProblem(new File(recentFile));
             }
         }
     }
