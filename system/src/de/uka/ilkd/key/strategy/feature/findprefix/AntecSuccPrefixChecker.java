@@ -1,7 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -12,7 +20,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 
 
 /**
- *
+ * Checks, whether the position in occurrence has antecedent/succedent polarity.
+ * 
  * @author christoph
  */
 class AntecSuccPrefixChecker implements Checker {
@@ -23,9 +32,11 @@ class AntecSuccPrefixChecker implements Checker {
 
     };
 
+    // checks, whether the position in occurrence has antecedent polarity
     public static final AntecSuccPrefixChecker ANTE_POLARITY_CHECKER =
             new AntecSuccPrefixChecker(Polarity.ANTECEDENT);
 
+    // checks, whether the position in occurrence has succedent polarity
     public static final AntecSuccPrefixChecker SUCC_POLARITY_CHECKER =
             new AntecSuccPrefixChecker(Polarity.SUCCEDENT);
 
