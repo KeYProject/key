@@ -70,8 +70,8 @@ public class TermTacletAppIndexCacheSet {
      * (well, almost), and that different proofs and different areas within one
      * proof compete for cache space
      */
-    private final static Map cacheBackend = new LRUCache ( MAX_INDEX_ENTRIES );//chrisg made public
-    
+    private final static Map cacheBackend = new LRUCache ( MAX_INDEX_ENTRIES ); //chrisg made public
+
     /**
      * dummy cache that is not caching at all, and from which no other cache is
      * reachable
@@ -239,7 +239,7 @@ public class TermTacletAppIndexCacheSet {
     }
     
     ////////////////////////////////////////////////////////////////////////////
-    
+
     private class TopLevelCache extends PrefixTermTacletAppIndexCacheImpl {
         public TopLevelCache(ImmutableList<QuantifiableVariable> prefix) {
             super ( prefix, cacheBackend );

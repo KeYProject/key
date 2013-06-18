@@ -84,7 +84,7 @@ public class JoinDialog extends StdDialog{
         
         private SequentViewer sequentViewer1;
         private SequentViewer sequentViewer2;
-        private JList         choiceList;
+        private JList<Object>     choiceList;
         private CheckedUserInput predicateInput;
         private JLabel        joinHeadline;
         private JLabel        infoPredicate;
@@ -196,7 +196,7 @@ public class JoinDialog extends StdDialog{
             
            
             
-            DefaultListModel model = new DefaultListModel();
+            DefaultListModel<Object> model = new DefaultListModel<Object>();
             for(final ProspectivePartner partner : partnerList){
                
                 Result result = estimator.estimate(partner, proof);
@@ -361,9 +361,9 @@ public class JoinDialog extends StdDialog{
             return predicateInput;
         }
 
-        private JList getChoiceList(){
+        private JList<Object> getChoiceList(){
             if(choiceList == null){
-                    choiceList = new JList();
+                    choiceList = new JList<Object>();
                     choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                     choiceList.setPreferredSize(new Dimension(100,300));
                     choiceList.addListSelectionListener(new ListSelectionListener() {

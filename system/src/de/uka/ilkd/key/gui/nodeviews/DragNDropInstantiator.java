@@ -96,24 +96,22 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         try {
             Transferable transferable = event.getTransferable();
-            if (transferable
-                    .isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
-                interpreteDragAndDropInstantiation(event, dropLocation,
-                        transferable);
-            } else if (transferable
-	                    .isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-	        	try {
-	                	event.acceptDrop(event.getSourceActions());
-	        	List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-	        	for (Iterator i = files.iterator(); i.hasNext(); ) {
-	        	    File f = (File) i.next();
-	        	    MainWindow.getInstance().loadProblem(f);
-	        	}
-	        	event.dropComplete(true);
-	        	}
-	        	catch (ClassCastException ex) {
-	        	    event.rejectDrop();
-	        	}
+            if (transferable.isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+                interpreteDragAndDropInstantiation(event, dropLocation, transferable);
+            } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                try {
+                    event.acceptDrop(event.getSourceActions());
+                    List<?> files =
+                            (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    for (Iterator<?> i = files.iterator(); i.hasNext(); ) {
+                        File f = (File) i.next();
+                        MainWindow.getInstance().loadProblem(f);
+                    }
+                    event.dropComplete(true);
+                }
+                catch (ClassCastException ex) {
+                    event.rejectDrop();
+                }
             } else {
                 event.rejectDrop();
             }

@@ -83,8 +83,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                     new LocationVariable(pen, paramVar.getKeYJavaType());
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
-
-            tb.getServices().getIFSymbols().add(formalParamVar);
+            tb.getServices().getProof().addIFSymbol(formalParamVar);
         }
 
         //create java block

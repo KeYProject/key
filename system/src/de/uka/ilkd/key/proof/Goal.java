@@ -236,7 +236,8 @@ public final class Goal  {
     }
 
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        assert node.proof().getNamespaces().contains(names(s)) : "\""+names(s)+ "\" not found in namespace.";
+        assert node.proof().getNamespaces().contains(names(s)) :
+                    "\""+names(s)+ "\" not found in namespace.";
         node.setGlobalProgVars(s);
     }
 
@@ -657,15 +658,15 @@ public final class Goal  {
         proof.getServices().saveNameRecorder(n);
 
         if (goalList != null){
-        if (goalList.isEmpty() ) {
-            proof.closeGoal ( this );
-        } else {
-            proof.replace ( this, goalList );
-            if ( ruleApp instanceof TacletApp &&
-                    ((TacletApp)ruleApp).taclet ().closeGoal () )
-                // the first new goal is the one to be closed
-                proof.closeGoal ( goalList.head () );
-        }
+            if (goalList.isEmpty() ) {
+                proof.closeGoal ( this );
+            } else {
+                proof.replace ( this, goalList );
+                if ( ruleApp instanceof TacletApp &&
+                        ((TacletApp)ruleApp).taclet ().closeGoal () )
+                    // the first new goal is the one to be closed
+                    proof.closeGoal ( goalList.head () );
+            }
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);

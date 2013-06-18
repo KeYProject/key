@@ -130,9 +130,9 @@ public class ProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
-              for (SequentFormula seqForm: proof.root().sequent().succedent().toList()) {
-                  proof.getServices().getIFSymbols().add(seqForm.formula());
-              }
+              /*for (SequentFormula seqForm: proof.root().sequent().succedent().toList()) {
+                  proof.addIFSymbol(seqForm.formula());
+              }*/
           } else {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
@@ -166,7 +166,7 @@ public class ProofSaver {
               if (po instanceof InfFlowRelatedPO) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
-                  ps.print(proof.getServices().getIFSymbols().printProofSymbols());
+                  ps.print(proof.printIFSymbols());
               }
               final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");

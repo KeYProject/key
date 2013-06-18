@@ -97,15 +97,15 @@ class BasicSnippetData {
         LABELS(Label[].class),
         CONTEXT(ExecutionContext.class); // this does not fit well here
 
-        private final Class type;
+        private final Class<?> type;
 
 
-        Key(Class type) {
+        Key(Class<?> type) {
             this.type = type;
         }
 
 
-        public Class getType() {
+        public Class<?> getType() {
             return type;
         }
     };

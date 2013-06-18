@@ -123,9 +123,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                 throw new UnsupportedOperationException("Unknown factory "
                         + "method for snippet \"" + snippet.name() + ".");
             }
-            Term result = m.produce(data, poVars);
-            data.tb.getServices().getIFSymbols().add(result);
-            return result;
+            return m.produce(data, poVars);
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "
                     + "snippet \"" + snippet.name() + " threw "

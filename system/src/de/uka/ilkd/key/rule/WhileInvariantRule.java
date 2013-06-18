@@ -171,22 +171,15 @@ public final class WhileInvariantRule implements BuiltInRule {
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    LoopInvariant inv, Services services) {
-        final boolean loadedInfFlow = false;
-//                                    services.getProof().getSettings()
-//                                        .getStrategySettings().getActiveStrategyProperties()
-//                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-//                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
 	final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
-	if (!loadedInfFlow)
-	    services.getNamespaces().functions().addSafely(loopHeapFunc);
+	services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = TB.func(loopHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_LOOP"));
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
-	if (!loadedInfFlow)
-	    services.getNamespaces().functions().addSafely(anonHeapFunc);
+	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.func(anonHeapFunc);
 
 	// check for strictly pure loops
@@ -346,6 +339,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
+        goal.proof().addIFSymbol(finalTerm);
 
         final Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
@@ -358,12 +352,16 @@ public final class WhileInvariantRule implements BuiltInRule {
                 splitPostTB.generateTaclets(post, services);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            goal.proof().addIFSymbol(t);
+            goal.proof().addIFSymbol(((RewriteTaclet)t).find());
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets =
                 removePostTB.generateTaclets(post, services);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            goal.proof().addIFSymbol(t);
+            goal.proof().addIFSymbol(((RewriteTaclet)t).find());
         }
 
         return infFlowGoal;
@@ -411,6 +409,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                         false);
         goal.addTaclet(infData.infFlowApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        goal.proof().addIFSymbol(infData.applPredTerm);
+        goal.proof().addIFSymbol(infData.infFlowApp);
 
         return goal;
     }

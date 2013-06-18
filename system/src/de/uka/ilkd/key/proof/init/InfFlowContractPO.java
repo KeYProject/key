@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
@@ -40,6 +41,11 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     private final IFProofObligationVars ifVars;
 
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     public InfFlowContractPO(InitConfig initConfig,
                              InformationFlowContract contract) {
@@ -66,7 +72,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        services.getIFSymbols().add(finalTerm);
+        addLabeledIFSymbol(finalTerm);
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
@@ -74,7 +80,8 @@ public class InfFlowContractPO extends AbstractOperationPO
 
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                services.getIFSymbols().add(t.taclet());
+                // FIXME: Bla!
+                addIFSymbol(t.taclet());
             }
         }
 
@@ -88,15 +95,20 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+            addIFSymbol(t);
+            addIFSymbol(((RewriteTaclet)t).find());
         }
-        final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
-        final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post, services);
+        final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
+        final ArrayList<Taclet> removePostTaclets =
+                removePostTB.generateTaclets(post, services);
         for (final Taclet t : removePostTaclets) {
             taclets = taclets.add(NoPosTacletApp
                     .createFixedNoPosTacletApp(t,
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+            addIFSymbol(t);
+            addIFSymbol(((RewriteTaclet)t).find());
         }
     }
 
@@ -183,6 +195,36 @@ public class InfFlowContractPO extends AbstractOperationPO
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
         properties.setProperty("Non-interference contract", contract.getName());
+    }
+
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+    public void addIFSymbol(Term t) {
+        assert t != null;
+        infFlowSymbols.add(t);
+    }
+
+    public void addIFSymbol(Named n) {
+        assert n != null;
+        infFlowSymbols.add(n);
+    }
+
+    public void addLabeledIFSymbol(Term t) {
+        assert t != null;
+        infFlowSymbols.addLabeled(t);
+    }
+
+    public void addLabeledIFSymbol(Named n) {
+        assert n != null;
+        infFlowSymbols.addLabeled(n);
+    }
+
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
     // the following code is legacy code

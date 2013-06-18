@@ -16,7 +16,7 @@ public class AutoSave extends MainWindowAction {
         super(mainWindow);
         setTooltip("If ticked, side-proofs are saved automatically (without save dialog pop up)," +
         		"when they are being left.");
-        setName("Auto Save");
+        setName("Auto Save Side Proofs");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave());
     }
 

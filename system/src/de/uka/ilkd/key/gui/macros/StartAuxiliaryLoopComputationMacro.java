@@ -96,15 +96,14 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars,
                                        goal, loopInv.getExecutionContext());
-        proof.getServices().addIFSymbols(
-                loopInvExecPO.getInitiatingGoal().proof().getServices().getIFSymbols());
-
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
+        loopInvExecPO.unionLabeledIFSymbols(proof.getIFSymbols());
         try {
-            pi.startProver(initConfig, loopInvExecPO, 0);
+            Proof p =  pi.startProver(initConfig, loopInvExecPO, 0);
+            p.unionLabeledIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

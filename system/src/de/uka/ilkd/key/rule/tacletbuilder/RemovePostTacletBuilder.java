@@ -41,8 +41,6 @@ public class RemovePostTacletBuilder {
             tacletBuilder.addTacletGoalTemplate(goal);
             tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
             removePostTaclets.add(tacletBuilder.getTaclet());
-            services.getIFSymbols().add(tacletBuilder.getTaclet());
-            i++;
         }
         return removePostTaclets;
     }

@@ -89,15 +89,14 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
         SymbolicExecutionPO symbExecPO =
                 new SymbolicExecutionPO(initConfig, po.getContract(),
                                         po.getIFVars().symbExecVars, goal);
-        proof.getServices().addIFSymbols(
-                symbExecPO.getInitiatingGoal().proof().getServices().getIFSymbols());
-
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
+        symbExecPO.unionLabeledIFSymbols(proof.getIFSymbols());
         try {
-            pi.startProver(initConfig, symbExecPO, 0);
+            Proof p = pi.startProver(initConfig, symbExecPO, 0);
+            p.unionLabeledIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

@@ -6,14 +6,15 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -118,9 +119,8 @@ public class InfFlowProofSymbols {
                 DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil();
         for (Pair<ProgramVariable, Boolean> pv: programVariables) {
             if (pv.second) {
-                labeledProgramVariables =
-                        labeledProgramVariables
-                                .add(new Pair<ProgramVariable, Boolean>(pv.first, false));
+                labeledProgramVariables = labeledProgramVariables.add(
+                        new Pair<ProgramVariable, Boolean>(pv.first, false));
             }
         }
         return labeledProgramVariables;
@@ -131,9 +131,8 @@ public class InfFlowProofSymbols {
                 DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil();
         for (Pair<SchemaVariable, Boolean> sv: schemaVariables) {
             if (sv.second) {
-                labeledSchemaVariables =
-                        labeledSchemaVariables
-                                .add(new Pair<SchemaVariable, Boolean>(sv.first, false));
+                labeledSchemaVariables = labeledSchemaVariables.add(
+                        new Pair<SchemaVariable, Boolean>(sv.first, false));
             }
         }
         return labeledSchemaVariables;
@@ -232,105 +231,171 @@ public class InfFlowProofSymbols {
         return false;
     }
 
-    private void addTerm(Term t) {
-        if (!t.subs().isEmpty()) {
-            for (final Term s: t.subs()) {
-                addTerm(s);
-            }
-        }
-        add(t.op());
-        if (t.op() instanceof UpdateApplication) {
-            addTerm(UpdateApplication.getUpdate(t));
-            addTerm(UpdateApplication.getTarget(t));
-        }
-    }
-
-    private void addTaclet(Taclet t) {
+    private void addTaclet(Taclet t, boolean labeled) {
         if (!containsTaclet(t)) {
-            taclets = taclets.add(new Pair<Taclet, Boolean>(t, true));
+            taclets = taclets.add(new Pair<Taclet, Boolean>(t, !labeled));
         }
     }
 
-    private void addSort(Sort s) {
+    private void addSort(Sort s, boolean labeled) {
         if (!(s instanceof NullSort) &&
                 !containsSort(s)) {
-            sorts = sorts.add(new Pair<Sort, Boolean>(s, true));
+            sorts = sorts.add(new Pair<Sort, Boolean>(s, !labeled));
         }
     }
 
-    private void addPredicate (Function p) {
-        if (!containsPredicate(p)) {
-            predicates = predicates.add(new Pair<Function, Boolean>(p, true));
-        }
-    }
-
-    private void addFunction (Function f) {
-        if (!containsFunction(f))
-            functions = functions.add(new Pair<Function, Boolean>(f, true));
-    }
-
-    private void addFunc(Function f) {
+    private boolean isPredicate(Function f) {
+        assert f != null;
         if (f.name().toString().startsWith("RELATED_BY") ||
                 f.name().toString().startsWith("EXECUTION_OF")) {
-            addPredicate(f);
+            return true;
         } else {
-            addFunction(f);
+            return false;
         }
     }
 
-    private void addSchemaVariable(SchemaVariable sv) {
+    private void addPredicate (Function p, boolean labeled) {
+        if (!containsPredicate(p)) {
+            predicates = predicates.add(new Pair<Function, Boolean>(p, !labeled));
+        }
+    }
+
+    private void addFunction (Function f, boolean labeled) {
+        if (!containsFunction(f))
+            functions = functions.add(new Pair<Function, Boolean>(f, !labeled));
+    }
+
+    private void addFunc(Function f, boolean labeled) {
+        if (isPredicate(f)) {
+            addPredicate(f, labeled);
+        } else {
+            addFunction(f, labeled);
+        }
+    }
+
+    private void addSchemaVariable(SchemaVariable sv, boolean labeled) {
         if (!containsSchemaVariable(sv)) {
-            schemaVariables = schemaVariables.add(new Pair<SchemaVariable, Boolean>(sv, true));
+            schemaVariables = schemaVariables.add(new Pair<SchemaVariable, Boolean>(sv, !labeled));
         }
     }
 
-    private void addProgramVariable(ProgramVariable pv) {
+    private void addProgramVariable(ProgramVariable pv, boolean labeled) {
         if (!containsProgramVariable(pv)) {
-            programVariables = programVariables.add(new Pair<ProgramVariable, Boolean>(pv, true));
+            programVariables = programVariables.add(new Pair<ProgramVariable, Boolean>(pv, !labeled));
         }
     }
 
-    public void add(Object symb) {
+    public void add(Named symb) {
         assert symb != null;
+        boolean l = false;
 
-        if (symb instanceof Term) {
-            final Term t = (Term)symb;
-            addTerm(t);
-        }
         if (symb instanceof Sort) {
             final Sort s = (Sort)symb;
-            addSort(s);
+            addSort(s, l);
         }
         if (symb instanceof SortedOperator) {
             final SortedOperator s = (SortedOperator)symb;
-            addSort(s.sort());
+            addSort(s.sort(), l);
         }
         if (symb instanceof Function) {
             final Function f = (Function)symb;
-            addFunc(f);
+            addFunc(f, l);
         }
         if (symb instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable)symb;
-            addProgramVariable(pv);
+            addProgramVariable(pv, l);
         }
         if (symb instanceof SchemaVariable) {
             final SchemaVariable sv = (SchemaVariable)symb;
-            addSchemaVariable(sv);
+            addSchemaVariable(sv, l);
         }
         if (symb instanceof Taclet) {
             final Taclet t = (Taclet)symb;
-            addTaclet(t);
+            addTaclet(t, l);
         }
     }
 
-    /*public void add(ImmutableList<?> symbs) {
-        assert symbs != null;
-        for (final Object symb: symbs) {
-            add(symb);
-        }
-    }*/
+    public void addLabeled(Named symb) {
+        assert symb != null;
+        boolean l = true;
 
-    public InfFlowProofSymbols add(InfFlowProofSymbols symbols) {
+        if (symb instanceof Sort) {
+            final Sort s = (Sort)symb;
+            addSort(s, l);
+        }
+        if (symb instanceof SortedOperator) {
+            final SortedOperator s = (SortedOperator)symb;
+            addSort(s.sort(), l);
+        }
+        if (symb instanceof Function) {
+            final Function f = (Function)symb;
+            addFunc(f, l);
+        }
+        if (symb instanceof ProgramVariable) {
+            final ProgramVariable pv = (ProgramVariable)symb;
+            addProgramVariable(pv, l);
+        }
+        if (symb instanceof SchemaVariable) {
+            final SchemaVariable sv = (SchemaVariable)symb;
+            addSchemaVariable(sv, l);
+        }
+        if (symb instanceof Taclet) {
+            final Taclet t = (Taclet)symb;
+            addTaclet(t, l);
+        }
+    }
+
+    public void add(Term t) {
+        assert t != null;
+        t = TermBuilder.DF.goBelowUpdates(t);
+        if (!(t.op() instanceof Function && isPredicate((Function)t.op()))
+                && !t.subs().isEmpty()) {
+            for (final Term s: t.subs()) {
+                add(s);
+            }
+        }
+        add(t.op());
+        /*if (t.op() instanceof UpdateApplication) {
+            add(UpdateApplication.getUpdate(t));
+            add(UpdateApplication.getTarget(t));
+        }
+        if (t.op() instanceof ElementaryUpdate) {
+            add(((ElementaryUpdate)t.op()).lhs());
+        }*/
+    }
+
+    public void addLabeled(Term t) {
+        assert t != null;
+        t = TermBuilder.DF.goBelowUpdates(t);
+        if (!(t.op() instanceof Function && isPredicate((Function)t.op()))
+                && !t.subs().isEmpty()) {
+            for (final Term s: t.subs()) {
+                addLabeled(s);
+            }
+        }
+        addLabeled(t.op());
+        /*if (t.op() instanceof UpdateApplication) {
+            add(UpdateApplication.getUpdate(t));
+            add(UpdateApplication.getTarget(t));
+        }
+        if (t.op() instanceof ElementaryUpdate) {
+            add(((ElementaryUpdate)t.op()).lhs());
+        }*/
+    }
+
+    public InfFlowProofSymbols union(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        InfFlowProofSymbols result = new InfFlowProofSymbols();
+        result.sorts = sorts.union(symbols.sorts);
+        result.predicates = predicates.union(symbols.predicates);
+        result.functions = functions.union(symbols.functions);
+        result.programVariables = programVariables.union(symbols.programVariables);
+        result.schemaVariables = schemaVariables.union(symbols.schemaVariables);
+        result.taclets = taclets.union(symbols.taclets);
+        return result;
+    }
+
+    public InfFlowProofSymbols unionLabeled(InfFlowProofSymbols symbols) {
         assert symbols != null;
         symbols = symbols.getLabeledSymbols();
         InfFlowProofSymbols result = new InfFlowProofSymbols();

@@ -73,9 +73,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -310,17 +308,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 	assert pm != null;
 	assert mod != null;
 
-	final boolean loadedInfFlow = services.getProof().getSettings()
-	                                  .getStrategySettings().getActiveStrategyProperties()
-	                                  .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-	                                  .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
-	if (!loadedInfFlow)
-	    services.getNamespaces().functions().addSafely(methodHeapFunc);
-    final Term methodHeap = TB.func(methodHeapFunc);
+	services.getNamespaces().functions().addSafely(methodHeapFunc);
+	final Term methodHeap = TB.func(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -493,7 +485,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        ec, 
 	        services);
-	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
+	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+
+	                    staticType+", execution context: "+ec;
 	final Term actualSelf = getActualSelf(mr, pm, ec, services);
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
@@ -564,11 +557,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext =
+                HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars =
+                HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -778,12 +773,15 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final Term normalPost = TB.apply(anonUpdate, 
-                                         TB.prog(inst.mod, 
-                                                 postJavaBlock, 
-                                                 inst.progPost.sub(0),
-                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
-                                         null);
+        final Term normalPost =
+                TB.apply(anonUpdate,
+                         TB.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
+                                 TermLabelWorkerManagement
+                                     .instantiateLabels(services, ruleApp.posInOccurrence(),
+                                                        this, postGoal, null, inst.mod,
+                                                        new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                                        null, postJavaBlock)),
+                         null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
@@ -835,18 +833,23 @@ public final class UseOperationContractRule implements BuiltInRule {
             // method contract precondition as an assumption to the post goal
             // (in case the precondition cannot be proofed easily)
             postGoal.addFormula(new SequentFormula(finalPreTerm), true, false);
+            postGoal.proof().addIFSymbol(contractApplPredTerm);
+            postGoal.proof().addIFSymbol(informationFlowContractApp);
         }
 
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term excPost = TB.apply(anonUpdate, 
-                                      TB.prog(inst.mod, 
-                                              excJavaBlock, 
-                                              inst.progPost.sub(0),
-                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
-                                      null);
+        final Term excPost =
+                TB.apply(anonUpdate,
+                         TB.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
+                                 TermLabelWorkerManagement
+                                     .instantiateLabels(services, ruleApp.posInOccurrence(),
+                                                        this, excPostGoal, null, inst.mod,
+                                                        new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                                        null, excJavaBlock)),
+                         null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        

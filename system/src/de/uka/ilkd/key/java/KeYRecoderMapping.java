@@ -31,18 +31,18 @@ public class KeYRecoderMapping{
     /** maps a recoder programelement (or something similar, e.g. Type)
     * to the KeY-equivalent
     */
-    private HashMap map;
+    private HashMap<Object, Object> map;
 
     /** maps a KeY programelement to the Recoder-equivalent */
-    private HashMap revMap;
+    private HashMap<Object, Object> revMap;
 
     /** a pseudo super class for all arrays used to declare length */
     private KeYJavaType superArrayType=null;
 
     
     public KeYRecoderMapping() {
-	this.map = new HashMap();
-	this.revMap = new HashMap();
+	this.map = new HashMap<Object, Object>();
+	this.revMap = new HashMap<Object, Object>();
     }
 
 
@@ -54,9 +54,9 @@ public class KeYRecoderMapping{
     * @param revMap the reverse map (KeY->Recoder)
     * @param parsedSpecial boolean indicating if the special classes have been parsed in
     */
-    KeYRecoderMapping(HashMap map, HashMap revMap,
+    KeYRecoderMapping(HashMap<Object, Object> map, HashMap<Object, Object> revMap,
                              KeYJavaType superArrayType,
-			     boolean parsedSpecial){
+			     boolean parsedSpecial) {
         this.map      = map;
         this.revMap   = revMap;
         this.superArrayType = superArrayType;
@@ -122,11 +122,11 @@ public class KeYRecoderMapping{
     }
     
 
-    public Set elemsKeY() {
+    public Set<Object> elemsKeY() {
 	return revMap.keySet();
     }
 
-    public Set elemsRec() {
+    public Set<Object> elemsRec() {
 	return map.keySet();
     }
 
@@ -140,8 +140,8 @@ public class KeYRecoderMapping{
 
     
     public KeYRecoderMapping copy() {
-	return new KeYRecoderMapping((HashMap)map.clone(), 
-				     (HashMap)revMap.clone(),
+	return new KeYRecoderMapping((HashMap<Object, Object>)map.clone(),
+				     (HashMap<Object, Object>)revMap.clone(),
                                      superArrayType,
 				     parsedSpecial);
     }

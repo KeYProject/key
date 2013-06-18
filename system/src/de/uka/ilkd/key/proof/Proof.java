@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
@@ -132,6 +133,11 @@ public class Proof implements Named {
      */
     private boolean disposed = false;
 
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
@@ -259,7 +265,7 @@ public class Proof implements Named {
 
     /**
      * Cut off all reference such that it does not lead to a big memory leak
-     * if someone still holds a refernce to this proof object.
+     * if someone still holds a reference to this proof object.
      */
     public void dispose() {
         if (isDisposed()) {
@@ -463,6 +469,36 @@ public class Proof implements Named {
     }
     public ProofIndependentSettings getProofIndependentSettings(){
     	return pis;
+    }
+
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+    public void addIFSymbol(Object s) {
+        assert s != null;
+        if (s instanceof Term) {
+            infFlowSymbols.add((Term)s);
+        } else if (s instanceof Named) {
+            infFlowSymbols.add((Named)s);
+        } else {
+            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
+        }
+    }
+
+    public void unionIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.union(symbols);
+    }
+
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
+    }
+
+    public String printIFSymbols() {
+        return infFlowSymbols.printProofSymbols();
     }
 
     /**

@@ -61,7 +61,11 @@ import javax.swing.border.MatteBorder;
 import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
-    
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -8448827642582176493L;
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
     public final JTextArea tacletInfo;

@@ -140,8 +140,12 @@ import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
-@SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8858832805409618171L;
 
     // Search bar for Sequent Views.
     public SequentSearchBar sequentSearchBar;
@@ -376,7 +380,8 @@ public final class MainWindow extends JFrame  {
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
+                mediator.getUI().loadProblem(new File(
+                        recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
             }
         }, MAX_RECENT_FILES, null);
         recentFiles.load(PathConfig.getRecentFileStorage());
@@ -384,8 +389,8 @@ public final class MainWindow extends JFrame  {
 
         // FIXME do this NOT in layout of GUI
         // minimize interaction
-        final boolean stupidMode =
-        		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+        final boolean stupidMode = ProofIndependentSettings.DEFAULT_INSTANCE
+                                        .getGeneralSettings().tacletFilter();
 //            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setStupidMode(stupidMode);
 
@@ -400,7 +405,8 @@ public final class MainWindow extends JFrame  {
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
         loadUserDefinedTacletsAction = new LemmaGenerationAction.ProveAndAddTaclets(this);
-        loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
+        loadUserDefinedTacletsForProvingAction =
+                new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
@@ -546,7 +552,9 @@ public final class MainWindow extends JFrame  {
 
     private ComplexButton createSMTComponent() {
 	smtComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
-	smtComponent.setEmptyItem("No solver available","<html>No SMT solver is applicable for KeY.<br><br>If a solver is installed on your system," +
+	smtComponent.setEmptyItem("No solver available",
+	        "<html>No SMT solver is applicable for KeY.<br>"+
+	        "<br>If a solver is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
 		"<br>Options|SMT Solvers</html>");
 
@@ -558,7 +566,8 @@ public final class MainWindow extends JFrame  {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem();
-		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(action.solverUnion);
+		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+		                    .setActiveSolverUnion(action.solverUnion);
 		}
 
 	    }
@@ -746,9 +755,11 @@ public final class MainWindow extends JFrame  {
         view.setMnemonic(KeyEvent.VK_V);
 
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
-        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
+        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your "+
+                           "window manager, if not in the default Java LaF (aka Metal).");
 //        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -853,7 +864,7 @@ public final class MainWindow extends JFrame  {
 	       smtComponent.setItems(null);
 	   }
 
-	   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SolverTypeCollection union){
+	   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SolverTypeCollection union) {
 	       for(SMTInvokeAction action : actions){
 		   if(action.solverUnion.equals(union)){
 		       return action;
@@ -874,7 +885,8 @@ public final class MainWindow extends JFrame  {
 
 		smtComponent.setItems(actions);
 
-		SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
+		SolverTypeCollection active = ProofIndependentSettings
+		        .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
 
 		SMTInvokeAction activeAction = findAction(actions, active);
 
@@ -883,7 +895,8 @@ public final class MainWindow extends JFrame  {
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
 			active = ((SMTInvokeAction)item).solverUnion;
-			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
+			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+			                            .setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -917,7 +930,8 @@ public final class MainWindow extends JFrame  {
         });
 
         JRadioButtonMenuItem noneButton
-        	= new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML() && !gs.useOCL());
+            = new JRadioButtonMenuItem("Source File Comments Are Ignored",
+                                       !gs.useJML() && !gs.useOCL());
         result.add(noneButton);
         group.add(noneButton);
         noneButton.addActionListener(new ActionListener() {
@@ -1234,6 +1248,10 @@ public final class MainWindow extends JFrame  {
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
     private static class BlockingGlassPane extends JComponent {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1218022319090988424L;
         GlassPaneListener listener;
 
         public BlockingGlassPane(Container contentPane) {
@@ -1381,7 +1399,11 @@ public final class MainWindow extends JFrame  {
      * For example the toolbar button is paramtrized with an instance of this action
      */
     private final class SMTInvokeAction extends AbstractAction {
-	SolverTypeCollection solverUnion;
+	/**
+         *
+         */
+        private static final long serialVersionUID = -8176122007799747342L;
+    SolverTypeCollection solverUnion;
 
 	public SMTInvokeAction(SolverTypeCollection solverUnion) {
 	    this.solverUnion = solverUnion;
@@ -1392,7 +1414,8 @@ public final class MainWindow extends JFrame  {
 
 	public boolean isEnabled() {
 	    boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION &&
- 	      mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
+	      mediator != null && mediator.getSelectedProof() != null &&
+	      !mediator.getSelectedProof().closed();
 	    return b;
 	}
 
@@ -1471,7 +1494,8 @@ public final class MainWindow extends JFrame  {
      */
     public static MainWindow getInstance() throws IllegalStateException {
         if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
+            System.err.println("Error: KeY started in graphical mode, " +
+                               "but no graphical environment present.");
             System.err.println("Please use the --auto option to start KeY in batch mode.");
             System.err.println("Use the --help option for more command line options.");
             System.exit(-1);
@@ -1609,9 +1633,6 @@ public final class MainWindow extends JFrame  {
     }
 
     public void loadProblem(File file) {
-        KeYFileChooser fileChooser =
-                GuiUtilities.getFileChooser("Select file to load proof or problem");
-        fileChooser.selectFile(file);
         getUserInterface().loadProblem(file);
     }
 

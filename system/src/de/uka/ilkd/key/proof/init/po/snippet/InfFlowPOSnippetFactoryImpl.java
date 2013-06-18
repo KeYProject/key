@@ -110,7 +110,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                          "method for snippet \"" + snippet.name() + ".");
             }
             Term result = m.produce(data, poVars1, poVars2);
-            data.tb.getServices().getIFSymbols().add(result);
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " +

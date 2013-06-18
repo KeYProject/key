@@ -26,6 +26,11 @@ import java.awt.Toolkit;
  */
 public class SearchInSequentAction extends MainWindowAction {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -9002009635814787502L;
+
     public SearchInSequentAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Search in sequent view");

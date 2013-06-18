@@ -32,7 +32,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 
 
-public class IfChoiceModel extends DefaultComboBoxModel {
+public class IfChoiceModel extends DefaultComboBoxModel<Object> {
 
 
     /**

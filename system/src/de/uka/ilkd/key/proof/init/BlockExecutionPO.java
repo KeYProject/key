@@ -38,6 +38,12 @@ public class BlockExecutionPO extends AbstractOperationPO
     private final Goal initiatingGoal;
     private final ExecutionContext context;
 
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
+
     public BlockExecutionPO(InitConfig initConfig,
                             BlockContract contract,
                             ProofObligationVars symbExecVars,
@@ -73,8 +79,8 @@ public class BlockExecutionPO extends AbstractOperationPO
         // symbolic execution
         final Term symExec =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
-        services.getIFSymbols().add(pre);
-        services.getIFSymbols().add(symExec);
+        addIFSymbol(pre);
+        addLabeledIFSymbol(symExec);
 
         // final symbolic execution term
         final Term finalTerm = TB.applyElementary(services, symbExecVars.pre.heap,
@@ -180,6 +186,35 @@ public class BlockExecutionPO extends AbstractOperationPO
         properties.setProperty("Non-interference contract", contract.getUniqueName());
     }
 
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+    public void addIFSymbol(Term t) {
+        assert t != null;
+        infFlowSymbols.add(t);
+    }
+
+    public void addIFSymbol(Named n) {
+        assert n != null;
+        infFlowSymbols.add(n);
+    }
+
+    public void addLabeledIFSymbol(Term t) {
+        assert t != null;
+        infFlowSymbols.addLabeled(t);
+    }
+
+    public void addLabeledIFSymbol(Named n) {
+        assert n != null;
+        infFlowSymbols.addLabeled(n);
+    }
+
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
+    }
 
     // the following code is legacy code
     @Override

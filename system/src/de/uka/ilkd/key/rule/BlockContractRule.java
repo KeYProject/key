@@ -404,7 +404,7 @@ public class BlockContractRule implements BuiltInRule {
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
             Pair<Sequent, Term> seqPostPair =
-                    buildBodyPreservesSequent(infFlowFactory, contract, services);
+                    buildBodyPreservesSequent(infFlowFactory, contract, goal, services);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
 
@@ -417,13 +417,19 @@ public class BlockContractRule implements BuiltInRule {
                     splitPostTB.generateTaclets(post, services);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                goal.proof().addIFSymbol(t);
+                goal.proof().addIFSymbol(((RewriteTaclet)t).find());
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
             final ArrayList<Taclet> removePostTaclets =
                     removePostTB.generateTaclets(post, services);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                goal.proof().addIFSymbol(t);
+                goal.proof().addIFSymbol(((RewriteTaclet)t).find());
             }
+            goal.proof().addIFSymbol(contractApplTerm);
+            goal.proof().addIFSymbol(informationFlowContractApp);
 
             return new InfFlowValidityData(infFlowAssumptions,
                                            informationFlowContractApp,
@@ -580,12 +586,13 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
-                                                  Services services) {
+                                                  Goal goal, Services services) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
+        goal.proof().addIFSymbol(finalTerm);
         Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
 

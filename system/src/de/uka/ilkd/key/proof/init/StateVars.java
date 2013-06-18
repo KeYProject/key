@@ -398,15 +398,6 @@ public class StateVars {
     }
 
 
-    private static Term buildHeapAtPreVar(String postfix,
-                                          Services services) {
-        Term heapAtPreVar =
-                TB.var(TB.heapAtPreVar(services, "heapAtPre" + postfix, true));
-        register(heapAtPreVar.op(LocationVariable.class), services);
-        return heapAtPreVar;
-    }
-
-
     private static Term buildExceptionVar(Services services,
                                           String postfix,
                                           IProgramMethod pm) {

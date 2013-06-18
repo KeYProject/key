@@ -24,7 +24,11 @@ import recoder.list.generic.ASTList;
 
 public class MethodSignature extends JavaNonTerminalProgramElement {
 
-   private Identifier methodName;
+   /**
+     *
+     */
+    private static final long serialVersionUID = 6966957683489654730L;
+private Identifier methodName;
    private ASTList<TypeReference> paramTypes;   
    
    public MethodSignature(Identifier methodName,

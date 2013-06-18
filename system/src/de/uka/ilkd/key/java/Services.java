@@ -26,7 +26,6 @@ import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -37,7 +36,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services{
+public class Services {
 
     /**
      * the proof
@@ -86,12 +85,6 @@ public class Services{
     	= new SpecificationRepository(this);
 
     private NameRecorder nameRecorder;
-
-    /**
-     * For saving and loading Information-Flow proofs, we need to remember the
-     * according taclets, program variables, functions and such.
-     */
-    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -283,17 +276,5 @@ public class Services{
      */
     public Proof getProof() {
 	return proof;
-    }
-
-
-    public InfFlowProofSymbols getIFSymbols() {
-        assert infFlowSymbols != null;
-        return infFlowSymbols;
-    }
-
-
-    public void addIFSymbols(InfFlowProofSymbols symbols) {
-        assert symbols != null;
-        infFlowSymbols = infFlowSymbols.add(symbols);
     }
 }

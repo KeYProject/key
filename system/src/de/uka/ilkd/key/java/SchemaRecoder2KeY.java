@@ -38,14 +38,14 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     protected Namespace svns;
 
     /** caches access to methods for reflection */
-    private final static HashMap schemaCt2meth = new HashMap(400);
+    private final static HashMap<?, ?> schemaCt2meth = new HashMap<Object, Object>(400);
 
     /** caches constructor access for reflection */
-    private final static HashMap recClass2schemakeyClassCons = new HashMap(400);
+    private final static HashMap<?, ?> recClass2schemakeyClassCons = new HashMap<Object, Object>(400);
 
     // could this be the servConf of the super class?
-    private static SchemaCrossReferenceServiceConfiguration schemaServConf = new SchemaCrossReferenceServiceConfiguration(
-            new KeYRecoderExcHandler());
+    private static SchemaCrossReferenceServiceConfiguration schemaServConf =
+            new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
     public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -61,11 +61,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      * corresponding KeY class. Speeds up reflection. Attention must be
      * overwritten by subclasses!
      */
-    protected HashMap getKeYClassConstructorCache() {
+    protected HashMap<?, ?> getKeYClassConstructorCache() {
         return recClass2schemakeyClassCons;
     }
 
-    protected HashMap getMethodCache() {
+    protected HashMap<?, ?> getMethodCache() {
         return schemaCt2meth;
     }
 

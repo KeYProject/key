@@ -18,7 +18,6 @@ import java.util.*;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -35,7 +34,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 
 public final class SimpleBlockContract implements BlockContract {
 
@@ -928,17 +926,6 @@ public final class SimpleBlockContract implements BlockContract {
             for (int i = 1; i < contracts.length && !hasMod; i++) {
                 hasMod = contracts[i].hasModifiesClause();
             }
-
-            // The information flow part of the contracts can't be combined on
-            // the contract level in a reasonable way. Therefore we omit it
-            // in the combined contract by adding an empty list.
-            // FIXME: Does not really work like this
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>> emptyResp =
-                    ImmutableSLList.<Triple<ImmutableList<Term>,
-                                            ImmutableList<Term>,
-                                            ImmutableList<Term>>>nil();
 
             return new SimpleBlockContract(
                     head.getBlock(), head.getLabels(), head.getMethod(), head.getModality(),

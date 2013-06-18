@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * Standard implementation of the LoopInvariant interface.

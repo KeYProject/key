@@ -52,6 +52,11 @@ import java.util.Vector;
  */
 public class CurrentGoalView extends SequentView implements Autoscroll {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6738520203927938643L;
+
     public static final Color DEFAULT_HIGHLIGHT_COLOR = new Color(70, 100, 170, 76);
 
     public static final Color ADDITIONAL_HIGHLIGHT_COLOR = new Color(0, 0, 0, 38);

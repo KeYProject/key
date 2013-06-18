@@ -44,8 +44,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                 extractTermListForPredicate(poVars);
         final Function contApplPred =
                 generateContApplPredicate(nameString, termList, d.tb);
-        Term result = instantiateContApplPredicate(contApplPred, termList, d.tb);
-        return result;
+        return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
 

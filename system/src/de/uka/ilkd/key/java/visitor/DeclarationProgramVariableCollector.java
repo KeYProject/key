@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
  */
 public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
-    private Set result = new HashSet();
+    private Set<IProgramVariable> result = new HashSet<IProgramVariable>();
 
 
     /** creates a new declaration visitor */
@@ -52,7 +52,7 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 	walk(root());	
     }
 
-    public Set result() { 
+    public Set<IProgramVariable> result() {
 	return result;
     }    
 

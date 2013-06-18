@@ -67,10 +67,10 @@ public class FinishAuxiliaryComputationMacro
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifPO.getIFVars(), initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
-        initiatingGoal.proof().getServices().getIFSymbols().add(rwTaclet);
+        initiatingGoal.proof().addIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        addProofSymbols(proof, initiatingProof);
+        initiatingGoal.proof().unionLabeledIFSymbols(proof.getIFSymbols());
 
         saveAuxiliaryProof();
 
@@ -103,6 +103,7 @@ public class FinishAuxiliaryComputationMacro
                                                    services);
         final Term find =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        services.getProof().addIFSymbol(find);
 
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
