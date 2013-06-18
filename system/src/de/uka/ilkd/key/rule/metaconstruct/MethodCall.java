@@ -442,7 +442,7 @@ public class MethodCall extends ProgramTransformer {
         
         TypeReference baseTyRef = arrayTy.getBaseType();
         
-        ArrayInitializer arrayInit = new ArrayInitializer(exps);
+        ArrayInitializer arrayInit = new ArrayInitializer(exps, kjt);
         Expression[] emptyArgs = new Expression[0];
         NewArray newArray = new NewArray(emptyArgs, baseTyRef, kjt, arrayInit, 1);
         
