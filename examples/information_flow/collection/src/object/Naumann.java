@@ -21,7 +21,6 @@ public class Naumann {
         /*@ normal_behavior
             ensures     m_result != null && m_result.length == 10;
             ensures     \typeof(m_result) == \type(Node[]);
-            ensures     \fresh(m_result);
             separates       \nothing
               \new_objects  m_result; */
         { m_result = new Node[10]; }
