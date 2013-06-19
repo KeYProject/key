@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleStaticAttributes.compute(newInstance);" pathCondition="true" pathConditionChanged="false">
-      <statement name="staticInt=1;" pathCondition="true" pathConditionChanged="false">
-         <branchNode name="if (finalStaticint==42&amp;&amp;staticInt==1) {   instance=newInstance;return    instance.x+finalInstance.x+staticInt+finalStaticint; }else  {return    -1; }" pathCondition="true" pathConditionChanged="false">
-            <statement name="instance=newInstance;" pathCondition="true" pathConditionChanged="false">
-               <statement name="return instance.x+finalInstance.x+staticInt+finalStaticint;" pathCondition="true" pathConditionChanged="false">
+      <statement name="SimpleStaticAttributes.staticInt=1;" pathCondition="true" pathConditionChanged="false">
+         <branchNode name="if (SimpleStaticAttributes.finalStaticint==42&amp;&amp;SimpleStaticAttributes.staticInt==1) {   SimpleStaticAttributes.instance=newInstance;return    SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint; }else  {return    -1; }" pathCondition="true" pathConditionChanged="false">
+            <statement name="SimpleStaticAttributes.instance=newInstance;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;" pathCondition="true" pathConditionChanged="false">
                   <branchCondition name="!newInstance = null" pathCondition="!newInstance = null" pathConditionChanged="true" branchCondition="!newInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <branchCondition name="!SimpleStaticAttributes.finalInstance = null" pathCondition="  !newInstance = null
 &amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="true" branchCondition="!SimpleStaticAttributes.finalInstance = null" mergedBranchCondition="false" isBranchConditionComputed="true">

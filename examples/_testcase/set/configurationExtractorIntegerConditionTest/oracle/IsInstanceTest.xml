@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(a);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (x==1) {int z = a+1;if (z==2) {if (y==3) {return 42;     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+      <branchNode name="if (this.x==1) {int z = a+1;if (z==2) {if (IntegerConditionTest.y==3) {return 42;     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="self.x = 1" pathCondition="self.x = 1" pathConditionChanged="true" branchCondition="self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="int z = a+1;" pathCondition="self.x = 1" pathConditionChanged="false">
-               <branchNode name="if (z==2) {if (y==3) {return 42;   }else  {return      -300;   } }else  {return    -200; }" pathCondition="self.x = 1" pathConditionChanged="false">
+               <branchNode name="if (z==2) {if (IntegerConditionTest.y==3) {return 42;   }else  {return      -300;   } }else  {return    -200; }" pathCondition="self.x = 1" pathConditionChanged="false">
                   <branchCondition name="a = 1" pathCondition="self.x = 1 &amp; a = 1" pathConditionChanged="true" branchCondition="a = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchNode name="if (y==3) {return 42; }else  {return    -300; }" pathCondition="self.x = 1 &amp; a = 1" pathConditionChanged="false">
+                     <branchNode name="if (IntegerConditionTest.y==3) {return 42; }else  {return    -300; }" pathCondition="self.x = 1 &amp; a = 1" pathConditionChanged="false">
                         <branchCondition name="IntegerConditionTest.y = 3" pathCondition="self.x = 1 &amp; a = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="true" branchCondition="IntegerConditionTest.y = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return 42;" pathCondition="self.x = 1 &amp; a = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="false">
                               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="self.x = 1 &amp; a = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="false" isReturnValueComputed="false">

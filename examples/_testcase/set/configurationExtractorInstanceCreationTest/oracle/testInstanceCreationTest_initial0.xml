@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <state name="One Step Simplification resulting in return classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value;">
+   <state name="One Step Simplification resulting in return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">

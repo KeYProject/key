@@ -10,9 +10,9 @@ public class ObjectConditionTest {
 		if (x == 1) {
 			if (next.x == 2) {
 				if (next.next.x == 3) {
-					if (instance.x == 4) {
-						if (instance.next.x == 5) {
-							if (instance.next.next.x == 6) {
+					if (ObjectConditionTest.instance.x == 4) {
+						if (ObjectConditionTest.instance.next.x == 5) {
+							if (ObjectConditionTest.instance.next.next.x == 6) {
 								return 42;
 							}
 							else {
