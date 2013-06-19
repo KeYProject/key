@@ -48,7 +48,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="a=x;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.a=x;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
@@ -95,7 +95,7 @@
                <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="b=3;" pathCondition="true" pathConditionChanged="false">
+            <statement name="this.b=3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="a" arrayIndex="-1" isArrayIndex="false">
@@ -306,7 +306,7 @@
                               <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <statement name="wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
+                           <statement name="this.wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="a" arrayIndex="-1" isArrayIndex="false">
@@ -396,17 +396,17 @@
                                     <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <variable name="i_3" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="i_3 {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="i_4" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="i_4 {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
                                           <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
-                                 <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                    <variable name="i_3" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="i_3 {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;" isReturnValueComputed="false">
+                                    <variable name="i_4" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="i_4 {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
                                              <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
@@ -429,7 +429,7 @@
                                           </variable>
                                        </value>
                                     </variable>
-                                    <statement name="wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
+                                    <statement name="this.wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
                                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                           <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="a" arrayIndex="-1" isArrayIndex="false">
@@ -441,7 +441,7 @@
                                                 </value>
                                              </variable>
                                              <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                <value name="wrapper {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
                                                       <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                       </value>
@@ -466,7 +466,7 @@
                                           <value name="x {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
-                                       <statement name="return a+b+x+wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="return this.a+this.b+x+this.wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
                                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                              <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="a" arrayIndex="-1" isArrayIndex="false">
@@ -478,7 +478,7 @@
                                                    </value>
                                                 </variable>
                                                 <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                   <value name="wrapper {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
                                                          <value name="value {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                          </value>
@@ -515,7 +515,7 @@
                                                       </value>
                                                    </variable>
                                                    <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                      <value name="wrapper {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
                                                             <value name="value {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                             </value>

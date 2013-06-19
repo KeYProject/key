@@ -114,7 +114,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
              "x == 1 && asdf == 2 && this.field == 3",
              new Position(27, 19),
              new Position(31, 25),
-             "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+             "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
    }
    
    /**
@@ -128,7 +128,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
              null,
              new Position(27, 19),
              new Position(31, 25),
-             "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+             "{method-frame(result->result, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
    }
 
    /**
@@ -142,7 +142,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
              "x == 1 && asdf == 2 && this.field == 3",
              new Position(27, 19),
              new Position(30, 44),
-             "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
+             "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
    }
    
    /**
@@ -156,7 +156,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
              null,
              new Position(27, 19),
              new Position(30, 44),
-             "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+CONSTANT+field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
+             "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
    }
    
    /**

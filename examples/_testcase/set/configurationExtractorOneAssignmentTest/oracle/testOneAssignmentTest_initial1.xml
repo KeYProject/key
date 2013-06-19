@@ -4,7 +4,7 @@
       <term term="self.y"/>
       <term term="null"/>
    </equivalenceClass>
-   <state name="One Step Simplification resulting in return first.value+second.value+tempX.value+tempY.value;">
+   <state name="One Step Simplification resulting in return this.first.value+this.second.value+tempX.value+tempY.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
