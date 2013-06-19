@@ -14,8 +14,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 public class WellDefinednessOperator {
@@ -87,9 +87,19 @@ public class WellDefinednessOperator {
             assert subs == 3;
             return cond(t.sub(0), t.sub(1), t.sub(2));
         }
-        // TODO: Type Expression
+        // Type Expressions:
+        // \type - not necessary (only supported by KeY for a special case)
+        // \typeof - done by parser
+        // \elemtype - not supported by KeY
 
         // TODO: Reference Expressions ...
+        else if (op.equals(locSetLDT.getSingleton())) {
+            assert subs == 2;
+            return wd(t.sub(0));
+        } else if (op.equals(heapLDT.getSelect(t.sort(), services))) {
+            assert subs == 3;
+            return TB.and(TB.and(heap(t.sub(0)), wd(t.sub(1))), wd(t.sub(2)));
+        }
 
         // Logical Quantifiers
         else if (op.equals(Quantifier.ALL)) {
@@ -112,10 +122,12 @@ public class WellDefinednessOperator {
 
         else if (isInv(t)) {
             return inv(t);
-        } // TODO: How to test if t is a fresh variable?
+        }
+        // TODO: How to test if t is a fresh variable?
         else {
             throw new TermCreationException("Unknown term!" + '\n' +
                     "Operator: " + op.toString() + '\n' +
+                    "With " + subs + " subterms" + '\n' +
                     "Term: " + t.toString());
         }
     }
@@ -128,37 +140,20 @@ public class WellDefinednessOperator {
     }
 
     // true, false
-    private Term primaryExpr(Term a) {
-        int subs = a.arity();
-        Operator op = a.op();
+    private Term primaryExpr(Term e) {
+        int subs = e.arity();
+        Operator op = e.op();
         assert subs == 0;
 
         if (op.equals(Junctor.TRUE) || op.equals(Junctor.FALSE)) {
             return TB.tt();
-        } else if (op.equals(locSetLDT.getAllLocs()) || op.equals(locSetLDT.getAllFields())
-                || op.equals(locSetLDT.getAllObjects()) || op.equals(locSetLDT.getElementOf())
-                || op.equals(locSetLDT.getEmpty()) || op.equals(heapLDT.getNull())) {
-            System.out.println(op.toString());
-            return TB.tt(); // TODO: tbc ...
-        } else if (op instanceof LocationVariable) {
-            for (LocationVariable lv: heapLDT.getAllHeaps()) {
-                if (op.equals(lv)) {
-                    return TB.tt();
-                }
-            }
+        } else if (op.equals(heapLDT.getNull())) {
+            return TB.tt();
+        } else if (op instanceof ParsableVariable) {
+            return TB.tt();
+        } else if (op instanceof Function) {
+            return TB.tt();
         }
-//        locSetLDT.getArrayRange();
-//        locSetLDT.getCreatedInHeap();
-//        locSetLDT.getDisjoint();
-//        locSetLDT.getElementOf();
-//        locSetLDT.getEmpty();
-//        locSetLDT.getFreshLocs();
-//        locSetLDT.getIntersect();
-//        locSetLDT.getSetMinus();
-//        locSetLDT.getSingleton();
-//        locSetLDT.getSubset();
-//        locSetLDT.getUnion();
-        System.out.println("Is this primary? -> " + op.toString());
         return TB.ff();
     }
 
@@ -188,14 +183,16 @@ public class WellDefinednessOperator {
                      wd(TB.not(a), wd(a, c)));
     }
 
-    private Term inv(Term a) {
-        // The implicit invariant (self != null) is ignored, since it is implicit
-        return TB.tt();
+    private Term inv(Term t) {
+        int subs = t.arity();
+        assert isInv(t);
+        assert subs == 2;
+        return TB.and(wd(t.sub(0)),heap(t.sub(1)));
     }
 
     private boolean isInv(Term t) {
         Operator op = t.op();
-        return op.name().toString().endsWith("<inv>");
+        return op.toString().endsWith("<inv>");
     }
 
     private Term num(Term t) {
@@ -209,7 +206,8 @@ public class WellDefinednessOperator {
         if (isUnaryNumericalOp(t)
                 && !f.equals(intLDT.getNumberTerminator())) {
             assert subs == 1;
-            // Type cast
+            // Type cast (only numerical type casts supported,
+            //            since domains for other casts unclear)
             if (isCastOp(t)) {
                 final String min;
                 final String max;
@@ -264,6 +262,18 @@ public class WellDefinednessOperator {
     private Term bProd(Term t) {
         // FIXME
         return null;
+    }
+
+    private Term heap(Term t) {
+        int subs = t.arity();
+        Operator op = t.op();
+        assert subs == 0;
+
+        if (op.equals(heapLDT.getHeap())) {
+            return TB.tt();
+        } else {
+            return TB.ff();
+        }
     }
 
     private boolean isCastOp(Term t) {
