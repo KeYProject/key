@@ -240,7 +240,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
         
         updateUpdateHighlights();
-//	restorePosition();
+	restorePosition();
         addMouseMotionListener(listener);
 	addMouseListener(listener);        
 	repaint();
