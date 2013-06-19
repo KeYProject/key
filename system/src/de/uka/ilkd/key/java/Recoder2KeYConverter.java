@@ -1991,7 +1991,8 @@ public class Recoder2KeYConverter {
     }
 
     public ArrayInitializer convert(recoder.java.expression.ArrayInitializer arg) {
-        return new ArrayInitializer(collectChildrenAndComments(arg));
+        return new ArrayInitializer(collectChildrenAndComments(arg), 
+                getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
     }
 
     public Throw convert(recoder.java.statement.Throw  arg) {
