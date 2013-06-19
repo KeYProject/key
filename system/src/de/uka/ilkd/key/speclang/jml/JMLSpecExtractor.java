@@ -63,6 +63,9 @@ import java.util.*;
  */
 public final class JMLSpecExtractor implements SpecExtractor {
 
+    private static final String EXCEPTION = "java.lang.Exception";
+    private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
+    private static final String SIGNALS_ONLY_RUNTIMEEXCEPTION = "signals_only "+RUNTIME_EXCEPTION+";";
     private final Services services;
     private final JMLSpecFactory jsf;
     private ImmutableSet<PositionedString> warnings
@@ -128,16 +131,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     private String getDefaultSignalsOnly(IProgramMethod pm) {
         if(pm.getThrown() == null) {
-            return "signals_only \\nothing;";
+            return SIGNALS_ONLY_RUNTIMEEXCEPTION;
         }
 
         ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if(exceptions == null) {
-            return "signals_only \\nothing;";
+            return SIGNALS_ONLY_RUNTIMEEXCEPTION;
         }
 
-        String exceptionsString = "";
+        String exceptionsString = RUNTIME_EXCEPTION + ", ";
 
         for(int i = 0; i < exceptions.size(); i++) {
             //only subtypes of java.lang.Exception are in the default
@@ -145,7 +148,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if(services.getJavaInfo().isSubtype(
                     exceptions.get(i).getKeYJavaType(),
                     services.getJavaInfo()
-                            .getKeYJavaType("java.lang.Exception"))) {
+                            .getKeYJavaType(EXCEPTION))) {
                 exceptionsString
                     += exceptions.get(i).getKeYJavaType().getFullName() + ", ";
             }
