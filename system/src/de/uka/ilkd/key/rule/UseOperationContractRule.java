@@ -73,6 +73,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -790,9 +791,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
+        boolean isInfFlowProof = // For loaded proofs, InfFlowCheckInfo is not correct without this
+                (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
+                    && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))
+                || goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties()
+                                         .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                         .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 
-        if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))) {
+        if (isInfFlowProof) {
             // prepare information flow analysis
             assert anonUpdateDatas.size() == 1 : "information flow extension " +
                                                  "is at the moment not " +

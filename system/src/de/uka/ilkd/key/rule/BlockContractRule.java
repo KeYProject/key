@@ -48,6 +48,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -306,9 +307,13 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) &&
-            contract.hasModifiesClause() && contract.getInfFlowSpecs() != null) {
+        boolean isInfFlowProof = // For loaded proofs, InfFlowCheckInfo is not correct without this
+                (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
+                    && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))
+                || goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties()
+                                         .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                         .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+        if (isInfFlowProof && contract.hasModifiesClause() && contract.getInfFlowSpecs() != null) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +

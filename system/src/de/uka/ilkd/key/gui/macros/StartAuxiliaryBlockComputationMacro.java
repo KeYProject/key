@@ -114,7 +114,7 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
                                        mediator.getUI());
         try {
             Proof p = pi.startProver(initConfig, blockExecPO, 0);
-            p.unionLabeledIFSymbols(proof.getIFSymbols());
+            p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

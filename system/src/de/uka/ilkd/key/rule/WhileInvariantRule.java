@@ -657,9 +657,12 @@ public final class WhileInvariantRule implements BuiltInRule {
             invTerm2 = invTerm;
         }
 
-        boolean isInfFlowProof =
-                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
+        boolean isInfFlowProof = // For loaded proofs, InfFlowCheckInfo is not correct without this
+                (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
+                    && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))
+                || goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties()
+                                         .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                         .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
 

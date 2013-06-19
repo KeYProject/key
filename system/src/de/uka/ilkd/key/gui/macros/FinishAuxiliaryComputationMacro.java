@@ -70,7 +70,7 @@ public class FinishAuxiliaryComputationMacro
         initiatingGoal.proof().addIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingGoal.proof().unionLabeledIFSymbols(proof.getIFSymbols());
+        initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
 
         saveAuxiliaryProof();
 

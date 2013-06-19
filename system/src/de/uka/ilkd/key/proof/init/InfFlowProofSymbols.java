@@ -490,13 +490,19 @@ public class InfFlowProofSymbols {
         return taclets;
     }
 
+    private String printSpace() {
+        StringBuffer result = new StringBuffer();
+        result.append("\n\n");
+        return result.toString();
+    }
+
     private String printSorts() {
         if (getSorts().isEmpty()) {
             return "";
         }
 
         StringBuffer result = new StringBuffer();
-        result.append("\n\n\\sorts{\n");
+        result.append("\\sorts{\n");
         final LinkedList<Sort> sorts = ensureRightOrderOfSorts(getSorts());
         for (final Sort sort: sorts) {
             result.append(sort.name());
@@ -517,6 +523,7 @@ public class InfFlowProofSymbols {
             }
             result.append(";\n");
         }
+        result.append("}\n\n");
         return result.toString();
     }
 
@@ -526,7 +533,7 @@ public class InfFlowProofSymbols {
         }
 
         StringBuffer result = new StringBuffer();
-        result.append("}\n\n\\predicates{\n");
+        result.append("\\predicates{\n");
         for (final Function pred: getPredicates()) {
             result.append(pred.name());
             String s = "";
@@ -538,6 +545,7 @@ public class InfFlowProofSymbols {
             result.append(s);
             result.append(";\n");
         }
+        result.append("}\n\n");
         return result.toString();
     }
 
@@ -547,7 +555,7 @@ public class InfFlowProofSymbols {
         }
 
         StringBuffer result = new StringBuffer();
-        result.append("}\n\n\\functions{\n");
+        result.append("\\functions{\n");
         for (final Function f: getFunctions()) {
             result.append(f.sort().name() + " ");
             result.append(f.name());
@@ -560,6 +568,7 @@ public class InfFlowProofSymbols {
             result.append(s);
             result.append(";\n");
         }
+        result.append("}\n\n");
         return result.toString();
     }
 
@@ -569,7 +578,7 @@ public class InfFlowProofSymbols {
         }
 
         StringBuffer result = new StringBuffer();
-        result.append("}\n\n\\programVariables{\n");
+        result.append("\\programVariables{\n");
         for (final ProgramVariable pv: getProgramVariables()) {
             result.append(pv.sort().name() + " ");
             result.append(pv.name());
@@ -633,6 +642,7 @@ public class InfFlowProofSymbols {
     public String printProofSymbols() {
         StringBuffer result = new StringBuffer();
 
+        result.append(printSpace());
         result.append(printSorts());
         result.append(printPredicates());
         result.append(printFunctions());

@@ -93,10 +93,9 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
-        symbExecPO.unionLabeledIFSymbols(proof.getIFSymbols());
         try {
             Proof p = pi.startProver(initConfig, symbExecPO, 0);
-            p.unionLabeledIFSymbols(proof.getIFSymbols());
+            p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

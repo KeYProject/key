@@ -562,7 +562,7 @@ public final class ProblemInitializer {
 	    }
 	    Proof p = pa.getProofs()[proofNum];
 	    if (po instanceof InfFlowRelatedPO) {
-	        p.unionIFSymbols(((InfFlowRelatedPO)po).getIFSymbols());
+	        p.unionLabeledIFSymbols(((InfFlowRelatedPO)po).getIFSymbols());
 	    }
 	    return p;
 

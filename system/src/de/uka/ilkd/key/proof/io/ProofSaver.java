@@ -130,9 +130,6 @@ public class ProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
-              /*for (SequentFormula seqForm: proof.root().sequent().succedent().toList()) {
-                  proof.addIFSymbol(seqForm.formula());
-              }*/
           } else {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
@@ -140,9 +137,11 @@ public class ProofSaver {
           }
           ps.println(writeSettings(proof.getSettings()));
 
-          strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                                 StrategyProperties.INF_FLOW_CHECK_FALSE);
-          strategySettings.setActiveStrategyProperties(strategyProperties);
+          if (po instanceof InfFlowRelatedPO) {
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_FALSE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
+          }
 
           //declarations of symbols, sorts
           String header = proof.header();
