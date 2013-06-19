@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,6 +27,8 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -56,6 +59,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
+import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -641,7 +646,33 @@ public class Proof implements Named {
 	return root.isClosed() && openGoals.isEmpty();
     }
 
+    /**
+     * save proof in file. If autoSave is on, this will potentially overwrite already
+     * existing proof files with the same name. Otherwise the save dialog pops up.
+     */
+    public void saveProof() {
+        final MainWindow mainWindow = MainWindow.getInstance();
+        final KeYFileChooser jFC =
+                GuiUtilities.getFileChooser("Choose filename to save proof");
+        final String defaultName =
+                MiscTools.toValidFileName(this.name().toString()).toString();
+        boolean autoSave =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
 
+        final Pair<Boolean, Pair<File, Boolean>> res =
+                jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
+        final boolean saved = res.first;
+        final boolean newDir = res.second.second;
+        if (saved) {
+            mainWindow.saveProof(jFC.getSelectedFile());
+        } else if (newDir) {
+            final File dir = res.second.first;
+            if (!dir.delete()) {
+                dir.deleteOnExit();
+            }
+        }
+        jFC.resetPath();
+    }
 
 
 
@@ -911,6 +942,9 @@ public class Proof implements Named {
 	ProofTreeEvent e = new ProofTreeEvent(this);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofClosed(e);
+	}
+	if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()) {
+	    saveProof(); // save proof only if auto save is on
 	}
     }
 

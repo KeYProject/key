@@ -361,18 +361,15 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    protected static void saveAuxiliaryProof() {
+    protected static void saveAuxiliaryProof(Proof proof) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser jFC =
                 GuiUtilities.getFileChooser("Choose filename to save auxiliary proof");
-
-        final String defaultName
-        = MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()
-                                            .name()
-                                            .toString()).toString();
-
+        final String defaultName =
+                MiscTools.toValidFileName(proof.name().toString()).toString();
         boolean autoSave =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
+
         final Pair<Boolean, Pair<File, Boolean>> res =
                 jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
         final boolean saved = res.first;

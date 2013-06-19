@@ -515,6 +515,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term variantPO = dia ?
                 TB.and(variantNonNeg, TB.lt(variant, TB.var(variantPV), services))
                 : TB.tt();
+
         //prepare guard
         final ProgramElementName guardVarName = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
@@ -814,7 +815,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                 result = result.append(infFlowGoal);
 
                 // set infFlowAssumptions, add term and taclet to post goal
-                useGoal = addInfFlowAssumptionsAndTaclet(infFlowData, anonUpdateDatas.head().loopHeapAtPre, useGoal);
+                useGoal = addInfFlowAssumptionsAndTaclet(
+                        infFlowData, anonUpdateDatas.head().loopHeapAtPre, useGoal);
             }
         }
 
@@ -822,7 +824,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         // \replacewith (==> inv );
         initGoal.changeFormula(new SequentFormula(TB.apply(inst.u,
                                                            TB.and(variantNonNeg,
-                                                                  TB.and(invTerm, reachableState)), null)),
+                                                                  TB.and(invTerm, reachableState)),
+                                                           null)),
                                ruleApp.posInOccurrence());
 
         // "Use Case":
@@ -834,7 +837,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+	Term restPsi =
+	        TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
+	                TermLabelWorkerManagement.instantiateLabels(
+	                        services, ruleApp.posInOccurrence(), this, useGoal, null,
+	                        inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)),
+	                        null, useJavaBlock));
         final Term guardFalseRestPsi = TB.imp(TB.box(guardJb,guardFalseTerm), restPsi);
         useGoal.changeFormula(new SequentFormula(TB.applySequential(uAnon, guardFalseRestPsi)),
                               ruleApp.posInOccurrence());

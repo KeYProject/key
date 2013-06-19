@@ -335,7 +335,7 @@ public final class MainWindow extends JFrame  {
 
 
     /**
-     * sets the mediator to corresspond with other gui elements
+     * sets the mediator to correspond with other gui elements
      *
      * @param m
      *            the KeYMediator
