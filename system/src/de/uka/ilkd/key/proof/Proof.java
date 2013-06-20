@@ -674,8 +674,6 @@ public class Proof implements Named {
         jFC.resetPath();
     }
 
-
-
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.
      * It has been introduced to encapsulate the methods that are needed for pruning.

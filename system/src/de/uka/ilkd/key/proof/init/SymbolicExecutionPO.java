@@ -83,8 +83,9 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         // add class axioms
         final Proof initiatingProof = initiatingGoal.proof();
         final AbstractOperationPO initiatingPO =
-                (AbstractOperationPO) services.getSpecificationRepository()
-                                                    .getPOForProof(initiatingProof);
+                specRepos.getPOForProof(initiatingProof) != null ? // if proof is loaded
+                (AbstractOperationPO) specRepos.getPOForProof(initiatingProof)
+                : new InfFlowContractPO(initConfig, contract);
         taclets = initiatingPO.getInitialTaclets();
     }
 

@@ -6,9 +6,6 @@ package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -33,11 +30,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.GuiUtilities;
-import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -358,30 +351,5 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 }
             }
         }
-    }
-
-
-    protected static void saveAuxiliaryProof(Proof proof) {
-        final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser jFC =
-                GuiUtilities.getFileChooser("Choose filename to save auxiliary proof");
-        final String defaultName =
-                MiscTools.toValidFileName(proof.name().toString()).toString();
-        boolean autoSave =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
-
-        final Pair<Boolean, Pair<File, Boolean>> res =
-                jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
-        final boolean saved = res.first;
-        final boolean newDir = res.second.second;
-        if (saved) {
-            mainWindow.saveProof(jFC.getSelectedFile());
-        } else if (newDir) {
-            final File dir = res.second.first;
-            if (!dir.delete()) {
-                dir.deleteOnExit();
-            }
-        }
-        jFC.resetPath();
     }
 }

@@ -520,26 +520,18 @@ public final class WhileInvariantRule implements BuiltInRule {
         final ProgramElementName guardVarName = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
         services.getNamespaces().programVariables().addSafely(guardVar);
-        final VariableSpecification guardVarSpec 
-        = new VariableSpecification(guardVar, 
-                inst.loop.getGuardExpression(), 
-                booleanKJT);        
-        final LocalVariableDeclaration guardVarDecl 
-        = new LocalVariableDeclaration(new TypeRef(booleanKJT), 
-                guardVarSpec);
-        final Statement guardVarMethodFrame 
-        = inst.innermostExecutionContext == null 
-        ? guardVarDecl
-                : new MethodFrame(null, 
-                        inst.innermostExecutionContext,
-                        new StatementBlock(guardVarDecl));
-        final JavaBlock guardJb
-        = JavaBlock.createJavaBlock(new StatementBlock(
-                guardVarMethodFrame));
-        final Term guardTrueTerm = TB.equals(TB.var(guardVar),
-                TB.TRUE(services));
-        final Term guardFalseTerm = TB.equals(TB.var(guardVar),
-                TB.FALSE(services));
+        final VariableSpecification guardVarSpec =
+                new VariableSpecification(guardVar, inst.loop.getGuardExpression(), booleanKJT);
+        final LocalVariableDeclaration guardVarDecl =
+                new LocalVariableDeclaration(new TypeRef(booleanKJT), guardVarSpec);
+        final Statement guardVarMethodFrame =
+                inst.innermostExecutionContext == null ?
+                        guardVarDecl : new MethodFrame(null, inst.innermostExecutionContext,
+                                                       new StatementBlock(guardVarDecl));
+        final JavaBlock guardJb =
+                JavaBlock.createJavaBlock(new StatementBlock( guardVarMethodFrame));
+        final Term guardTrueTerm = TB.equals(TB.var(guardVar), TB.TRUE(services));
+        final Term guardFalseTerm = TB.equals(TB.var(guardVar), TB.FALSE(services));
 
         Term beforeLoopUpdate = null;
 

@@ -72,7 +72,7 @@ public class FinishAuxiliaryComputationMacro
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
 
-        saveAuxiliaryProof(proof);
+        proof.saveProof();
 
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {

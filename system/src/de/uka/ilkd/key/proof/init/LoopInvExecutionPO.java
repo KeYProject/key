@@ -93,12 +93,14 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
         // add class axioms
         Proof initiatingProof = initiatingGoal.proof();
-        AbstractOperationPO initatingPO =
-                (AbstractOperationPO) services.getSpecificationRepository()
-                                                    .getPOForProof(initiatingProof);
-        taclets = initatingPO.getInitialTaclets();
+        final AbstractOperationPO initiatingPO =
+                specRepos.getPOForProof(initiatingProof) != null ? // if proof is loaded
+                (AbstractOperationPO) specRepos.getPOForProof(initiatingProof)
+                : new SymbolicExecutionPO(initConfig, generatedIFContract,
+                                          symbExecVars, initiatingGoal);
+        taclets = initiatingPO.getInitialTaclets();
     }
-    
+
     @Override
     public boolean implies(ProofOblInput po) {
         if (!(po instanceof LoopInvExecutionPO)) {

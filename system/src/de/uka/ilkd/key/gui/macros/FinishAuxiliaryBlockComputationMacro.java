@@ -85,7 +85,7 @@ public class FinishAuxiliaryBlockComputationMacro
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingGoal.proof().unionLabeledIFSymbols(proof.getIFSymbols());
 
-        saveAuxiliaryProof(proof);
+        proof.saveProof();
 
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {

@@ -91,10 +91,12 @@ public class BlockExecutionPO extends AbstractOperationPO
 
         // add class axioms
         final Proof initiatingProof = initiatingGoal.proof();
-        final AbstractOperationPO initatingPO =
-                (AbstractOperationPO) services.getSpecificationRepository()
-                                                    .getPOForProof(initiatingProof);
-        taclets = initatingPO.getInitialTaclets();
+        final AbstractOperationPO initiatingPO =
+                specRepos.getPOForProof(initiatingProof) != null ? // if proof is loaded
+                (AbstractOperationPO) specRepos.getPOForProof(initiatingProof)
+                : new SymbolicExecutionPO(initConfig, generatedIFContract,
+                                          symbExecVars, initiatingGoal);
+        taclets = initiatingPO.getInitialTaclets();
     }
 
     @Override
