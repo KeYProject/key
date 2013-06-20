@@ -1018,10 +1018,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnArrayInitializer(ArrayInitializer x) {
+    public void performActionOnArrayInitializer(final ArrayInitializer x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new ArrayInitializer(changeList);
+                return new ArrayInitializer(changeList, x.getKeYJavaType(services, null));
             }
         };
         def.doAction(x);

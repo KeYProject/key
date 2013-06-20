@@ -171,7 +171,7 @@ public final class MainWindow extends JFrame  {
     public MainFrame goalView;
 
     /** the current proof tree*/
-    public ProofTreeView proofTreeView;
+    private ProofTreeView proofTreeView;
 
     /** the list of current open goals*/
     private JScrollPane openGoalsView;
