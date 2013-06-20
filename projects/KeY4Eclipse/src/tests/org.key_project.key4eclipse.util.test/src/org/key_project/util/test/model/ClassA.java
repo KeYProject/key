@@ -27,6 +27,12 @@ public class ClassA {
    
    private boolean booleanField = true;
    
+   public static int staticField = -42;
+
+   public static boolean staticBooleanField = false;
+   
+   public static String staticStringField = null;
+
    private int getPrivate() {
       return 42;
    }

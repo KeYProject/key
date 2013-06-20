@@ -7,8 +7,8 @@
                <statement name="result_1=2;" pathCondition="input = 0" pathConditionChanged="false">
                   <statement name="result_1=result_1*2;" pathCondition="input = 0" pathConditionChanged="false">
                      <statement name="return result_1;" pathCondition="input = 0" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="input = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.tryCatchFinally(input);&gt;" isReturnValueComputed="true">
-                           <termination name="&lt;end&gt;" pathCondition="input = 0" pathConditionChanged="false" exceptionalTermination="false">
+                        <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="input = 0" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="input = 0" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -18,8 +18,8 @@
             <branchCondition name="!input = 0" pathCondition="!input = 0" pathConditionChanged="true" branchCondition="!input = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=result_1*2;" pathCondition="!input = 0" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!input = 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="!input = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;quotient_0 * 2&apos; as result of self.tryCatchFinally(input);&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="!input = 0" pathConditionChanged="false" exceptionalTermination="false">
+                     <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="!input = 0" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="!input = 0" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>

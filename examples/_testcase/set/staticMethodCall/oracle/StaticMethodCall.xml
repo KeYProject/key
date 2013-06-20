@@ -3,23 +3,23 @@
    <methodCall name="StaticMethodCall.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="doSomething();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="StaticMethodCall.doSomething();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of StaticMethodCall.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of StaticMethodCall.doSomething();&gt;" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of StaticMethodCall.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                <statement name="int x = sub()+sub();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="StaticMethodCall.sub();" pathCondition="true" pathConditionChanged="false">
                      <statement name="return subSub()+2;" pathCondition="true" pathConditionChanged="false">
                         <methodCall name="StaticMethodCall.subSub();" pathCondition="true" pathConditionChanged="false">
                            <statement name="return 2;" pathCondition="true" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of StaticMethodCall.subSub();&gt;" isReturnValueComputed="true">
-                                 <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of StaticMethodCall.sub();&gt;" isReturnValueComputed="true">
+                              <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                     <methodCall name="StaticMethodCall.sub();" pathCondition="true" pathConditionChanged="false">
                                        <statement name="return subSub()+2;" pathCondition="true" pathConditionChanged="false">
                                           <methodCall name="StaticMethodCall.subSub();" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return 2;" pathCondition="true" pathConditionChanged="false">
-                                                <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of StaticMethodCall.subSub();&gt;" isReturnValueComputed="true">
-                                                   <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of StaticMethodCall.sub();&gt;" isReturnValueComputed="true">
+                                                <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                   <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                       <statement name="return x;" pathCondition="true" pathConditionChanged="false">
-                                                         <methodReturn name="&lt;return of StaticMethodCall.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;8&apos; as result of StaticMethodCall.main();&gt;" isReturnValueComputed="true">
-                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                                         <methodReturn name="&lt;return of StaticMethodCall.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>

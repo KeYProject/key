@@ -78,6 +78,13 @@ public class DbCDiagramEditor extends DiagramDocumentEditor implements
    public DbCDiagramEditor() {
       super(true);
    }
+   
+   /**
+    * @generated NOT
+    */
+   public DbCDiagramEditor(boolean hasFlyoutPalette) {
+      super(hasFlyoutPalette);
+   }
 
    /**
     * @generated

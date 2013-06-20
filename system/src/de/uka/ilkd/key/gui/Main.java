@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.gui;
@@ -34,6 +34,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.UnicodeHelper;
 
 /**
  * The main entry point for KeY
@@ -57,7 +58,7 @@ public class Main {
     public static final String JUSTIFY_RULES ="--justify-rules";
     private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String TIMEOUT ="--timeout";
-    private static final String EXAMPLES = "--examples"; 
+    private static final String EXAMPLES = "--examples";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
     public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
@@ -91,7 +92,8 @@ public class Main {
             KeYResourceManager.getManager().getVersion() +
             " (internal: "+INTERNAL_VERSION+")";
 
-    public static final String COPYRIGHT="(C) Copyright 2001-2013 "
+    public static final String COPYRIGHT=UnicodeHelper.COPYRIGHT
+            +" Copyright 2001"+UnicodeHelper.ENDASH+"2013 "
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
 
@@ -103,7 +105,7 @@ public class Main {
 
     /**
      * Determines which {@link UserInterface} is to be used.
-     * 
+     *
      * By specifying <code>AUTO</code> as command line argument this will be set
      * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
      */
@@ -112,7 +114,7 @@ public class Main {
     /**
      * Determines whether to actually prove or only load a problem when
      * {@link Main#uiMode} is {@link UiMode#AUTO}.
-     * 
+     *
      * This can be controlled from the command line by specifying the argument
      * <code>AUTO_LOADONLY</code> instead of <code>AUTO</code>.
      */
@@ -127,15 +129,15 @@ public class Main {
      * flag whether recent loaded file should be loaded on startup
      */
     private static boolean loadRecentFile=false;
-    
+
     /** Lists all features currently marked as experimental.
      * Unless invoked with command line option --experimental ,
      * those will be deactivated.
      */
-    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = 
+    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
-    
+
     /**
      * <p>
      * This flag indicates if the example chooser should be shown
@@ -184,19 +186,9 @@ public class Main {
         }
     }
 
-
-    /**
-     * Returns the used title. This information is required in other
-     * projects which instantiates the {@link MainWindow} manually.
-     * @return The title of {@link MainWindow} to use.
-     */
-    public static String getMainWindowTitle() {
-        return "KeY " + KeYResourceManager.getManager().getVersion();
-    }
-
     /**
      * Register commandline options with command line object
-     * @return commandline object 
+     * @return commandline object
      */
     private static CommandLine createCommandLine(){
         CommandLine cl = new CommandLine();
@@ -249,7 +241,7 @@ public class Main {
 
         if(cl.isSet(HELP)){
             // 0 as exit value means: no error
-            printUsageAndExit(true, null, 0);	
+            printUsageAndExit(true, null, 0);
         }
 
         if(cl.isSet(NO_JMLSPECS)){
@@ -322,7 +314,7 @@ public class Main {
         }
 
     }
-    
+
     /** Deactivate experimental features. */
     private static void deactivateExperimentalFeatures () {
         for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES)
@@ -332,10 +324,10 @@ public class Main {
 
     /**
      * Initializes the {@link UserInterface} to be used by KeY.
-     * 
+     *
      * {@link ConsoleUserInterface} will be used if {@link Main#uiMode} is
      * {@link UiMode#AUTO} and {@link WindowUserInterface} otherwise.
-     * 
+     *
      * @return a <code>UserInterface</code> based on the value of
      *         <code>uiMode</code>
      */
@@ -347,6 +339,8 @@ public class Main {
 
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);
         } else {
+            updateSplashScreen();
+
             GuiUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     MainWindow key = MainWindow.getInstance();
@@ -355,7 +349,7 @@ public class Main {
             });
 
             if (loadRecentFile) {
-                RecentFileEntry mostRecent = 
+                RecentFileEntry mostRecent =
                         MainWindow.getInstance().getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
@@ -370,6 +364,15 @@ public class Main {
 
         return ui;
 
+    }
+
+    private static void updateSplashScreen() {
+        try {
+            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
+            if (sp == null) return;
+            // insert customization code here
+            // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
+        } catch (Exception e) {}
     }
 
     private static void evaluateLemmataOptions(CommandLine options){

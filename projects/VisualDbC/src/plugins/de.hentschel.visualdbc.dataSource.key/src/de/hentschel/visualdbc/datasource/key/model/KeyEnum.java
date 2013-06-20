@@ -66,6 +66,7 @@ public class KeyEnum extends MemoryEnum {
             if (proofResult != null) {
                KeyProof dsProof = new KeyProof(proofResult, connection);
                addProof(obligation, dsProof);
+               connection.fireInteractiveProofStarted(dsProof);
                return dsProof;
             }
             else {

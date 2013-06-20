@@ -135,9 +135,9 @@ public final class DependencyContractPO extends AbstractPO
 	}
 	
 	//prepare variables
-	final ProgramVariable selfVar 
-		= !contract.getTarget().isStatic() 
-                  ? TB.selfVar(services, contract.getKJT(), true) : null;
+	final ProgramVariable selfVar
+                = !contract.getTarget().isStatic() 
+                ? TB.selfVar(services, contract.getKJT(), true) : null;
 	final ImmutableList<ProgramVariable> paramVars
 		= TB.paramVars(services, target, true);
 
@@ -193,7 +193,7 @@ public final class DependencyContractPO extends AbstractPO
 	//build po
 	final Term po = TB.imp(pre,
                                TB.equals(targetTerm, 
-                        	         TB.apply(update, targetTerm)));
+                        	         TB.apply(update, targetTerm, null)));
 	
         //save in field
         assignPOTerms(po);

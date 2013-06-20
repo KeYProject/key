@@ -77,6 +77,7 @@ public class KeyAxiomContract extends MemoryAxiomContract {
             if (proofResult != null) {
                KeyProof dsProof = new KeyProof(proofResult, connection);
                addProof(obligation, dsProof);
+               connection.fireInteractiveProofStarted(dsProof);
                return dsProof;
             }
             else {

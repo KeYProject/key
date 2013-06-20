@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 
 package de.uka.ilkd.key.proof;
 
@@ -43,7 +42,7 @@ public class Node implements Iterable<Node> {
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private List<Node>           children            = new LinkedList<Node>();
+    private List<Node>           children            = new ArrayList<Node>(5);
 
     private Node                 parent              = null;
 
@@ -549,7 +548,7 @@ public class Node implements Iterable<Node> {
     public int countNodes() {
         NodeIterator it = subtreeIterator();
         int res = 0;
-        while (it.hasNext()) res++;
+        for (; it.hasNext(); it.next()) res++;
         return res;
     }
 

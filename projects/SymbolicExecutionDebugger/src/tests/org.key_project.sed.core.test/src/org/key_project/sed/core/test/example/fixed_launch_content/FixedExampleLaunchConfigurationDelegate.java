@@ -34,6 +34,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
@@ -219,8 +220,8 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnPositiveVar2.setValue(returnPositiveVar2value);
        returnPositive.addVariable(returnPositiveVar2);
        
-       SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
-       terminationPositive.setName("<end>");
+       SEDMemoryLoopBodyTermination terminationPositive = new SEDMemoryLoopBodyTermination(target, returnPositive, thread);
+       terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
     }

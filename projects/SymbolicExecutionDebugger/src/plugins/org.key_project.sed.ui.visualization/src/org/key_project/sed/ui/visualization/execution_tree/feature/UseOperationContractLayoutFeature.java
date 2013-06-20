@@ -16,11 +16,10 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDUseLoopInvariant;
 import org.key_project.sed.core.model.ISEDUseOperationContract;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDUseLoopInvariant}s.
+ * Implementation of {@link ILayoutFeature} for {@link ISEDUseOperationContract}s.
  * @author Martin Hentschel
  */
 public class UseOperationContractLayoutFeature extends AbstractDebugNodeLayoutFeature {

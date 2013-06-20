@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.InteractiveProver;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
@@ -45,53 +45,6 @@ public abstract class StrategyProofMacro implements ProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
 
-    protected ProverTaskListener createTaskListener(InteractiveProver interactiveProver,
-            Strategy oldStrategy) {
-        return new StopListener(interactiveProver, oldStrategy);
-    }
-
-    /**
-     * When a prove run is finished, we need to reset the goals' rule
-     * application managers using this listener.
-     */
-    private static class StopListener implements ProverTaskListener {
-
-        private final InteractiveProver interactiveProver;
-        private final Strategy oldStrategy;
-
-        public StopListener(InteractiveProver interactiveProver, Strategy oldStrategy) {
-            this.interactiveProver = interactiveProver;
-            this.oldStrategy = oldStrategy;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-        }
-
-        @Override
-        public void taskProgress(int position) {
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-            Proof proof = interactiveProver.getProof();
-            for (final Goal goal : proof.openGoals()) {
-                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
-                // touch the manager only if necessary
-                if(manager.getDelegate() != null) {
-                    while(manager.getDelegate() != null) {
-                        manager = manager.getDelegate();
-                    }
-                    manager.clearCache();
-                    goal.setRuleAppManager(manager);
-                }
-            }
-
-            proof.setActiveStrategy(oldStrategy);
-            interactiveProver.removeProverTaskListener(this);
-        }
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -109,11 +62,20 @@ public abstract class StrategyProofMacro implements ProofMacro {
      * Set a new rule app manager similar to the focussed mode.
      * Set a new strategy which only allows for the named admitted rules.
      * Then run automation mode and in the end reset the managers.
-     * and the strategy
+     * and the strategy.
+     * 
+     * If the automation is interrupted, report the interruption as an exception.
      */
-    @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        InteractiveProver interactiveProver = mediator.getInteractiveProver();
+    @Override 
+    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
+            ProverTaskListener listener) throws InterruptedException {
+
+        final ApplyStrategy applyStrategy = 
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+
+        if(listener != null) {
+            applyStrategy.addProverTaskObserver(listener);
+        }
 
         // add a focus manager if there is a focus
         if(posInOcc != null) {
@@ -126,19 +88,38 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
         // set a new strategy.
-        Proof proof = interactiveProver.getProof();
+        Proof proof = mediator.getProof();
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
-
-        // this resets the proof strategy and the managers after the automation
-        // has run
-        interactiveProver.addProverTaskListener(
-                createTaskListener(interactiveProver, oldStrategy));
 
         // find the relevant goals
         // and start
         ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(mediator.getSelectedNode());
-        interactiveProver.startAutoMode(goals);
+        
+        try {
+            applyStrategy.start(proof, goals);
+        } finally {
+            // this resets the proof strategy and the managers after the automation
+            // has run
+            for (final Goal goal : proof.openGoals()) {
+                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
+                // touch the manager only if necessary
+                if(manager.getDelegate() != null) {
+                    while(manager.getDelegate() != null) {
+                        manager = manager.getDelegate();
+                    }
+                    manager.clearCache();
+                    goal.setRuleAppManager(manager);
+                }
+            }
+
+            proof.setActiveStrategy(oldStrategy);
+        }
+        
+        if(applyStrategy.hasBeenInterrupted()) {
+            throw new InterruptedException();
+        }
+
     }
 
 }

@@ -49,10 +49,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   SVInstantiations svInst,
                   Services services) {
         final Term target = term.sub(0);
-        // final boolean transaction = true;
-        //      (target.op() != null &&
-        //          (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
-        // Thread.currentThread().dumpStack();
 
         //the target term should have a Java block
         final ProgramElement pe = target.javaBlock().program();
@@ -134,10 +130,15 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
+                     &&
+                     inv.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(TB.ff())) {
+                    continue;
+                  }
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
-                  newMods.put(heap, m);
-                  newInvariants.put(heap, i);
+                  if(m != null) { newMods.put(heap, m); }
+                  if(i != null) { newInvariants.put(heap, i); }
                 }
                 final LoopInvariant newInv
                        = new LoopInvariantImpl(loop,
@@ -178,6 +179,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
         }*/
 
-        return TB.apply(atPreUpdate, target);
+        return TB.apply(atPreUpdate, target, null);
     }
 }

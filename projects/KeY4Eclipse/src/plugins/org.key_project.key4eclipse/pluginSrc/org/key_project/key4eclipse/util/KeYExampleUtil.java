@@ -31,6 +31,7 @@ import org.key_project.key4eclipse.Activator;
 import org.osgi.framework.Bundle;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
+import de.uka.ilkd.key.gui.Main;
 
 /**
  * Provides static methods to work with the KeY examples in the Eclipse
@@ -47,6 +48,15 @@ public class KeYExampleUtil {
      * Forbid instances.
      */
     private KeYExampleUtil() {
+    }
+    
+    /**
+     * Returns a *.key with a fast and simple proof.
+     * @return A *.key with a fast and simple proof.
+     */
+    public static File getExampleProof() {
+       String exampleDir = Main.getExamplesDir();
+       return new File(exampleDir, "02-Subset" + File.separator + "project.key");
     }
 
     /**

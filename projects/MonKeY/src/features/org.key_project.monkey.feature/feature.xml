@@ -8,6 +8,14 @@
 
    <description>
       Batch verification of all proof obligations.
+
+For an optimal user experience it is recommended to use at least the following JVM memory settings:
+-Xms128m
+-Xmx1024m 
+-XX:MaxPermSize=256m
+
+The current settings can be inspected in the configuration tab of the installation details available in the "About Eclipse" dialog. They can be changed in the "eclipse.ini" file or by starting Eclipse with the following additional parameters:
+-vmargs -Xms128m -Xmx1024m -XX:MaxPermSize=256m
    </description>
 
    <copyright>

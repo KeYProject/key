@@ -667,11 +667,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         for(LocationVariable heap : heapContext) {
            final Triple<Term,Term,Term> tAnon;
            if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap() && !contract.hasModifiesClause()) {
+             // Strictly pure methods should not be concerned with savedHeap
              break;
            }
            if(!contract.hasModifiesClause()) {
              tAnon = new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.var(heap));
-             
            }else{
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
            }
@@ -717,18 +717,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term postAssumption 
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   	     TB.and(anonAssumption,
-        		   		    TB.apply(anonUpdate,
-        		   	                     TB.and(new Term[]{excNull, 
-                                	     	                       freePost, 
-                                	     	                       post}))));
+        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull, 
+                          freePost, 
+                          post}), null)));
         final Term excPostAssumption 
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   TB.and(anonAssumption,
-                                  TB.apply(anonUpdate,
-                                           TB.and(new Term[]{TB.not(excNull),
-                                	     	             excCreated, 
-                                	     	             freeExcPost, 
-                                	     	             post}))));
+                                  TB.apply(anonUpdate, TB.and(new Term[]{TB.not(excNull),
+                                  excCreated, 
+                                  freeExcPost, 
+                                  post}), null)));
        
         //create "Pre" branch
 	int i = 0;
@@ -753,6 +751,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                                	   	     reachableState, 
         	                                	   	     mbyOk}))),
                               ruleApp.posInOccurrence());
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
+        }
        
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -765,16 +766,17 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}        
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
-        final Term normalPost 
-            	= TB.apply(anonUpdate,
-                           TB.prog(inst.mod,
-                                   JavaBlock.createJavaBlock(postSB),
-                                   inst.progPost.sub(0)));
+        JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        final Term normalPost = TB.apply(anonUpdate, 
+                                         TB.prog(inst.mod, 
+                                                 postJavaBlock, 
+                                                 inst.progPost.sub(0),
+                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
+                                         null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
-        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
-        						       normalPost)),
+        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, normalPost, null)),
         	               ruleApp.posInOccurrence());
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
@@ -783,16 +785,17 @@ public final class UseOperationContractRule implements BuiltInRule {
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        final Term excPost
-            = TB.apply(anonUpdate,
-                       TB.prog(inst.mod,
-                               JavaBlock.createJavaBlock(excPostSB), 
-                               inst.progPost.sub(0)));
+        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+        final Term excPost = TB.apply(anonUpdate, 
+                                      TB.prog(inst.mod, 
+                                              excJavaBlock, 
+                                              inst.progPost.sub(0),
+                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
+                                      null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        
-        excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
-        						          excPost)),
+        excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, excPost, null)),
         	                  ruleApp.posInOccurrence());        
         excPostGoal.addFormula(new SequentFormula(excPostAssumption), 
         	               true, 
@@ -803,9 +806,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(nullGoal != null) {
             final Term actualSelfNotNull 
             	= TB.not(TB.equals(inst.actualSelf, TB.NULL(services)));
-            nullGoal.changeFormula(new SequentFormula(TB.apply(
-        	    				inst.u, 
-        					actualSelfNotNull)),
+            nullGoal.changeFormula(new SequentFormula(TB.apply(inst.u, actualSelfNotNull, null)),
         	                   ruleApp.posInOccurrence());                    
         }
         

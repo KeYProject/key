@@ -4,8 +4,8 @@
       <statement name="int first = _value;" pathCondition="true" pathConditionChanged="false">
          <statement name="int second = _value;" pathCondition="true" pathConditionChanged="false">
             <statement name="return first+second;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.doubleValue(_value);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;value * 2&apos; as result of self.doubleValue(_value);&gt;" isReturnValueComputed="true">
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+               <methodReturn name="&lt;return of self.doubleValue(_value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                   </termination>
                </methodReturn>
             </statement>
