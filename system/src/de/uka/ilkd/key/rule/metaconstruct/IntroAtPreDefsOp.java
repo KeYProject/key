@@ -49,10 +49,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   SVInstantiations svInst,
                   Services services) {
         final Term target = term.sub(0);
-        // final boolean transaction = true;
-        //      (target.op() != null &&
-        //          (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
-        // Thread.currentThread().dumpStack();
 
         //the target term should have a Java block
         final ProgramElement pe = target.javaBlock().program();
