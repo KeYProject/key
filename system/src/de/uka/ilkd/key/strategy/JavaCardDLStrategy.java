@@ -43,6 +43,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -467,7 +468,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         
         if ( programsToRight )
             bindRuleSet ( d, "boxDiamondConv",
-                          TopLevelFindFeature.ANTEC_WITH_UPDATE );
+                          SumFeature.createSum (
+                                new FindPrefixRestrictionFeature(
+                                      FindPrefixRestrictionFeature.PositionModifier.ALLOW_UPDATE_AS_PARENT,
+                                      FindPrefixRestrictionFeature.PrefixChecker.ANTEC_POLARITY),
+                                longConst(-1000)));
         else
             bindRuleSet ( d, "boxDiamondConv", inftyConst () );
         
