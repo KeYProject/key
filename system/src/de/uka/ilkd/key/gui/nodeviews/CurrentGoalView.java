@@ -31,10 +31,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.*;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -78,8 +74,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     
     // an object that detects opening and closing of an Taclet instantiation dialog
     private GUIListener guiListener;
-
-    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
     
     // enables this component to be a Drag Source
     DragSource dragSource = null;
@@ -191,36 +185,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
     
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        Config.DEFAULT.addConfigChangeListener(configChangeListener);
-        updateUI();
-    }
-    
-    @Override
-    public void removeNotify(){
-        super.removeNotify();
-        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-    }
-
-
-    @Override
-    protected void finalize(){
-        try{
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-        }finally{
-            try {
-                super.finalize();
-            } catch (Throwable e) {
-                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-            }
-        }
-    }
-    
-    
     protected DragSource getDragSource() {
 	return dragSource;
     }
@@ -284,6 +248,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     
     // last highlighted caret position
     private int lastHighlightedCaretPos;
+    
+    @Override
+    public void highlight(Point p) {
+        super.highlight(p);
+        lastHighlightedCaretPos = correctedViewToModel(p);
+    }
     
     /** makes the last caret position visible (if possible) */
     public void restorePosition() {
