@@ -24,17 +24,25 @@ import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 /**
  * Feature for investigating whether some restrictions to the prefix of the
  * find formula apply.
+ *
+ * @author christoph
  */
 public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     public enum PrefixChecker {
 
+        // checks, whether the position in occurrence is in the antecedent
         ANTEC(new AntecChecker()),
+        // checks, whether the position in occurrence is in the succedent
         SUCC(new SuccChecker()),
+        // checks, whether the position in occurrence has antecedent polarity
         ANTEC_POLARITY(AntecSuccPrefixChecker.ANTE_POLARITY_CHECKER),
+        // checks, whether the position in occurrence has succedent polarity
         SUCC_POLARITY(AntecSuccPrefixChecker.SUCC_POLARITY_CHECKER),
+        // checks, whether the position in occurrence is top level
         TOP_LEVEL(new TopLevelChecker());
-        
+
+        /** wrapped checker */
         private final Checker checker;
 
 
@@ -59,8 +67,13 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     };
 
     public enum PositionModifier {
+        // If the parent operator of the find term is an update application,
+        // then change the position (on which the checkers are applied)
+        // to the parent operator. Repeat until parent is no update
+        // application.
         ALLOW_UPDATE_AS_PARENT(new RemoveParentUpdateModifier());
 
+        /** wrapped modifier */
         private final Modifier modifier;
 
 
@@ -77,15 +90,43 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     private final PositionModifier[] positionModifiers;
 
 
+
+    /**
+     * Construct a feature that checks the prefix with the passed
+     * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
+     * otherwise computes top cost.
+     * 
+     * @param prefixCheckers the PrefixCheckers to be used.
+     */
     public FindPrefixRestrictionFeature(PrefixChecker... prefixCheckers) {
         this(new PositionModifier[0], prefixCheckers);
     }
 
+    /**
+     * Construct a feature that checks the prefix with the passed
+     * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
+     * otherwise computes top cost. Before the prefix check all
+     * PositionModifiers are applied. This allows for instance to ignore
+     * prefixing updates.
+     *
+     * @param positionModifier the PositionModifier to be applied.
+     * @param prefixCheckers the PrefixCheckers to be used.
+     */
     public FindPrefixRestrictionFeature(PositionModifier positionModifier,
                                         PrefixChecker... prefixCheckers) {
         this(new PositionModifier[]{positionModifier}, prefixCheckers);
     }
 
+    /**
+     * Construct a feature that checks the prefix with the passed
+     * PrefixCheckers. Computes zero costs, if all PrefixCheckers return true,
+     * otherwise computes top cost. Before the prefix check all
+     * PositionModifiers are applied. This allows for instance to ignore
+     * prefixing updates.
+     *
+     * @param positionModifiers the PositionModifiers to be applied.
+     * @param prefixCheckers the PrefixCheckers to be used.
+     */
     public FindPrefixRestrictionFeature(PositionModifier[] positionModifiers,
                                         PrefixChecker... prefixCheckers) {
         this.positionModifiers = positionModifiers;
@@ -97,30 +138,31 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
                              PosInOccurrence pos,
                              Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
+
+        // apply the position modifiers
         PosInOccurrence newPos = pos;
         for (PositionModifier positionModifier : positionModifiers) {
             newPos = positionModifier.modifyPosistion(pos);
         }
+
+        // apply the prefix checkers
         return checkPrefix(newPos);
     }
 
 
     /**
-     * For taclets with
-     * <code>getSameUpdatePrefix ()</code>, collect the updates above
-     * <code>p_pos</code> and add them to the update context of the
-     * instantiations object
-     * <code>p_mc</code>.
-     * <p/>
-     * @return the new instantiations with the additional updates, or
-     *         <code>null</code>, if program modalities appear above
-     *         <code>p_pos</code>
+     * Applies the PrefixCheckers.
+     *
+     * @param pos the PosInOccurrence to be checked.
+     * @return true, if all PrefixCheckers return true
      */
-    public boolean checkPrefix(PosInOccurrence pos) {
+    private boolean checkPrefix(PosInOccurrence pos) {
+        // init prefix checkers
         for (PrefixChecker prefixChecker : prefixCheckers) {
             prefixChecker.initPrefixCheck(pos);
         }
 
+        // iterate through the prefix and let the prefix checkers do their work
         if (pos.posInTerm() != null) {
             PIOPathIterator it = pos.iterator();
             Operator op;
@@ -136,6 +178,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             }
         }
 
+        // return the result
         boolean result = true;
         for (PrefixChecker prefixChecker : prefixCheckers) {
             result &= prefixChecker.getResult();
