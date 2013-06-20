@@ -315,7 +315,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        &amp; array.length &gt;= i_0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; (!array = null &amp; i_0 &gt;= 0)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i_0&apos; as result of WhileWithMethodCallAsCondition.size(array);&gt;" isReturnValueComputed="true">
+   &amp; (!array = null &amp; i_0 &gt;= 0)" pathConditionChanged="false" isReturnValueComputed="false">
                            <callStackEntry path="/0"/>
                            <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !(  i_0 &gt;= 1 &amp; array.length &lt;= -1 + i_0

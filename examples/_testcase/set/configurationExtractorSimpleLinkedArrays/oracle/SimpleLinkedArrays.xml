@@ -44,14 +44,7 @@
    &amp; !x.next[0] = null
    &amp; !(  x.next[0].next = null
        | x.next[0].next.length &lt;= 0)
-   &amp; !x.next[0].next[0] = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
-+ x.next.length
-+ \if (x.next[0].next[0] = x)
-      \then (3)
-      \else (\if (x.next[0] = x)  \then (2)  \else (1))
-+ \if (x.next[0].next[0] = x.next[0])
-      \then (3)
-      \else (2)&apos; as result of SimpleLinkedArrays.compute(x);&gt;" isReturnValueComputed="true">
+   &amp; !x.next[0].next[0] = null" pathConditionChanged="false" isReturnValueComputed="false">
                                     <termination name="&lt;end&gt;" pathCondition="   x.next[0].next.length &gt;= 0 &amp; x.next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)

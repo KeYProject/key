@@ -1263,7 +1263,7 @@ public class KeyConnection extends MemoryConnection {
          result.setVisibility(DSVisibility.DEFAULT);
       }
       // Add operation contracts and obligations
-      fillOperationContractsAndObligations(result, services, type, implicitConstructor);
+      fillOperationContractsAndObligations(result, services, type, explicitConstructor);
       // Update internal mappings
       operationsMapping.put(explicitConstructor, result);
       operationsMapping.put(implicitConstructor, result);

@@ -9,7 +9,7 @@
 //
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
+// 
 
 package de.uka.ilkd.key.rule;
 
@@ -88,7 +88,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return filterAppliedContracts(collectedContracts, block, goal);
     }
-    
+
     private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
                                                                       final StatementBlock block,
                                                                       final Goal goal)
@@ -120,7 +120,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return false;
     }
-    
+
     private BlockContractRule() {
     }
 
@@ -210,7 +210,7 @@ public class BlockContractRule implements BuiltInRule {
 
     private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final boolean isStrictlyPure, final Services services)
     {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
+        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         if (!isStrictlyPure) {
             for (LocationVariable variable : variables) {
                 final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());

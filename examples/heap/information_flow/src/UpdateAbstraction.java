@@ -8,9 +8,9 @@ class UpdateAbstraction {
     static int h;
     
     //@ static model \locset LOW;           	//just an abbreviation
-    //@ static represents LOW = \set_union(l, l2);
+    //@ static represents UpdateAbstraction.LOW = \set_union(l, l2);
     //@ static model \locset HIGH;           	//just an abbreviation
-    //@ static represents HIGH = \singleton(h);
+    //@ static represents UpdateAbstraction.HIGH = \singleton(h);
     
     //@ static ghost \locset pcDep;     //buffer for dependencies of program counter     
     
@@ -19,119 +19,119 @@ class UpdateAbstraction {
     //@ static ghost \locset hDep;  //one dep field for every normal field
     
     
-    /*@ requires pcDep == \empty;
-      @ requires lDep == \singleton(l);
-      @ requires l2Dep == \singleton(l2); 
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.pcDep == \empty;
+      @ requires UpdateAbstraction.lDep == \singleton(l);
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2); 
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_1_insecure() {
-	//@ set lDep = \set_union(pcDep, hDep); //assignment
+	//@ set UpdateAbstraction.lDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //assignment
 	l = h;
     }
     
     
-    /*@ requires pcDep == \empty;
-      @ requires lDep == \singleton(l); 
-      @ requires l2Dep == \singleton(l2);      
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.pcDep == \empty;
+      @ requires UpdateAbstraction.lDep == \singleton(l); 
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2);      
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_2_insecure() {
-	//@ set pcDep = \set_union(pcDep, hDep); //entering conditional
+	//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering conditional
 	if(h > 0) {
-	    //@ set lDep = pcDep; //assignment 
+	    //@ set UpdateAbstraction.lDep = UpdateAbstraction.pcDep; //assignment 
 	    l = 1;
 	} else {
-	    //@ set lDep = pcDep; //assignment
+	    //@ set UpdateAbstraction.lDep = UpdateAbstraction.pcDep; //assignment
 	    l = 2;
 	}
     }
     
     
-    /*@ requires pcDep == \empty;
-      @ requires lDep == \singleton(l); 
-      @ requires l2Dep == \singleton(l2);      
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.pcDep == \empty;
+      @ requires UpdateAbstraction.lDep == \singleton(l); 
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2);      
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_3_secure() {
-	//@ set pcDep = \set_union(pcDep, hDep); //entering conditional
+	//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering conditional
 	if(l > 0) {
-	    //@ set hDep = pcDep; //assignment 
+	    //@ set UpdateAbstraction.hDep = UpdateAbstraction.pcDep; //assignment 
 	    h = 1;
 	} else {
-	    //@ set hDep = pcDep; //assignment
+	    //@ set UpdateAbstraction.hDep = UpdateAbstraction.pcDep; //assignment
 	    h = 2;
 	}
     }   
     
     
-    /*@ requires pcDep == \empty;
-      @ requires lDep == \singleton(l); 
-      @ requires l2Dep == \singleton(l2);      
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.pcDep == \empty;
+      @ requires UpdateAbstraction.lDep == \singleton(l); 
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2);      
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_4_secure() {
-	//@ ghost \locset oldPcDep = pcDep;         //entering conditional
-	//@ set pcDep = \set_union(pcDep, hDep); //entering conditional
+	//@ ghost \locset oldPcDep = UpdateAbstraction.pcDep;         //entering conditional
+	//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering conditional
 	if(h > 0) {
-	    //@ set hDep = pcDep; //assignment 
+	    //@ set UpdateAbstraction.hDep = UpdateAbstraction.pcDep; //assignment 
 	    l = 1;
 	} else {
-	    //@ set hDep = pcDep; //assignment
+	    //@ set UpdateAbstraction.hDep = UpdateAbstraction.pcDep; //assignment
 	    l = 2;
 	}
-	//@ set pcDep = oldPcDep; //leaving conditional; setting back pcDep is allowed because conditional has no other exit points
+	//@ set UpdateAbstraction.pcDep = oldPcDep; //leaving conditional; setting back pcDep is allowed because conditional has no other exit points
 	
-	//@ set lDep = pcDep; //assignment
+	//@ set UpdateAbstraction.lDep = UpdateAbstraction.pcDep; //assignment
 	l = 3;
     }     
     
     
-    /*@ requires pcDep == \empty;
-      @ requires lDep == \singleton(l);
-      @ requires l2Dep == \singleton(l2);       
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.pcDep == \empty;
+      @ requires UpdateAbstraction.lDep == \singleton(l);
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2);       
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_5_secure() {
-	//@ set hDep = pcDep; //assignment
+	//@ set UpdateAbstraction.hDep = UpdateAbstraction.pcDep; //assignment
 	h = 0;
 	
-	//@ set lDep = \set_union(pcDep, hDep); 
+	//@ set UpdateAbstraction.lDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); 
 	l = h;
     } 
     
     
     //different encoding here (following the paper more closely)    
-    /*@ requires lDep == \singleton(l); 
-      @ requires l2Dep == \singleton(l2); 
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.lDep == \singleton(l); 
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2); 
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_6_secure() {
 	//ghost code for entering conditional----->
-	//@ ghost \locset guardDep = hDep;
+	//@ ghost \locset guardDep = UpdateAbstraction.hDep;
 	int lOld = l;	
 	int hOld = h;
 	//<----------------------------------------
 	
 	if(h > 0) {
-	    //@ set hDep = lDep; //assignment
+	    //@ set UpdateAbstraction.hDep = UpdateAbstraction.lDep; //assignment
 	    h = l;
-	    //@ set lDep = hDep; //assignment
+	    //@ set UpdateAbstraction.lDep = UpdateAbstraction.hDep; //assignment
 	    l = h;
 	}
 	
 	//ghost code for leaving conditional------>
 	if(l != lOld) {
-	    //@ set lDep = \set_union(lDep, guardDep);
+	    //@ set UpdateAbstraction.lDep = \set_union(UpdateAbstraction.lDep, guardDep);
 	    ;
 	}
 	if(h != hOld) {
-	    //@ set hDep = \set_union(hDep, guardDep);
+	    //@ set UpdateAbstraction.hDep = \set_union(UpdateAbstraction.hDep, guardDep);
 	    ;
 	}
 	//<-----------------------------------------
@@ -139,37 +139,37 @@ class UpdateAbstraction {
     
     
     //again the encoding of 7_6 (cannot prove security)
-    /*@ requires lDep == \singleton(l);
-      @ requires l2Dep == \singleton(l2);     
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.lDep == \singleton(l);
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2);     
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_7_secure() {
 	//ghost code for entering conditional----->
-	//@ ghost \locset guardDep = hDep;
+	//@ ghost \locset guardDep = UpdateAbstraction.hDep;
 	int lOld = l;	
 	int hOld = h;
 	//<----------------------------------------	
 	
 	if(h > 0) {
-	    //@ set lDep = \empty; //assignment
+	    //@ set UpdateAbstraction.lDep = \empty; //assignment
 	    l = 2;	    
-	    //@ set hDep = \empty; //assignment	    
+	    //@ set UpdateAbstraction.hDep = \empty; //assignment	    
 	    h = 2;
 	} else {
-	    //@ set lDep = \empty; //assignment	    
+	    //@ set UpdateAbstraction.lDep = \empty; //assignment	    
 	    l = 2;
-	    //@ set hDep = \empty; //assignment	    
+	    //@ set UpdateAbstraction.hDep = \empty; //assignment	    
 	    h = 2;
 	}
 	
 	//ghost code for leaving conditional------>
 	if(l != lOld) {
-	    //@ set lDep = \set_union(lDep, guardDep);
+	    //@ set UpdateAbstraction.lDep = \set_union(UpdateAbstraction.lDep, guardDep);
 	    ;
 	}
 	if(h != hOld) {
-	    //@ set hDep = \set_union(hDep, guardDep);
+	    //@ set UpdateAbstraction.hDep = \set_union(UpdateAbstraction.hDep, guardDep);
 	    ;
 	}
 	//<-----------------------------------------
@@ -177,44 +177,44 @@ class UpdateAbstraction {
     
     
     //again the encoding of 7_6 (cannot prove security)
-    /*@ requires lDep == \singleton(l); 
-      @ requires l2Dep == \singleton(l2); 
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.lDep == \singleton(l); 
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2); 
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @*/
     static void ex7_8_secure() {
-	//@ set lDep = hDep; //assignment
+	//@ set UpdateAbstraction.lDep = UpdateAbstraction.hDep; //assignment
 	l = h - h;
     }         
     
     
-    /*@ requires pcDep == \empty;
-      @ requires lDep == \singleton(l);
-      @ requires l2Dep == \singleton(l2);       
-      @ requires hDep == \singleton(h);
-      @ ensures \subset(lDep, LOW);
+    /*@ requires UpdateAbstraction.pcDep == \empty;
+      @ requires UpdateAbstraction.lDep == \singleton(l);
+      @ requires UpdateAbstraction.l2Dep == \singleton(l2);       
+      @ requires UpdateAbstraction.hDep == \singleton(h);
+      @ ensures \subset(UpdateAbstraction.lDep, UpdateAbstraction.LOW);
       @ diverges true;
       @*/    
     static void ex9_secure() {
-	//@ set lDep = pcDep; //assignment
+	//@ set UpdateAbstraction.lDep = UpdateAbstraction.pcDep; //assignment
 	l = 0;
-	//@ set l2Dep = pcDep; //assignment
+	//@ set UpdateAbstraction.l2Dep = UpdateAbstraction.pcDep; //assignment
 	l2 = 0;
 	
-	//@ set pcDep = \set_union(pcDep, hDep); //entering loop
+	//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering loop
 	/*@ loop_invariant l2 >= 0;
-	  @ assignable l2, \singleton(l2Dep), h, \singleton(hDep), \singleton(pcDep);
+	  @ assignable l2, \singleton(UpdateAbstraction.l2Dep), h, \singleton(UpdateAbstraction.hDep), \singleton(UpdateAbstraction.pcDep);
 	  @*/
 	while(h < 0) {
-	    //@ set l2Dep = \set_union(pcDep, l2Dep); //assignment
+	    //@ set UpdateAbstraction.l2Dep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.l2Dep); //assignment
 	    l2++;
-	    //@ set hDep = \set_union(pcDep, hDep);
+	    //@ set UpdateAbstraction.hDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep);
 	    h++;
-	    //@ set pcDep = \set_union(pcDep, hDep); //entering loop again	    
+	    //@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering loop again	    
 	}
-	//@ set pcDep = \set_union(pcDep, l2Dep); //entering conditional
+	//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.l2Dep); //entering conditional
 	if(l2 < 0) {
-	    //@ set lDep = pcDep; //assignment
+	    //@ set UpdateAbstraction.lDep = UpdateAbstraction.pcDep; //assignment
 	    l = 1;
 	}
     }

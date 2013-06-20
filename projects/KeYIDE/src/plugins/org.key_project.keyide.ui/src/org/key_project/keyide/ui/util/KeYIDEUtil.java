@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,8 +37,7 @@ import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContent
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.keyide.ui.editor.input.ProofEditorInput;
-import org.key_project.keyide.ui.editor.input.ProofStorage;
+import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -48,11 +46,12 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -91,13 +90,9 @@ public class KeYIDEUtil {
                                     public void run() {
                                        try {
                                           // Open selection dialog
-                                          Proof proof = openDialog(operationContracts, environment);
-                                          environment.getMediator().setProof(proof);
-                                          //TODO: Stupid Mode wirklich hier?
-                                          environment.getMediator().setStupidMode(true);
-                                          //Open proof in Editor if correctly selected
-                                          if (proof != null){
-                                             KeYIDEUtil.openEditor(proof, environment);
+                                          Contract contract = openDialog(operationContracts, environment);
+                                          if (contract != null) {
+                                             KeYIDEUtil.openEditor(contract, environment, method);
                                           }
                                        }
                                        catch (Exception e) {
@@ -135,42 +130,44 @@ public class KeYIDEUtil {
 
    /**
     * Opens the currently selected {@link Proof} into the KeY-Editor.
-    * @param name The  name to display at the editor-tab
-    * @param ui The UserInterface that holds the KeYMediator
+    * @param contract The {@link Contract} to prove.
+    * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
+    * @param method An optional {@link IMethod} from which the {@link Proof} was started.
+    * @throws PartInitException Occurred Exception.
     */
-   private static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment)throws PartInitException{
-      String inputText = InnerNodeView.getTacletDescription(environment.getMediator(), proof.root(), null);
-      IStorage storage = new ProofStorage(inputText, proof.name().toString());
-      IStorageEditorInput input = new ProofEditorInput(storage, proof, environment);
-      WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
+   public static void openEditor(Contract contract, KeYEnvironment<CustomConsoleUserInterface> environment, IMethod method)throws PartInitException{
+      Assert.isNotNull(contract);
+      Assert.isNotNull(environment);
+      ProofOblInput problem = contract.createProofObl(environment.getInitConfig(), contract);
+      IStorageEditorInput input = new ProofOblInputEditorInput(problem, environment, method);
+      WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);
    }
    
    /**
-    * Opens a dialog to select the {@link FunctionalOperationContract} for the selected {@link IMethod}. For the selected contract a {@link Proof} will be created and returned.
-    * @param operationContracts - Set of available {@link FunctionalOperationContract}s
+    * Opens a dialog to select the {@link Contract} for the selected {@link IMethod}.
+    * @param contracts - Set of available {@link Contract}s
     * @param environment - the given {@link KeYEnvironment}
-    * @return the created {@link Proof}
-    * @throws ProofInputException
+    * @return the selected {@link Contract} or {@code null} if the dialog was cancelled.
+    * @throws ProofInputException Occurred Exception
     */
-   private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException {
-      Assert.isNotNull(operationContracts);
+   private static Contract openDialog(ImmutableSet<? extends Contract> contracts, KeYEnvironment<?> environment) throws ProofInputException {
+      Assert.isNotNull(contracts);
       Assert.isNotNull(environment);
       Shell parent = WorkbenchUtil.getActiveShell();
       ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
       ContractSelectionDialog dialog = new ContractSelectionDialog(parent, contentProvider, environment.getServices());
       dialog.setTitle("Select Contract for Proof in KeY");
       dialog.setMessage("Select contract to prove.");
-      dialog.setInput(operationContracts);
+      dialog.setInput(contracts);
       
-      if(!operationContracts.isEmpty()){
-         dialog.setInitialSelections(new FunctionalOperationContract[] {CollectionUtil.getFirst(operationContracts)});
+      if(!contracts.isEmpty()){
+         dialog.setInitialSelections(new Contract[] {CollectionUtil.getFirst(contracts)});
       }
       if (dialog.open() == ContractSelectionDialog.OK) {
           Object result = dialog.getFirstResult();
-          if (result instanceof FunctionalOperationContract) {
-              FunctionalOperationContract foc = (FunctionalOperationContract)result;
-              return environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
-         }
+          if (result instanceof Contract) {
+              return (Contract)result;
+          }
           else {
              throw new ProofInputException("The selected contract is no FunctionalOperationContract.");
           }

@@ -43,21 +43,6 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * The {@link Name} of the symbolic execution {@link Strategy}.
     */
    public static final Name name = new Name("Symbolic Execution Strategy");
-
-   /**
-    * Key used in {@link StrategyProperties} to configure alias checks.
-    */
-   public static final String ALIAS_CHECK_OPTIONS_KEY = "ALIAS_CHECK_OPTIONS_KEY";
-   
-   /**
-    * Value of key {@link #ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to disable alias checks.
-    */
-   public static final String ALIAS_CHECK_NEVER = "ALIAS_CHECK_NEVER";
-   
-   /**
-    * Value of key {@link #ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to enable immediately alias checks.
-    */
-   public static final String ALIAS_CHECK_IMMEDIATELY = "ALIAS_CHECK_IMMEDIATELY";
    
    /**
     * Constructor.
@@ -80,7 +65,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       bindRuleSet(costRsd, "instanceof_to_exists", inftyConst());
       
       // Update instantiation dispatcher
-      if (ALIAS_CHECK_IMMEDIATELY.equals(sp.get(ALIAS_CHECK_OPTIONS_KEY))) {
+      if (StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY))) {
          // Make sure that an immediately alias check is performed by doing cuts of objects to find out if they can be the same or not
          RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
          enableInstantiate();
@@ -165,7 +150,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       sp.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
       sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-      sp.setProperty(ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
+      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
       return sp;
    }
 
