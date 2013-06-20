@@ -21,6 +21,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.ExtensionContributionFactory;
 import org.eclipse.ui.menus.IContributionRoot;
 import org.eclipse.ui.services.IServiceLocator;
+import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -46,7 +47,7 @@ public class TacletContextMenu extends ExtensionContributionFactory {
       IEditorPart activeEditor = WorkbenchUtil.getActiveEditor();
       if (activeEditor instanceof KeYEditor) {
          KeYEditor keyEditor = (KeYEditor)activeEditor;
-         KeYEnvironment<CustomConsoleUserInterface> environment = keyEditor.getKeYEnvironment();
+         KeYEnvironment<CustomConsoleUserInterface> environment = keyEditor.getEnvironment();
          KeYMediator mediator = environment.getMediator();
          if(mediator.getSelectedNode().getAppliedRuleApp() == null){
             ProofSourceViewerDecorator textViewer = keyEditor.getTextViewer();

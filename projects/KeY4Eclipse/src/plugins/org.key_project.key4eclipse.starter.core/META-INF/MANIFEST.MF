@@ -21,4 +21,5 @@ Export-Package: org.key_project.key4eclipse.starter.core.adapter,
  org.key_project.key4eclipse.starter.core.expression,
  org.key_project.key4eclipse.starter.core.job,
  org.key_project.key4eclipse.starter.core.property,
- org.key_project.key4eclipse.starter.core.util
+ org.key_project.key4eclipse.starter.core.util,
+ org.key_project.key4eclipse.starter.core.util.event

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,10 +40,8 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -60,7 +57,11 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -68,6 +69,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -77,6 +79,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -94,12 +97,18 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.ITermLabelWorker;
+import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -263,13 +272,14 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
+    * extract the return value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param contextObjectType The type of the current object (this reference).
     * @param contextMethod The current method.
     * @param contextObject The current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param methodReturnNode The method return {@link Node} which provides the sequent to extract updates and return expression from.
+    * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to start site proof in.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
@@ -277,34 +287,38 @@ public final class SymbolicExecutionUtil {
                                                                                      TypeReference contextObjectType,
                                                                                      IProgramMethod contextMethod,
                                                                                      ReferencePrefix contextObject,
-                                                                                     Node node,
+                                                                                     Node methodReturnNode,
+                                                                                     Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Create execution context in that the method was called.
       IExecutionContext context = new ExecutionContext(contextObjectType, contextMethod, contextObject);
       // Create sequent
-      return createExtractReturnVariableValueSequent(services, context, node, variable);
+      return createExtractReturnVariableValueSequent(services, context, methodReturnNode, methodCallEmptyNode, variable);
    }
 
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
+    * extract the return value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param context The {@link IExecutionContext} that defines the current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param methodReturnNode The method return {@link Node} which provides the sequent to extract updates and return expression from.
+    * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to start site proof in.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
                                                                                      IExecutionContext context,
-                                                                                     Node node,
+                                                                                     Node methodReturnNode,
+                                                                                     Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Make sure that correct parameters are given
       assert context != null;
-      assert node != null;
+      assert methodReturnNode != null;
+      assert methodCallEmptyNode != null;
       assert variable instanceof ProgramVariable;
       // Create method frame which will be executed in site proof
-      Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
+      Statement originalReturnStatement = (Statement)methodReturnNode.getNodeInfo().getActiveStatement();
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
@@ -313,8 +327,11 @@ public final class SymbolicExecutionUtil {
       Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      // Get the updates from the return node which includes the value interested in.
+      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, modalityTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null, modalityTerm, originalUpdates);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -354,12 +371,14 @@ public final class SymbolicExecutionUtil {
     * @param node The original {@link Node} which provides the sequent to extract from.
     * @param additionalConditions Additional conditions to add to the antecedent.
     * @param term The new succedent term.
+    * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
                                                                       Term additionalConditions,
-                                                                      Term term) {
+                                                                      Term term,
+                                                                      boolean keepUpdates) {
       // Make sure that correct parameters are given
       assert node != null;
       assert term != null;
@@ -368,7 +387,9 @@ public final class SymbolicExecutionUtil {
       // Create formula which contains the value interested in.
       Term newTerm = TermBuilder.DF.func(newPredicate, term);
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm);
+      Sequent sequentToProve = keepUpdates ?
+                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm) :
+                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, null);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -473,37 +494,20 @@ public final class SymbolicExecutionUtil {
     */
    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
       assert starter != null;
-      starter.setMaxRuleApplications(1000);
+      starter.setMaxRuleApplications(10000);
       StrategyProperties sp = !proof.isDisposed() ? 
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
-      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
-      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
-      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF); // Query Treatment: Off
+      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT); // Method Treatment: Contract
+      sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); // Loop Treatment: Invariant
+      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON); // Dependency Contracts: On
+      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON); // Query Treatment: On
       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits 
       starter.setStrategy(sp);
       // Execute proof in the current thread
       return starter.start();
-   }
-   
-   /**
-    * Extracts the value for the formula with the given {@link Operator}
-    * from the site proof result ({@link ApplyStrategyInfo}).
-    * @param info The site proof result.
-    * @param operator The {@link Operator} for the formula which should be extracted.
-    * @return The value of the formula with the given {@link Operator}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public static Term extractOperatorValue(ApplyStrategyInfo info, Operator operator) throws ProofInputException {
-      // Make sure that valid parameters are given
-      assert info != null;
-      if (info.getProof().openGoals().size() != 1) {
-         throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
-      }
-      // Get node of open goal
-      return extractOperatorValue(info.getProof().openGoals().head(), operator);
    }
 
    /**
@@ -802,7 +806,7 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link IProgramVariable} with the current {@code this}/{@code self} reference or {@code null} if no one is available.
     */
    public static IProgramVariable findSelfTerm(Node node) {
-      Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
       term = TermBuilder.DF.goBelowUpdates(term);
       JavaBlock jb = term.javaBlock();
       Services services = node.proof().getServices();
@@ -844,10 +848,10 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = findExplicitConstructor(node.proof().getServices(), pm);
+               if (KeYTypeUtil.isImplicitConstructor(pm)) {
+                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
                   return explicitConstructor != null && 
-                         !isLibraryClass(explicitConstructor.getContainerType());
+                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
                }
                else {
                   return !pm.isImplicit(); // Do not include implicit methods, but always constructors
@@ -860,61 +864,6 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
-      }
-   }
-   
-   /**
-    * Checks if the given {@link KeYJavaType} is a library class.
-    * @param kjt The {@link KeYJavaType} to check.
-    * @return {@code true} is library class, {@code false} is no library class.
-    */
-   public static boolean isLibraryClass(KeYJavaType kjt) {
-      return kjt != null && 
-             kjt.getJavaType() instanceof TypeDeclaration && 
-             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass();
-   }
-   
-   /**
-    * Checks if the given {@link IProgramMethod} is an implicit constructor.
-    * @param pm The {@link IProgramMethod} to check.
-    * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g. method or explicit construcotr).
-    */
-   public static boolean isImplicitConstructor(IProgramMethod pm) {
-      return pm != null && ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER.equals(pm.getName());
-   }
-
-   /**
-    * Returns the {@link IProgramMethod} of the explicit constructor for
-    * the given implicit constructor.
-    * @param services The {@link Services} to use.
-    * @param implicitConstructor The implicit constructor.
-    * @return The found explicit constructor or {@code null} if not available.
-    */
-   public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
-      if (services != null && implicitConstructor != null) {
-         ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
-         return JavaUtil.search(pms, new IFilter<IProgramMethod>() {
-            @Override
-            public boolean select(IProgramMethod element) {
-               if (implicitConstructor.getParameterDeclarationCount() == element.getParameterDeclarationCount()) {
-                  Iterator<ParameterDeclaration> implicitIter = implicitConstructor.getParameters().iterator();
-                  Iterator<ParameterDeclaration> elementIter = element.getParameters().iterator();
-                  boolean sameTypes = true;
-                  while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
-                     ParameterDeclaration implicitNext = implicitIter.next();
-                     ParameterDeclaration elementNext = elementIter.next();
-                     sameTypes = implicitNext.getTypeReference().equals(elementNext.getTypeReference());
-                  }
-                  return sameTypes;
-               }
-               else {
-                  return false;
-               }
-            }
-         });
-      }
-      else {
-         return null;
       }
    }
    
@@ -970,7 +919,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isFirstLoopIteration(Node node, RuleApp ruleApp, SourceElement statement) {
       // Compute stack size of current node
-      int stackSize = computeStackSize(node, ruleApp);
+      int stackSize = computeStackSize(ruleApp);
       // Iterate over all parents until another loop iteration is found or the current method was called
       boolean firstLoop = true;
       Node parent = node.parent();
@@ -982,7 +931,7 @@ public final class SymbolicExecutionUtil {
          parent = parent.parent();
          // Check if the next parent is the method call of the current method, in this case iteration can stop
          if (isMethodCallNode(parent, parent.getAppliedRuleApp(), parent.getNodeInfo().getActiveStatement(), true) &&
-             computeStackSize(parent, parent.getAppliedRuleApp()) < stackSize) {
+             computeStackSize(parent.getAppliedRuleApp()) < stackSize) {
             // Stop iteration because further parents are before the current method is called
             parent = null;
          }
@@ -1061,6 +1010,292 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
+    */
+   public static boolean hasLoopBodyLabel(RuleApp ruleApp) {
+      if (ruleApp != null && ruleApp.posInOccurrence() != null) {
+         Term term = ruleApp.posInOccurrence().subTerm();
+         if (term != null) {
+            term = TermBuilder.DF.goBelowUpdates(term);
+            return term.containsLabel(LoopBodyTermLabel.INSTANCE);
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
+    */
+   public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
+      if (ruleApp != null && ruleApp.posInOccurrence() != null) {
+         Term term = ruleApp.posInOccurrence().subTerm();
+         return term.containsLabel(LoopInvariantNormalBehaviorTermLabel.INSTANCE);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
+    */
+   public static boolean hasSymbolicExecutionLabel(RuleApp ruleApp) {
+      return getSymbolicExecutionLabel(ruleApp) != null;
+   }
+   
+   /**
+    * Returns the contained {@link SymbolicExecutionTermLabel} if available.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no {@link SymbolicExecutionTermLabel} is provided.
+    */
+   public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(RuleApp ruleApp) {
+      if (ruleApp != null && ruleApp.posInOccurrence() != null) {
+         return getSymbolicExecutionLabel(ruleApp.posInOccurrence().subTerm());
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link Term} contains a {@link SymbolicExecutionTermLabel}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link Term} is {@code null}.
+    */
+   public static boolean hasSymbolicExecutionLabel(Term term) {
+      return getSymbolicExecutionLabel(term) != null;
+   }
+   
+   /**
+    * Returns the contained {@link SymbolicExecutionTermLabel} if available.
+    * @param term The {@link Term} to search in.
+    * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no {@link SymbolicExecutionTermLabel} is provided.
+    */
+   public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(Term term) {
+      if (term != null) {
+         term = TermBuilder.DF.goBelowUpdates(term);
+         return (SymbolicExecutionTermLabel)JavaUtil.search(term.getLabels(), new IFilter<ITermLabel>() {
+            @Override
+            public boolean select(ITermLabel element) {
+               return element instanceof SymbolicExecutionTermLabel;
+            }
+         });
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
+    * @param sequent The {@link Sequent} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
+      if (sequent != null) {
+         Term nextAntecedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent());
+         Term nextSuccedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent());
+         if (nextAntecedent != null) {
+            if (nextSuccedent != null) {
+               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent);
+               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent);
+               return antecedentLabel.getId() > succedentLabel.getId() ? nextAntecedent : nextSuccedent;
+            }
+            else {
+               return nextAntecedent;
+            }
+         }
+         else {
+            return nextSuccedent;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
+    * @param semisequent The {@link Semisequent} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMaxSymbolicExecutionLabelId(Semisequent semisequent) {
+      if (semisequent != null) {
+         int maxId = Integer.MIN_VALUE;
+         Term modality = null;
+         for (SequentFormula sf : semisequent) {
+            Term current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
+            if (current != null) {
+               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(current);
+               if (modality == null || label.getId() > maxId) {
+                  modality = current;
+                  maxId = label.getId();
+               }
+            }
+         }
+         return modality;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+    * @param term The {@link Term} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMaxSymbolicExecutionLabelId(Term term) {
+      if (term != null) {
+         FindModalityWithMaxSymbolicExecutionLabelId visitor = new FindModalityWithMaxSymbolicExecutionLabelId();
+         term.execPreOrder(visitor);
+         return visitor.getModality();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Utility class used to find the maximal modality Term
+    * used by {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
+    * @author Martin Hentschel
+    */
+   private static final class FindModalityWithMaxSymbolicExecutionLabelId extends DefaultVisitor {
+      /**
+       * The modality {@link Term} with the maximal ID.
+       */
+      private Term modality;
+      
+      /**
+       * The maximal ID.
+       */
+      private int maxId;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(Term visited) {
+         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
+         if (label != null) {
+            if (modality == null || label.getId() > maxId) {
+               modality = visited;
+               maxId = label.getId();
+            }
+         }
+      }
+
+      /**
+       * Returns the modality {@link Term} with the maximal ID.
+       * @return The modality {@link Term} with the maximal ID.
+       */
+      public Term getModality() {
+         return modality;
+      }
+   }
+
+   /**
+    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
+    * @param sequent The {@link Sequent} to compute the next unused ID in.
+    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
+    */
+   public static int computeNextSymbolicExecutionLabelId(Sequent sequent) {
+      if (sequent != null) {
+         int nextAntecedent = computeNextSymbolicExecutionLabelId(sequent.antecedent());
+         int nextSuccedent = computeNextSymbolicExecutionLabelId(sequent.succedent());
+         return nextAntecedent > nextSuccedent ? nextAntecedent : nextSuccedent;
+      }
+      else {
+         return SymbolicExecutionTermLabel.START_ID;
+      }
+   }
+
+   /**
+    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
+    * @param semisequent The {@link Semisequent} to compute the next unused ID in.
+    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
+    */
+   public static int computeNextSymbolicExecutionLabelId(Semisequent semisequent) {
+      if (semisequent != null) {
+         int nextId = SymbolicExecutionTermLabel.START_ID;
+         for (SequentFormula sf : semisequent) {
+            int nextSfId = computeNextSymbolicExecutionLabelId(sf.formula());
+            if (nextSfId > nextId) {
+               nextId = nextSfId;
+            }
+         }
+         return nextId;
+      }
+      else {
+         return SymbolicExecutionTermLabel.START_ID;
+      }
+   }
+
+   /**
+    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
+    * @param term The {@link Term} to compute the next unused ID in.
+    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
+    */
+   public static int computeNextSymbolicExecutionLabelId(Term term) {
+      if (term != null) {
+         NextSymbolicExecutionLabelIdVisitor visitor = new NextSymbolicExecutionLabelIdVisitor();
+         term.execPreOrder(visitor);
+         return visitor.getNextId();
+      }
+      else {
+         return SymbolicExecutionTermLabel.START_ID;
+      }
+   }
+   
+   /**
+    * Utility class used to compute the next unused ID of {@link SymbolicExecutionTermLabel}s
+    * used by {@link SymbolicExecutionUtil#computeNextSymbolicExecutionLabelId(Term)}.
+    * @author Martin Hentschel
+    */
+   private static final class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
+      /**
+       * The next unused ID.
+       */
+      private int nextId = SymbolicExecutionTermLabel.START_ID;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(Term visited) {
+         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
+         if (label != null) {
+            if (label.getId() + 1 > nextId) {
+               nextId = label.getId() + 1;
+            }
+         }
+      }
+
+      /**
+       * Returns the next unused ID.
+       * @return The next unused ID.
+       */
+      public int getNextId() {
+         return nextId;
+      }
+   }
+
+   /**
     * Checks if the given {@link Node} in KeY's proof tree represents
     * also a {@link Node} in a symbolic execution tree.
     * @param node The {@link Node} of KeY's proof tree to check.
@@ -1068,7 +1303,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
     */
    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
-      if (node != null && !isRuleAppToIgnore(ruleApp)) {
+      if (node != null && !isRuleAppToIgnore(ruleApp) && hasSymbolicExecutionLabel(ruleApp)) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
@@ -1098,6 +1333,9 @@ public final class SymbolicExecutionUtil {
             return false;
          }
       }
+      else if (isLoopBodyTermination(node, ruleApp)) {
+         return true;
+      }
       else {
          return false;
       }
@@ -1121,7 +1359,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is in implicit method, {@code false} is not in implicit method.
     */
    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
-      Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
+      Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.DF.goBelowUpdates(term);
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
@@ -1129,21 +1367,20 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Compute the stack size of the given {@link Node} in the proof tree of KeY.
-    * @param node The {@link Node} to compute stack size for.
-    * @param ruleApp The {@link RuleApp} which is or should be applied in the {@link Node}.
+    * Compute the stack size of the given {@link Term} described by the given {@link RuleApp}.
+    * @param ruleApp The {@link RuleApp} which defines the {@link Term} to compute its stack size.
     * @return The stack size.
     */
-   public static int computeStackSize(Node node, RuleApp ruleApp) {
+   public static int computeStackSize(RuleApp ruleApp) {
       int result = 0;
-      if (node != null && ruleApp != null) {
+      if (ruleApp != null) {
          PosInOccurrence posInOc = ruleApp.posInOccurrence();
-         if (posInOc != null && posInOc.constrainedFormula() != null) {
-            Term term = posInOc.constrainedFormula().formula();
-            if (term != null && term.subs().size() == 2) {
-               Term sub = term.sub(1);
-               if (sub != null) {
-                  JavaBlock block = sub.javaBlock();
+         if (posInOc != null) {
+            Term subTerm = posInOc.subTerm();
+            if (subTerm != null) {
+               Term modality = TermBuilder.DF.goBelowUpdates(subTerm);
+               if (modality != null) {
+                  JavaBlock block = modality.javaBlock();
                   if (block != null) {
                      JavaProgramElement element = block.program();
                      if (element instanceof StatementBlock) {
@@ -1229,7 +1466,7 @@ public final class SymbolicExecutionUtil {
    public static Node findMethodCallNode(Node node) {
       if (node != null && node.getAppliedRuleApp() != null) {
          // Get current program method
-         Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
          term = TermBuilder.DF.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
@@ -1301,13 +1538,13 @@ public final class SymbolicExecutionUtil {
         return computeContractRuleAppBranchCondition(parent, node, simplify);
       }
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-         return TermBuilder.DF.tt(); // TODO: Implement real branch condition of loop invariants!
+         return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify);
       }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\"."); 
       }
    }
-   
+
    /**
     * <p>
     * Computes the branch condition of the given {@link Node} which was constructed by a {@link ContractRuleApp}.
@@ -1317,7 +1554,7 @@ public final class SymbolicExecutionUtil {
     * <ul>
     *    <li>Post:    caller != null & (pre1 | .. | preN)</li>
     *    <li>ExcPost: caller != null & (excPre1 | ... | excPreM)</li>
-    *    <li>Pre:     caller != null & !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
+    *    <li>Pre:     caller != null & !(pre1 | ... | preN | excPre1 | ... | excPreM) because the branch is only open if all conditions are false</li>
     *    <li>NPE:     caller = null</li>
     * </ul>
     * </p>
@@ -1345,70 +1582,182 @@ public final class SymbolicExecutionUtil {
       }
       
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
-      if (childIndex >= 2) {
-         throw new ProofInputException("Branch condition of precondition check and null pointer check are not supported."); 
+      if (childIndex >= 3) {
+         throw new ProofInputException("Branch condition of null pointer check is not supported."); 
       }
-      // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
-      // Find Term to extract implications from.
-      Semisequent antecedent = node.sequent().antecedent();
-      SequentFormula sf = antecedent.get(antecedent.size() - 1);
-      Term workingTerm = sf.formula();
-      Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
-      workingTerm = updatesAndTerm.second;
-      if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
-      }
-      workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
-      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
-      if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
-      }
-      // Find Term exc_n = null which is added negated to all exceptional preconditions
-      Term definitions = workingTerm.sub(0);
-      if (definitions.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
-      }
-      Term exceptionDefinition = definitions.sub(0);
-      // Collect all implications for normal or exceptional preconditions
-      Term result;
-      Term implications = workingTerm.sub(1);
-      ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
-      if (!implicationTerms.isEmpty()) {
-         // Implications find, return their conditions as branch condition
-         ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
-         for (Term implication : implicationTerms) {
-            condtionTerms = condtionTerms.append(implication.sub(0));
+      else if (childIndex == 2) {
+         // Assumption: Original formula in parent is replaced
+         PosInOccurrence pio = parent.getAppliedRuleApp().posInOccurrence();
+         Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
+         if (workingTerm == null) {
+            throw new ProofInputException("Term not find in precondition branch, implementation of UseOperationContractRule might has changed!"); 
          }
-         result = TermBuilder.DF.or(condtionTerms);
-         // Add updates
-         result = TermBuilder.DF.applyParallel(updatesAndTerm.first, result);
+         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+         if (workingTerm.op() != Junctor.AND) {
+            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         Term preconditions = workingTerm.sub(0);
+         return TermBuilder.DF.not(preconditions);
       }
       else {
-         // No preconditions available, branch condition is true
-         result = TermBuilder.DF.tt();
+         // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
+         // Find Term to extract implications from.
+         Semisequent antecedent = node.sequent().antecedent();
+         SequentFormula sf = antecedent.get(antecedent.size() - 1);
+         Term workingTerm = sf.formula();
+         Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
+         workingTerm = updatesAndTerm.second;
+         if (workingTerm.op() != Junctor.AND) {
+            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
+         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+         if (workingTerm.op() != Junctor.AND) {
+            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
+         Term exceptionDefinition = workingTerm;
+         while (exceptionDefinition.op() == Junctor.AND) {
+            exceptionDefinition = exceptionDefinition.sub(0);
+         }
+         // Make sure that exception equality was found
+         Term exceptionEquality;
+         if (exceptionDefinition.op() == Junctor.NOT) {
+            exceptionEquality = exceptionDefinition.sub(0);
+         }
+         else {
+            exceptionEquality = exceptionDefinition;
+         }
+         if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
+            throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (!isNullSort(exceptionEquality.sub(1).sort(), parent.proof().getServices())) {
+            throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         KeYJavaType exceptionType = parent.proof().getServices().getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
+         if (!parent.proof().getServices().getJavaInfo().isSubtype(exceptionType, parent.proof().getServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+            throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         // Collect all implications for normal or exceptional preconditions
+         Term result;
+         Term implications = workingTerm.sub(1);
+         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
+         if (!implicationTerms.isEmpty()) {
+            // Implications find, return their conditions as branch condition
+            ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
+            for (Term implication : implicationTerms) {
+               condtionTerms = condtionTerms.append(implication.sub(0));
+            }
+            result = TermBuilder.DF.or(condtionTerms);
+            // Add updates
+            result = TermBuilder.DF.applyParallel(updatesAndTerm.first, result);
+         }
+         else {
+            // No preconditions available, branch condition is true
+            result = TermBuilder.DF.tt();
+         }
+         // Add caller not null to condition
+         if (parent.childrenCount() == 4) {
+            Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
+            callerNotNullTerm = TermBuilder.DF.goBelowUpdates(callerNotNullTerm);
+            if (callerNotNullTerm.op() != Junctor.NOT) {
+               throw new ProofInputException("Not operation expacted, implementation of UseOperationContractRule might has changed!"); 
+            }
+            if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
+               throw new ProofInputException("Equals operation expacted, implementation of UseOperationContractRule might has changed!"); 
+            }
+            if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
+               throw new ProofInputException("ProgramVariable expacted, implementation of UseOperationContractRule might has changed!"); 
+            }
+            if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(), parent.proof().getServices())) {
+               throw new ProofInputException("Null expacted, implementation of UseOperationContractRule might has changed!"); 
+            }
+            result = TermBuilder.DF.and(callerNotNullTerm, result);
+         }
+         if (simplify) {
+            result = simplify(node.proof(), result);
+         }
+         return result;
       }
-      // Add caller not null to condition
-      if (parent.childrenCount() == 4) {
-         Term callerNotNullTerm = posInOccurrenceInOtherNode(parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(3));
-         callerNotNullTerm = TermBuilder.DF.goBelowUpdates(callerNotNullTerm);
-         if (callerNotNullTerm.op() != Junctor.NOT) {
-            throw new ProofInputException("Not operation expacted, implementation of UseOperationContractRule might has changed!"); 
-         }
-         if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
-            throw new ProofInputException("Equals operation expacted, implementation of UseOperationContractRule might has changed!"); 
-         }
-         if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
-            throw new ProofInputException("ProgramVariable expacted, implementation of UseOperationContractRule might has changed!"); 
-         }
-         if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(), parent.proof().getServices())) {
-            throw new ProofInputException("Null expacted, implementation of UseOperationContractRule might has changed!"); 
-         }
-         result = TermBuilder.DF.and(callerNotNullTerm, result);
+   }
+   
+   /**
+    * <p>
+    * Computes the branch condition of the given {@link Node} which was constructed by a {@link LoopInvariantBuiltInRuleApp}.
+    * </p>
+    * <p>
+    * The branch conditions are:
+    * <ul>
+    *    <li>Preserves Branch: Invariant + LoopCondition</li>
+    *    <li>Use Branch: Invariant + !LoopCondition</li>
+    * </ul>
+    * </p>
+    * @param parent The parent {@link Node} of the given one.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent, 
+                                                                         Node node, 
+                                                                         boolean simplify) throws ProofInputException {
+      // Make sure that a computation is possible
+      if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
+         throw new ProofInputException("Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
       }
-      if (simplify) {
-         result = simplify(node.proof(), result);
+      // Make sure that branch is supported
+      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      if (childIndex == 1 || childIndex == 2) { // Body Preserves Invariant or Use Case
+         LoopInvariantBuiltInRuleApp app = (LoopInvariantBuiltInRuleApp)parent.getAppliedRuleApp();
+         // Compute invariant (last antecedent formula of the use branch)
+         Services services = parent.proof().getServices();
+         Node useNode = parent.child(2);
+         Semisequent antecedent = useNode.sequent().antecedent();
+         Term invTerm = antecedent.get(antecedent.size() - 1).formula();
+         // Extract loop condition from child
+         Term loopConditionModalityTerm = posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
+         loopConditionModalityTerm = TermBuilder.DF.goBelowUpdates(loopConditionModalityTerm);
+         if (childIndex == 1) { // Body Preserves Invariant
+            if (loopConditionModalityTerm.op() != Junctor.IMP) {
+               throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+            }
+            loopConditionModalityTerm = loopConditionModalityTerm.sub(0);
+         }
+         else { // Use Case
+            if (loopConditionModalityTerm.op() != Modality.BOX) {
+               throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+            }
+            Term sub = loopConditionModalityTerm.sub(0);
+            if (sub.op() != Junctor.IMP) {
+               throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+            }
+            loopConditionModalityTerm = TermBuilder.DF.box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
+         }
+         if (loopConditionModalityTerm.op() != Modality.BOX ||
+             loopConditionModalityTerm.sub(0).op() != Equality.EQUALS ||
+             !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable) ||
+             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ? TermBuilder.DF.TRUE(services) : TermBuilder.DF.FALSE(services))) {
+            throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
+         }
+         // Execute modality in a side proof to convert the JavaBlock of the modality into a Term
+         SiteProofVariableValueInput input = createExtractTermSequent(services, parent, null, loopConditionModalityTerm, false);
+         ApplyStrategyInfo info = startSideProof(parent.proof(), input.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+         ImmutableList<Term> results = ImmutableSLList.<Term>nil();
+         for (Goal goal : info.getProof().openGoals()) {
+            Term goalTerm = extractOperatorValue(goal, input.getOperator());
+            results = results.append(goalTerm);
+         }
+         Term loopCondition = TermBuilder.DF.or(results);
+         Term branchCondition = TermBuilder.DF.and(loopCondition, invTerm);
+         // Simplify result if requested
+         if (simplify) {
+            branchCondition = simplify(node.proof(), branchCondition);
+         }
+         return branchCondition;
       }
-      return result;
+      else {
+         throw new ProofInputException("Branch condition of initially valid check is not supported."); 
+      }
    }
 
    /**
@@ -1486,11 +1835,13 @@ public final class SymbolicExecutionUtil {
          }
          // Update result
          if (exceptionalExecution) {
+            // Collect only exceptional terms
             if (isExceptionCondition) {
                toFill = toFill.append(root);
             }
          }
          else {
+            // Collect only normal terms
             if (!isExceptionCondition) {
                toFill = toFill.append(root);
             }
@@ -1542,16 +1893,16 @@ public final class SymbolicExecutionUtil {
             ImmutableList<Term> newSuccedents = ImmutableSLList.nil();
             // Apply updates on antecedents and add result to new antecedents list
             for (Term a : antecedents) {
-               newAntecedents = newAntecedents.append(TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), a));
+               newAntecedents = newAntecedents.append(TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(), a));
             }
             // Apply updates on succedents and add result to new succedents list
             for (Term suc : succedents) {
-               newSuccedents = newSuccedents.append(TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), suc));
+               newSuccedents = newSuccedents.append(TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(), suc));
             }
             // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
             replaceTerm = TermBuilder.DF.equals(replaceTerm, ((PosTacletApp)app).posInOccurrence().subTerm());
-            replaceTerm = TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), replaceTerm);
+            replaceTerm = TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
             if (!newAntecedents.contains(replaceTerm)) {
                newAntecedents = newAntecedents.append(replaceTerm);
             }
@@ -1559,8 +1910,8 @@ public final class SymbolicExecutionUtil {
             antecedents = newAntecedents;
             succedents = newSuccedents;
          }
-         else {
-            throw new ProofInputException("Expected replacement as Sequent during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+         else if (goalTemplate.replaceWithExpressionAsObject() != null) {
+            throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
          }
       }
       // Construct branch condition from created antecedent and succedent terms as new implication 
@@ -1571,7 +1922,7 @@ public final class SymbolicExecutionUtil {
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Simplify branch condition if required
-         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
+         result = TermBuilder.DF.applyUpdatePairsSequential(instantiations.getUpdateContext(), leftAndRight);
       }
       else {
          // No update context, just use the implication as branch condition
@@ -1596,7 +1947,7 @@ public final class SymbolicExecutionUtil {
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
       for (SequentFormula sf : semisequent) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null);
          sf.formula().execPostOrder(visitor);
          terms = terms.append(visitor.getTerm());
       }
@@ -1630,21 +1981,6 @@ public final class SymbolicExecutionUtil {
       clone.putAll(settings);
       clone.put(key, value);
       ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-   }
-
-   /**
-    * This method should be called before the auto mode is started in
-    * context of symbolic execution. The method sets {@link StrategyProperties}
-    * of the auto mode which are not supported in context of symbolic execution
-    * to valid default values.
-    * @param proof The {@link Proof} to configure its {@link StrategyProperties} for symbolic execution.
-    */
-   public static void updateStrategyPropertiesForSymbolicExecution(Proof proof) {
-      if (proof != null) {
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
-         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-      }
    }
 
    /**
@@ -1755,7 +2091,13 @@ public final class SymbolicExecutionUtil {
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates) {
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(updates, newSuccedent);
+      Term newSuccedentToProve;
+      if (updates != null) {
+         newSuccedentToProve = TermBuilder.DF.applySequential(updates, newSuccedent);
+      }
+      else {
+         newSuccedentToProve = newSuccedent;
+      }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -1966,34 +2308,59 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Configures the proof to use operation contracts or to expand methods instead.
+    * Configures the proof to use the given settings.
     * @param proof The {@link Proof} to configure.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
+    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
     */
-   public static void setUseOperationContracts(Proof proof, boolean useOperationContracts) {
+   public static void updateStrategySettings(Proof proof, 
+                                             boolean useOperationContracts,
+                                             boolean useLoopInvariants,
+                                             boolean aliasChecksImmediately) {
       if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
                                        StrategyProperties.METHOD_CONTRACT : 
                                        StrategyProperties.METHOD_EXPAND;
+         String loopTreatmentValue = useLoopInvariants ? 
+                                     StrategyProperties.LOOP_INVARIANT : 
+                                     StrategyProperties.LOOP_EXPAND;
+         String aliasChecksValue = aliasChecksImmediately ? 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
+         updateStrategySettings(proof, sp);
+      }
+   }
+
+   /**
+    * Configures the proof to use the given {@link StrategyProperties}.
+    * @param proof The {@link Proof} to configure.
+    * @param sb The {@link StrategyProperties} to set.
+    */
+   public static void updateStrategySettings(Proof proof, 
+                                             StrategyProperties sp) {
+      if (proof != null && !proof.isDisposed()) {
+         assert sp != null;
+         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
 
    /**
-    * Configures the proof to use loop invariants or to expand loops instead.
-    * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * Configures the proof for symbolic execution.
+    * @param proof The proof to configure.
     */
-   public static void setUseLoopInvariants(Proof proof, boolean useLoopInvariants) {
-      if (proof != null && !proof.isDisposed()) {
-         String loopTreatmentValue = useLoopInvariants ? 
-                                     StrategyProperties.LOOP_INVARIANT : 
-                                     StrategyProperties.LOOP_EXPAND;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+   public static void configureProof(Proof proof) {
+      if (proof != null) {
+         ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
+         labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
    
@@ -2003,6 +2370,41 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isChoiceSettingInitialised() {
       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
+   }
+
+   /**
+    * Checks if the given node should be represented as loop body termination.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as loop body termination, {@code false} represent node as something else. 
+    */
+   public static boolean isLoopBodyTermination(final Node node, RuleApp ruleApp) {
+      boolean result = false;
+      if (ruleApp instanceof OneStepSimplifierRuleApp) {
+         // Check applied rules in protocol
+         OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp)ruleApp;
+         if (simplifierApp.getProtocol() != null) {
+            RuleApp terminationApp = JavaUtil.search(simplifierApp.getProtocol(), new IFilter<RuleApp>() {
+               @Override
+               public boolean select(RuleApp element) {
+                  return isLoopBodyTermination(node, element);
+               }
+            });
+            result = terminationApp != null;
+         }
+      }
+      else if (hasLoopBodyTerminationLabel(ruleApp)) {
+         if ("impRight".equals(MiscTools.getRuleDisplayName(ruleApp))) {
+            result = true; // Implication removed (not done if left part is false)
+         }
+         else {
+            Term term = ruleApp.posInOccurrence().subTerm();
+            if (term.op() == Junctor.IMP && term.sub(0).op() == Junctor.TRUE) {
+               result = true; // Left part is true
+            }
+         }
+      }
+      return result;
    }
    
    /**
@@ -2024,5 +2426,24 @@ public final class SymbolicExecutionUtil {
       else {
          return false;
       }
+   }
+   
+   /**
+    * Returns the path to the source file defined by the given {@link PositionInfo}.
+    * @param posInfo The {@link PositionInfo} to extract source file from.
+    * @return The source file name or {@code null} if not available.
+    */
+   public static String getSourcePath(PositionInfo posInfo) {
+      String result = null;
+      if (posInfo.getFileName() != null) {
+         result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
+      }
+      else if (posInfo.getParentClass() != null) {
+         result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
+      }
+      if (result != null && result.startsWith("FILE:")) {
+         result = result.substring("FILE:".length());
+      }
+      return result;
    }
 }

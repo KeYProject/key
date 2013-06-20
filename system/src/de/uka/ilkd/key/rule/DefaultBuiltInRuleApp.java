@@ -11,29 +11,26 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-
 package de.uka.ilkd.key.rule;
 
-import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
-/** 
+/**
  * this class represents an application of a built in rule
  * application
  */
 public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
-   
-    protected DefaultBuiltInRuleApp(BuiltInRule builtInRule, 
+
+    protected DefaultBuiltInRuleApp(BuiltInRule builtInRule,
 			  PosInOccurrence pio) {
         super(builtInRule, pio);
     }
-    
-    
-    protected DefaultBuiltInRuleApp(BuiltInRule builtInRule, 
+
+
+    protected DefaultBuiltInRuleApp(BuiltInRule builtInRule,
 			  PosInOccurrence pio,
 			  ImmutableList<PosInOccurrence> ifInsts) {
         super(builtInRule, pio, ifInsts);

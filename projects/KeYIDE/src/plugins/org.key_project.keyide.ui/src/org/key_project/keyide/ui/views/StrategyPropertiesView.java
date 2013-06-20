@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 // TODO: Document class StrategyPropertiesView
 public class StrategyPropertiesView extends AbstractViewBasedView {
+   public static final String VIEW_ID = "org.key_project.keyide.ui.view.StrategyProperties";
 
    private StrategyPropertiesScrolledForm form;
    
@@ -74,7 +75,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);
-            Object obj = part.getAdapter(this.getClass());
+            Object obj = part.getAdapter(Proof.class);
             if(obj instanceof Proof){
                proof = (Proof) obj;
                form.setProof((Proof)obj);
@@ -93,7 +94,7 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);
-            Object obj = part.getAdapter(this.getClass());
+            Object obj = part.getAdapter(Proof.class);
             if(obj instanceof Proof){
                proof = (Proof) obj;
                form.setProof((Proof)obj);

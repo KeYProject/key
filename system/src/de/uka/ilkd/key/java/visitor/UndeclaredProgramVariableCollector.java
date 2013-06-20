@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -47,17 +47,17 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
    /**
     * Contains the found declared {@link IProgramVariable}s.
     */
-   private Set<IProgramVariable> declaredVariables = new HashSet<IProgramVariable>();
+   private LinkedHashSet<IProgramVariable> declaredVariables = new LinkedHashSet<IProgramVariable>();
 
    /**
     * Contains the super result.
     */
-   private HashSet<LocationVariable> allVariables;
+   private LinkedHashSet<LocationVariable> allVariables;
    
    /**
     * Contains the undeclared variables as result.
     */
-   private HashSet<LocationVariable> undeclaredVariables;
+   private LinkedHashSet<LocationVariable> undeclaredVariables;
    
    /**
     * Constructor.
@@ -123,7 +123,7 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * Returns all used variables.
     * @return All used variables.
     */
-   public HashSet<LocationVariable> getAllVariables() {
+   public LinkedHashSet<LocationVariable> getAllVariables() {
       if (allVariables == null) {
          allVariables = super.result();
       }
@@ -135,10 +135,10 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * @return The undeclared variables.
     */
    @Override
-   public HashSet<LocationVariable> result() {
+   public LinkedHashSet<LocationVariable> result() {
       if (undeclaredVariables == null) {
          // Create result Set
-         undeclaredVariables = new HashSet<LocationVariable>();
+         undeclaredVariables = new LinkedHashSet<LocationVariable>();
          // Add all found variables
          undeclaredVariables.addAll(getAllVariables());
          // Remove all declared variables

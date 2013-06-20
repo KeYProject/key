@@ -513,8 +513,9 @@
       <clientContext id="de.hentschel.visualdbc.dbcmodel.diagram.TypeContext">
          <enablement>
             <test
-               property="org.eclipse.gmf.runtime.emf.core.editingDomain"
-               value="de.hentschel.visualdbc.dbcmodel.diagram.EditingDomain"/>
+                  forcePluginActivation="true"
+                  property="org.eclipse.gmf.runtime.emf.core.editingDomain"
+                  value="de.hentschel.visualdbc.dbcmodel.diagram.EditingDomain"/>
          </enablement>
       </clientContext> 
       <binding context="de.hentschel.visualdbc.dbcmodel.diagram.TypeContext">
@@ -586,7 +587,10 @@
             <or>
 	           <and>
     	          <instanceof value="org.eclipse.core.resources.IFile"/>
-        	      <test property="org.eclipse.core.resources.extension" value="dbc_diagram"/>
+        	      <test
+                     forcePluginActivation="true"
+                     property="org.eclipse.core.resources.extension"
+                     value="dbc_diagram"/>
                </and>
                <instanceof value="de.hentschel.visualdbc.dbcmodel.diagram.navigator.DbCAbstractNavigatorItem"/>
             </or>
@@ -603,7 +607,10 @@
                <or>
 	              <and>
     	             <instanceof value="org.eclipse.core.resources.IFile"/>
-        	         <test property="org.eclipse.core.resources.extension" value="dbc_diagram"/>
+        	         <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.extension"
+                        value="dbc_diagram"/>
                   </and>
                   <instanceof value="de.hentschel.visualdbc.dbcmodel.diagram.navigator.DbCAbstractNavigatorItem"/>
                </or>
@@ -622,7 +629,10 @@
             <or>
 	           <and>
     	          <instanceof value="org.eclipse.core.resources.IFile"/>
-        	      <test property="org.eclipse.core.resources.extension" value="dbc"/>
+        	      <test
+                     forcePluginActivation="true"
+                     property="org.eclipse.core.resources.extension"
+                     value="dbc"/>
                </and>
                <instanceof value="de.hentschel.visualdbc.dbcmodel.diagram.navigator.DbCDomainNavigatorItem"/>
             </or>
@@ -650,7 +660,9 @@
          <editorInputEnablement>
             <and>
                <instanceof value="org.eclipse.emf.common.ui.URIEditorInput"/>
-               <test property="de.hentschel.visualdbc.dbcmodel.diagram.isURIEditorInput"/>
+               <test
+                     forcePluginActivation="true"
+                     property="de.hentschel.visualdbc.dbcmodel.diagram.isURIEditorInput"/>
             </and>
          </editorInputEnablement>
          <selectionEnablement>

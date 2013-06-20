@@ -18,6 +18,7 @@ import org.junit.runners.Suite;
 
 import de.hentschel.visualdbc.datasource.key.test.testCase.AccessibleTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.AttributeTest;
+import de.hentschel.visualdbc.datasource.key.test.testCase.ConstructorTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.EnumTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.GeneralizationTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.InnerTypeTest;
@@ -37,6 +38,7 @@ import de.hentschel.visualdbc.datasource.key.test.testCase.PackageTest;
 @Suite.SuiteClasses({
    AccessibleTest.class,
    AttributeTest.class,
+   ConstructorTest.class,
    EnumTest.class,
    GeneralizationTest.class,
    InnerTypeTest.class,

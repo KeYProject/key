@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_645019e4-6ed2-42ec-bf36-a52c1f3f2ac5" name="ContractTest[ContractTest::returnValue(int)].JML operation contract.0" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_07e75751-625c-41e8-a417-6371f1a8782a" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_b1690e31-b73e-406f-b738-31d5dc27a87e" name="self.returnValue(_value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-            <sedStatement xml:id="_5cd54206-237c-49f1-8a52-5753455030c7" name="return _value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
-               <sedMethodReturn xml:id="_d776982c-1d45-4374-9b3d-e9a8e58816df" name="&lt;return &apos;2&apos; as result of self.returnValue(_value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-                  <sedTermination xml:id="_76c1204a-bb30-49f7-849f-a0a44ac9319c" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_3d1f1507-0799-4d31-8287-b1097404aed5" name="ContractTest[ContractTest::returnValue(int)].JML operation contract.0" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_bd7013a5-5bb5-44dc-b68c-5a8cdc489785" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_f560637f-d173-495b-9fe6-174cc7d7126f" name="self.returnValue(_value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+            <sedStatement xml:id="_ffc07818-f8e5-4dea-bccb-007de8f37227" name="return _value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
+               <sedMethodReturn xml:id="_0fcadf67-bdd6-4aa1-b969-8d156bcfb95c" name="&lt;return 2 as result of self.returnValue(_value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+                  <sedTermination xml:id="_3bd879c3-5711-4785-b929-a021daef2fe3" name="&lt;end&gt;" pathCondition="true">
                   </sedTermination>
                </sedMethodReturn>
             </sedStatement>

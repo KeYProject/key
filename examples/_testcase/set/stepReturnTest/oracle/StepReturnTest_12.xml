@@ -11,7 +11,7 @@
                            <methodCall name="self.fourthLevel(a_4);" pathCondition="true" pathConditionChanged="false">
                               <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
                                  <statement name="a_2=a_2*2;" pathCondition="true" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of self.secondLevel(a_2);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.secondLevel(a_2);&gt;" isReturnValueComputed="false">
+                                    <methodReturn name="&lt;return of self.secondLevel(a_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                        <statement name="secondLevel(a_1);" pathCondition="true" pathConditionChanged="false">
                                        </statement>
                                     </methodReturn>

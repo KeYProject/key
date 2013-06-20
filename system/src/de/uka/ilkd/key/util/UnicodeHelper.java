@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -24,7 +24,7 @@ package de.uka.ilkd.key.util;
  *
  */
 public final class UnicodeHelper {
-    
+
     // first order operators
     public static final char NEG = '\u00AC';
     public static final char IMP = '\u2192';
@@ -40,13 +40,13 @@ public final class UnicodeHelper {
     public static final char DIAMOND = '\u25C7';
     public static final char CIRC = '\u2218';
     public static final char BULLET = '\u2219';
-    
+
     // arithmetic stuff
     public static final char LEQ = '\u2264';
     public static final char GEQ = '\u2265';
     public static final char SUM = '\u2211';
     public static final char PROD = '\u220F';
-    
+
     // sets
     public static final char IN = '\u220A';
     public static final char EMPTY = '\u2205';
@@ -56,13 +56,13 @@ public final class UnicodeHelper {
     public static final char SETMINUS = '\u2216';
     public static final char NATURALS = '\u2115';
     public static final char INTEGERS = '\u2124';
-    
+
     // delimiters (for modalities)
     public static final char LANGLE = '\u27E8';
     public static final char RANGLE = '\u27E9';
     public static final char LLBRACKET = '\u27E6';
     public static final char RRBRACKET = '\u27E7';
-    
+
     // greek alphabet
     public static final char ALPHA = '\u03B1';
     public static final char BETA = '\u03B2';
@@ -88,15 +88,33 @@ public final class UnicodeHelper {
     public static final char CHI = '\u03C7';
     public static final char PSI = '\u03C8';
     public static final char OMEGA = '\u03C9';
-    
-    
+
+
     // also quite popular
     public static final char TOP = '\u22A4';
     public static final char BOT = '\u22A5';
     public static final char TURNSTILE = '\u22A6';
     public static final char MODELS = '\u22A7';
-    
-    
+
+
+    // non-logic symbols
+    public static final char COPYRIGHT = '\u00A9';
+    public static final char ENSPACE = '\u2002';
+    public static final char EMSPACE = '\u2003';
+    public static final char ENDASH = '\u2013';
+
+
+    /**
+     * Return a String containing em-spaces.
+     */
+    public static String emSpaces (int em) {
+        final StringBuffer sb = new StringBuffer();
+        for (int i= 0; i < em; i++)
+            sb.append(EMSPACE);
+        return sb.toString();
+    }
+
+
     /** For testing Unicode symbols. */
 //    public static void main(String[] args){
 //        System.out.println("Testing Unicode symbols:");
@@ -109,5 +127,5 @@ public final class UnicodeHelper {
 //            }
 //        }
 //    }
-    
+
 }

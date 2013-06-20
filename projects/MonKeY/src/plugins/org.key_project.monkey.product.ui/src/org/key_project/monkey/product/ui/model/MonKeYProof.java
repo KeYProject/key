@@ -561,4 +561,20 @@ public class MonKeYProof extends Bean {
    public boolean isReused() {
       return "Loaded Proof".equals(getReuseStatus());
    }
+
+   /**
+    * Returns the {@link Proof} instance if available.
+    * @return The {@link Proof} instance if available.
+    */
+   public Proof getProof() {
+      return proof;
+   }
+
+   /**
+    * Returns the {@link UserInterface} in which {@link #getProof()} lives.
+    * @return The {@link UserInterface} in which {@link #getProof()} lives.
+    */
+   public UserInterface getUi() {
+      return ui;
+   }
 }

@@ -64,8 +64,27 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
         return proof;
     }       
     
+    // display message for the status bar
     @Override
     public String toString() {
-                return "";
+        if ( appliedRules != 0 ) {
+            StringBuilder message = new StringBuilder();
+            String timeString = (time/1000) + "." + ((time%1000)/100);
+
+            message.append("Strategy: Applied " + appliedRules + " rule");
+            if ( appliedRules != 1 ) {
+                message.append("s");
+            }
+            message.append(" (" + timeString + " sec), ");
+            message.append(" closed " + closedGoals + " goal");
+            if ( closedGoals != 1 ) {
+                message.append("s");             
+            }
+            message.append(", " + proof.openGoals().size());
+            message.append(" remaining");
+            return message.toString();
+        } else {
+            return "No rules applied";
+        }
     }
 }

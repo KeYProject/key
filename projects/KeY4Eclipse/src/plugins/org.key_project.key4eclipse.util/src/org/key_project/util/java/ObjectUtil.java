@@ -135,9 +135,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -193,9 +190,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, boolean value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -251,9 +245,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, int value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }

@@ -34,7 +34,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
 	super(mainWindow);
 	setName("Show Active Taclet Options...");
 	
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
 
     }
 

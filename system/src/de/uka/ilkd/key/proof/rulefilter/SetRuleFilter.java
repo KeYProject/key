@@ -11,8 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-
-
 package de.uka.ilkd.key.proof.rulefilter;
 
 import java.util.HashSet;
@@ -20,11 +18,11 @@ import java.util.HashSet;
 import de.uka.ilkd.key.rule.Rule;
 
 /**
- * Rule filter that selects taclets which are members of a given explicit set 
+ * Rule filter that selects taclets which are members of a given explicit set
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private HashSet<Rule> set = new HashSet<Rule> ();
+    private HashSet<Rule> set = new HashSet<Rule> (2000);
 
     public void addRuleToSet ( Rule rule ) {
     	set.add(rule);

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.array(w,array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="w.value=1;" pathCondition="true" pathConditionChanged="false">
+         <statement name="array[0].value=2;" pathCondition="true" pathConditionChanged="false">
+            <statement name="array[1].value=3;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return w.value+array[0].value+array[1].value;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	9 {array[1] = array[0] &amp; array[0] = w}, 
+	7 {  array[1] = array[0] &amp; !array[0] = w
+| !array[1] = array[0]
+&amp; array[0] = w}, 
+	8 {!array[1] = array[0] &amp; (!array[0] = w &amp; array[1] = w)}, 
+	6 {!array[1] = array[0] &amp; (!array[0] = w &amp; !array[1] = w)}
+as result of self.array(w,array);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="9 {array[1] = array[0] &amp; array[0] = w}" returnValueString="9" hasCondition="true" conditionString="array[1] = array[0] &amp; array[0] = w">
+                     </methodReturnValue>
+                     <methodReturnValue name="7 {  array[1] = array[0] &amp; !array[0] = w
+| !array[1] = array[0]
+&amp; array[0] = w}" returnValueString="7" hasCondition="true" conditionString="  array[1] = array[0] &amp; !array[0] = w
+| !array[1] = array[0]
+&amp; array[0] = w">
+                     </methodReturnValue>
+                     <methodReturnValue name="8 {!array[1] = array[0] &amp; (!array[0] = w &amp; array[1] = w)}" returnValueString="8" hasCondition="true" conditionString="!array[1] = array[0] &amp; (!array[0] = w &amp; array[1] = w)">
+                     </methodReturnValue>
+                     <methodReturnValue name="6 {!array[1] = array[0] &amp; (!array[0] = w &amp; !array[1] = w)}" returnValueString="6" hasCondition="true" conditionString="!array[1] = array[0] &amp; (!array[0] = w &amp; !array[1] = w)">
+                     </methodReturnValue>
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
