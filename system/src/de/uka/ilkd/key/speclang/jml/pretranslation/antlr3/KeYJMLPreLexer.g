@@ -22,12 +22,6 @@ lexer grammar KeYJMLPreLexer;
 @members {
     private final Stack<String> paraphrase = new Stack<String>();
 
-    private boolean expressionMode = false;
-    
-    public void setExpressionMode(boolean b) {
-    	expressionMode = b;
-    }
-
     private void newline() {
       Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
     }
