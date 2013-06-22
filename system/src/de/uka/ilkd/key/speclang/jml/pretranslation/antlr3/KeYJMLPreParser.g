@@ -58,7 +58,7 @@ options {
     private KeYJMLPreParser(KeYJMLPreLexer lexer,
                             String fileName,
                             Position offsetPos) {
-    	this(new LegacyCommonTokenStream(lexer));
+    	this(new CommonTokenStream(lexer));
     	this.lexer      = lexer;
     	this.excManager = new SLTranslationExceptionManager(this,
     							    fileName,
