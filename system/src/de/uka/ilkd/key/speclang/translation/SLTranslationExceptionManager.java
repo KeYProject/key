@@ -46,8 +46,8 @@ public class SLTranslationExceptionManager {
 	int line;
 	int column;
 	try {
-	    line = parser.LT(0).getLine();
-	    column = parser.LT(0).getColumn();
+	    line = parser.LT(1).getLine();
+	    column = parser.LT(1).getColumn();
 	} catch (final TokenStreamException e) {
 	    line = 1;
 	    column = 1;
@@ -62,8 +62,8 @@ public class SLTranslationExceptionManager {
     public SLTranslationExceptionManager(KeYJMLPreParser parser, 
                                          String fileName, 
                                          Position offsetPos) {
-        this.line = parser.input.LT(0).getLine();
-        this.column = parser.input.LT(0).getCharPositionInLine();
+        this.line = parser.input.LT(1).getLine();
+        this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName  = fileName;
         this.offsetPos = offsetPos;
     }
