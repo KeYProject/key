@@ -649,29 +649,36 @@ public class Proof implements Named {
     /**
      * save proof in file. If autoSave is on, this will potentially overwrite already
      * existing proof files with the same name. Otherwise the save dialog pops up.
+     * Change: Now for loaded proofs both are turned off by default, i.e. only manual
+     * saving is possible, and the save dialog never pops up automatically (except
+     * for hitting the "Save ..." or "Save current proof" button).
      */
     public void saveProof() {
-        final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser jFC =
-                GuiUtilities.getFileChooser("Choose filename to save proof");
-        final String defaultName =
-                MiscTools.toValidFileName(this.name().toString()).toString();
-        boolean autoSave =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
+                && !name().toString().endsWith(".proof")) {
+            // Save proof only if auto save is on and not a loaded proof
+            final MainWindow mainWindow = MainWindow.getInstance();
+            final KeYFileChooser jFC =
+                    GuiUtilities.getFileChooser("Choose filename to save proof");
+            final String defaultName =
+                    MiscTools.toValidFileName(this.name().toString()).toString();
+            boolean autoSave =
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
 
-        final Pair<Boolean, Pair<File, Boolean>> res =
-                jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
-        final boolean saved = res.first;
-        final boolean newDir = res.second.second;
-        if (saved) {
-            mainWindow.saveProof(jFC.getSelectedFile());
-        } else if (newDir) {
-            final File dir = res.second.first;
-            if (!dir.delete()) {
-                dir.deleteOnExit();
-            }
+            final Pair<Boolean, Pair<File, Boolean>> res =
+                    jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
+            final boolean saved = res.first;
+            final boolean newDir = res.second.second;
+            if (saved) {
+                mainWindow.saveProof(jFC.getSelectedFile());
+            } else if (newDir) {
+                    final File dir = res.second.first;
+                    if (!dir.delete()) {
+                        dir.deleteOnExit();
+                    }
+                }
+            jFC.resetPath();
         }
-        jFC.resetPath();
     }
 
     /**
@@ -941,9 +948,7 @@ public class Proof implements Named {
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofClosed(e);
 	}
-	if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()) {
-	    saveProof(); // save proof only if auto save is on
-	}
+	saveProof();
     }
 
 
