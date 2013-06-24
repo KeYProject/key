@@ -455,6 +455,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+          if(p == null) {
+            assert heap == services.getTypeConverter().getHeapLDT().getSavedHeap() && !hasModifiesClause();
+            continue;
+          }
           if(result == null) {
             result = p;
           }else{
@@ -819,6 +823,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
+          if(p == null) {
+            assert heap == services.getTypeConverter().getHeapLDT().getSavedHeap() && !hasModifiesClause();
+            continue;
+          }
           if(result == null) {
             result = p;
           }else{
@@ -989,3 +997,4 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 }
+
