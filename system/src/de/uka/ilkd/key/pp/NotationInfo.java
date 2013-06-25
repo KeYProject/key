@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
@@ -199,7 +200,7 @@ public final class NotationInfo {
             notationTable = defaultNotationCache;
             return;
         }
-    defaultNotationCache = new HashMap<Object,Notation>();
+    defaultNotationCache = new LinkedHashMap<Object,Notation>();
     HashMap<Object,Notation> tbl = defaultNotationCache;
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));

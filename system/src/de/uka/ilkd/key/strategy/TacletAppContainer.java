@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -619,11 +620,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static final class IfInstCache {
         public Node cacheKey = null;
 
-        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>
-            antecCache = new HashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
-        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  =
-            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
-
+        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> 
+            antecCache = new LinkedHashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
+        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  = 
+            new LinkedHashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();  
         public void reset(Node n){
             cacheKey = n;
             antecCache.clear ();

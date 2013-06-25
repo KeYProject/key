@@ -17,6 +17,8 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -90,8 +92,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                           TransformerCache cache) {
         super(services, cache);
         warnings = DefaultImmutableSet.<PositionedString>nil();
-        typeDeclaration2Constructores = new HashMap<TypeDeclaration, List<? extends Constructor>>();
-        typeDeclaration2Methods = new HashMap<TypeDeclaration, List<Method>>();
+        typeDeclaration2Constructores = new LinkedHashMap<TypeDeclaration, List<? extends Constructor>>();
+        typeDeclaration2Methods = new LinkedHashMap<TypeDeclaration, List<Method>>();
     }
 
    
@@ -714,7 +716,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     
     private static class TypeDeclarationCollector extends SourceVisitor{
         
-        HashSet<TypeDeclaration> result = new HashSet<TypeDeclaration>();
+        HashSet<TypeDeclaration> result = new LinkedHashSet<TypeDeclaration>();
                 
         public void walk(SourceElement s){
             s.accept(this);

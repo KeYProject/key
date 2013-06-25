@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -36,7 +37,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 public class BoundUniquenessChecker {
 
-    private HashSet<QuantifiableVariable> boundVars = new HashSet<QuantifiableVariable>();
+    private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
     private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
 
     public BoundUniquenessChecker(Sequent seq) {
@@ -73,7 +74,7 @@ public class BoundUniquenessChecker {
 	/* Note that a term can bound a variable in several
 	 * subterms. 
          */
-        final HashSet<QuantifiableVariable> localVars = new HashSet<QuantifiableVariable>(10);
+        final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<QuantifiableVariable>(10);
         
         for (int i = 0, ar = t.arity(); i<ar; i++) {
             for (int j=0, sz = t.varsBoundHere(i).size(); j<sz; j++) {
