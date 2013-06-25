@@ -73,8 +73,8 @@ public class ClassInitializeMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
 	        TransformerCache cache) {	
 	super(services, cache);
-	class2initializers = new HashMap<TypeDeclaration, ASTList<Statement>>(10*getUnits().size());
-	class2super = new HashMap<ClassDeclaration, TypeReference>(2*getUnits().size());
+	class2initializers = new LinkedHashMap<TypeDeclaration, ASTList<Statement>>(10*getUnits().size());
+	class2super = new LinkedHashMap<ClassDeclaration, TypeReference>(2*getUnits().size());
     }
 
     /** 

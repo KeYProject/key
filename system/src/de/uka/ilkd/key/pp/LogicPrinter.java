@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -319,7 +320,7 @@ public final class LogicPrinter {
     
     private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
 	
-	Set<SchemaVariable> result = new HashSet<SchemaVariable>();
+	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 	OpCollector oc = new OpCollector();
 	
 	//find, assumes

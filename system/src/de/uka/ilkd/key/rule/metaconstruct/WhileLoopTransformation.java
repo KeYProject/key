@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -659,7 +660,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	     * rename all occ. variables in the body (same name but different object)
 	     */
 	    ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body, 
-	            new HashMap<ProgramVariable, ProgramVariable>(), true, services);
+	            new LinkedHashMap<ProgramVariable, ProgramVariable>(), true, services);
 	    replacer.start();
 	    body = (Statement) replacer.result();
 	    

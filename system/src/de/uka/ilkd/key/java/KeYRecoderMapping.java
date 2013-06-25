@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -41,8 +42,8 @@ public class KeYRecoderMapping{
 
     
     public KeYRecoderMapping() {
-	this.map = new HashMap<Object, Object>();
-	this.revMap = new HashMap<Object, Object>();
+	this.map = new LinkedHashMap<Object, Object>();
+	this.revMap = new LinkedHashMap<Object, Object>();
     }
 
 

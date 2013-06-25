@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.*;
@@ -48,7 +49,7 @@ public class OpReplacer {
     
     
     public static Term replace(Term toReplace, Term with, Term in) {
-	Map<Term,Term> map = new HashMap<Term,Term>();
+	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(in);
@@ -58,7 +59,7 @@ public class OpReplacer {
     public static ImmutableList<Term> replace(Term toReplace, 
 	                                      Term with, 
 	                                      ImmutableList<Term> in) {
-	Map<Term,Term> map = new HashMap<Term,Term>();
+	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(in);
@@ -67,7 +68,7 @@ public class OpReplacer {
     
     
     public static Term replace(Operator toReplace, Operator with, Term in) {
-	Map<Operator,Operator> map = new HashMap<Operator,Operator>();
+	Map<Operator,Operator> map = new LinkedHashMap<Operator,Operator>();
 	map.put(toReplace, with);
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(in);
@@ -179,7 +180,7 @@ public class OpReplacer {
      */
     public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> myMap) {
         
-        Map<Operator,Term> result = new HashMap<Operator, Term>();
+        Map<Operator,Term> result = new LinkedHashMap<Operator, Term>();
         
         final Iterator<Map.Entry<Operator, Term>> it = myMap.entrySet().iterator();
         while(it.hasNext()) {

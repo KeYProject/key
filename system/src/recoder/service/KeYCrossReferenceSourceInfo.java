@@ -488,7 +488,7 @@ public class KeYCrossReferenceSourceInfo
     /**
      * The mapping from class names to stub compilation units.
      */
-    protected Map<String, CompilationUnit> stubClasses = new HashMap<String, CompilationUnit>();
+    protected Map<String, CompilationUnit> stubClasses = new LinkedHashMap<String, CompilationUnit>();
 
     /**
      *  The flag which decides on the behaviour on undefined classes

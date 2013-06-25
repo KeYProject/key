@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -757,10 +758,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             }
             String[] instFiles = dir.list();
             if (instFiles == null) {
-                hm = new HashMap<String, List<List<String>>>(0);
+                hm = new LinkedHashMap<String, List<List<String>>>(0);
             } else {
                 // Avoid resizing of HashMap
-                hm = new HashMap<String, List<List<String>>>(instFiles.length + 1, 1);
+                hm = new LinkedHashMap<String, List<List<String>>>(instFiles.length + 1, 1);
                 for (String instFile : instFiles) {
                     hm.put(instFile, null);
                 }

@@ -24,6 +24,7 @@ package de.uka.ilkd.key.util.make;
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 
 public class Config {
@@ -45,7 +46,7 @@ public class Config {
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
     
-    static HashMap<String,StringBuffer> map = new HashMap<String,StringBuffer>();
+    static HashMap<String,StringBuffer> map = new LinkedHashMap<String,StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
@@ -167,7 +168,7 @@ public class Config {
 	FileReader fr = null;
 	try {
 	    fr = new FileReader(args[0]);       	
-	    map = new HashMap<String, StringBuffer>();
+	    map = new LinkedHashMap<String, StringBuffer>();
 	    while (readIdentifier(fr)!=-1) {	    
 	    }
 	    fr.close();

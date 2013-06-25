@@ -80,6 +80,11 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                         info.getProof().openGoals().size());              
                 System.exit(0);
             }
+
+            // setInteractive(false) has to be called because the ruleAppIndex
+            // has to be notified that we work in auto mode (CS)
+            mediator.setInteractive(false);
+
             final Object result = ps.start();
             if (verbose) {
             	System.out.println(result);

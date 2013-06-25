@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.HashMap;
-
+import java.util.LinkedHashMap;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -87,7 +87,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
     private static final HashMap<Name, ProgramSVSort> name2sort =
-        new HashMap<Name, ProgramSVSort>(60);
+        new LinkedHashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
     

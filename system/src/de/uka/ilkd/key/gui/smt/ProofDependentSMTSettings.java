@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 
 
@@ -52,7 +53,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
   
 
-        private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
+        private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
         public boolean useExplicitTypeHierarchy     = false;
         public boolean useNullInstantiation         = true;

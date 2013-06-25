@@ -674,8 +674,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         for(LocationVariable heap : heapContext) {
            final AnonUpdateData tAnon;
-           // TODO probably the special case still needs fixing (later)
-           if(heap == baseHeap && !contract.hasModifiesClause()) {
+           if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap() && !contract.hasModifiesClause()) {
+             // Strictly pure methods should not be concerned with savedHeap
+             break;
+           }
+           if(!contract.hasModifiesClause()) {
              tAnon = new AnonUpdateData(TB.tt(), TB.skip(), TB.var(heap), TB.var(heap), TB.var(heap));
            }else{
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);

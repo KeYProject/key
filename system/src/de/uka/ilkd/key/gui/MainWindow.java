@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
@@ -1018,8 +1019,7 @@ public final class MainWindow extends JFrame  {
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
 	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
-
-	    doNotReenable = new HashSet<Component>();
+	    doNotReenable = new LinkedHashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
 	    for (int i = 0; i < cs.length; i++) {
 		if (!cs[i].isEnabled()) {
