@@ -619,11 +619,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static final class IfInstCache {
         public Node cacheKey = null;
 
-        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>
-            antecCache = new HashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
-        public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  =
-            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
-
         public void reset(Node n){
             cacheKey = n;
             antecCache.clear ();

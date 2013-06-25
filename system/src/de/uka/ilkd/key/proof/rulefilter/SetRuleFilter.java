@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private HashSet<Rule> set = new HashSet<Rule> (2000);
 
     public void addRuleToSet ( Rule rule ) {
     	set.add(rule);
