@@ -220,7 +220,7 @@ public class Node implements Iterable<Node> {
 	if ( p_node.root () )
 	    return p_node;
 
-	HashSet<Node> paths = new HashSet<Node> ();
+	HashSet<Node> paths = new LinkedHashSet<Node> ();
 	Node    n     = this;
 
 	while ( true ) {

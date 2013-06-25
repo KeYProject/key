@@ -50,7 +50,7 @@ public class PrepareObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
 	 TransformerCache cache) {	
 	super(services, cache);
-	class2fields = new HashMap<TypeDeclaration, ASTList<Statement>>(getUnits().size());
+	class2fields = new LinkedHashMap<TypeDeclaration, ASTList<Statement>>(getUnits().size());
     }
 
     /**

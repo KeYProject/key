@@ -72,7 +72,7 @@ public class InvariantConfigurator {
      */
     private InvariantConfigurator() {
         invariants = new ArrayList<Map<String,String>[]>();
-        mapLoopsToInvariants = new HashMap<LoopStatement, List<Map<String,String>[]>>();
+        mapLoopsToInvariants = new LinkedHashMap<LoopStatement, List<Map<String,String>[]>>();
     }
 
     /**

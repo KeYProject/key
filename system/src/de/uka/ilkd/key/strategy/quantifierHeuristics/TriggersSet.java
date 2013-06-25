@@ -43,7 +43,7 @@ class TriggersSet {
     /**a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code> 
      * which stores different subterms of <code>allTerm</code> 
      * with its according trigger */
-    private final Map<Term, Trigger> termToTrigger = new HashMap<Term, Trigger>();
+    private final Map<Term, Trigger> termToTrigger = new LinkedHashMap<Term, Trigger>();
     /**all universal variables of <code>allTerm</code>*/
     private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
     /**
@@ -236,7 +236,7 @@ class TriggersSet {
                 changed = changed || possibleSubs[i].size() != 1 || possibleSubs[i].iterator().next() != oriSub;
             }
 
-            final Set<Term> res = new HashSet<Term>();
+            final Set<Term> res = new LinkedHashSet<Term>();
             if (t.op() == IfThenElse.IF_THEN_ELSE) {
                 res.addAll(possibleSubs[1]);
                 res.addAll(possibleSubs[2]);
@@ -258,7 +258,7 @@ class TriggersSet {
                 Term[] chosenSubs,
                 ImmutableArray<QuantifiableVariable> boundVars,
                 int i) {
-            final HashSet<Term> set = new HashSet<Term>();
+            final HashSet<Term> set = new LinkedHashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res =
                         TermFactory.DEFAULT.createTerm(oriTerm.op(),
@@ -368,7 +368,7 @@ class TriggersSet {
          * @return a set of triggers
          */
         private Set<ImmutableSet<Trigger>> setMultiTriggers(Iterator<Trigger> ts) {
-            Set<ImmutableSet<Trigger>> res = new HashSet<ImmutableSet<Trigger>>();
+            Set<ImmutableSet<Trigger>> res = new LinkedHashSet<ImmutableSet<Trigger>>();
             if (ts.hasNext()) {
         	final Trigger trigger = ts.next();
         	ImmutableSet<Trigger> tsi = DefaultImmutableSet.<Trigger>nil().add(trigger);

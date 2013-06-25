@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
@@ -87,7 +88,7 @@ public class ExpandMethodBody extends ProgramTransformer {
 	ImmutableArray<? extends Expression> argsAsParam = mbs.getArguments();
 
 	final HashMap<ProgramVariable, ProgramVariable> map = 
-	    new HashMap<ProgramVariable, ProgramVariable>();	
+	    new LinkedHashMap<ProgramVariable, ProgramVariable>();	
 	for (int i = 0; i < argsAsParam.size(); i++) {
 	    IProgramVariable pv = methDecl.getParameterDeclarationAt(i).
 	            getVariableSpecification().getProgramVariable();

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -296,9 +297,9 @@ public class SymbolicConfigurationExtractor {
                initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
                currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
                // Create configuration maps which are filled lazily
-               initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-               currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-               configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+               initialConfigurations = new LinkedHashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               currentConfigurations = new LinkedHashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               configurationsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
             }
             finally {
                equivalentClassesProofStarter.getProof().dispose();
@@ -319,7 +320,7 @@ public class SymbolicConfigurationExtractor {
     * @return The objects to ignore.
     */
    protected Set<Term> computeInitialObjectsToIgnore() {
-      Set<Term> result = new HashSet<Term>();
+      Set<Term> result = new LinkedHashSet<Term>();
       // Add exception variable to the ignore list because it is not part of the source code.
       IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
       if (excVar instanceof ProgramVariable) {
@@ -1245,7 +1246,7 @@ public class SymbolicConfigurationExtractor {
       SymbolicState state = new SymbolicState(stateName);
       result.setState(state);
       // Create objects
-      Map<Term, SymbolicObject> objects = new HashMap<Term, SymbolicObject>();
+      Map<Term, SymbolicObject> objects = new LinkedHashMap<Term, SymbolicObject>();
       for (ExecutionVariableValuePair pair : pairs) {
          Term parent = pair.getParent();
          if (parent != null) {

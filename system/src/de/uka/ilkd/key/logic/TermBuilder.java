@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -1684,7 +1685,7 @@ public class TermBuilder {
     final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
     final Map<LocationVariable, LogicVariable> map
-        = new HashMap<LocationVariable, LogicVariable>();
+        = new LinkedHashMap<LocationVariable, LogicVariable>();
     map.put(heapLDT.getHeap(), heapLV);
     final OpReplacer or = new OpReplacer(map);
     t = or.replace(t);

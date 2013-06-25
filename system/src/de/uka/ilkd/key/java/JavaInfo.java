@@ -16,6 +16,8 @@ package de.uka.ilkd.key.java;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -143,7 +145,7 @@ public final class JavaInfo {
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
     
-    private HashMap<KeYJavaType,IObserverFunction> staticInvs = new HashMap<KeYJavaType,IObserverFunction>();
+    private HashMap<KeYJavaType,IObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,IObserverFunction>();
 
     
     /**
@@ -257,7 +259,7 @@ public final class JavaInfo {
      */
     private void buildNameCache() {
         nameCachedSize = kpmi.rec2key().size();
-        name2KJTCache = new HashMap<String, KeYJavaType>();
+        name2KJTCache = new LinkedHashMap<String, KeYJavaType>();
         for (final Object o : kpmi.allElements()) {
             if (o != null && o instanceof KeYJavaType){                 
                 final KeYJavaType oKJT = (KeYJavaType)o;
@@ -356,9 +358,9 @@ public final class JavaInfo {
      * caches all known types according to their short name
      */
     private void buildShortNameCache() {
-        sName2KJTCache = new HashMap<String, Object>();
+        sName2KJTCache = new LinkedHashMap<String, Object>();
         sNameCachedSize = kpmi.rec2key().size();
-        final HashSet<String> duplicates = new HashSet<String>();
+        final HashSet<String> duplicates = new LinkedHashSet<String>();
         for (Object o : kpmi.allElements()) {
             if (o instanceof KeYJavaType){
                 KeYJavaType t = (KeYJavaType)o;                
@@ -393,7 +395,7 @@ public final class JavaInfo {
      * program type model
      */
     public Set<KeYJavaType> getAllKeYJavaTypes() {
-	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
+	final Set<KeYJavaType> result  = new LinkedHashSet<KeYJavaType>();
         for (final Object o : kpmi.allElements()) {     
 	    if (o instanceof KeYJavaType) {		
 	        result.add((KeYJavaType)o);
@@ -477,7 +479,7 @@ public final class JavaInfo {
      public KeYJavaType getKeYJavaType(Sort sort) {
 	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
 	     sortCachedSize = kpmi.rec2key().size();
-	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
+	     sort2KJTCache = new LinkedHashMap<Sort, KeYJavaType>();
 	     for (final Object o : kpmi.allElements()) {
 	         if (o instanceof KeYJavaType){
 	             final KeYJavaType oKJT = (KeYJavaType)o;
@@ -507,7 +509,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getKeYJavaType(Type t) {
 	if(type2KJTCache == null) {
-	    type2KJTCache = new HashMap<Type, KeYJavaType>();
+	    type2KJTCache = new LinkedHashMap<Type, KeYJavaType>();
 	    for (final Object o : kpmi.allElements()) {
 		if (o instanceof KeYJavaType) {
 		    final KeYJavaType oKJT = (KeYJavaType)o;
