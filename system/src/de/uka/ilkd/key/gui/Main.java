@@ -186,16 +186,6 @@ public class Main {
         }
     }
 
-
-    /**
-     * Returns the used title. This information is required in other
-     * projects which instantiates the {@link MainWindow} manually.
-     * @return The title of {@link MainWindow} to use.
-     */
-    public static String getMainWindowTitle() {
-        return "KeY " + KeYResourceManager.getManager().getVersion();
-    }
-
     /**
      * Register commandline options with command line object
      * @return commandline object
@@ -349,6 +339,8 @@ public class Main {
 
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);
         } else {
+            updateSplashScreen();
+
             GuiUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     MainWindow key = MainWindow.getInstance();
@@ -372,6 +364,15 @@ public class Main {
 
         return ui;
 
+    }
+
+    private static void updateSplashScreen() {
+        try {
+            final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
+            if (sp == null) return;
+            // insert customization code here
+            // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
+        } catch (Exception e) {}
     }
 
     private static void evaluateLemmataOptions(CommandLine options){

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <state name="return first.value+second.value+tempX.value+tempY.value;">
+   <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o3"/>
       <association name="tempX" programVariable="tempX" isArrayIndex="false" arrayIndex="-1" target="o3"/>

@@ -82,6 +82,7 @@ tokens {
 	ISOBSERVER = "\\isObserver";
 	DIFFERENT = "\\different";		
 	METADISJOINT = "\\metaDisjoint";
+	ISTHISREFERENCE="\\isThisReference";	        
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	
