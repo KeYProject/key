@@ -40,6 +40,31 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testLoopInvariantMethodReturnInDifferentModalities() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/test/WhileWithMethodCallAsConditionFullImplemented.java", 
+                "WhileWithMethodCallAsConditionFullImplemented", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/oracle/WhileWithMethodCallAsConditionFullImplemented.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed
     * </p>
     * <p>
