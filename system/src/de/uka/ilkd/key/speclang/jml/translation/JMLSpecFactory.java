@@ -81,7 +81,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         cf = new ContractFactory(services);
-        modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
+        modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 
 
@@ -443,7 +443,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         PositionedString[] array = new PositionedString[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new HashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),
@@ -468,7 +468,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         PositionedString[] array = new PositionedString[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new HashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),
@@ -655,6 +655,10 @@ public class JMLSpecFactory {
                       ? TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services)) 
                       : TB.imp(TB.not(excNull),TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services))));
             result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ? TB.and(post1, post2) : post1);
+          }else{
+            if(clauses.assignables.get(heap) != null) {
+               result.put(heap, TB.tt());
+            }
           }
         }
         return result;
@@ -686,6 +690,10 @@ public class JMLSpecFactory {
            if(clauses.requires.get(heap) != null) {
              final Term pre = TB.convertToFormula(clauses.requires.get(heap), services);
              pres.put(heap, pre);
+           }else{
+             if(clauses.assignables.get(heap) != null) {
+               pres.put(heap, TB.tt());
+             }
            }
         }
         if (clauses.diverges.equals(TB.ff())) {

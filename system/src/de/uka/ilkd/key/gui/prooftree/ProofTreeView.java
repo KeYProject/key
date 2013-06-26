@@ -22,6 +22,8 @@ import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -64,7 +66,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     GUIProofTreeModel delegateModel;
     
-    private HashMap<Proof, GUIProofTreeModel> models = new HashMap<Proof, GUIProofTreeModel>(20);
+    private HashMap<Proof, GUIProofTreeModel> models = new LinkedHashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;
@@ -274,7 +276,7 @@ public class ProofTreeView extends JPanel {
 	if (delegateModel != null) {
             expansionState.disconnect(delegateView);
             delegateModel.storeExpansionState(
-                expansionState.state(new HashSet()));
+                expansionState.state(new LinkedHashSet()));
             delegateModel.storeSelection(delegateView.getSelectionPath());
 	    delegateModel.unregister();
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
@@ -521,7 +523,7 @@ public class ProofTreeView extends JPanel {
 	 */
 	public void autoModeStarted(ProofEvent e) {
 	    modifiedSubtrees      = ImmutableSLList.<Node>nil();
-	    modifiedSubtreesCache = new HashSet<Node>();
+	    modifiedSubtreesCache = new LinkedHashSet<Node>();
 	    if (delegateModel == null) {
                 Debug.out("delegateModel is null");
                 return;

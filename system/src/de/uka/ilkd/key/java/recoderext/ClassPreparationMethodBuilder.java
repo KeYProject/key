@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -71,7 +72,7 @@ public class ClassPreparationMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
 	 TransformerCache cache) {	
 	super(services, cache);
-	class2staticFields = new HashMap<ClassDeclaration, ASTList<Statement>>(10*getUnits().size());
+	class2staticFields = new LinkedHashMap<ClassDeclaration, ASTList<Statement>>(10*getUnits().size());
     }
 
     /** 

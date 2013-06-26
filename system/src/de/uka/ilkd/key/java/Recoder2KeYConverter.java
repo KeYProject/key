@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -240,14 +241,14 @@ public class Recoder2KeYConverter {
     /**
      * caches access to methods for reflection. It is a HashMap<Class, Method>
      */
-    private final HashMap<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>(400);
+    private final HashMap<Class<?>, Method> methodCache = new LinkedHashMap<Class<?>, Method>(400);
 
     /**
      * caches constructor access for reflection. It is a HashMap<Class,
      * Constructor>
      */
-    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
-	new HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
+    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache = 
+	new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
 
     /**
      * Hashmap from <code>recoder.java.declaration.FieldSpecification</code>
@@ -255,16 +256,16 @@ public class Recoder2KeYConverter {
      * when converting initializers. Access to this map is performed via the
      * method <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
-	new HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
+    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping = 
+	new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
 
     /**
      * methodsDeclaring contains the recoder method declarations as keys that
      * have been started to convert but are not yet finished. The mapped value
      * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
-	new HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
+	new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed

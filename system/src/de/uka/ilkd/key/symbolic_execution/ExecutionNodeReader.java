@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -194,7 +195,7 @@ public class ExecutionNodeReader {
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
        */
-      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new HashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
       
       /**
        * {@inheritDoc}

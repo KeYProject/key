@@ -16,6 +16,7 @@ package de.uka.ilkd.key.util.make;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class MakefileReader {
 
@@ -66,7 +67,7 @@ public class MakefileReader {
     }
     
     public HashSet<String> getRules() {
-	hset = new HashSet<String>();
+	hset = new LinkedHashSet<String>();
 	try {
 	    FileReader fr = new FileReader(file);		
 	    if (hset.size()==0) read(fr);

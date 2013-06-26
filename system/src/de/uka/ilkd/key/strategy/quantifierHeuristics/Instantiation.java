@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableMap;
@@ -46,7 +47,7 @@ class Instantiation {
 	    .<Term> nil();
 
     /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
-    private final Map<Term, Long> instancesWithCosts = new HashMap<Term, Long>();
+    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
 
     /** the <code>TriggersSet</code> of this <code>allTerm</code> */
     private final TriggersSet triggersSet;

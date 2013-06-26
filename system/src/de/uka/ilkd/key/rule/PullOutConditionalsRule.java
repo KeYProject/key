@@ -180,7 +180,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	result.head().changeFormula(newCF, ruleApp.posInOccurrence());
 	
 	//add definitions
-	final Set<Term> alreadyDefined = new HashSet<Term>(); 
+	final Set<Term> alreadyDefined = new LinkedHashSet<Term>(); 
 	for(Map.Entry<Term, Term> entry : map.entrySet()) {
 	    final Term term   = entry.getKey();
 	    final Term abbrev = entry.getValue();

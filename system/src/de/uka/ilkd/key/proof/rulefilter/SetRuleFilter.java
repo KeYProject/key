@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.rulefilter;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.rule.Rule;
 
@@ -22,7 +23,7 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private HashSet<Rule> set = new HashSet<Rule> (2000);
+    private HashSet<Rule> set = new LinkedHashSet<Rule> ();
 
     public void addRuleToSet ( Rule rule ) {
     	set.add(rule);

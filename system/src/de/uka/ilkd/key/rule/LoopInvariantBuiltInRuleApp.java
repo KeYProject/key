@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -166,7 +167,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         };
 		
 		// replace index
-        Map<LocationVariable,Term> newInvs = new HashMap<LocationVariable,Term>(invs);
+        Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>(invs);
 		if (!skipIndex){
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
                 for(LocationVariable heap : invs.keySet()) {
