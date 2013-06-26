@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -502,7 +503,7 @@ public final class SymbolicExecutionUtil {
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT); // Method Treatment: Contract
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); // Loop Treatment: Invariant
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON); // Dependency Contracts: On
-      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON); // Query Treatment: On
+      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED); // Query Treatment: Restricted
       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits 
       starter.setStrategy(sp);
@@ -1161,7 +1162,80 @@ public final class SymbolicExecutionUtil {
     */
    public static Term findModalityWithMaxSymbolicExecutionLabelId(Term term) {
       if (term != null) {
-         FindModalityWithMaxSymbolicExecutionLabelId visitor = new FindModalityWithMaxSymbolicExecutionLabelId();
+         FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(true);
+         term.execPreOrder(visitor);
+         return visitor.getModality();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
+    * @param sequent The {@link Sequent} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
+      if (sequent != null) {
+         Term nextAntecedent = findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent());
+         Term nextSuccedent = findModalityWithMinSymbolicExecutionLabelId(sequent.succedent());
+         if (nextAntecedent != null) {
+            if (nextSuccedent != null) {
+               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent);
+               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent);
+               return antecedentLabel.getId() < succedentLabel.getId() ? nextAntecedent : nextSuccedent;
+            }
+            else {
+               return nextAntecedent;
+            }
+         }
+         else {
+            return nextSuccedent;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
+    * @param semisequent The {@link Semisequent} to search in.
+    * @return The modality {@link Term} with the minimal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMinSymbolicExecutionLabelId(Semisequent semisequent) {
+      if (semisequent != null) {
+         int maxId = Integer.MIN_VALUE;
+         Term modality = null;
+         for (SequentFormula sf : semisequent) {
+            Term current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+            if (current != null) {
+               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(current);
+               if (modality == null || label.getId() < maxId) {
+                  modality = current;
+                  maxId = label.getId();
+               }
+            }
+         }
+         return modality;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+    * @param term The {@link Term} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMinSymbolicExecutionLabelId(Term term) {
+      if (term != null) {
+         FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(false);
          term.execPreOrder(visitor);
          return visitor.getModality();
       }
@@ -1175,7 +1249,7 @@ public final class SymbolicExecutionUtil {
     * used by {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
     * @author Martin Hentschel
     */
-   private static final class FindModalityWithMaxSymbolicExecutionLabelId extends DefaultVisitor {
+   private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor {
       /**
        * The modality {@link Term} with the maximal ID.
        */
@@ -1185,6 +1259,19 @@ public final class SymbolicExecutionUtil {
        * The maximal ID.
        */
       private int maxId;
+      
+      /**
+       * {@code true} search maximal ID, {@code false} search minimal ID.
+       */
+      private boolean maximum;
+      
+      /**
+       * Constructor.
+       * @param maximum {@code true} search maximal ID, {@code false} search minimal ID.
+       */
+      public FindModalityWithSymbolicExecutionLabelId(boolean maximum) {
+         this.maximum = maximum;
+      }
 
       /**
        * {@inheritDoc}
@@ -1193,7 +1280,7 @@ public final class SymbolicExecutionUtil {
       public void visit(Term visited) {
          SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
          if (label != null) {
-            if (modality == null || label.getId() > maxId) {
+            if (modality == null || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
                modality = visited;
                maxId = label.getId();
             }
@@ -2276,27 +2363,30 @@ public final class SymbolicExecutionUtil {
     */
    public static IProgramVariable extractExceptionVariable(Proof proof) {
       Node root = proof.root();
-      if (root.sequent().succedent().size() == 1) {
-         Term succedent = root.sequent().succedent().getFirst().formula(); // Succedent term
-         if (succedent.subs().size() == 2) {
-            Term updateApplication = succedent.subs().get(1);
-            if (updateApplication.subs().size() == 2) {
-               JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
-               if (updateContent instanceof StatementBlock) { // try catch inclusive
-                  ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
-                  if (updateContentBody.size() == 2 && updateContentBody.get(1) instanceof Try) {
-                     Try tryStatement = (Try)updateContentBody.get(1);
-                     if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
-                        Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
-                        if (catchStatement.getBody() instanceof StatementBlock) {
-                           StatementBlock  catchBlock = (StatementBlock)catchStatement.getBody();
-                           if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
-                              Assignment assignment = (Assignment)catchBlock.getBody().get(0);
-                              if (assignment.getFirstElement() instanceof IProgramVariable) {
-                                 IProgramVariable var = (IProgramVariable)assignment.getFirstElement();
-                                 return var;
-                              }
-                           }
+      Term modalityTerm = SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
+      if (modalityTerm != null) {
+         modalityTerm = TermBuilder.DF.goBelowUpdates(modalityTerm);
+         JavaProgramElement updateContent = modalityTerm.javaBlock().program();
+         if (updateContent instanceof StatementBlock) { // try catch inclusive
+            ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
+            Try tryStatement = null;
+            Iterator<? extends Statement> iter = updateContentBody.iterator();
+            while (tryStatement == null && iter.hasNext()) {
+               Statement next = iter.next();
+               if (next instanceof Try) {
+                  tryStatement = (Try)next;
+               }
+            }
+            if (tryStatement != null) {
+               if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
+                  Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
+                  if (catchStatement.getBody() instanceof StatementBlock) {
+                     StatementBlock  catchBlock = (StatementBlock)catchStatement.getBody();
+                     if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
+                        Assignment assignment = (Assignment)catchBlock.getBody().get(0);
+                        if (assignment.getFirstElement() instanceof IProgramVariable) {
+                           IProgramVariable var = (IProgramVariable)assignment.getFirstElement();
+                           return var;
                         }
                      }
                   }
