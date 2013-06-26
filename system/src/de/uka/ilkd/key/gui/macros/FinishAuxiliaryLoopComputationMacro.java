@@ -39,7 +39,9 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public void applyTo(final KeYMediator mediator, PosInOccurrence posInOcc, ProverTaskListener listener) {
+    public void applyTo(final KeYMediator mediator,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
         final Proof proof = mediator.getSelectedProof();
         final ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
@@ -70,7 +72,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingGoal.proof().addIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingGoal.proof().unionLabeledIFSymbols(proof.getIFSymbols());
+        initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
 
         proof.saveProof();
 
@@ -96,6 +98,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         i++;
 
         // create find term
+        ifVars = generateApplicationDataSVs(ifVars, services);
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1, ifVars.c2,

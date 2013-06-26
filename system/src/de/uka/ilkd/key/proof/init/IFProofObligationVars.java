@@ -33,7 +33,7 @@ public class IFProofObligationVars {
     }
 
 
-    private IFProofObligationVars(ProofObligationVars c1,
+    public IFProofObligationVars(ProofObligationVars c1,
                                   ProofObligationVars c2,
                                   ProofObligationVars symbExecVars) {
         this.c1 = c1;

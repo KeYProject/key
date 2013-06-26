@@ -83,7 +83,7 @@ public class FinishAuxiliaryBlockComputationMacro
         initiatingGoal.proof().addIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingGoal.proof().unionLabeledIFSymbols(proof.getIFSymbols());
+        initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
 
         proof.saveProof();
 
@@ -110,6 +110,7 @@ public class FinishAuxiliaryBlockComputationMacro
         i++;
 
         // create find term
+        ifVars = generateApplicationDataSVs(ifVars, services);
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,

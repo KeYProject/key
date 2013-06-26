@@ -5,12 +5,14 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -19,19 +21,24 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -42,6 +49,8 @@ import java.util.Map;
 abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     static final TermBuilder TB = TermBuilder.DF;
+
+    private static final String SCHEMA_PREFIX = "sv_";
 
 
     @Override
@@ -59,6 +68,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     protected Term calculateResultingTerm(Proof proof,
                                           IFProofObligationVars ifVars,
                                           Goal initGoal) {
+        ifVars = generateApplicationDataSVs(ifVars, proof.getServices());
         final Term[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
                                proof.openGoals(), initGoal);
@@ -73,7 +83,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                 composedStates = TB.or(composedStates, composedState);
             }
         }
-        initGoal.proof().addIFSymbol(composedStates);
+        //initGoal.proof().addIFSymbol(composedStates);
         return composedStates;
     }
 
@@ -121,13 +131,18 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
 
     private Map<ProgramVariable, ProgramVariable>
-                        extractProgamVarReplaceMap(Map<Term, Term> replaceMap) {
+                        extractProgramVarReplaceMap(Map<Term, Term> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 new HashMap<ProgramVariable, ProgramVariable>();
         for (final Term t : replaceMap.keySet()) {
             if (t.op() instanceof ProgramVariable) {
-                progVarReplaceMap.put((ProgramVariable) t.op(),
-                                      (ProgramVariable) replaceMap.get(t).op());
+                if (replaceMap.get(t).op() instanceof ProgramVariable) {
+                    progVarReplaceMap.put((ProgramVariable) t.op(),
+                                          (ProgramVariable) replaceMap.get(t).op());
+                } else {
+                    System.out.println(t.op().toString() + " :: " + t.op().getClass());
+                    assert false;
+                }
             }
         }
         return progVarReplaceMap;
@@ -208,8 +223,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                                   initGoal);
             final Term[] renamedSubs =
                     renameSubs(term, replaceMap, notReplaceMap, postfix, initGoal);
-            final ElementaryUpdate renamedU =
-                    ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
+            ProgramSV psv = SchemaVariableFactory.createProgramSV(
+                                    new ProgramElementName(renamedLhs.op().name().toString()),
+                                    ProgramSVSort.VARIABLE, false);
+            final ElementaryUpdate renamedU = ElementaryUpdate.getInstance(psv);
             final Term uTerm = TermFactory.DEFAULT.createTerm(renamedU, renamedSubs);
             replaceMap.put(term, uTerm);
             return uTerm;
@@ -229,6 +246,12 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
                                       Term term, Services services) {
+        /*Map<ProgramVariable, ProgramVariable> pvMap = new HashMap<ProgramVariable, ProgramVariable>();
+        for (ProgramSV psv: progVarReplaceMap.keySet()) {
+            pvMap.put(new LocationVariable(psv.getProgramElementName(), psv.getKeYJavaType(),
+                                           psv.getContainerType(), psv.isStatic(), psv.isModel()),
+                                           progVarReplaceMap.get(psv));
+        }*/
         final ProgVarReplaceVisitor paramRepl =
                 new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
         paramRepl.start();
@@ -288,7 +311,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                         initGoal);
         Services services = initGoal.proof().getServices();
         final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-                extractProgamVarReplaceMap(replaceMap);
+                extractProgramVarReplaceMap(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap, notReplaceMap,
                                         postfix, services);
     }
@@ -337,6 +360,97 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         return renamedSubs;
     }
 
+    IFProofObligationVars generateApplicationDataSVs(IFProofObligationVars ifVars, Services services) {
+        return new IFProofObligationVars(generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c1, services),
+                                         generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c2, services),
+                                         ifVars.symbExecVars);
+    }
+
+    private ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
+                                                           ProofObligationVars appData,
+                                                           Services services) {
+        // generate a new schema variable for any pre variable
+        Term selfAtPreSV =
+                createTermSV(appData.pre.self, schemaPrefix, services);
+        ImmutableList<Term> localVarsAtPreSVs =
+                createTermSV(appData.pre.localVars, schemaPrefix, services);
+        Term guardAtPreSV =
+                createTermSV(appData.pre.guard, schemaPrefix, services);
+        Term resAtPreSV =
+                createTermSV(appData.pre.result, schemaPrefix, services);
+        Term excAtPreSV =
+                createTermSV(appData.pre.exception, schemaPrefix, services);
+        Term heapAtPreSV =
+                createTermSV(appData.pre.heap, schemaPrefix, services);
+        Term mbyAtPreSV =
+                createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
+
+        // generate a new schema variable only for those post variables
+        // which do not equal the corresponding pre variable; else use
+        // the pre schema variable
+        Term selfAtPostSV = (appData.pre.self == appData.post.self ?
+                selfAtPreSV : createTermSV(appData.post.self, schemaPrefix, services));
+
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
+        Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
+        for (Term appDataPostLocalVar : appData.post.localVars) {
+            Term appDataPreLocalVar = appDataPreLocalVarsIt.next();
+            Term localPreVar = schemaLocalVarsAtPreIt.next();
+            if (appDataPostLocalVar == appDataPreLocalVar) {
+                localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
+            } else {
+                localVarsAtPostSVs =
+                        localVarsAtPostSVs.append(createTermSV(appDataPostLocalVar,
+                                                               schemaPrefix,
+                                                               services));
+            }
+        }
+
+        Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
+                guardAtPreSV : createTermSV(appData.post.guard, schemaPrefix, services));
+        Term resAtPostSV = (appData.pre.result == appData.post.result ?
+                resAtPreSV : createTermSV(appData.post.result, schemaPrefix, services));
+        Term excAtPostSV = (appData.pre.exception == appData.post.exception ?
+                excAtPreSV : createTermSV(appData.post.exception, schemaPrefix, services));
+        Term heapAtPostSV = (appData.pre.heap == appData.post.heap ?
+                heapAtPreSV : createTermSV(appData.post.heap, schemaPrefix, services));
+
+        // build state vararibale container for pre and post state
+        StateVars pre =
+                new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
+                              excAtPreSV, heapAtPreSV, mbyAtPreSV, services);
+        StateVars post =
+                new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
+                              excAtPostSV, heapAtPostSV, null, services);
+
+        // return proof obligation schema variables
+        return new ProofObligationVars(pre, post);
+    }
+
+    Term createTermSV(Term t,
+                      String schemaPrefix,
+                      Services services) {
+        if (t == null) {
+            return null;
+        }
+        String svName = schemaPrefix + t.toString();
+        Sort sort = t.sort();
+        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
+        return TB.var(SchemaVariableFactory.createProgramSV(new ProgramElementName(name.toString()),
+                                                        ProgramSVSort.VARIABLE, false));
+
+    }
+
+    private ImmutableList<Term> createTermSV(ImmutableList<Term> ts,
+                                             String schemaPrefix,
+                                             Services services) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term t : ts) {
+            result = result.append(createTermSV(t, schemaPrefix, services));
+        }
+        return result;
+    }
 
     void addContractApplicationTaclets(Goal initiatingGoal,
                                        Proof symbExecProof) {

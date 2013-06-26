@@ -72,7 +72,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        addIFSymbol(finalTerm);
+        addIFSymbol(selfComposedExec);
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
@@ -94,7 +94,7 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            addIFSymbol(t);
+            addLabeledIFSymbol(t);
             addIFSymbol(((RewriteTaclet)t).find());
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
@@ -106,7 +106,7 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                SVInstantiations.EMPTY_SVINSTANTIATIONS,
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            addIFSymbol(t);
+            addLabeledIFSymbol(t);
             addIFSymbol(((RewriteTaclet)t).find());
         }
     }

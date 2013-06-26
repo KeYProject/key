@@ -96,7 +96,7 @@ public class FinishAuxiliaryComputationMacro
         i++;
 
         // create find term
-        final IFProofObligationVars ifVars = infPO.getIFVars();
+        IFProofObligationVars ifVars = generateApplicationDataSVs(infPO.getIFVars(), services);
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(infPO.getContract(),
                                                    ifVars.c1, ifVars.c2,

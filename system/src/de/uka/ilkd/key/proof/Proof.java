@@ -492,6 +492,17 @@ public class Proof implements Named {
         }
     }
 
+    public void addLabeledIFSymbol(Object s) {
+        assert s != null;
+        if (s instanceof Term) {
+            infFlowSymbols.addLabeled((Term)s);
+        } else if (s instanceof Named) {
+            infFlowSymbols.addLabeled((Named)s);
+        } else {
+            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
+        }
+    }
+
     public void unionIFSymbols(InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.union(symbols);

@@ -422,7 +422,7 @@ public class BlockContractRule implements BuiltInRule {
                     splitPostTB.generateTaclets(post, services);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                goal.proof().addIFSymbol(t);
+                goal.proof().addLabeledIFSymbol(t);
                 goal.proof().addIFSymbol(((RewriteTaclet)t).find());
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
@@ -430,7 +430,7 @@ public class BlockContractRule implements BuiltInRule {
                     removePostTB.generateTaclets(post, services);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-                goal.proof().addIFSymbol(t);
+                goal.proof().addLabeledIFSymbol(t);
                 goal.proof().addIFSymbol(((RewriteTaclet)t).find());
             }
             goal.proof().addIFSymbol(contractApplTerm);
@@ -597,7 +597,7 @@ public class BlockContractRule implements BuiltInRule {
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        goal.proof().addIFSymbol(finalTerm);
+        goal.proof().addIFSymbol(selfComposedExec);
         Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
 
