@@ -51,9 +51,6 @@ public class Disjoint {
         disjointHelper();
         disjointHelper();
         disjointHelper();
-        disjointHelper();
-        disjointHelper();
-        disjointHelper();
     }
 
     /*@ requires    \disjoint(\locset(x), rep);
