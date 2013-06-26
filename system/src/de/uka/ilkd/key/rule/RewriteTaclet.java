@@ -39,11 +39,11 @@ public final class RewriteTaclet extends FindTaclet {
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;
 
-    /** all taclet consituents must appear in the same state 
+    /** all taclet constituents must appear in the same state
      * (and not below a modality (for efficiency reasons)) */
     public static final int SAME_UPDATE_LEVEL = 1;
 
-    /** all taclet consituents must be in the same state 
+    /** all taclet constituents must be in the same state
      * as the sequent */
     public static final int IN_SEQUENT_STATE = 2;
     
@@ -67,18 +67,19 @@ public final class RewriteTaclet extends FindTaclet {
      */
     public static final int SUCCEDENT_POLARITY = 8;
 
+    public static final int TRANSFORMER_PROCEDURE = 16;
     
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
-     * If the value is equal to 
-     * <ul> 
+     * If the value is equal to
+     * <ul>
      * <li> {@link RewriteTaclet#NONE} no state restrictions are posed</li>
-     * <li> {@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code> 
+     * <li> {@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code>
      * must match on a formula within the same state as <code>\find</code>
-     * rsp. <code>\add</code>. For efficiency no modalities are allowed above 
+     * rsp. <code>\add</code>. For efficiency no modalities are allowed above
      * the <code>\find</code> position  </li>
-     * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is 
-     * only allowed to match on formulas which are evaulated in the same state as 
+     * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is
+     * only allowed to match on formulas which are evaluated in the same state as
      * the sequent</li>
      *</ul>
      */
@@ -166,49 +167,55 @@ public final class RewriteTaclet extends FindTaclet {
 	if ( getApplicationRestriction() == NONE)  
 	    return p_mc;
         
-    int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
+	if (getApplicationRestriction() == TRANSFORMER_PROCEDURE) {
+	    // check if we are in top level of uppermost transformer procedure
+	    // if no, then no matching
+	    // if yes, then check if rule fits for this kind of transformer
+	}
+
+	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	if ( p_pos.posInTerm () != null ) {
 	    PIOPathIterator it = p_pos.iterator ();
 	    Operator        op;
 
 	    while ( it.next () != -1 ) {
-            final Term t = it.getSubTerm ();
-            op = t.op ();
+	        final Term t = it.getSubTerm ();
+	        op = t.op ();
 
-            if ( op instanceof UpdateApplication &&
-                it.getChild () == UpdateApplication.targetPos()) {		    
-                if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
-                return null;
-                } else {
-                Term update = UpdateApplication.getUpdate(t);
-                svi = svi.addUpdate(update, t.getLabels());
+	        if ( op instanceof UpdateApplication &&
+	                it.getChild () == UpdateApplication.targetPos()) {
+	            if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
+	                return null;
+	            } else {
+	                Term update = UpdateApplication.getUpdate(t);
+	                svi = svi.addUpdate(update, t.getLabels());
                 }
 
-            } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
-                return null;
-            }
+	        } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
+	            return null;
+	        }
 
             // compute polarity
-                                                                                // toggle polarity if find term is subterm of
-            if ((op == Junctor.NOT) ||                                          //   not
-                (op == Junctor.IMP && it.getChild() == 0)) {                    //   left hand side of implication
-                polarity = polarity * -1;
-                                                                                // do not change polarity if find term is subterm of
-            } else if ((op == Junctor.AND) ||                                   //   and
-                       (op == Junctor.OR) ||                                    //   or
-                       (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
-                       (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
-                // do nothing
-            } else {                                                            // find term has no polarity in any other case
-                polarity = 0;
-            }
+                                                                                 // toggle polarity if find term is subterm of
+	        if ((op == Junctor.NOT) ||                                       //   not
+	                (op == Junctor.IMP && it.getChild() == 0)) {             //   left hand side of implication
+	            polarity = polarity * -1;
+                                                                                 // do not change polarity if find term is subterm of
+	        } else if ((op == Junctor.AND) ||                                //   and
+	                (op == Junctor.OR) ||                                    //   or
+	                (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
+	                (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
+	            // do nothing
+	        } else {                                                         // find term has no polarity in any other case
+	            polarity = 0;
+	        }
 	    }
 	}
-    if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
-        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
-        return null;
-    }
+	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
+	        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
+	    return null;
+	}
 
 	return p_mc.setInstantiations ( svi );
     }
