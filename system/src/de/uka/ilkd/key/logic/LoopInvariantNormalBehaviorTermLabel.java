@@ -28,49 +28,49 @@ public class LoopInvariantNormalBehaviorTermLabel implements ITermLabel {
    /**
     * The only instance of this class.
     */
-	public static LoopInvariantNormalBehaviorTermLabel INSTANCE = new LoopInvariantNormalBehaviorTermLabel();
-	
-	/**
-	 * Constructor to forbid multiple instances.
-	 */
-	private LoopInvariantNormalBehaviorTermLabel() {		
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean equals(Object o) {
-		return this == o;
-	}
-		
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString() {
-		return NAME.toString();
-	}
+   public static LoopInvariantNormalBehaviorTermLabel INSTANCE = new LoopInvariantNormalBehaviorTermLabel();
+
+   /**
+    * Constructor to forbid multiple instances.
+    */
+   private LoopInvariantNormalBehaviorTermLabel() {
+   }
 
    /**
     * {@inheritDoc}
     */
-	@Override
+   public boolean equals(Object o) {
+       return this == o;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   public String toString() {
+       return NAME.toString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public ITermLabel getChild(int i) {
-      return null;
+       return null;
    }
 
    /**
     * {@inheritDoc}
     */
-	@Override
+   @Override
    public int getChildCount() {
-      return 0;
+       return 0;
    }
 
-	/**
-	 * {@inheritDoc}
-	 */
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public Name name() {
-      return NAME;
+       return NAME;
    }
 }

@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -50,10 +51,18 @@ public class WellDefinednessOperator {
             return wd(t.sub(0));
         } else if (op.equals(Junctor.OR)) {
             assert subs == 2;
-            return or(t.sub(0), t.sub(1));
+            if (t.hasLabels() && t.getLabels().contains(ShortcutEvaluationTermLabel.INSTANCE)) {
+                return or(t.sub(0), t.sub(1));
+            } else {
+                return wd (t.sub(0), t.sub(1));
+            }
         } else if (op.equals(Junctor.AND)) {
             assert subs == 2;
-            return and(t.sub(0), t.sub(1));
+            if (t.hasLabels() && t.getLabels().contains(ShortcutEvaluationTermLabel.INSTANCE)) {
+                return and(t.sub(0), t.sub(1));
+            } else {
+                return wd (t.sub(0), t.sub(1));
+            }
         } else if (op.equals(Junctor.IMP)) {
             // Reverse implication is parsed to an equivalent disjunction and thus
             // does not have to be considered separately

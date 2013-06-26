@@ -539,20 +539,20 @@ class TermImpl implements Term {
         return serialNumber;
     }
 
-	@Override
-	public boolean hasLabels() {
-		return false;
-	}
+    @Override
+    public boolean hasLabels() {
+        return false;
+    }
 
-	@Override
-	public boolean containsLabel(ITermLabel label) {
-		return false;
-	}
+    @Override
+    public boolean containsLabel(ITermLabel label) {
+        return false;
+    }
 
-	@Override
-	public ImmutableArray<ITermLabel> getLabels() {
-		return EMPTY_LABEL_LIST;
-	}
+    @Override
+    public ImmutableArray<ITermLabel> getLabels() {
+        return EMPTY_LABEL_LIST;
+    }
     
     /**
      * {@inheritDoc}

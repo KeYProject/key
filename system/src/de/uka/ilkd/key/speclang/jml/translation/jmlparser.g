@@ -784,8 +784,9 @@ logicalorexpr returns [SLExpression result=null] throws SLTranslationException
 	(
 	    LOGICALOR expr=logicalorexpr
 	    {
-		result = new SLExpression(TB.or(TB.convertToFormula(result.getTerm(), services),
-		                                TB.convertToFormula(expr.getTerm(), services)));
+	        Term t = TB.or(TB.convertToFormula(result.getTerm(), services),
+	                       TB.convertToFormula(expr.getTerm(), services));
+		result = new SLExpression(TB.label(t, ShortcutEvaluationTermLabel.INSTANCE));
 	    }
 	)?
 ;
@@ -799,8 +800,9 @@ logicalandexpr returns [SLExpression result=null] throws SLTranslationException
 	(
 	    LOGICALAND expr=logicalandexpr
 	    {
-		result = new SLExpression(TB.and(TB.convertToFormula(result.getTerm(), services),
-		                                 TB.convertToFormula(expr.getTerm(), services)));
+		Term t = TB.and(TB.convertToFormula(result.getTerm(), services),
+                                TB.convertToFormula(expr.getTerm(), services));
+		result = new SLExpression(TB.label(t, ShortcutEvaluationTermLabel.INSTANCE));
 	    }
 	)?
 ;
