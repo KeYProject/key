@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -41,7 +42,7 @@ class ClausesGraph {
     /**
      * Map from <code>Term</code> to <code>ImmutableSet<Term></code>
      */
-    private final Map<Term, ImmutableSet<Term>> connections = new HashMap<Term, ImmutableSet<Term>>();
+    private final Map<Term, ImmutableSet<Term>> connections = new LinkedHashMap<Term, ImmutableSet<Term>>();
     
     private final ImmutableSet<Term> clauses;
     

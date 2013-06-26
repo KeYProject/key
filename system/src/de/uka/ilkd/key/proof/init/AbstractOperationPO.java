@@ -170,7 +170,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                  new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 
          for (LocationVariable heap : modHeaps) {
-            heapToAtPre.put(heap, new HashMap<Term, Term>());
+            heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
             heapToAtPre.get(heap).put(TB.var(heap), TB.var(atPreVars.get(heap)));
          }
 

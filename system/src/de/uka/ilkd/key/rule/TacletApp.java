@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -221,7 +223,7 @@ public abstract class TacletApp implements RuleApp {
 	    					SVInstantiations insts,
 	    					Services services) {
 
-	HashMap<LogicVariable, SchemaVariable> collMap = new HashMap<LogicVariable, SchemaVariable>();
+	HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<LogicVariable, SchemaVariable>();
 
 	final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it = insts
 		.pairIterator();
@@ -627,7 +629,7 @@ public abstract class TacletApp implements RuleApp {
      *         variable name should not fall.
      */
     private Collection<String> collectClashNames(SchemaVariable sv, Services services) {
-        Collection<String> result = new HashSet<String>();
+        Collection<String> result = new LinkedHashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         Iterator<NotFreeIn> it = taclet().varsNotFreeIn();
         while(it.hasNext()) {
@@ -1199,7 +1201,7 @@ public abstract class TacletApp implements RuleApp {
             SchemaVariable sv = schemaVariable;
 	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
 		TacletPrefix prefix = taclet().getPrefix(sv);
-		HashSet<Name> names = new HashSet<Name>();
+		HashSet<Name> names = new LinkedHashSet<Name>();
                 if (prefix.context()) {
                     for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
                         names.add(quantifiableVariable.name());

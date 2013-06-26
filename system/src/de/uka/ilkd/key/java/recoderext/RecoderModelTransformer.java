@@ -296,7 +296,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	    }
 	    classDeclarations = cdc.result();
 	    
-	    typeDeclaration2allSupertypes = new HashMap<TypeDeclaration, List<ClassType>>();
+	    typeDeclaration2allSupertypes = new LinkedHashMap<TypeDeclaration, List<ClassType>>();
 	    for (TypeDeclaration td : cdc.types()) {
 		typeDeclaration2allSupertypes.put(td, td.getAllSupertypes());
 	    }
@@ -304,7 +304,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         
         public HashMap<ClassType, List<Variable>> getLocalClass2FinalVarMapping() {
             if(localClass2FinalVar == null){
-                localClass2FinalVar = new HashMap<ClassType, List<Variable>>();
+                localClass2FinalVar = new LinkedHashMap<ClassType, List<Variable>>();
             }
             return localClass2FinalVar;
         }
@@ -363,8 +363,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     
     private static class TypeAndClassDeclarationCollector extends SourceVisitorExtended {
         
-        private HashSet<ClassDeclaration> result = new HashSet<ClassDeclaration>();
-	private HashSet<TypeDeclaration> types   = new HashSet<TypeDeclaration>();
+        private HashSet<ClassDeclaration> result = new LinkedHashSet<ClassDeclaration>();
+	private HashSet<TypeDeclaration> types   = new LinkedHashSet<TypeDeclaration>();
         
         public TypeAndClassDeclarationCollector(){
             super();

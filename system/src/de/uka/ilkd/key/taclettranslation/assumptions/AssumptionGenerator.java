@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -57,7 +59,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         protected final static TermFactory tf = TermFactory.DEFAULT;
 
-        protected HashMap<String, LogicVariable> usedVariables = new HashMap<String, LogicVariable>();
+        protected HashMap<String, LogicVariable> usedVariables = new LinkedHashMap<String, LogicVariable>();
 
         protected Collection<TranslationListener> listener = new LinkedList<TranslationListener>();
 
@@ -183,7 +185,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         }
 
         static public HashSet<GenericSort> collectGenerics(Term term) {
-                HashSet<GenericSort> genericSorts = new HashSet<GenericSort>();
+                HashSet<GenericSort> genericSorts = new LinkedHashSet<GenericSort>();
                 collectGenerics(term, genericSorts);
                 return genericSorts;
         }

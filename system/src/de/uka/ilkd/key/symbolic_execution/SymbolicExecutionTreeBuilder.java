@@ -17,6 +17,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -156,31 +158,31 @@ public class SymbolicExecutionTreeBuilder {
     * Maps a {@link Node} of KeY's proof tree to his execution tree model representation
     * if it is available.
     */
-   private Map<Node, AbstractExecutionNode> keyNodeMapping = new HashMap<Node, AbstractExecutionNode>();
+   private Map<Node, AbstractExecutionNode> keyNodeMapping = new LinkedHashMap<Node, AbstractExecutionNode>();
    
    /**
     * Maps a loop condition of a {@link Node} of KeY's proof tree to his 
     * execution tree model representation ({@link IExecutionLoopCondition}) if it is available.
     */
-   private Map<Node, ExecutionLoopCondition> keyNodeLoopConditionMapping = new HashMap<Node, ExecutionLoopCondition>();
+   private Map<Node, ExecutionLoopCondition> keyNodeLoopConditionMapping = new LinkedHashMap<Node, ExecutionLoopCondition>();
    
    /**
     * Maps a branch condition of a {@link Node} of KeY's proof tree to his 
     * execution tree model representation ({@link IExecutionBranchCondition}) if it is available.
     */
-   private Map<Node, ExecutionBranchCondition> keyNodeBranchConditionMapping = new HashMap<Node, ExecutionBranchCondition>();
+   private Map<Node, ExecutionBranchCondition> keyNodeBranchConditionMapping = new LinkedHashMap<Node, ExecutionBranchCondition>();
    
    /**
     * Contains the method call stacks for each tracked symbolic execution modality.
     * As key is {@link SymbolicExecutionTermLabel#getId()} used.
     */
-   private Map<Integer, LinkedList<Node>> methodCallStackMap = new HashMap<Integer, LinkedList<Node>>();
+   private Map<Integer, LinkedList<Node>> methodCallStackMap = new LinkedHashMap<Integer, LinkedList<Node>>();
 
    /**
     * Contains {@link Node}s of method calls which return statements should be ignored. 
     * As key is {@link SymbolicExecutionTermLabel#getId()} used.
     */
-   private Map<Integer, Set<Node>> methodReturnsToIgnoreMap = new HashMap<Integer, Set<Node>>();
+   private Map<Integer, Set<Node>> methodReturnsToIgnoreMap = new LinkedHashMap<Integer, Set<Node>>();
 
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
@@ -311,7 +313,7 @@ public class SymbolicExecutionTreeBuilder {
          Integer key = Integer.valueOf(id);
          Set<Node> result = methodReturnsToIgnoreMap.get(key);
          if (result == null) {
-            result = new HashSet<Node>();
+            result = new LinkedHashSet<Node>();
             methodReturnsToIgnoreMap.put(key, result);
          }
          return result;
@@ -436,7 +438,7 @@ public class SymbolicExecutionTreeBuilder {
       /**
        * Maps the {@link Node} in KeY's proof tree to the {@link IExecutionNode} of the symbolic execution tree where the {@link Node}s children should be added to.
        */
-      private Map<Node, AbstractExecutionNode> addToMapping = new HashMap<Node, AbstractExecutionNode>();
+      private Map<Node, AbstractExecutionNode> addToMapping = new LinkedHashMap<Node, AbstractExecutionNode>();
       
       /**
        * Branch conditions ({@link ExecutionBranchCondition}) are only applied to the 
@@ -455,7 +457,7 @@ public class SymbolicExecutionTreeBuilder {
        * This utility {@link Map} helps to find a {@link List} in {@link #branchConditionsStack}
        * for the given parent node to that elements in the {@link List} should be added.
        */
-      private Map<AbstractExecutionNode, List<ExecutionBranchCondition>> parentToBranchConditionMapping = new HashMap<AbstractExecutionNode, List<ExecutionBranchCondition>>();
+      private Map<AbstractExecutionNode, List<ExecutionBranchCondition>> parentToBranchConditionMapping = new LinkedHashMap<AbstractExecutionNode, List<ExecutionBranchCondition>>();
       
       /**
        * {@inheritDoc}
