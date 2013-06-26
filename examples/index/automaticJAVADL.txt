@@ -14,6 +14,9 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Performance tests
+provable: ./performance-test/disjoint-test-1.key
+provable: ./performance-test/disjoint-test-3.key
 
 # Tests for rule application restrictions
 provable: ./heap/polarity_tests/wellformed1.key
