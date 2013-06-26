@@ -292,6 +292,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "concrete", -10000 );        
         bindRuleSet ( d, "simplify", -3000 );        
         bindRuleSet ( d, "simplify_enlarging", -1800 );        
+        bindRuleSet ( d, "simplify_select", -1700 );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
