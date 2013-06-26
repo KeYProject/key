@@ -373,8 +373,23 @@ public final class JMLSpecExtractor implements SpecExtractor {
         = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
 
         int startPos;
+        TextualJMLMethodDecl modelMethodDecl = null;
         if(pm.isModel()) {
             startPos = getIndexOfMethodDecl(pm, constructsArray) - 1;
+            modelMethodDecl = (TextualJMLMethodDecl)constructsArray[startPos+1];
+            if(startPos < 0 || !(constructsArray[startPos] instanceof TextualJMLSpecCase)) {
+              //Special case, the method is model, but does not have any specification
+              //create an empty one and insert it:
+              TextualJMLSpecCase modelSpec = new TextualJMLSpecCase(
+                 ImmutableSLList.<String>nil(),
+                 Behavior.NORMAL_BEHAVIOR);
+              TextualJMLConstruct[] t = new TextualJMLConstruct[constructsArray.length+1];
+              startPos++;
+              System.arraycopy(constructsArray, 0, t, 0, startPos);
+              System.arraycopy(constructsArray, startPos, t, startPos+1, constructsArray.length - startPos);
+              t[startPos] = modelSpec;
+              constructsArray = t;
+            }
             assert startPos != constructsArray.length - 1;
         } else {
             startPos = constructsArray.length - 1;
@@ -384,16 +399,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
         i--) {
             TextualJMLSpecCase specCase 
             = (TextualJMLSpecCase) constructsArray[i];
+            if(modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
+               specCase.addAxioms(modelMethodDecl.getMethodDefinition());
+            }
 
             //add purity. Strict purity overrides purity.
-            if(isStrictlyPure) {
-                specCase.addAssignable(new PositionedString("assignable \\less_than_nothing"));
+            if(isStrictlyPure || pm.isModel()) {
+                specCase.addAssignable(new PositionedString("assignable \\strictly_nothing"));
             } else if(isPure) {
                 specCase.addAssignable(new PositionedString("assignable \\nothing"));
             }
 
             //add invariants
-            if(!isHelper && (!pm.isStatic() || addInvariant)) {
+            if(!isHelper && pm.getStateCount() > 0 && (!pm.isStatic() || addInvariant)) {
                 // for a static method translate \inv once again, otherwise use the internal symbol
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
@@ -405,7 +423,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(new PositionedString("ensures "+invString));
                 }
-                if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+                if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
                     specCase.addSignals(new PositionedString("signals (Exception e) "+invString));
                 }
             }
@@ -443,7 +461,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             //add implicit signals-only if omitted
             if(specCase.getSignalsOnly().isEmpty()
-                    && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+                    && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
+                    && !pm.isModel()) {
                 specCase.addSignalsOnly(
                         new PositionedString(getDefaultSignalsOnly(pm)));
             }

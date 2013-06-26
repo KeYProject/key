@@ -47,6 +47,7 @@ tokens {
     ENSURES         = "ensures";
     DECLASSIFY      = "declassify";
     DEPENDS         = "depends";
+    MODEL_METHOD_AXIOM    = "model_method_axiom";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
     RESPECTS        = "respects";

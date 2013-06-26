@@ -211,7 +211,7 @@ public class JMLSpecFactory {
         progVar.selfVar = TB.selfVar(services, pm, pm.getContainerType(), false);
         progVar.paramVars = TB.paramVars(services, pm, false);
         progVar.resultVar = TB.resultVar(services, pm, false);
-        progVar.excVar = TB.excVar(services, pm, false);
+        progVar.excVar = pm.isModel() ? null : TB.excVar(services, pm, false);
 
         progVar.atPreVars = new LinkedHashMap<LocationVariable,LocationVariable>();
         progVar.atPres = new LinkedHashMap<LocationVariable,Term>();

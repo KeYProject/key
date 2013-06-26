@@ -326,7 +326,11 @@ public class MethodDeclaration extends JavaDeclaration
         return super.isModel();
     }
     
-    
+    @Override
+    public int getStateCount() {
+        return super.getStateCount();
+    }
+
     /**
      * test whether the declaration is a method with a variable number of arguments (i.e. the ellipsis ...)
      * @return true iff so

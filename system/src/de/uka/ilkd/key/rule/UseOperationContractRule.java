@@ -623,9 +623,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         final Term mby = contract.hasMby() 
-                         ? contract.getMby(TB.getBaseHeap(services), 
+                         ? contract.getMby(heapTerms, 
                         	 	   contractSelf, 
                         	 	   contractParams, 
+                        	 	   atPres,
                         	 	   services) 
                          : null;
         
@@ -736,7 +737,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		= services.getSpecificationRepository()
 		          .getPOForProof(goal.proof());
 	final Term mbyOk;	
-	if(po != null && po.getMbyAtPre() != null && mby != null ) {
+	if(po != null && contract.getTarget().equals(po.getContract().getTarget()) && po.getMbyAtPre() != null && mby != null ) {
     	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
     			       TB.lt(mby, po.getMbyAtPre(), services));
 	} else {
