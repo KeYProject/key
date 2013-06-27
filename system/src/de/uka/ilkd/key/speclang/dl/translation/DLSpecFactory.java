@@ -325,7 +325,8 @@ public final class DLSpecFactory {
 					 modality, 
 					 pres,
 					 null,// TODO measured_by in DL contracts not supported yet
-					 posts, 
+					 posts,
+					 null, // TODO no model methods in DL contracts
 					 mods, 
 					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 

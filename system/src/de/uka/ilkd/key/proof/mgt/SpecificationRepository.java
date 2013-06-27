@@ -847,7 +847,8 @@ public final class SpecificationRepository {
                          kjt,  
                          new Private(),
                          invDef,
-                         selfVar);
+                         selfVar,
+                         ImmutableSLList.<ProgramVariable>nil(), null);
           result = result.add(invRepresentsAxiom);
              
           //add query axioms for own class

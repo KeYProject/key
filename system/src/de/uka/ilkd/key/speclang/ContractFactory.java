@@ -89,6 +89,7 @@ public class ContractFactory {
             foci.originalPres,
             foci.originalMby,
             newPosts,
+            foci.originalAxioms,
             foci.originalMods,
             foci.hasRealModifiesClause,
             foci.originalSelfVar,
@@ -141,6 +142,7 @@ public class ContractFactory {
                                                    newPres,
                                                    foci.originalMby,
                                                    foci.originalPosts,
+                                                   foci.originalAxioms,
                                                    foci.originalMods,
                                                    foci.hasRealModifiesClause,
                                                    foci.originalSelfVar,
@@ -157,14 +159,15 @@ public class ContractFactory {
     public DependencyContract dep(KeYJavaType containerType,
                                   IObserverFunction pm,
                                   KeYJavaType specifiedIn,
-                                  Term requires,
+                                  Map<LocationVariable,Term> requires,
                                   Term measuredBy,
-                                  Term accessible,
+                                  Map<ProgramVariable,Term> accessibles,
                                   ProgramVariable selfVar,
-                                  ImmutableList<ProgramVariable> paramVars) {
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  Map<LocationVariable,? extends ProgramVariable> atPreVars) {
         assert (selfVar == null) == pm.isStatic();
         return dep("JML accessible clause", containerType, pm, specifiedIn,
-                   requires, measuredBy, accessible, selfVar, paramVars);
+                   requires, measuredBy, accessibles, selfVar, paramVars, atPreVars);
     }
 
     public DependencyContract dep(KeYJavaType kjt,
@@ -173,29 +176,29 @@ public class ContractFactory {
         final ImmutableList<ProgramVariable> paramVars =
                 tb.paramVars(services, dep.first, false);
         assert (selfVar == null) == dep.first.isStatic();
-        if (selfVar != null) {
-            return dep(kjt, dep.first, dep.first.getContainerType(), tb.inv(services, tb.var(selfVar)),
-                       dep.third, dep.second, selfVar, paramVars);
-        } else {
-            // TODO: insert static invariant??
-            return dep(kjt, dep.first, dep.first.getContainerType(), tb.tt(), dep.third, dep.second,
-                       selfVar, paramVars);
-        }
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
+        pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
+                 selfVar == null ? tb.tt() : tb.inv(services, tb.var(selfVar)));
+        Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
+        accessibles.put(services.getTypeConverter().getHeapLDT().getHeap(), dep.second);
+        // TODO: insert static invariant??
+        return dep(kjt, dep.first, dep.first.getContainerType(), pres, dep.third, accessibles, selfVar, paramVars, null);
     }
 
     public DependencyContract dep(String string,
                                   KeYJavaType containerType,
                                   IObserverFunction pm,
                                   KeYJavaType specifiedIn,
-                                  Term requires,
+                                  Map<LocationVariable, Term> requires,
                                   Term measuredBy,
-                                  Term accessible,
+                                  Map<ProgramVariable, Term> accessibles,
                                   ProgramVariable selfVar,
-                                  ImmutableList<ProgramVariable> paramVars) {
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  Map<LocationVariable,? extends ProgramVariable> atPreVars) {
         assert (selfVar == null) == pm.isStatic();
         return new DependencyContractImpl(string, containerType, pm, specifiedIn,
-                                          requires, measuredBy, accessible,
-                                          selfVar, paramVars);
+                                          requires, measuredBy, accessibles,
+                                          selfVar, paramVars, atPreVars);
     }
 
     @Override
@@ -223,6 +226,7 @@ public class ContractFactory {
             Map<LocationVariable,Term> pres,
             Term mby,
             Map<LocationVariable,Term> posts,
+            Map<LocationVariable,Term> axioms,
             Map<LocationVariable,Term> mods,
             boolean hasMod,
             ProgramVariable selfVar,
@@ -232,21 +236,21 @@ public class ContractFactory {
             Map<LocationVariable,LocationVariable> atPreVars,
             boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, kjt, pm, pm.getContainerType(), modality,
-                pres, mby, posts, mods, hasMod, selfVar, paramVars,resultVar,excVar,atPreVars, toBeSaved,
+                pres, mby, posts, axioms, mods, hasMod, selfVar, paramVars,resultVar,excVar,atPreVars, toBeSaved,
                 mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
     public FunctionalOperationContract func (String baseName, IProgramMethod pm, boolean terminates, Map<LocationVariable,Term> pres,
-               Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
-        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, mods, hasMod, pv, false, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+               Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> axioms, Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
+        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms, mods, hasMod, pv, false, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
 
     public FunctionalOperationContract func (String baseName, IProgramMethod pm,
-            Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod,
+            Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> axioms, Map<LocationVariable,Term> mods, boolean hasMod,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, pm.getContainerType(), modality, pres, mby,
-                posts, mods, hasMod, progVars.selfVar, progVars.paramVars,
+                posts, axioms, mods, hasMod, progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar, progVars.atPreVars,
                 Contract.INVALID_ID, toBeSaved, transaction);
     }
@@ -293,6 +297,15 @@ public class ContractFactory {
            }
         }
 
+        Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
+        if(t.originalAxioms != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                Term oriAxiom = t.originalAxioms.get(h);
+                if(oriAxiom != null) {
+                    axioms.put(h,tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars), oriAxiom));
+                }
+            }
+        }
         Map<LocationVariable,Term> mods = t.originalMods;
         boolean hasMod = t.hasModifiesClause();
         Modality moda = t.modality;
@@ -313,6 +326,12 @@ public class ContractFactory {
                                  t.originalExcVar,
                                  t.originalAtPreVars,
                                  services);
+              Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
+            	                                 t.originalParamVars,
+            		                             t.originalResultVar,
+            		                             t.originalAtPreVars,
+            		                             services);
+
               if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
                 // bugfix (MU)
                 // if the first or the other contract do not have a
@@ -330,6 +349,11 @@ public class ContractFactory {
                 final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
                 posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
               }
+              if(otherAxiom != null) {
+                final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
+              }
+ 
             }
 
             boolean otherHasMod = other.hasModifiesClause();
@@ -370,6 +394,7 @@ public class ContractFactory {
                                                    pres,
                                                    mby,
                                                    posts,
+                                                   axioms,
                                                    mods,
                                                    hasMod,
                                                    t.originalSelfVar,

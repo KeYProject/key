@@ -281,7 +281,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
 
       // "self.<created> = TRUE"
-      final Term selfCreated = generateSelfCreated(getProgramMethod(), selfVar);
+      final Term selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar);
 
       // "MyClass::exactInstance(self) = TRUE"
       final Term selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
@@ -295,7 +295,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
       Term wellFormed = null;
       for (LocationVariable heap : heaps) {
-         final Term wf = TB.wellFormed(heap, services);
+         final Term wf = TB.wellFormed(TB.var(heap), services);
          if (wellFormed == null) {
             wellFormed = wf;
          }
@@ -304,7 +304,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
       }
 
-      return TB.and(new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, paramsOK, mbyAtPreDef });
+      return TB.and(new Term[] { wellFormed != null ? wellFormed : TB.tt(), selfNotNull, selfCreated, selfExactType, paramsOK, mbyAtPreDef });
    }
 
    /**
@@ -325,11 +325,24 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param selfVar The self variable.
     * @return The term representing the general assumption.
     */
-   protected Term generateSelfCreated(IProgramMethod pm, ProgramVariable selfVar) {
-      return selfVar == null || pm.isConstructor() ? 
-             TB.tt() : 
-             TB.created(services, TB.var(selfVar));
+   protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm, ProgramVariable selfVar) {
+	  if(selfVar == null || pm.isConstructor()) {
+		  return TB.tt();
+	  }
+	  Term created = null;
+	  for(LocationVariable heap : heaps) {
+		  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap())
+			  continue;
+		  final Term cr = TB.created(services, TB.var(heap), TB.var(selfVar));
+		  if(created == null) {
+			  created = cr;
+		  }else{
+			  created = TB.and(created, cr);
+		  }
+	  }
+	  return created;
    }
+
 
    /**
     * Generates the general assumption which defines the type of self.
@@ -542,20 +555,24 @@ public abstract class AbstractOperationPO extends AbstractPO {
       final ProgramElementName ePEN = new ProgramElementName("e");
       final ProgramVariable eVar = new LocationVariable(ePEN, eType);
 
-      // create try statement
-      final CopyAssignment nullStat = new CopyAssignment(exceptionVar, NullLiteral.NULL);
-      final VariableSpecification eSpec = new VariableSpecification(eVar);
-      final ParameterDeclaration excDecl = new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
-      final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
-      final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
-      final Try tryStat = new Try(sb, new Branch[] {catchStat});
-      final StatementBlock sb2 = new StatementBlock(transaction ? 
+      final StatementBlock sb2;
+      if(exceptionVar == null) {
+    	  sb2 = sb;
+      }else{
+          // create try statement
+          final CopyAssignment nullStat = new CopyAssignment(exceptionVar, NullLiteral.NULL);
+          final VariableSpecification eSpec = new VariableSpecification(eVar);
+          final ParameterDeclaration excDecl = new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
+          final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
+          final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
+          final Try tryStat = new Try(sb, new Branch[] {catchStat});
+          sb2 = new StatementBlock(transaction ? 
                                                     new Statement[] {new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN), 
                                                                                               nullStat, 
                                                                                               tryStat, 
                                                                                               new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) } : 
                                                     new Statement[] {nullStat, tryStat});
-
+      }
       // create java block
       JavaBlock result = JavaBlock.createJavaBlock(sb2);
       return result;

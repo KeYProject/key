@@ -17,10 +17,13 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +45,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -142,8 +146,10 @@ public class TacletGenerator {
                                                      Term originalAxiom,
                                                      KeYJavaType kjt,
                                                      IObserverFunction target,
-                                                     ProgramVariable heap,
+                                                     List<? extends ProgramVariable> heaps,
                                                      ProgramVariable self,
+                                                     ImmutableList<ProgramVariable> paramVars,
+                                                     Map<LocationVariable,ProgramVariable> atPreVars,
                                                      boolean satisfiabilityGuard,
                                                      Services services) {
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
@@ -151,25 +157,55 @@ public class TacletGenerator {
         originalAxiom = TB.convertToFormula(originalAxiom, services);
 
         // create schema terms
-        final SchemaVariable heapSV = createSchemaVariable(heap);
+        ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<SchemaVariable> svs = ImmutableSLList.<SchemaVariable>nil();
+        List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        for(ProgramVariable heap : heaps) {
+             if(target.getStateCount() >= 1) {
+                  pvs = pvs.append(heap);
+                  SchemaVariable heapSV = createSchemaVariable(heap);
+                  svs = svs.append(heapSV);
+                  heapSVs.add(heapSV);
+                  if(target.getStateCount() == 2) {
+                       pvs = pvs.append(atPreVars.get(heap));
+                       heapSV = createSchemaVariable(atPreVars.get(heap));
+                       svs = svs.append(heapSV);
+                       heapSVs.add(heapSV);
+                  }
+             }
+        }
+
         final SchemaVariable selfSV = createSchemaVariable(self);
+        
+        ImmutableList<SchemaVariable> paramSVs = ImmutableSLList.<SchemaVariable>nil();
+        for(ProgramVariable paramVar : paramVars) {
+             paramSVs = paramSVs.append(createSchemaVariable(paramVar));
+        }
+        pvs = pvs.append(self).append(paramVars);
+        svs = svs.append(selfSV).append(paramSVs);
+
         @SuppressWarnings("unchecked")
-        final TermAndBoundVarPair schemaAxiom =
-                createSchemaTerm(originalAxiom,
-                                 new Pair<ProgramVariable, SchemaVariable>(heap, heapSV),
-                                 new Pair<ProgramVariable, SchemaVariable>(self, selfSV));
+        final TermAndBoundVarPair schemaAxiom = createSchemaTerm(originalAxiom, pvs, svs);
 
         // create goal template
         SequentFormula guardedSchemaAxiom =
-                generateGuard(kjt, target, services, selfSV, heapSV,
+                generateGuard(kjt, target, services, selfSV, heapSVs, paramSVs,
                               schemaAxiom.term, tacletBuilder, satisfiabilityGuard);
         final Sequent addedSeq =
                 Sequent.createAnteSequent(
                 Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
-        final Term findTerm = 
-                 target.isStatic()
-                              ? TB.func(target, TB.var(heapSV))
-                              : TB.func(target, TB.var(heapSV), TB.var(selfSV));
+        ImmutableList<Term> vars = ImmutableSLList.<Term>nil();
+        for(SchemaVariable heapSV : heapSVs) {
+             vars = vars.append(TB.var(heapSV));
+        }
+        if(!target.isStatic()) {
+             vars = vars.append(TB.var(selfSV));
+        }
+        for(SchemaVariable sv : paramSVs) {
+             vars = vars.append(TB.var(sv));
+        }
+        final Term findTerm = TB.func(target, vars.toArray(new Term[0]));
+         
         final RewriteTacletGoalTemplate axiomTemplate =
                 new RewriteTacletGoalTemplate(addedSeq,
                                               ImmutableSLList.<Taclet>nil(),
@@ -185,7 +221,14 @@ public class TacletGenerator {
         tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(choice));
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
-        tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV, selfSV);
+        tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
+        for(SchemaVariable heapSV : heapSVs) {
+             tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV);
+        }
+        for(SchemaVariable paramSV : paramSVs) {
+             tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, paramSV);
+        }
+
         tacletBuilder.addRuleSet(ruleSet);
         return tacletBuilder.getTaclet();
     }
@@ -196,21 +239,44 @@ public class TacletGenerator {
             Term originalRepresentsTerm,
             KeYJavaType kjt,
             IObserverFunction target,
-            ProgramVariable heap,
+            List<? extends ProgramVariable> heaps,
             ProgramVariable self,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable,ProgramVariable> atPreVars,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             boolean satisfiability,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
         //instantiate axiom with schema variables
-        final SchemaVariable heapSV = createSchemaVariable(heap);
+        ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<SchemaVariable> svs = ImmutableSLList.<SchemaVariable>nil();
+        List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        for(ProgramVariable heap : heaps) {
+             if(target.getStateCount() >= 1) {
+                  pvs = pvs.append(heap);
+                  SchemaVariable heapSV = createSchemaVariable(heap);
+                  svs = svs.append(heapSV);
+                  heapSVs.add(heapSV);
+                  if(target.getStateCount() == 2) {
+                      pvs = pvs.append(atPreVars.get(heap));
+                      heapSV = createSchemaVariable(atPreVars.get(heap));
+                      svs = svs.append(heapSV);
+                      heapSVs.add(heapSV);
+                  }
+            }
+        }
+
         final SchemaVariable selfSV = createSchemaVariable(self);
+        ImmutableList<SchemaVariable> paramSVs = ImmutableSLList.<SchemaVariable>nil();
+        for(ProgramVariable paramVar : paramVars) {
+            paramSVs = paramSVs.append(createSchemaVariable(paramVar));
+        }
+        pvs = pvs.append(self).append(paramVars);
+        svs = svs.append(selfSV).append(paramSVs);
         @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaRepresents =
-                createSchemaTerm(originalRepresentsTerm,
-                                 new Pair<ProgramVariable, SchemaVariable>(heap, heapSV),
-                                 new Pair<ProgramVariable, SchemaVariable>(self, selfSV));
+                createSchemaTerm(originalRepresentsTerm, pvs, svs);
         assert schemaRepresents.term.op() instanceof Equality;
         final Term schemaLhs = schemaRepresents.term.sub(0);
         final Term schemaRhs = schemaRepresents.term.sub(1);
@@ -240,7 +306,7 @@ public class TacletGenerator {
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setFind(schemaLhs);
-        Term updatedRhs = makeUpdatedRHS(limitedRhs, heap, heapSV, services);
+        Term updatedRhs = makeUpdatedRHS(limitedRhs, heaps, heapSVs, services);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
@@ -253,9 +319,14 @@ public class TacletGenerator {
         if (satisfiability)
             tacletBuilder.addRuleSet(new RuleSet(new Name("split")));
         for (VariableSV boundSV : schemaRepresents.boundVars) {
-            tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+        	for(SchemaVariable heapSV : heapSVs) {
+                tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+        	}
             if (selfSV != null) {
                 tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
+            }
+            for(SchemaVariable paramSV : paramSVs) {
+                tacletBuilder.addVarsNotFreeIn(boundSV, paramSV);
             }
         }
         Choice c = new Choice(satisfiability? "showSatisfiability" : "treatAsAxiom",
@@ -263,8 +334,8 @@ public class TacletGenerator {
         tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(c));
 
         if (satisfiability)
-            functionalRepresentsAddSatisfiabilityBranch(target, services, heapSV,
-                    selfSV, schemaRepresents, tacletBuilder);
+            functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,
+                    selfSV, paramSVs, schemaRepresents, tacletBuilder);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         result = result.add(tacletBuilder.getTaclet());
 
@@ -278,28 +349,37 @@ public class TacletGenerator {
      * which makes the outcome a lot more comprehensible for the human.
      * And smaller in size.  
      */
-    private Term makeUpdatedRHS(Term term, ProgramVariable heap, 
-            SchemaVariable heapSV, Services services) {
+    private Term makeUpdatedRHS(Term term, List<? extends ProgramVariable> heaps, 
+            List<SchemaVariable> heapSVs, Services services) {
         if(!MAKE_UPDATED_REPLACEMENT) {
             return term;
         }
 
-        final OpReplacer or = new OpReplacer(
-                Collections.<ParsableVariable, ProgramVariable>singletonMap(heapSV, heap));
+        Map<ParsableVariable,ProgramVariable> replace = new LinkedHashMap<ParsableVariable, ProgramVariable>();
+        Term update = null;
+        int i = 0;
+        for(ProgramVariable heap : heaps) {
+        	replace.put(heapSVs.get(i++), heap);
+            final Term u = TB.elementary(services, TB.var(heap), TB.var(heapSVs.get(i)));
+            if(update == null) {
+            	update = u;
+            }else{
+            	update = TB.parallel(update, u);
+            }
+        }
+        final OpReplacer or = new OpReplacer(replace);
         final Term replaced = or.replace(term);
-        final Term update = TB.elementary(services, TB.var(heapSV));
-
         return TB.apply(update, replaced, null);
     }
 
 
     private void functionalRepresentsAddSatisfiabilityBranch(
             IObserverFunction target, Services services,
-            final SchemaVariable heapSV, final SchemaVariable selfSV,
+            List<SchemaVariable> heapSVs, final SchemaVariable selfSV, ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder tacletBuilder) {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(
-              target, services, heapSV, selfSV, schemaRepresents,
+              target, services, heapSVs, selfSV, paramSVs, schemaRepresents,
               tacletBuilder);
         SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
         final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
@@ -308,9 +388,14 @@ public class TacletGenerator {
         final SchemaVariable skolemSV =
                 SchemaVariableFactory.createSkolemTermSV(new Name("sk"),
                                                          target.sort());
-        tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
+        for(SchemaVariable heapSV : heapSVs) {
+             tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
+        }
         if (!target.isStatic()) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
+        }
+        for(SchemaVariable paramSV : paramSVs) {
+            tacletBuilder.addVarsNewDependingOn(skolemSV, paramSV);
         }
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
                 addedSeq,
@@ -323,14 +408,23 @@ public class TacletGenerator {
 
 
     private Term functionalRepresentsSatisfiability(IObserverFunction target,
-            Services services, final SchemaVariable heapSV,
+            Services services, List<SchemaVariable> heapSVs,
             final SchemaVariable selfSV,
+            ImmutableList<SchemaVariable> paramSVs,
             final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder tacletBuilder) {
-        final Term targetTerm =
-                target.isStatic()
-                ? TB.func(target, TB.var(heapSV))
-                : TB.func(target, TB.var(heapSV), TB.var(selfSV));
+    	ImmutableList<Term> vars = ImmutableSLList.<Term>nil();
+    	for(SchemaVariable heapSV : heapSVs) {
+    	     vars = vars.append(TB.var(heapSV));
+    	}
+    	if(!target.isStatic()) {
+    	     vars = vars.append(TB.var(selfSV));
+    	}
+    	for(SchemaVariable sv : paramSVs) {
+    	     vars = vars.append(TB.var(sv));
+    	}
+    	final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
+
         final Term axiomSatisfiable;
         if (target.sort() == Sort.FORMULA) {
             axiomSatisfiable = TB.or(OpReplacer.replace(targetTerm, TB.tt(),
@@ -341,14 +435,22 @@ public class TacletGenerator {
             final VariableSV targetSV = SchemaVariableFactory.createVariableSV(
                     new Name(target.sort().name().toString().substring(0, 1)),
                     target.sort());
-            tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
+            Term targetSVReachable = null;
+            for(SchemaVariable heapSV : heapSVs) {
+                 tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
+                 final Term tReach = TB.reachableValue(services, TB.var(heapSV), TB.var(targetSV), target.getType());
+                 if(targetSVReachable == null) {
+                	 targetSVReachable = tReach;
+                 }else{
+                     targetSVReachable = TB.and(targetSVReachable, tReach);
+                 }
+            }
             if (!target.isStatic()) {
                 tacletBuilder.addVarsNotFreeIn(targetSV, selfSV);
             }
-            final Term targetSVReachable = TB.reachableValue(services,
-                                                             TB.var(heapSV),
-                                                             TB.var(targetSV),
-                                                             target.getType());
+            for(SchemaVariable paramSV : paramSVs) {
+            	tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
+            }
             axiomSatisfiable =
                     TB.ex(targetSV,
                           TB.and(targetSVReachable,
@@ -653,14 +755,15 @@ public class TacletGenerator {
                                          IObserverFunction target,
                                          Services services,
                                          final SchemaVariable selfSV,
-                                         final SchemaVariable heapSV,
+                                         List<SchemaVariable> heapSVs,
+                                         ImmutableList<SchemaVariable> paramSVs,
                                          final Term schemaAxiom,
                                          final RewriteTacletBuilder tacletBuilder,
                                          boolean addGuard) {
         final Term exactInstance =
                 prepareExactInstanceGuard(kjt, target, services, selfSV);
         final Term axiomSatisfiable = addGuard?
-                prepareSatisfiabilityGuard(target, heapSV, selfSV, schemaAxiom,
+                prepareSatisfiabilityGuard(target, heapSVs, selfSV, paramSVs, schemaAxiom,
                                            tacletBuilder, services)
                                            : TB.tt();
         //assemble formula
@@ -672,15 +775,26 @@ public class TacletGenerator {
 
 
     private Term prepareSatisfiabilityGuard(IObserverFunction target,
-                                            final SchemaVariable heapSV,
+                                            List<SchemaVariable> heapSVs,
                                             final SchemaVariable selfSV,
+                                            ImmutableList<SchemaVariable> paramSVs,
                                             final Term schemaAxiom,
                                             final RewriteTacletBuilder tacletBuilder,
                                             Services services) {
-        final Term targetTerm =
-                target.isStatic() ? TB.func(target, TB.var(heapSV))
-                : TB.func(target, TB.var(heapSV), TB.var(selfSV));
-        final Term axiomSatisfiable;
+
+    	ImmutableList<Term> vars = ImmutableSLList.<Term>nil();
+    	for(SchemaVariable heapSV : heapSVs) {
+    	    vars = vars.append(TB.var(heapSV));
+    	}
+    	if(!target.isStatic()) {
+    	    vars = vars.append(TB.var(selfSV));
+    	}
+    	for(SchemaVariable sv : paramSVs) {
+    	    vars = vars.append(TB.var(sv));
+    	}
+    	final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
+
+    	final Term axiomSatisfiable;
         if (target.sort() == Sort.FORMULA) {
             axiomSatisfiable =
                     TB.or(OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom),
@@ -692,13 +806,26 @@ public class TacletGenerator {
                     1)
                                                                     + "_lv"),
                                                            target.sort());
-            tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
+            for(SchemaVariable heapSV : heapSVs) {
+                tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
+            }
             if (!target.isStatic()) {
                 tacletBuilder.addVarsNotFreeIn(targetSV, selfSV);
             }
-            final Term targetLVReachable =
-                    TB.reachableValue(services, TB.var(heapSV), TB.var(targetSV),
-                                      target.getType());
+
+            for(SchemaVariable paramSV : paramSVs) {
+                 tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
+            }
+            Term targetLVReachable = null;
+            for(SchemaVariable heapSV : heapSVs) {
+                final Term targetReachable = TB.reachableValue(services, TB.var(heapSV), TB.var(targetSV), target.getType());
+            	if(targetLVReachable == null) {
+            		targetLVReachable = targetReachable;
+            	}else{
+                    targetLVReachable = TB.and(targetLVReachable, targetReachable);
+            	}
+            }
+     
             axiomSatisfiable =
                     TB.ex(targetSV,
                           TB.and(targetLVReachable,
