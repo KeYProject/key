@@ -153,33 +153,33 @@
 &amp; !current.right = null
 &amp; current.right.left = null" pathConditionChanged="false">
                                        <branchCondition name="current.parent = null" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="true" branchCondition="current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+&amp; current.right.left = null" pathConditionChanged="true" branchCondition="current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                           <statement name="this.root=newParent;" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                              <statement name="newParent.parent=null;" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                                 <statement name="current.parent=newParent;" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                                    <statement name="return current;" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                                       <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false" isReturnValueComputed="false">
+&amp; current.right.left = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
+&amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; current.right.left = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                          </termination>
                                                       </methodReturn>
                                                    </statement>
@@ -188,33 +188,33 @@
                                           </statement>
                                        </branchCondition>
                                        <branchCondition name="!current.parent = null" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="true" branchCondition="!current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+&amp; current.right.left = null" pathConditionChanged="true" branchCondition="!current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                           <statement name="current.parent.right=newParent;" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                              <statement name="newParent.parent=current.parent;" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                                 <statement name="current.parent=newParent;" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                                    <statement name="return current;" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false">
+&amp; current.right.left = null" pathConditionChanged="false">
                                                       <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false" isReturnValueComputed="false">
+&amp; current.right.left = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
+&amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; current.right.left = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                          </termination>
                                                       </methodReturn>
                                                    </statement>
