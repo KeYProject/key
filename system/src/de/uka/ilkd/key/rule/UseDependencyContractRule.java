@@ -481,6 +481,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
         int heapExprIndex = 0;
         boolean useful = false;
+        ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.<PosInOccurrence>nil();
         for(LocationVariable heap : heaps) {
           for(boolean atPre : twoState ? new boolean[] { false, true } : new boolean[] { false } ) {
             //get changed locs and used equalities
@@ -491,8 +492,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
                         services);
 
             assert changedLocs != null;
-            //store insts in rule app
-            ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(changedLocs.second.prepend(step));
+            //store insts 
+            ifInsts = ifInsts.append(changedLocs.second.prepend(step));
             if(!target.isStatic()) {
                 final Term cr = TB.created(services, subStep, selfTerm);
                 if(freePre == null) {
@@ -548,6 +549,17 @@ public final class UseDependencyContractRule implements BuiltInRule {
           }
         }
 
+        //store insts in rule app
+        ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(ifInsts);
+
+        //create justification
+        final RuleJustificationBySpec just
+                = new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cjust
+                = (ComplexRuleJustificationBySpec)
+                    goal.proof().env().getJustifInfo().getJustification(this);
+        cjust.add(ruleApp, just);
+
         if(!useful) {
         	return goal.split(1);        	
         }
@@ -573,14 +585,6 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term implication =
                 TB.imp(cutFormula, TB.equals(focus, termWithBaseHeap));
         result.head().addFormula(new SequentFormula(implication), true, false);
-
-        //create justification
-        final RuleJustificationBySpec just
-                = new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust
-                = (ComplexRuleJustificationBySpec)
-                    goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);
 
         return result;
     }
