@@ -12,7 +12,35 @@ class Dynamic2 {
   //@ requires \subset(\locset(x, y), rep);
   //@ requires \disjoint(rep, rep2);
   //@ ensures x > 0 & y > 0;
-  void foo () {
+  void foo_1 () {
+    x++; y++; bar();
+  }
+
+  //@ requires x > 0 & y > 0;
+  //@ requires \subset(\locset(x, y), rep);
+  //@ requires \disjoint(rep, rep2);
+  //@ ensures x > 0 & y > 0;
+  void foo_2 () {
+    x++; y++; bar();
+    x++; y++; bar();
+  }
+
+  //@ requires x > 0 & y > 0;
+  //@ requires \subset(\locset(x, y), rep);
+  //@ requires \disjoint(rep, rep2);
+  //@ ensures x > 0 & y > 0;
+  void foo_4 () {
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+  }
+
+  //@ requires x > 0 & y > 0;
+  //@ requires \subset(\locset(x, y), rep);
+  //@ requires \disjoint(rep, rep2);
+  //@ ensures x > 0 & y > 0;
+  void foo_8 () {
     x++; y++; bar();
     x++; y++; bar();
     x++; y++; bar();
@@ -23,6 +51,22 @@ class Dynamic2 {
     x++; y++; bar();
   }
 
+  //@ requires x > 0 & y > 0;
+  //@ requires \subset(\locset(x, y), rep);
+  //@ requires \disjoint(rep, rep2);
+  //@ ensures x > 0 & y > 0;
+  void foo_10 () {
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+    x++; y++; bar();
+  }
 
   //@ ensures \new_elems_fresh(rep2);
   //@ assignable rep2;

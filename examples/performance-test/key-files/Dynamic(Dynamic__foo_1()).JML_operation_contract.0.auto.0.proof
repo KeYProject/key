@@ -1,0 +1,219 @@
+\settings {
+"#Proof-Settings-Config-File
+#Wed Jun 26 18:46:45 CEST 2013
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[Label]Instantiators=
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:on , assertions-assertions\\:on , bigint-bigint\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , modelFields-modelFields\\:treatAsAxiom , initialisation-initialisation\\:disableStaticInitialisation , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:allow
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../src.templates";
+
+\proofObligation "#Proof Obligation Settings
+#Wed Jun 26 18:46:45 CEST 2013
+name=Dynamic[Dynamic\\:\\:foo_1()].JML operation contract.0
+contract=Dynamic[Dynamic\\:\\:foo_1()].JML operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+";
+
+\proof {
+(keyLog "0" (keyUser "christoph" ) (keyVersion "98151b013121376e2e9354875c034e6e91892cac"))
+(keyLog "1" (keyUser "christoph" ) (keyVersion "1f1226c4c6024cfbad7c2c83e640e8e4598e721f"))
+
+(autoModeTime "924")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "2"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "4"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "8"))
+(rule "inEqSimp_gtToGeq" (formula "4"))
+(rule "times_zero_1" (formula "4") (term "1,0,0"))
+(rule "add_zero_right" (formula "4") (term "0,0"))
+(rule "inEqSimp_gtToGeq" (formula "8") (term "0,1,0,0,1"))
+(rule "times_zero_1" (formula "8") (term "1,0,0,0,1,0,0,1"))
+(rule "add_literals" (formula "8") (term "0,0,0,1,0,0,1"))
+(rule "disjointDefinition" (formula "5"))
+(rule "inEqSimp_sepPosMonomial1" (formula "4"))
+(rule "mul_literals" (formula "4") (term "1"))
+(rule "inEqSimp_sepPosMonomial1" (formula "8") (term "0,1,0,0,1"))
+(rule "mul_literals" (formula "8") (term "1,0,1,0,0,1"))
+(rule "intersectWithSingleton" (formula "5") (term "0"))
+(builtin "One Step Simplification" (formula "5"))
+(rule "notLeft" (formula "5"))
+(rule "Class_invariant_axiom_for_Dynamic" (formula "5") (ifseqformula "3"))
+(rule "true_left" (formula "5"))
+(rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_foo_1,savedHeapBefore_foo_1"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "postincrement_attribute" (formula "7") (term "1") (inst "#v=d"))
+(rule "variableDeclarationAssign" (formula "7") (term "1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "d"))
+(rule "assignment" (formula "7") (term "1"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "eval_order_access4" (formula "7") (term "1") (inst "#v1=x") (inst "#v0=d_1"))
+(rule "ifUnfold" (formula "7") (term "1") (inst "#boolv=x_1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "x_1"))
+(rule "equality_comparison_simple" (formula "7") (term "1"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "replace_known_right" (formula "7") (term "0,0,1,0") (ifseqformula "6"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "if" (formula "7") (term "1"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "variableDeclarationAssign" (formula "7") (term "1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "d_1"))
+(rule "assignment" (formula "7") (term "1"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "variableDeclarationAssign" (formula "7") (term "1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "x"))
+(rule "compound_int_cast_expression" (formula "7") (term "1") (inst "#v=x_1"))
+(rule "variableDeclarationAssign" (formula "7") (term "1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "x_2"))
+(rule "remove_parentheses_right" (formula "7") (term "1"))
+(rule "compound_addition_1" (formula "7") (term "1") (inst "#v=x_3"))
+(rule "variableDeclarationAssign" (formula "7") (term "1"))
+(rule "variableDeclaration" (formula "7") (term "1") (newnames "x_3"))
+(rule "assignment_read_attribute" (formula "7") (term "1"))
+(branch "Normal Execution (d != null)"
+   (builtin "One Step Simplification" (formula "8"))
+   (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "6")))
+   (rule "false_right" (formula "7"))
+   (rule "assignmentAdditionInt" (formula "7") (term "1"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "translateJavaAddInt" (formula "7") (term "0,1,0"))
+   (rule "polySimp_addComm0" (formula "7") (term "0,1,0"))
+   (rule "widening_identity_cast_5" (formula "7") (term "1"))
+   (rule "assignment" (formula "7") (term "1"))
+   (builtin "One Step Simplification" (formula "7"))
+   (rule "assignment_write_attribute" (formula "7") (term "1"))
+   (branch "Normal Execution (d_1 != null)"
+      (builtin "One Step Simplification" (formula "8"))
+      (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "6")))
+      (rule "false_right" (formula "7"))
+      (builtin "Use Operation Contract" (formula "7") (newnames "heapBefore_bar,exc_0,heapAfter_bar,anon_heap_bar") (contract "Dynamic[Dynamic::bar()].JML operation contract.0"))
+      (branch "Post (bar)"
+         (builtin "One Step Simplification" (formula "6"))
+         (builtin "One Step Simplification" (formula "9"))
+         (rule "andLeft" (formula "6"))
+         (rule "andLeft" (formula "7"))
+         (rule "andLeft" (formula "8"))
+         (rule "replace_known_left" (formula "8") (term "0") (ifseqformula "7"))
+         (builtin "One Step Simplification" (formula "8"))
+         (rule "andLeft" (formula "8"))
+         (rule "commuteUnion" (formula "8") (term "1"))
+         (rule "Class_invariant_axiom_for_Dynamic" (formula "9") (ifseqformula "3"))
+         (rule "true_left" (formula "9"))
+         (rule "methodCallEmpty" (formula "11") (term "1"))
+         (rule "tryEmpty" (formula "11") (term "1"))
+         (rule "emptyModality" (formula "11") (term "1"))
+         (builtin "One Step Simplification" (formula "11"))
+         (rule "selectOfAnonEQ" (formula "11") (term "0,0") (ifseqformula "6"))
+         (builtin "One Step Simplification" (formula "11") (ifInst ""  (formula "10")))
+         (rule "selectOfStore" (formula "11") (term "0,0,1,0,0,0"))
+         (builtin "One Step Simplification" (formula "11") (ifInst ""  (formula "2")))
+         (rule "selectOfStore" (formula "11") (term "2,0,0"))
+         (builtin "One Step Simplification" (formula "11"))
+         (rule "castDel" (formula "11") (term "2,0,0"))
+         (rule "commute_and" (formula "11"))
+         (rule "Class_invariant_axiom_for_Dynamic" (formula "11") (term "0") (ifseqformula "3"))
+         (builtin "One Step Simplification" (formula "11"))
+         (rule "inEqSimp_geqRight" (formula "11"))
+         (rule "mul_literals" (formula "1") (term "1,0,0"))
+         (rule "add_literals" (formula "1") (term "0,0"))
+         (rule "add_zero_left" (formula "1") (term "0"))
+         (rule "ifthenelse_split" (formula "1") (term "0"))
+         (branch "(self, x) in store(heap, self, x, 1 + self.x)[self.footprint] TRUE"
+            (rule "onlyCreatedObjectsAreObservedInLocSets" (formula "1"))
+            (rule "replace_known_right" (formula "1") (term "0") (ifseqformula "13"))
+            (builtin "One Step Simplification" (formula "1"))
+            (rule "selectOfStore" (formula "1") (term "0"))
+            (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "5")))
+            (rule "true_left" (formula "1"))
+            (builtin "Use Dependency Contract" (formula "8") (term "1,0") (ifInst ""  (formula "11") (term "2")) (contract "Dynamic[Dynamic::$footprint()].JML accessible clause.0"))
+            (rule "wellFormedStorePrimitive" (formula "11") (term "1,0,0,0,0,0"))
+            (builtin "One Step Simplification" (formula "11") (ifInst ""  (formula "3")) (ifInst ""  (formula "3")) (ifInst ""  (formula "13")) (ifInst ""  (formula "4")))
+            (rule "disjointDefinition" (formula "11") (term "1,0"))
+            (rule "intersectWithSingleton_2" (formula "11") (term "0,1,0"))
+            (builtin "One Step Simplification" (formula "11") (ifInst ""  (formula "12")))
+            (rule "Class_invariant_axiom_for_Dynamic" (formula "11") (term "0") (ifseqformula "5"))
+            (builtin "One Step Simplification" (formula "11"))
+            (rule "applyEq" (formula "10") (term "1,1") (ifseqformula "11"))
+            (rule "applyEq" (formula "1") (term "2") (ifseqformula "11"))
+            (rule "close" (formula "12") (ifseqformula "1"))
+         )
+         (branch "(self, x) in store(heap, self, x, 1 + self.x)[self.footprint] FALSE"
+            (rule "inEqSimp_sepPosMonomial0" (formula "1"))
+            (rule "mul_literals" (formula "1") (term "1"))
+            (rule "inEqSimp_contradInEq1" (formula "1") (ifseqformula "5"))
+            (rule "qeq_literals" (formula "1") (term "0"))
+            (builtin "One Step Simplification" (formula "1"))
+            (rule "closeFalse" (formula "1"))
+         )
+      )
+      (branch "Exceptional Post (bar)"
+         (builtin "One Step Simplification" (formula "9"))
+         (builtin "One Step Simplification" (formula "6"))
+         (rule "andLeft" (formula "6"))
+         (rule "selectCreatedOfAnonAsFormulaEQ" (formula "7") (term "1,0") (ifseqformula "6"))
+         (rule "andLeft" (formula "7"))
+         (rule "andLeft" (formula "8"))
+         (rule "andLeft" (formula "7"))
+         (rule "notLeft" (formula "7"))
+         (rule "close" (formula "10") (ifseqformula "9"))
+      )
+      (branch "Pre (bar)"
+         (builtin "One Step Simplification" (formula "7"))
+         (rule "wellFormedStorePrimitive" (formula "7") (term "1"))
+         (rule "replace_known_left" (formula "7") (term "1") (ifseqformula "1"))
+         (builtin "One Step Simplification" (formula "7"))
+         (rule "Class_invariant_axiom_for_Dynamic" (formula "7") (ifseqformula "3"))
+         (rule "closeTrue" (formula "7"))
+      )
+   )
+   (branch "Null Reference (d_1 = null)"
+      (builtin "One Step Simplification" (formula "8"))
+      (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "7")))
+      (rule "closeFalse" (formula "1"))
+   )
+)
+(branch "Null Reference (d = null)"
+   (builtin "One Step Simplification" (formula "8"))
+   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "7")))
+   (rule "closeFalse" (formula "1"))
+)
+)
+
+}
