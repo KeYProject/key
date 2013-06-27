@@ -605,8 +605,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
       String axioms = "";
       for(LocationVariable h : heapLDT.getAllHeaps()) {
          if(originalAxioms.get(h) != null) {
-           axioms = axioms +"<br><b>axiom"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-           LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalAxioms.get(h),services), false);
+           String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services);
+           posts = posts
+                   + (includeHtmlMarkup ? "<br><b>" : "\n")
+                   + "axiom"
+                   + (h == baseHeap ? "" : "[" + h + "]")
+                   + (includeHtmlMarkup ? "</b> " : ": ")
+                   + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false) : printAxioms.trim());
          }
       }
       
@@ -630,6 +635,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
          return sig.toString()
                + pres
                + posts
+               + axioms
                + mods
                + (hasMby() ? "\nmeasured-by: "+ mby : "")
                + "\ntermination: "
@@ -936,8 +942,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 		+ originalMods
 		+ "; hasMod: "
 		+ hasRealModifiesClause
-		+ "; axioms: "
-		+ originalAxioms
+		+ (originalAxioms.size() > 0 ?  ("; axioms: " + originalAxioms) : "")
 		+ "; termination: "
 		+ getModality()
                 + "; transaction: "

@@ -88,7 +88,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
        int offset;
 
        for(offset = 0; offset < stateCount * heapCount; offset++) {
-         result[offset++] = heapSort;
+         result[offset] = heapSort;
        }
        if(!isStatic) {
            result[offset] = container.getSort();

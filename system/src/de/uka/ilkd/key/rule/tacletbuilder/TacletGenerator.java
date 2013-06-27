@@ -359,13 +359,14 @@ public class TacletGenerator {
         Term update = null;
         int i = 0;
         for(ProgramVariable heap : heaps) {
-        	replace.put(heapSVs.get(i++), heap);
+        	replace.put(heapSVs.get(i), heap);
             final Term u = TB.elementary(services, TB.var(heap), TB.var(heapSVs.get(i)));
             if(update == null) {
             	update = u;
             }else{
             	update = TB.parallel(update, u);
             }
+            i++;
         }
         final OpReplacer or = new OpReplacer(replace);
         final Term replaced = or.replace(term);
