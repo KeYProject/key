@@ -4,7 +4,76 @@ class Inc {
 
   //@ requires x > 0;
   //@ ensures x > 0;
-  void foo () {
+  void foo_1 () {
+    x++;
+  }
+
+  //@ requires x > 0;
+  //@ ensures x > 0;
+  void foo_2 () {
+    x++;
+    x++;
+  }
+
+  //@ requires x > 0;
+  //@ ensures x > 0;
+  void foo_4 () {
+    x++;
+    x++;
+    x++;
+    x++;
+  }
+
+  //@ requires x > 0;
+  //@ ensures x > 0;
+  void foo_8 () {
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+  }
+
+  //@ requires x > 0;
+  //@ ensures x > 0;
+  void foo_10 () {
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+ }
+
+  //@ requires x > 0;
+  //@ ensures x > 0;
+  void foo_20 () {
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
+    x++;
     x++;
   }
 
