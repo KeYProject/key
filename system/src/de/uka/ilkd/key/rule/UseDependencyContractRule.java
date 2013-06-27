@@ -396,7 +396,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
 	boolean hasRawSteps = false;
 	for(int i = 0; i<heaps.size() * target.getStateCount(); i++) {
-	  if(!hasRawSteps(focus.sub(i), goal.sequent(), services)) {
+	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
         hasRawSteps = true;		  
 	    break;
 	  }
