@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 /* -*-Antlr-*- */
@@ -31,15 +31,15 @@ tokens {
     BOOLEAN = "boolean";
     BYTE = "byte";
     FALSE = "false";
-    INSTANCEOF = "instanceof";        
+    INSTANCEOF = "instanceof";
     INT = "int";
-    LONG = "long";        
+    LONG = "long";
     NEW = "new";
-    NULL = "null";    
+    NULL = "null";
     SHORT = "short";
-    SUPER = "super";    
+    SUPER = "super";
     THIS = "this";
-    TRUE = "true";    
+    TRUE = "true";
     VOID = "void";
 
     ACCESSIBLE      = "accessible";
@@ -53,7 +53,7 @@ tokens {
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
-    
+
     NULLABLE        = "nullable";
     NON_NULL        = "non_null";
 
@@ -78,7 +78,7 @@ DURATION : "\\duration";
 ELEMTYPE : "\\elemtype";
 EQUAL_SINGLE : "=";
 EVERYTHING : "\\everything";
-FRESH : "\\fresh"; 
+FRESH : "\\fresh";
 FREE : "\\free";
 GEQ : ">=";
 GT : ">";
@@ -97,23 +97,30 @@ LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
 LBRACE : "{";
 LEQ : "<=";
+LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU);
+// less_than_nothing is *deprecated* and to be removed eventually, use strictly_nothing instead
 LOCKSET : "\\lockset";
+LOCKSET_LT: "<#";
+LOCKSET_LEQ: "<#=";
 LOGICALAND : "&&";
 LOGICALOR : "||";
 MAX_SPACE : "\\max_space"; //KeY extension, not official JML
+MEASURED_BY : "\\measured_by";
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
 MINUS : "-";
 MOD : "%";
 MULT : "*";
 NONNULLELEMENTS : "\\nonnullelements";
 NOT : "!";
+NOT_ASSIGNED: "\\not_assigned";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTHING : "\\nothing";
-LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU);
-// less_than_nothing is *deprecated* and to be removed eventually, use strictly_nothing instead
-STRICTLY_NOTHING : "\\strictly_nothing";
 OLD : "\\old";
+// ONLY_ACCESSED: "\\only_accessed"; // too many common lexemes
+// ONLY_ASSIGNED: "\\only_assigned";
+// ONLY_CALLED: "\\only_called";
+// ONLY_CAPTURED: "\\only_captured";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
 PLUS : "+";
@@ -132,6 +139,7 @@ SEMI : ";";
 SHIFTLEFT : "<<";
 SHIFTRIGHT : ">>";
 SPACE : "\\space";
+STRICTLY_NOTHING : "\\strictly_nothing";
 STRING_EQUAL : "\\string_equal";
 TRANSACTIONUPDATED: "\\transactionUpdated";
 TYPEOF : "\\typeof";
@@ -168,7 +176,6 @@ SEQREPLACE : "\\seq_put";
 INDEXOF : "\\indexOf";
 SEQDEF : "\\seq_def";
 
-MEASURED_BY : "\\measured_by";
 
 FROM : "\\from";
 TO : "\\to";
@@ -186,10 +193,10 @@ LT_DISPATCH
     |
      LT {$setType(LT);}
     ;
-    
+
 protected LT : "<";
 
-    
+
 protected IMPLICIT_IDENT
 options {
   paraphrase = "an implicit identifier (letters only)";
@@ -204,7 +211,7 @@ options {
   paraphrase = "`('";
 }
 	:
-	'(' 
+	'('
 	;
 
 RPAREN
@@ -219,7 +226,7 @@ options {
   paraphrase = "`['";
 }
 	:
-	'[' 
+	'['
 	;
 
 RBRACKET
@@ -227,19 +234,19 @@ options {
   paraphrase = "`]'";
 }
 	:
-	']' 
+	']'
 	;
 
-QUANTIFIER 
+QUANTIFIER
     :
-        "\\forall" 
+        "\\forall"
     |
         "\\exists"
     |
         "\\min"
     |
         "\\max"
-    | 
+    |
         "\\num_of"
     |
         "\\product"
@@ -267,7 +274,7 @@ DIGIT
 options {
   paraphrase = "a digit";
 }
-	:	
+	:
         '0'..'9'
 ;
 
@@ -294,7 +301,7 @@ options {
 }:
    LETTER (LETTERORDIGIT)*
 ;
-    
+
 HEXNUMERAL
     :
         '0'! ('x'!|'X'!) (HEXDIGIT)+
@@ -306,7 +313,7 @@ DIGITS
 ;
 
 CHAR_LITERAL:
-        '\'' 
+        '\''
                 ((' '..'&') |
                  ('('..'[') |
                  (']'..'~') |
@@ -319,7 +326,7 @@ STRING_LITERAL
 options {
   paraphrase = "a string in double quotes";
 }
-    : '"'! ( ESC | ~('"'|'\\') )* '"'! 
+    : '"'! ( ESC | ~('"'|'\\') )* '"'!
     ;
 
 protected
@@ -357,11 +364,11 @@ INFORMAL_DESCRIPTION
 options {
   paraphrase = "informal specification";
 }
-    : 
-        "(*" 
+    :
+        "(*"
         (
             '*' ~')'
-        |	
+        |
             ~'*'
         )*
         "*)"

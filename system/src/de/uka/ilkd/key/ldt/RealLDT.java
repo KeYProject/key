@@ -27,16 +27,17 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * Complete this class if you want to add support for the Java double type.
+ * Complete this class if you want to add support for the JML \real type.
  *
  * At the moment this class contains only stubs.
+ * @author bruns
  */
-public final class DoubleLDT extends LDT {
+public final class RealLDT extends LDT {
 
-    public static final Name NAME = new Name("double");
+    public static final Name NAME = new Name("real");
 
 
-    public DoubleLDT(Services services) {
+    public RealLDT(Services services) {
 	super(NAME, services);
     }
 
@@ -101,7 +102,7 @@ public final class DoubleLDT extends LDT {
     @Override
     public final Type getType(Term t) {
 	if(t.sort() == targetSort()) {
-	    return PrimitiveType.JAVA_DOUBLE;
+	    return PrimitiveType.JAVA_REAL;
 	} else {
 	    return null;
 	}
