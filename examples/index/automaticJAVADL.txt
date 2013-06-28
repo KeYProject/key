@@ -154,7 +154,6 @@ provable: ./heap/SmansEtAl/Iterator_next.key
 provable: ./heap/SmansEtAl/Stack_footprint.key
 provable: ./heap/SmansEtAl/Stack_inv.key
 provable: ./heap/SmansEtAl/Stack_push.key
-provable: ./heap/SmansEtAl/Stack_size_dep.key
 provable: ./heap/SmansEtAl/Stack_size.key
 provable: ./heap/SmansEtAl/Stack_Stack.key
 provable: ./heap/SmansEtAl/Stack_switchContents.key
