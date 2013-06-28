@@ -66,8 +66,6 @@ public final class RewriteTaclet extends FindTaclet {
      * "wellformed(h) <-> wellformed(h2) ==>" has NO succedent polarity.
      */
     public static final int SUCCEDENT_POLARITY = 8;
-
-    public static final int TRANSFORMER_PROCEDURE = 16;
     
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
@@ -167,11 +165,9 @@ public final class RewriteTaclet extends FindTaclet {
 	if ( getApplicationRestriction() == NONE)  
 	    return p_mc;
         
-	if (getApplicationRestriction() == TRANSFORMER_PROCEDURE) {
-	    // check if we are in top level of uppermost transformer procedure
-	    // if no, then no matching
-	    // if yes, then check if rule fits for this kind of transformer
-	}
+	// check if we are in top level of uppermost transformer procedure
+	// if no, then no matching
+	// if yes, then check if rule fits for this kind of transformer
 
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
@@ -183,6 +179,9 @@ public final class RewriteTaclet extends FindTaclet {
 	        final Term t = it.getSubTerm ();
 	        op = t.op ();
 
+	        if (op instanceof TransformerProcedure) {
+                    return null;
+                }
 	        if ( op instanceof UpdateApplication &&
 	                it.getChild () == UpdateApplication.targetPos()) {
 	            if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
@@ -196,7 +195,7 @@ public final class RewriteTaclet extends FindTaclet {
 	            return null;
 	        }
 
-            // compute polarity
+	        // compute polarity
                                                                                  // toggle polarity if find term is subterm of
 	        if ((op == Junctor.NOT) ||                                       //   not
 	                (op == Junctor.IMP && it.getChild() == 0)) {             //   left hand side of implication

@@ -12,8 +12,6 @@ import de.uka.ilkd.key.util.Triple;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
-    protected final WellDefinednessOperator WD = new WellDefinednessOperator(services);
-
     protected static final TermBuilder TB = TermBuilder.DF;
 
     private WellDefinednessCheck check;
@@ -36,12 +34,12 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         Triple<Term, ImmutableList<Term>, Term> po = check.createPOTerm();
         ImmutableList<Term> c = ImmutableSLList.<Term>nil();
         for (Term t: po.second) {
-            c = c.append(WD.wd(t));
+            c = c.append(wd(t));
         }
-        Term poTerms = TB.and(WD.wd(po.first),
+        Term poTerms = TB.and(wd(po.first),
                               TB.imp(po.first,
                                       TB.and(TB.and(c),
-                                              WD.wd(po.third))));
+                                              wd(po.third))));
         assignPOTerms(poTerms);
     }
 
@@ -66,6 +64,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      */
     private LocationVariable getHeap() {
        return services.getTypeConverter().getHeapLDT().getHeap();
+    }
+
+    private Term wd(Term t) {
+        return TB.wd(t);
     }
 
     @Deprecated

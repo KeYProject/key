@@ -1692,7 +1692,8 @@ public class TermBuilder {
     }
 
     public Term wd(Term t) {
-        return tf.createTerm(TransformerProcedure.WELL_DEFINEDNESS, t);
+        return func(new TransformerProcedure(new Name("WD"), Sort.FORMULA, t.sort()),
+                    t);
     }
 
 

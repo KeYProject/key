@@ -27,10 +27,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * of function.
  */
 public class Function extends AbstractSortedOperator {
-            
+
     private final boolean unique;
-    
-    
+
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------     
@@ -64,7 +64,7 @@ public class Function extends AbstractSortedOperator {
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
 	this(name, sort, argSorts, null, false);
-    }    
+    }
     
     
     public Function(Name name, Sort sort, Sort ... argSorts) {
@@ -74,7 +74,7 @@ public class Function extends AbstractSortedOperator {
     
     public Function(Name name, Sort sort) {
 	this(name, sort, new ImmutableArray<Sort>(), null, false);
-    }    
+    }
     
     
     //-------------------------------------------------------------------------

@@ -16,7 +16,6 @@
 header {
     package de.uka.ilkd.key.parser;
 
-    import java.io.InputStream;
     import de.uka.ilkd.key.util.*;
     import java.util.HashMap;
     import java.util.LinkedHashMap;
@@ -144,6 +143,7 @@ tokens {
 
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";
+	TRANSFORMERS = "\\transformers";
 	UNIQUE = "\\unique";
 
 	RULES = "\\rules";

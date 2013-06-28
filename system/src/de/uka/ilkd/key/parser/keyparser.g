@@ -27,7 +27,6 @@ header {
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
 
-  import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
 
@@ -52,7 +51,6 @@ header {
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.java.recoderext.adt.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
 }
@@ -82,6 +80,7 @@ options {
       prooflabel2tag.put("rule", new Character('r'));
       prooflabel2tag.put("term", new Character('t'));
       prooflabel2tag.put("formula", new Character('f'));
+      prooflabel2tag.put("transformer", new Character('t'));
       prooflabel2tag.put("inst", new Character('i'));
       prooflabel2tag.put("ifseqformula", new Character('q'));
       prooflabel2tag.put("ifdirectformula", new Character('d'));
@@ -98,81 +97,84 @@ options {
       prooflabel2tag.put("autoModeTime", new Character('e'));
    }
 
-    private NamespaceSet nss;
-    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
-    private boolean onlyWith=false;
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private HashSet usedChoiceCategories = new LinkedHashSet();
-    private HashMap taclet2Builder;
-    private AbbrevMap scm;
-    private KeYExceptionHandler keh = null;
+   private NamespaceSet nss;
+   private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
+   private boolean onlyWith=false;
+   private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+   private HashSet usedChoiceCategories = new LinkedHashSet();
+   private HashMap taclet2Builder;
+   private AbbrevMap scm;
+   private KeYExceptionHandler keh = null;
 
-    // these variables are set if a file is read in step by
-    // step. This used when reading in LDTs because of cyclic
-    // dependencies.
-    private boolean skip_schemavariables;
-    private boolean skip_functions;
-    private boolean skip_predicates;
-    private boolean skip_sorts;
-    private boolean skip_rulesets;
-    private boolean skip_taclets;
-    private boolean parse_includes = false;
-    private Includes includes = new Includes();
+   // these variables are set if a file is read in step by
+   // step. This used when reading in LDTs because of cyclic
+   // dependencies.
+   private boolean skip_schemavariables;
+   private boolean skip_functions;
+   private boolean skip_transformers;
+   private boolean skip_predicates;
+   private boolean skip_sorts;
+   private boolean skip_rulesets;
+   private boolean skip_taclets;
+   private boolean parse_includes = false;
+   private Includes includes = new Includes();
 
-    private boolean schemaMode = false;
-    private ParserMode parserMode;
+   private boolean schemaMode = false;
+   private ParserMode parserMode;
 
-    private String chooseContract = null;
-    private String proofObligation = null;
+   private String chooseContract = null;
+   private String proofObligation = null;
     
-    private int savedGuessing = -1;
+   private int savedGuessing = -1;
 
-    private int lineOffset=0;
-    private int colOffset=0;
-    private int stringLiteralLine=0; // HACK!
+   private int lineOffset=0;
+   private int colOffset=0;
+   private int stringLiteralLine=0; // HACK!
 
-    private Services services;
-    private JavaReader javaReader;
+   private Services services;
+   private JavaReader javaReader;
 
-    // if this is used then we can capture parts of the input for later use
-    private DeclPicker capturer = null;
-    private IProgramMethod pm = null;
+   // if this is used then we can capture parts of the input for later use
+   private DeclPicker capturer = null;
+   private IProgramMethod pm = null;
 
-    private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
-    private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
-    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
+   private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+   private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
+   private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
-    private ParserConfig schemaConfig;
-    private ParserConfig normalConfig;
+   private ParserConfig schemaConfig;
+   private ParserConfig normalConfig;
     
-    // the current active config
-    private ParserConfig parserConfig;
+   // the current active config
+   private ParserConfig parserConfig;
 
-    private Term quantifiedArrayGuard = null;
+   private Term quantifiedArrayGuard = null;
     
-    private TokenStreamSelector selector;
+   private TokenStreamSelector selector;
 
-    /**
-     * Although the parser mode can be deduced from the particular constructor
-     * used we still require the caller to provide the parser mode explicitly, 
-     * so that the code is readable.
-     */
-    public KeYParser(ParserMode mode, TokenStream lexer) {
-	this((lexer instanceof KeYLexer)? ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector(), 2);
-        this.selector = (lexer instanceof KeYLexer)? ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector();
+   /**
+    * Although the parser mode can be deduced from the particular constructor
+    * used we still require the caller to provide the parser mode explicitly,
+    * so that the code is readable.
+    */
+   public KeYParser(ParserMode mode, TokenStream lexer) {
+	this((lexer instanceof KeYLexer) ?
+	       ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector(), 2);
+        this.selector = (lexer instanceof KeYLexer) ?
+                ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector();
 	this.parserMode = mode;
 	if(isTacletParser()) {
 	    switchToSchemaMode();
 	}
     }
 
-    public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
-        this(mode, lexer);
-        this.keh = services.getExceptionHandler();
-    }
+   public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
+       this(mode, lexer);
+       this.keh = services.getExceptionHandler();
+   }
 
-    /* Most general constructor, should only be used internally */
-    private KeYParser(TokenStream lexer,
+   /* Most general constructor, should only be used internally */
+   private KeYParser(TokenStream lexer,
 		     String filename,
                      Services services,
 		     NamespaceSet nss,
@@ -184,51 +186,51 @@ options {
           this.keh = services.getExceptionHandler();
 	this.nss = nss;
         switchToNormalMode();
-    }
+   }
 
-    /** 
-     * Used to construct Term parser - for first-order terms
-     * and formulae.
-     */  
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,                   
-                     String filename, 
-                     JavaReader jr, 
-                     Services services,
-                     NamespaceSet nss, 
-                     AbbrevMap scm) {
+   /**
+    * Used to construct Term parser - for first-order terms
+    * and formulae.
+    */
+   public KeYParser(ParserMode mode,
+                    TokenStream lexer,
+                    String filename,
+                    JavaReader jr,
+                    Services services,
+                    NamespaceSet nss,
+                    AbbrevMap scm) {
         this(lexer, filename, services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
-    }
+   }
 
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
-                     String filename,
-                     Services services, 
-                     NamespaceSet nss) {
-        this(mode, 
-             lexer, 
+   public KeYParser(ParserMode mode,
+                    TokenStream lexer,
+                    String filename,
+                    Services services,
+                    NamespaceSet nss) {
+        this(mode,
+             lexer,
              filename,
              new SchemaRecoder2KeY(services, nss),
-	     services, 
-	     nss, 
+	     services,
+	     nss,
 	     new LinkedHashMap());
-    }
+   }
 
 
 
-    /** ONLY FOR TEST CASES.
-     * Used to construct Global Declaration Term parser - for first-order 
-     * terms and formulae. Variables in quantifiers are expected to be
-     * declared globally in the variable namespace.  This parser is used
-     * for test cases, where you want to know in advance which objects
-     * will represent bound variables.
-     */  
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
-		     JavaReader jr,
-		     NamespaceSet nss) {
+   /** ONLY FOR TEST CASES.
+    * Used to construct Global Declaration Term parser - for first-order
+    * terms and formulae. Variables in quantifiers are expected to be
+    * declared globally in the variable namespace.  This parser is used
+    * for test cases, where you want to know in advance which objects
+    * will represent bound variables.
+    */
+   public KeYParser(ParserMode mode,
+                    TokenStream lexer,
+	            JavaReader jr,
+		    NamespaceSet nss) {
         this(lexer, null, new Services(), nss, mode);
         this.scm = new AbbrevMap();
         this.javaReader = jr;
@@ -329,28 +331,28 @@ options {
     }
 
     public void recover( RecognitionException ex, BitSet tokenSet ) throws TokenStreamException {
-     consume();
-     consumeUntil( tokenSet );
+        consume();
+        consumeUntil( tokenSet );
     }
 
     public String getChooseContract() {
-      return chooseContract;
+        return chooseContract;
     }
     
     public String getProofObligation() {
-      return proofObligation;
+        return proofObligation;
     }
     
     public String getFilename() {
-      return ((CharScanner)selector.getCurrentStream()).getFilename();
+        return ((CharScanner)selector.getCurrentStream()).getFilename();
     }
 
     public void setFilename(String filename) {
-      ((CharScanner)selector.getCurrentStream()).setFilename(filename);
+        ((CharScanner)selector.getCurrentStream()).setFilename(filename);
     }
  
     private boolean isDeclParser() {
-	return parserMode == ParserMode.DECLARATION;
+        return parserMode == ParserMode.DECLARATION;
     }
 
     private boolean isTermParser() {
@@ -489,6 +491,7 @@ options {
     private void resetSkips() {
        skip_schemavariables = false;
        skip_functions       = false;
+       skip_transformers    = false;
        skip_predicates      = false;
        skip_sorts           = false;
        skip_rulesets        = false;
@@ -498,7 +501,11 @@ options {
     private void skipFuncs() {
         skip_functions = true;
     }
-    
+
+    private void skipTransformers() {
+        skip_transformers = true;
+    }
+
     private void skipPreds() {
         skip_predicates = true;
     }
@@ -577,20 +584,22 @@ options {
     
     public void parseSorts() throws RecognitionException, 
     				    TokenStreamException {
-      resetSkips(); 
-      skipFuncs(); 
-      skipPreds(); 
+      resetSkips();
+      skipFuncs();
+      skipTransformers();
+      skipPreds();
       skipRuleSets();
       skipVars();
       skipTaclets();
       decls();
       resetSkips();
-    }    
+    }
 
     public void parseFunctions() throws RecognitionException, 
     					TokenStreamException {
       resetSkips();
-      skipSorts();      
+      skipSorts();
+      skipTransformers();
       skipPreds();      
       skipRuleSets();
       skipVars();
@@ -604,6 +613,7 @@ options {
       resetSkips();
       skipSorts();
       skipFuncs();
+      skipTransformers();
       skipRuleSets();
       skipVars();
       skipTaclets();
@@ -614,20 +624,22 @@ options {
     public void parseFuncAndPred() throws RecognitionException, 
     					  TokenStreamException {
       resetSkips();
-      skipSorts(); 
+      skipSorts();
+      skipTransformers();
       skipRuleSets();
       skipVars();
-      skipTaclets();  
+      skipTaclets();
       decls();
       resetSkips();
-    }    
+    }
     
     public void parseRuleSets() throws RecognitionException, 
     				       TokenStreamException {
       resetSkips();
       skipSorts();      
-      skipFuncs(); 
-      skipPreds(); 
+      skipFuncs();
+      skipTransformers();
+      skipPreds();
       skipVars();
       skipTaclets();
       decls();
@@ -637,9 +649,10 @@ options {
     public void parseVariables() throws RecognitionException, 
                                         TokenStreamException {
       resetSkips();
-      skipSorts();       
-      skipFuncs(); 
-      skipPreds(); 
+      skipSorts();
+      skipFuncs();
+      skipTransformers();
+      skipPreds();
       skipRuleSets();      
       skipTaclets();
       decls();
@@ -650,7 +663,8 @@ options {
     				      TokenStreamException {
       resetSkips();
       skipSorts(); 
-      skipFuncs(); 
+      skipFuncs();
+      skipTransformers();
       skipPreds();
       skipRuleSets();
       //skipVars(); 
@@ -1414,6 +1428,8 @@ decls :
         |
             func_decls
         |
+            transform_decls
+        |
             {!onlyWith}? ruleset_decls
 
         ) *
@@ -2029,12 +2045,55 @@ func_decl
         SEMI
     ;
 
-func_decls 
+func_decls
     :
         FUNCTIONS 
         LBRACE 
         (
             func_decl
+        ) *
+        RBRACE
+    ;
+
+transform_decl
+{
+    Sort[] argSorts;
+    String trans_name;
+}
+    :
+        trans_name = funcpred_name
+
+        argSorts = arg_sorts[!skip_transformers]
+
+        {
+            if (!skip_transformers) {
+
+                TransformerProcedure t =
+                    new TransformerProcedure(new Name(trans_name),
+                                             Sort.FORMULA,
+                                             new ImmutableArray<Sort>(argSorts));
+
+                if (lookup(t.name()) != null) {
+                    if(!isProblemParser()) {
+                      throw new AmbigiousDeclException(t.name().toString(),
+                                                       getFilename(),
+                                                       getLine(),
+                                                       getColumn());
+                    }
+                } else {
+                    addFunction(t);
+                }
+            }
+        }
+        SEMI
+    ;
+
+transform_decls
+    :
+        TRANSFORMERS
+        LBRACE
+        (
+            transform_decl
         ) *
         RBRACE
     ;
