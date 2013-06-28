@@ -161,13 +161,7 @@ public final class RewriteTaclet extends FindTaclet {
     public MatchConditions checkPrefix
 	( PosInOccurrence p_pos,
 	  MatchConditions p_mc,
-	  Services        p_services ) {
-	if ( getApplicationRestriction() == NONE)  
-	    return p_mc;
-        
-	// check if we are in top level of uppermost transformer procedure
-	// if no, then no matching
-	// if yes, then check if rule fits for this kind of transformer
+	  Services        p_services) {
 
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
@@ -180,10 +174,14 @@ public final class RewriteTaclet extends FindTaclet {
 	        op = t.op ();
 
 	        if (op instanceof TransformerProcedure) {
+	            /* FIXME: Good approach, but apparently this method is not general
+	                      enough, i.e. does not get always called (?). Maybe one of
+                              the filter methods would be a good place for this? */
                     return null;
                 }
 	        if ( op instanceof UpdateApplication &&
-	                it.getChild () == UpdateApplication.targetPos()) {
+	                it.getChild () == UpdateApplication.targetPos() &&
+	                getApplicationRestriction() != NONE) {
 	            if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
 	                return null;
 	            } else {
@@ -191,7 +189,8 @@ public final class RewriteTaclet extends FindTaclet {
 	                svi = svi.addUpdate(update, t.getLabels());
                 }
 
-	        } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
+	        } else if (getApplicationRestriction() != NONE &&
+	                (op instanceof Modality || op instanceof ModalOperatorSV)) {
 	            return null;
 	        }
 
@@ -211,6 +210,8 @@ public final class RewriteTaclet extends FindTaclet {
 	        }
 	    }
 	}
+	if (getApplicationRestriction() == NONE)
+            return p_mc;
 	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
 	        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
 	    return null;
