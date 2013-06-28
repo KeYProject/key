@@ -22,7 +22,7 @@ public class UseOperationContractNormalAndExceptionalTogetherTest {
 	  @
 	  @ public exceptional_behavior
 	  @ requires x < 0;
-	  @ signals (Exception myExc) \not_specified;
+	  @ signals (Exception myExc) true;
 	  @*/
 	public static int magic(int x) throws Exception {
 		if (x >= 0) {

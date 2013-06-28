@@ -22,7 +22,8 @@ public class WhileWithMethodCallAsCondition {
 		throw new RuntimeException();
 	}
 	
-	/*@ requires array != null;
+	/*@ normal_behavior
+	  @ requires array != null;
 	  @ ensures \result == i < array.length;
 	  @*/
 	public static boolean goOnExc(int[] array, int i) {
@@ -37,7 +38,7 @@ public class WhileWithMethodCallAsCondition {
 	  @
 	  @ public exceptional_behavior
 	  @ requires i < 0;
-	  @ signals (RuntimeException myExc) \not_specified;
+	  @ signals (RuntimeException myExc) true;
 	  @*/
 	public static boolean goOnNice(/*@ nullable @*/ int[] array, int i) throws RuntimeException {
 		throw new RuntimeException();
