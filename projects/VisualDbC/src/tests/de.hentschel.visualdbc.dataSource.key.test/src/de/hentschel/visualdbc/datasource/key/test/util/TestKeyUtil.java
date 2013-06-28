@@ -552,10 +552,9 @@ public final class TestKeyUtil {
       result.addConstructor(constructor);
       MemoryMethod createJuniorCard = new MemoryMethod("createJuniorCard()", qualifiedPaycardName, DSVisibility.PUBLIC, true);
       addOperationObligations(createJuniorCard, true, true, true);
-      MemoryOperationContract cjc = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "createJuniorCard()", operationContractIDs[0], ""), 
+      MemoryOperationContract cjc = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, qualifiedPaycardName, "createJuniorCard()", operationContractIDs[0], "normal_behavior"), 
                                                                 "true", 
-                                                                "(exc = null -> result.limit = 100 & !result = null)\n" +
-                                                                "& exc = null", 
+                                                                "result.limit = 100 & !result = null & exc = null", 
                                                                 "mod[heap]: allLocs", 
                                                                 "diamond");
       addAllOperationContractObligations(cjc);
@@ -887,9 +886,9 @@ public final class TestKeyUtil {
       b.addAttribute(new MemoryAttribute("x", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       b.addConstructor(createDefaultConstructor("ModelFieldTest()", null, false));
       MemoryMethod doubleX = new MemoryMethod("doubleX()", "int", DSVisibility.PUBLIC);
-      MemoryOperationContract doubleXcontract = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId("ModelFieldTest", "ModelFieldTest", "doubleX()", "0", null),
+      MemoryOperationContract doubleXcontract = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId("ModelFieldTest", "ModelFieldTest", "doubleX()", "0", "normal_behavior"),
                                                                             "self.<inv>", 
-                                                                            "(exc = null -> result = self.f & self.<inv>)\n& exc = null", 
+                                                                            "result = self.f & self.<inv> & exc = null", 
                                                                             "mod[heap]: allLocs", 
                                                                             "diamond");
       addAllOperationContractObligations(doubleXcontract);
@@ -1111,7 +1110,7 @@ public final class TestKeyUtil {
       classConstructor.addAttribute(new MemoryAttribute("value", "int", bugAttributeVisibility(DSVisibility.PRIVATE)));
       MemoryConstructor classConstructorConstructor = new MemoryConstructor("ConstructorTest(x : int, a : B)", DSVisibility.PUBLIC);
       classConstructor.addConstructor(classConstructorConstructor);
-      MemoryOperationContract classConstructorConstructorOC = new MemoryOperationContract("ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML operation contract.0", "!a = null", "(   exc = null\n   -> self.value = javaSubInt(42, 4711) & self.<inv>)\n& exc = null", "mod[heap]: allLocs", "diamond");
+      MemoryOperationContract classConstructorConstructorOC = new MemoryOperationContract("ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML normal_behavior operation contract.0", "!a = null", "self.value = javaSubInt(42, 4711)\n& self.<inv>\n& exc = null", "mod[heap]: allLocs", "diamond");
       addAllOperationContractObligations(classConstructorConstructorOC);
       classConstructorConstructor.addOperationContract(classConstructorConstructorOC);
       con.addClass(classA);
