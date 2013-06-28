@@ -61,11 +61,20 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -149,12 +158,27 @@ public class ProofManager {
                System.out.println("Warning: no meta file created for " + proofFile.getName());
             }
          }
+         pe.getProof().dispose();
          monitor.worked(1);
       }
+      detectCycling(proofElements);
       if(autoDeleteProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
       }
       monitor.done();
+   }
+   
+   
+   private void detectCycling(LinkedList<ProofElement> proofElements){
+      Contract c0 = proofElements.get(0).getContract();
+      Contract c1 = proofElements.get(1).getContract();
+      for(ProofElement pe : proofElements){
+         ProofCorrectnessMgt pcm = new ProofCorrectnessMgt(pe.getProof());
+         boolean isC0Applicable = pcm.isContractApplicable(c0);
+         boolean isC1Applicable = pcm.isContractApplicable(c1);
+         ImmutableSet<Contract> usedContracts = pcm.getUsedContracts();
+         System.out.println("");
+      }
    }
    
    
@@ -281,24 +305,10 @@ public class ProofManager {
          monitor.worked(1);
       }
       
-      for(ProofElement pe : proofElements){
-         checkContractRecursion(pe, proofElements);
-      }
-      
       if(autoDeleteProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
       }
       monitor.done();
-   }
-   
-   
-   private void checkContractRecursion(ProofElement pe, LinkedList<ProofElement> proofElements){
-      LinkedList<Contract> proofRefContracts = getProofRefContracts(pe);
-   }
-   
-   
-   private LinkedList<Contract> getProofRefContracts(ProofElement pe){
-      return null;
    }
    
    
@@ -313,7 +323,11 @@ public class ProofManager {
       KeYJavaType[] kjtsarr = KeY4EclipseResourcesUtil.sortKeYJavaTypes(kjts);
       LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
       for (KeYJavaType type : kjtsarr) {
+//         KeYEnvironment<CustomConsoleUserInterface> environment = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), this.environment.getInitConfig());
+//         KeYEnvironment<CustomConsoleUserInterface> environment = cloneEnvironment();
+//         KeYJavaType kjt = environment.getJavaInfo().getKeYJavaType(type.getFullName());
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
+//         Type javaType = kjt.getJavaType();
          Type javaType = type.getJavaType();
          IFile javaFile = null;
          SourceLocation scl = null;
@@ -332,6 +346,7 @@ public class ProofManager {
                   scl = KeYUtil.convertToSourceLocation(progMethod.getPositionInfo());
                }
             }
+            
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
                ProofOblInput obl = contract.createProofObl(environment.getInitConfig(), contract);
@@ -340,6 +355,51 @@ public class ProofManager {
          }
       }
       return proofElements;
+   }
+   
+   
+   
+   private KeYEnvironment<CustomConsoleUserInterface> cloneEnvironment(){
+System.out.println("Cloning");
+
+      InitConfig sourceInitConfig = environment.getInitConfig();
+      RuleJustificationInfo sourceJustiInfo = environment.getInitConfig().getProofEnv().getJustifInfo();
+      // Create new profile which has separate OneStepSimplifier instance
+      JavaProfile profile = new JavaProfile() {
+         private OneStepSimplifier simplifier;
+         
+         @Override
+         protected OneStepSimplifier getInitialOneStepSimpilifier() {
+            if (simplifier == null) {
+               simplifier = new OneStepSimplifier();
+            }
+            return simplifier;
+         }
+      };
+      // Create new InitConfig and initialize it with value from initial one.
+      InitConfig initConfig = new InitConfig(environment.getServices().copy(), environment.getProfile());
+      initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
+      initConfig.setSettings(sourceInitConfig.getSettings());
+      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
+      initConfig.setTaclets(sourceInitConfig.getTaclets());
+      // Create new ProofEnvironment and initialize it with values from initial one.
+      ProofEnvironment env = initConfig.getProofEnv();
+      env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
+      env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
+      for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
+         env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
+      }
+      for (BuiltInRule rule : initConfig.builtInRules()) {
+         RuleJustification origJusti = sourceInitConfig.getProofEnv().getJustifInfo().getJustification(rule);
+         if (origJusti == null) {
+            assert rule instanceof OneStepSimplifier;
+            origJusti = AxiomJustification.INSTANCE;
+         }
+         env.getJustifInfo().addJustification(rule, origJusti);
+      }
+//      GlobalProofMgt.getInstance().registerProofEnvironment(env);
+      KeYEnvironment<CustomConsoleUserInterface> keyEnv = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), initConfig);
+      return environment;
    }
    
    
@@ -506,14 +566,14 @@ public class ProofManager {
       try{
          KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(file, null, null);
          Proof proof = loadEnv.getLoadedProof();
-         pe.setKeYEnvironment(loadEnv);
-         pe.setProof(proof);
          if (proof != null) {
             proofs.add(proof);
             if (!proof.closed()){
                environment.getUi().startAndWaitForAutoMode(proof);
             }
          }
+         pe.setKeYEnvironment(loadEnv);
+         pe.setProof(proof);
          return pe;
       }catch(Exception e){
          LogUtil.getLogger().createErrorStatus(e);
