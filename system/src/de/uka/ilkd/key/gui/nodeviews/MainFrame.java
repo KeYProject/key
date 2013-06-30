@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -34,13 +35,16 @@ import javax.swing.border.TitledBorder;
  *
  * @author Kai Wallisch
  */
+@SuppressWarnings("serial")
 public class MainFrame extends JScrollPane {
 
     public void setSequentView(SequentView sequentView) {
+        Point oldViewpointPosition = getViewport().getViewPosition();
         setViewportView(new MainFrameBody(sequentView));
+        getViewport().setViewPosition(oldViewpointPosition);
 
         // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
-        ProofTreeView ptv = MainWindow.getInstance().proofTreeView;
+        ProofTreeView ptv = MainWindow.getInstance().getProofView();
         if (ptv != null) {
             ptv.tacletInfoToggle.setSequentView(sequentView);
         }
@@ -65,7 +69,7 @@ public class MainFrame extends JScrollPane {
         setSequentView(new EmptySequent());
     }
 
-    private class MainFrameBody extends JPanel {
+    private static class MainFrameBody extends JPanel {
 
         public MainFrameBody(SequentView sequentView) {
 
