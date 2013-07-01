@@ -60,6 +60,9 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -87,7 +90,6 @@ public class QueryExpand implements BuiltInRule {
 
 
     @Override
-
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) {
 
@@ -98,9 +100,18 @@ public class QueryExpand implements BuiltInRule {
         ImmutableList<Goal> newGoal = goal.split(1);
         Goal g = newGoal.head();
 
-        Term topLevel = queryEvalTerm(services, query, null);
+        Pair<Term,Term> queryEval = queryEvalTerm(services, query, null);
 
-        g.addFormula(new SequentFormula(topLevel), true, true);	//move the query call directly to the succedent. Use box instead of diamond?
+        // The following additional rewrite taclet increases performance
+        // (sometimes significantly, e.g. by factor 10).
+        RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        tb.setName(new Name("replaceKnownQuery"));
+        tb.setFind(query);
+        tb.addGoalTerm(queryEval.second);
+        tb.addRuleSet(new RuleSet(new Name("concrete")));
+
+        g.addFormula(new SequentFormula(queryEval.first), true, true);	//move the query call directly to the succedent. Use box instead of diamond?
+        g.addTaclet(tb.getTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
         /*  replaces old query
         final Term newFormula = replace(pio.constrainedFormula().formula(),
@@ -124,7 +135,7 @@ public class QueryExpand implements BuiltInRule {
      * @author Richard Bubel
      * @author gladisch
      */
-    public Term queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
+    public Pair<Term,Term> queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
 
     	   final IProgramMethod method = (IProgramMethod)query.op();
 
@@ -229,11 +240,14 @@ public class QueryExpand implements BuiltInRule {
 
 
            // The following additional equation increases performance (sometimes significantly, e.g. by factor 10).
-           topLevel = tb.and(topLevel, tb.equals(query,placeHolderResultTrm));
+           // CS: It is even more efficien to introduce a rewrite taclet instead
+           // of an equation. Therefore return the placeHolderResultTrm such that
+           // the caller can decide whether to introduce an equation or taclet.
+//           topLevel = tb.and(topLevel, tb.equals(query,placeHolderResultTrm));
 
            //topLevel = tb.ex(logicResultQV, topLevel); //Alternative way to declare the symbol
 
-           return topLevel;
+           return new Pair<Term,Term>(topLevel, placeHolderResultTrm);
     }
 
 
@@ -288,14 +302,15 @@ public class QueryExpand implements BuiltInRule {
 
     	for(QueryEvalPos qep: qeps){
     	    //System.out.println("\nInserting: "+qep+"\n");
-        	Term queryExp = QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
+        	Pair<Term,Term> queryExp = QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
+                Term queryExpTerm = tb.and(queryExp.first, tb.equals(qep.query,queryExp.second));
         	Iterator<Integer> it = qep.pathInTerm.iterator();
         	it.next(); //Skip the first element
         	final Term termToInsert;
         	if(qep.positivePosition){
-        		termToInsert = tb.imp(queryExp,qep.getTermOnPath(term));
+        		termToInsert = tb.imp(queryExpTerm,qep.getTermOnPath(term));
         	}else{
-        		termToInsert = tb.and(queryExp,qep.getTermOnPath(term));
+        		termToInsert = tb.and(queryExpTerm,qep.getTermOnPath(term));
         	}
         	//System.out.println("----------- Calling replace. Insert term: ----------------\n"+termToInsert+"\n-----------------------\n");
         	//Attention, when the term is modified, then the paths in the term have changed. Perform the changes in a depth-first order.

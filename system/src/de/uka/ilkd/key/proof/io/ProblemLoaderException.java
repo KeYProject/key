@@ -31,7 +31,7 @@ extends RuntimeException // to have it passed through the parser (without adding
         super(msg, cause);
         this.origin = origin;
     }
-
+    
     public ProblemLoaderException(DefaultProblemLoader origin, String msg) {
         super(msg);
         this.origin = origin;
