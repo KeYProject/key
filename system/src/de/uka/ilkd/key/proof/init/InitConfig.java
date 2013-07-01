@@ -101,7 +101,7 @@ public class InitConfig {
                                               .getChoiceSettings()
         	                              .getDefaultChoices();
   	    for(LDT ldt : getServices().getTypeConverter().getModels()) {
-  		  ldt.settingsUpdated(ProofSettings.DEFAULT_SETTINGS);
+  		  ldt.proofSettingsUpdated(ProofSettings.DEFAULT_SETTINGS);
   	    }
     }
 
@@ -346,7 +346,7 @@ public class InitConfig {
     public void setSettings(ProofSettings settings) {
 	  this.settings = settings;
 	  for(LDT ldt : getServices().getTypeConverter().getModels()) {
-		ldt.settingsUpdated(settings);
+		ldt.proofSettingsUpdated(settings);
 	  }
 	}
     
