@@ -16,6 +16,8 @@ package de.uka.ilkd.key.gui.smt;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -59,7 +61,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
 
 
         private final HashMap<SolverType,SolverData> dataOfSolvers =
-                new HashMap<SolverType,SolverData>();
+                new LinkedHashMap<SolverType,SolverData>();
         public boolean showResultsAfterExecution    = false;
         public boolean storeSMTTranslationToFile    = false;
         public boolean storeTacletTranslationToFile = false;
@@ -73,7 +75,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         public String   pathForTacletTranslation   = "";
         public String   activeSolver               = "";
     
-        private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
+        private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
         private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
         private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>();

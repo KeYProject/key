@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -30,7 +31,7 @@ public class LabelCollector extends JavaASTVisitor {
     public LabelCollector(ProgramElement root,                           
                           Services services) {
         super(root, services);        
-        this.labels = new HashSet<Label>(20);
+        this.labels = new LinkedHashSet<Label>(20);
     }
     
     public boolean contains(Label l) {

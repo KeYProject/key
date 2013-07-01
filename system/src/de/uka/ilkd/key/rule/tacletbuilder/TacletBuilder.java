@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -135,7 +136,7 @@ public abstract class TacletBuilder {
      */
     public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc){
 	if(goal2Choices==null){
-	    goal2Choices = new HashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
+	    goal2Choices = new LinkedHashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
 	}
 	goal2Choices.put(gt, soc);
     }

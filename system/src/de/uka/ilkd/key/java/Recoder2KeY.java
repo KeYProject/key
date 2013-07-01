@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -945,7 +946,7 @@ public class Recoder2KeY implements JavaReader {
             recoder.service.CrossReferenceSourceInfo csi) {
 
         HashMap<String, recoder.java.declaration.VariableSpecification> names2var = 
-            new HashMap<String, recoder.java.declaration.VariableSpecification>();
+            new LinkedHashMap<String, recoder.java.declaration.VariableSpecification>();
         Iterator<ProgramVariable> it = vars.iterator();
         java.util.HashSet<String> names = new java.util.HashSet<String>();
         ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();

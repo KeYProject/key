@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,7 +110,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	    		  Services services) {
 	assert heapVar != null;
 	assert (selfVar == null) == target.isStatic();
-	final Map<ProgramVariable, ParsableVariable> map = new HashMap<ProgramVariable, ParsableVariable>();
+	final Map<ProgramVariable, ParsableVariable> map = new LinkedHashMap<ProgramVariable, ParsableVariable>();
 	map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);	
 	if(selfVar != null) {
 	    map.put(originalSelfVar, selfVar);

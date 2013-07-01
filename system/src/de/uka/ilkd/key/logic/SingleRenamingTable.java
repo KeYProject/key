@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -50,7 +51,7 @@ public class SingleRenamingTable extends RenamingTable{
     }
     
     public HashMap<SourceElement, SourceElement> getHashMap(){
-        HashMap<SourceElement, SourceElement> hm = new HashMap<SourceElement, SourceElement>();
+        HashMap<SourceElement, SourceElement> hm = new LinkedHashMap<SourceElement, SourceElement>();
         hm.put(oldVar,newVar);
         return hm;
     }

@@ -69,6 +69,8 @@ tokens {
     ENSURES_RED 		= "ensures_redundantly";
     EXCEPTIONAL_BEHAVIOR 	= "exceptional_behavior";
     EXCEPTIONAL_BEHAVIOUR 	= "exceptional_behaviour";
+    EXSURES                     = "exsures";
+    EXSURES_RED                 = "exsures_redundantly";
     EXTRACT                     = "extract";
     FINAL 			= "final";
     FOR_EXAMPLE			= "for_example";

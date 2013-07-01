@@ -16,6 +16,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -166,7 +167,7 @@ public abstract class TacletLoader {
                 private InitConfig createInitConfig(InitConfig reference) {
                     InitConfig newConfig = reference.deepCopy();
                         newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
-                        newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
+                        newConfig.setTaclet2Builder(new LinkedHashMap<Taclet, TacletBuilder>());
                        
                         return newConfig;
                 }

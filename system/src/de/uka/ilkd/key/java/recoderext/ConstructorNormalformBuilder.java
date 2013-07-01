@@ -63,14 +63,14 @@ public class ConstructorNormalformBuilder
 	 TransformerCache cache) {	
 	super(services, cache);
 	List<CompilationUnit> units = getUnits();
-	class2constructors = new HashMap<ClassDeclaration, List<Constructor>>(4*units.size());
-	class2initializers = new HashMap<ClassDeclaration, ASTList<Statement>>(10*units.size());
-	class2methodDeclaration = new HashMap<ClassDeclaration, ASTList<MethodDeclaration>>(10*units.size());
-	class2enclosingThis = new HashMap<ClassDeclaration, Field>(units.size());
-	class2enclosingClass = new HashMap<ClassDeclaration, ClassDeclaration>(units.size());
-	class2identifier = new HashMap<ClassDeclaration, Identifier>(units.size());
-	class2superContainer = new HashMap<ClassDeclaration, ClassType>(units.size());
-	v2t = new HashMap<Variable,Type>(units.size());
+	class2constructors = new LinkedHashMap<ClassDeclaration, List<Constructor>>(4*units.size());
+	class2initializers = new LinkedHashMap<ClassDeclaration, ASTList<Statement>>(10*units.size());
+	class2methodDeclaration = new LinkedHashMap<ClassDeclaration, ASTList<MethodDeclaration>>(10*units.size());
+	class2enclosingThis = new LinkedHashMap<ClassDeclaration, Field>(units.size());
+	class2enclosingClass = new LinkedHashMap<ClassDeclaration, ClassDeclaration>(units.size());
+	class2identifier = new LinkedHashMap<ClassDeclaration, Identifier>(units.size());
+	class2superContainer = new LinkedHashMap<ClassDeclaration, ClassType>(units.size());
+	v2t = new LinkedHashMap<Variable,Type>(units.size());
 //	class2fieldsForFinalVars = new HashMap(units.size());
     }
 
