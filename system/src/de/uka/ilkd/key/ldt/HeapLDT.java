@@ -131,9 +131,6 @@ public final class HeapLDT extends LDT {
         wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
     }
     
-    public void settingsUpdated(ProofSettings settings) {
-    }
-    
     //-------------------------------------------------------------------------
     //internal methods
     //------------------------------------------------------------------------- 

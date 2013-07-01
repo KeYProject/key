@@ -140,9 +140,10 @@ public abstract class LDT implements Named {
     }
 
     /**
-     *  Called each time proof settings are updated in case the LDT wants to change its behaviour
+     *  Called each time proof settings are updated in case the LDT
+     *  wants to change its behaviour based on new settings
      */
-    public void settingsUpdated(ProofSettings settings) {    	
+    public void proofSettingsUpdated(ProofSettings settings) {    	
     }
     
     public boolean containsFunction(Function op) {
