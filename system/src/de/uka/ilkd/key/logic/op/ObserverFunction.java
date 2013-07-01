@@ -38,6 +38,8 @@ public class ObserverFunction extends Function implements IObserverFunction {
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
     private final KeYJavaType type;
+    private final int heapCount;
+    private final int stateCount;
 
     
     //-------------------------------------------------------------------------
@@ -50,17 +52,21 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	            	    Sort heapSort,
 	            	    KeYJavaType container,
 	            	    boolean isStatic,	            	    
-	            	    ImmutableArray<KeYJavaType> paramTypes) {
+	            	    ImmutableArray<KeYJavaType> paramTypes,
+	            	    int heapCount,
+	            	    int stateCount) {
 	super(new ProgramElementName(baseName, 
 		                     container.getSort().toString()),
               sort, 
-              getArgSorts(heapSort, container, isStatic, paramTypes));
+              getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
 	assert type == null || type.getSort() == sort;
 	assert container != null;	
 	this.type = type;
 	this.container = container;
 	this.isStatic = isStatic;
 	this.paramTypes = paramTypes;
+	this.heapCount = heapCount;
+	this.stateCount = stateCount;
     }
     
     
@@ -72,21 +78,22 @@ public class ObserverFunction extends Function implements IObserverFunction {
     private static Sort[] getArgSorts(Sort heapSort,
 	    			      KeYJavaType container, 
 	                              boolean isStatic, 
-	                              ImmutableArray<KeYJavaType> paramTypes) {
-       final int arity = isStatic 
-                         ? paramTypes.size() + 1 
-                         : paramTypes.size() + 2;       
+	                              ImmutableArray<KeYJavaType> paramTypes,
+	                              int heapCount,
+	                              int stateCount) {
+       final int arity = paramTypes.size() + stateCount*heapCount + (isStatic ? 0 : 1);
        
        final Sort[] result = new Sort[arity];
-       result[0] = heapSort;
  
-       final int offset;
-       if(isStatic) {  
-           offset = 1;
-       } else {
-           result[1] = container.getSort();
-           assert result[1] != null : "Bad KJT: " + container;
-           offset = 2;
+       int offset;
+
+       for(offset = 0; offset < stateCount * heapCount; offset++) {
+         result[offset] = heapSort;
+       }
+       if(!isStatic) {
+           result[offset] = container.getSort();
+           assert result[offset] != null : "Bad KJT: " + container;
+           offset++;
        }
        
        for(int i = 0, n = paramTypes.size(); i < n; i++) {
@@ -124,10 +131,18 @@ public class ObserverFunction extends Function implements IObserverFunction {
     * @see de.uka.ilkd.key.logic.op.IObserverFunction#isStatic()
     */
     @Override
-   public final boolean isStatic() {
+    public final boolean isStatic() {
 	return isStatic;
     }
     
+    
+    /* (non-Javadoc)
+     * @see de.uka.ilkd.key.logic.op.IObserverFunction#getStateCount()
+     */
+    @Override
+    public int getStateCount() {
+        return stateCount;
+    }
     
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IObserverFunction#getNumParams()

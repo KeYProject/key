@@ -404,6 +404,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
         ASTList<DeclarationSpecifier> mods 
             = methodDecl.getDeclarationSpecifiers();
         mods.add(new Model());
+        if(decl.getMods().contains("two_state")) {
+            mods.add(new TwoState());
+        }
+        if(decl.getMods().contains("no_state")) {
+            mods.add(new NoState());
+        }
         methodDecl.setDeclarationSpecifiers(mods);
         
         //set comments: the original list of comments with the declaration, 

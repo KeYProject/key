@@ -53,6 +53,8 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
+import de.uka.ilkd.key.java.declaration.modifier.NoState;
+import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -2185,4 +2187,14 @@ public class Recoder2KeYConverter {
     public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {
         return new Model(collectComments(m));
     }
-}
+
+    public TwoState convert(de.uka.ilkd.key.java.recoderext.TwoState m) {
+        return new TwoState(collectComments(m));
+    }
+
+    public NoState convert(de.uka.ilkd.key.java.recoderext.NoState m) {
+        return new NoState(collectComments(m));
+    }
+
+}	
+
