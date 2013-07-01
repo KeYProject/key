@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -44,7 +45,7 @@ public class ProofEnvironment {
     private RuleConfig ruleConfig;
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
     private final InitConfig initConfig; 
-    private Set<ProofAggregate> proofs = new HashSet<ProofAggregate>(); //of ProofList
+    private Set<ProofAggregate> proofs = new LinkedHashSet<ProofAggregate>(); //of ProofList
     private int number = 0;
 
     /** constructs a proof environment with the given initial

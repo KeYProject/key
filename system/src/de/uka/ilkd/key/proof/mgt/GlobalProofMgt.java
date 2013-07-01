@@ -23,7 +23,7 @@ public final class GlobalProofMgt {
     private static final GlobalProofMgt INSTANCE = new GlobalProofMgt();
 
     private Map<EnvKey, List<ProofEnvironment>> envKeyToEnv = 
-        new HashMap<EnvKey, List<ProofEnvironment>>();
+        new LinkedHashMap<EnvKey, List<ProofEnvironment>>();
 
     public static GlobalProofMgt getInstance() {
 	return INSTANCE;

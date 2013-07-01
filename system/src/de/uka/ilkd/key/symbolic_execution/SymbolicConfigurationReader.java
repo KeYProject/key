@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -112,12 +113,12 @@ public class SymbolicConfigurationReader {
       /**
        * Maps each unique object ID to the instantiated {@link ISymbolicObject}.
        */
-      private Map<String, ISymbolicObject> objectIdMapping = new HashMap<String, ISymbolicObject>();
+      private Map<String, ISymbolicObject> objectIdMapping = new LinkedHashMap<String, ISymbolicObject>();
       
       /**
        * Maps a {@link KeYlessAssociation} to its target object ID.
        */
-      private Map<KeYlessAssociation, String> associationTargetMapping = new HashMap<KeYlessAssociation, String>(); 
+      private Map<KeYlessAssociation, String> associationTargetMapping = new LinkedHashMap<KeYlessAssociation, String>(); 
       
       /**
        * {@inheritDoc}

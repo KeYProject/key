@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +53,7 @@ public class KeYProgModelInfo{
     private KeYRecoderMapping mapping;
     private TypeConverter typeConverter;
     private HashMap<KeYJavaType, HashMap<String, IProgramMethod>> implicits = 
-        new HashMap<KeYJavaType, HashMap<String, IProgramMethod>>();
+        new LinkedHashMap<KeYJavaType, HashMap<String, IProgramMethod>>();
     private KeYExceptionHandler exceptionHandler = null;
     
     public KeYProgModelInfo(Services services, TypeConverter typeConverter, 
@@ -826,7 +827,7 @@ public class KeYProgModelInfo{
     public void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
 	HashMap<String, IProgramMethod> map = implicits.get(t);
 	if (map==null) {
-	    map = new HashMap<String, IProgramMethod>();
+	    map = new LinkedHashMap<String, IProgramMethod>();
 	    implicits.put(t, map);
 	}
 	map.put(m.name().toString(), m);

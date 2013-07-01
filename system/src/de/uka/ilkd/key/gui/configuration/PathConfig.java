@@ -70,7 +70,7 @@ public class PathConfig {
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
-        PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependetSettings.props";
+        PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
     }
 
     /**

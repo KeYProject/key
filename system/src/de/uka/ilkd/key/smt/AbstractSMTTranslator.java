@@ -147,54 +147,54 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
         
         //key is the term to identify the bsum, value is the name used for that function.
-        private final HashMap<Term, StringBuffer> usedBsumTerms = new HashMap<Term, StringBuffer>();
+        private final HashMap<Term, StringBuffer> usedBsumTerms = new LinkedHashMap<Term, StringBuffer>();
 
         //key is the term to identify the bprod, value is the name used for that function.
-        private final HashMap<Term, StringBuffer> usedBprodTerms = new HashMap<Term, StringBuffer>();
+        private final HashMap<Term, StringBuffer> usedBprodTerms = new LinkedHashMap<Term, StringBuffer>();
         
         //key is the term to identify the function binding vars, value is the name used for the function
-        private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new LinkedHashMap<Term, StringBuffer>();
         
         //key is the term to identify the predicate binding vars, value is the name used for the predicate
-        private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new LinkedHashMap<Term, StringBuffer>();
         
-        private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
+        private HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<Operator, ArrayList<Sort>>();
 
-        private HashSet<Function> specialFunctions = new HashSet<Function>();
+        private HashSet<Function> specialFunctions = new LinkedHashSet<Function>();
 
-        private HashMap<Operator, ArrayList<Sort>> predicateDecls = new HashMap<Operator, ArrayList<Sort>>();
+        private HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<Operator, ArrayList<Sort>>();
 
-        private HashMap<Operator, StringBuffer> usedVariableNames = new HashMap<Operator, StringBuffer>();
+        private HashMap<Operator, StringBuffer> usedVariableNames = new LinkedHashMap<Operator, StringBuffer>();
 
-        private HashMap<Operator, StringBuffer> usedFunctionNames = new HashMap<Operator, StringBuffer>();
+        private HashMap<Operator, StringBuffer> usedFunctionNames = new LinkedHashMap<Operator, StringBuffer>();
 
         private Collection<FunctionWrapper> usedFunctions = new LinkedList<FunctionWrapper>();
 
-        private HashMap<Operator, StringBuffer> usedPredicateNames = new HashMap<Operator, StringBuffer>();
+        private HashMap<Operator, StringBuffer> usedPredicateNames = new LinkedHashMap<Operator, StringBuffer>();
 
-        protected HashMap<Sort, StringBuffer> usedDisplaySort = new HashMap<Sort, StringBuffer>();
+        protected HashMap<Sort, StringBuffer> usedDisplaySort = new LinkedHashMap<Sort, StringBuffer>();
 
-        protected HashMap<Sort, StringBuffer> usedRealSort = new HashMap<Sort, StringBuffer>();
+        protected HashMap<Sort, StringBuffer> usedRealSort = new LinkedHashMap<Sort, StringBuffer>();
 
-        private HashMap<Sort, StringBuffer> typePredicates = new HashMap<Sort, StringBuffer>();
+        private HashMap<Sort, StringBuffer> typePredicates = new LinkedHashMap<Sort, StringBuffer>();
 
         // used type predicates for constant values, e.g. 1, 2, ...
-        private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> constantTypePreds = new LinkedHashMap<Term, StringBuffer>();
 
         /** map used for storing predicates representing modalities or updates */
-        private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> modalityPredicates = new LinkedHashMap<Term, StringBuffer>();
 
         /**
          * If a integer is not supported by a solver because it is too big, the
          * integer is translated into a constant. This constants are stored at
          * this place.
          */
-        private final HashMap<Long, StringBuffer> constantsForBigIntegers = new HashMap<Long, StringBuffer>();
+        private final HashMap<Long, StringBuffer> constantsForBigIntegers = new LinkedHashMap<Long, StringBuffer>();
         /**
          * If a integer is not supported by a solver because it is too small,
          * the integer is translated into a constant.
          */
-        private final HashMap<Long, StringBuffer> constantsForSmallIntegers = new HashMap<Long, StringBuffer>();
+        private final HashMap<Long, StringBuffer> constantsForSmallIntegers = new LinkedHashMap<Long, StringBuffer>();
 
         // assumptions. they have to be added to the formula!
         private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
@@ -3035,7 +3035,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 Vector<QuantifiableVariable> vector = new Vector<QuantifiableVariable>();
                 ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
-                HashSet<Sort> tempSorts = new HashSet<Sort>();
+                HashSet<Sort> tempSorts = new LinkedHashSet<Sort>();
                 tempSorts.addAll(usedRealSort.keySet());
 
                 for (Operator op : usedFunctionNames.keySet()) {

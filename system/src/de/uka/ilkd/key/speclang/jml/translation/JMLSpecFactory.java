@@ -81,7 +81,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         cf = new ContractFactory(services);
-        modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
+        modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 
 
@@ -443,7 +443,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         PositionedString[] array = new PositionedString[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new HashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),
@@ -468,7 +468,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         PositionedString[] array = new PositionedString[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new HashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),

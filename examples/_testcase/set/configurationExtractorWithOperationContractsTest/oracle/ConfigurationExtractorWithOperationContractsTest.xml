@@ -8,8 +8,7 @@
                   <statement name="int add = sub(x,y);" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
                      <useOperationContract name="result = sub(x, y) catch(exc)
 pre: !x = null &amp; !y = null
-post: (exc = null -&gt; result = javaAddInt(x.value, y.value))
-&amp; exc = null
+post: result = javaAddInt(x.value, y.value) &amp; exc = null
 mod: allLocs
 termination: diamond" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">

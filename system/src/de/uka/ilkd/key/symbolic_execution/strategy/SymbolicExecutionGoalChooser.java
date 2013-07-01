@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -66,7 +67,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     * that on all {@link Goal}s a symbolic execution tree node was created.
     * Then the process starts again.
     */
-   private Set<Goal> goalsToPrefer = new HashSet<Goal>();
+   private Set<Goal> goalsToPrefer = new LinkedHashSet<Goal>();
    
    /**
     * The optional custom stop condition used in the current proof.
@@ -95,7 +96,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
             }
          }
          // Select goal
-         Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new HashSet<Goal>();
+         Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<Goal>();
          do {
             Goal next = super.getNextGoal();
             if (next == null) {

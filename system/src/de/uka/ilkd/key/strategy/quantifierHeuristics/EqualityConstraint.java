@@ -63,7 +63,7 @@ public class EqualityConstraint implements Constraint {
     
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
-	this ( new HashMap<Metavariable, Term> () );
+	this ( new LinkedHashMap<Metavariable, Term> () );
     }
 
     private EqualityConstraint( HashMap<Metavariable, Term> map ) {
@@ -155,7 +155,7 @@ public class EqualityConstraint implements Constraint {
     public synchronized Term getInstantiation (Metavariable p_mv) {
         Term t = null;
         if ( instantiationCache == null )
-            instantiationCache = new HashMap<Metavariable, Term> ();
+            instantiationCache = new LinkedHashMap<Metavariable, Term> ();
         else
             t = instantiationCache.get ( p_mv );
 
@@ -929,9 +929,9 @@ public class EqualityConstraint implements Constraint {
     private static final Object joinCacheMonitor = new Object();
     
     private static HashMap<ECPair, Constraint> joinCache = 
-        new HashMap<ECPair, Constraint> ();
+        new LinkedHashMap<ECPair, Constraint> ();
     private static HashMap<ECPair, Constraint> joinCacheOld = 
-        new HashMap<ECPair, Constraint> ();
+        new LinkedHashMap<ECPair, Constraint> ();
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );
 

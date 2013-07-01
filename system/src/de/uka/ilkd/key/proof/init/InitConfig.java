@@ -228,7 +228,7 @@ public class InitConfig {
 
     public Taclet lookupActiveTaclet(Name name) {
 	if (quickTacletMap == null) {
-            quickTacletMap = new HashMap<Name, Named>();
+            quickTacletMap = new LinkedHashMap<Name, Named>();
             Iterator<Taclet> it = activatedTaclets().iterator();
             while (it.hasNext())  {
                 Taclet t = it.next();

@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
-
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -87,7 +88,7 @@ public class LexPathOrdering implements TermOrdering {
     
     
     private final HashMap<CacheKey, CompRes> cache = 
-        new HashMap<CacheKey, CompRes> ();
+        new LinkedHashMap<CacheKey, CompRes> ();
     
     
     private CompRes compareHelp (Term p_a, Term p_b) {
@@ -198,7 +199,12 @@ public class LexPathOrdering implements TermOrdering {
 	    if ( v != 0 ) return v;
 
 	    // HACK: compare the hash values of the two symbols
-	    return sign ( bOp.hashCode () - aOp.hashCode () );
+	    //return sign ( bOp.hashCode () - aOp.hashCode () );
+	    // The two functions have the same name, consider them
+	    // equal for the sake of this comparison.
+	    // Otherwise the proof is indeterministic as the hash
+	    // codes may change from run to run. (MU)
+	    return 0;
     }
 
     
@@ -280,7 +286,7 @@ public class LexPathOrdering implements TermOrdering {
      */
     private static class LiteralWeighter extends Weighter {
 
-        private final Set<String> intFunctionNames = new HashSet<String> ();
+        private final Set<String> intFunctionNames = new LinkedHashSet<String> ();
         {
             intFunctionNames.add("#");
             intFunctionNames.add("0");
@@ -297,7 +303,7 @@ public class LexPathOrdering implements TermOrdering {
             intFunctionNames.add("neglit");
         }
 
-        private final Set<String> stringFunctionNames = new HashSet<String> ();
+        private final Set<String> stringFunctionNames = new LinkedHashSet<String> ();
         {
             stringFunctionNames.add("strPool");            
             stringFunctionNames.add("clEmpty");
