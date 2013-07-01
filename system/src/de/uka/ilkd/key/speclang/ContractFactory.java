@@ -228,7 +228,7 @@ public class ContractFactory {
             Map<LocationVariable,Term> posts,
             Map<LocationVariable,Term> axioms,
             Map<LocationVariable,Term> mods,
-            boolean hasMod,
+            Map<LocationVariable,Boolean> hasMod,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
@@ -241,13 +241,13 @@ public class ContractFactory {
     }
 
     public FunctionalOperationContract func (String baseName, IProgramMethod pm, boolean terminates, Map<LocationVariable,Term> pres,
-               Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> axioms, Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
+               Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> axioms, Map<LocationVariable,Term> mods, Map<LocationVariable,Boolean> hasMod, ProgramVariableCollection pv){
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms, mods, hasMod, pv, false, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
 
     public FunctionalOperationContract func (String baseName, IProgramMethod pm,
-            Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> axioms, Map<LocationVariable,Term> mods, boolean hasMod,
+            Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> axioms, Map<LocationVariable,Term> mods, Map<LocationVariable,Boolean> hasMod,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, pm.getContainerType(), modality, pres, mby,
                 posts, axioms, mods, hasMod, progVars.selfVar, progVars.paramVars,
@@ -287,8 +287,10 @@ public class ContractFactory {
            pres.put(h, t.originalPres.get(h));
         }
         Term mby = t.originalMby;
+        Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>(t.originalPosts.size());
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           hasMod.put(h, false);
            Term oriPost = t.originalPosts.get(h);
            if(oriPost != null) {
               posts.put(h,tb.imp(atPreify(t.originalPres.get(h),
@@ -307,7 +309,6 @@ public class ContractFactory {
             }
         }
         Map<LocationVariable,Term> mods = t.originalMods;
-        boolean hasMod = t.hasModifiesClause();
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
             Term otherMby = other.hasMby()
@@ -356,31 +357,26 @@ public class ContractFactory {
  
             }
 
-            boolean otherHasMod = other.hasModifiesClause();
-
-            if(!hasMod && !otherHasMod) {
-                // both contracts are strictly pure
-                // hasMod remains false ...
-                // no need to update mod.
-            } else {
-                hasMod = true;
-                for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                   Term m1 = mods.get(h);
-                   Term m2 = other.getMod(h,t.originalSelfVar,
-                                         t.originalParamVars,
-                                         services);
-                   Term nm = null;
-                   if(m1 == null && m2 == null)
-                     continue;
-                   if(m1 == null){
-                     nm = m2;
-                   }else if(m2 == null) {
-                     nm = m1;
-                   }else{
-                     nm = tb.union(services, m1, m2);
-                   }
-                   mods.put(h, nm);
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+               if(!hasMod.get(h) && !other.hasModifiesClause(h)) {
+             	   continue;
+               }
+               hasMod.put(h, true);
+               Term m1 = mods.get(h);
+               Term m2 = other.getMod(h,t.originalSelfVar,
+                                      t.originalParamVars,
+                                      services);
+                Term nm = null;
+                if(m1 == null && m2 == null)
+                  continue;
+                if(m1 == null){
+                   nm = m2;
+                }else if(m2 == null) {
+                   nm = m1;
+                }else{
+                   nm = tb.union(services, m1, m2);
                 }
+                mods.put(h, nm);
 
             }
         }

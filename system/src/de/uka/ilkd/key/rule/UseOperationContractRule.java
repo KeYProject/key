@@ -325,23 +325,35 @@ public final class UseOperationContractRule implements BuiltInRule {
     } 
     
     
-    private static Term getFreePost(IProgramMethod pm,
+    private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
 	    		     	    Term selfTerm,
-	    		     	    Term heapAtPre,
+	    		     	    Map<LocationVariable, Term> heapAtPres,
 	    		     	    Services services) {
         final Term result;
         if(pm.isConstructor()) {
             assert resultTerm == null;
             assert selfTerm != null;
+            Term createdForm = null;
+            for(LocationVariable heap : heapContext) {
+            	if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+            		continue;
+            	}
+            	final Term cr = TB.and(OpReplacer.replace(TB.var(heap), 
+	                  	 heapAtPres.get(heap), 
+	                   	 TB.not(TB.created(services, TB.var(heap),
+	                   	                   selfTerm))),
+                         TB.created(services, TB.var(heap), selfTerm));
+            	if(createdForm == null) {
+            		createdForm = cr;
+            	}else{
+            		createdForm = TB.and(createdForm, cr);
+            	}
+            }
             result = TB.and(new Term[]{
         	      TB.not(TB.equals(selfTerm, TB.NULL(services))),
-                      OpReplacer.replace(TB.getBaseHeap(services), 
-        	                  	 heapAtPre, 
-        	                   	 TB.not(TB.created(services, 
-        	                   	                   selfTerm))),
-                      TB.created(services, selfTerm),
+                      createdForm,
                       TB.exactInstance(services, kjt.getSort(), selfTerm)});            
         } else if(resultTerm != null) {
             result = TB.reachableValue(services, 
@@ -667,8 +679,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         for(LocationVariable heap : heapContext) {
            final Triple<Term,Term,Term> tAnon;
-           // TODO probably the special case still needs fixing (later)
-           if(heap == baseHeap && !contract.hasModifiesClause()) {
+           if(!contract.hasModifiesClause(heap)) {
              tAnon = new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.var(heap));
            }else{
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
@@ -703,11 +714,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         final Term excNull = TB.equals(TB.var(excVar), TB.NULL(services));
         final Term excCreated = TB.created(services, TB.var(excVar));
-        final Term freePost = getFreePost(inst.pm,
+        final Term freePost = getFreePost(heapContext,
+                              inst.pm,
 	    		     		  inst.staticType,
 	    		     		  contractResult,
 	    		     		  contractSelf,
-	    		     		  atPres.get(baseHeap),
+	    		     		  atPres,
 	    		     		  services);  
         final Term freeExcPost = inst.pm.isConstructor() 
                                  ? freePost 

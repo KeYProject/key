@@ -167,7 +167,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             heapToAtPre.get(heap).put(TB.var(heap), TB.var(atPreVars.get(heap)));
          }
 
-         // FIXME check this again!?
+         // FIXME Wojtek: This is a fiddly bit that needs to be rechecked eventually
          if (modHeaps.contains(getSavedHeap())) {
             heapToAtPre.get(getSavedHeap()).put(TB.getBaseHeap(services), TB.var(atPreVars.get(getSavedHeap())));
          }
@@ -523,6 +523,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
       Term update = buildUpdate(paramVars, formalParamVars, atPreVars);
 
       return TB.apply(update, programTerm, null);
+   }
+
+    /**
+    * Returns the base heap.
+    * @return The {@link LocationVariable} of the base heap.
+    */
+   protected LocationVariable getBaseHeap() {
+      return services.getTypeConverter().getHeapLDT().getHeap();
    }
 
    /**

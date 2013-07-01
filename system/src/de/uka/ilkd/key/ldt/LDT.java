@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.ldt;
 
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -138,6 +139,11 @@ public abstract class LDT implements Named {
 	return sort;
     }
 
+    /**
+     *  Called each time proof settings are updated in case the LDT wants to change its behaviour
+     */
+    public void settingsUpdated(ProofSettings settings) {    	
+    }
     
     public boolean containsFunction(Function op) {
 	Named n=functions.lookup(op.name());

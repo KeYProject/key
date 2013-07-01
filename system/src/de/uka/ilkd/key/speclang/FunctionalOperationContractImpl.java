@@ -81,7 +81,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * anonymised.
      * @see #hasModifiesClause()
      */
-    final boolean hasRealModifiesClause;
+    final Map<LocationVariable,Boolean> hasRealModifiesClause;
     
     
     //-------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Map<LocationVariable,Term> posts,
                                     Map<LocationVariable,Term> axioms,
                                     Map<LocationVariable,Term> mods,
-                                    boolean hasRealMod,
+                                    Map<LocationVariable,Boolean> hasRealMod,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
@@ -174,7 +174,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Map<LocationVariable,Term> posts,
                                     Map<LocationVariable,Term> axioms,
                                     Map<LocationVariable,Term> mods,
-                                    boolean hasMod,
+                                    Map<LocationVariable,Boolean> hasMod,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
@@ -464,6 +464,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+          if(p == null) {
+            continue;
+          }
           if(result == null) {
             result = p;
           }else{
@@ -567,7 +570,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                   + (h == baseHeap ? "" : "[" + h + "]")
                   + (includeHtmlMarkup ? "</b> " : ": ")
                   + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
-            if (h == baseHeap && !hasRealModifiesClause) {
+            if (!hasRealModifiesClause.get(h)) {
                mods = mods + 
                       (includeHtmlMarkup ? "<b>" : "") +
                		 ", creates no new objects" +
@@ -829,6 +832,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
+          if(p == null) {
+            continue;
+          }
           if(result == null) {
             result = p;
           }else{
@@ -918,8 +924,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
     
     @Override
-    public boolean hasModifiesClause() {
-        return this.hasRealModifiesClause;
+    public boolean hasModifiesClause(LocationVariable heap) {
+        return this.hasRealModifiesClause.get(heap);
     }
   
     @Override    

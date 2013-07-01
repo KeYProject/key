@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -99,6 +100,9 @@ public class InitConfig {
         category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
                                               .getChoiceSettings()
         	                              .getDefaultChoices();
+  	    for(LDT ldt : getServices().getTypeConverter().getModels()) {
+  		  ldt.settingsUpdated(ProofSettings.DEFAULT_SETTINGS);
+  	    }
     }
 
            
@@ -340,8 +344,11 @@ public class InitConfig {
 
     
     public void setSettings(ProofSettings settings) {
-	this.settings = settings;
-    }
+	  this.settings = settings;
+	  for(LDT ldt : getServices().getTypeConverter().getModels()) {
+		ldt.settingsUpdated(settings);
+	  }
+	}
     
     
     public ProofSettings getSettings() {

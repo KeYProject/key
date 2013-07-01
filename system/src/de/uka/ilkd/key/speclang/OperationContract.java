@@ -32,7 +32,7 @@ public interface OperationContract extends Contract {
      * 
      * @return whether this contract is strictly pure.
      */
-    public boolean hasModifiesClause();
+    public boolean hasModifiesClause(LocationVariable heap);
     
     /**
      * Returns the modifies clause of the contract.

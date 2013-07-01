@@ -103,7 +103,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> breaks;
         public Map<Label, Term> continues;
         public Term returns;
-        public boolean strictlyPure;
+        public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
     }
 
     //-------------------------------------------------------------------------
@@ -236,14 +236,14 @@ public class JMLSpecFactory {
                 translateMeasuredBy(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getMeasuredBy());
-        clauses.strictlyPure =
-                translateStrictlyPure(pm, progVars.selfVar,
-                        progVars.paramVars,
-                        textualSpecCase.getAssignable());
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           clauses.hasMod.put(heap,
+                    !translateStrictlyPure(pm, progVars.selfVar,
+                            progVars.paramVars,
+                            textualSpecCase.getAssignable(heap.name().toString())));
            if(heap == savedHeap && textualSpecCase.getAssignable(heap.name().toString()).isEmpty()) {
              clauses.assignables.put(heap, null);
-           } else if (clauses.strictlyPure) {
+           } else if (!clauses.hasMod.get(heap)) {
                final ImmutableList<PositionedString> assignableNothing = ImmutableSLList.<PositionedString>nil().append(new PositionedString("assignable \\nothing;"));
                clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                        progVars.paramVars,assignableNothing));
@@ -677,6 +677,10 @@ public class JMLSpecFactory {
                         ? TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services)) 
                         : TB.imp(TB.not(excNull),TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services))));
               result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ? TB.and(post1, post2) : post1);
+            }else{
+              if(clauses.assignables.get(heap) != null) {
+                result.put(heap, TB.tt());
+              }
             }
           }
         }
@@ -721,18 +725,22 @@ public class JMLSpecFactory {
            if(clauses.requires.get(heap) != null) {
              final Term pre = TB.convertToFormula(clauses.requires.get(heap), services);
              pres.put(heap, pre);
+           }else{
+             if(clauses.assignables.get(heap) != null) {
+                 pres.put(heap, TB.tt());
+             }
            }
         }
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, true, pres,
                     clauses.measuredBy, posts, axioms, clauses.assignables, 
-                    !clauses.strictlyPure, progVars);
+                    clauses.hasMod, progVars);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, false, pres,
-                    clauses.measuredBy, posts, axioms, clauses.assignables, !clauses.strictlyPure, progVars);
+                    clauses.measuredBy, posts, axioms, clauses.assignables, clauses.hasMod, progVars);
             result = result.add(contract);
         } else {
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -745,10 +753,10 @@ public class JMLSpecFactory {
                     name, pm, true,
                     pres,
                     clauses.measuredBy, posts, axioms, clauses.assignables,
-                    !clauses.strictlyPure, progVars);
+                    clauses.hasMod, progVars);
             FunctionalOperationContract contract2 =
                     cf.func(name, pm, false, clauses.requires, clauses.measuredBy, posts, axioms,
-                        clauses.assignables, !clauses.strictlyPure, progVars);
+                        clauses.assignables, clauses.hasMod, progVars);
             result = result.add(contract1).add(contract2);
         }
         return result;
@@ -1083,7 +1091,7 @@ public class JMLSpecFactory {
         final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues,
-            clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, !clauses.strictlyPure, services
+            clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, clauses.hasMod, services
         ).create();
     }
 
@@ -1225,6 +1233,8 @@ public class JMLSpecFactory {
         //translateToTerm assignable
         Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(String h : originalAssignables.keySet()) {
+           LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h));
+           if(heap == null) continue;
            Term a = null;
            ImmutableList<PositionedString> as = originalAssignables.get(h);
            if(as.isEmpty()) {
@@ -1241,7 +1251,7 @@ public class JMLSpecFactory {
              }
            }
            
-           mods.put(services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h)), a);
+           mods.put(heap, a);
         }
 
         //translateToTerm variant
