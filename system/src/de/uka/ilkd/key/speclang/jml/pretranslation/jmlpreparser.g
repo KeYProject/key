@@ -468,9 +468,10 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 	throws SLTranslationException
 {
     ImmutableList<PositionedString> requires;
+    ImmutableList<PositionedString[]> abbrvs = null;
 }
 :
-    (spec_var_decls)?
+    (abbrvs=spec_var_decls)?
     (
         requires=spec_header
         (
@@ -487,6 +488,11 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
                 it.hasNext(); ) {
             	TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
                 sc.addRequires(requires);
+    			if (abbrvs!=null) {
+    				for (PositionedString[] pz: abbrvs) {
+    					sc.addAbbreviation(pz);
+    			    }
+    			}
             }
         }
       	|
@@ -495,18 +501,23 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 ;
 
 
-spec_var_decls throws SLTranslationException
+spec_var_decls
+	returns [ ImmutableList<PositionedString[]> result = ImmutableSLList.<PositionedString[]>nil() ]
+throws SLTranslationException
 {
-    PositionedString ps;
+	PositionedString[] pz = new PositionedString[3];
+	PositionedString ps;
 }
 :
     (
+            pz=old_clause
+            { result = result.append(pz); }
+            |
     	    FORALL ps=expression
-    	|   OLD ps=expression
-    )+
     {
     	raiseNotSupported("specification variables");
     }
+    )+
 ;
 
 
@@ -596,6 +607,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	throws SLTranslationException
 {
     PositionedString ps;
+    PositionedString[] pss;
 }
 :
     (
@@ -841,6 +853,23 @@ duration_keyword
     |   DURATION_RED
 ;
 
+old_clause
+	returns [ PositionedString[] result = new PositionedString[3] ]
+	throws SLTranslationException
+{
+	ImmutableList<String> mods;
+}
+:
+	OLD mods=modifiers
+	type:IDENT
+	name:IDENT
+	init:INITIALISER
+	{ // modifiers are ignored, don't make any sense here
+	  result[0] = new PositionedString(type.getText(),type);
+	  result[1] = new PositionedString(name.getText(),name);
+	  result[2] = new PositionedString(init.getText().substring(2),init);
+    }
+;
 
 
 //-----------------------------------------------------------------------------
@@ -1195,7 +1224,7 @@ expression returns [PositionedString result = null]
 }
 :
     t:EXPRESSION
-    {   
+    {
     	result = createPositionedString(t.getText(), t);
     }
 ;
