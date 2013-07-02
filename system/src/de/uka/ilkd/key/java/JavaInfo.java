@@ -1303,7 +1303,7 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-	if(inv == null) {
+	if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
         			       null,

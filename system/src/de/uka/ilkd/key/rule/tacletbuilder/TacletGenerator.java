@@ -60,6 +60,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -465,7 +466,7 @@ public class TacletGenerator {
 
 
     public ImmutableSet<Taclet> generatePartialInvTaclet(Name name,
-                                                         SchemaVariable heapSV,
+                                                         List<SchemaVariable> heapSVs,
                                                          SchemaVariable selfSV,
                                                          SchemaVariable eqSV,
                                                          Term term,
@@ -475,11 +476,16 @@ public class TacletGenerator {
                                                          boolean eqVersion,
                                                          Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-        
+        Map<Term,SchemaVariable> replace = new LinkedHashMap<Term, SchemaVariable>();
+        Term update = null;
+        int i = 0;
+        for(ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
+                replace.put(TB.var(heap), heapSVs.get(i++));
+        }
+        final OpReplacer replacer = new OpReplacer(replace);
+        // TB.getBaseHeap(services),  TB.var(heapSV)
         //instantiate axiom with schema variables
-        final Term rawAxiom = OpReplacer.replace(TB.getBaseHeap(services),
-                                                 TB.var(heapSV),
-                                                 term);
+        final Term rawAxiom = replacer.replace(term);
         final TermAndBoundVarPair schemaAxiom =
                 replaceBoundLogicVars(rawAxiom);
 
@@ -495,12 +501,17 @@ public class TacletGenerator {
                 addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 
+        final Term[] hs = new Term[heapSVs.size()];
+        i = 0;
+        for(SchemaVariable heapSV : heapSVs) {
+            hs[i++] = TB.var(heapSV);
+        }
         //create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
         final Term invTerm = isStatic? 
-                TB.staticInv(services,TB.var(heapSV),kjt) :
+                TB.staticInv(services,hs,kjt) :
                     TB.inv(services,
-                            TB.var(heapSV),
+                            hs,
                             eqVersion
                             ? TB.var(eqSV)
                             : TB.var(selfSV));        
@@ -511,7 +522,9 @@ public class TacletGenerator {
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("partialInvAxiom")));
         for (VariableSV boundSV : schemaAxiom.boundVars) {
-            tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+            for(SchemaVariable heapSV : heapSVs) {
+                tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
+            }
             if (selfSV != null) {
                 tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
             }
