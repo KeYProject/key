@@ -338,29 +338,6 @@ public class JMLSpecFactory {
     }
 
 
-    private ImmutableList<ImmutableList<Term>> translateIndependetClauses(
-            IProgramMethod pm,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<PositionedString> originalClauses)
-            throws SLTranslationException {
-        if (originalClauses.isEmpty()) {
-            return ImmutableSLList.<ImmutableList<Term>>nil();
-        } else {
-            ImmutableList<ImmutableList<Term>> result =
-                    ImmutableSLList.<ImmutableList<Term>>nil();
-            for (PositionedString expr : originalClauses) {
-                ImmutableList<Term> translated =
-                        JMLTranslator.translate(
-                        expr, pm.getContainerType(), selfVar, paramVars, null,
-                        null, null, ImmutableList.class, services);
-                result = result.append(translated);
-            }
-            return result;
-        }
-    }
-
-
     /**
      * Clauses are expected to be conjoined in a right-associative way, i.e. A & (B & ( C (...& N))).
      * When using auto induction with lemmas, then A will be used as a lemma for B,
@@ -442,24 +419,6 @@ public class JMLSpecFactory {
         return result;
     }
 
-    private ImmutableList<Term> translateListUnionClauses(
-            IProgramMethod pm,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ImmutableList<PositionedString> originalClauses)
-            throws SLTranslationException {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (PositionedString expr : originalClauses) {
-            ImmutableList<Term> translated =
-                    JMLTranslator.translate(expr, pm.getContainerType(),
-                                            selfVar, paramVars, null,
-                                            null, null,
-                                            ImmutableList.class, services);
-            result  = result.append(translated);
-        }
-        return result;
-    }
-
 
     private Map<Label, Term> translateBreaks(
             IProgramMethod pm,
@@ -475,6 +434,7 @@ public class JMLSpecFactory {
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
+            @SuppressWarnings("unchecked")
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),
                             selfVar, paramVars, resultVar,
@@ -500,6 +460,7 @@ public class JMLSpecFactory {
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
+            @SuppressWarnings("unchecked")
             Pair<Label, Term> translation =
                     JMLTranslator.translate(array[i], pm.getContainerType(),
                             selfVar, paramVars, resultVar,
