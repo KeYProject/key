@@ -476,11 +476,11 @@ public class TacletGenerator {
                                                          boolean eqVersion,
                                                          Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-        Map<Term,SchemaVariable> replace = new LinkedHashMap<Term, SchemaVariable>();
+        Map<Term, Term> replace = new LinkedHashMap<Term, Term>();
         Term update = null;
         int i = 0;
         for(ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
-                replace.put(TB.var(heap), heapSVs.get(i++));
+                replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
         }
         final OpReplacer replacer = new OpReplacer(replace);
         // TB.getBaseHeap(services),  TB.var(heapSV)
