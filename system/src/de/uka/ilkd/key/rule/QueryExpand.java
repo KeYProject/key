@@ -62,6 +62,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -105,7 +106,9 @@ public class QueryExpand implements BuiltInRule {
         // The following additional rewrite taclet increases performance
         // (sometimes significantly, e.g. by factor 10).
         RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        tb.setName(new Name("replaceKnownQuery"));
+        Name tacletName = MiscTools.toValidTacletName("replaceKnownQuery_" + query.toString());
+        tb.setName(tacletName);
+        tb.setDisplayName("replaceKnownQuery");
         tb.setFind(query);
         tb.addGoalTerm(queryEval.second);
         tb.addRuleSet(new RuleSet(new Name("concrete")));
