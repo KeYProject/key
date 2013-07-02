@@ -16,6 +16,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -143,6 +144,11 @@ public class ObserverFunction extends Function implements IObserverFunction {
     public int getStateCount() {
         return stateCount;
     }
+
+    @Override
+	public int getHeapCount(Services services) {
+		return heapCount;
+	}
     
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IObserverFunction#getNumParams()
@@ -169,4 +175,5 @@ public class ObserverFunction extends Function implements IObserverFunction {
    public final ImmutableArray<KeYJavaType> getParamTypes() {
 	return paramTypes;
     }
+
 }

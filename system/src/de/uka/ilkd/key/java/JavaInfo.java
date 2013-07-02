@@ -1345,7 +1345,7 @@ public final class JavaInfo {
                            target,
                            true,
                            new ImmutableArray<KeYJavaType>(),
-                           HeapContext.getModHeaps(services, false).size(),
+        			       HeapContext.getModHeaps(services, false).size(),
                            1));
         return staticInvs.get(target);
     }

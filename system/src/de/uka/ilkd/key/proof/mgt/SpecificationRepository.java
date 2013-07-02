@@ -1203,7 +1203,7 @@ public final class SpecificationRepository {
 		    			   obs.getContainerType(),
 		    			   obs.isStatic(),
 		    			   obs.getParamTypes(),
-		    			   HeapContext.getModHeaps(services, false).size(),
+		    			   obs.getHeapCount(services),
 		    			   obs.getStateCount());
 	    unlimitedToLimited.put(obs, limited);
 	    limitedToUnlimited.put(limited, obs);

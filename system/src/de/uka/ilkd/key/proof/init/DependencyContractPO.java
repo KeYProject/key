@@ -170,10 +170,17 @@ public final class DependencyContractPO extends AbstractPO
 		= TB.paramVars(services, target, true);
 
 	final boolean twoState = (contract.getTarget().getStateCount() == 2);
+	final int heapCount = contract.getTarget().getHeapCount(services);
 	
 	final Map<LocationVariable,LocationVariable> preHeapVars = new LinkedHashMap<LocationVariable, LocationVariable>();
 	final Map<LocationVariable,LocationVariable> preHeapVarsReverse = new LinkedHashMap<LocationVariable, LocationVariable>();
+    List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+    int hc = 0;
 	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+		  if(hc >= heapCount) {
+			  break;
+		  }
+		  heaps.add(h);
 	      LocationVariable preVar = twoState ?
 	        TB.heapAtPreVar(services, h.name()+"AtPre", h.sort(), true)
 	        : null ;
@@ -183,17 +190,15 @@ public final class DependencyContractPO extends AbstractPO
 	    	  preHeapVarsReverse.put(preVar, h);
 	      }
 	}
+    if(twoState) {
+    	heaps.addAll(preHeapVars.values());
+    }
 
         //register the variables and anon heap so they are declared in proof 
 	//header if the proof is saved to a file
         register(selfVar);	
         register(paramVars);
 
-    List<LocationVariable> heaps = new LinkedList<LocationVariable>();
-    heaps.addAll(HeapContext.getModHeaps(services, false));
-    if(twoState) {
-    	heaps.addAll(preHeapVars.values());
-    }
 
     Term wellFormedHeaps = null;
     Term update = null;
@@ -233,6 +238,7 @@ public final class DependencyContractPO extends AbstractPO
 		            contract.getKJT(), paramVars, wellFormedHeaps),
        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
 	
+	assert heaps.size() == heapCount;
 	//prepare target term
 	final Term[] subs
 	    = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];

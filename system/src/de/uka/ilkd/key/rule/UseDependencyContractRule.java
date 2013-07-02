@@ -307,7 +307,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final List<Term> rawSteps = new LinkedList<Term>();
 	int index = 0;
 	final int stateCount = ((IObserverFunction)focus.op()).getStateCount();
-	final int numHeaps = heapContext.size();
+	final int numHeaps = ((IObserverFunction)focus.op()).getHeapCount(services);
 	while(index < stateCount*numHeaps) {
 	  getRawSteps(focus.sub(index++), seq, services, rawSteps);
 	  if(((IObserverFunction)focus.op()).getStateCount() == 2) {
@@ -393,9 +393,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	//memset, ...)
 	final Services services = goal.proof().getServices();
 	final IObserverFunction target = (IObserverFunction) focus.op();
-    final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+    //final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
 	boolean hasRawSteps = false;
-	for(int i = 0; i<heaps.size() * target.getStateCount(); i++) {
+	for(int i = 0; i<target.getHeapCount(services) * target.getStateCount(); i++) {
 	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
         hasRawSteps = true;		  
 	    break;
@@ -408,7 +408,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final KeYJavaType kjt
 		= target.isStatic()
 		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(focus.sub(heaps.size()*target.getStateCount()).sort());
+	          : services.getJavaInfo().getKeYJavaType(focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
 	assert kjt != null : "could not determine receiver type for " + focus;
 	if(kjt.getSort() instanceof NullSort) {
 	    return false;
@@ -442,11 +442,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
         if (target.isStatic()) {
             selfTerm = null;
         } else {
-            selfTerm = focus.sub(heaps.size()*target.getStateCount());
+            selfTerm = focus.sub(target.getHeapCount(services)*target.getStateCount());
         }
 
         ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
-        for(int i = heaps.size()*target.getStateCount() + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
+        for(int i = target.getHeapCount(services)*target.getStateCount() + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
             paramTerms = paramTerms.append(focus.sub(i));
         }
 
@@ -460,10 +460,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 ((UseDependencyContractApp)ruleApp).step(goal.sequent(), services);
 
         final boolean twoState = target.getStateCount() == 2;
+        final int obsHeapCount = target.getHeapCount(services);
         Map<LocationVariable,Term> atPres = twoState ? new LinkedHashMap<LocationVariable, Term>() : null;
         Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
         int i=0;
         for(LocationVariable heap : heaps) {
+        	if(i >= obsHeapCount) {
+        		break;
+        	}
             heapTerms.put(heap, step.subTerm().sub(2*i));
             if(twoState) {
             	atPres.put(heap, step.subTerm().sub(2*i+1));
@@ -482,7 +486,11 @@ public final class UseDependencyContractRule implements BuiltInRule {
         int heapExprIndex = 0;
         boolean useful = false;
         ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.<PosInOccurrence>nil();
+        int hc = 0;
         for(LocationVariable heap : heaps) {
+          if(hc >= obsHeapCount) {
+        	  break;
+          }
           for(boolean atPre : twoState ? new boolean[] { false, true } : new boolean[] { false } ) {
             //get changed locs and used equalities
             final Term subStep = step.subTerm().sub(heapExprIndex);
@@ -547,6 +555,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             }
             heapExprIndex++;
           }
+          hc++;
         }
 
         //store insts in rule app

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
 public interface IObserverFunction extends SortedOperator {
@@ -39,6 +40,11 @@ public interface IObserverFunction extends SortedOperator {
     */
    public abstract int getStateCount();
 
+   /**
+    * Check the heap count of the declaration, e.g. the base heap and extra heap.
+    */
+   public abstract int getHeapCount(Services services);   
+   
    /**
     * Gives the number of parameters of the observer symbol. "Parameters" here
     * includes only the *explicit* parameters, not the heap and the receiver
