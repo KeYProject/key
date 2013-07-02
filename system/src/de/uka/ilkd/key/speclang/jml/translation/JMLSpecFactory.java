@@ -92,7 +92,7 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     private class ContractClauses {
 
-        public Map<LocationVariable,Term> abbreviations = new LinkedHashMap<LocationVariable,Term>();
+        public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
@@ -319,7 +319,7 @@ public class JMLSpecFactory {
 
     /** register abbreviations in contracts (aka. old clauses)
      * @throws SLTranslationException */
-    private void registerAbbreviationVariables(
+    private ImmutableList<Term> registerAbbreviationVariables(
             TextualJMLSpecCase textualSpecCase, KeYJavaType inClass,
             ProgramVariableCollection progVars, ContractClauses clauses) throws SLTranslationException {
         for (Triple<PositionedString,PositionedString,PositionedString> abbrv:
@@ -330,10 +330,11 @@ public class JMLSpecFactory {
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
             progVars.paramVars = progVars.paramVars.append(abbrVar); // treat as (ghost) parameter
-            final Term abbrvTerm = JMLTranslator.translate(abbrv.third,
+            final Term rhs = JMLTranslator.translate(abbrv.third,
                     inClass, progVars.selfVar, progVars.paramVars, progVars.resultVar, progVars.excVar, progVars.atPres, Term.class, services);
-            clauses.abbreviations.put(abbrVar, abbrvTerm);
+            clauses.abbreviations = clauses.abbreviations.append(TB.equals(TB.var(abbrVar), rhs));
         }
+        return clauses.abbreviations;
     }
 
 
