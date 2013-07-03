@@ -66,7 +66,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplaceVisitor(ProgramElement st,
+                                 Map<ProgramVariable, ProgramVariable> map,
+                                 Services services) {
     super(st, true, services);
     this.replaceMap = map;
         assert services != null;
@@ -104,30 +106,30 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ProgramElementName name = pv.getProgramElementName();
         //%%% HACK: final local variables are not renamed since they can occur in an
         // anonymous class declared in their scope of visibility.
-/*      if(pv.isFinal()){
+        /*      if(pv.isFinal()){
             return pv;
         }*/
-    return new LocationVariable
-        (VariableNamer.parseName(name.toString() + postFix,
-                         name.getCreationInfo()),
-         pv.getKeYJavaType(), pv.isFinal());
+        return new LocationVariable
+                (VariableNamer.parseName(name.toString() + postFix,
+                        name.getCreationInfo()),
+                        pv.getKeYJavaType(), pv.isFinal());
     }
 
 
     protected void walk(ProgramElement node) {
-    if (node instanceof LocalVariableDeclaration && replaceallbynew) {
-        LocalVariableDeclaration vd= (LocalVariableDeclaration)node;
-        ImmutableArray<VariableSpecification> vspecs=vd.getVariableSpecifications();
-        for (int i=0; i<vspecs.size(); i++) {
-        ProgramVariable pv
-            = (ProgramVariable)
-                 vspecs.get(i).getProgramVariable();
-        if (!replaceMap.containsKey(pv)) {
-            replaceMap.put(pv, copy(pv));
+        if (node instanceof LocalVariableDeclaration && replaceallbynew) {
+            LocalVariableDeclaration vd= (LocalVariableDeclaration)node;
+            ImmutableArray<VariableSpecification> vspecs=vd.getVariableSpecifications();
+            for (int i=0; i<vspecs.size(); i++) {
+                ProgramVariable pv
+                = (ProgramVariable)
+                vspecs.get(i).getProgramVariable();
+                if (!replaceMap.containsKey(pv)) {
+                    replaceMap.put(pv, copy(pv));
+                }
+            }
         }
-        }
-    }
-    super.walk(node);
+        super.walk(node);
     }
 
 
@@ -141,19 +143,19 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     /** starts the walker*/
     public void start() {
-    stack.push(new ExtList());
-    walk(root());
-    ExtList el= stack.peek();
-    int i=0;
-    while (!(el.get(i) instanceof ProgramElement)) {
-        i++;
-    }
-    result=(ProgramElement) stack.peek().get(i);
+        stack.push(new ExtList());
+        walk(root());
+        ExtList el= stack.peek();
+        int i=0;
+        while (!(el.get(i) instanceof ProgramElement)) {
+            i++;
+        }
+        result=(ProgramElement) stack.peek().get(i);
     }
 
 
     public ProgramElement result() {
-    return result;
+        return result;
     }
 
 

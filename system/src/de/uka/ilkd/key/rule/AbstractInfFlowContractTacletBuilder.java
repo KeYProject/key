@@ -184,7 +184,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                                                services));
             }
         }
-        
+
         Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
                 guardAtPreSV :
                 createTermSV(appData.post.guard, schemaPrefix, services));

@@ -348,8 +348,7 @@ public class InfFlowProofSymbols {
     public void add(Term t) {
         assert t != null;
         t = TermBuilder.DF.goBelowUpdates(t);
-        if (!(t.op() instanceof Function && isPredicate((Function)t.op()))
-                && !t.subs().isEmpty()) {
+        if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
                 add(s);
             }
@@ -367,8 +366,7 @@ public class InfFlowProofSymbols {
     public void addLabeled(Term t) {
         assert t != null;
         t = TermBuilder.DF.goBelowUpdates(t);
-        if (!(t.op() instanceof Function && isPredicate((Function)t.op()))
-                && !t.subs().isEmpty()) {
+        if (!t.subs().isEmpty()) {
             for (final Term s: t.subs()) {
                 addLabeled(s);
             }

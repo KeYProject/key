@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -62,11 +63,14 @@ public class FinishAuxiliaryComputationMacro
         final Proof initiatingProof = initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
         final InfFlowContractPO ifPO =
-                (InfFlowContractPO) services.getSpecificationRepository().getPOForProof(initiatingProof);
+                (InfFlowContractPO) services.getSpecificationRepository()
+                                         .getPOForProof(initiatingProof);
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifPO.getIFVars(), initiatingGoal);
-        final Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
+        final IFProofObligationVars ifVars =
+                generateApplicationDataSVs(ifPO.getIFVars(), proof.getServices());
+        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final Taclet rwTaclet = generateRewriteTaclet(result, ifPO.getContract(), ifVars, services);
         initiatingGoal.proof().addIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
@@ -88,17 +92,17 @@ public class FinishAuxiliaryComputationMacro
 
 
     private Taclet generateRewriteTaclet(Term replacewith,
-                                         InfFlowContractPO infPO,
+                                         InformationFlowContract contract,
+                                         IFProofObligationVars ifVars,
                                          Services services) {
         final Name tacletName =
                 MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
-                                            infPO.getContract().getTarget().getFullName());
+                                            contract.getTarget().getFullName());
         i++;
 
         // create find term
-        IFProofObligationVars ifVars = generateApplicationDataSVs(infPO.getIFVars(), services);
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(infPO.getContract(),
+                POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
                                                    services);
         final Term find =

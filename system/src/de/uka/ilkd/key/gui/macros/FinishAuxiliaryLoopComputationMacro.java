@@ -62,11 +62,11 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp)app;
         final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
-        final IFProofObligationVars ifVars =
-                loopInvRuleApp.getInformationFlowProofObligationVars();
-
 
         // create and register resulting taclets
+        final IFProofObligationVars ifVars =
+                generateApplicationDataSVs(loopInvRuleApp.getInformationFlowProofObligationVars(),
+                                           proof.getServices());
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifVars, services);
         initiatingGoal.proof().addIFSymbol(rwTaclet);
@@ -98,7 +98,6 @@ public class FinishAuxiliaryLoopComputationMacro extends
         i++;
 
         // create find term
-        ifVars = generateApplicationDataSVs(ifVars, services);
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1, ifVars.c2,

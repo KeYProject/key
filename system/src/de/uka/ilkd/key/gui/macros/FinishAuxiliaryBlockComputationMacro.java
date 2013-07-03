@@ -73,11 +73,12 @@ public class FinishAuxiliaryBlockComputationMacro
         final BlockContractBuiltInRuleApp blockRuleApp =
                 (BlockContractBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();
-        final IFProofObligationVars ifVars =
-                blockRuleApp.getInformationFlowProofObligationVars();
 
 
         // create and register resulting taclets
+        final IFProofObligationVars ifVars =
+                generateApplicationDataSVs(blockRuleApp.getInformationFlowProofObligationVars(),
+                                           proof.getServices());
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
         initiatingGoal.proof().addIFSymbol(rwTaclet);
@@ -110,7 +111,6 @@ public class FinishAuxiliaryBlockComputationMacro
         i++;
 
         // create find term
-        ifVars = generateApplicationDataSVs(ifVars, services);
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
