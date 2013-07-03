@@ -211,7 +211,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        Term frameTerm = null;
        for(LocationVariable heap : modHeaps) {
           final Term ft;
-          if(!getContract().hasModifiesClause() && heap == getBaseHeap()) {
+          if(!getContract().hasModifiesClause(heap)) {
             // strictly pure have a different contract.
             ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
           }else{
@@ -226,14 +226,6 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           }
        }
        return frameTerm;
-    }
-    
-    /**
-     * Returns the base heap.
-     * @return The {@link LocationVariable} which contains the base heap.
-     */
-    private LocationVariable getBaseHeap() {
-       return services.getTypeConverter().getHeapLDT().getHeap();
     }
     
     /**

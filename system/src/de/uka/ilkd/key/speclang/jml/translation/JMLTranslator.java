@@ -88,6 +88,7 @@ final class JMLTranslator {
         ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
+        MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         SIGNALS ("signals"),
@@ -277,7 +278,18 @@ final class JMLTranslator {
                 return TB.convertToFormula(ensuresTerm, services);
             }
         });
-        translationMethods.put(JMLKeyWord.REPRESENTS,
+        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
+
+        	@Override
+        	public Term translate(SLTranslationExceptionManager excManager, Object... params)
+        	              throws SLTranslationException {
+        	    checkParameters(params, Term.class, Services.class);
+        	    Term axiomsTerm = (Term) params[0];
+        	    Services services = (Services) params[1];
+        	    return TB.convertToFormula(axiomsTerm, services);
+        	}
+       });
+       translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 
             @Override
@@ -2133,6 +2145,9 @@ final class JMLTranslator {
             try {
                 if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
                     result = TB.equals(a, b);
+                // Special case so that model methods are handled better
+                } else if(a.sort() == services.getTypeConverter().getBooleanLDT().targetSort() && b.sort() == Sort.FORMULA) {
+                    result = TB.equals(a, TB.ife(b, TB.TRUE(services), TB.FALSE(services)));
                 } else {
                     result = TB.equals(TB.convertToFormula(a, services),
                                        TB.convertToFormula(b, services));

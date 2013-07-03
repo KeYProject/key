@@ -46,6 +46,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -1302,14 +1303,16 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-	if(inv == null) {
+	if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
         			       null,
         			       services.getTypeConverter().getHeapLDT().targetSort(),
         			       getJavaLangObject(),
         			       false,
-        			       new ImmutableArray<KeYJavaType>());
+        			       new ImmutableArray<KeYJavaType>(),
+        			       HeapContext.getModHeaps(services, false).size(),
+        			       1);
 	}
 	return inv;
     }
@@ -1341,7 +1344,9 @@ public final class JavaInfo {
                            services.getTypeConverter().getHeapLDT().targetSort(),
                            target,
                            true,
-                           new ImmutableArray<KeYJavaType>()));
+                           new ImmutableArray<KeYJavaType>(),
+        			       HeapContext.getModHeaps(services, false).size(),
+                           1));
         return staticInvs.get(target);
     }
 

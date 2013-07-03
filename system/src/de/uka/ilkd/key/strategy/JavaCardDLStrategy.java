@@ -17,6 +17,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -176,11 +177,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
                 depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                longConst(400));            
-            } else {
-                depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                inftyConst());
-            }        
+                                                                longConst(400));
+        } else {
+            depSpecF = ConditionalFeature.createConditional(depFilter,
+        	    					    inftyConst());
+        }
         
         final Feature loopInvF;
         final String loopProp
@@ -278,6 +279,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private RuleSetDispatchFeature setupCostComputationF(Proof p_proof) {
         final IntegerLDT numbers =
             p_proof.getServices().getTypeConverter().getIntegerLDT();
+        final LocSetLDT locSetLDT =
+                p_proof.getServices().getTypeConverter().getLocSetLDT();
             
         final RuleSetDispatchFeature d = RuleSetDispatchFeature.create ();
             
@@ -289,6 +292,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "concrete", -10000 );        
         bindRuleSet ( d, "simplify", -3000 );        
         bindRuleSet ( d, "simplify_enlarging", -1800 );        
+        bindRuleSet ( d, "simplify_select", -1700 );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
@@ -477,7 +481,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet ( d, "boxDiamondConv", inftyConst () );
         
         bindRuleSet ( d, "cut", not ( isInstantiated ( "cutFormula" ) ) );
-        
+
         setupUserTaclets ( d );
         
         setupArithPrimaryCategories ( d );
@@ -490,7 +494,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                
         
         if ( quantifierInstantiatedEnabled() ) {
-            setupFormulaNormalisation ( d, numbers );
+            setupFormulaNormalisation (d, numbers, locSetLDT);
         } else {
             bindRuleSet ( d, "negationNormalForm", inftyConst() );
             bindRuleSet ( d, "moveQuantToLeft", inftyConst() );
@@ -971,7 +975,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
 
     private void setupFormulaNormalisation(RuleSetDispatchFeature d,
-                                           IntegerLDT numbers) {
+                                           IntegerLDT numbers,
+                                           LocSetLDT locSetLDT) {
        
         bindRuleSet ( d, "negationNormalForm",
            add ( not ( NotBelowBinderFeature.INSTANCE ),
@@ -986,8 +991,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  longConst ( -550 ) ) );
 
         bindRuleSet ( d, "conjNormalForm",
-                      add ( not ( applyTF ( FocusFormulaProjection.INSTANCE,
-                                            ff.propJunctor ) ),
+                      ifZero(add ( or ( FocusInAntecFeature.INSTANCE,
+                                        NotBelowQuantifierFeature.INSTANCE ),
+                                   NotInScopeOfModalityFeature.INSTANCE),
+                             add ( longConst ( -150 ),
+                                   ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
+                             inftyConst() ) );
+
+        bindRuleSet ( d, "setEqualityBlastingRight", longConst(-150) );
+
+        bindRuleSet ( d, "cnf_setComm",
+                      add ( SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
                             NotInScopeOfModalityFeature.INSTANCE,
                             longConst ( -150 ) ) );
 
@@ -2181,8 +2195,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if(depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF = ConditionalFeature.createConditional(
         	    		depFilter,
-        	    		ifZero(new DependencyContractFeature(), 
-        	    		       longConst(0),
+        	    		ifZero(new DependencyContractFeature(),
+        	    		       longConst(400),
         	    		       inftyConst()));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, 

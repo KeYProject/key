@@ -197,7 +197,8 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Deprecated
-    public Term getMby(Term heapTerm, Term selfTerm, ImmutableList<Term> paramTerms,
+    public Term getMby(Map<LocationVariable,Term> heapTerms, Term selfTerm,
+                       ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
                        Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
