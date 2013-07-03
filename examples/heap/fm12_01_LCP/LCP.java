@@ -21,7 +21,7 @@ final class LCP {
     int lcp(int[] a, int x, int y) {
         int l = 0;
         /*@ maintaining 0 <= l && l+x <= a.length && l+y <= a.length;
-          @ maintaining (\forall int i; 0 <= i && i < l; a[x+i]==a[y+i]);
+          @ maintaining (\forall int z; 0 <= z && z < l; a[x+z]==a[y+z]);
           @ maintaining x!=y;
           @ decreasing a.length-l;
           @ assignable \strictly_nothing;
