@@ -72,6 +72,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final ProgramVariable originalResultVar;
     final ProgramVariable originalExcVar;
     final Map<LocationVariable,LocationVariable> originalAtPreVars;
+    final Term globalDefs;
     final int id;
     final boolean transaction;
     final boolean toBeSaved;
@@ -104,6 +105,45 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     ProgramVariable resultVar,
                                     ProgramVariable excVar,
                                     Map<LocationVariable, LocationVariable> atPreVars,
+                                    int id,
+                                    boolean toBeSaved,
+                                    boolean transaction) {
+        this(baseName,name,kjt,pm,specifiedIn,modality,pres,mby,posts,mods,hasRealMod,selfVar,paramVars,resultVar,excVar,atPreVars,null,id,toBeSaved,transaction);
+    }
+
+    /**
+     * Creates an operation contract.
+     * @param baseName base name of the contract (does not have to be unique)
+     * @param pm the IProgramMethod to which the contract belongs
+     * @param modality the modality of the contract
+     * @param pre the precondition of the contract
+     * @param mby the measured_by clause of the contract
+     * @param post the postcondition of the contract
+     * @param mod the modifies clause of the contract
+     * @param selfVar the variable used for the receiver object
+     * @param paramVars the variables used for the operation parameters
+     * @param resultVar the variables used for the operation result
+     * @param excVar the variable used for the thrown exception
+     * @param heapAtPreVar the variable used for the pre-heap
+     * @param globalDefs definitions for the whole contract
+     */
+    FunctionalOperationContractImpl(String baseName,
+                                    String name,
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> mods,
+                                    boolean hasRealMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    Term globalDefs,
                                     int id,
                                     boolean toBeSaved,
                                     boolean transaction) {
@@ -142,6 +182,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.originalResultVar      = resultVar;
         this.originalExcVar         = excVar;
         this.originalAtPreVars      = atPreVars;
+        this.globalDefs             = globalDefs;
         this.id                     = id;
         this.transaction            = transaction;
         this.toBeSaved	            = toBeSaved;
@@ -350,7 +391,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
 
-    // XXX
+    /** Make sure ghost parameters appear in the list of parameter variables. */
     private ImmutableList<ProgramVariable> addGhostParams(
             ImmutableList<ProgramVariable> paramVars) {
         // make sure ghost parameters are present
@@ -363,7 +404,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return paramVars;
     }
 
-    // XXX
+    /** Make sure ghost parameters appear in the list of parameter variables. */
     private ImmutableList<Term> addGhostParamTerms(
             ImmutableList<Term> paramVars) {
         // make sure ghost parameters are present
@@ -528,6 +569,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
+        paramTerms = addGhostParamTerms(paramTerms);
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
 	final Map<Term, Term> replaceMap = getReplaceMap(null, heapTerm,
@@ -916,8 +958,30 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        paramTerms = addGhostParamTerms(paramTerms);
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm,
+                selfTerm,
+                paramTerms,
+                null,
+                null,
+                null,
+                services);
+        final OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(globalDefs);
+    }
+
+    @Override
     public String toString() {
-	return "pre: "
+	return
+	    (globalDefs == null? "": "defs: "+ globalDefs +"; ")
+	    + "pre: "
 		+ originalPres
 		+ "; mby: "
 		+ originalMby

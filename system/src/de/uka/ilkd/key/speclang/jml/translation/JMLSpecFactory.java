@@ -234,7 +234,8 @@ public class JMLSpecFactory {
         ContractClauses clauses = new ContractClauses();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
 
-        registerAbbreviationVariables(textualSpecCase, pm.getContainerType(), progVars, clauses);
+        clauses.abbreviations =
+                registerAbbreviationVariables(textualSpecCase, pm.getContainerType(), progVars, clauses);
 
         clauses.measuredBy =
                 translateMeasuredBy(pm, progVars.selfVar,
@@ -676,6 +677,10 @@ public class JMLSpecFactory {
             ContractClauses clauses,
             Map<LocationVariable,Term> posts) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+
+        final Term abbrvLhs = TB.convertToFormula(TB.and(clauses.abbreviations), services);
+
+        // requires
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            if(clauses.requires.get(heap) != null) {
@@ -687,6 +692,8 @@ public class JMLSpecFactory {
              }
            }
         }
+
+        // diverges
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, true, pres,

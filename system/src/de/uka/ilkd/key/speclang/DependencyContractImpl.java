@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.speclang;
@@ -40,26 +40,26 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  * Standard implementation of the DependencyContract interface.
  */
 public final class DependencyContractImpl implements DependencyContract {
-    
+
     private static final TermBuilder TB = TermBuilder.DF;
-    
-    final String baseName;    
+
+    final String baseName;
     final String name;
     final KeYJavaType kjt;
     final IObserverFunction target;
     final KeYJavaType specifiedIn;
     final Term originalPre;
-    final Term originalMby;    
+    final Term originalMby;
     final Term originalDep;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
-    final int id;    
-    
+    final int id;
+
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    
+
     DependencyContractImpl(String baseName,
                            String name,
                            KeYJavaType kjt,
@@ -81,22 +81,22 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars.size() == target.arity() - (target.isStatic() ? 1 : 2);
         assert pre.sort() == Sort.FORMULA;
 	this.baseName = baseName;
-        this.name = name != null 
-                  ? name 
+        this.name = name != null
+                  ? name
                   : ContractFactory.generateContractName(baseName, kjt, target,
                                        specifiedIn, id);
 	this.kjt = kjt;
 	this.target = target;
     this.specifiedIn = specifiedIn;
 	this.originalPre = pre;
-	this.originalMby = mby;	
+	this.originalMby = mby;
 	this.originalDep = dep;
 	this.originalSelfVar = selfVar;
 	this.originalParamVars = paramVars;
 	this.id = id;
     }
-    
-    
+
+
     DependencyContractImpl(String baseName,
                            KeYJavaType kjt,
                            IObserverFunction target,
@@ -106,57 +106,57 @@ public final class DependencyContractImpl implements DependencyContract {
                            Term dep,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars) {
-	this(baseName, 
-             null, 
-             kjt, 
+	this(baseName,
+             null,
+             kjt,
              target,
              specifiedIn,
-             pre, 
-             mby,             
-             dep, 
-             selfVar, 
-             paramVars, 
+             pre,
+             mby,
+             dep,
+             selfVar,
+             paramVars,
              INVALID_ID);
-    }    
-    
-    
+    }
+
+
     //-------------------------------------------------------------------------
     //public interface
-    //-------------------------------------------------------------------------    
-    
+    //-------------------------------------------------------------------------
+
     @Override
     public String getName() {
 	return name;
     }
-    
-    
+
+
     @Override
     public int id() {
 	return id;
     }
-    
+
 
     @Override
     public KeYJavaType getKJT() {
 	return kjt;
     }
 
-    
+
     @Override
     public IObserverFunction getTarget() {
 	return target;
     }
-    
-    
+
+
     @Override
     public boolean hasMby() {
 	return originalMby != null;
     }
-    
-    
+
+
     @Override
     public Term getPre(LocationVariable heap,
-                       ProgramVariable selfVar, 
+                       ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
 	    	       Services services) {
@@ -177,7 +177,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     public Term getPre(List<LocationVariable> heapContext,
-                       ProgramVariable selfVar, 
+                       ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
 	    	       Services services) {
@@ -192,12 +192,12 @@ public final class DependencyContractImpl implements DependencyContract {
        }
        return result;
     }
-    
-    
+
+
     @Override
     public Term getPre(LocationVariable heap,
                        Term heapTerm,
-	               Term selfTerm, 
+	               Term selfTerm,
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
 	    	       Services services) {
@@ -214,15 +214,15 @@ public final class DependencyContractImpl implements DependencyContract {
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(TB.var(originalParamVar), paramTerms.head());
 	    paramTerms = paramTerms.tail();
-	}	
+	}
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalPre);
     }
-    
+
 
     public Term getPre(List<LocationVariable> heapContext,
                        Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm, 
+	               Term selfTerm,
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
 	    	       Services services) {
@@ -258,12 +258,12 @@ public final class DependencyContractImpl implements DependencyContract {
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalMby);
     }
-    
+
 
     @Override
     public Term getMby(Term heapTerm,
-	               Term selfTerm, 
-	               ImmutableList<Term> paramTerms, 
+	               Term selfTerm,
+	               ImmutableList<Term> paramTerms,
 	               Services services) {
 	assert hasMby();
 	assert heapTerm != null;
@@ -279,39 +279,39 @@ public final class DependencyContractImpl implements DependencyContract {
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(TB.var(originalParamVar), paramTerms.head());
 	    paramTerms = paramTerms.tail();
-	}	
+	}
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalMby);
-    }    
-   
-    
+    }
+
+
     @Override
     public String getPlainText(Services services) {
        return getText(false, services);
     }
-    
+
     @Override
     public String getHTMLText(Services services) {
        return getText(true, services);
     }
-    
+
     private String getText(boolean includeHtmlMarkup, Services services) {
 	     final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
-        final String mby = hasMby() 
+        final String mby = hasMby()
         	           ? LogicPrinter.quickPrintTerm(originalMby, services)
         	           : null;
         final String dep = LogicPrinter.quickPrintTerm(originalDep, services);
-        
+
         if (includeHtmlMarkup) {
            return "<html>"
                  + "<b>pre</b> "
                  + LogicPrinter.escapeHTML(pre, false)
                  + "<br><b>dep</b> "
                  + LogicPrinter.escapeHTML(dep, false)
-                 + (hasMby() 
-                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
+                 + (hasMby()
+                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby,
                                          false)
-                    : "")                
+                    : "")
                  + "</html>";
         }
         else {
@@ -321,22 +321,22 @@ public final class DependencyContractImpl implements DependencyContract {
                  + dep
                  + (hasMby() ? "\nmeasured-by: " + mby : "");
         }
-    }    
-    
-    
+    }
+
+
     @Override
     public boolean toBeSaved() {
 	return false; //because dependency contracts currently cannot be
-	              //specified directly in DL 
+	              //specified directly in DL
     }
-    
-    
+
+
     @Override
     public String proofToString(Services services) {
 	assert false;
 	return null;
     }
-    
+
 
     @Override
     public Term getDep(ProgramVariable selfVar,
@@ -357,12 +357,12 @@ public final class DependencyContractImpl implements DependencyContract {
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalDep);
     }
-    
+
 
     @Override
     public Term getDep(Term heapTerm,
-	               Term selfTerm, 
-	               ImmutableList<Term> paramTerms, 
+	               Term selfTerm,
+	               ImmutableList<Term> paramTerms,
 	               Services services) {
 	assert heapTerm != null;
 	assert (selfTerm == null) == (originalSelfVar == null);
@@ -377,12 +377,18 @@ public final class DependencyContractImpl implements DependencyContract {
 	for(ProgramVariable originalParamVar : originalParamVars) {
 	    map.put(TB.var(originalParamVar), paramTerms.head());
 	    paramTerms = paramTerms.tail();
-	}	
+	}
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalDep);
-    }    
-    
-    
+    }
+
+    @Override
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public String toString() {
 	return originalDep.toString();
@@ -445,8 +451,8 @@ public final class DependencyContractImpl implements DependencyContract {
                                           originalParamVars,
                                           id);
     }
-    
-    
+
+
     @Override
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
