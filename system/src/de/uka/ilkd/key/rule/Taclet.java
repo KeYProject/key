@@ -17,8 +17,6 @@ package de.uka.ilkd.key.rule;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.omg.CORBA.ORB;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;

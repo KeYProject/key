@@ -1706,11 +1706,6 @@ public class TermBuilder {
         return all(heapLV, t);
     }
 
-    public Term wd(Term t) {
-        return func(new TransformerProcedure(new Name("WD"), Sort.FORMULA, t.sort()),
-                    t);
-    }
-
 
     //-------------------------------------------------------------------------
     //reachability operators

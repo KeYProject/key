@@ -2,17 +2,23 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Triple;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     protected static final TermBuilder TB = TermBuilder.DF;
+
+    private static final TransformerProcedure WD =
+            new TransformerProcedure(new Name("WD"), Sort.FORMULA, Sort.FORMULA);
 
     private WellDefinednessCheck check;
 
@@ -66,8 +72,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
        return services.getTypeConverter().getHeapLDT().getHeap();
     }
 
-    private Term wd(Term t) {
-        return TB.wd(t);
+    private static Term wd(Term t) {
+        return TB.func(WD, t);
     }
 
     @Deprecated
