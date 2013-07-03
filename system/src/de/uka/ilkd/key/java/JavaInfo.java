@@ -615,28 +615,31 @@ public final class JavaInfo {
 				     Term[] args,
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-	Term[] subs = new Term[args.length+2];
-	subs[0] = TermBuilder.DF.getBaseHeap(services);
-	subs[1] = prefix;
-	for(int i = 2; i < subs.length; i++) {
-              Term t = args[i-2];
-              sig = sig.append(getServices().getTypeConverter()
-        	                            .getKeYJavaType(t));
-              subs[i] = t;
-	}
-	className = translateArrayType(className);
 	KeYJavaType clType = getKeYJavaTypeByClassName(className);
+	for(int i=0; i < args.length; i++) {
+        sig = sig.append(getServices().getTypeConverter()
+                .getKeYJavaType(args[i]));
+	}	
 	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
 	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" not found.");
 	}
-	if(pm.isStatic()) {
-	    Term[] newSubs = new Term[subs.length - 1];
-	    newSubs[0] = subs[0];
-	    System.arraycopy(subs, 2, newSubs, 1, newSubs.length - 1);
-	    subs=newSubs;
+	Term[] subs = new Term[pm.getHeapCount(services)*pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
+	int offset = 0;
+	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+		if(offset >= pm.getHeapCount(services)) {
+			break;
+		}
+		subs[offset++] = TermBuilder.DF.var(heap);
 	}
+	if(!pm.isStatic()) {
+	  subs[offset++] = prefix;
+	}
+	for(int i=0; offset < subs.length; i++, offset++) {
+        subs[offset] = args[i];
+	}
+	className = translateArrayType(className);
 	assert pm.getReturnType() != null;
 	if(pm.isVoid()) {
 	    throw new IllegalArgumentException("Program method "+methodName
