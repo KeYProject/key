@@ -30,6 +30,8 @@ import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -224,13 +226,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
         //add invariants for non_null fields
         for(MemberDeclaration member : td.getMembers()) {
             if(member instanceof FieldDeclaration) {
-        	VisibilityModifier visibility = null;
-        	for(Modifier mod : member.getModifiers()) {
-        	    if(mod instanceof VisibilityModifier) {
-        		visibility = (VisibilityModifier)mod;
-        		break;
-        	    }
-        	}
+                VisibilityModifier visibility = null;
+                for(Modifier mod : member.getModifiers()) {
+                    if(mod instanceof VisibilityModifier) {
+                        visibility = (VisibilityModifier)mod;
+                        break;
+                    }
+                }
+                // check for spec_* modifiers (bug #1280)
+                if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration)member, "spec_public"))
+                    visibility = new Public();
+                else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration)member, "spec_protected"))
+                    visibility = new Protected();
+
+
                 for(FieldSpecification field
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
                     // add a static invariant for static fields
