@@ -20,7 +20,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Marco Drebing
  */
-public class TestBreakpointStopConditionSimpleWithHitCount extends AbstractSymbolicExecutionTestCase {
+public class TestLineBreakpointStopConditionSimpleWithHitCount extends AbstractSymbolicExecutionTestCase {
    /**
     * Does some step over tests on two branches with different number
     * of symbolic execution tree nodes to make sure that the

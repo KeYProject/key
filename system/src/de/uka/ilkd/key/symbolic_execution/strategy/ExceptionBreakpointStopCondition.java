@@ -1,55 +1,59 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.CoreException;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchNode;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 
 public class ExceptionBreakpointStopCondition extends
       ExecutedSymbolicExecutionTreeNodesStopCondition {
-   
-   private IProgramVariable exceptionVariable;
    private SymbolicExecutionEnvironment<?> env;
    private String exceptionName;
-   private boolean exceptionThrown;
+   private Set<Node> exceptionNodes;
+   private Set<Node> exceptionParentNodes;
+   private boolean caught;
+   private boolean suspendOnSubclasses;
+   private boolean uncaught;
+   private boolean enabled;
+   
+   
+   /**
+    * The HitCount of the Breakpoint (set by user).
+    */
+   private int hitCount;
+   
+   /**
+    * Counter for how often the Breakpoint was hit.
+    */
+   private int hitted = 0;
 
-   public ExceptionBreakpointStopCondition(SymbolicExecutionEnvironment<?>env, String exceptionName){
-      this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(env.getBuilder().getProof());
+   public ExceptionBreakpointStopCondition(SymbolicExecutionEnvironment<?>env, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
       this.env = env;
       this.exceptionName = exceptionName;
-      exceptionThrown = false;
+      exceptionNodes = new HashSet<Node>();
+      exceptionParentNodes = new HashSet<Node>();
+      this.enabled=enabled;
+      this.caught=caught;
+      this.uncaught=uncaught;
+      this.suspendOnSubclasses=suspendOnSubclasses;
+      this.hitCount = hitCount;
    }
-
    /**
     * {@inheritDoc}
     */
@@ -65,43 +69,62 @@ public class ExceptionBreakpointStopCondition extends
          Node node = goal.node();
          // Check if goal is allowed
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-         
-            // Check if the result for the current node was already computed.
-            Boolean value = getGoalAllowedResultPerSetNode().get(node);
-            if (value == null) {
-               // Get the number of executed set nodes on the current goal
-               Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
-               if (executedNumberOfSetNodes == null) {
-                  executedNumberOfSetNodes = Integer.valueOf(0);
-               }
-               // Check if limit of set nodes of the current goal is exceeded
-               if (executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal()) {
-                  Node parent = SymbolicExecutionUtil.findParentSetNode(node);
-                  System.out.println("Stopped for  Exception at : "+node.serialNr()+" with parent: "+ parent.serialNr());
-                  getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
-                  return false;
-                   // Limit of set nodes of this goal exceeded
-               }
-               else {
-                  SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-                  if(activeStatement!=null&&activeStatement.toString().equals("throw new "+exceptionName+" ();")){
-                     Node parent = SymbolicExecutionUtil.findParentSetNode(node);
-                     System.out.println("Found Exception at : "+node.serialNr()+" with parent: "+ parent.serialNr());
-                     executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                     getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                     getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
+         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
+         if(activeStatement!=null&&activeStatement instanceof Throw&&enabled){
+            Throw throwStatement = (Throw)activeStatement;
+            for(int i = 0; i<throwStatement.getChildCount();i++){
+               SourceElement childElement = throwStatement.getChildAt(i);
+               if(childElement instanceof LocationVariable){
+                  LocationVariable locVar = (LocationVariable)childElement;
+                  if(locVar.getKeYJavaType().getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
+                     exceptionNodes.add(node);
+                     exceptionParentNodes.add(SETParent);
+                  }else if(suspendOnSubclasses){
+                     JavaInfo info = env.getServices().getJavaInfo();
+                     KeYJavaType kjt = locVar.getKeYJavaType();
+                     ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
+                     for(KeYJavaType kjtloc: kjts){
+                        if(kjtloc.getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
+                           exceptionNodes.add(node);
+                           exceptionParentNodes.add(SETParent);
+                        }
+                     }
                   }
                }
             }
-            else {
-               // Reuse already computed result.
-               System.out.println("Reuse: "+value.booleanValue()+"From :"+node.serialNr());
-               return value.booleanValue();
-            }
-         
+         }
       }
       return true;
    }
+
+
+   
+   /**
+    * Checks if the given node is a parent of the other given node.
+    * @param node The {@link Node} to start search in.
+    * @param node The {@link Node} that is thought to be the parent.
+    * @return true if the parent node is one of the nodes parents
+    */
+   public static boolean isParentNode(Node node, Node parent) {
+      if (node != null) {
+         Node parentIter = node.parent();
+         boolean result = false;
+         while (parentIter != null && !result) {
+            if (parentIter.equals(parent)) {
+               result = true;
+            }
+            else {
+               parentIter = parentIter.parent();
+            }
+         }
+         return result;
+      }
+      else {
+         return false;
+      }
+   }
+   
    
    /**
     * {@inheritDoc}
@@ -114,109 +137,128 @@ public class ExceptionBreakpointStopCondition extends
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      // Check if a rule was applied
+   // Check if a rule was applied
       if (singleRuleApplicationInfo != null) {
          // Get the node on which a rule was applied.
          Goal goal = singleRuleApplicationInfo.getGoal();
-         Node goalNode = goal.node();
-         assert goalNode.childrenCount() == 0; // Make sure that this is the current goal node
-         Node updatedNode = goalNode.parent();
-         // Check if multiple branches where created.
-         if (updatedNode.childrenCount() >= 2) {
-            // If a number of executed set nodes is available for the goal it must be used for all other new created goals.
-            Integer executedValue = getExecutedNumberOfSetNodesPerGoal().get(goal);
-            if (executedValue != null) {
-               // Reuse number of set nodes for new created goals
-               NodeIterator childIter = updatedNode.childrenIterator();
-               while (childIter.hasNext()) {
-                  Node next = childIter.next();
-                  Goal nextGoal = next.proof().getGoal(next);
-                  // Check if the current goal is a new one
-                  if (nextGoal != goal) {
-                     // New goal found, use the number of set nodes for it.
-                     getExecutedNumberOfSetNodesPerGoal().put(nextGoal, executedValue);
-                  }
-               }
+         Node node = goal.node();
+         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         Node parent = null;
+         for(Node parents : exceptionNodes){
+            if(isParentNode(node, parents)){
+               parent = parents;
             }
          }
+         if(parent!=null
+               && SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)
+               &&!exceptionParentNodes.isEmpty()){
+            if(SymbolicExecutionUtil.isTerminationNode(node, ruleApp)&&uncaught){
+               if(hitcountExceeded()){
+                  exceptionNodes.remove(parent);
+                  return true;
+               }
+            } 
+            else if(!SymbolicExecutionUtil.isTerminationNode(node, ruleApp)&&caught){
+               if(hitcountExceeded()){
+                  exceptionNodes.remove(parent);
+                  return true;
+               }
+            }
+            exceptionNodes.remove(parent);
+         }
+
+      }
+      
+      return false;
+   }
+
+   /**
+    * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
+    * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
+    * 
+    * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
+    * @throws CoreException
+    */
+   private boolean hitcountExceeded(){
+      if (!(hitCount == -1)) {
+         if (hitCount == hitted + 1) {
+            hitted=0;
+            return true;
+         }
+         else {
+           hitted++;
+         }
+      }
+      else {
+         return true;
       }
       return false;
    }
    
-   
-//   /**
-//    * {@inheritDoc}
-//    */
-//   @Override
-//   public boolean shouldStop(int maxApplications, 
-//                             long timeout, 
-//                             Proof proof, 
-//                             IGoalChooser goalChooser, 
-//                             long startTime, 
-//                             int countApplied, 
-//                             SingleRuleApplicationInfo singleRuleApplicationInfo) {
-//      // Check if a rule was applied
-//      if (singleRuleApplicationInfo != null) {
-//         // Get the node on which a rule was applied.
-//         Goal goal = singleRuleApplicationInfo.getGoal();
-//         Node goalNode = goal.node();
-//         assert goalNode.childrenCount() == 0; // Make sure that this is the current goal node
-//         SourceElement activeStatement = NodeInfo.computeActiveStatement(singleRuleApplicationInfo.getAppliedRuleApp());
-//         if(activeStatement!=null&&activeStatement.toString().equals("throw new "+exceptionName+" ();")){
-//            System.out.println(activeStatement+" "+ goalNode.serialNr());
-//            return true;
-//         }
-//      }
-//      return false;
-//   }
-   
    /**
-    * Computes the exception {@link Sort} lazily when {@link #getExceptionSort()}
-    * is called the first time. 
-    * @return The exception {@link Sort}.
+    * @return the isCaught
     */
-   private Sort lazyComputeExceptionSort(Node node) {
-      Sort result = null;
-      if (exceptionVariable != null) {
-         // Search final value of the exceptional variable which is used to check if the verified program terminates normally
-         ImmutableArray<Term> value = null;
-         for (SequentFormula f : node.sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = TermBuilder.DF.goBelowUpdates2(f.formula());
-            Iterator<Term> iter = updates.first.iterator();
-            while (value == null && iter.hasNext()) {
-               value = extractValueFromUpdate(iter.next(), exceptionVariable);
-            }
-         }
-         // An exceptional termination is found if the exceptional variable is not null
-         if (value != null && value.size() == 1) {
-            result = value.get(0).sort();
-         }
-      }
-      return result;
+   public boolean isCaught() {
+      return caught;
+   }
+   /**
+    * @param isCaught the isCaught to set
+    */
+   public void setCaught(boolean isCaught) {
+      this.caught = isCaught;
+   }
+   /**
+    * @return the isUncaught
+    */
+   public boolean isUncaught() {
+      return uncaught;
+   }
+   /**
+    * @param isUncaught the isUncaught to set
+    */
+   public void setUncaught(boolean isUncaught) {
+      this.uncaught = isUncaught;
+   }
+   /**
+    * @return the isEnabled
+    */
+   public boolean isEnabled() {
+      return enabled;
+   }
+   /**
+    * @param isEnabled the isEnabled to set
+    */
+   public void setEnabled(boolean isEnabled) {
+      this.enabled = isEnabled;
+   }
+   
+
+   /**
+    * Returns the hitCount of the associated Breakpoint.
+    * @return the hitCount of the associated Breakpoint
+    */
+   public int getHitCount() {
+      return hitCount;
    }
    
    /**
-    * Utility method to extract the value of the {@link IProgramVariable}
-    * from the given update term.
-    * @param term The given update term.
-    * @param variable The {@link IProgramVariable} for that the value is needed.
-    * @return The found value or {@code null} if it is not defined in the given update term.
+    * Set the hitCount to the new value
+    * @param hitCount the new value
     */
-   private ImmutableArray<Term> extractValueFromUpdate(Term term,
-                                                         IProgramVariable variable) {
-      ImmutableArray<Term> result = null;
-      if (term.op() instanceof ElementaryUpdate) {
-         ElementaryUpdate update = (ElementaryUpdate)term.op();
-         if (JavaUtil.equals(variable, update.lhs())) {
-            result = term.subs();
-         }
-      }
-      else if (term.op() instanceof UpdateJunctor) {
-         Iterator<Term> iter = term.subs().iterator();
-         while (result == null && iter.hasNext()) {
-            result = extractValueFromUpdate(iter.next(), variable);
-         }
-      }
-      return result;
+   public void setHitCount(int hitCount) {
+      this.hitCount = hitCount;
+   }
+   
+   /**
+    * @return the suspendOnSubclasses
+    */
+   public boolean isSuspendOnSubclasses() {
+      return suspendOnSubclasses;
+   }
+   /**
+    * @param suspendOnSubclasses the suspendOnSubclasses to set
+    */
+   public void setSuspendOnSubclasses(boolean suspendOnSubclasses) {
+      this.suspendOnSubclasses = suspendOnSubclasses;
    }
 }

@@ -1040,8 +1040,19 @@ public final class KeYUtil {
       }
       return methods;
    }
-
-
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static IType getType(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      IType[] types = unit.getAllTypes();
+      return types[0];
+   }
+   
    /**
     * Returns the lineNumber of the given {@link IMethod}.
     * @param method - the {@link IMethod} to use
@@ -1052,6 +1063,15 @@ public final class KeYUtil {
       Position pos = KeYUtil.getCursorPositionForOffset(method, offset);
       return pos.getLine();
    }
+
+   public static IMethod getContainingMethodForMethodStart(int charStart, IResource resource) throws CoreException {
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
+      IJavaElement javaElement = unit.getElementAt(charStart);
+      if(javaElement instanceof IMethod){
+         return (IMethod) javaElement;
+      }
+      return null;
+   }  
    
 
    public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {

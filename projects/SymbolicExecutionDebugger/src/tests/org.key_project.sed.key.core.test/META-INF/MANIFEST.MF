@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Symbolic Execution Debugger (SED) KeY Core Test
-Bundle-SymbolicName: org.key_project.sed.key.core.test
+Bundle-SymbolicName: org.key_project.sed.key.core.test;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.key.core.test.Activator
 Require-Bundle: org.eclipse.ui,

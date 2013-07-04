@@ -231,7 +231,7 @@
                         variable="activeMenuSelection">
                      <iterate>
                         <adapt
-                              type="org.key_project.sed.key.ui.breakpoints.WatchPoint">
+                              type="org.key_project.sed.key.core.model.breakpoints.WatchPoint">
                         </adapt>
                      </iterate>
                   </with>
@@ -444,7 +444,7 @@
                            variable="activeMenuSelection">
                         <iterate>
                            <adapt
-                                 type="org.key_project.sed.key.ui.breakpoints.WatchPoint">
+                                 type="org.key_project.sed.key.core.model.breakpoints.WatchPoint">
                            </adapt>
                         </iterate>
                      </with>
@@ -537,7 +537,7 @@
       <extension
             point="org.eclipse.debug.core.breakpoints">
          <breakpoint
-               class="org.key_project.sed.key.ui.breakpoints.WatchPoint"
+               class="org.key_project.sed.key.core.model.breakpoints.WatchPoint"
                id="org.key_project.sed.key.ui.breakpoints.watchPoint"
                markerType="org.eclipse.core.resources.marker">
          </breakpoint>

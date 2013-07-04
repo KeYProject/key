@@ -28,7 +28,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 
-public class SWTBotBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
+public class SWTBotLineBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
    
    private static final String CALLER_PATH= ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toString() + "/SWTBotBreakpointTestCase_testLineBreakpoints/src/BreakpointStopCaller.java";
    
@@ -57,10 +57,9 @@ public class SWTBotBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
                
                
                SWTBotView view = TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-               view.bot().tree().setFocus();
-               SWTBotTreeItem treeItem = TestUtilsUtil.selectInTree(view.bot().tree(), "BreakpointStopCallee [line: 6] - main(int)");
+               TestUtilsUtil.selectInTree(view.bot().tree(), "BreakpointStopCallee [line: 6] - main(int)");
                
-               treeItem.contextMenu("Disable");
+               TestUtilsUtil.clickContextMenu(view.bot().tree(), "Disable");
                
                resume(bot, item, target);
                
@@ -89,7 +88,7 @@ public class SWTBotBreakpointTestCase extends AbstractKeYDebugTargetTestCase {
                }
          }
       };
-      doKeYDebugTargetTest("SWTBotBreakpointTestCase_testLineBreakpoints",
+      doKeYDebugTargetTest("SWTBotLineBreakpointTestCase_testLineBreakpoints",
             "data/BreakpointTest/test",
             true,
             true,

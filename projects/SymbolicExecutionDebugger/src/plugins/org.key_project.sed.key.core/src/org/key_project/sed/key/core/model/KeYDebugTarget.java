@@ -15,6 +15,7 @@ package org.key_project.sed.key.core.model;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
@@ -35,8 +36,13 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.debug.core.breakpoints.JavaClassPrepareBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
+import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
+import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.eclipse.jdt.internal.debug.ui.ConditionalBreakpointErrorDialog;
 import org.eclipse.jdt.internal.debug.ui.DebugUIMessages;
 import org.eclipse.jdt.internal.debug.ui.HotCodeReplaceErrorDialog;
@@ -61,6 +67,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,10 +78,13 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.strategy.ClassLoadStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExceptionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.JavaWatchpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.MethodBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
@@ -133,10 +144,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       
       private KeYDebugTarget target;
       
-      private IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
+      private class ResourceDeltaVisitorForHotCodeReplace implements IResourceDeltaVisitor{
          
          private boolean binFlag = false;
-         
+
          @Override
          public boolean visit(IResourceDelta delta) throws CoreException {
             IResource resource = delta.getResource();
@@ -145,12 +156,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                return false;
             }
             if(resource!=null && IResource.FILE==resource.getType()&&resource.getFileExtension().equalsIgnoreCase("java")&&!binFlag){
-               openHotCodeReplaceDialog(target);
+               if((delta.getFlags() & IResourceDelta.CONTENT)==IResourceDelta.CONTENT){
+                  openHotCodeReplaceDialog(target);
+               }
                return false;
             }
             return true;
          }
-      };
+         
+      }
+      private ResourceDeltaVisitorForHotCodeReplace visitor = new ResourceDeltaVisitorForHotCodeReplace();
       
       public ResourceChangeListener(KeYDebugTarget target){
          this.target=target;
@@ -159,7 +174,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       @Override
       public void resourceChanged(IResourceChangeEvent event) {
          try {
-            event.getDelta().accept(visitor);
+            IResourceDelta delta = event.getDelta();
+            delta.accept(visitor);
+            visitor.binFlag=false;
          }
          catch (CoreException e) {
             // TODO Auto-generated catch block
@@ -563,7 +580,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * Adds all Breakpoints to this DebugTarget. Is called only when the DebugTarget is initially created.
     */
-   private void addBreakpoints(){      
+   private void addBreakpoints(){ 
       IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
       for(int i = 0; i < breakpoints.length; i++){
          breakpointAdded(breakpoints[i]);
@@ -582,43 +599,34 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void breakpointAdded(IBreakpoint breakpoint) {
       try {
-         if (breakpoint instanceof WatchPoint && !this.isTerminated()) {
-            WatchPoint watchpoint = (WatchPoint) breakpoint;
-            WatchpointStopCondition stopCondition = new WatchpointStopCondition(watchpoint.getHitCount(),
-                  environment, environment.getBuilder().getProof(),
-                  watchpoint.getCondition(), watchpoint.isEnabled());
-            breakpointStopConditions.addChildren(stopCondition);
-            breakpointMap.put(watchpoint, stopCondition);
-         }
-         else if (breakpoint instanceof JavaLineBreakpoint
+//         if (breakpoint instanceof WatchPoint && !this.isTerminated()) {
+//            WatchPoint watchpoint = (WatchPoint) breakpoint;
+//            watchPointAdded(watchpoint);
+//         }
+         if (breakpoint instanceof JavaWatchpoint
                && !this.isTerminated()) {
-            JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
-            IResource resource = lineBreakpoint.getMarker().getResource();
-            if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
-               IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
-               IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
-               int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
-               int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-               LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(
-                     lineBreakpoint.getMarker().getResource().getLocation(),
-                     lineBreakpoint.getLineNumber(),
-                     lineBreakpoint.getHitCount(), environment, pm, environment
-                           .getBuilder().getProof(), breakpointStopConditions,
-                     lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
-                     lineBreakpoint.isConditionEnabled(), start, end);
-               breakpointStopConditions.addChildren(stopCondition);
-               breakpointMap.put(lineBreakpoint, stopCondition);
-            }
+            JavaWatchpoint watchpoint = (JavaWatchpoint) breakpoint;
+            javaWatchpointAdded(watchpoint);
          }
          else if (breakpoint instanceof JavaExceptionBreakpoint
                && !this.isTerminated()) {
             JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) breakpoint;
-            exceptionBreakpoint.isCaught();
-            exceptionBreakpoint.isUncaught();
-            exceptionBreakpoint.getHitCount();
-            ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment, exceptionBreakpoint.getTypeName());
-            breakpointStopConditions.addChildren(stopCondition);
-            breakpointMap.put(exceptionBreakpoint, stopCondition);
+            exceptionBreakpointAdded(exceptionBreakpoint);
+         } 
+         else if (breakpoint instanceof JavaMethodBreakpoint
+               && !this.isTerminated()) {
+            JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
+            methodBreakpointAdded(methodBreakpoint);
+         }
+         else if (breakpoint instanceof JavaClassPrepareBreakpoint
+               && !this.isTerminated()) {
+            JavaClassPrepareBreakpoint classPrepareBreakpoint = (JavaClassPrepareBreakpoint) breakpoint;
+            classPrepareBreakpointAdded(classPrepareBreakpoint);
+         }
+         else if (breakpoint instanceof JavaLineBreakpoint
+               && !this.isTerminated()) {
+            JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
+            lineBreakpointAdded(lineBreakpoint);
          }
       }
       catch (CoreException e) {
@@ -634,15 +642,110 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
 
+   private void classPrepareBreakpointAdded(
+         JavaClassPrepareBreakpoint classPrepareBreakpoint) throws CoreException {
+      IResource resource = classPrepareBreakpoint.getMarker().getResource();
+      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+         JavaInfo javaInfo = environment.getServices().getJavaInfo();
+         String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
+         containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
+         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
+         ClassLoadStopCondition stopCondition = new ClassLoadStopCondition(
+               environment, classPrepareBreakpoint.isEnabled(),containerKJT, classPrepareBreakpoint.getHitCount());
+         breakpointStopConditions.addChildren(stopCondition);
+         breakpointMap.put(classPrepareBreakpoint, stopCondition);
+      }
+   }
+
+   private void methodBreakpointAdded(JavaMethodBreakpoint methodBreakpoint) throws CoreException, ProofInputException {
+      IResource resource = methodBreakpoint.getMarker().getResource();
+      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+         IMethod method = KeYUtil.getContainingMethodForMethodStart(methodBreakpoint.getCharStart(), resource);
+         IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+         int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
+         MethodBreakpointStopCondition stopCondition = new MethodBreakpointStopCondition(
+               methodBreakpoint.getMarker().getResource().getLocation(),
+               methodBreakpoint.getLineNumber(),
+               methodBreakpoint.getHitCount(), environment, pm, environment
+                     .getBuilder().getProof(), breakpointStopConditions,
+                     methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
+                     methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
+         breakpointStopConditions.addChildren(stopCondition);
+         breakpointMap.put(methodBreakpoint, stopCondition);
+      }
+   }
+
+   private void javaWatchpointAdded(JavaWatchpoint javaWatchpoint) throws CoreException, ProofInputException {
+      IResource resource = javaWatchpoint.getMarker().getResource();
+      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+         JavaInfo javaInfo = environment.getServices().getJavaInfo();
+         String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
+         containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
+         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
+         JavaWatchpointStopCondition stopCondition = new JavaWatchpointStopCondition(
+               environment, javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
+                     javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), javaWatchpoint.isModification(), containerKJT, environment.getBuilder().getProof());
+         breakpointStopConditions.addChildren(stopCondition);
+         breakpointMap.put(javaWatchpoint, stopCondition);
+      }
+   }
+
+   private void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
+      ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment, exceptionBreakpoint.getTypeName(),
+            exceptionBreakpoint.isCaught(), exceptionBreakpoint.isUncaught(), exceptionBreakpoint.isSuspendOnSubclasses(),
+            exceptionBreakpoint.isEnabled(), exceptionBreakpoint.getHitCount());
+      breakpointStopConditions.addChildren(stopCondition);
+      breakpointMap.put(exceptionBreakpoint, stopCondition);
+      
+   }
+
+   private void lineBreakpointAdded(JavaLineBreakpoint lineBreakpoint) throws CoreException, ProofInputException {
+      IResource resource = lineBreakpoint.getMarker().getResource();
+      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
+         IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
+         IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+         int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
+         LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(
+               lineBreakpoint.getMarker().getResource().getLocation(),
+               lineBreakpoint.getLineNumber(),
+               lineBreakpoint.getHitCount(), environment, pm, environment
+                     .getBuilder().getProof(), breakpointStopConditions,
+               lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
+               lineBreakpoint.isConditionEnabled(), start, end);
+         breakpointStopConditions.addChildren(stopCondition);
+         breakpointMap.put(lineBreakpoint, stopCondition);
+      }
+      
+   }
+
+   private void watchPointAdded(WatchPoint watchpoint) throws CoreException {
+      WatchpointStopCondition stopCondition = new WatchpointStopCondition(watchpoint.getHitCount(),
+            environment, environment.getBuilder().getProof(),
+            watchpoint.getCondition(), watchpoint.isEnabled());
+      breakpointStopConditions.addChildren(stopCondition);
+      breakpointMap.put(watchpoint, stopCondition);
+      
+   }
+
    /**
     * {@inheritDoc}
     */
    @Override
    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-      if(breakpoint instanceof WatchPoint){
-         WatchPoint watchpoint = (WatchPoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(watchpoint));
-         breakpointMap.remove(watchpoint);
+      if(breakpoint instanceof JavaMethodBreakpoint){
+         JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
+         breakpointStopConditions.removeChild(breakpointMap.get(methodBreakpoint));
+         breakpointMap.remove(methodBreakpoint);
+      } else if(breakpoint instanceof JavaWatchpoint){
+         JavaWatchpoint javaWatchpoint = (JavaWatchpoint) breakpoint;
+         breakpointStopConditions.removeChild(breakpointMap.get(javaWatchpoint));
+         breakpointMap.remove(javaWatchpoint);
+      } else if(breakpoint instanceof JavaClassPrepareBreakpoint){
+         JavaClassPrepareBreakpoint javaClassPrepareBreakpoint = (JavaClassPrepareBreakpoint) breakpoint;
+         breakpointStopConditions.removeChild(breakpointMap.get(javaClassPrepareBreakpoint));
+         breakpointMap.remove(javaClassPrepareBreakpoint);
       } else if(breakpoint instanceof JavaLineBreakpoint){
          JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
          breakpointStopConditions.removeChild(breakpointMap.get(lineBreakpoint));
@@ -660,16 +763,43 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
       try {
-         if (breakpoint instanceof WatchPoint) {
-            WatchPoint watchpoint = (WatchPoint) breakpoint;
-            if (breakpointMap.containsKey(watchpoint)) {
-               WatchpointStopCondition stopCondition = (WatchpointStopCondition) breakpointMap.get(watchpoint);
-               stopCondition.setHitCount(watchpoint.getHitCount());
-               stopCondition.setEnabled(watchpoint.isEnabled());
-               stopCondition.setCondition(watchpoint.getCondition());
+         if (breakpoint instanceof JavaMethodBreakpoint) {
+            JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
+            if (breakpointMap.containsKey(methodBreakpoint)) {
+               MethodBreakpointStopCondition stopCondition = (MethodBreakpointStopCondition) breakpointMap.get(methodBreakpoint);
+               stopCondition.setHitCount(methodBreakpoint.getHitCount());
+               stopCondition.setEnabled(methodBreakpoint.isEnabled());
+               stopCondition.setConditionEnabled(methodBreakpoint.isConditionEnabled());
+               stopCondition.setCondition(methodBreakpoint.getCondition());
+               stopCondition.setEntry(methodBreakpoint.isEntry());
+               stopCondition.setExit(methodBreakpoint.isExit());
             }
             else {
-               breakpointAdded(watchpoint);
+               breakpointAdded(methodBreakpoint);
+            }
+         }
+         else if (breakpoint instanceof JavaWatchpoint) {
+            JavaWatchpoint javaWatchpoint = (JavaWatchpoint) breakpoint;
+            if (breakpointMap.containsKey(javaWatchpoint)) {
+               JavaWatchpointStopCondition stopCondition = (JavaWatchpointStopCondition) breakpointMap.get(javaWatchpoint);
+               stopCondition.setHitCount(javaWatchpoint.getHitCount());
+               stopCondition.setEnabled(javaWatchpoint.isEnabled());
+               stopCondition.setAccess(javaWatchpoint.isAccess());
+               stopCondition.setModification(javaWatchpoint.isModification());
+            }
+            else {
+               breakpointAdded(javaWatchpoint);
+            }
+         }
+         else if (breakpoint instanceof JavaClassPrepareBreakpoint) {
+            JavaClassPrepareBreakpoint javaClassPrepareBreakpoint = (JavaClassPrepareBreakpoint) breakpoint;
+            if (breakpointMap.containsKey(javaClassPrepareBreakpoint)) {
+               ClassLoadStopCondition stopCondition = (ClassLoadStopCondition) breakpointMap.get(javaClassPrepareBreakpoint);
+               stopCondition.setHitCount(javaClassPrepareBreakpoint.getHitCount());
+               stopCondition.setEnabled(javaClassPrepareBreakpoint.isEnabled());
+            }
+            else {
+               breakpointAdded(javaClassPrepareBreakpoint);
             }
          }
          else if (breakpoint instanceof JavaLineBreakpoint) {
@@ -689,7 +819,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) breakpoint;
             if (breakpointMap.containsKey(exceptionBreakpoint)) {
                ExceptionBreakpointStopCondition stopCondition = (ExceptionBreakpointStopCondition) breakpointMap.get(exceptionBreakpoint);
-               stopCondition.getClass();
+               stopCondition.setEnabled(exceptionBreakpoint.isEnabled());
+               stopCondition.setCaught(exceptionBreakpoint.isCaught());
+               stopCondition.setUncaught(exceptionBreakpoint.isUncaught());
+               stopCondition.setSuspendOnSubclasses(exceptionBreakpoint.isSuspendOnSubclasses());
+               stopCondition.setHitCount(exceptionBreakpoint.getHitCount());
             }
             else {
                breakpointAdded(exceptionBreakpoint);
@@ -729,8 +863,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          @Override
          public void run() {
             HotCodeReplaceErrorDialog dialog= new HotCodeReplaceErrorDialog(shell, title, message, status, preference, alertMessage, JDIDebugUIPlugin.getDefault().getPreferenceStore(), target);
+            dialog.setBlockOnOpen(true);
             dialog.create();
-            dialog.open();   
+            dialog.open();
          }
       };
       Display.getDefault().asyncExec(run);   

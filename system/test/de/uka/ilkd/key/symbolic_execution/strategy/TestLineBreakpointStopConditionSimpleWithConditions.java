@@ -15,7 +15,7 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-public class TestBreakpointStopConditionSimpleWithConditions extends
+public class TestLineBreakpointStopConditionSimpleWithConditions extends
       AbstractSymbolicExecutionTestCase {
 
    /**
