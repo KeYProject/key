@@ -494,7 +494,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
           for(boolean atPre : twoState ? new boolean[] { false, true } : new boolean[] { false } ) {
             //get changed locs and used equalities
             final Term subStep = step.subTerm().sub(heapExprIndex);
-            final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs  = getChangedLocsForStep(focus.sub(0),
+            final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs  = getChangedLocsForStep(focus.sub(heapExprIndex),
                         subStep,
                         goal.sequent(),
                         services);
@@ -546,10 +546,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
             }
             if(!atPre) {
               final Term p = contract.getPre(heap, subStep, selfTerm, paramTerms, atPres, services);
-              if(pre == null) {
+              if(p != null) {
+                if(pre == null) {
             	  pre = p;
-              }else{
+                }else{
                   pre = TB.and(pre, p);
+                }
               }
               subs[heapExprIndex] = subStep;
             }
