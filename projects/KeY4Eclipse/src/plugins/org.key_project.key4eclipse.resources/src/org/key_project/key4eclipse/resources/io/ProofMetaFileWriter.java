@@ -42,16 +42,16 @@ public class ProofMetaFileWriter {
    private LinkedHashSet<KeYJavaType> addedTypes;
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
-   public IFile writeMetaFile(IFile proofFile, ProofElement pe) {
+   public IFile writeMetaFile(ProofElement pe) {
       try{
          this.environment = pe.getKeYEnvironment();
          this.addedTypes = new LinkedHashSet<KeYJavaType>();
-         Document doc = createDoument(proofFile, pe);
+         Document doc = createDoument(pe);
          
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
          DOMSource source = new DOMSource(doc);
-         IFile metaIFile = createMetaFile(proofFile);
+         IFile metaIFile = createMetaFile(pe.getProofFile());
          File metaFile = metaIFile.getLocation().toFile();
          StreamResult result = new StreamResult(metaFile);
          transformer.transform(source, result);
@@ -65,7 +65,7 @@ public class ProofMetaFileWriter {
    }
    
    
-   private Document createDoument(IFile proofFile, ProofElement pe) throws ParserConfigurationException{
+   private Document createDoument(ProofElement pe) throws ParserConfigurationException{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
@@ -75,7 +75,7 @@ public class ProofMetaFileWriter {
       doc.appendChild(rootElement);
       
       Element proofFileHashCode = doc.createElement("proofFileHashCode");
-      String hashCode = String.valueOf(proofFile.hashCode());
+      String hashCode = String.valueOf(pe.getProofFile().hashCode());
       proofFileHashCode.appendChild(doc.createTextNode(hashCode));
       rootElement.appendChild(proofFileHashCode);
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();

@@ -82,6 +82,9 @@ public class ProofElement {
    public ProofOblInput getProofObl() {
       return proofObl;
    }
+   public void setProofObl(ProofOblInput proofObl){
+      this.proofObl = proofObl;
+   }
 
    
    public Proof getProof(){
@@ -103,7 +106,7 @@ public class ProofElement {
    } 
    
    
-   public ProofElement(ProofOblInput obl, IFile javaFile, SourceLocation scl, IFolder proofFolder, IFile proofFile, KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment, Contract contract){
+   public ProofElement(ProofOblInput obl, IFile javaFile, SourceLocation scl, KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, KeYJavaType kjt, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
       
