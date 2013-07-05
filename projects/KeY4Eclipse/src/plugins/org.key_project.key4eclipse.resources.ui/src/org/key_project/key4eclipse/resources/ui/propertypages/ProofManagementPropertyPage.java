@@ -18,12 +18,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
@@ -35,9 +39,18 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
    private Button enableEfficentProofManagementButton;
    
+   private Combo setNumberOfThreadsCombo;
+   
+   private Text setNumberOfThreadsText;
+   
+   private Button enableMultiThreadingButton;
+   
    private Button autoDeleteProofFilesButton;
    
    private Button hideMefaFiles;
+   
+   private Text fillText;
+
    
    private SelectionListener buildProofButtonSelectionListener = new SelectionListener() {
       
@@ -55,7 +68,26 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       
       @Override
       public void widgetDefaultSelected(SelectionEvent e) {
-         System.out.println("widgetDefaultSelected");
+      }
+   };
+   
+   
+private SelectionListener enableMultiThreadingButtonSelectionListener = new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+         boolean isSelected = enableMultiThreadingButton.getSelection();
+         if(isSelected){
+            setNumberOfThreadsCombo.setEnabled(true);
+         }
+         else{
+            setNumberOfThreadsCombo.setEnabled(false);
+         }
+         
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
       }
    };
 
@@ -85,7 +117,38 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       enableEfficentProofManagementButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableEfficentProofManagementButton.setText("Build proof efficient");
       setSelectionForEnableEfficientProofManagementButton();
-      setEnabledForEfficientProfManagement();
+      setEnabledForEfficientProofManagementButton();
+      
+      
+      Group multiThreadingSettings = new Group(root, SWT.NONE);
+      multiThreadingSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      multiThreadingSettings.setLayout(new GridLayout(1, false));
+      multiThreadingSettings.setText("Multi Threading");
+      Composite multiThreadingComposite = new Composite(multiThreadingSettings, SWT.NONE);
+      multiThreadingComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      multiThreadingComposite.setLayout(new GridLayout(2, false));
+      
+      enableMultiThreadingButton = new Button(multiThreadingComposite, SWT.CHECK);
+      enableMultiThreadingButton.setText("Enable multithreading");
+      enableMultiThreadingButton.addSelectionListener(enableMultiThreadingButtonSelectionListener);
+      setSelectionForEnableMultiThreadingButton();
+      
+      fillText = new Text(multiThreadingComposite, SWT.SINGLE);
+      fillText.setText("");
+      Display display = Display.getCurrent();
+      Color backgroundColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+      fillText.setBackground(backgroundColor);
+      
+      setNumberOfThreadsText = new Text(multiThreadingComposite, SWT.SINGLE);
+      setNumberOfThreadsText.setText("Number of threads:");
+      setNumberOfThreadsText.setBackground(backgroundColor);
+      
+      setNumberOfThreadsCombo = new Combo(multiThreadingComposite, SWT.DROP_DOWN);
+      for(int i = 0; i < Runtime.getRuntime().availableProcessors(); i++){
+         setNumberOfThreadsCombo.add(""+(i+1));
+      }
+      setSelectionForSetNumberOfThreads();
+      setEnabledForSetNumberOfThreads();
       
       Group folderSettings = new Group(root, SWT.NONE);
       folderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -135,8 +198,51 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    }
    
    
-   private void setEnabledForEfficientProfManagement(){
+   private void setEnabledForEfficientProofManagementButton(){
       enableEfficentProofManagementButton.setEnabled(buildProofButton.getSelection());
+   }
+   
+   
+   /**
+    * Sets the selection for the EnableMultiThreadingButton CheckBox.
+    */
+   private void setSelectionForEnableMultiThreadingButton(){
+      try {
+         IProject project = getProject();
+         enableMultiThreadingButton.setSelection(KeYProjectProperties.isEnableMultiThreading(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         enableMultiThreadingButton.setEnabled(false);
+      }
+   }
+   
+   
+   
+   /**
+    * Sets the selection for the setNumberOfThreads DropDown Menu.
+    */
+   private void setSelectionForSetNumberOfThreads(){
+      try {
+         IProject project = getProject();
+         int index = KeYProjectProperties.getNumberOfThreads(project)-1;
+         if(index < 0){
+            setNumberOfThreadsCombo.select(0);
+         }
+         else{
+            setNumberOfThreadsCombo.select(index);
+         }
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         setNumberOfThreadsCombo.setEnabled(false);
+      }
+   }
+   
+   private void setEnabledForSetNumberOfThreads(){
+      setNumberOfThreadsCombo.setEnabled(enableMultiThreadingButton.getSelection());
    }
    
 
@@ -181,6 +287,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          IProject project = getProject();
          KeYProjectProperties.setBuildProofs(project, buildProofButton.getSelection());
          KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
+         KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
+         KeYProjectProperties.setNumberOfThreads(project, setNumberOfThreadsCombo.getItem(setNumberOfThreadsCombo.getSelectionIndex()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
          KeY4EclipseResourcesUtil.hideMetaFiles(project, KeYProjectProperties.isHideMetaFiles(project));
@@ -201,6 +309,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    protected void performDefaults() {
       buildProofButton.setSelection(true);
       enableEfficentProofManagementButton.setSelection(false);
+      enableMultiThreadingButton.setSelection(false);
+      setNumberOfThreadsCombo.select(0);
       autoDeleteProofFilesButton.setSelection(false);
       hideMefaFiles.setSelection(false);
       super.performDefaults();

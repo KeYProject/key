@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -33,6 +34,9 @@ public class ProofElement {
 
    private IFile javaFile;
    private SourceLocation scl;
+   
+   private IFolder proofFolder;
+   private IFile proofFile;
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
@@ -53,7 +57,13 @@ public class ProofElement {
       return scl;
    }
    
-
+   public IFolder getProofFolder(){
+      return proofFolder;
+   }
+   public IFile getProofFile(){
+      return proofFile;
+   }
+   
    public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment(){
       return environment;
    }
@@ -93,9 +103,12 @@ public class ProofElement {
    } 
    
    
-   public ProofElement(ProofOblInput obl, IFile javaFile, SourceLocation scl, KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment, Contract contract){
+   public ProofElement(ProofOblInput obl, IFile javaFile, SourceLocation scl, IFolder proofFolder, IFile proofFile, KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
+      
+      this.proofFolder = proofFolder;
+      this.proofFile = proofFile;
       
       this.environment = environment;
       

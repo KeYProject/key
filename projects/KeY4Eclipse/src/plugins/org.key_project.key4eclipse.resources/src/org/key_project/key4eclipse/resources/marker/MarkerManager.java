@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -29,6 +30,7 @@ public class MarkerManager {
    public final static String CLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker";
    public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
+   public final static String CYCLEDETECTEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
    
    
    /**
@@ -41,7 +43,7 @@ public class MarkerManager {
     */
    public void setMarker(Proof proof, SourceLocation scl, IFile javaFile, IFile proofFile) throws CoreException {
       if(scl != null){
-         if (proof.closed()) {
+         if (proof != null && proof.closed()) {
             IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
             if (marker.exists()) {
                marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
@@ -76,10 +78,23 @@ public class MarkerManager {
       }
    }
    
+   
+   public void setCycleDetectedMarker(ProofElement pe) throws CoreException{
+      IMarker marker = pe.getJavaFile().createMarker(CYCLEDETECTEDMARKER_ID);
+      if (marker.exists()) {
+         marker.setAttribute(IMarker.MESSAGE, "Cycle detected");
+         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+         marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
+         marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
+      }
+   }
+   
    private LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       markerList.addAll(markerArrayToList(res.findMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
       markerList.addAll(markerArrayToList(res.findMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
+      markerList.addAll(markerArrayToList(res.findMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE)));
+      markerList.addAll(markerArrayToList(res.findMarkers(CYCLEDETECTEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
       return markerList;
    }
    
@@ -116,6 +131,7 @@ public class MarkerManager {
       res.deleteMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
       res.deleteMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
       res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE);
+      res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, IResource.DEPTH_INFINITE);
    }
 
    

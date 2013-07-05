@@ -67,13 +67,7 @@ public class ProofMetaFileReader {
             throw new ProofMetaFileContentException("Illegal entry in file");
          }
       }
-      if(!typeElements.isEmpty()){
-         return typeElements;
-      }
-      else{
-         throw new ProofMetaFileContentException("No types found in this file");
-      }
-         
+      return typeElements;
    }
    
    

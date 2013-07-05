@@ -114,7 +114,6 @@ public class ProofMetaFileWriter {
       else if(target instanceof Contract){
          Contract contract = (Contract) target;
          kjt = contract.getKJT();
-         System.out.println("Contract");
       }
       else if(target instanceof ClassInvariant){
          ClassInvariant classInv = (ClassInvariant) target;

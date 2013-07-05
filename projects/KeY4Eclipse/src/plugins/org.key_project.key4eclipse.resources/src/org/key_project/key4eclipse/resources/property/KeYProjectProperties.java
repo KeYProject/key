@@ -21,6 +21,8 @@ public final class KeYProjectProperties {
    
    public static final QualifiedName PROP_BUILD_PROOFS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
    public static final QualifiedName PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT = new QualifiedName("org.key_project.key4eclipse.resources", "enableEfficientProofManagement");
+   public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
+   public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
    public static final QualifiedName PROP_HIDE_META_FILES = new QualifiedName("org.key_project.key4eclipse.resources", "hideMetaFiles");
    
@@ -53,6 +55,43 @@ public final class KeYProjectProperties {
    public static void setEnableEfficientProofManagement(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT, enabled + "");
+      }
+   }
+   
+   
+   public static boolean isEnableMultiThreading(IProject project) throws CoreException {
+      if (project != null) {
+         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENABLE_MULTITHREADING));
+      }
+      else {
+         return false;
+      }
+   }
+   
+   public static void setEnableMultiThreading(IProject project,  boolean enabled) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_ENABLE_MULTITHREADING, enabled + "");
+      }
+   }
+   
+   
+   public static int getNumberOfThreads(IProject project) throws CoreException {
+      if (project != null) {
+         try{
+            return Integer.parseInt(project.getPersistentProperty(PROP_NUMBER_OF_THREADS));
+         }
+         catch (Exception e) {
+            return 0;
+         }
+      }
+      else {
+         return -1;
+      }
+   }
+   
+   public static void setNumberOfThreads(IProject project,  String number) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_NUMBER_OF_THREADS, number);
       }
    }
    

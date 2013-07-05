@@ -13,11 +13,22 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.TransformerException;
 
@@ -29,6 +40,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,6 +52,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileContentException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
@@ -51,9 +64,11 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -64,14 +79,13 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
-import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
@@ -87,6 +101,8 @@ public class ProofManager {
    private IFolder mainProofFolder;
    private IProject project;   
    private List<Proof> proofs = new LinkedList<Proof>();
+   private List<IFile> proofFiles;
+   private IProgressMonitor monitor;
    
    /**
     * The Constructor - sets up the {@link MarkerManager}, the main Proof{@link IFolder} and tries 
@@ -116,12 +132,12 @@ public class ProofManager {
     * Disposes this {@link ProofManager}.
     */
    public void dispose() {
-      if (environment != null) {
-         environment.dispose();
-      }
-      for (Proof proof : proofs) {
-         proof.dispose();
-      }
+//      if (environment != null) {
+//         environment.dispose();
+//      }
+//      for (Proof proof : proofs) {
+//         proof.dispose();
+//      }
    }
    
    
@@ -131,53 +147,113 @@ public class ProofManager {
     * @param autoDeleteProofFiles - enables or deletes the automatically proof{@link IFile} deletion
     * @throws Exception
     */
-   public void runAllProofs(boolean autoDeleteProofFiles, IProgressMonitor monitor) throws Exception{
+   public void runAllProofs(boolean autoDeleteProofFiles, IProgressMonitor mon) throws Exception{
+      monitor = mon;
       LinkedList<ProofElement> proofElements = getAllProofElements();
       LinkedList<IFile> javaFiles = getAllJavaFilesFromProofElements(proofElements);
-      LinkedList<IFile> proofFiles = new LinkedList<IFile>();
+//      proofFiles = new LinkedList<IFile>();
+      proofFiles = Collections.synchronizedList((LinkedList<IFile>)proofElements.clone());
       markerManager.deleteKeYMarker(javaFiles);
       markerManager.deleteKeYMarker(project);
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
-      for(ProofElement pe : proofElements){
-         monitor.subTask("Build " + pe.getProofObl().name());
-         IFolder proofFolder = createProofFolder(pe.getJavaFile());
-         IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
-         pe = processProof(pe, proofFile);
-         markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
-         if(pe.getProof() != null){
-            proofFiles.add(proofFile);
-            KeYUtil.saveProof(pe.getProof(), proofFile);
-            
-            IFile metaFile = saveMetaFile(proofFile, pe);
-            if(metaFile != null){
-               proofFiles.add(metaFile);
-            }
-            else{
-               //TODO: solve this problem
-               System.out.println("Warning: no meta file created for " + proofFile.getName());
-            }
-         }
-         pe.getProof().dispose();
+      init(proofElements);
+//      runParallel(Integer.parseInt(project.getPersistentProperty(KeYProjectProperties.PROP_NUMBER_OF_THREADS)), proofElements, monitor);
+//      for(ProofElement pe : proofElements){
+//         monitor.subTask("Build " + pe.getProofObl().name());
+//         IFolder proofFolder = createProofFolder(pe.getJavaFile());
+//         IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
+//         pe = processProof(pe, proofFile);
+//         markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+//         if(pe.getProof() != null){
+//            proofFiles.add(proofFile);
+//            KeYUtil.saveProof(pe.getProof(), proofFile);
+//            
+//            IFile metaFile = saveMetaFile(proofFile, pe);
+//            if(metaFile != null){
+//               proofFiles.add(metaFile);
+//            }
+//            else{
+//               //TODO: solve this problem
+//               System.out.println("Warning: no meta file created for " + proofFile.getName());
+//            }
+//            pe.getProof().dispose();
+//            pe.getKeYEnvironment().getMediator().setProof(null);
+//         }
+//         if(environment.getMediator().getSelectedProof() != null){
+//            environment.getMediator().getSelectedProof().dispose();
+//            environment.getMediator().getSelectionModel().setSelectedProof(null);
+//         }
          monitor.worked(1);
-      }
-      detectCycling(proofElements);
+//      }
+      checkContractRecursion(proofElements);
       if(autoDeleteProofFiles){
-         cleanProofFolder(proofFiles, mainProofFolder);  
+         cleanProofFolder(proofFiles, mainProofFolder);
       }
       monitor.done();
    }
-   
-   
-   private void detectCycling(LinkedList<ProofElement> proofElements){
-      Contract c0 = proofElements.get(0).getContract();
-      Contract c1 = proofElements.get(1).getContract();
-      for(ProofElement pe : proofElements){
-         ProofCorrectnessMgt pcm = new ProofCorrectnessMgt(pe.getProof());
-         boolean isC0Applicable = pcm.isContractApplicable(c0);
-         boolean isC1Applicable = pcm.isContractApplicable(c1);
-         ImmutableSet<Contract> usedContracts = pcm.getUsedContracts();
-         System.out.println("");
+
+
+   public void runParallel(int threads, LinkedList<ProofElement> proofElements, IProgressMonitor monitor) throws InterruptedException{
+      int numberThreadProofElements = proofElements.size() / threads;
+      int modNumber = proofElements.size() % threads;
+      int currentElementIndex = 0;         
+      LinkedBlockingQueue<Runnable> runnables = new LinkedBlockingQueue<Runnable>();
+      ThreadPoolExecutor tpe = new ThreadPoolExecutor(threads, threads, 1000, TimeUnit.SECONDS, runnables);
+      for(int i = 0; i < threads; i++){
+         LinkedList<ProofElement> threadProofElements = new LinkedList<ProofElement>();
+         int toIndex = currentElementIndex + numberThreadProofElements;
+         for(int j = currentElementIndex; j < toIndex; j++){
+            threadProofElements.add(proofElements.get(j));
+         }
+         if(i < modNumber){
+            threadProofElements.add(proofElements.get(toIndex));
+            toIndex += 1;
+         }
+         currentElementIndex = toIndex;
+         
+         final LinkedList<ProofElement> finalProofElement = threadProofElements;
+         Runnable runnable = new Runnable() {
+            
+            @Override
+            public void run() {
+               try{
+                  synchronized (this) {
+                     
+                  
+                  KeYEnvironment<CustomConsoleUserInterface> environment = cloneEnvironment();
+                  for(ProofElement pe : finalProofElement){
+   //                  monitor.subTask("Build " + pe.getProofObl().name());
+                     IFolder proofFolder = createProofFolder(pe.getJavaFile());
+                     IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
+                     pe = processProof(pe, proofFile);
+                     markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+                     if(pe.getProof() != null){
+                        proofFiles.add(proofFile);
+                        KeYUtil.saveProof(pe.getProof(), proofFile);
+                        
+                        IFile metaFile = saveMetaFile(proofFile, pe);
+                        if(metaFile != null){
+                           proofFiles.add(metaFile);
+                        }
+                        else{
+                           //TODO: solve this problem
+                           System.out.println("Warning: no meta file created for " + proofFile.getName());
+                        }
+                     }
+                     if(environment.getMediator().getSelectedProof() != null){
+                        environment.getMediator().getSelectedProof().dispose();
+                        environment.getMediator().getSelectionModel().setSelectedProof(null);
+                     }
+   //                  monitor.worked(1);
+                  }
+               }}
+               catch (Exception e) {
+                  LogUtil.getLogger().createErrorStatus(e);
+               }
+            }    
+         };
+         tpe.execute(runnable);
       }
    }
    
@@ -251,6 +327,7 @@ public class ProofManager {
    
    
    private ProofElement runProof(ProofElement pe, IFile proofFile) throws Exception{
+      System.out.println(pe.getProofObl().name());
       markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
       pe = processProof(pe, proofFile);
       markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
@@ -263,10 +340,7 @@ public class ProofManager {
       }
       return pe;
    }
-      
-      
-      
-   
+
    
    public void runProofsSelective(LinkedList<IFile> changedJavaFiles, boolean autoDeleteProofFiles, IProgressMonitor monitor) throws Exception{
       LinkedList<IFile> proofFiles = new LinkedList<IFile>();
@@ -302,8 +376,14 @@ public class ProofManager {
             proofFiles.add(proofFile);
             proofFiles.add(metaFile);
          }
+         if(environment.getMediator().getSelectedProof() != null){
+            environment.getMediator().getSelectedProof().dispose();
+            environment.getMediator().getSelectionModel().setSelectedProof(null);
+         }
          monitor.worked(1);
       }
+      
+      checkContractRecursion(proofElements);
       
       if(autoDeleteProofFiles){
          cleanProofFolder(proofFiles, mainProofFolder);  
@@ -312,22 +392,30 @@ public class ProofManager {
    }
    
    
+   private void checkContractRecursion(LinkedList<ProofElement> proofElements) throws CoreException{
+      RecursionGraph graph = new RecursionGraph(proofElements);
+      LinkedHashSet<ProofElement> cyclingElements = graph.findCycles();
+      for(ProofElement pe : cyclingElements){
+         markerManager.deleteMarkerForSourceLocation(pe.getJavaFile(), pe.getSourceLocation());
+         markerManager.setCycleDetectedMarker(pe);
+      }
+   }
+   
+   
+   
    /**
     * Collects all {@link Proof}s available in the {@link IProject} and returns their
     * {@link ProofOblInput}s, java{@link IFiles}s and {@link SourceLocation}s as 
     * {@link ProofElement}s in a {@link LinkedList}.
     * @return - the {@link LinkedList} with all {@link ProofElement}s
+    * @throws CoreException 
     */
-   private LinkedList<ProofElement> getAllProofElements() {
+   private LinkedList<ProofElement> getAllProofElements() throws CoreException {
       Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
       KeYJavaType[] kjtsarr = KeY4EclipseResourcesUtil.sortKeYJavaTypes(kjts);
       LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
       for (KeYJavaType type : kjtsarr) {
-//         KeYEnvironment<CustomConsoleUserInterface> environment = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), this.environment.getInitConfig());
-//         KeYEnvironment<CustomConsoleUserInterface> environment = cloneEnvironment();
-//         KeYJavaType kjt = environment.getJavaInfo().getKeYJavaType(type.getFullName());
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
-//         Type javaType = kjt.getJavaType();
          Type javaType = type.getJavaType();
          IFile javaFile = null;
          SourceLocation scl = null;
@@ -346,11 +434,12 @@ public class ProofManager {
                   scl = KeYUtil.convertToSourceLocation(progMethod.getPositionInfo());
                }
             }
-            
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
                ProofOblInput obl = contract.createProofObl(environment.getInitConfig(), contract);
-               proofElements.add(new ProofElement(obl, javaFile, scl, type, environment, contract));
+               IFolder proofFolder = createProofFolder(javaFile);
+               IFile proofFile = getProofFile(obl.name(), proofFolder.getFullPath());
+               proofElements.add(new ProofElement(obl, javaFile, scl, proofFolder, proofFile, type, environment, contract));
             }
          }
       }
@@ -358,49 +447,48 @@ public class ProofManager {
    }
    
    
-   
    private KeYEnvironment<CustomConsoleUserInterface> cloneEnvironment(){
-System.out.println("Cloning");
+      System.out.println("Cloning");
 
-      InitConfig sourceInitConfig = environment.getInitConfig();
-      RuleJustificationInfo sourceJustiInfo = environment.getInitConfig().getProofEnv().getJustifInfo();
-      // Create new profile which has separate OneStepSimplifier instance
-      JavaProfile profile = new JavaProfile() {
-         private OneStepSimplifier simplifier;
-         
-         @Override
-         protected OneStepSimplifier getInitialOneStepSimpilifier() {
-            if (simplifier == null) {
-               simplifier = new OneStepSimplifier();
+            InitConfig sourceInitConfig = environment.getInitConfig();
+            RuleJustificationInfo sourceJustiInfo = environment.getInitConfig().getProofEnv().getJustifInfo();
+            // Create new profile which has separate OneStepSimplifier instance
+            JavaProfile profile = new JavaProfile() {
+               private OneStepSimplifier simplifier;
+               
+               @Override
+               protected OneStepSimplifier getInitialOneStepSimpilifier() {
+                  if (simplifier == null) {
+                     simplifier = new OneStepSimplifier();
+                  }
+                  return simplifier;
+               }
+            };
+            // Create new InitConfig and initialize it with value from initial one.
+            InitConfig initConfig = new InitConfig(environment.getServices().copy(), environment.getProfile());
+            initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
+            initConfig.setSettings(sourceInitConfig.getSettings());
+            initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
+            initConfig.setTaclets(sourceInitConfig.getTaclets());
+            // Create new ProofEnvironment and initialize it with values from initial one.
+            ProofEnvironment env = initConfig.getProofEnv();
+            env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
+            env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
+            for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
+               env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
             }
-            return simplifier;
+            for (BuiltInRule rule : initConfig.builtInRules()) {
+               RuleJustification origJusti = sourceInitConfig.getProofEnv().getJustifInfo().getJustification(rule);
+               if (origJusti == null) {
+                  assert rule instanceof OneStepSimplifier;
+                  origJusti = AxiomJustification.INSTANCE;
+               }
+               env.getJustifInfo().addJustification(rule, origJusti);
+            }
+//            GlobalProofMgt.getInstance().registerProofEnvironment(env);
+            KeYEnvironment<CustomConsoleUserInterface> keyEnv = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), initConfig);
+            return environment;
          }
-      };
-      // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(environment.getServices().copy(), environment.getProfile());
-      initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
-      initConfig.setSettings(sourceInitConfig.getSettings());
-      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
-      initConfig.setTaclets(sourceInitConfig.getTaclets());
-      // Create new ProofEnvironment and initialize it with values from initial one.
-      ProofEnvironment env = initConfig.getProofEnv();
-      env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
-      env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
-      for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
-         env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
-      }
-      for (BuiltInRule rule : initConfig.builtInRules()) {
-         RuleJustification origJusti = sourceInitConfig.getProofEnv().getJustifInfo().getJustification(rule);
-         if (origJusti == null) {
-            assert rule instanceof OneStepSimplifier;
-            origJusti = AxiomJustification.INSTANCE;
-         }
-         env.getJustifInfo().addJustification(rule, origJusti);
-      }
-//      GlobalProofMgt.getInstance().registerProofEnvironment(env);
-      KeYEnvironment<CustomConsoleUserInterface> keyEnv = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), initConfig);
-      return environment;
-   }
    
    
    /**
@@ -437,7 +525,7 @@ System.out.println("Cloning");
     * @param folder - the {@link IFolder} to start at
     * @throws CoreException
     */
-   private void cleanProofFolder(LinkedList<IFile> proofFiles, IFolder folder) throws CoreException{
+   private void cleanProofFolder(List<IFile> proofFiles, IFolder folder) throws CoreException{
       IResource[] members = folder.members();
       for(IResource res : members){
          if(res.getType() == IResource.FILE){
@@ -547,8 +635,10 @@ System.out.println("Cloning");
       try{
          Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
          proofs.add(proof);
+         pe.getKeYEnvironment().getMediator().setProof(proof);
          pe.getKeYEnvironment().getUi().startAndWaitForAutoMode(proof);
          pe.setProof(proof);
+         pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
          return pe;
       }catch(ProofInputException e){
          LogUtil.getLogger().createErrorStatus(e);
@@ -566,19 +656,19 @@ System.out.println("Cloning");
       try{
          KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(file, null, null);
          Proof proof = loadEnv.getLoadedProof();
+         pe.setKeYEnvironment(loadEnv);
+         pe.setProof(proof);
+         pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
          if (proof != null) {
             proofs.add(proof);
             if (!proof.closed()){
                environment.getUi().startAndWaitForAutoMode(proof);
             }
          }
-         pe.setKeYEnvironment(loadEnv);
-         pe.setProof(proof);
          return pe;
       }catch(Exception e){
          LogUtil.getLogger().createErrorStatus(e);
-         e.printStackTrace();
-         return null;
+         return createProof(pe);
       }
    }
    
@@ -778,5 +868,112 @@ System.out.println("Cloning");
    private IFile saveMetaFile(IFile proofFile, ProofElement pe) throws  TransformerException, CoreException{
       ProofMetaFileWriter metaFileWriter = new ProofMetaFileWriter();
       return metaFileWriter.writeMetaFile(proofFile, pe);
+   }
+
+
+   private List<ProofElement> proofsToDo = Collections.synchronizedList(new LinkedList<ProofElement>());
+   
+   protected ProofElement getProofToDo() {
+      ProofElement pe = null;
+      synchronized (proofsToDo) {
+         if (!proofsToDo.isEmpty()) {
+            pe = proofsToDo.remove(0);
+            // TODO: Update progress monitor
+            monitor.worked(1);
+         }
+      }
+      return pe;
+   }
+   
+   
+   private List<ProofElement> proofsToSave = Collections.synchronizedList(new LinkedList<ProofElement>());
+   
+   protected void saveProofFormList(){
+      
+   }
+   
+   public void init(LinkedList<ProofElement> proofElements) {
+      proofsToDo = Collections.synchronizedList((LinkedList<ProofElement>)proofElements.clone());
+      // Fill proofsToDO;
+      int numOfThreads = 2;
+      if (numOfThreads >= 2) {
+         Thread[] threads = new Thread[numOfThreads];
+         for (int i = 0; i < numOfThreads; i++) {
+            // TODO: Each thread needs a clone of the environment
+            ProofRunnable run = new ProofRunnable(cloneEnvironment());
+            Thread thread = new Thread(run);
+            thread.start();
+            threads[i] = thread;
+         }
+         ObjectUtil.waitForThreads(threads);
+         // Wait until all threads have terminated
+         while(!proofsToSave.isEmpty()){
+            ProofElement pe = proofsToSave.remove(0);
+            try {
+               KeYUtil.saveProof(pe.getProof(), pe.getProofFile());
+            }
+            catch (CoreException e) {
+               e.printStackTrace();
+            }
+         }
+         
+      }
+      else {
+         ProofRunnable run = new ProofRunnable(cloneEnvironment());
+         run.run();
+      }
+      // Set marker
+      System.out.println("Done");
+   }
+   
+   private List<ProofElement> peToSave = Collections.synchronizedList(new LinkedList<ProofElement>());
+   
+   protected void saveProoff(final ProofElement pe){
+      System.out.println("save " + Thread.currentThread().getName());
+   }
+
+   private class ProofRunnable implements Runnable {
+      
+      private KeYEnvironment<CustomConsoleUserInterface> environment;
+      
+      public ProofRunnable(KeYEnvironment<CustomConsoleUserInterface> environment){
+         this.environment = environment;
+      }
+      
+      @Override
+      public void run() {
+         ProofElement pe;
+         while ((pe = getProofToDo()) != null) {
+              // Work with proof
+         try{
+               pe.setKeYEnvironment(environment);
+               IFolder proofFolder = pe.getProofFolder();
+               IFile proofFile = getProofFile(pe.getProofObl().name(), proofFolder.getFullPath());
+               pe = processProof(pe, proofFile);
+               markerManager.setMarker(pe.getProof(), pe.getSourceLocation(), pe.getJavaFile(), proofFile);
+               if(pe.getProof() != null){
+                  proofFiles.add(proofFile);
+                  proofsToSave.add(pe);
+                  //diesen thread warten lassen
+                  //speichern
+                  //thread weiter laufen lassen
+                  
+//                  KeYUtil.saveProof(pe.getProof(), proofFile);                     
+//                  IFile metaFile = saveMetaFile(proofFile, pe);
+//                  if(metaFile != null){
+//                     proofFiles.add(metaFile);
+//                  }
+//                  else{
+//                     //TODO: solve this problem
+//                     System.out.println("Warning: no meta file created for " + proofFile.getName());
+//                  }
+                  pe.getProof().dispose();
+                  pe.getKeYEnvironment().getMediator().setProof(null);
+               }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+         }
+      }
    }
 }

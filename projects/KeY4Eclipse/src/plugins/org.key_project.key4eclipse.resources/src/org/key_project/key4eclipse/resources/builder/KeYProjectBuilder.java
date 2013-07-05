@@ -64,7 +64,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          }
          finally {
             if (proofManager != null) {
-               proofManager.dispose();
+//               proofManager.dispose();
             }
          }
       }
@@ -89,7 +89,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       }
       finally {
          if (proofManager != null) {
-            proofManager.dispose();
+//            proofManager.dispose();
          }
       }
    }
