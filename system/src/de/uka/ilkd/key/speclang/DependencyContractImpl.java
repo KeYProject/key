@@ -80,8 +80,6 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
     assert target.getStateCount() > 0;
     // FIXME small hack, -1 is the savedHeap, this is because there is no access to services
-    int numHeaps = atPreVars != null ? atPreVars.keySet().size()-1 : deps.keySet().size();
-    assert paramVars.size() == target.arity() - numHeaps*target.getStateCount() - (target.isStatic() ? 0 : 1);
          
     this.baseName = baseName;
         this.name = name != null 
