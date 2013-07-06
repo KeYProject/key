@@ -80,7 +80,6 @@ options {
       prooflabel2tag.put("rule", new Character('r'));
       prooflabel2tag.put("term", new Character('t'));
       prooflabel2tag.put("formula", new Character('f'));
-      prooflabel2tag.put("transformer", new Character('t'));
       prooflabel2tag.put("inst", new Character('i'));
       prooflabel2tag.put("ifseqformula", new Character('q'));
       prooflabel2tag.put("ifdirectformula", new Character('d'));
@@ -1578,6 +1577,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                 }
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
+                            } else if (new Name("Formula").equals(sort_name)) {
+                                s = Sort.FORMULA;
                             } else  {
                                 ImmutableSet<Sort>  ext = DefaultImmutableSet.<Sort>nil();
 

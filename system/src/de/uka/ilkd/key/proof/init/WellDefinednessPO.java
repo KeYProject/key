@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -17,8 +18,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     protected static final TermBuilder TB = TermBuilder.DF;
 
-    private static final TransformerProcedure WD =
-            new TransformerProcedure(new Name("WD"), Sort.FORMULA, Sort.FORMULA);
+    private final TransformerProcedure WD_FORMULA = getTransformer("WD", Sort.FORMULA);
+    private final TransformerProcedure WD_ANY = getTransformer("wd", Sort.ANY);
 
     private WellDefinednessCheck check;
 
@@ -72,8 +73,22 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
        return services.getTypeConverter().getHeapLDT().getHeap();
     }
 
-    private static Term wd(Term t) {
-        return TB.func(WD, t);
+    private Term wd(Term t) {
+        if (new Name("Formula").equals(t.sort().name())) {
+            return TB.func(WD_FORMULA, t);
+        } else {
+            return TB.func(WD_ANY, t);
+        }
+    }
+
+    TransformerProcedure getTransformer(String nameString, Sort argSort) {
+        Name name = new Name(nameString);
+        Named f = services.getNamespaces().functions().lookup(name);
+        if (f != null && f instanceof TransformerProcedure) {
+            return (TransformerProcedure) f;
+        } else {
+            return new TransformerProcedure(name, Sort.FORMULA, argSort);
+        }
     }
 
     @Deprecated

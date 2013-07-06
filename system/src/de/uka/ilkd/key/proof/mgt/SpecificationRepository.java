@@ -63,7 +63,6 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
@@ -1235,9 +1234,13 @@ public final class SpecificationRepository {
                 .add(new Pair<KeYJavaType,IObserverFunction>(mc.getKJT(),
                                                              mc.getTarget()));
         for (Pair<KeYJavaType,IObserverFunction> pair: impls) {
-            wdChecks.put(pair, getWdChecks(pair.first, pair.second)
-                                .add(new MethodWellDefinedness(
-                                        (FunctionalOperationContract)mc, services)));
+            if (mc instanceof FunctionalOperationContract) {
+                wdChecks.put(pair, getWdChecks(pair.first, pair.second)
+                        .add(new MethodWellDefinedness(
+                                (FunctionalOperationContract)mc, services)));
+            } else {
+                // TODO
+            }
         }
     }
 

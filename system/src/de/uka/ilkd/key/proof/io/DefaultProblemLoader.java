@@ -37,7 +37,6 @@ import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * <p>

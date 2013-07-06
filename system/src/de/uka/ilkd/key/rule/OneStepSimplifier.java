@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -38,7 +38,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -532,11 +534,30 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    return false;
 	}
 
+	// abort if inside of transformer
+	if (inTransformer(pio)) {
+	    return false;
+	}
+
 	//applicable to the formula?
 	return applicableTo(goal.proof().getServices(),
 			    pio.constrainedFormula());
     }
 
+    private boolean inTransformer(PosInOccurrence pio) {
+        boolean trans = false;
+        if ( pio.posInTerm () != null ) {
+            PIOPathIterator it = pio.iterator ();
+            Operator        op;
+
+            while ( it.next () != -1 && !trans) {
+                final Term t = it.getSubTerm ();
+                op = t.op ();
+                trans = op instanceof TransformerProcedure;
+            }
+        }
+        return trans;
+    }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal,

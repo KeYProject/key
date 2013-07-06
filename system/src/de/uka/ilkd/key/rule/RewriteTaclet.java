@@ -158,27 +158,22 @@ public final class RewriteTaclet extends FindTaclet {
      * <code>null</code>, if program modalities appear above
      * <code>p_pos</code>
      */
-    public MatchConditions checkPrefix
-	( PosInOccurrence p_pos,
-	  MatchConditions p_mc,
-	  Services        p_services) {
-
+    public MatchConditions checkPrefix(PosInOccurrence p_pos,
+                                       MatchConditions p_mc,
+                                       Services        p_services) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	if ( p_pos.posInTerm () != null ) {
 	    PIOPathIterator it = p_pos.iterator ();
 	    Operator        op;
-
 	    while ( it.next () != -1 ) {
 	        final Term t = it.getSubTerm ();
 	        op = t.op ();
 
 	        if (op instanceof TransformerProcedure) {
-	            /* FIXME: Good approach, but apparently this method is not general
-	                      enough, i.e. does not get always called (?). Maybe one of
-                              the filter methods would be a good place for this? */
-                    return null;
-                }
+	            // FIXME: Only seems to work if transformer-term in antecedent and for .key-files
+	            return null;
+	        }
 	        if ( op instanceof UpdateApplication &&
 	                it.getChild () == UpdateApplication.targetPos() &&
 	                getApplicationRestriction() != NONE) {
@@ -187,27 +182,12 @@ public final class RewriteTaclet extends FindTaclet {
 	            } else {
 	                Term update = UpdateApplication.getUpdate(t);
 	                svi = svi.addUpdate(update, t.getLabels());
-                }
-
+	            }
 	        } else if (getApplicationRestriction() != NONE &&
 	                (op instanceof Modality || op instanceof ModalOperatorSV)) {
-	            return null;
+                        return null;
 	        }
-
-	        // compute polarity
-                                                                                 // toggle polarity if find term is subterm of
-	        if ((op == Junctor.NOT) ||                                       //   not
-	                (op == Junctor.IMP && it.getChild() == 0)) {             //   left hand side of implication
-	            polarity = polarity * -1;
-                                                                                 // do not change polarity if find term is subterm of
-	        } else if ((op == Junctor.AND) ||                                //   and
-	                (op == Junctor.OR) ||                                    //   or
-	                (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
-	                (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
-	            // do nothing
-	        } else {                                                         // find term has no polarity in any other case
-	            polarity = 0;
-	        }
+	        polarity = polarity(op, it, polarity);
 	    }
 	}
 	if (getApplicationRestriction() == NONE)
@@ -216,8 +196,31 @@ public final class RewriteTaclet extends FindTaclet {
 	        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
 	    return null;
 	}
-
 	return p_mc.setInstantiations ( svi );
+    }
+
+    /**
+     * Compute polarity
+     */
+    private int polarity(Operator op, PIOPathIterator it, int polarity) {
+                                                                // toggle polarity if find term is
+                                                                // subterm of
+        if ((op == Junctor.NOT) ||                              //   not
+                (op == Junctor.IMP && it.getChild() == 0)) {    //   left hand side of implication
+            polarity = polarity * -1;
+                                                                // do not change polarity if find term
+                                                                // is subterm of
+        } else if ((op == Junctor.AND) ||                       //   and
+                (op == Junctor.OR) ||                           //   or
+                (op == Junctor.IMP && it.getChild() != 0) ||    //   right hand side of implication
+                (op == IfThenElse.IF_THEN_ELSE &&
+                    it.getChild() != 0)) {                      //   then or else part of if-then-else
+            // do nothing
+        } else {                                                // find term has no polarity in any
+                                                                // other case
+            polarity = 0;
+        }
+        return polarity;
     }
 
     /**
