@@ -69,6 +69,8 @@ tokens {
     ENSURES_RED 		= "ensures_redundantly";
     EXCEPTIONAL_BEHAVIOR 	= "exceptional_behavior";
     EXCEPTIONAL_BEHAVIOUR 	= "exceptional_behaviour";
+    EXSURES                     = "exsures";
+    EXSURES_RED                 = "exsures_redundantly";
     EXTRACT                     = "extract";
     FINAL 			= "final";
     FOR_EXAMPLE			= "for_example";
@@ -91,6 +93,8 @@ tokens {
     MEASURED_BY                 = "measured_by";
     MEASURED_BY_REDUNDANTLY     = "measured_by_redundantly";
     MODEL 			= "model";
+    MODEL_BEHAVIOR 		= "model_behavior";
+    MODEL_BEHAVIOUR 		= "model_behaviour";
     MODIFIABLE			= "modifiable";
     MODIFIABLE_RED		= "modifiable_redundantly";
     MODIFIES			= "modifies";
@@ -101,6 +105,7 @@ tokens {
     NON_NULL 			= "non_null";
     NORMAL_BEHAVIOR 		= "normal_behavior";
     NORMAL_BEHAVIOUR 		= "normal_behaviour";
+    NO_STATE			= "no_state";
     NOWARN			= "nowarn";
     NULLABLE 			= "nullable";
     NULLABLE_BY_DEFAULT 	= "nullable_by_default";
@@ -136,6 +141,7 @@ tokens {
     STRICTFP 			= "strictfp";
     SYNCHRONIZED 		= "synchronized";
     TRANSIENT 			= "transient";
+    TWO_STATE			= "two_state";
     UNINITIALIZED 		= "uninitialized";
     VOLATILE 			= "volatile";
     WHEN 			= "when";

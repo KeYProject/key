@@ -63,6 +63,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
@@ -846,13 +847,14 @@ public final class SpecificationRepository {
                          kjt,  
                          new Private(),
                          invDef,
-                         selfVar);
+                         selfVar,
+                         ImmutableSLList.<ProgramVariable>nil(), null);
           result = result.add(invRepresentsAxiom);
              
           //add query axioms for own class
           for(IProgramMethod pm : services.getJavaInfo()
                                     .getAllProgramMethods(kjt)) {
-              if(!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()) {
+              if(!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
              pm = services.getJavaInfo().getToplevelPM(kjt, pm);      
              final ClassAxiom queryAxiom 
                  = new QueryAxiom("Query axiom for " + pm.getName() 
@@ -1200,7 +1202,9 @@ public final class SpecificationRepository {
 		    			   heapSort,	
 		    			   obs.getContainerType(),
 		    			   obs.isStatic(),
-		    			   obs.getParamTypes());
+		    			   obs.getParamTypes(),
+		    			   HeapContext.getModHeaps(services, false).size(),
+		    			   obs.getStateCount());
 	    unlimitedToLimited.put(obs, limited);
 	    limitedToUnlimited.put(limited, obs);
 	    

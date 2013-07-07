@@ -17,11 +17,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDUseLoopInvariant;
 import org.key_project.sed.core.model.impl.AbstractSEDUseLoopInvariant;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -142,7 +143,7 @@ public class KeYUseLoopInvariant extends AbstractSEDUseLoopInvariant implements 
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourcePath(computeGuardPositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(computeGuardPositionInfo());
       }
       return sourceName;
    }
@@ -196,7 +197,7 @@ public class KeYUseLoopInvariant extends AbstractSEDUseLoopInvariant implements 
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      SourceLocation guardLocation = KeYModelUtil.convertToSourceLocation(computeGuardPositionInfo());
+      SourceLocation guardLocation = KeYUtil.convertToSourceLocation(computeGuardPositionInfo());
       // Return location of loop using JDT
       ASTNode guardASTNode = KeYModelUtil.findASTNode(this, guardLocation);
       return KeYModelUtil.updateLocationFromAST(guardLocation, guardASTNode.getParent());

@@ -43,7 +43,7 @@ public class SumFeature implements Feature {
         features = p_features;
     }
 
-    public static Feature createSum (Feature[] fs) {
+    public static Feature createSum (Feature... fs) {
         Debug.assertFalse ( fs.length == 0,
                             "Cannot compute the sum of zero features" );
         final Feature[] fsCopy = new Feature [ fs.length ];

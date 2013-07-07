@@ -481,6 +481,10 @@ public final class ProgramSV extends AbstractSV
       return false;
    }
 
+   @Override
+   public int getStateCount() {
+      return 1;
+   }
 
    @Override
    public boolean isVoid() {

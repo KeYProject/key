@@ -63,16 +63,17 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
@@ -235,6 +236,14 @@ public class ExecutionNodeReader {
             }
             callStackEntries.add(getPathInTree(attributes));
          }
+         else if (isMethodReturnValue(uri, localName, qName)) {
+            Object parentValue = parentNodeStack.peekFirst();
+            if (!(parentValue instanceof KeYlessMethodReturn)) {
+               throw new SAXException("Can't add method return value to parent.");
+            }
+            KeYlessMethodReturnValue returnValue = createMethodReturnValue(uri, localName, qName, attributes);
+            ((KeYlessMethodReturn)parentValue).addReturnValue(returnValue);
+         }
          else {
             AbstractKeYlessExecutionNode child = createExecutionNode(parent, uri, localName, qName, attributes);
             if (root == null) {
@@ -259,6 +268,9 @@ public class ExecutionNodeReader {
             parentVariableValueStack.removeFirst();
          }
          else if (isCallStackEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
+         else if (isMethodReturnValue(uri, localName, qName)) {
             // Nothing to do.
          }
          else {
@@ -293,7 +305,18 @@ public class ExecutionNodeReader {
    protected boolean isVariable(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_VARIABLE.equals(qName);
    }
-   
+
+   /**
+    * Checks if the currently parsed tag represents an {@link IExecutionMethodReturnValue}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents an {@link IExecutionMethodReturnValue}, {@code false} is something else.
+    */
+   public boolean isMethodReturnValue(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_METHOD_RETURN_VALUE.equals(qName);
+   }
+
    /**
     * Checks if the currently parsed tag represents an {@link IExecutionValue}.
     * @param uri The URI.
@@ -334,6 +357,24 @@ public class ExecutionNodeReader {
                                  isArrayIndex(attributes), 
                                  getArrayIndex(attributes), 
                                  getName(attributes));
+   }
+   
+   /**
+    * Creates a new {@link IExecutionMethodReturnValue} with the given content.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @param attributes The attributes.
+    * @return The created {@link IExecutionMethodReturnValue}.
+    */
+   public KeYlessMethodReturnValue createMethodReturnValue(String uri, 
+                                                           String localName,
+                                                           String qName, 
+                                                           Attributes attributes) {
+      return new KeYlessMethodReturnValue(getName(attributes), 
+                                          getReturnValueString(attributes), 
+                                          getHasCondition(attributes), 
+                                          getConditionString(attributes));
    }
 
    /**
@@ -541,6 +582,24 @@ public class ExecutionNodeReader {
     */
    protected String getConditionString(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONDITION_STRING);
+   }
+
+   /**
+    * Returns the is has condition value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean getHasCondition(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_CONDITION));
+   }
+
+   /**
+    * Returns the return value string value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getReturnValueString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_STRING);
    }
 
    /**
@@ -1291,6 +1350,11 @@ public class ExecutionNodeReader {
       private boolean returnValueComputed;
 
       /**
+       * The possible return values.
+       */
+      private List<IExecutionMethodReturnValue> returnValues = new LinkedList<IExecutionMethodReturnValue>();
+
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1325,22 +1389,6 @@ public class ExecutionNodeReader {
       public String getNameIncludingReturnValue() throws ProofInputException {
          return nameIncludingReturnValue;
       }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public Term getReturnValue() throws ProofInputException {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public String getFormatedReturnValue() throws ProofInputException {
-         return null;
-      }
       
       /**
        * {@inheritDoc}
@@ -1354,8 +1402,111 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public boolean isReturnValueComputed() {
+      public boolean isReturnValuesComputed() {
          return returnValueComputed;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
+         return returnValues.toArray(new IExecutionMethodReturnValue[returnValues.size()]);
+      }
+      
+      /**
+       * Adds the given {@link IExecutionMethodReturnValue}.
+       * @param returnValue The {@link IExecutionMethodReturnValue} to add.
+       */
+      public void addReturnValue(IExecutionMethodReturnValue returnValue) {
+         returnValues.add(returnValue);
+      }
+   }
+   
+   /**
+    * An implementation of {@link IExecutionMethodReturn} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessMethodReturnValue extends AbstractKeYlessExecutionElement implements IExecutionMethodReturnValue {
+      /**
+       * The human readable return value.
+       */
+      private String returnValueString;
+      
+      /**
+       * Is a condition available?
+       */
+      private boolean hasCondition;
+      
+      /**
+       * The optional human readable condition.
+       */
+      private String conditionString;
+
+      /**
+       * Constructor.
+       * @param name The name of this node.
+       * @param returnValueString The human readable return value.
+       * @param hasCondition Is a condition available?
+       * @param conditionString The optional human readable condition.
+       */
+      public KeYlessMethodReturnValue(String name,
+                                      String returnValueString,
+                                      boolean hasCondition,
+                                      String conditionString) {
+         super(name);
+         this.returnValueString = returnValueString;
+         this.hasCondition = hasCondition;
+         this.conditionString = conditionString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Return Value";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getReturnValue() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getReturnValueString() throws ProofInputException {
+         return returnValueString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean hasCondition() throws ProofInputException {
+         return hasCondition;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getCondition() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getConditionString() throws ProofInputException {
+         return conditionString;
       }
    }
 

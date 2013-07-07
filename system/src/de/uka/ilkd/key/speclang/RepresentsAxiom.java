@@ -16,9 +16,11 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -51,15 +53,19 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final VisibilityModifier visibility;
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
+    private final Map<LocationVariable,ProgramVariable> atPreVars;
+    private final ImmutableList<ProgramVariable> originalParamVars;
+
     
     public RepresentsAxiom(String name,
 	    		   IObserverFunction target, 
 	                   KeYJavaType kjt,
 	                   VisibilityModifier visibility,
 	                   Term rep,
-	                   ProgramVariable selfVar) {
-        this(name,null,target,kjt,visibility,rep,selfVar);
-    }
+	                   ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,ProgramVariable> atPreVars) {
+    	      this(name,null,target,kjt,visibility,rep,selfVar, paramVars,atPreVars);
+    	 
+   }
     
     
     public RepresentsAxiom(String name,
@@ -68,7 +74,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                 KeYJavaType kjt,
                 VisibilityModifier visibility,
                 Term rep,
-                ProgramVariable selfVar) {
+                ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,ProgramVariable> atPreVars) {
 
         assert name != null;
         assert kjt != null;
@@ -81,14 +87,16 @@ public final class RepresentsAxiom extends ClassAxiom {
         this.visibility = visibility;
         this.originalRep = rep;
         this.originalSelfVar = selfVar;
+        this.originalParamVars = paramVars;
+        this.atPreVars = atPreVars;
         this.displayName = displayName;
     }
     
-    private boolean isFunctional() {
+    private boolean isFunctional(Services services) {
 	return originalRep.op() instanceof Equality
 	       && originalRep.sub(0).op() == target
 	       && (target.isStatic() 
-		   || originalRep.sub(0).sub(1).op().equals(originalSelfVar));
+		   || originalRep.sub(0).sub(target.getStateCount()*HeapContext.getModHeaps(services, false).size()).op().equals(originalSelfVar));
     }
     
     private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
@@ -135,18 +143,15 @@ public final class RepresentsAxiom extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        LocationVariable heap =
-                services.getTypeConverter().getHeapLDT().getHeap();
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
-//	        ifSemiSeq.insertFirst(ifCf).semisequent();
-//	    } else ifSeq = null;
 
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
-        if (isFunctional()) {
+        if (isFunctional(services)) {
             ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-            res = res.union(TG.generateFunctionalRepresentsTaclets(tacletName, originalRep, kjt, target, heap, self, toLimit, true, services));
-            res = res.union(TG.generateFunctionalRepresentsTaclets(tacletName, originalRep, kjt, target, heap, self, toLimit, false, services));
+            res = res.union(TG.generateFunctionalRepresentsTaclets(tacletName, originalRep, kjt, target, heaps, self, originalParamVars, atPreVars, toLimit, true, services));
+            res = res.union(TG.generateFunctionalRepresentsTaclets(tacletName, originalRep, kjt, target, heaps, self, originalParamVars, atPreVars, toLimit, false, services));
             return res;
         } else {
             Taclet tacletWithShowSatisfiability =
@@ -154,8 +159,10 @@ public final class RepresentsAxiom extends ClassAxiom {
                                                           originalRep,
                                                           kjt,
                                                           target,
-                                                          heap,
+                                                          heaps,
                                                           self,
+                                                          originalParamVars,
+                                                          atPreVars,
                                                           true,
                                                           services);
             Taclet tacletWithTreatAsAxiom =
@@ -163,8 +170,10 @@ public final class RepresentsAxiom extends ClassAxiom {
                                                           originalRep,
                                                           kjt,
                                                           target,
-                                                          heap,
+                                                          heaps,
                                                           self,
+                                                          originalParamVars,
+                                                          atPreVars,
                                                           false,
                                                           services);
             return DefaultImmutableSet.<Taclet>nil().add(tacletWithShowSatisfiability).add(tacletWithTreatAsAxiom);
@@ -174,7 +183,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
-	if(!isFunctional()) {
+	if(!isFunctional(services)) {
 	    return DefaultImmutableSet.nil();
 	} else {
 	    return MiscTools.collectObservers(originalRep.sub(1));
@@ -191,7 +200,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     public RepresentsAxiom setKJT(KeYJavaType newKjt) {
         String newName = "JML represents clause for " + target
         		+ " (subclass " + newKjt.getName()+ ")";
-        return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalRep, originalSelfVar);
+        return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalRep, originalSelfVar, originalParamVars, atPreVars);
     }
     
     /** Conjoins two represents clauses with minimum visibility. 
@@ -205,7 +214,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         }
         VisibilityModifier minVisibility = visibility == null ? (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null) : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
         Term newRep = TB.and(originalRep, ax.originalRep);
-        return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newRep, originalSelfVar);
+        return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newRep, originalSelfVar, originalParamVars, atPreVars);
     }
 
 }

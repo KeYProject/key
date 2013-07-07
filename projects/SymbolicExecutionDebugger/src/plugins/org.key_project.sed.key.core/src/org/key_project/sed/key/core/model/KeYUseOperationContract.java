@@ -19,11 +19,12 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.core.model.impl.AbstractSEDUseOperationContract;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -143,7 +144,7 @@ public class KeYUseOperationContract extends AbstractSEDUseOperationContract imp
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
+         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
       }
       return sourceName;
    }
@@ -188,7 +189,7 @@ public class KeYUseOperationContract extends AbstractSEDUseOperationContract imp
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getContractProgramMethod().getPositionInfo());
+      SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getContractProgramMethod().getPositionInfo());
       // Try to update the position info with the position of the method name provided by JDT.
       try {
          if (location.getCharEnd() >= 0) {

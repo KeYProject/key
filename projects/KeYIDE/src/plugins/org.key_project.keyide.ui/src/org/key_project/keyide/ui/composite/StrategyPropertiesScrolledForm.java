@@ -31,6 +31,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class StrategyPropertiesScrolledForm extends ScrolledForm {
    
@@ -333,129 +334,129 @@ public class StrategyPropertiesScrolledForm extends ScrolledForm {
    SelectionListener listener = new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
           if(e.getSource().equals(stopAtDefault)&&stopAtDefault.getSelection()){
-             props.put(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+             props.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
           }
           else if(e.getSource().equals(stopAtUnclosable)&&stopAtUnclosable.getSelection()){
-             props.put(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
+             props.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
           }
           else if(e.getSource().equals(treatmentOfNewUnclosableGoalsNone)&&treatmentOfNewUnclosableGoalsNone.getSelection()){
-             props.put(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
+             props.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
           }
           else if(e.getSource().equals(treatmentOfNewUnclosableGoalsAutoPrune)&&treatmentOfNewUnclosableGoalsAutoPrune.getSelection()){
-             props.put(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_RETREAT);
+             props.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_RETREAT);
           }
           else if(e.getSource().equals(logicalSplittingDelayed)&&logicalSplittingDelayed.getSelection()){
-             props.put(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
+             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
           }
           else if(e.getSource().equals(logicalSplittingFree)&&logicalSplittingFree.getSelection()){
-             props.put(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
+             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
           }
           else if(e.getSource().equals(logicalSplittingOff)&&logicalSplittingOff.getSelection()){
-             props.put(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
+             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
           }
           else if(e.getSource().equals(loopTreatmentInvariant)&&loopTreatmentInvariant.getSelection()){
-             props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT);
+             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT);
           }
           else if(e.getSource().equals(loopTreatmentExpand)&&loopTreatmentExpand.getSelection()){
-             props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
+             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
           }
           else if(e.getSource().equals(loopTreatmentNone)&&loopTreatmentNone.getSelection()){
-             props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
+             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
           }
           else if(e.getSource().equals(blockTreatmentContract)&&blockTreatmentContract.getSelection()){
-             props.put(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_CONTRACT);
+             props.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_CONTRACT);
           }
           else if(e.getSource().equals(blockTreatmentExpand)&&blockTreatmentExpand.getSelection()){
-             props.put(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+             props.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
           }
           else if(e.getSource().equals(methodTreatmentContract)&&methodTreatmentContract.getSelection()){
-             props.put(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT);
+             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT);
           }
           else if(e.getSource().equals(methodTreatmentExpand)&&methodTreatmentExpand.getSelection()){
-             props.put(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
+             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
           }
           else if(e.getSource().equals(methodTreatmentNone)&&methodTreatmentNone.getSelection()){
-             props.put(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE);
+             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE);
           }
           else if(e.getSource().equals(dependencyContratcsOn)&&dependencyContratcsOn.getSelection()){
-             props.put(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON);
+             props.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON);
           }
           else if(e.getSource().equals(dependencyContratcsOff)&&dependencyContratcsOff.getSelection()){
-             props.put(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+             props.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
           }
           else if(e.getSource().equals(queryTreatmentOn)&&queryTreatmentOn.getSelection()){
-             props.put(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
+             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
           }
           else if(e.getSource().equals(queryTreatmentRestricted)&&queryTreatmentRestricted.getSelection()){
-             props.put(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
+             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
           }
           else if(e.getSource().equals(queryTreatmentOff)&&queryTreatmentOff.getSelection()){
-             props.put(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
+             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
           }
           else if(e.getSource().equals(expandLocalQueriesOn)&&expandLocalQueriesOn.getSelection()){
-             props.put(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
+             props.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
           }
           else if(e.getSource().equals(expandLocalQueriesOff)&&expandLocalQueriesOff.getSelection()){
-             props.put(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
+             props.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
           }
           else if(e.getSource().equals(arithmeticTreatmentBasic)&&arithmeticTreatmentBasic.getSelection()){
-             props.put(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_NONE);
+             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_NONE);
           }
           else if(e.getSource().equals(arithmeticTreatmentDefOps)&&arithmeticTreatmentDefOps.getSelection()){
-             props.put(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
           }
           else if(e.getSource().equals(arithmeticTreatmentModelSearch)&&arithmeticTreatmentModelSearch.getSelection()){
-             props.put(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_COMPLETION);
+             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_COMPLETION);
           }
           else if(e.getSource().equals(quantifierTreatmentNone)&&quantifierTreatmentNone.getSelection()){
-             props.put(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE);
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE);
           }
           else if(e.getSource().equals(quantifierTreatmentNoSplits)&&quantifierTreatmentNoSplits.getSelection()){
-             props.put(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
           }
           else if(e.getSource().equals(quantifierTreatmentNoSplitsWithProgs)&&quantifierTreatmentNoSplitsWithProgs.getSelection()){
-             props.put(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
           }
           else if(e.getSource().equals(quantifierTreatmentFree)&&quantifierTreatmentFree.getSelection()){
-             props.put(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
           }
           else if(e.getSource().equals(autoInductionOn)&&autoInductionOn.getSelection()){
-             props.put(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_ON);
+             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_ON);
           }
           else if(e.getSource().equals(autoInductionRestricted)&&autoInductionRestricted.getSelection()){
-             props.put(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_RESTRICTED);
+             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_RESTRICTED);
           }
           else if(e.getSource().equals(autoInductionOff)&&autoInductionOff.getSelection()){
-             props.put(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
           }
           else if(e.getSource().equals(userSpecificTacletsOneOff)&&userSpecificTacletsOneOff.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_OFF);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_OFF);
           }
           else if(e.getSource().equals(userSpecificTacletsOneLowPrior)&&userSpecificTacletsOneLowPrior.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_LOW);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_LOW);
           }
           else if(e.getSource().equals(userSpecificTacletsOneHighPrior)&&userSpecificTacletsOneHighPrior.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_HIGH);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_HIGH);
           }
           else if(e.getSource().equals(userSpecificTacletsTwoOff)&&userSpecificTacletsTwoOff.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_OFF);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_OFF);
           }
           else if(e.getSource().equals(userSpecificTacletsTwoLowPrior)&&userSpecificTacletsTwoLowPrior.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_LOW);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_LOW);
           }
           else if(e.getSource().equals(userSpecificTacletsTwoHighPrior)&&userSpecificTacletsTwoHighPrior.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_HIGH);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_HIGH);
           }
           else if(e.getSource().equals(userSpecificTacletsThreeOff)&&userSpecificTacletsThreeOff.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_OFF);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_OFF);
           }
           else if(e.getSource().equals(userSpecificTacletsThreeLowPrior)&&userSpecificTacletsThreeLowPrior.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_LOW);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_LOW);
           }
           else if(e.getSource().equals(userSpecificTacletsThreeHighPrior)&&userSpecificTacletsThreeHighPrior.getSelection()){
-             props.put(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_HIGH);
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_HIGH);
           }
-          proof.getSettings().getStrategySettings().setActiveStrategyProperties(props);
+          SymbolicExecutionUtil.updateStrategySettings(proof, props);
       }
    };
    

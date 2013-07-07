@@ -5,7 +5,7 @@
          <statement name="break label1;" pathCondition="true" pathConditionChanged="false">
             <statement name="break label2;" pathCondition="true" pathConditionChanged="false">
                <statement name="return 0;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of EmptyBlockTest.emptyBlocks();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of EmptyBlockTest.emptyBlocks();&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of EmptyBlockTest.emptyBlocks();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>

@@ -49,7 +49,7 @@ public interface BlockContract extends SpecificationElement {
      * 
      * @return whether this contract is strictly pure.
      */
-    public boolean hasModifiesClause();
+    public boolean hasModifiesClause(LocationVariable heap);
 
     // TODO Why do we need remembranceHeaps for the precondition? Do we also need remembranceLocalVariables?
     public Term getPrecondition(LocationVariable heap,

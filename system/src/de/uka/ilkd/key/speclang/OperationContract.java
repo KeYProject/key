@@ -32,7 +32,7 @@ public interface OperationContract extends Contract {
      * 
      * @return whether this contract is strictly pure.
      */
-    public boolean hasModifiesClause();
+    public boolean hasModifiesClause(LocationVariable heap);
     
     /**
      * Returns the modifies clause of the contract.
@@ -49,21 +49,5 @@ public interface OperationContract extends Contract {
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services);
-
-    /**
-     * Returns the modifies_backup clause of the contract.
-     */
-//    public Term getBackupMod(ProgramVariable selfVar, 
-//	    	       ImmutableList<ProgramVariable> paramVars,
-//                       Services services);
-    
-    
-    /**
-     * Returns the modifies_backup clause of the contract.
-     */
-//    public Term getBackupMod(Term heapTerm,
-//	               Term selfTerm, 
-//	    	       ImmutableList<Term> paramTerms,
-//                       Services services);
     
 }

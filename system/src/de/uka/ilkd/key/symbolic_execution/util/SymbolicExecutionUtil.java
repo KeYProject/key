@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -42,10 +41,8 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -101,6 +98,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.ITermLabelWorker;
@@ -124,7 +122,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -276,13 +273,14 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
+    * extract the return value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param contextObjectType The type of the current object (this reference).
     * @param contextMethod The current method.
     * @param contextObject The current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param methodReturnNode The method return {@link Node} which provides the sequent to extract updates and return expression from.
+    * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to start site proof in.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
@@ -290,34 +288,38 @@ public final class SymbolicExecutionUtil {
                                                                                      TypeReference contextObjectType,
                                                                                      IProgramMethod contextMethod,
                                                                                      ReferencePrefix contextObject,
-                                                                                     Node node,
+                                                                                     Node methodReturnNode,
+                                                                                     Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Create execution context in that the method was called.
       IExecutionContext context = new ExecutionContext(contextObjectType, contextMethod, contextObject);
       // Create sequent
-      return createExtractReturnVariableValueSequent(services, context, node, variable);
+      return createExtractReturnVariableValueSequent(services, context, methodReturnNode, methodCallEmptyNode, variable);
    }
 
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
+    * extract the return value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param context The {@link IExecutionContext} that defines the current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param methodReturnNode The method return {@link Node} which provides the sequent to extract updates and return expression from.
+    * @param methodCallEmptyNode The method call empty {@link Node} which provides the sequent to start site proof in.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
                                                                                      IExecutionContext context,
-                                                                                     Node node,
+                                                                                     Node methodReturnNode,
+                                                                                     Node methodCallEmptyNode,
                                                                                      IProgramVariable variable) {
       // Make sure that correct parameters are given
       assert context != null;
-      assert node != null;
+      assert methodReturnNode != null;
+      assert methodCallEmptyNode != null;
       assert variable instanceof ProgramVariable;
       // Create method frame which will be executed in site proof
-      Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
+      Statement originalReturnStatement = (Statement)methodReturnNode.getNodeInfo().getActiveStatement();
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
       JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
       // Create predicate which will be used in formulas to store the value interested in.
@@ -326,8 +328,11 @@ public final class SymbolicExecutionUtil {
       Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      // Get the updates from the return node which includes the value interested in.
+      Term originalModifiedFormula = methodReturnNode.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, modalityTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(methodCallEmptyNode, null, modalityTerm, originalUpdates);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -504,24 +509,6 @@ public final class SymbolicExecutionUtil {
       starter.setStrategy(sp);
       // Execute proof in the current thread
       return starter.start();
-   }
-   
-   /**
-    * Extracts the value for the formula with the given {@link Operator}
-    * from the site proof result ({@link ApplyStrategyInfo}).
-    * @param info The site proof result.
-    * @param operator The {@link Operator} for the formula which should be extracted.
-    * @return The value of the formula with the given {@link Operator}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public static Term extractOperatorValue(ApplyStrategyInfo info, Operator operator) throws ProofInputException {
-      // Make sure that valid parameters are given
-      assert info != null;
-      if (info.getProof().openGoals().size() != 1) {
-         throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
-      }
-      // Get node of open goal
-      return extractOperatorValue(info.getProof().openGoals().head(), operator);
    }
 
    /**
@@ -862,10 +849,10 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = findExplicitConstructor(node.proof().getServices(), pm);
+               if (KeYTypeUtil.isImplicitConstructor(pm)) {
+                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
                   return explicitConstructor != null && 
-                         !isLibraryClass(explicitConstructor.getContainerType());
+                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
                }
                else {
                   return !pm.isImplicit(); // Do not include implicit methods, but always constructors
@@ -878,61 +865,6 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
-      }
-   }
-   
-   /**
-    * Checks if the given {@link KeYJavaType} is a library class.
-    * @param kjt The {@link KeYJavaType} to check.
-    * @return {@code true} is library class, {@code false} is no library class.
-    */
-   public static boolean isLibraryClass(KeYJavaType kjt) {
-      return kjt != null && 
-             kjt.getJavaType() instanceof TypeDeclaration && 
-             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass();
-   }
-   
-   /**
-    * Checks if the given {@link IProgramMethod} is an implicit constructor.
-    * @param pm The {@link IProgramMethod} to check.
-    * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g. method or explicit construcotr).
-    */
-   public static boolean isImplicitConstructor(IProgramMethod pm) {
-      return pm != null && ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER.equals(pm.getName());
-   }
-
-   /**
-    * Returns the {@link IProgramMethod} of the explicit constructor for
-    * the given implicit constructor.
-    * @param services The {@link Services} to use.
-    * @param implicitConstructor The implicit constructor.
-    * @return The found explicit constructor or {@code null} if not available.
-    */
-   public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
-      if (services != null && implicitConstructor != null) {
-         ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
-         return JavaUtil.search(pms, new IFilter<IProgramMethod>() {
-            @Override
-            public boolean select(IProgramMethod element) {
-               if (implicitConstructor.getParameterDeclarationCount() == element.getParameterDeclarationCount()) {
-                  Iterator<ParameterDeclaration> implicitIter = implicitConstructor.getParameters().iterator();
-                  Iterator<ParameterDeclaration> elementIter = element.getParameters().iterator();
-                  boolean sameTypes = true;
-                  while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
-                     ParameterDeclaration implicitNext = implicitIter.next();
-                     ParameterDeclaration elementNext = elementIter.next();
-                     sameTypes = implicitNext.getTypeReference().equals(elementNext.getTypeReference());
-                  }
-                  return sameTypes;
-               }
-               else {
-                  return false;
-               }
-            }
-         });
-      }
-      else {
-         return null;
       }
    }
    
@@ -2053,21 +1985,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * This method should be called before the auto mode is started in
-    * context of symbolic execution. The method sets {@link StrategyProperties}
-    * of the auto mode which are not supported in context of symbolic execution
-    * to valid default values.
-    * @param proof The {@link Proof} to configure its {@link StrategyProperties} for symbolic execution.
-    */
-   public static void updateStrategyPropertiesForSymbolicExecution(Proof proof) {
-      if (proof != null) {
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
-         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-      }
-   }
-
-   /**
     * Checks if the given {@link Term} is null in the {@link Sequent} of the given {@link Node}. 
     * @param services The {@link Services} to use.
     * @param node The {@link Node} which provides the original {@link Sequent}
@@ -2392,33 +2309,44 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Configures the proof to use operation contracts or to expand methods instead.
+    * Configures the proof to use the given settings.
     * @param proof The {@link Proof} to configure.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
+    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
     */
-   public static void setUseOperationContracts(Proof proof, boolean useOperationContracts) {
+   public static void updateStrategySettings(Proof proof, 
+                                             boolean useOperationContracts,
+                                             boolean useLoopInvariants,
+                                             boolean aliasChecksImmediately) {
       if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
                                        StrategyProperties.METHOD_CONTRACT : 
                                        StrategyProperties.METHOD_EXPAND;
+         String loopTreatmentValue = useLoopInvariants ? 
+                                     StrategyProperties.LOOP_INVARIANT : 
+                                     StrategyProperties.LOOP_EXPAND;
+         String aliasChecksValue = aliasChecksImmediately ? 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : 
+                                   StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
+         updateStrategySettings(proof, sp);
       }
    }
 
    /**
-    * Configures the proof to use loop invariants or to expand loops instead.
+    * Configures the proof to use the given {@link StrategyProperties}.
     * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param sb The {@link StrategyProperties} to set.
     */
-   public static void setUseLoopInvariants(Proof proof, boolean useLoopInvariants) {
+   public static void updateStrategySettings(Proof proof, 
+                                             StrategyProperties sp) {
       if (proof != null && !proof.isDisposed()) {
-         String loopTreatmentValue = useLoopInvariants ? 
-                                     StrategyProperties.LOOP_INVARIANT : 
-                                     StrategyProperties.LOOP_EXPAND;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         assert sp != null;
+         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
@@ -2434,22 +2362,6 @@ public final class SymbolicExecutionUtil {
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
-      }
-   }
-   
-   /**
-    * Configures the proof to do alias checks or not.
-    * @param proof The {@link Proof} to configure.
-    * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
-    */
-   public static void setAliasChecks(Proof proof, boolean immediately) {
-      if (proof != null && !proof.isDisposed()) {
-         String aliasChecksValue = immediately ? 
-                                   SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY : 
-                                   SymbolicExecutionStrategy.ALIAS_CHECK_NEVER;
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         sp.setProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
-         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }
    
@@ -2515,5 +2427,24 @@ public final class SymbolicExecutionUtil {
       else {
          return false;
       }
+   }
+   
+   /**
+    * Returns the path to the source file defined by the given {@link PositionInfo}.
+    * @param posInfo The {@link PositionInfo} to extract source file from.
+    * @return The source file name or {@code null} if not available.
+    */
+   public static String getSourcePath(PositionInfo posInfo) {
+      String result = null;
+      if (posInfo.getFileName() != null) {
+         result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
+      }
+      else if (posInfo.getParentClass() != null) {
+         result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
+      }
+      if (result != null && result.startsWith("FILE:")) {
+         result = result.substring("FILE:".length());
+      }
+      return result;
    }
 }

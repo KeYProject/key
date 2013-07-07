@@ -11,18 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 // 
 
-
-
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProgVarReplacer;
 
 
 /**
@@ -41,8 +36,8 @@ public class InnerVariableNamer extends VariableNamer {
      * and the passed program
      */
     private int getMaxCounterInGlobalsAndProgram(String basename,
-    				 		 Globals globals, 
-						 ProgramElement program, 
+    				 		 Globals globals,
+						 ProgramElement program,
 						 PosInProgram posOfDeclaration) {
 	int maxInGlobals = getMaxCounterInGlobals(basename, globals);
 	int maxInProgram = getMaxCounterInProgram(basename,
@@ -82,13 +77,13 @@ public class InnerVariableNamer extends VariableNamer {
             final NamespaceSet namespaces = services.getNamespaces();
             while (!isUniqueInGlobals(newname.toString(), globals) ||
                     namespaces.lookupLogicSymbol(newname)!=null) {
-	        newcounter += 1; 
+	        newcounter += 1;
 	        newname = createName(bai.basename, newcounter, nci);
 	    }
 	}
-        
+
         ProgramVariable newvar = var;
-        if (!newname.equals(name)) {        
+        if (!newname.equals(name)) {
             newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;

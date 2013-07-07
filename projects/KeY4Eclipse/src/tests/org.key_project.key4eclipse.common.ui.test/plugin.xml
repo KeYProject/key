@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.globalStarter">
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingGlobalStarter"
+            description="Description of First Global Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingGlobalStarterID"
+            name="First Global Starter">
+      </starter>
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingGlobalStarter"
+            description="Description of Second Global Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingGlobalStarterID"
+            name="Second Global Starter">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.methodStarter">
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingMethodStarter"
+            description="Description of First Method Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingMethodStarterID"
+            name="First Method Starter">
+      </starter>
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingMethodStarter"
+            description="Description of Second Method Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingMethodStarterID"
+            name="Second Method Starter">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.fileStarter">
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingFileStarter"
+            description="Description of First File Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingFileStarterID"
+            name="First File Starter">
+      </starter>
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingFileStarter"
+            description="Description of Second File Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingFileStarterID"
+            name="Second File Starter">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.projectStarter">
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProjectStarter"
+            description="Description of First Project Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProjectStarterID"
+            name="First Project Starter">
+      </starter>
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProjectStarter"
+            description="Description of Second Project Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProjectStarterID"
+            name="Second Project Starter">
+      </starter>
+   </extension>
+</plugin>

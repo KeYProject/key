@@ -35,6 +35,11 @@ public interface IObserverFunction extends SortedOperator {
    public abstract boolean isStatic();
 
    /**
+    * Check the state count of the declaration (no_state = 0, two_state = 2, 1 otherwise).
+    */
+   public abstract int getStateCount();
+
+   /**
     * Gives the number of parameters of the observer symbol. "Parameters" here
     * includes only the *explicit* parameters, not the heap and the receiver
     * object. Thus, for observer symbols representing model fields, this will
