@@ -44,18 +44,13 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          try {
             proofManager = new ProofManager(project);
             
-            boolean enableEfficientProofManagement = KeYProjectProperties.isEnableEfficientProofManagement(project);
-            boolean autoDeleteProofFiles = KeYProjectProperties.isAutoDeleteProofFiles(project); 
-            
-            if (!enableEfficientProofManagement) {
-               proofManager.runAllProofs(autoDeleteProofFiles, monitor);
+            if (!KeYProjectProperties.isEnableEfficientProofManagement(project)) {
+               proofManager.runProofs(monitor);
                System.out.println("ALL");
             }
-            else if(enableEfficientProofManagement){
-               //Do not use. Not working right now.
-//               runProofsEfficient(proofManager, delta);
+            else {
                LinkedList<IFile> changedJavaFiles = collectChangedJavaFiles(delta);
-               proofManager.runProofsSelective(changedJavaFiles, autoDeleteProofFiles, monitor);
+               proofManager.runProofs(changedJavaFiles, monitor);
                System.out.println("EFFICIENT");
             }
          }
@@ -64,7 +59,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          }
          finally {
             if (proofManager != null) {
-//               proofManager.dispose();
+               proofManager.dispose();
             }
          }
       }

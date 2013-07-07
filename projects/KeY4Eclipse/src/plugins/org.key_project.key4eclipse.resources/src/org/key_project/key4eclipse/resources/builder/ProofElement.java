@@ -37,6 +37,7 @@ public class ProofElement {
    
    private IFolder proofFolder;
    private IFile proofFile;
+   private IFile metaFile;
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
@@ -63,11 +64,19 @@ public class ProofElement {
    public IFile getProofFile(){
       return proofFile;
    }
+   public void setProofFile(IFile proofFile){
+      this.proofFile = proofFile;
+   }
+   public IFile getMetaFile(){
+      return metaFile;
+   }
+   public void setMetaFile(IFile metaFile){
+      this.metaFile = metaFile;
+   }
    
    public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment(){
       return environment;
    }
-   
    public void setKeYEnvironment(KeYEnvironment<CustomConsoleUserInterface> environment){
       this.environment = environment;
    }
@@ -106,17 +115,15 @@ public class ProofElement {
    } 
    
    
-   public ProofElement(ProofOblInput obl, IFile javaFile, SourceLocation scl, KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, KeYJavaType kjt, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl, KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, KeYJavaType kjt, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
       
       this.proofFolder = proofFolder;
-      this.proofFile = proofFile;
       
       this.environment = environment;
       
       this.contract = contract;
-      this.proofObl = obl;
       
       this.proof = null;
       

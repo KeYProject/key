@@ -89,7 +89,7 @@ public class MarkerManager {
       }
    }
    
-   private LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
+   public LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       markerList.addAll(markerArrayToList(res.findMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
       markerList.addAll(markerArrayToList(res.findMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
@@ -111,15 +111,19 @@ public class MarkerManager {
       if(scl != null){
          LinkedList<IMarker> markerList = getAllKeYMarker(javaFile);
          for(IMarker marker : markerList){
-            Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
-            Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
-            if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
-               marker.delete();
-               return;
+            if(marker.exists()){
+               Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+               Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+               if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
+                  marker.delete();
+                  return;
+               }
             }
          }
       }
    }
+   
+   
    
    
    /**
@@ -127,11 +131,11 @@ public class MarkerManager {
     * @param res the {@link IResource} to use
     * @throws CoreException
     */
-   public void deleteKeYMarker(IResource res) throws CoreException{
-      res.deleteMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
-      res.deleteMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE);
-      res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE);
-      res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, IResource.DEPTH_INFINITE);
+   public void deleteKeYMarker(IResource res, int depth) throws CoreException{
+      res.deleteMarkers(CLOSEDMARKER_ID, true, depth);
+      res.deleteMarkers(NOTCLOSEDMARKER_ID, true, depth);
+      res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, depth);
+      res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, depth);
    }
 
    
@@ -142,7 +146,7 @@ public class MarkerManager {
     */
    public void deleteKeYMarker(LinkedList<IFile> files) throws CoreException{
       for(IFile file : files){
-         deleteKeYMarker(file);
+         deleteKeYMarker(file, IResource.DEPTH_INFINITE);
       }
    }
 }

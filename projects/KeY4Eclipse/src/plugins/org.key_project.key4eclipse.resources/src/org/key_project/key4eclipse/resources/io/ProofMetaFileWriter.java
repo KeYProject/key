@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IPath;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -43,6 +44,7 @@ public class ProofMetaFileWriter {
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
    public IFile writeMetaFile(ProofElement pe) {
+      IFile metaIFile = null;
       try{
          this.environment = pe.getKeYEnvironment();
          this.addedTypes = new LinkedHashSet<KeYJavaType>();
@@ -51,17 +53,16 @@ public class ProofMetaFileWriter {
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
          DOMSource source = new DOMSource(doc);
-         IFile metaIFile = createMetaFile(pe.getProofFile());
+         metaIFile = createMetaFile(pe.getProofFile());
          File metaFile = metaIFile.getLocation().toFile();
          StreamResult result = new StreamResult(metaFile);
          transformer.transform(source, result);
          metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
          metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
-         return metaIFile;
       } catch (Exception e) {
-         e.printStackTrace();
-         return null;
+         LogUtil.getLogger().createErrorStatus(e);
       }
+      return metaIFile;
    }
    
    

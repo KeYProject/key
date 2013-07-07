@@ -36,6 +36,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -196,5 +197,15 @@ public class KeY4EclipseResourcesTestUtil {
       else{
          return null;
       }
+   }
+   
+   
+   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean hideMetaFiles, boolean autoDeleteProofFiles) throws CoreException{
+      KeYProjectProperties.setBuildProofs(project, buildProofs);
+      KeYProjectProperties.setEnableEfficientProofManagement(project, buildProofsEfficient);
+      KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
+      KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
+      KeYProjectProperties.setHideMetaFiles(project, hideMetaFiles);
+      KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
    }
 }

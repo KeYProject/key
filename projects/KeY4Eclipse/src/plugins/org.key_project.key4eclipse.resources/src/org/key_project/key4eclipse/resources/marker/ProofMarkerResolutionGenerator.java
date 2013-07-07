@@ -33,7 +33,8 @@ public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerato
       LinkedList<IMarkerResolution> resolutions = new LinkedList<IMarkerResolution>();
       try{
          if (StarterUtil.areFileStartersAvailable()) {
-            resolutions.add(new ProofMarkerResolution(marker.getType()));
+            resolutions.add(new ProofMarkerResolution(marker.getType(), false));
+            resolutions.add(new ProofMarkerResolution(marker.getType(), true));
          }
       } catch (CoreException e){
          LogUtil.getLogger().createErrorStatus(e);

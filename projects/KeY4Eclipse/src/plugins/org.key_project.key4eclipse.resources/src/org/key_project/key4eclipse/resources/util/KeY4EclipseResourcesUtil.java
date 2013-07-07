@@ -127,6 +127,7 @@ public class KeY4EclipseResourcesUtil {
             //TODO: refresh gui
          }
       }
+      project.refreshLocal(IResource.DEPTH_INFINITE, null);
    }
 
    

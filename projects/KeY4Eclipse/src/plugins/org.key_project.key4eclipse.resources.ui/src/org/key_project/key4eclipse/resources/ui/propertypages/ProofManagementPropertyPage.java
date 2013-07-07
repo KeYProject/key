@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
@@ -39,7 +40,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
 
    private Button enableEfficentProofManagementButton;
    
-   private Combo setNumberOfThreadsCombo;
+   private Spinner setNumberOfThreadsSpinner;
    
    private Text setNumberOfThreadsText;
    
@@ -78,10 +79,10 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       public void widgetSelected(SelectionEvent e) {
          boolean isSelected = enableMultiThreadingButton.getSelection();
          if(isSelected){
-            setNumberOfThreadsCombo.setEnabled(true);
+            setNumberOfThreadsSpinner.setEnabled(true);
          }
          else{
-            setNumberOfThreadsCombo.setEnabled(false);
+            setNumberOfThreadsSpinner.setEnabled(false);
          }
          
       }
@@ -142,11 +143,11 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       setNumberOfThreadsText = new Text(multiThreadingComposite, SWT.SINGLE);
       setNumberOfThreadsText.setText("Number of threads:");
       setNumberOfThreadsText.setBackground(backgroundColor);
-      
-      setNumberOfThreadsCombo = new Combo(multiThreadingComposite, SWT.DROP_DOWN);
-      for(int i = 0; i < Runtime.getRuntime().availableProcessors(); i++){
-         setNumberOfThreadsCombo.add(""+(i+1));
-      }
+
+      setNumberOfThreadsSpinner = new Spinner(multiThreadingComposite, SWT.NONE);
+      setNumberOfThreadsSpinner.setMinimum(1);
+      setNumberOfThreadsSpinner.setMaximum(100);
+      setNumberOfThreadsSpinner.setIncrement(1);
       setSelectionForSetNumberOfThreads();
       setEnabledForSetNumberOfThreads();
       
@@ -159,7 +160,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       folderSettingsComposite.setLayout(new GridLayout(1, false));
       
       autoDeleteProofFilesButton = new Button(folderSettingsComposite, SWT.CHECK);
-      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
+      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically (Refresh the project afterwards)");
       setSelectionForAutoDeleteProofFilesButton();
       hideMefaFiles = new Button(folderSettingsComposite, SWT.CHECK);
       hideMefaFiles.setText("Hide meta files");
@@ -226,23 +227,23 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
    private void setSelectionForSetNumberOfThreads(){
       try {
          IProject project = getProject();
-         int index = KeYProjectProperties.getNumberOfThreads(project)-1;
-         if(index < 0){
-            setNumberOfThreadsCombo.select(0);
+         int index = KeYProjectProperties.getNumberOfThreads(project);
+         if(index < 0 || index > 100){
+            setNumberOfThreadsSpinner.setSelection(1);
          }
          else{
-            setNumberOfThreadsCombo.select(index);
+            setNumberOfThreadsSpinner.setSelection(index);
          }
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
          LogUtil.getLogger().openErrorDialog(getShell(), e);
-         setNumberOfThreadsCombo.setEnabled(false);
+         setNumberOfThreadsSpinner.setEnabled(false);
       }
    }
    
    private void setEnabledForSetNumberOfThreads(){
-      setNumberOfThreadsCombo.setEnabled(enableMultiThreadingButton.getSelection());
+      setNumberOfThreadsSpinner.setEnabled(enableMultiThreadingButton.getSelection());
    }
    
 
@@ -288,7 +289,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
          KeYProjectProperties.setBuildProofs(project, buildProofButton.getSelection());
          KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
-         KeYProjectProperties.setNumberOfThreads(project, setNumberOfThreadsCombo.getItem(setNumberOfThreadsCombo.getSelectionIndex()));
+         KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
          KeY4EclipseResourcesUtil.hideMetaFiles(project, KeYProjectProperties.isHideMetaFiles(project));
@@ -310,7 +311,7 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
       buildProofButton.setSelection(true);
       enableEfficentProofManagementButton.setSelection(false);
       enableMultiThreadingButton.setSelection(false);
-      setNumberOfThreadsCombo.select(0);
+      setNumberOfThreadsSpinner.setSelection(1);
       autoDeleteProofFilesButton.setSelection(false);
       hideMefaFiles.setSelection(false);
       super.performDefaults();
