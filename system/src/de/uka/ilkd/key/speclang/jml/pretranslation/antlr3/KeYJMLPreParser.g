@@ -868,6 +868,7 @@ field_declaration[ImmutableList<String> mods]
 :
     type=IDENT 	      { sb.append(type.getText() + " "); }
     name=IDENT 	      { sb.append(name.getText()); }
+    (t=EMPTYBRACKETS { sb.append(t.getText()); })*
     (
     	    init=initialiser  { sb.append(init); }
     	|   semi=SEMICOLON    { sb.append(semi.getText()); }
