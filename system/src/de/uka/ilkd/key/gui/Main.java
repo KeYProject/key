@@ -68,7 +68,7 @@ public class Main {
     public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
-
+    
     /**
      * The user interface modes KeY can operate in.
      */
@@ -83,7 +83,7 @@ public class Main {
 	 */
 	AUTO
     }
-
+    private static UiMode uiMode = UiMode.INTERACTIVE;
 
     public static final String INTERNAL_VERSION =
             KeYResourceManager.getManager().getSHA1();
@@ -102,14 +102,6 @@ public class Main {
     private static String statisticsFile = null;
 
     private static String examplesDir = null;
-
-    /**
-     * Determines which {@link UserInterface} is to be used.
-     *
-     * By specifying <code>AUTO</code> as command line argument this will be set
-     * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
-     */
-    private static UiMode uiMode = UiMode.INTERACTIVE;
 
     /**
      * Determines whether to actually prove or only load a problem when
@@ -350,8 +342,7 @@ public class Main {
 
             GuiUtilities.invokeAndWait(new Runnable() {
                 public void run() {
-                    MainWindow key = MainWindow.getInstance();
-                    key.setVisible(true);
+                    MainWindow.createInstance();
                 }
             });
 

@@ -25,7 +25,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -74,10 +73,6 @@ import de.uka.ilkd.key.util.Pair;
 
 public final class ProofManagementDialog extends JDialog {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3543411893273433386L;
     private static final ImageIcon keyIcon 
         = IconFactory.keyHole(20, 20);
     private static final ImageIcon keyAlmostClosedIcon 
@@ -85,7 +80,6 @@ public final class ProofManagementDialog extends JDialog {
     private static final ImageIcon keyClosedIcon
         = IconFactory.keyHoleClosed(20, 20);
     
-    private static ProofManagementDialog instance;
     private static boolean startedProof;
 
     private InitConfig initConfig;
@@ -100,15 +94,15 @@ public final class ProofManagementDialog extends JDialog {
     private ContractSelectionPanel contractPanelByProof;
     private JButton startButton;
     private JButton cancelButton;
-	private KeYMediator mediator;
+    private KeYMediator mediator;
         
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
 
-    private ProofManagementDialog(KeYMediator mediator, InitConfig initConfig, String title) {
-	super(MainWindow.getInstance(), title, true);
+    private ProofManagementDialog(KeYMediator mediator, InitConfig initConfig) {
+	super(MainWindow.getInstance(), "Proof Management", true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
@@ -127,11 +121,8 @@ public final class ProofManagementDialog extends JDialog {
 	//create proof list
 	proofList = new JList();
 	proofList.setCellRenderer(new DefaultListCellRenderer() {
-	    /**
-         * 
-         */
-        private static final long serialVersionUID = -7810888250050777877L;
 
+        @Override
         public Component getListCellRendererComponent(JList list, 
 	     					   	  Object value, 
 		     					  int index, 
@@ -190,6 +181,7 @@ public final class ProofManagementDialog extends JDialog {
 	//create contract panel by method
 	contractPanelByMethod = new ContractSelectionPanel(services, false);
 	contractPanelByMethod.addMouseListener(new MouseAdapter() {
+            @Override
 	    public void mouseClicked(MouseEvent e){
 		if(e.getClickCount() == 2){
 		    startButton.doClick();
@@ -207,6 +199,7 @@ public final class ProofManagementDialog extends JDialog {
 	//create contract panel by proof
 	contractPanelByProof = new ContractSelectionPanel(services, false);
 	contractPanelByProof.addMouseListener(new MouseAdapter() {
+            @Override
 	    public void mouseClicked(MouseEvent e){
 		updateStartButton();
 		if(e.getClickCount() == 2){
@@ -293,7 +286,25 @@ public final class ProofManagementDialog extends JDialog {
 	setLocation(mainLoc.x + 20, mainLoc.y + 20);
     }
     
-    
+    @Override
+    public void dispose() {
+        super.dispose();
+        //============================================
+        // cumbersome but necessary code providing a workaround for a memory leak 
+        // in Java, see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6497929
+        getInstance().initConfig = null;
+        getInstance().services = null;
+        getInstance().specRepos = null;
+        getInstance().tabbedPane = null;
+        getInstance().proofList = null;
+        getInstance().targetIcons = null;
+        getInstance().classTree = null;
+        getInstance().contractPanelByMethod = null;
+        getInstance().contractPanelByProof = null;
+        getInstance().startButton = null;
+        getInstance().cancelButton = null;
+        //============================================
+    }
     
     //-------------------------------------------------------------------------
     //internal methods
@@ -305,32 +316,16 @@ public final class ProofManagementDialog extends JDialog {
 	    			     KeYJavaType selectedKJT,
 	    			     IObserverFunction selectedTarget,
 	    			     Proof selectedProof) {
-	if(instance == null
-           || instance.initConfig != initConfig
-           || !instance.initConfig.equals(initConfig)) {
+	if(getInstance() == null
+           || getInstance().initConfig != initConfig
+           || !getInstance().initConfig.equals(initConfig)) {
             
-            if(instance != null) {
-                instance.dispose();
-                
-                //============================================
-                // cumbersome but necessary code providing a workaround for a memory leak 
-                // in Java, see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6497929
-                instance.initConfig = null;
-                instance.services = null;
-                instance.specRepos = null;
-                instance.tabbedPane = null;
-                instance.proofList = null;
-                instance.targetIcons = null;
-                instance.classTree = null;
-                instance.contractPanelByMethod = null;
-                instance.contractPanelByProof = null;
-                instance.startButton = null;
-                instance.cancelButton = null;
-                //============================================
+            if(getInstance() != null) {
+                getInstance().dispose();
             }
-            
-            instance = new ProofManagementDialog(mediator, initConfig, 
-            			     		 "Proof Management");
+
+            MainWindow.getInstance().ProofManagementDialogInstance
+                    = new ProofManagementDialog(mediator, initConfig);
             //determine own defaults if not given
             if(selectedKJT == null || selectedTarget == null) {
         	Services services = initConfig.getServices();
@@ -388,16 +383,19 @@ public final class ProofManagementDialog extends JDialog {
         }
 	
 	startedProof = false;
-	instance.updateGlobalStatus();
+	getInstance().updateGlobalStatus();
 	if(selectedProof != null) {
-	    instance.select(selectedProof);
+	    getInstance().select(selectedProof);
 	}
 	if(selectedTarget != null) {
-	    instance.select(selectedKJT, selectedTarget);
+	    getInstance().select(selectedKJT, selectedTarget);
 	}
-        instance.setVisible(true);
+        getInstance().setVisible(true);
     }    
     
+    static ProofManagementDialog getInstance(){
+        return MainWindow.getInstance().ProofManagementDialogInstance;
+    }
     
     private ContractSelectionPanel getActiveContractPanel() {
 	return tabbedPane.getSelectedIndex() == 0 
@@ -437,7 +435,7 @@ public final class ProofManagementDialog extends JDialog {
         ImmutableSet<Proof> proofs = specRepos.getProofs(po);
         
         //no proofs?
-        if(proofs.size() == 0) {
+        if(proofs.isEmpty()) {
             return null;
         }
         
@@ -627,7 +625,7 @@ public final class ProofManagementDialog extends JDialog {
      */
     public static void showInstance(KeYMediator mediator, InitConfig initConfig) {
 	showInstance(mediator, initConfig, null, null, null);
-    }    
+    }
     
     
     /**

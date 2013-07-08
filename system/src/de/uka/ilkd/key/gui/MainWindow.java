@@ -33,7 +33,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -141,6 +140,8 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
+    
+    public ProofManagementDialog ProofManagementDialogInstance = null;
 
     // Search bar for Sequent Views.
     public SequentSearchBar sequentSearchBar;
@@ -360,6 +361,7 @@ public final class MainWindow extends JFrame  {
         return mediator;
     }
 
+    @Override
     public void setVisible(boolean v){
         super.setVisible(v && visible);
     }
@@ -1257,6 +1259,7 @@ public final class MainWindow extends JFrame  {
             this.contentPane   = contentPane;
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             redispatchMouseEvent(e);
         }
@@ -1267,26 +1270,32 @@ public final class MainWindow extends JFrame  {
          * it keeps its dark gray background or whatever its L&F uses to indicate that the button is
          * currently being pressed.
          */
+        @Override
         public void mouseDragged(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             redispatchMouseEvent(e);
             currentComponent = null;
@@ -1385,6 +1394,7 @@ public final class MainWindow extends JFrame  {
 	    }
 	}
 
+        @Override
 	public boolean isEnabled() {
 	    boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION &&
  	      mediator != null && mediator.getSelectedProof() != null && !mediator.getSelectedProof().closed();
@@ -1417,6 +1427,7 @@ public final class MainWindow extends JFrame  {
 
 	}
 
+        @Override
 	public String toString(){
 	    return solverUnion.toString();
 	}
@@ -1464,7 +1475,7 @@ public final class MainWindow extends JFrame  {
      * @return the instance of Main
      * @throws IllegalStateException
      */
-    public static MainWindow getInstance() throws IllegalStateException {
+    public static void createInstance() throws IllegalStateException {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
             System.err.println("Please use the --auto option to start KeY in batch mode.");
@@ -1474,10 +1485,20 @@ public final class MainWindow extends JFrame  {
         if (instance == null) {
             instance = new MainWindow();
             instance.initialize();
+            instance.setVisible(true);
+        } else {
+            throw new Error("Function createInstance() has already been called.");
         }
-
-        return instance;
     }
+    
+    public static MainWindow getInstance(){
+        if (instance != null) {
+            return instance;
+        } else {
+            throw new Error("No MainWindow instance existent.");
+        }
+    }
+            
 
     /**
      * <p>

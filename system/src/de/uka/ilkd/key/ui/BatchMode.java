@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.ui;
 
+import de.uka.ilkd.key.gui.Main;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
