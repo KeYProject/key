@@ -36,13 +36,49 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.AgeFeature;
+import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
+import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
+import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
+import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
+import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
+import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
+import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
+import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
+import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
+import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
+import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
+import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
+import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
+import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
+import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
+import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
+import de.uka.ilkd.key.strategy.feature.SumFeature;
+import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
+import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
+import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -96,15 +132,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private final StrategyProperties strategyProperties;
-    private OneStepSimplifier oneStepSimplifierRuleInstance;
     
     protected JavaCardDLStrategy(Proof p_proof,
                                  StrategyProperties strategyProperties) {
         
         super ( p_proof );
-        
-        this.oneStepSimplifierRuleInstance = 
-              MiscTools.findOneStepSimplifier(p_proof);
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
@@ -247,7 +279,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(oneStepSimplifierRuleInstance);
+	
+	filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
 
         return ConditionalFeature.createConditional(filter, cost);        
     }

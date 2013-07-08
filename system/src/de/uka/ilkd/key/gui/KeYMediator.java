@@ -65,6 +65,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 public class KeYMediator {    
@@ -119,7 +120,10 @@ public class KeYMediator {
 	
 	// moved from layout main here; but does not actually belong here at all;
 	// we should get that rule to behave like a normal built-in rule
-	addKeYSelectionListener(OneStepSimplifier.INSTANCE);
+	OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(getProfile());
+	if (simplifier != null) {
+	   addKeYSelectionListener(simplifier);
+	}
 
     }
 

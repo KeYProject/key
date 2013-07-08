@@ -234,17 +234,7 @@ public final class SymbolicExecutionUtil {
       InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
-      JavaProfile profile = new JavaProfile() {
-         private OneStepSimplifier simplifier;
-         
-         @Override
-         protected OneStepSimplifier getInitialOneStepSimpilifier() {
-            if (simplifier == null) {
-               simplifier = new OneStepSimplifier();
-            }
-            return simplifier;
-         }
-      };
+      JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(source.getServices().copy(), profile);
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
