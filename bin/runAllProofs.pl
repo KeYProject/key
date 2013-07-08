@@ -5,6 +5,7 @@ use File::Find;
 use File::Basename;
 use Getopt::Long;
 use POSIX qw(strftime);
+use Text::CSV;
 # use File::Copy;
 # use Net::SMTP;
 
@@ -28,7 +29,7 @@ my $time_limit = 30*60;
 #
 # Command line options
 my %option = ();
-GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s');
+GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$path_to_index\'.\n";
@@ -41,6 +42,7 @@ if ($option{'help'}) {
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
   print "Use '-x <filename>' or '--xml-junit <filename>' to store the results in junit's xml result format to <filename>.\n";
+  print "Use '-p <filename>' or '--printStatistics <filename>' to generate a statistics file. The file is overridden in case it already exists.";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
 #  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
@@ -51,6 +53,10 @@ my $reloadTests = $option{'reload'};
 if($option{'delete'}) {
     &cleanDirectories ($path_to_examples);
     exit 0;
+}
+
+if ($option{'printStatistics'} and -e $option{'printStatistics'}) {
+  unlink($option{'printStatistics'});
 }
 
 #
@@ -154,6 +160,10 @@ if($option{'storefailed'}) {
 
 if($option{'xml-junit'}) {
     &writeXmlReport($option{'xml-junit'});
+}
+
+if ($option{'printStatistics'}) {
+  &sumUpStatistics();
 }
 
 if($failures + $errors + scalar(@reloadFailed) > 0) {
@@ -337,7 +347,11 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto '$dk'";
+  my $statisticsCmd = "";
+  if ($option{'printStatistics'}) {
+    $statisticsCmd = "--print-statistics $orig_path/$option{'printStatistics'}";
+  }
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto $statisticsCmd '$dk'";
    print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -399,4 +413,45 @@ sub cleanDirectories {
 	}
     }
 
+}
+
+sub sumUpStatistics {
+    my $statisticsFile = "$orig_path/$option{'printStatistics'}";
+    my $statSumFile = "$statisticsFile.sum.properties";
+
+    my $csv = Text::CSV->new({sep_char => "|", allow_whitespace => 1});
+
+    open (CSV, "<", $statisticsFile) or die $!;
+
+    my @sum;
+    my @columnNames;
+    while (<CSV>) {
+	if ($csv->parse($_)) {
+	    my @line = $csv->fields();
+	    # remove the name of the example (can not be summed up)
+	    shift(@line);
+	    if ($. == 1) {
+		# first line with column names
+		@columnNames = @line;
+	    } elsif ($. == 2) {
+		# second line: init sum
+		@sum = @line;
+	    } else {
+		for (@sum) {
+		    $_ = $_ + shift(@line);
+		}
+	    }
+	} else {
+	    my $err = $csv->error_input;
+	    print "Failed to parse line: $err";
+	}
+    }
+    close CSV;
+    
+    open (OUT, ">", $statSumFile) or die $!;
+    for (@columnNames) {
+	print OUT $_."=".shift(@sum)."\n";
+    }
+    close OUT;
+    
 }
