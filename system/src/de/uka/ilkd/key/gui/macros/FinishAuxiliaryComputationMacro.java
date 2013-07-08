@@ -70,6 +70,8 @@ public class FinishAuxiliaryComputationMacro
         final IFProofObligationVars ifVars =
                 generateApplicationDataSVs(ifPO.getIFVars(), proof.getServices());
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        // 2 x
+        // result = ReplaceAndRegisterMethod.replace(result, StateVars origVars, StateVars poVars)
         final Taclet rwTaclet = generateRewriteTaclet(result, ifPO.getContract(), ifVars, services);
         initiatingGoal.proof().addIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
