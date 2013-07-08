@@ -352,15 +352,15 @@ public final class HeapLDT extends LDT {
 		Sort sortDependingOn = fieldPV.getContainerType().getSort();		
 		result = firstInstance.getInstanceFor(sortDependingOn, services);
 	    } else {
-		if(fieldPV.isModel()) {
+		    if(fieldPV.isModel()) {
 			int heapCount = 0;
 			for(LocationVariable heap : getAllHeaps()) {
 			   if(heap == getSavedHeap()) {
 			      continue;
 			   }
 			   heapCount++;
-		    }
-		    result = new ObserverFunction(
+			}
+			result = new ObserverFunction(
 			    		kind.toString(), 
 			                fieldPV.sort(),
 			                fieldPV.getKeYJavaType(),

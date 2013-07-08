@@ -348,6 +348,8 @@ public class InitConfig {
 	  for(LDT ldt : getServices().getTypeConverter().getModels()) {
 		ldt.proofSettingsUpdated(settings);
 	  }
+	  // replace the <inv> symbol as it may have changed arity
+	  namespaces().functions().add(services.getJavaInfo().getInv());
 	}
     
     

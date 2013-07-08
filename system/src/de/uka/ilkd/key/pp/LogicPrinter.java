@@ -1163,7 +1163,7 @@ public final class LogicPrinter {
 	    final ObserverFunction obs = (ObserverFunction) t.op();
             startTerm(t.arity());
 
-            int numHeaps = HeapContext.getModHeaps(services, false).size();
+            int numHeaps = obs.getHeapCount(services);
             final int stateCount = obs.getStateCount();
             final boolean printHeaps = 
             		(stateCount == 1 && t.sub(0).op() != heapLDT.getHeap()) 

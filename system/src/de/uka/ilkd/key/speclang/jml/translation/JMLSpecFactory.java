@@ -1034,7 +1034,6 @@ public class JMLSpecFactory {
         Triple<IObserverFunction, Term, Term> dep =
                 JMLTranslator.translate(originalDep, kjt, selfVar, null, null,
                                         null, null, Triple.class, services);
-        assert dep.first.arity() <= 2;
         return cf.dep(kjt, dep, dep.first.isStatic() ? null : selfVar);
     }
 

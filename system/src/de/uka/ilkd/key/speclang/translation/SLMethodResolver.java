@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -89,10 +90,17 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
         
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+    	List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+    	int hc = 0;
+    	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+    		if(hc >= pm.getHeapCount(services)) {
+    			break;
+    		}
+    		heaps.add(h);
+    	}
         ImmutableList<SLExpression> params = parameters.getParameters();
         int i = 0;
-        Term[] subs = new Term[params.size() - heaps.size() + pm.getStateCount()*heaps.size() + (pm.isStatic() ? 0 : 1) ];
+        Term[] subs = new Term[params.size() - pm.getHeapCount(services) + pm.getStateCount()*pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1) ];
         for(LocationVariable heap : heaps ) {
           if(pm.getStateCount() >= 1) {
             subs[i++] = TB.var(heap);
