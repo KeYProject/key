@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
@@ -42,7 +43,13 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
+import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
+import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -137,33 +144,34 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                                  ProgramVariable selfVar,
                                                  ProgramVariable resultVar) {
         final StatementBlock[] result = new StatementBlock[4];
-        final JavaInfo ji = services.getJavaInfo();
-       final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
+        final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
              new ProgramVariable[formalParVars.size()]));
 
-       if (getContract().getTarget().isConstructor()) {
+        if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
             assert resultVar == null;
             final KeYJavaType type = getContract().getKJT();
-            // TODO
+            // TODO clean up
 
             final Expression[] formalArray2 = formalArray.toArray(
                     new Expression[formalArray.size()]);
+            final New n = new New(formalArray2, new TypeRef(type), null);
+            final SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
             // construct what would be produced from rule instanceCreationAssignment
-            final ProgramVariable tmpVar = localVariable("tmp", type);
-            final Expression init = createObject(type);
+            final ProgramVariable tmpVar = selfVar;//localVariable("tmp", type);
+            final Expression init = (Expression) (new CreateObject(n)).transform(n, services, svInst);
             final Statement assignTmp = declare(tmpVar,init,type);
             result[0] = new StatementBlock(assignTmp);
 
             // try block
-            final Statement constructorCall = initObject(tmpVar, formalArray2);
-            final Statement setInitialized = setInitialized(ji, tmpVar);
+            final Statement constructorCall = (Statement)(new ConstructorCall(selfVar, n)).transform(n, services, svInst);
+            final Statement setInitialized = (Statement) (new PostWork(selfVar)).transform(tmpVar, services, svInst);
             result[1] = new StatementBlock(constructorCall, setInitialized);
 
             // finally block
-            final CopyAssignment ca = new CopyAssignment(selfVar, tmpVar);
-            result[3] = new StatementBlock(ca);
+//            final CopyAssignment ca = new CopyAssignment(selfVar, tmpVar);
+//            result[3] = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
                     new MethodBodyStatement(getContract().getTarget(),

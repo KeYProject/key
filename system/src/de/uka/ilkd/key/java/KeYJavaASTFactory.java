@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -141,15 +142,6 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference method (KeYJavaType kjt, String methodName, Expression... parameters) {
         return method(new TypeRef(kjt), methodName, parameters);
-    }
-
-    /**
-     * Creates an object creation expression (part of "new" call).
-     * @param kjt the type of the returned element
-     */
-    public static MethodReference createObject (KeYJavaType kjt) {
-        final String createObject = "<createObject>";
-        return method(kjt, createObject);
     }
 
     public static MethodReference initObject(ReferencePrefix prefix, Expression... parameters) {
