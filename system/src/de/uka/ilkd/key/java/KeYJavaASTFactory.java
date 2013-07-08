@@ -19,11 +19,15 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MethodName;
+import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -122,6 +126,42 @@ public abstract class KeYJavaASTFactory {
 		 (new LocationVariable(new ProgramElementName(name), type)));
     }
 
+
+    /**
+     * Creates a method call expression.
+     */
+    public static MethodReference method (ReferencePrefix prefix, String methodName, Expression... parameters) {
+        final ImmutableArray<Expression> a = new ImmutableArray<Expression>(parameters);
+        return new MethodReference(a, new ProgramElementName(methodName), prefix);
+    }
+
+    /**
+     * Creates a static method call expression.
+     * @param kjt the type where the static method is declared
+     */
+    public static MethodReference method (KeYJavaType kjt, String methodName, Expression... parameters) {
+        return method(new TypeRef(kjt), methodName, parameters);
+    }
+
+    /**
+     * Creates an object creation expression (part of "new" call).
+     * @param kjt the type of the returned element
+     */
+    public static MethodReference createObject (KeYJavaType kjt) {
+        final String createObject = "<createObject>";
+        return method(kjt, createObject);
+    }
+
+    public static MethodReference initObject(ReferencePrefix prefix, Expression... parameters) {
+        return method(prefix, "<init>", parameters);
+    }
+
+    public static CopyAssignment setInitialized (JavaInfo ji, ProgramVariable pv) {
+        final VariableReference vr = new VariableReference(pv);
+        final ProgramVariable field = ji.getAttribute("<initialized>", vr.getKeYJavaType());
+        final FieldReference fr = new FieldReference(field, vr);
+        return new CopyAssignment(fr, BooleanLiteral.TRUE);
+    }
 
     /**
      * create a parameter declaration

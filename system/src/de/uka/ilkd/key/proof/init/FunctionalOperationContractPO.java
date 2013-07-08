@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -22,8 +22,12 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import static de.uka.ilkd.key.java.KeYJavaASTFactory.*;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -124,36 +128,54 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected KeYJavaType getCalleeKeYJavaType() {
        return getContract().getKJT();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected StatementBlock buildOperationBlock(ImmutableList<LocationVariable> formalParVars,
+    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                  ProgramVariable selfVar,
                                                  ProgramVariable resultVar) {
+        final StatementBlock[] result = new StatementBlock[4];
+        final JavaInfo ji = services.getJavaInfo();
        final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
              new ProgramVariable[formalParVars.size()]));
 
        if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
             assert resultVar == null;
+            final KeYJavaType type = getContract().getKJT();
+            // TODO
+
             final Expression[] formalArray2 = formalArray.toArray(
                     new Expression[formalArray.size()]);
-            final New n = new New(formalArray2, new TypeRef(
-                    getContract().getKJT()), null);
-            final CopyAssignment ca = new CopyAssignment(selfVar, n);
-            return new StatementBlock(ca);
+
+            // construct what would be produced from rule instanceCreationAssignment
+            final ProgramVariable tmpVar = localVariable("tmp", type);
+            final Expression init = createObject(type);
+            final Statement assignTmp = declare(tmpVar,init,type);
+            result[0] = new StatementBlock(assignTmp);
+
+            // try block
+            final Statement constructorCall = initObject(tmpVar, formalArray2);
+            final Statement setInitialized = setInitialized(ji, tmpVar);
+            result[1] = new StatementBlock(constructorCall, setInitialized);
+
+            // finally block
+            final CopyAssignment ca = new CopyAssignment(selfVar, tmpVar);
+            result[3] = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
                     new MethodBodyStatement(getContract().getTarget(),
                                             selfVar,
                                             resultVar,
                                             formalArray);
-            return new StatementBlock(call);
+            result[1] = new StatementBlock(call);
         }
+       assert result[1] != null : "null body in method";
+       return ImmutableSLList.<StatementBlock>nil().prepend(result);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -174,39 +196,39 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         }
         return mbyAtPreDef;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Term getPre(List<LocationVariable> modHeaps,
-                          ProgramVariable selfVar, 
+                          ProgramVariable selfVar,
                           ImmutableList<ProgramVariable> paramVars,
-                          Map<LocationVariable, LocationVariable> atPreVars, 
+                          Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
        return contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, 
-                           ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, 
-                           ProgramVariable resultVar, 
-                           ProgramVariable exceptionVar, 
-                           Map<LocationVariable, LocationVariable> atPreVars, 
+    protected Term getPost(List<LocationVariable> modHeaps,
+                           ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+                           ProgramVariable resultVar,
+                           ProgramVariable exceptionVar,
+                           Map<LocationVariable, LocationVariable> atPreVars,
                            Services services) {
        return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, services);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                     Map<LocationVariable, Map<Term, Term>> heapToAtPre,
-                                    ProgramVariable selfVar, 
+                                    ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars) {
        Term frameTerm = null;
        for(LocationVariable heap : modHeaps) {
@@ -227,7 +249,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        }
        return frameTerm;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -235,7 +257,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected Modality getTerminationMarker() {
        return getContract().getModality();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -262,7 +284,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         }
         return update;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -286,7 +308,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     public Term getMbyAtPre() {
         return mbyAtPre;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -326,7 +348,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         super.fillSaveProperties(properties);
         properties.setProperty("contract", contract.getName());
     }
-    
+
     /**
      * Instantiates a new proof obligation with the given settings.
      * @param initConfig The already load {@link InitConfig}.
