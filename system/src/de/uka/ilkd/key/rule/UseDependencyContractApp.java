@@ -133,7 +133,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     		if(getHeapContext() == null) {
                  heapContext = HeapContext.getModHeaps(services, false);
     	    }
-    		selfTerm = focus.sub(target.getStateCount() * getHeapContext().size());
+    		selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
     		kjt = services.getJavaInfo().getKeYJavaType(
     		        selfTerm.sort());
     	}

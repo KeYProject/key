@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -96,7 +97,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 	return originalRep.op() instanceof Equality
 	       && originalRep.sub(0).op() == target
 	       && (target.isStatic() 
-		   || originalRep.sub(0).sub(target.getStateCount()*HeapContext.getModHeaps(services, false).size()).op().equals(originalSelfVar));
+		   || originalRep.sub(0).sub(target.getStateCount()*target.getHeapCount(services)).op().equals(originalSelfVar));
     }
     
     private Term instance(boolean finalClass, SchemaVariable selfSV, Services services){
@@ -143,7 +144,14 @@ public final class RepresentsAxiom extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+    	List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+    	int hc = 0;
+    	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+    		if(hc >= target.getHeapCount(services)) {
+    			break;
+    		}
+    		heaps.add(h);
+    	}
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
 
         Name tacletName = MiscTools.toValidTacletName(name);

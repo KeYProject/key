@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -484,6 +485,11 @@ public final class ProgramSV extends AbstractSV
    @Override
    public int getStateCount() {
       return 1;
+   }
+
+   @Override
+   public int getHeapCount(Services services) {
+      return HeapContext.getModHeaps(services, false).size();
    }
 
    @Override
