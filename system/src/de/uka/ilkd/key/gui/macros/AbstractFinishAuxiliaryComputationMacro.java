@@ -4,37 +4,29 @@
  */
 package de.uka.ilkd.key.gui.macros;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
@@ -43,7 +35,7 @@ import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,9 +65,9 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    protected Term calculateResultingTerm(Proof proof,
-                                          IFProofObligationVars ifVars,
-                                          Goal initGoal) {
+    private static Term calculateResultingTerm(Proof proof,
+                                               IFProofObligationVars ifVars,
+                                               Goal initGoal) {
         final Term[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1),
                                proof.openGoals(), initGoal);
@@ -94,15 +86,14 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term[] buildExecution(ProofObligationVars c,
-                                  Map<Term, Term> vsMap,
-                                  ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
-                                  Goal initGoal) {
+    private static Term[] buildExecution(ProofObligationVars c,
+                                         Map<Term, Term> vsMap,
+                                         ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
+                                         Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         // the built-in heap symbol has to be handled with care
-        final HashMap<Operator, Boolean> doNotReplace =
-                new HashMap<Operator, Boolean>();
+        final HashMap<Operator, Boolean> doNotReplace = new HashMap<Operator, Boolean>();
         doNotReplace.put(TB.getBaseHeap(services).op(), Boolean.TRUE);
         final Term[] renamedGoalFormulas =
                 renameVariablesAndSkolemConstants(goalFormulas, vsMap, doNotReplace,
@@ -116,12 +107,12 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term[] applyProgramRenamingsToSubs(Term term,
-                                               Map<ProgramVariable, AbstractSortedOperator>
-                                                                        progVarReplaceMap,
-                                               Map<Operator, Boolean> notReplaceMap,
-                                               String postfix,
-                                               Services services) {
+    private static Term[] applyProgramRenamingsToSubs(Term term,
+                                                      Map<ProgramVariable, ProgramVariable>
+                                                                          progVarReplaceMap,
+                                                      Map<Operator, Boolean> notReplaceMap,
+                                                      String postfix,
+                                                      Services services) {
         Term[] appliedSubs = null;
         if (term.subs() != null) {
             appliedSubs = new Term[term.subs().size()];
@@ -137,31 +128,22 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Map<ProgramVariable, AbstractSortedOperator>
-                    extractProgramVarReplaceMap(Map<Term, Term> replaceMap) {
-        Map<ProgramVariable, AbstractSortedOperator> progVarReplaceMap =
-                new HashMap<ProgramVariable, AbstractSortedOperator>();
+    private static Map<ProgramVariable, ProgramVariable>
+                        extractProgramVarReplaceMap(Map<Term, Term> replaceMap) {
+        Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
+                new HashMap<ProgramVariable, ProgramVariable>();
         for (final Term t : replaceMap.keySet()) {
             if (t.op() instanceof ProgramVariable) {
-                if (!(replaceMap.get(t).op() instanceof AbstractSortedOperator)) {
-                    ProgramSV sv =
-                            SchemaVariableFactory.createProgramSV(
-                                    new ProgramElementName(replaceMap.get(t).op().name().toString()),
-                                    ProgramSVSort.VARIABLE, false);
-                    System.out.println("extractProgramVarReplaceMap:" + '\n' +
-                                       sv.toString() + " :: " + sv.sort().toString());
-                    //replaceMap.put(t, TB.var(sv));
-                }
-            progVarReplaceMap.put((ProgramVariable) t.op(),
-                                  (AbstractSortedOperator) replaceMap.get(t).op());
+                progVarReplaceMap.put((ProgramVariable) t.op(),
+                                      (ProgramVariable) replaceMap.get(t).op());
             }
         }
         return progVarReplaceMap;
     }
 
 
-    private void insertBoundVarsIntoNotReplaceMap(Term term,
-                                                  Map<Operator, Boolean> notReplaceMap) {
+    private static void insertBoundVarsIntoNotReplaceMap(Term term,
+                                                         Map<Operator, Boolean> notReplaceMap) {
         if (term.boundVars() != null) {
             for (final QuantifiableVariable bv : term.boundVars()) {
                 notReplaceMap.put(bv, Boolean.TRUE);
@@ -170,11 +152,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term renameFormulasWithoutPrograms(Term term,
-                                               Map<Term, Term> replaceMap,
-                                               Map<Operator, Boolean> notReplaceMap,
-                                               String postfix,
-                                               Goal initGoal) {
+    private static Term renameFormulasWithoutPrograms(Term term,
+                                                      Map<Term, Term> replaceMap,
+                                                      Map<Operator, Boolean> notReplaceMap,
+                                                      String postfix,
+                                                      Goal initGoal) {
         Services services = initGoal.proof().getServices();
         if (term == null) {
             return null;
@@ -234,18 +216,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                                                   initGoal);
             final Term[] renamedSubs =
                     renameSubs(term, replaceMap, notReplaceMap, postfix, initGoal);
-            final UpdateableOperator lhs;
-            if (renamedLhs.op() instanceof UpdateableOperator) {
-                lhs = (UpdateableOperator) renamedLhs.op();
-            } else {
-                lhs = SchemaVariableFactory.createProgramSV(
-                        (VariableNamer.parseName(renamedLhs.op().name().toString())),
-                        ProgramSVSort.VARIABLE, false);
-                System.out.println(renamedLhs.toString() + " :: " +
-                                   renamedLhs.sort().toString() + " -> " +
-                                   lhs.toString() + " :: " + lhs.sort().toString());
-            }
-            final ElementaryUpdate renamedU = ElementaryUpdate.getInstance(lhs);
+            final ElementaryUpdate renamedU =
+                    ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
             final Term uTerm = TermFactory.DEFAULT.createTerm(renamedU, renamedSubs);
             replaceMap.put(term, uTerm);
             return uTerm;
@@ -263,12 +235,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private JavaBlock renameJavaBlock(Map<ProgramVariable, AbstractSortedOperator> progVarReplaceMap,
-                                      Term term, Services services) {
-        final ProgVarSchemaVarReplaceVisitor paramRepl =
-                new ProgVarSchemaVarReplaceVisitor(term.javaBlock().program(),
-                                                   progVarReplaceMap,
-                                                   services);
+    private static JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
+                                             Term term, Services services) {
+        final ProgVarReplaceVisitor paramRepl =
+                new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
         paramRepl.start();
         final JavaBlock renamedJavaBlock =
                 JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
@@ -276,7 +246,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
+    private static Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
         Term[] result = new Term[symbExecGoals.size()];
         int i = 0;
         for (final Goal symbExecGoal : symbExecGoals) {
@@ -287,7 +257,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term buildFormulaFromGoal(Goal symbExecGoal) {
+    private static Term buildFormulaFromGoal(Goal symbExecGoal) {
         Term result = TB.tt();
         for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
             result = TB.and(result, f.formula());
@@ -299,11 +269,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term[] renameVariablesAndSkolemConstants(Term[] terms,
-                                                     Map<Term, Term> replaceMap,
-                                                     Map<Operator, Boolean> notReplaceMap,
-                                                     String postfix,
-                                                     Goal initGoal) {
+    private static Term[] renameVariablesAndSkolemConstants(Term[] terms,
+                                                            Map<Term, Term> replaceMap,
+                                                            Map<Operator, Boolean> notReplaceMap,
+                                                            String postfix,
+                                                            Goal initGoal) {
         Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
             result[i] =
@@ -315,29 +285,29 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term renameVariablesAndSkolemConstants(Term term,
-                                                   Map<Term, Term> replaceMap,
-                                                   Map<Operator, Boolean> notReplaceMap,
-                                                   String postfix,
-                                                   Goal initGoal) {
+    private static Term renameVariablesAndSkolemConstants(Term term,
+                                                          Map<Term, Term> replaceMap,
+                                                          Map<Operator, Boolean> notReplaceMap,
+                                                          String postfix,
+                                                          Goal initGoal) {
         final Term temp = renameFormulasWithoutPrograms(term, replaceMap,
                                                         notReplaceMap,
                                                         postfix,
                                                         initGoal);
         Services services = initGoal.proof().getServices();
-        final Map<ProgramVariable, AbstractSortedOperator> progVarReplaceMap =
+        final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 extractProgramVarReplaceMap(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap, notReplaceMap,
                                         postfix, services);
     }
 
 
-    private Term applyRenamingsToPrograms(Term term,
-                                          Map<ProgramVariable, AbstractSortedOperator>
-                                                                    progVarReplaceMap,
-                                          Map<Operator, Boolean> notReplaceMap,
-                                          String postfix,
-                                          Services services) {
+    private static Term applyRenamingsToPrograms(Term term,
+                                                 Map<ProgramVariable, ProgramVariable>
+                                                                     progVarReplaceMap,
+                                                 Map<Operator, Boolean> notReplaceMap,
+                                                 String postfix,
+                                                 Services services) {
         if (term != null) {
             final JavaBlock renamedJavaBlock =
                     renameJavaBlock(progVarReplaceMap, term, services);
@@ -357,11 +327,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term[] renameSubs(Term term,
-                              Map<Term, Term> replaceMap,
-                              Map<Operator, Boolean> notReplaceMap,
-                              String postfix,
-                              Goal initGoal) {
+    private static Term[] renameSubs(Term term,
+                                     Map<Term, Term> replaceMap,
+                                     Map<Operator, Boolean> notReplaceMap,
+                                     String postfix,
+                                     Goal initGoal) {
         Term[] renamedSubs = null;
         if (term.subs() != null) {
             renamedSubs = new Term[term.subs().size()];
@@ -395,9 +365,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         Term guardAtPreSV =
                 createTermSV(appData.pre.guard, schemaPrefix, services);
         Term resAtPreSV =
-                createTermSV(appData.pre.result, schemaPrefix, services);
+                null;
+                //createTermSV(appData.pre.result, schemaPrefix, services);
         Term excAtPreSV =
-                createTermSV(appData.pre.exception, schemaPrefix, services);
+                null;
+                //createTermSV(appData.pre.exception, schemaPrefix, services);
         Term heapAtPreSV =
                 createTermSV(appData.pre.heap, schemaPrefix, services);
         Term mbyAtPreSV =
@@ -427,41 +399,37 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
         Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
                 guardAtPreSV : createTermSV(appData.post.guard, schemaPrefix, services));
-        Term resAtPostSV = (appData.pre.result == appData.post.result ?
-                resAtPreSV : createTermSV(appData.post.result, schemaPrefix, services));
-        Term excAtPostSV = (appData.pre.exception == appData.post.exception ?
-                excAtPreSV : createTermSV(appData.post.exception, schemaPrefix, services));
+        Term resAtPostSV = //(appData.pre.result == appData.post.result ? resAtPreSV :
+            createTermSV(appData.post.result, schemaPrefix, services);//);
+        Term excAtPostSV = //(appData.pre.exception == appData.post.exception ? excAtPreSV :
+            createTermSV(appData.post.exception, schemaPrefix, services);//);
         Term heapAtPostSV = (appData.pre.heap == appData.post.heap ?
                 heapAtPreSV : createTermSV(appData.post.heap, schemaPrefix, services));
 
         // build state variable container for pre and post state
         StateVars pre =
                 new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
-                              excAtPreSV, heapAtPreSV, mbyAtPreSV, services);
+                              excAtPreSV, heapAtPreSV, mbyAtPreSV);
+        pre = filterSchemaVars(appData.pre, pre);
         StateVars post =
                 new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
-                              excAtPostSV, heapAtPostSV, null, services);
+                              excAtPostSV, heapAtPostSV, null);
+        post = filterSchemaVars(appData.post, post);
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post);
     }
 
     private static Term createTermSV(Term t,
-                                 String schemaPrefix,
-                                 Services services) {
+                                     String schemaPrefix,
+                                     Services services) {
         if (t == null) {
             return null;
         }
         String svName = schemaPrefix + t.toString();
         Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
         Sort sort = t.sort();
-        if (sort instanceof UpdateableOperator) {
-            return TB.var(SchemaVariableFactory.createProgramSV(
-                    VariableNamer.parseName(name.toString()), ProgramSVSort.VARIABLE, false));
-        } else {
-            return TB.var(SchemaVariableFactory.createTermSV(name, sort));
-        }
-
+        return TB.var(SchemaVariableFactory.createTermSV(name, sort));
     }
 
     private static ImmutableList<Term> createTermSV(ImmutableList<Term> ts,
@@ -474,8 +442,106 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         return result;
     }
 
-    protected void addContractApplicationTaclets(Goal initiatingGoal,
-                                                 Proof symbExecProof) {
+    protected static final Term calculateResultingSVTerm(Proof proof,
+                                                         IFProofObligationVars origVars,
+                                                         IFProofObligationVars schemaVars,
+                                                         Goal initGoal) {
+        final Term term = calculateResultingTerm(proof, origVars, initGoal);
+        return replace(term, origVars, schemaVars);
+    }
+
+    private static final Term replace(Term term,
+                                      IFProofObligationVars origVars,
+                                      IFProofObligationVars schemaVars) {
+        Term intermediateResult = replace(term, origVars.c1, schemaVars.c1);
+        return replace(intermediateResult, origVars.c2, schemaVars.c2);
+    }
+
+    private static final Term replace(Term term,
+                                      ProofObligationVars origVars,
+                                      ProofObligationVars schemaVars) {
+        Term intermediateResult = replace(term, origVars.pre, schemaVars.pre);
+        return replace(intermediateResult, origVars.post, schemaVars.post);
+    }
+
+    private static final Term replace(Term term,
+                                      StateVars origVars,
+                                      StateVars schemaVars) {
+        de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
+                new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
+
+        Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
+        origVars = vars.first;
+        schemaVars = vars.second;
+        assert origVars.termList.size() == schemaVars.termList.size();
+        Iterator<Term> origVarsIt = origVars.termList.iterator();
+        Iterator<Term> schemaVarsIt = schemaVars.termList.iterator();
+        while (origVarsIt.hasNext()) {
+            Term origTerm = origVarsIt.next();
+            Term svTerm = schemaVarsIt.next();
+            if (origTerm != null && svTerm != null) {
+                assert svTerm.sort().equals(origTerm.sort()) ||
+                svTerm.sort().extendsSorts().contains(origTerm.sort()) :
+                    "mismatch of sorts: orignal term " + origTerm +
+                    ", sort " + origTerm.sort() +
+                    "; replacement term" + svTerm + ", sort " +
+                    svTerm.sort();
+                map.put(origTerm, svTerm);
+            }
+        }
+        OpReplacer or = new OpReplacer(map);
+        Term result = or.replace(term);
+
+        return result;
+    }
+
+    private static Pair<StateVars, StateVars> filter(StateVars origVars,
+                                                     StateVars schemaVars) {
+        schemaVars = filterSchemaVars(origVars, schemaVars);
+        origVars = filterSchemaVars(schemaVars, origVars);
+        return new Pair<StateVars, StateVars> (origVars, schemaVars);
+    }
+
+    private static StateVars filterSchemaVars(StateVars origVars,
+                                              StateVars schemaVars) {
+        if (origVars.termList.size() == schemaVars.termList.size()) {
+            return schemaVars;
+        }
+        Term self = schemaVars.self;
+        Term guard = schemaVars.guard;
+        ImmutableList<Term> localVars = schemaVars.localVars;
+        Term result = schemaVars.result;
+        Term exception = schemaVars.exception;
+        Term heap = schemaVars.heap;
+        Term mbyAtPre = schemaVars.mbyAtPre;
+        if (origVars.self == null) {
+            self = null;
+        }
+        if (origVars.guard == null) {
+            guard = null;
+        }
+        if (origVars.localVars == null) {
+            localVars = null;
+        } else if (origVars.localVars.isEmpty()) {
+            localVars = ImmutableSLList.<Term>nil();
+        }
+        if (origVars.result == null) {
+            result = null;
+        }
+        if (origVars.exception == null) {
+            exception = null;
+        }
+        if (origVars.heap == null) {
+            heap = null;
+        }
+        if (origVars.mbyAtPre == null) {
+            mbyAtPre = null;
+        }
+        return new StateVars(self, guard, localVars, result, exception, heap, mbyAtPre);
+    }
+
+    protected static void addContractApplicationTaclets(Goal initiatingGoal,
+                                                        Proof symbExecProof) {
         final ImmutableList<Goal> openGoals = symbExecProof.openGoals();
         for (final Goal openGoal : openGoals) {
             final ImmutableSet<NoPosTacletApp> ruleApps =
@@ -486,96 +552,6 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                     initiatingGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
                 }
             }
-        }
-    }
-    private static class ProgVarSchemaVarReplaceVisitor extends CreatingASTVisitor {
-
-        private ProgramElement result = null;
-
-        // indicates if ALL program variables are to be replace by new
-        // variables with the same name
-        protected boolean replaceallbynew = true;
-
-        /**
-         * stores the program variables to be replaced as keys and the new
-         * program variables as values
-         */
-        protected Map<ProgramVariable, AbstractSortedOperator> replaceMap;
-
-        /**
-         * creates a visitor that replaces the program variables in the given
-         * statement by new ones with the same name
-         * @param st the statement where the prog vars are replaced
-         * @param map the HashMap with the replacements
-         */
-        public ProgVarSchemaVarReplaceVisitor(ProgramElement st,
-                                              Map<ProgramVariable, AbstractSortedOperator> map,
-                                              Services services) {
-        super(st, true, services);
-        this.replaceMap = map;
-            assert services != null;
-        }
-
-        //%%% HACK: there should be a central facility for introducing new program
-        // variables; this method is also used in <code>MethodCall</code> to
-        // create copies of parameter variables
-        public static AbstractSortedOperator copy(ProgramVariable pv) {
-        return copy(pv, "");
-        }
-
-        //%%% HACK: there should be a central facility for introducing new program
-        // variables; this method is also used in <code>MethodCall</code> to
-        // create copies of parameter variables
-        public static AbstractSortedOperator copy(ProgramVariable pv, String postFix) {
-            ProgramElementName name = pv.getProgramElementName();
-            //%%% HACK: final local variables are not renamed since they can occur in an
-            // anonymous class declared in their scope of visibility.
-            /*      if(pv.isFinal()){
-                return pv;
-            }*/
-            if (pv.sort() instanceof UpdateableOperator) {
-                return SchemaVariableFactory.createProgramSV(
-                        (VariableNamer.parseName(name.toString() + postFix, name.getCreationInfo())),
-                        ProgramSVSort.VARIABLE, false);
-            } else {
-                return SchemaVariableFactory.createTermSV(name, pv.sort());
-            }
-            /*return new LocationVariable
-                    (VariableNamer.parseName(name.toString() + postFix,
-                            name.getCreationInfo()),
-                            pv.getKeYJavaType(), pv.isFinal());*/
-        }
-
-        protected void walk(ProgramElement node) {
-            if (node instanceof LocalVariableDeclaration && replaceallbynew) {
-                LocalVariableDeclaration vd = (LocalVariableDeclaration)node;
-                ImmutableArray<VariableSpecification> vspecs = vd.getVariableSpecifications();
-                for (int i = 0; i < vspecs.size(); i++) {
-                    ProgramVariable pv
-                    = (ProgramVariable)
-                    vspecs.get(i).getProgramVariable();
-                    if (!replaceMap.containsKey(pv)) {
-                        replaceMap.put(pv, copy(pv));
-                    }
-                }
-            }
-            super.walk(node);
-        }
-
-        /** starts the walker*/
-        public void start() {
-            stack.push(new ExtList());
-            walk(root());
-            ExtList el= stack.peek();
-            int i=0;
-            while (!(el.get(i) instanceof ProgramElement)) {
-                i++;
-            }
-            result=(ProgramElement) stack.peek().get(i);
-        }
-
-        public ProgramElement result() {
-            return result;
         }
     }
 }

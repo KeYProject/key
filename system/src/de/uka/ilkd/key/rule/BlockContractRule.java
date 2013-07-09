@@ -380,15 +380,13 @@ public class BlockContractRule implements BuiltInRule {
                                   localVarsAtPre,
                                   heapAtPre,
                                   hasRes ? resultAtPre : null,
-                                  hasExc ? exceptionAtPre : null,
-                                  services);
+                                  hasExc ? exceptionAtPre : null);
             final StateVars instantiationPostVars =
                     new StateVars(hasSelf ? selfAtPost : null,
                                   localVarsAtPost,
                                   heapAtPost,
                                   hasRes ? resultAtPost : null,
-                                  hasExc ? exceptionAtPost : null,
-                                  services);
+                                  hasExc ? exceptionAtPost : null);
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(instantiationPreVars,
                                                 instantiationPostVars);
@@ -419,19 +417,17 @@ public class BlockContractRule implements BuiltInRule {
             // create and add split-post and remove-post taclets
             final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
             final ArrayList<Taclet> splitPostTaclets =
-                    splitPostTB.generateTaclets(post, services);
+                    splitPostTB.generateTaclets(post, ifVars, services);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
                 goal.proof().addLabeledIFSymbol(t);
-                goal.proof().addIFSymbol(((RewriteTaclet)t).find());
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
             final ArrayList<Taclet> removePostTaclets =
-                    removePostTB.generateTaclets(post, services);
+                    removePostTB.generateTaclets(post, ifVars, services);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
                 goal.proof().addLabeledIFSymbol(t);
-                goal.proof().addIFSymbol(((RewriteTaclet)t).find());
             }
             goal.proof().addIFSymbol(contractApplTerm);
             goal.proof().addIFSymbol(informationFlowContractApp);
@@ -597,7 +593,7 @@ public class BlockContractRule implements BuiltInRule {
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        goal.proof().addIFSymbol(selfComposedExec);
+        goal.proof().addLabeledIFSymbol(selfComposedExec);
         Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
 

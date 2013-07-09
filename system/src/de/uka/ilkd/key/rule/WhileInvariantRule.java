@@ -339,7 +339,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        goal.proof().addIFSymbol(selfComposedExec);
+        goal.proof().addLabeledIFSymbol(selfComposedExec);
 
         final Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
@@ -349,19 +349,17 @@ public final class WhileInvariantRule implements BuiltInRule {
         // create and add split-post and remove-post taclets
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
         final ArrayList<Taclet> splitPostTaclets =
-                splitPostTB.generateTaclets(post, services);
+                splitPostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
             goal.proof().addLabeledIFSymbol(t);
-            goal.proof().addIFSymbol(((RewriteTaclet)t).find());
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets =
-                removePostTB.generateTaclets(post, services);
+                removePostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
             goal.proof().addLabeledIFSymbol(t);
-            goal.proof().addIFSymbol(((RewriteTaclet)t).find());
         }
 
         return infFlowGoal;
@@ -727,14 +725,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                     new StateVars(selfTerm,
                                   guardAtPre,
                                   localVarsAtPre,
-                                  heapAtPre,
-                                  services);
+                                  heapAtPre);
             final StateVars instantiationPostVars =
                     new StateVars(selfAtPost,
                                   guardAtPost,
                                   localVarsAtPost,
-                                  heapAtPost,
-                                  services);
+                                  heapAtPost);
             final ProofObligationVars instantiationVars =
                 new ProofObligationVars(instantiationPreVars, instantiationPostVars);
 

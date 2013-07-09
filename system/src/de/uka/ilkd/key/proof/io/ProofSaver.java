@@ -131,7 +131,7 @@ public class ProofSaver {
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
               for (SequentFormula s: proof.root().sequent().succedent().toList()) {
-                  proof.addLabeledIFSymbol(s.formula());
+                  proof.addLabeledTotalTerm(s.formula());
               }
           } else {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,

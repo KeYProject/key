@@ -503,6 +503,16 @@ public class Proof implements Named {
         }
     }
 
+    public void addTotalTerm(Term p) {
+        assert p != null;
+        infFlowSymbols.addTotalTerm(p);
+    }
+
+    public void addLabeledTotalTerm(Term p) {
+        assert p != null;
+        infFlowSymbols.addLabeledTotalTerm(p);
+    }
+
     public void unionIFSymbols(InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.union(symbols);

@@ -62,14 +62,15 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp)app;
         final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        final IFProofObligationVars ifSchemaVars =
+                generateApplicationDataSVs(ifVars, proof.getServices());
 
         // create and register resulting taclets
-        final IFProofObligationVars ifVars =
-                generateApplicationDataSVs(loopInvRuleApp.getInformationFlowProofObligationVars(),
-                                           proof.getServices());
-        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
-        final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifVars, services);
-        initiatingGoal.proof().addIFSymbol(rwTaclet);
+        final Term result = calculateResultingSVTerm(proof, ifVars, ifSchemaVars, initiatingGoal);
+        final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifSchemaVars, services);
+        initiatingGoal.proof().addLabeledTotalTerm(result);
+        initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
@@ -104,7 +105,6 @@ public class FinishAuxiliaryLoopComputationMacro extends
                                                    services);
         final Term find =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
-        services.getProof().addIFSymbol(find);
 
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();

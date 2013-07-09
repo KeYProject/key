@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
@@ -72,7 +71,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        addIFSymbol(selfComposedExec);
+        addLabeledIFSymbol(selfComposedExec);
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
@@ -87,7 +86,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         // create and add split-post and remove-post taclets
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
         final ArrayList<Taclet> splitPostTaclets =
-                splitPostTB.generateTaclets(post, services);
+                splitPostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : splitPostTaclets) {
             taclets = taclets.add(NoPosTacletApp
                     .createFixedNoPosTacletApp(t,
@@ -95,11 +94,10 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
             addLabeledIFSymbol(t);
-            addIFSymbol(((RewriteTaclet)t).find());
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets =
-                removePostTB.generateTaclets(post, services);
+                removePostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : removePostTaclets) {
             taclets = taclets.add(NoPosTacletApp
                     .createFixedNoPosTacletApp(t,
@@ -107,7 +105,6 @@ public class InfFlowContractPO extends AbstractOperationPO
                                                services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
             addLabeledIFSymbol(t);
-            addIFSymbol(((RewriteTaclet)t).find());
         }
     }
 

@@ -131,10 +131,10 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private ProofObligationVars getProofObligationVars() {
         StateVars pre =
                 new StateVars(contractSelfAtPre, loopGuardAtPre, localVarsAtPre,
-                              heapAtPre, contractResultAtPre, exceptionVarAtPre, services);
+                              heapAtPre, contractResultAtPre, exceptionVarAtPre);
         StateVars post =
                 new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
-                              heapAtPost, contractResultAtPost, exceptionVarAtPost, services);
+                              heapAtPost, contractResultAtPost, exceptionVarAtPost);
         assert pre.paddedTermList.size() == post.paddedTermList.size();
         return new ProofObligationVars(pre, post);
     }
@@ -201,14 +201,14 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         // build state vararibale container for pre and post state
         StateVars pre =
                 new StateVars(selfAtPreSV, guardAtPreSV,
-                                        localVarsAtPreSVs, resAtPreSV,
-                                        excAtPreSV, heapAtPreSV,
-                                        mbyAtPreSV, services);
+                              localVarsAtPreSVs, resAtPreSV,
+                              excAtPreSV, heapAtPreSV,
+                              mbyAtPreSV);
         StateVars post =
                 new StateVars(selfAtPostSV, guardAtPostSV,
-                                        localVarsAtPostSVs, resAtPostSV,
-                                        excAtPostSV, heapAtPostSV,
-                                        null, services);
+                              localVarsAtPostSVs, resAtPostSV,
+                              excAtPostSV, heapAtPostSV,
+                              null);
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post);

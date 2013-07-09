@@ -9,12 +9,15 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -244,7 +247,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private boolean isPredicate(Function f) {
+    private boolean isPredicate(Operator f) {
         assert f != null;
         if (f.name().toString().startsWith("RELATED_BY") ||
                 f.name().toString().startsWith("EXECUTION_OF")) {
@@ -348,19 +351,14 @@ public class InfFlowProofSymbols {
     public void add(Term t) {
         assert t != null;
         t = TermBuilder.DF.goBelowUpdates(t);
-        if (!t.subs().isEmpty()) {
-            for (final Term s: t.subs()) {
-                add(s);
+        if (!isPredicate(t.op())) {
+            if (!t.subs().isEmpty()) {
+                for (final Term s: t.subs()) {
+                    add(s);
+                }
             }
         }
         add(t.op());
-        /*if (t.op() instanceof UpdateApplication) {
-            add(UpdateApplication.getUpdate(t));
-            add(UpdateApplication.getTarget(t));
-        }
-        if (t.op() instanceof ElementaryUpdate) {
-            add(((ElementaryUpdate)t.op()).lhs());
-        }*/
     }
 
     public void addLabeled(Term t) {
@@ -372,13 +370,6 @@ public class InfFlowProofSymbols {
             }
         }
         addLabeled(t.op());
-        /*if (t.op() instanceof UpdateApplication) {
-            add(UpdateApplication.getUpdate(t));
-            add(UpdateApplication.getTarget(t));
-        }
-        if (t.op() instanceof ElementaryUpdate) {
-            add(((ElementaryUpdate)t.op()).lhs());
-        }*/
     }
 
     public InfFlowProofSymbols union(InfFlowProofSymbols symbols) {
@@ -404,6 +395,42 @@ public class InfFlowProofSymbols {
         result.schemaVariables = schemaVariables.union(symbols.schemaVariables);
         result.taclets = taclets.union(symbols.taclets);
         return result;
+    }
+
+    public void addTotalTerm(Term t) {
+        assert t != null;
+        if (t.op() instanceof UpdateApplication) {
+            addTotalTerm(UpdateApplication.getUpdate(t));
+            addTotalTerm(UpdateApplication.getTarget(t));
+        }
+        if (t.op() instanceof ElementaryUpdate) {
+            add(((ElementaryUpdate)t.op()).lhs());
+        }
+        t = TermBuilder.DF.goBelowUpdates(t);
+        if (!t.subs().isEmpty()) {
+            for (final Term s: t.subs()) {
+                addTotalTerm(s);
+            }
+        }
+        add(t.op());
+    }
+
+    public void addLabeledTotalTerm(Term t) {
+        assert t != null;
+        if (t.op() instanceof UpdateApplication) {
+            addLabeledTotalTerm(UpdateApplication.getUpdate(t));
+            addLabeledTotalTerm(UpdateApplication.getTarget(t));
+        }
+        if (t.op() instanceof ElementaryUpdate) {
+            addLabeled(((ElementaryUpdate)t.op()).lhs());
+        }
+        t = TermBuilder.DF.goBelowUpdates(t);
+        if (!t.subs().isEmpty()) {
+            for (final Term s: t.subs()) {
+                addLabeledTotalTerm(s);
+            }
+        }
+        addLabeled(t.op());
     }
 
     private ImmutableSet<Sort> getSorts() {

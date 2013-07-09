@@ -1,23 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design 
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General 
-// Public License. See LICENSE.TXT for details.
-// 
-
 package de.uka.ilkd.key.gui.macros;
 
-/**
- *
- * @author christoph scheben
- */
-public class AuxiliaryComputationAutoPilotMacro extends SequentialOnLastGoalProofMacro {
+public class AuxiliaryBlockComputationAutoPilotMacro extends SequentialOnLastGoalProofMacro {
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
@@ -66,7 +49,7 @@ public class AuxiliaryComputationAutoPilotMacro extends SequentialOnLastGoalProo
             }
         };
         return new ProofMacro[]{
-            new StartAuxiliaryComputationMacro(),
+            new StartAuxiliaryBlockComputationMacro(),
             finishSymbExecAndTryToClose,
         };
     }
