@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use Cwd 'getcwd', 'realpath', 'abs_path';
+use Cwd 'getcwd', 'realpath';
 use File::Find;
 use File::Basename;
 use Getopt::Long;
@@ -55,8 +55,9 @@ if($option{'delete'}) {
 }
 
 if ($option{'printStatistics'}) {
-    $option{'printStatistics'} = abs_path($option{'printStatistics'});
-    unlink($option{'printStatistics'}) if -e $option{'printStatistics'};
+    $option{'printStatistics'} = realpath($option{'printStatistics'});
+    unlink($option{'printStatistics'}) 
+	if $option{'printStatistics'} && -e $option{'printStatistics'};
 }
 
 #
@@ -349,7 +350,7 @@ sub runAuto {
   my $dk = &getcwd . "/$_[0]";
   my $statisticsCmd = "";
   if ($option{'printStatistics'}) {
-    $statisticsCmd = "--print-statistics $option{'printStatistics'}";
+    $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
   }
   my $command = "'" . $path_to_key . "/bin/runProver' --auto $statisticsCmd '$dk'";
    print "Command is: $command\n";
