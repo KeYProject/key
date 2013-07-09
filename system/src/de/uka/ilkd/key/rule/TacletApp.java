@@ -743,7 +743,8 @@ public abstract class TacletApp implements RuleApp {
 	    				  Services services) {
 	final Function c 
 		= new Function(new Name(instantiation), sort, new Sort[0]);
-	return addInstantiation(sv, TB.func(c), interesting, services);
+        final Term labeledTerm = TB.label(TB.func(c), AuxiliaryTermLabel.INSTANCE);
+	return addInstantiation(sv, labeledTerm, interesting, services);
     }
     
     

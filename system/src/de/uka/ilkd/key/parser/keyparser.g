@@ -695,6 +695,9 @@ options {
                 } else if(makeSkolemTermSV) {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
+                } else if (mods instanceof SchemaVariableModifierSet.AuxiliarySV) {
+                    v = SchemaVariableFactory.createAuxiliarySV(new Name(name),
+                    				                s);
                 } else { v = SchemaVariableFactory.createTermSV(
                 					new Name(name), 
                 					s, 
@@ -1793,6 +1796,9 @@ one_schema_var_decl
       | (SKOLEMTERM 
          { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
+         ( schema_modifiers[mods] ) ?)
+      | (AUXILIARY_VAR
+         { mods = new SchemaVariableModifierSet.AuxiliarySV (); }
          ( schema_modifiers[mods] ) ?)
     )
     s = any_sortId_check[true]

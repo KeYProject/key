@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.logic.op.AuxiliarySV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -81,7 +82,7 @@ public abstract class GenericSortCondition {
      *         have to match exactly
      */
     static boolean subSortsAllowed (SchemaVariable p_sv) {
-        return p_sv instanceof TermSV && !p_sv.isStrict ();
+        return (p_sv instanceof TermSV || p_sv instanceof AuxiliarySV) && !p_sv.isStrict ();
     }
     
     /**

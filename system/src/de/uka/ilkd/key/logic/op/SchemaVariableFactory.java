@@ -95,6 +95,11 @@ public class SchemaVariableFactory {
     }
     
 
+    public static AuxiliarySV createAuxiliarySV(Name name, Sort s) {
+        return new AuxiliarySV(name, s);
+    }
+    
+
     /** creates a SchemaVariable representing a program construct
      */
     public static ProgramSV createProgramSV(ProgramElementName name, 
