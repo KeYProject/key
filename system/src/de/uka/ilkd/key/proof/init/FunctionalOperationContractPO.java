@@ -25,14 +25,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.*;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
@@ -43,9 +40,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
@@ -151,7 +146,6 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             assert selfVar != null;
             assert resultVar == null;
             final KeYJavaType type = getContract().getKJT();
-            // TODO clean up
 
             final Expression[] formalArray2 = formalArray.toArray(
                     new Expression[formalArray.size()]);
@@ -159,19 +153,14 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             final SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
             // construct what would be produced from rule instanceCreationAssignment
-            final ProgramVariable tmpVar = selfVar;//localVariable("tmp", type);
             final Expression init = (Expression) (new CreateObject(n)).transform(n, services, svInst);
-            final Statement assignTmp = declare(tmpVar,init,type);
+            final Statement assignTmp = declare(selfVar,init,type);
             result[0] = new StatementBlock(assignTmp);
 
             // try block
             final Statement constructorCall = (Statement)(new ConstructorCall(selfVar, n)).transform(n, services, svInst);
-            final Statement setInitialized = (Statement) (new PostWork(selfVar)).transform(tmpVar, services, svInst);
+            final Statement setInitialized = (Statement) (new PostWork(selfVar)).transform(selfVar, services, svInst);
             result[1] = new StatementBlock(constructorCall, setInitialized);
-
-            // finally block
-//            final CopyAssignment ca = new CopyAssignment(selfVar, tmpVar);
-//            result[3] = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
                     new MethodBodyStatement(getContract().getTarget(),

@@ -30,17 +30,20 @@ public class PostWork extends ProgramTransformer {
 
     private final static String POST_WORK = "post-work";
 
+    /**
+     * Whether this transformer is used schematically (i.e., in taclets).
+     */
     private final boolean schema;
 
-     /** creates a typeof ProgramTransformer
-     * @param newObjectSV the instance of expression contained by
-     * the meta construct
-     */
     public PostWork(SchemaVariable newObjectSV) {
 	super(POST_WORK, (Expression)newObjectSV);
 	schema = true;
     }
 
+    /**
+     * Used to create this Java statement programmatically.
+     * Do not use in taclet meta constructs!
+     */
     public PostWork (ProgramVariable pv) {
         super(POST_WORK, pv);
         schema = false;

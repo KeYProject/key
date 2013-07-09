@@ -21,9 +21,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -142,17 +140,6 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference method (KeYJavaType kjt, String methodName, Expression... parameters) {
         return method(new TypeRef(kjt), methodName, parameters);
-    }
-
-    public static MethodReference initObject(ReferencePrefix prefix, Expression... parameters) {
-        return method(prefix, "<init>", parameters);
-    }
-
-    public static CopyAssignment setInitialized (JavaInfo ji, ProgramVariable pv) {
-        final VariableReference vr = new VariableReference(pv);
-        final ProgramVariable field = ji.getAttribute("<initialized>", vr.getKeYJavaType());
-        final FieldReference fr = new FieldReference(field, vr);
-        return new CopyAssignment(fr, BooleanLiteral.TRUE);
     }
 
     /**

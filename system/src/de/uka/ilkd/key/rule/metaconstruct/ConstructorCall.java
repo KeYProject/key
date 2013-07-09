@@ -53,6 +53,7 @@ public class ConstructorCall extends ProgramTransformer {
 		 ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
 
+    //@ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;
     private final ProgramVariable newObjectVar;
 
@@ -76,6 +77,10 @@ public class ConstructorCall extends ProgramTransformer {
 	this(new Name(CONSTRUCTOR_CALL), newObjectSV, consRef);
     }
 
+    /**
+     * Used to programmatically produce this statement.
+     * There is no schema variable instantiation, since we have a concrete variable.
+     */
     public ConstructorCall(ProgramVariable pv, New n) {
         super(new Name(CONSTRUCTOR_CALL), n);
         newObjectSV = null;
