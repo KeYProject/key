@@ -417,10 +417,11 @@ sub cleanDirectories {
 
 # see http://www.somacon.com/p114.php
 sub trim($) {
-	my $string = shift;
-	$string =~ s/^\s+//;
-	$string =~ s/\s+$//;
-	return $string;
+    my $string = shift;
+    chomp $string;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
 }
 
 sub sumUpStatistics {
@@ -432,8 +433,7 @@ sub sumUpStatistics {
     my @sum;
     my @columnNames;
     while (<CSV>) {
-	trim $_;
-	my @line = split /\s*\|\s*/, $_;
+	my @line = split /\s*\|\s*/, &trim($_);
 	# remove the name of the example (can not be summed up)
 	shift(@line);
 	if ($. == 1) {
