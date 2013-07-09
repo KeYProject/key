@@ -1,11 +1,10 @@
 #!/usr/bin/perl -w
 use strict;
-use Cwd 'getcwd', 'realpath';
+use Cwd 'getcwd', 'realpath', 'abs_path';
 use File::Find;
 use File::Basename;
 use Getopt::Long;
 use POSIX qw(strftime);
-use Text::CSV;
 # use File::Copy;
 # use Net::SMTP;
 
@@ -42,7 +41,7 @@ if ($option{'help'}) {
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
   print "Use '-x <filename>' or '--xml-junit <filename>' to store the results in junit's xml result format to <filename>.\n";
-  print "Use '-p <filename>' or '--printStatistics <filename>' to generate a statistics file. The file is overridden in case it already exists.";
+  print "Use '-p <filename>' or '--printStatistics <filename>' to generate a statistics file. The file is overridden in case it already exists.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
 #  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
@@ -55,8 +54,9 @@ if($option{'delete'}) {
     exit 0;
 }
 
-if ($option{'printStatistics'} and -e $option{'printStatistics'}) {
-  unlink($option{'printStatistics'});
+if ($option{'printStatistics'}) {
+    $option{'printStatistics'} = abs_path($option{'printStatistics'});
+    unlink($option{'printStatistics'}) if -e $option{'printStatistics'};
 }
 
 #
@@ -349,7 +349,7 @@ sub runAuto {
   my $dk = &getcwd . "/$_[0]";
   my $statisticsCmd = "";
   if ($option{'printStatistics'}) {
-    $statisticsCmd = "--print-statistics $orig_path/$option{'printStatistics'}";
+    $statisticsCmd = "--print-statistics $option{'printStatistics'}";
   }
   my $command = "'" . $path_to_key . "/bin/runProver' --auto $statisticsCmd '$dk'";
    print "Command is: $command\n";
@@ -415,35 +415,42 @@ sub cleanDirectories {
 
 }
 
-sub sumUpStatistics {
-    my $statisticsFile = "$orig_path/$option{'printStatistics'}";
-    my $statSumFile = "$statisticsFile.sum.properties";
+# see http://www.somacon.com/p114.php
+sub trim($) {
+	my $string = shift;
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	return $string;
+}
 
-    my $csv = Text::CSV->new({sep_char => "|", allow_whitespace => 1});
+sub sumUpStatistics {
+    my $statisticsFile = "$option{'printStatistics'}";
+    my $statSumFile = "$statisticsFile.sum.properties";
 
     open (CSV, "<", $statisticsFile) or die $!;
 
     my @sum;
     my @columnNames;
     while (<CSV>) {
-	if ($csv->parse($_)) {
-	    my @line = $csv->fields();
-	    # remove the name of the example (can not be summed up)
-	    shift(@line);
-	    if ($. == 1) {
-		# first line with column names
-		@columnNames = @line;
-	    } elsif ($. == 2) {
-		# second line: init sum
-		@sum = @line;
-	    } else {
-		for (@sum) {
-		    $_ = $_ + shift(@line);
-		}
-	    }
+	trim $_;
+	my @line = split /\s*\|\s*/, $_;
+	# remove the name of the example (can not be summed up)
+	shift(@line);
+	if ($. == 1) {
+	    # first line with column names
+	    @columnNames = @line;
+	} elsif ($. == 2) {
+	    # second line: init sum
+	    die "wrong number of fields in line $." 
+		unless scalar(@line) == scalar(@columnNames);
+	    @sum = @line;
 	} else {
-	    my $err = $csv->error_input;
-	    print "Failed to parse line: $err";
+	    # remaining lines: adding up
+	    die "wrong number of fields in line $." 
+		unless scalar(@line) == scalar(@columnNames);
+	    for (@sum) {
+		$_ = $_ + shift(@line);
+	    }
 	}
     }
     close CSV;
