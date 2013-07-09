@@ -110,6 +110,7 @@ public class QueryExpand implements BuiltInRule {
         tb.setName(tacletName);
         tb.setDisplayName("replaceKnownQuery");
         tb.setFind(query);
+        tb.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tb.addGoalTerm(queryEval.second);
         tb.addRuleSet(new RuleSet(new Name("concrete")));
 
