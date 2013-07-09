@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
+import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -111,8 +112,24 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
           }
        }), longConst(-3000)));
        // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break. 
-       globalF = add(globalF, ifZero(new ContainsLabelFeature(LoopBodyTermLabel.INSTANCE), longConst(-2000)));
+       globalF = add(globalF, ifZero(new ContainsLabelFeature(LoopBodyTermLabel.INSTANCE), longConst(-2000)));       
+       globalF = add(globalF, querySiteProofFeature());       
        return globalF;
+   }
+   
+   /**
+    * Computes the cost {@link Feature} for the {@link QuerySideProofRule}.
+    * @return The cost {@link Feature} for the {@link QuerySideProofRule}.
+    */
+   protected Feature querySiteProofFeature() {
+      SetRuleFilter filter = new SetRuleFilter();
+      filter.addRuleToSet(QuerySideProofRule.INSTANCE);
+      if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(strategyProperties.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
+         return ConditionalFeature.createConditional(filter, longConst(-30000));
+      }
+      else {
+         return ConditionalFeature.createConditional(filter, inftyConst());
+      }
    }
 
    /**
@@ -129,6 +146,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The default {@link StrategyProperties} for symbolic execution.
     */
@@ -136,6 +154,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                                                                            boolean quantifierInstantiationWithSplitting,
                                                                            boolean methodTreatmentContract, 
                                                                            boolean loopTreatmentInvariant,
+                                                                           boolean nonExecutionBranchHidingSideProofs,
                                                                            boolean aliasChecks) {
       StrategyProperties sp = new StrategyProperties();
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
@@ -151,6 +170,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
       sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, nonExecutionBranchHidingSideProofs ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
       return sp;
    }
 

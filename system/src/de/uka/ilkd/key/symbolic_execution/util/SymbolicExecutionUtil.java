@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,6 +58,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
@@ -247,7 +249,7 @@ public final class SymbolicExecutionUtil {
          }
       };
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(source.getServices().copy(), profile);
+      InitConfig initConfig = new InitConfig(source.getServices().copy(profile));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -503,9 +505,12 @@ public final class SymbolicExecutionUtil {
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT); // Method Treatment: Contract
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); // Loop Treatment: Invariant
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON); // Dependency Contracts: On
-      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED); // Query Treatment: Restricted
+      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON); // Query Treatment: On
+      sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON); // Expand local queries: Off
       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits 
+      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER); // Alias checks 
+      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF); // Avoid branches caused by modalities not part of the main execution 
       starter.setStrategy(sp);
       // Execute proof in the current thread
       return starter.start();
@@ -2402,11 +2407,13 @@ public final class SymbolicExecutionUtil {
     * @param proof The {@link Proof} to configure.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
     * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
     */
    public static void updateStrategySettings(Proof proof, 
                                              boolean useOperationContracts,
                                              boolean useLoopInvariants,
+                                             boolean nonExecutionBranchHidingSideProofs,
                                              boolean aliasChecksImmediately) {
       if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
@@ -2415,12 +2422,16 @@ public final class SymbolicExecutionUtil {
          String loopTreatmentValue = useLoopInvariants ? 
                                      StrategyProperties.LOOP_INVARIANT : 
                                      StrategyProperties.LOOP_EXPAND;
+         String nonExecutionBranchHidingValue = nonExecutionBranchHidingSideProofs ? 
+                                                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : 
+                                                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF;
          String aliasChecksValue = aliasChecksImmediately ? 
                                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : 
                                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, nonExecutionBranchHidingValue);
          sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
          updateStrategySettings(proof, sp);
       }
@@ -2535,5 +2546,44 @@ public final class SymbolicExecutionUtil {
          result = result.substring("FILE:".length());
       }
       return result;
+   }
+
+   /**
+    * Checks if the given {@link Term} is a select on a heap.
+    * @param services The {@link Services} to use.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is select, {@code false} is something else.
+    */
+   public static boolean isSelect(Services services, Term term) {
+      Function select = services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
+      return select == term.op();
+   }
+
+   /**
+    * Checks if the given {@link Operator} is a number.
+    * @param op The {@link Operator} to check.
+    * @return {@code true} is number, {@code false} is something else.
+    */
+   public static boolean isNumber(Operator op) {
+      if (op instanceof Function) {
+         String[] numbers = {"#", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Z", "neglit"};
+         Arrays.sort(numbers);
+         int index = Arrays.binarySearch(numbers, op.name().toString());
+         return index >= 0;
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the given {@link Operator} is a boolean.
+    * @param op The {@link Operator} to check.
+    * @return {@code true} is boolean, {@code false} is something else.
+    */
+   public static boolean isBoolean(Services services, Operator op) {
+      BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+      return booleanLDT.getFalseConst() == op ||
+             booleanLDT.getTrueConst() == op;
    }
 }

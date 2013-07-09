@@ -28,9 +28,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
@@ -73,6 +75,11 @@ public class DefaultProblemLoader {
     * The {@link KeYMediator} to use.
     */
    private KeYMediator mediator;
+   
+   /**
+    * The {@link Profile} to use for new {@link Proof}s.
+    */
+   private Profile profileOfNewProofs;
 
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
@@ -99,14 +106,19 @@ public class DefaultProblemLoader {
     * @param file The file or folder to load.
     * @param classPath The optional class path entries to use.
     * @param bootClassPath An optional boot class path.
+    * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
       this.bootClassPath = bootClassPath;
       this.mediator = mediator;
+      this.profileOfNewProofs = profileOfNewProofs;
+      if (this.profileOfNewProofs == null) {
+         this.profileOfNewProofs = AbstractProfile.getDefaultProfile();
+      }
    }
 
    /**
@@ -167,22 +179,22 @@ public class DefaultProblemLoader {
       if (filename.endsWith(".java")) {
          // java file, probably enriched by specifications
          if (file.getParentFile() == null) {
-            return new SLEnvInput(".", classPath, bootClassPath);
+            return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs);
          }
          else {
             return new SLEnvInput(file.getParentFile().getAbsolutePath(),
-                  classPath, bootClassPath);
+                  classPath, bootClassPath, profileOfNewProofs);
          }
       }
       else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
          // KeY problem specification or saved proof
-         return new KeYUserProblemFile(filename, file, mediator.getUI());
+         return new KeYUserProblemFile(filename, file, mediator.getUI(), profileOfNewProofs);
 
       }
       else if (file.isDirectory()) {
          // directory containing java sources, probably enriched
          // by specifications
-         return new SLEnvInput(file.getPath(), classPath, bootClassPath);
+         return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs);
       }
       else {
          if (filename.lastIndexOf('.') != -1) {
@@ -207,8 +219,7 @@ public class DefaultProblemLoader {
    protected ProblemInitializer createProblemInitializer(boolean registerProof) {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
-                                    mediator.getProfile(),
-                                    new Services(mediator.getExceptionHandler()),
+                                    new Services(envInput.getProfile(), mediator.getExceptionHandler()),
                                     registerProof,
                                     ui);
    }

@@ -20,6 +20,259 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTestCase {
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
+    */
+   public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects/test/QueryWithSideEffects.java", 
+                          "QueryWithSideEffects", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects/oracle/QueryWithSideEffects_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
+    */
+   public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects/test/QueryWithSideEffects.java", 
+                          "QueryWithSideEffects", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects/oracle/QueryWithSideEffects_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithFields
+    */
+   public void testNonExecutionBranchHidingQueryWithFields_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithFields/test/QueryWithFields.java", 
+                          "QueryWithFields", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithFields/oracle/QueryWithFields_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithFields
+    */
+   public void testNonExecutionBranchHidingQueryWithFields_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithFields/test/QueryWithFields.java", 
+                          "QueryWithFields", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryWithFields/oracle/QueryWithFields_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleObjectQuery
+    */
+   public void testNonExecutionBranchHidingSimpleObjectQuery_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleObjectQuery/test/SimpleObjectQuery.java", 
+                          "SimpleObjectQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleObjectQuery/oracle/SimpleObjectQuery_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleObjectQuery
+    */
+   public void testNonExecutionBranchHidingSimpleObjectQuery_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleObjectQuery/test/SimpleObjectQuery.java", 
+                          "SimpleObjectQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleObjectQuery/oracle/SimpleObjectQuery_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleBooleanQuery
+    */
+   public void testNonExecutionBranchHidingSimpleBooleanQuery_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleBooleanQuery/test/SimpleBooleanQuery.java", 
+                          "SimpleBooleanQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleBooleanQuery/oracle/SimpleBooleanQuery_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleBooleanQuery
+    */
+   public void testNonExecutionBranchHidingSimpleBooleanQuery_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleBooleanQuery/test/SimpleBooleanQuery.java", 
+                          "SimpleBooleanQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleBooleanQuery/oracle/SimpleBooleanQuery_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery
+    */
+   public void testNonExecutionBranchHidingSimpleIntQuery_mainWithSymbolicUpdates_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java", 
+                          "SimpleIntQuery", 
+                          "mainWithSymbolicUpdates", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/oracle/SimpleIntQuery_mainWithSymbolicUpdates_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery
+    */
+   public void testNonExecutionBranchHidingSimpleIntQuery_mainWithUpdates_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java", 
+                          "SimpleIntQuery", 
+                          "mainWithUpdates", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/oracle/SimpleIntQuery_mainWithUpdates_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery
+    */
+   public void testNonExecutionBranchHidingSimpleIntQuery_main_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java", 
+                          "SimpleIntQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/oracle/SimpleIntQuery_main_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery
+    */
+   public void testNonExecutionBranchHidingSimpleIntQuery_main_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/test/SimpleIntQuery.java", 
+                          "SimpleIntQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingSimpleIntQuery/oracle/SimpleIntQuery_main_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/aliasTest
     */
@@ -37,8 +290,10 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           false);
    }
+   
    /**
     * Tests example: examples/_testcase/set/aliasTest
     */
@@ -53,6 +308,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -76,8 +332,10 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           false);
    }
+   
    /**
     * Tests example: examples/_testcase/set/aliasTest
     */
@@ -92,6 +350,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,

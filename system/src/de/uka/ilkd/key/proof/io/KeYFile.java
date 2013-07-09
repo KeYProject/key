@@ -33,6 +33,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -66,6 +67,8 @@ public class KeYFile implements EnvInput {
 
     private String proofObligation = null;
     
+    private final Profile profile;
+    
     // when parsing the key file store the classPaths here
     private ImmutableList<String> classPaths;
     
@@ -82,13 +85,16 @@ public class KeYFile implements EnvInput {
      * and a RuleSource representing the physical source of the .key file.
      */
     public KeYFile(String name, 
-                   RuleSource file, 
-                   ProgressMonitor monitor) {
+                   RuleSource file,
+                   ProgressMonitor monitor,
+                   Profile profile) {
         assert name != null;
         assert file != null;
+        assert profile != null;
         this.name = name;
         this.file = file;
         this.monitor = monitor;
+        this.profile = profile;
     }
 
         
@@ -97,8 +103,9 @@ public class KeYFile implements EnvInput {
      */
     public KeYFile(String name, 
                    File file, 
-                   ProgressMonitor monitor) {
-	this(name, RuleSource.initRuleFile(file), monitor);
+                   ProgressMonitor monitor,
+                   Profile profile) {
+	this(name, RuleSource.initRuleFile(file), monitor, profile);
     }
     
 
@@ -133,12 +140,13 @@ public class KeYFile implements EnvInput {
                 return null;
             }
             try {
-                KeYParser problemParser 
+                
+               KeYParser problemParser 
                     = new KeYParser(ParserMode.PROBLEM,
                                     new KeYLexer(getNewStream(), null), 
                                     file.toString());
-                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-                settings.setProfile(ProofSettings.DEFAULT_SETTINGS.getProfile());
+               problemParser.profile();
+               ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.loadSettingsFromString(problemParser.preferences());
                 initConfig.setSettings(settings);
                 return settings;                
@@ -183,7 +191,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 ParserConfig pc = new ParserConfig
-                (new Services(), 
+                (new Services(getProfile()), 
                         new NamespaceSet());
                 // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
                 // during collection of includes (it is enough to mispell \include) the error
@@ -260,6 +268,7 @@ public class KeYFile implements EnvInput {
                                                                  null), 
                                                     file.toString());
             
+            problemParser.profile(); // skip profile
             problemParser.preferences(); // skip preferences
 
             bootClassPath = problemParser.bootClassPath();
@@ -482,5 +491,10 @@ public class KeYFile implements EnvInput {
             return -1;
         }
 	return externalForm.hashCode();
+    }
+
+    @Override
+    public Profile getProfile() {
+        return profile;
     }
 }

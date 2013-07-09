@@ -156,7 +156,7 @@ public class Proof implements Named {
         StrategyProperties activeStrategyProperties =
             settings.getStrategySettings().getActiveStrategyProperties();
 
-        final Profile profile = settings.getProfile();
+        final Profile profile = services.getProfile();
 
         if (profile.supportsStrategyFactory(settings.getStrategySettings().getStrategy())) {
             setActiveStrategy

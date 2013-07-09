@@ -57,8 +57,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      */
     public KeYUserProblemFile(String name, 
                               File file, 
-                              ProgressMonitor monitor) {
-        super(name, file, monitor);
+                              ProgressMonitor monitor,
+                              Profile profile) {
+        super(name, file, monitor, profile);
     }
     
     
@@ -101,7 +102,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         //read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
         				       readClassPath(), 
-        				       readBootClassPath());
+        				       readBootClassPath(), getProfile());
         slEnvInput.setInitConfig(initConfig);
         slEnvInput.read();
                 
@@ -221,4 +222,48 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public int hashCode() {
         return file.file().getAbsolutePath().hashCode();
     }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Profile getProfile() {
+      try {
+         Profile profile = readProfileFromFile();
+         if (profile != null) {
+            return profile;
+         }
+         else {
+            return getDefaultProfile();
+         }
+      }
+      catch (Exception e) {
+         return getDefaultProfile();
+      }
+   }
+   
+   /**
+    * Tries to read the {@link Profile} from the file to load.
+    * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile} is defined by the file.
+    * @throws Exception Occurred Exception.
+    */
+   protected Profile readProfileFromFile() throws Exception {
+      KeYParser problemParser = new KeYParser(ParserMode.GLOBALDECL, new KeYLexer(getNewStream(), null), file.toString());
+      problemParser.profile();
+      String profileName = problemParser.getProfileName();
+      if (profileName != null && !profileName.isEmpty()) {
+         return AbstractProfile.getDefaultInstanceForName(profileName);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the default {@link Profile} which was defined by a constructor.
+    * @return The default {@link Profile}.
+    */
+   protected Profile getDefaultProfile() {
+      return super.getProfile();
+   }
 }

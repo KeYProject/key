@@ -88,7 +88,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
 
         // set a new strategy.
-        Proof proof = mediator.getProof();
+        Proof proof = mediator.getSelectedProof();
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
 

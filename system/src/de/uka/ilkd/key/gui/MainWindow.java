@@ -660,7 +660,7 @@ public final class MainWindow extends JFrame  {
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
-            getMediator().getProof().fireProofGoalsChanged();
+            getMediator().getSelectedProof().fireProofGoalsChanged();
         }
     }
 
@@ -1396,7 +1396,7 @@ public final class MainWindow extends JFrame  {
             MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
 	    	return;
 	    }
-	    final Proof proof = mediator.getProof();
+	    final Proof proof = mediator.getSelectedProof();
 
 	    Thread thread = new Thread(new Runnable() {
 	        @Override

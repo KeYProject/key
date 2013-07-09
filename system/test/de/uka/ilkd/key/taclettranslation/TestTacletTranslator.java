@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class TestTacletTranslator extends TestCase {
@@ -42,7 +43,7 @@ public class TestTacletTranslator extends TestCase {
 
     protected void setUp() throws Exception {
         nss = new NamespaceSet();
-        services = new Services();
+        services = new Services(AbstractProfile.getDefaultProfile());
 
         parseDecls("\\sorts { S; }\n" +
                 "\\functions {\n" +

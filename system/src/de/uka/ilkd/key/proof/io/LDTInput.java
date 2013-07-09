@@ -20,9 +20,17 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.FreeLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
@@ -41,6 +49,7 @@ public class LDTInput implements EnvInput {
 
     private final KeYFile[] keyFiles;
     private final LDTInputListener listener;
+    private final Profile profile;
 
     private InitConfig initConfig = null;
 
@@ -50,9 +59,11 @@ public class LDTInput implements EnvInput {
      * @param keyFiles an array containing the LDT .key files
      * @param main the main class used to report the progress of reading
      */
-    public LDTInput(KeYFile[] keyFiles, LDTInputListener listener) {
+    public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
+   assert profile != null;
 	this.keyFiles = keyFiles;
 	this.listener=listener;
+	this.profile = profile;
     }
         
     
@@ -192,5 +203,10 @@ public class LDTInput implements EnvInput {
     @Override
     public String toString() {
 	return name();
+    }
+
+    @Override
+    public Profile getProfile() {
+        return profile;
     }
 }

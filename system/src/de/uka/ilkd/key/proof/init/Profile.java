@@ -15,15 +15,17 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
- *
+ *<p>
  * This interface provides methods that allow to customize KeY for
  * certain applications. It supports to customize
  * <ul>
@@ -40,6 +42,23 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
  *    </li>
  *    </ul>
  * etc.
+ * </p>
+ * <p>
+ * Each {@link Profile} has a unique name {@link #name()}. It is recommended
+ * to have only one instance of each {@link Profile}. The default instances
+ * for usage in the {@link Thread} of the user interface
+ * are available via {@link JavaProfile#getDefaultInstance()} and
+ * {@link SymbolicExecutionJavaProfile#getDefaultInstance()}.
+ * It is possible to get the default instance for a given name via
+ * {@link AbstractProfile#getDefaultInstanceForName(String)}. Multiple instances
+ * are only required if {@link Proof}s are done in parallel (in different {@link Thread}s),
+ * because some rules might have a state (at the moment this is only the {@link OneStepSimplifier}).
+ * </p>
+ * <p>
+ * The default {@link Profile} which is used if no profile is programmatically
+ * or via a custom problem file defined is {@link AbstractProfile#getDefaultProfile()}.
+ * It can be changed via {@link AbstractProfile#setDefaultProfile(Profile)}.
+ * </p>
  */
 public interface Profile {
 
@@ -98,13 +117,6 @@ public interface Profile {
     /** returns the (default) justification for the given rule */
     RuleJustification getJustification(Rule r);
 
-    /**
-     *
-     * @param settings the ProofSettings to be updated to defaults provided by
-     * this profile
-     */
-    void updateSettings(ProofSettings settings);
-
     
     /**
      * returns the file name of the internal class directory relative to JavaRedux
@@ -117,5 +129,4 @@ public interface Profile {
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
-
 }

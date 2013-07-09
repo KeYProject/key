@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -227,10 +227,6 @@ public class Main {
      * @param commandline object cl
      */
     public static void evaluateOptions(CommandLine cl) {
-
-        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
-
-
         if(cl.isSet(AUTO)){
         	uiMode = UiMode.AUTO;
         }
@@ -383,7 +379,7 @@ public class Main {
             opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
             LemmataHandler handler = new LemmataHandler(opt,
-                    ProofSettings.DEFAULT_SETTINGS.getProfile());
+                    AbstractProfile.getDefaultProfile());
             handler.start();
 
         } catch(Exception e) {

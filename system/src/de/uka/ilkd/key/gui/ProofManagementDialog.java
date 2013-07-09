@@ -457,7 +457,7 @@ public final class ProofManagementDialog extends JDialog {
         if(proof == null) {
         	UserInterface ui = mediator.getUI();
             ProblemInitializer pi = 
-            		new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
+            		new ProblemInitializer(ui, services, true, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch(ProofInputException exc) {

@@ -205,7 +205,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public boolean canSuspend() {
       return super.canSuspend() && 
              environment.getBuilder().getMediator().autoMode() && // Only if the auto mode is in progress
-             environment.getBuilder().getMediator().getProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
+             environment.getBuilder().getMediator().getSelectedProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
    }
    
    /**
