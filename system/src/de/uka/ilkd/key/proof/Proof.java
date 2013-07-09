@@ -53,6 +53,8 @@ import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -511,6 +513,20 @@ public class Proof implements Named {
     public void addLabeledTotalTerm(Term p) {
         assert p != null;
         infFlowSymbols.addLabeledTotalTerm(p);
+    }
+
+    public void addGoalTemplates(Taclet t) {
+        assert t != null;
+        ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
+        assert temps != null;
+        for (TacletGoalTemplate tgt: temps) {
+            for (SequentFormula sf: tgt.sequent().antecedent().toList()) {
+                addLabeledTotalTerm(sf.formula());
+            }
+            for (SequentFormula sf: tgt.sequent().succedent().toList()) {
+                addLabeledTotalTerm(sf.formula());
+            }
+        }
     }
 
     public void unionIFSymbols(InfFlowProofSymbols symbols) {

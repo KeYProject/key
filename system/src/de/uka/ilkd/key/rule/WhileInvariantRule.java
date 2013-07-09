@@ -409,6 +409,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         goal.proof().addIFSymbol(infData.applPredTerm);
         goal.proof().addIFSymbol(infData.infFlowApp);
+        goal.proof().addGoalTemplates(infData.infFlowApp);
 
         return goal;
     }

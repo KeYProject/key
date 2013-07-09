@@ -431,6 +431,7 @@ public class BlockContractRule implements BuiltInRule {
             }
             goal.proof().addIFSymbol(contractApplTerm);
             goal.proof().addIFSymbol(informationFlowContractApp);
+            goal.proof().addGoalTemplates(informationFlowContractApp);
 
             return new InfFlowValidityData(infFlowAssumptions,
                                            informationFlowContractApp,

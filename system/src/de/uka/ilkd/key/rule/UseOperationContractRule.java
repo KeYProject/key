@@ -844,6 +844,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             postGoal.addFormula(new SequentFormula(finalPreTerm), true, false);
             postGoal.proof().addIFSymbol(contractApplPredTerm);
             postGoal.proof().addIFSymbol(informationFlowContractApp);
+            postGoal.proof().addGoalTemplates(informationFlowContractApp);
         }
 
         //create "Exceptional Post" branch
