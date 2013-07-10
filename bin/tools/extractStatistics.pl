@@ -19,6 +19,7 @@ GetOptions ('directory|d=s' => \$targetDir,
 
 my @sum;
 my @columnNames;
+my $countExamples = 0;
 while (<>) {
     my @line = split /\s*\|\s*/, &trim($_);
     # remove the name of the example (can not be summed up)
@@ -31,6 +32,7 @@ while (<>) {
 	die "wrong number of fields in line $." 
 	    unless scalar(@line) == scalar(@columnNames);
 	@sum = @line;
+	$countExamples ++;
     } else {
 	# remaining lines: adding up
 	die "wrong number of fields in line $." 
@@ -38,9 +40,11 @@ while (<>) {
 	for (@sum) {
 	    $_ = $_ + shift(@line);
 	}
+	$countExamples ++;
     }
 }
 
+# generate files for the columns
 foreach (@columnNames) {
     print "creating $targetDir/$_.sum.properties\n";
     open (OUT, ">", "$targetDir/$_.sum.properties") or die $!;
@@ -49,4 +53,10 @@ foreach (@columnNames) {
     close OUT;
 }
 
+# and finally for the total number of examples
+print "creating $targetDir/count.sum.properties\n";
+open OUT, ">", "$targetDir/count.sum.properties" or die $!;
+print OUT "YVALUE=$countProblems\n";
+print OUT "URL=http://abu.se.informatik.tu-darmstadt.de:8080/hudson/userContent/$projectName\n";
+close OUT;
 
