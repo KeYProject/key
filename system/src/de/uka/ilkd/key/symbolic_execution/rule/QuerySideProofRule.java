@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.rule;
 
-import java.security.KeyStore.Builder;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -21,6 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -40,31 +43,57 @@ import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
- * A {@link Builder} which evaluates a query in a side proof.
+ * A {@link BuiltInRule} which evaluates a query in a side proof.
  * </p>
  * <p>
- * This rule is only applicable on top level formulas of the form 
- * {@code <var> = <query>},
- * {@code <query> = <var>},
- * {@code <pre> -> <var> = <query>} or
- * {@code <pre> -> <query> = <var>}.
+ * This rule is applicable on each equality which contains a query: 
+ * <ul>
+ *    <li>{@code ...(<something> = <query>)...} or</li>
+ *    <li>{@code ...(<query> = <something>)...}</li>
+ * </ul>
  * </p>
  * <p>
- * In the following Goal the equality term is removed and for each possible
- * result is a new top level formula of the form 
- * {@code <resultCondition> -> <var> = <result>}, 
- * {@code <resultCondition> -> <result> = <var>},
- * {@code <pre> -> <resultCondition> -> <var> = <result>} or 
- * {@code <pre> -> <resultCondition> -> <result> = <var>} 
- * added. The side proof uses the default side proof settings (splitting = delayed) and is started
+ * The original {@link SequentFormula} which contains the equality is always
+ * removed in the following {@link Goal}. How the result of the query computed
+ * in the side proof is represented depends on the occurrence of the equality:
+ * <ol>
+ *    <li>
+ *       <b>top level {@code <something> = <query>} or {@code <query> = <something>}</b><br>
+ *       For each possible result value is a {@link SequentFormula} added to the antecedent of the form:
+ *       <ul>
+ *          <li>{@code <resultCondition> -> <something> = <result>} or </li>
+ *          <li>{@code <resultCondition> -> <result> = <something>}</li>
+ *       </ul>
+ *    </li>
+ *    <li>
+ *       <b>right side of an implication on top level {@code <queryCondition> -> <something> = <query>} or {@code <queryCondition> -> <query> = <something>}</b><br>
+ *       For each possible result value is a {@link SequentFormula} added to the antecedent of the form:
+ *       <ul>
+ *          <li>{@code <pre> -> (<resultCondition> -> <something> = <result>)} or </li>
+ *          <li>{@code <pre> -> (<resultCondition> -> <result> = <something>)}</li>
+ *       </ul>
+ *    </li>
+ *    <li>
+ *       <b>everywhere else {@code ...(<something> = <query>)...} or {@code ...(<query> = <something>)...}</b><br>
+ *       In the original {@link SequentFormula} is the {@code <query>} replaced by a new constant function named {@code QueryResult} and added to the antecedent.
+ *       For each possible result value is an additional {@link SequentFormula} added to the antecedent of the form:
+ *       <ul>
+ *          <li>{@code <resultCondition> -> QueryResult = <result>} or </li>
+ *          <li>{@code <resultCondition> -> <result> = QueryResult}</li>
+ *       </ul>
+ *    </li>
+ * </ol>
+ * The side proof uses the default side proof settings (splitting = delayed) and is started
  * via {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}.
  * In case that at least one result branch has applicable rules an exception is thrown and the rule is aborted.
  * </p>
  * @author Martin Hentschel
  */
+// TODO: What happens if a query occurs in the succedent?
 public final class QuerySideProofRule implements BuiltInRule {
    /**
     * The singleton instance of this class.
@@ -89,26 +118,11 @@ public final class QuerySideProofRule implements BuiltInRule {
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
       boolean applicable = false;
       if (pio != null) {
-         Term term = null;
-         if (pio.isTopLevel()) {
-            term = pio.subTerm();
-         }
-         else {
-            Term topTerm = pio.constrainedFormula().formula();
-            if (topTerm.op() == Junctor.IMP) {
-               if (topTerm.sub(1) == pio.subTerm()) {
-                  term = pio.subTerm();
-               }
-            }
-         }
+         Term term = pio.subTerm();
          if (term != null) {
             if (term.op() == Equality.EQUALS) {
-               if (term.sub(0).op() instanceof LocationVariable) {
-                  applicable = isApplicableQuery(goal, term.sub(1), pio);
-               }
-               else if (term.sub(1).op() instanceof LocationVariable) {
-                  applicable = isApplicableQuery(goal, term.sub(0), pio);
-               }
+               applicable = isApplicableQuery(goal, term.sub(0), pio) ||
+                            isApplicableQuery(goal, term.sub(1), pio);
             }
          }
       }
@@ -174,7 +188,7 @@ public final class QuerySideProofRule implements BuiltInRule {
             varFirst = false;
          }
          Term queryConditionTerm = null;
-         if (equalitySF.formula().op() == Junctor.IMP) {
+         if (equalitySF.formula().op() == Junctor.IMP && equalitySF.formula().sub(1) == equalityTerm) {
             queryConditionTerm = equalitySF.formula().sub(0); 
          }
          // Compute sequent for side proof to compute query in.
@@ -192,10 +206,6 @@ public final class QuerySideProofRule implements BuiltInRule {
                   sequentToProve = sequentToProve.addFormula(sf, false, false).sequent();
                }
             }
-         }
-         if (queryConditionTerm != null) {
-            // Add query condition to antecedent because it reduces the number of required steps to prove the result
-            sequentToProve = sequentToProve.addFormula(new SequentFormula(queryConditionTerm), true, false).sequent();
          }
          Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, queryTerm.sort());
          Term newTerm = TermBuilder.DF.func(newPredicate, queryTerm);
@@ -246,13 +256,25 @@ public final class QuerySideProofRule implements BuiltInRule {
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
          resultGoal.removeFormula(ruleApp.posInOccurrence());
-         for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-            Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
-                                                 varFirst ? TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm));
-            if (queryConditionTerm != null) {
-               resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
+         if (ruleApp.posInOccurrence().isTopLevel() || queryConditionTerm != null) {
+            for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
+               Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
+                                                    varFirst ? TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm));
+               if (queryConditionTerm != null) {
+                  resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
+               }
+               resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
             }
-            resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+         }
+         else {
+            Function resultFunction = new Function(new Name(TermBuilder.DF.newName(services, "QueryResult")), varTerm.sort());
+            Term resultFunctionTerm = TermBuilder.DF.func(resultFunction);
+            resultGoal.addFormula(replace(ruleApp.posInOccurrence(), varFirst ? TermBuilder.DF.equals(resultFunctionTerm, varTerm) : TermBuilder.DF.equals(resultFunctionTerm, varTerm)), true, false);
+            for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
+               Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
+                                                    varFirst ? TermBuilder.DF.equals(resultFunctionTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), resultFunctionTerm));
+               resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+            }
          }
          return goals;
       }
@@ -260,7 +282,7 @@ public final class QuerySideProofRule implements BuiltInRule {
          throw new RuleAbortException(e.getMessage());
       }
    }
-
+   
    /**
     * Extracts all {@link Operator}s from the given {@link Sequent} which
     * represents relevant things.
@@ -454,6 +476,34 @@ public final class QuerySideProofRule implements BuiltInRule {
       public boolean isContainsModalityOrQuery() {
          return containsModalityOrQuery;
       }
+   }
+   
+   /**
+    * Replaces the {@link Term} defined by the given {@link PosInOccurrence}
+    * with the given new {@link Term}.
+    * @param pio The {@link PosInOccurrence} which defines the {@link Term} to replace.
+    * @param newTerm The new {@link Term}.
+    * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
+    */
+   protected static SequentFormula replace(PosInOccurrence pio, Term newTerm) {
+      // Iterate along the PosInOccurrence and collect the parents and indices
+      Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<Pair<Integer, Term>>();
+      Term root = pio.constrainedFormula().formula();
+      IntIterator iter = pio.posInTerm().iterator();
+      while (iter.hasNext()) {
+         int next = iter.next();
+         indexAndParents.addFirst(new Pair<Integer, Term>(Integer.valueOf(next), root));
+         root = root.sub(next);
+      }
+      // Iterate over the collected parents and replace terms
+      root = newTerm;
+      for (Pair<Integer, Term> pair : indexAndParents) {
+         Term parent = pair.second;
+         Term[] newSubs = parent.subs().toArray(new Term[parent.subs().size()]);
+         newSubs[pair.first] = root;
+         root = TermFactory.DEFAULT.createTerm(parent.op(), newSubs, parent.boundVars(), parent.javaBlock(), parent.getLabels());
+      }
+      return new SequentFormula(root);
    }
 
    /**

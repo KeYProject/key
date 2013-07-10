@@ -22,7 +22,49 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTestCase {
    
    /**
-    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition
+    */
+   public void testNonExecutionBranchHidingQueryInPrecondition_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition/test/QueryInPrecondition.java", 
+                          "QueryInPrecondition", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition/oracle/QueryInPrecondition_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition
+    */
+   public void testNonExecutionBranchHidingQueryInPrecondition_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition/test/QueryInPrecondition.java", 
+                          "QueryInPrecondition", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition/oracle/QueryInPrecondition_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingComplexPrecondition
     */
    public void testNonExecutionBranchHidingComplexPrecondition_hiding_side_proof() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
@@ -43,7 +85,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    }
    
    /**
-    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingComplexPrecondition
     */
    public void testNonExecutionBranchHidingComplexPrecondition_hiding_off() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
