@@ -355,36 +355,34 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
     private static ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                                  ProofObligationVars appData,
+                                                                  ProofObligationVars poVars,
                                                                   Services services) {
+        Function n = services.getTypeConverter().getHeapLDT().getNull();
+
         // generate a new schema variable for any pre variable
         Term selfAtPreSV =
-                createTermSV(appData.pre.self, schemaPrefix, services);
+                createTermSV(poVars.pre.self, schemaPrefix, services);
         ImmutableList<Term> localVarsAtPreSVs =
-                createTermSV(appData.pre.localVars, schemaPrefix, services);
+                createTermSV(poVars.pre.localVars, schemaPrefix, services);
         Term guardAtPreSV =
-                createTermSV(appData.pre.guard, schemaPrefix, services);
-        Term resAtPreSV =
-                null;
-                //createTermSV(appData.pre.result, schemaPrefix, services);
-        Term excAtPreSV =
-                null;
-                //createTermSV(appData.pre.exception, schemaPrefix, services);
+                createTermSV(poVars.pre.guard, schemaPrefix, services);
+        Term resAtPreSV = null;
+        Term excAtPreSV = null;
         Term heapAtPreSV =
-                createTermSV(appData.pre.heap, schemaPrefix, services);
+                createTermSV(poVars.pre.heap, schemaPrefix, services);
         Term mbyAtPreSV =
-                createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
+                createTermSV(poVars.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
         // which do not equal the corresponding pre variable; else use
         // the pre schema variable
-        Term selfAtPostSV = (appData.pre.self == appData.post.self ?
-                selfAtPreSV : createTermSV(appData.post.self, schemaPrefix, services));
+        Term selfAtPostSV = (poVars.pre.self == poVars.post.self ?
+                selfAtPreSV : createTermSV(poVars.post.self, schemaPrefix, services));
 
         ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
-        Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
+        Iterator<Term> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
         Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
-        for (Term appDataPostLocalVar : appData.post.localVars) {
+        for (Term appDataPostLocalVar : poVars.post.localVars) {
             Term appDataPreLocalVar = appDataPreLocalVarsIt.next();
             Term localPreVar = schemaLocalVarsAtPreIt.next();
             if (appDataPostLocalVar == appDataPreLocalVar) {
@@ -397,24 +395,24 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             }
         }
 
-        Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
-                guardAtPreSV : createTermSV(appData.post.guard, schemaPrefix, services));
-        Term resAtPostSV = //(appData.pre.result == appData.post.result ? resAtPreSV :
-            createTermSV(appData.post.result, schemaPrefix, services);//);
-        Term excAtPostSV = //(appData.pre.exception == appData.post.exception ? excAtPreSV :
-            createTermSV(appData.post.exception, schemaPrefix, services);//);
-        Term heapAtPostSV = (appData.pre.heap == appData.post.heap ?
-                heapAtPreSV : createTermSV(appData.post.heap, schemaPrefix, services));
+        Term guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ? guardAtPreSV :
+            createTermSV(poVars.post.guard, schemaPrefix, services);
+        Term resAtPostSV = (poVars.post.result == null || poVars.post.result.op().equals(n)) ?
+                null : createTermSV(poVars.post.result, schemaPrefix, services);
+        Term excAtPostSV = (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ?
+                        null : createTermSV(poVars.post.exception, schemaPrefix, services);
+        Term heapAtPostSV = (poVars.pre.heap == poVars.post.heap ?
+                heapAtPreSV : createTermSV(poVars.post.heap, schemaPrefix, services));
 
         // build state variable container for pre and post state
         StateVars pre =
                 new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
                               excAtPreSV, heapAtPreSV, mbyAtPreSV);
-        pre = filterSchemaVars(appData.pre, pre);
+        pre = filterSchemaVars(poVars.pre, pre);
         StateVars post =
                 new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
                               excAtPostSV, heapAtPostSV, null);
-        post = filterSchemaVars(appData.post, post);
+        post = filterSchemaVars(poVars.post, post);
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post);
