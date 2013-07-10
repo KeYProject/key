@@ -75,6 +75,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 
 /**
@@ -430,7 +431,83 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return result;	
     }
 
-    
+
+    private boolean isInfFlow(Goal goal) {
+        StrategyProperties stratProps =
+                goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
+        String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
+
+        boolean isOriginalIF =
+                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
+        // For loaded proofs, InfFlowCheckInfo is not correct without the following
+        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        return isOriginalIF || isLoadedIF;
+    }
+
+
+    private void applyInfFlow(Goal goal,
+                              final FunctionalOperationContract contract,
+                              final Instantiation inst,
+                              final Term self,
+                              final ImmutableList<Term> params,
+                              final Term result,
+                              final Term exception,
+                              final Term atPreUpdates,
+                              final Term finalPreTerm,
+                              final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                              Services services) {
+        if (!isInfFlow(goal)) {
+            return;
+        }
+
+        // prepare information flow analysis
+        assert anonUpdateDatas.size() == 1 : "information flow extension " +
+                                             "is at the moment not " +
+                                             "compatible with the " +
+                                             "non-base-heap setting";
+        AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+
+        final Term heapAtPre = anonUpdateData.methodHeapAtPre;
+        final Term heapAtPost = anonUpdateData.methodHeap;
+
+        InfFlowMethodContractTacletBuilder ifContractBuilder =
+                new InfFlowMethodContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
+        ifContractBuilder.setHeapAtPre(heapAtPre);
+        ifContractBuilder.setSelfAtPre(self);
+        ifContractBuilder.setLocalVarsAtPre(params);
+        ifContractBuilder.setResultAtPre(result);
+        ifContractBuilder.setExceptionAtPre(exception);
+        ifContractBuilder.setHeapAtPost(heapAtPost);
+        ifContractBuilder.setSelfAtPost(self);
+        ifContractBuilder.setLocalVarsAtPost(params);
+        ifContractBuilder.setResultAtPost(result);
+        ifContractBuilder.setExceptionAtPost(exception);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
+
+        // add term and taclet to post goal
+        goal.addFormula(new SequentFormula(contractApplPredTerm),
+                true,
+                false);
+        goal.addTaclet(informationFlowContractApp,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+        // information flow proofs might get easier if we add the (proved)
+        // method contract precondition as an assumption to the post goal
+        // (in case the precondition cannot be proved easily)
+        goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+        goal.proof().addIFSymbol(contractApplPredTerm);
+        goal.proof().addIFSymbol(informationFlowContractApp);
+        goal.proof().addGoalTemplates(informationFlowContractApp);
+    }
+
 
     //-------------------------------------------------------------------------
     //public interface
@@ -794,58 +871,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
-        boolean isInfFlowProof = // For loaded proofs, InfFlowCheckInfo is not correct without this
-                (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                    && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))
-                || goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties()
-                                         .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                                         .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 
-        if (isInfFlowProof) {
-            // prepare information flow analysis
-            assert anonUpdateDatas.size() == 1 : "information flow extension " +
-                                                 "is at the moment not " +
-                                                 "compatible with the " +
-                                                 "non-base-heap setting";
-            final Term heapAtPre = anonUpdateDatas.head().methodHeapAtPre;
-            final Term heapAtPost = anonUpdateDatas.head().methodHeap;
-
-            InfFlowMethodContractTacletBuilder ifContractBuilder =
-                    new InfFlowMethodContractTacletBuilder(services);
-            ifContractBuilder.setContract(contract);
-            ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
-            ifContractBuilder.setHeapAtPre(heapAtPre);
-            ifContractBuilder.setSelfAtPre(contractSelf);
-            ifContractBuilder.setLocalVarsAtPre(contractParams);
-            ifContractBuilder.setResultAtPre(contractResult);
-            ifContractBuilder.setExceptionAtPre(TB.var(excVar));
-            ifContractBuilder.setHeapAtPost(heapAtPost);
-            ifContractBuilder.setSelfAtPost(contractSelf);
-            ifContractBuilder.setLocalVarsAtPost(contractParams);
-            ifContractBuilder.setResultAtPost(contractResult);
-            ifContractBuilder.setExceptionAtPost(TB.var(excVar));
-
-            // generate information flow contract application predicate
-            // and associated taclet
-            Term contractApplPredTerm =
-                    ifContractBuilder.buildContractApplPredTerm();
-            Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
-
-            // add term and taclet to post goal
-            postGoal.addFormula(new SequentFormula(contractApplPredTerm),
-                                true,
-                                false);
-            postGoal.addTaclet(informationFlowContractApp,
-                               SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-
-            // information flow proofs might get easier if we add the (proofed)
-            // method contract precondition as an assumption to the post goal
-            // (in case the precondition cannot be proofed easily)
-            postGoal.addFormula(new SequentFormula(finalPreTerm), true, false);
-            postGoal.proof().addIFSymbol(contractApplPredTerm);
-            postGoal.proof().addIFSymbol(informationFlowContractApp);
-            postGoal.proof().addGoalTemplates(informationFlowContractApp);
-        }
+        applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
+                     TB.var(excVar), atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 

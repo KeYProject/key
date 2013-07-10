@@ -479,6 +479,9 @@ public final class SimpleBlockContract implements BlockContract {
         return false;
     }
 
+    public boolean hasInfFlowSpecs() {
+        return infFlowSpecs != null;
+    }
 
     @Override
     public IProgramMethod getTarget() {

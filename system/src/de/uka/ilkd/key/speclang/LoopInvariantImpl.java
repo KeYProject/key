@@ -115,7 +115,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
              localIns, localOuts, atPres);
     }
 
-    public LoopInvariantImpl(LoopStatement loop,
+    /*public LoopInvariantImpl(LoopStatement loop,
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,   
                              Term variant,
@@ -124,9 +124,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              ImmutableList<Term> localOuts,
                              Map<LocationVariable,Term> atPres) {
         this(loop, invariants, modifies, null, variant, selfTerm, localIns, localOuts, atPres);
-    }
-    
-    public LoopInvariantImpl(LoopStatement loop,
+    }*/
+
+    /*public LoopInvariantImpl(LoopStatement loop,
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,   
                              Term variant,
@@ -134,8 +134,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              Map<LocationVariable,Term> atPres) {
         this(loop, invariants, modifies, null, variant, selfTerm,
              ImmutableSLList.<Term>nil(),ImmutableSLList.<Term>nil(), atPres);
-    }
-    
+    }*/
+
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
@@ -290,9 +290,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public ImmutableList<InfFlowSpec>getInfFlowSpecs(LocationVariable heap) {
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
-        return infFlowSpecs.append(originalInfFlowSpecs.get(heap)); // apparently infFlowSpecs can be null
+        // apparently infFlowSpecs can be null
+        return infFlowSpecs.append(originalInfFlowSpecs.get(heap));
     }
-    
+
     @Override
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services) {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -309,7 +310,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
-    
+
     @Override
     public Map<LocationVariable,Term> getInternalInvariants() {
         return originalInvariants;

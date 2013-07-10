@@ -103,6 +103,9 @@ public interface BlockContract extends SpecificationElement {
     public boolean hasMby();
 
 
+    public boolean hasInfFlowSpecs();
+
+
     /**
      * Returns the original precondition of the contract.
      */
