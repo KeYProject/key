@@ -108,8 +108,8 @@ public class BatchMode {
 
             if (!fileExists) {
                 statPrinter.println("Name | Total rule apps | Nodes | " +
-                        "Branches | Complete time | Automode time | " +
-                        "Avg. time per step");
+                        "Branches | Overall time | Automode time | " +
+                        "Time per step");
             }
 
             String name = fileName;
