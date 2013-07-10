@@ -26,6 +26,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -1041,6 +1042,7 @@ public class Proof implements Named {
         public final int operationContractApps;
         public final int loopInvApps;
         public final long autoModeTime;
+        public final long time;
 
         private List<Pair<String, String>> summaryList =
                 new ArrayList<Pair<String, String>>(10);
@@ -1103,6 +1105,7 @@ public class Proof implements Named {
             this.operationContractApps = tmpContr;
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
+            this.time = System.currentTimeMillis() - Main.getStartTime();
             
             generateSummary(tmpNodes, tmpBranches, tmpInteractive, proof, tmpOss, tmpSmt, tmpDep, tmpContr, tmpInv, tmpOssCaptured);
         }

@@ -107,7 +107,9 @@ public class BatchMode {
             final PrintWriter statPrinter = new PrintWriter ( statisticsFW );
 
             if (!fileExists) {
-                statPrinter.println("Name | Total rule apps | Nodes | Branches | Automode time | Avg. time per step");
+                statPrinter.println("Name | Total rule apps | Nodes | " +
+                        "Branches | Complete time | Automode time | " +
+                        "Avg. time per step");
             }
 
             String name = fileName;
@@ -117,11 +119,12 @@ public class BatchMode {
             
             statPrinter.print ( name + " | " );
             if ("Error".equals ( result ) )
-                statPrinter.println ( "-1 | -1" );
+                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1" );
             else
                 statPrinter.println (statistics.totalRuleApps + " | " +
                                      statistics.nodes + " | " +
                                      statistics.branches + " | " +
+                                     statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
                                      ((double)statistics.autoModeTime / (double)statistics.totalRuleApps));
             statPrinter.close();
