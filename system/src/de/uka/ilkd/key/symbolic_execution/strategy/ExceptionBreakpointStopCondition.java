@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.core.runtime.CoreException;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
@@ -42,6 +42,8 @@ public class ExceptionBreakpointStopCondition extends
     * Counter for how often the Breakpoint was hit.
     */
    private int hitted = 0;
+   
+   private Map<Integer, Boolean> hittedNodes;
 
    public ExceptionBreakpointStopCondition(SymbolicExecutionEnvironment<?>env, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
       this.env = env;
@@ -53,6 +55,7 @@ public class ExceptionBreakpointStopCondition extends
       this.uncaught=uncaught;
       this.suspendOnSubclasses=suspendOnSubclasses;
       this.hitCount = hitCount;
+      hittedNodes=new HashMap<Integer, Boolean>();
    }
    /**
     * {@inheritDoc}
@@ -106,7 +109,7 @@ public class ExceptionBreakpointStopCondition extends
     * @param node The {@link Node} that is thought to be the parent.
     * @return true if the parent node is one of the nodes parents
     */
-   public static boolean isParentNode(Node node, Node parent) {
+   public boolean isParentNode(Node node, Node parent) {
       if (node != null) {
          Node parentIter = node.parent();
          boolean result = false;
@@ -153,13 +156,13 @@ public class ExceptionBreakpointStopCondition extends
                && SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)
                &&!exceptionParentNodes.isEmpty()){
             if(SymbolicExecutionUtil.isTerminationNode(node, ruleApp)&&uncaught){
-               if(hitcountExceeded()){
+               if(hitcountExceeded(node)){
                   exceptionNodes.remove(parent);
                   return true;
                }
             } 
             else if(!SymbolicExecutionUtil.isTerminationNode(node, ruleApp)&&caught){
-               if(hitcountExceeded()){
+               if(hitcountExceeded(node)){
                   exceptionNodes.remove(parent);
                   return true;
                }
@@ -177,16 +180,21 @@ public class ExceptionBreakpointStopCondition extends
     * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
     * 
     * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
-    * @throws CoreException
     */
-   private boolean hitcountExceeded(){
+   private boolean hitcountExceeded(Node node){
       if (!(hitCount == -1)) {
-         if (hitCount == hitted + 1) {
-            hitted=0;
-            return true;
-         }
-         else {
-           hitted++;
+         if(!hittedNodes.containsKey(node.serialNr())){
+            if (hitCount == hitted + 1) {
+               hitted=0;
+               hittedNodes.put(node.serialNr(), Boolean.TRUE);
+               return true;
+            }
+            else {
+               hittedNodes.put(node.serialNr(), Boolean.FALSE);
+               hitted++;
+            }
+         }else {
+            return hittedNodes.get(node.serialNr());
          }
       }
       else {

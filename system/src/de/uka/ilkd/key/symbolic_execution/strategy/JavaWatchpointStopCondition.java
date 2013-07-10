@@ -1,16 +1,13 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import org.eclipse.core.runtime.CoreException;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -19,7 +16,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class JavaWatchpointStopCondition extends
@@ -31,13 +27,13 @@ public class JavaWatchpointStopCondition extends
 
    private String fieldName;
 
-   private KeYEnvironment<?> environment;
-
    private boolean enabled;
 
    private KeYJavaType containerKJT;
 
    private String fullFieldName;
+   
+   private Map<Integer, Boolean> hittedNodes;
    
    /**
     * The HitCount of the Breakpoint (set by user).
@@ -49,18 +45,17 @@ public class JavaWatchpointStopCondition extends
     */
    private int hitted = 0;
 
-   public JavaWatchpointStopCondition(KeYEnvironment<?> environment,
-         boolean enabled, int hitCount, String fieldName, boolean isAcces,
+   public JavaWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces,
          boolean isModification, KeYJavaType containerKJT, Proof proof) {
       super();
       this.enabled = enabled;
-      this.environment = environment;
       this.isAccess = isAcces;
       this.isModification = isModification;
       this.fieldName = fieldName;
       this.containerKJT = containerKJT;
       this.fullFieldName = containerKJT.getSort().toString()+"::"+fieldName;
       this.hitCount = hitCount;
+      hittedNodes=new HashMap<Integer, Boolean>();
    }
 
    /**
@@ -97,21 +92,21 @@ public class JavaWatchpointStopCondition extends
                            if(firstElement instanceof LocationVariable){
                               LocationVariable locVar = (LocationVariable)firstElement;
                               KeYJavaType containerType = locVar.getContainerType();
-                              if(containerType!=null&&containerType.equals(containerKJT)&&fullFieldName.equals(locVar.toString())&&isModification&&hitcountExceeded()){
+                              if(containerType!=null&&containerType.equals(containerKJT)&&fullFieldName.equals(locVar.toString())&&isModification&&hitcountExceeded(node)){
                                  // Increase number of set nodes on this goal and allow rule application
                                  executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                                  getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
                                  getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
                               }
                            }
-                           if(checkChildrenOfSourceElement(assignment)&&hitcountExceeded()){
+                           if(checkChildrenOfSourceElement(assignment)&&hitcountExceeded(node)){
                               // Increase number of set nodes on this goal and allow rule application
                               executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                               getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
                               getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
                            }
                         }else if (activeStatement != null) {
-                           if(checkChildrenOfSourceElement(activeStatement)&&hitcountExceeded()){
+                           if(checkChildrenOfSourceElement(activeStatement)&&hitcountExceeded(node)){
                               // Increase number of set nodes on this goal and allow rule application
                               executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                               getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
@@ -174,16 +169,21 @@ public class JavaWatchpointStopCondition extends
     * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
     * 
     * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
-    * @throws CoreException
     */
-   private boolean hitcountExceeded(){
+   private boolean hitcountExceeded(Node node){
       if (!(hitCount == -1)) {
-         if (hitCount == hitted + 1) {
-            hitted=0;
-            return true;
-         }
-         else {
-           hitted++;
+         if(!hittedNodes.containsKey(node.serialNr())){
+            if (hitCount == hitted + 1) {
+               hitted=0;
+               hittedNodes.put(node.serialNr(), Boolean.TRUE);
+               return true;
+            }
+            else {
+               hittedNodes.put(node.serialNr(), Boolean.FALSE);
+               hitted++;
+            }
+         }else {
+            return hittedNodes.get(node.serialNr());
          }
       }
       else {

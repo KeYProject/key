@@ -469,8 +469,11 @@ public final class TestSedCoreUtil {
          for (SWTBotTreeItem item : launchItems) {
             item.select();
             item.contextMenu("Terminate and Remove").click();
-            SWTBotShell dialog = bot.shell("Terminate and Remove");
-            dialog.bot().button("Yes").click();
+            try{
+               SWTBotShell dialog = bot.shell("Terminate and Remove");
+               dialog.bot().button("Yes").click();
+            }catch(Exception e){
+            }
          }
          // Wait until all items are removed
          bot.waitWhile(Conditions.treeHasRows(debugTree, 1));

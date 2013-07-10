@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import org.eclipse.core.runtime.IPath;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -37,7 +36,7 @@ public class LineBreakpointStopCondition extends AbstractBreakpointStopCondition
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public LineBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+   public LineBreakpointStopCondition(String classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
       super(classPath, lineNumber, hitCount, environment, pm, proof, parentCondition,
             condition, enabled, conditionEnabled, methodStart, methodEnd);
    }

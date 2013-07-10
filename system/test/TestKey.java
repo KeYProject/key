@@ -96,22 +96,30 @@ public class TestKey extends TestSuite {
     };
 
     static Class<? extends TestCase>[] setTests = new Class[] {
-       de.uka.ilkd.key.util.TestNodePreorderIterator.class,
-       de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
-       de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
-       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
-       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
-       de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
-       de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
-       de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
-       de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+//       de.uka.ilkd.key.util.TestNodePreorderIterator.class,
+//       de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
+//       de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+//       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
+//       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
+//       de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
+//       de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
+//       de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
+//       de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
+//       de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
+//       de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
+//       de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
+//       de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
+//       de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
+//       de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
+//       de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionCaughtOrUncaught.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestJavaWatchpointStopConditionWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithConditions.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithConditions.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithHitCount.class
     };
     
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
@@ -147,17 +155,17 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
         
 	TestSuite suite = new TestSuite();
-	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
-	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));	
-	suite.addTest(createSuite(parserTests, "Testing Parsers"));
-	suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
-	suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
-	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
-        suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
-        suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+//	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
+//	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));	
+//	suite.addTest(createSuite(parserTests, "Testing Parsers"));
+//	suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
+//	suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
+//	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
+//        suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
+//        suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
-   suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
-	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
+//   suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
+//	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;
     }

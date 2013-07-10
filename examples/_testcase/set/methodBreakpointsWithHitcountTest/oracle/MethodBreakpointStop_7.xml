@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+      <statement name="a++;" pathCondition="true" pathConditionChanged="false">
+         <statement name="x=callee.main(a);" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="!self.callee = null" pathCondition="!self.callee = null" pathConditionChanged="true" branchCondition="!self.callee = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <methodCall name="self.callee.main(a_1);" pathCondition="!self.callee = null" pathConditionChanged="false">
+                  <statement name="x=a_1+4;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                     <statement name="return a_1*x;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.callee.main(a_1);&gt;" pathCondition="!self.callee = null" pathConditionChanged="false" isReturnValueComputed="false">
+                           <statement name="x=callee.main(a);" pathCondition="!self.callee = null" pathConditionChanged="false">
+                              <methodCall name="self.callee.main(a_2);" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                 <statement name="x=a_2+4;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                    <statement name="return a_2*x;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                       <methodReturn name="&lt;return of self.callee.main(a_2);&gt;" pathCondition="!self.callee = null" pathConditionChanged="false" isReturnValueComputed="false">
+                                          <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                             <statement name="loop();" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                <methodCall name="self.loop();" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                   <loopNode name="for ( int i = 0; i&lt;=3; i++ ) {   x++; }" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                      <statement name="int i = 0;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                         <loopCondition name="i&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                            <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                               <statement name="i++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                  <loopCondition name="i&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                     <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                        <statement name="i++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                           <loopCondition name="i&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                              <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                 <statement name="i++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                    <loopCondition name="i&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                       <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                          <statement name="i++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                             <loopCondition name="i&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                <statement name="return x;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                   <statement name="loop();" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                      <methodCall name="self.loop();" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                         <loopNode name="for ( int i = 0; i&lt;=3; i++ ) {   x++; }" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                            <statement name="int i = 0;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                               <loopCondition name="i_1&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                  <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                     <statement name="i_1++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                        <loopCondition name="i_1&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                           <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                              <statement name="i_1++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                 <loopCondition name="i_1&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                    <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                       <statement name="i_1++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                          <loopCondition name="i_1&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                             <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                <statement name="i_1++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                   <loopCondition name="i_1&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                      <statement name="return x;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                         <statement name="loop();" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                            <methodCall name="self.loop();" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                               <loopNode name="for ( int i = 0; i&lt;=3; i++ ) {   x++; }" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                  <statement name="int i = 0;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                     <loopCondition name="i_2&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                        <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                           <statement name="i_2++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                              <loopCondition name="i_2&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                 <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                    <statement name="i_2++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                       <loopCondition name="i_2&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                          <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                             <statement name="i_2++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                <loopCondition name="i_2&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                   <statement name="x++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                      <statement name="i_2++;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                         <loopCondition name="i_2&lt;=3" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                            <statement name="return x;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                               <statement name="return x;" pathCondition="!self.callee = null" pathConditionChanged="false">
+                                                                                                                                                                                                                  <methodReturn name="&lt;return of self.main(a);&gt;" pathCondition="!self.callee = null" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                                                                                                                                     <termination name="&lt;end&gt;" pathCondition="!self.callee = null" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                                                                                                                                                                     </termination>
+                                                                                                                                                                                                                  </methodReturn>
+                                                                                                                                                                                                               </statement>
+                                                                                                                                                                                                            </statement>
+                                                                                                                                                                                                         </loopCondition>
+                                                                                                                                                                                                      </statement>
+                                                                                                                                                                                                   </statement>
+                                                                                                                                                                                                </loopCondition>
+                                                                                                                                                                                             </statement>
+                                                                                                                                                                                          </statement>
+                                                                                                                                                                                       </loopCondition>
+                                                                                                                                                                                    </statement>
+                                                                                                                                                                                 </statement>
+                                                                                                                                                                              </loopCondition>
+                                                                                                                                                                           </statement>
+                                                                                                                                                                        </statement>
+                                                                                                                                                                     </loopCondition>
+                                                                                                                                                                  </statement>
+                                                                                                                                                               </loopNode>
+                                                                                                                                                            </methodCall>
+                                                                                                                                                         </statement>
+                                                                                                                                                      </statement>
+                                                                                                                                                   </loopCondition>
+                                                                                                                                                </statement>
+                                                                                                                                             </statement>
+                                                                                                                                          </loopCondition>
+                                                                                                                                       </statement>
+                                                                                                                                    </statement>
+                                                                                                                                 </loopCondition>
+                                                                                                                              </statement>
+                                                                                                                           </statement>
+                                                                                                                        </loopCondition>
+                                                                                                                     </statement>
+                                                                                                                  </statement>
+                                                                                                               </loopCondition>
+                                                                                                            </statement>
+                                                                                                         </loopNode>
+                                                                                                      </methodCall>
+                                                                                                   </statement>
+                                                                                                </statement>
+                                                                                             </loopCondition>
+                                                                                          </statement>
+                                                                                       </statement>
+                                                                                    </loopCondition>
+                                                                                 </statement>
+                                                                              </statement>
+                                                                           </loopCondition>
+                                                                        </statement>
+                                                                     </statement>
+                                                                  </loopCondition>
+                                                               </statement>
+                                                            </statement>
+                                                         </loopCondition>
+                                                      </statement>
+                                                   </loopNode>
+                                                </methodCall>
+                                             </statement>
+                                          </statement>
+                                       </methodReturn>
+                                    </statement>
+                                 </statement>
+                              </methodCall>
+                           </statement>
+                        </methodReturn>
+                     </statement>
+                  </statement>
+               </methodCall>
+            </branchCondition>
+            <branchCondition name="self.callee = null" pathCondition="self.callee = null" pathConditionChanged="true" branchCondition="self.callee = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.callee = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+               </termination>
+            </branchCondition>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

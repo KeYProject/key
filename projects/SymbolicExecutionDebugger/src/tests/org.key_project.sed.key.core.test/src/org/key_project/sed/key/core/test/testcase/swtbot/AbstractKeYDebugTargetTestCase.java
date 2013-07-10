@@ -46,6 +46,7 @@ import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
+import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeThumbNailView;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
@@ -515,6 +516,58 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * Performs a test on a {@link KeYDebugTarget}. This methods setups
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
     * @param projectName The project name.
+    * @param pathInBundle The path to the test files in bundle.
+    * @param closePropertiesView Close properties sheet page?
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
+    * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
+    * @param showMethodReturnValues Show method return values?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
+    * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doKeYDebugTargetTest(String projectName,
+                                       String pathInBundle,
+                                       boolean closePropertiesView,
+                                       boolean closeExecutionTreeViews,
+                                       IMethodSelector selector,
+                                       Boolean useExistingContract,
+                                       String preconditionOrExistingContract,
+                                       Boolean showMethodReturnValues,
+                                       Boolean showVariablesOfSelectedDebugNode,
+                                       Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
+                                       int timeoutFactor,
+                                       IKeYDebugTargetTestExecutor executor,
+                                       String path,
+                                       Object... lines) throws Exception {
+      doKeYDebugTargetTest(projectName,
+                           Activator.PLUGIN_ID, 
+                           pathInBundle, 
+                           closePropertiesView,
+                           closeExecutionTreeViews, 
+                           selector, 
+                           useExistingContract,
+                           preconditionOrExistingContract,
+                           showMethodReturnValues, 
+                           showVariablesOfSelectedDebugNode, 
+                           showKeYMainWindow, 
+                           mergeBranchConditions,
+                           timeoutFactor, 
+                           executor,
+                           path,
+                           lines);
+   }
+
+
+   /**
+    * Performs a test on a {@link KeYDebugTarget}. This methods setups
+    * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
+    * @param projectName The project name.
     * @param plugin The plug-in which contains the test data.
     * @param pathInBundle The path to the test files in bundle.
     * @param closePropertiesView Close properties sheet page?
@@ -559,6 +612,60 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                            mergeBranchConditions, 
                            timeoutFactor, 
                            executor);
+   }
+
+   /**
+    * Performs a test on a {@link KeYDebugTarget}. This methods setups
+    * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
+    * @param projectName The project name.
+    * @param plugin The plug-in which contains the test data.
+    * @param pathInBundle The path to the test files in bundle.
+    * @param closePropertiesView Close properties sheet page?
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
+    * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
+    * @param showMethodReturnValues Show method return values?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
+    * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doKeYDebugTargetTest(String projectName,
+                                       String plugin,
+                                       String pathInBundle,
+                                       boolean closePropertiesView,
+                                       boolean closeExecutionTreeViews,
+                                       IMethodSelector selector,
+                                       Boolean useExistingContract,
+                                       String preconditionOrExistingContract,
+                                       Boolean showMethodReturnValues,
+                                       Boolean showVariablesOfSelectedDebugNode,
+                                       Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
+                                       int timeoutFactor,
+                                       IKeYDebugTargetTestExecutor executor,
+                                       String path,
+                                       Object... lines) throws Exception {
+      doKeYDebugTargetTest(projectName, 
+                           plugin, 
+                           pathInBundle, 
+                           null, 
+                           closePropertiesView, 
+                           closeExecutionTreeViews, 
+                           selector, 
+                           useExistingContract, 
+                           preconditionOrExistingContract, 
+                           showMethodReturnValues, 
+                           showVariablesOfSelectedDebugNode, 
+                           showKeYMainWindow, 
+                           mergeBranchConditions, 
+                           timeoutFactor, 
+                           executor,
+                           path,
+                           lines);
    }
    
    /**
@@ -623,6 +730,130 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          if (projectConfigurator != null) {
             projectConfigurator.configure(project);
          }
+         // Get method
+         assertNotNull(selector);
+         IMethod method = selector.getMethod(project);
+         String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
+         // Increase timeout
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, false);
+            proof.dispose();
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         // Set choice settings in KeY.
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+         // Launch method
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
+         // Find the launched ILaunch in the debug view
+         SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
+         debugTree = debugView.bot().tree();
+         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ILaunch launch = target.getLaunch();
+         // Do test
+         executor.test(bot, project, method, targetName, debugView, debugTree, target, launch);
+      }
+      finally {
+         // Restore timeout
+         SWTBotPreferences.TIMEOUT = originalTimeout;
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
+         // Terminate and remove all launches
+         TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Make sure that all jobs are done because otherwise older jobs may influence the next test execution
+         TestUtilsUtil.waitForJobs();
+         // Close all opened editors which where not opened before test execution
+         List<? extends SWTBotEditor> currentEditors = bot.editors();
+         for (SWTBotEditor editor : currentEditors) {
+            if (!oldEditors.contains(editor)) {
+               editor.close();
+            }
+         }
+         // Restore closed views if required
+         if (restorePropertiesView) {
+            TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
+         }
+         if (restoreExecutionTreeView) {
+            TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
+         }
+         if (restoreThumbinalExecutionTreeView) {
+            TestUtilsUtil.openView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
+      }
+   }
+   
+   /**
+    * Performs a test on a {@link KeYDebugTarget}. This methods setups
+    * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
+    * @param projectName The project name.
+    * @param plugin The plug-in which contains the test data.
+    * @param pathInBundle The path to the test files in bundle.
+    * @param projectConfigurator An optional {@link IProjectConfigurator}.
+    * @param closePropertiesView Close properties sheet page?
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
+    * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
+    * @param showMethodReturnValues Show method return values?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
+    * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doKeYDebugTargetTest(String projectName,
+                                       String plugin,
+                                       String pathInBundle,
+                                       IProjectConfigurator projectConfigurator,
+                                       boolean closePropertiesView,
+                                       boolean closeExecutionTreeViews,
+                                       IMethodSelector selector,
+                                       Boolean useExistingContract,
+                                       String preconditionOrExistingContract,
+                                       Boolean showMethodReturnValues,
+                                       Boolean showVariablesOfSelectedDebugNode,
+                                       Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
+                                       int timeoutFactor,
+                                       IKeYDebugTargetTestExecutor executor,
+                                       String path,
+                                       Object... lines) throws Exception {
+      // Create bot
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      // Get current settings to restore them in finally block
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
+      SWTBotTree debugTree = null;
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      String originalRuntimeExceptions = null;
+      boolean restoreExecutionTreeView = false;
+      boolean restoreThumbinalExecutionTreeView = false;
+      boolean restorePropertiesView = false;
+      List<? extends SWTBotEditor> oldEditors = bot.editors();
+      try {
+         // Open symbolic debug perspective
+         TestSedCoreUtil.openSymbolicDebugPerspective();
+         if (closeExecutionTreeViews) {
+            restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
+            restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
+         if (closePropertiesView) {
+            restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
+         }
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+         BundleUtil.extractFromBundleToWorkspace(plugin, pathInBundle, project.getProject().getFolder("src"));
+         if (projectConfigurator != null) {
+            projectConfigurator.configure(project);
+         }
+         TestBreakpointsUtil.addSomeBreakpoints(path, bot, lines);
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);

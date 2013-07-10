@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -24,7 +22,7 @@ public class MethodBreakpointStopCondition extends AbstractBreakpointStopConditi
    
    private boolean isExit;
 
-   public MethodBreakpointStopCondition(IPath classPath, int lineNumber,
+   public MethodBreakpointStopCondition(String classPath, int lineNumber,
          int hitCount, KeYEnvironment<?> environment, IProgramMethod pm,
          Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
@@ -65,9 +63,11 @@ public class MethodBreakpointStopCondition extends AbstractBreakpointStopConditi
                            try {
                               if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&enabled&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
                                  // Increase number of set nodes on this goal and allow rule application
+                                 if(hitcountExceeded(node)){
                                     executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                                     getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
                                     getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                                 }
                                  }
                            }
                            catch (ProofInputException e) {
@@ -95,13 +95,17 @@ public class MethodBreakpointStopCondition extends AbstractBreakpointStopConditi
          MethodBodyStatement mbs = (MethodBodyStatement)statement;
          currentPm = mbs.getProgramMethod(environment.getServices()); 
       }
-      return SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(pm);
+      if(SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(pm)){
+            return true;
+      }
+      return false;
       
    }
    
    private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)){
-         return isInScope(node);
+      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
+            &&isInScope(node)){
+            return true;
       }
       return false;
       

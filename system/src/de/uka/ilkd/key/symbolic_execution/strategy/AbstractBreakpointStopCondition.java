@@ -4,12 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -17,10 +13,10 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -63,9 +59,9 @@ public abstract class AbstractBreakpointStopCondition extends
 
 
    /**
-    * The {@link IPath} of the class this {@link LineBreakpointStopCondition} is associated with.
+    * The path of the class this {@link LineBreakpointStopCondition} is associated with.
     */
-   private IPath classPath;
+   private String classPath;
 
 
    /**
@@ -154,6 +150,12 @@ public abstract class AbstractBreakpointStopCondition extends
    protected Set<LocationVariable> paramVars;
 
 
+   private Map<Integer, Boolean> hittedNodes;
+
+
+   private String conditionString;
+
+
    /**
     * Creates a new {@link LineBreakpointStopCondition}.
     * 
@@ -171,7 +173,7 @@ public abstract class AbstractBreakpointStopCondition extends
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public AbstractBreakpointStopCondition(IPath classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+   public AbstractBreakpointStopCondition(String classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
       super();
       variableNamingMap=new HashMap<SVSubstitute, SVSubstitute>();
       toKeep = new HashSet<LocationVariable>();
@@ -187,8 +189,10 @@ public abstract class AbstractBreakpointStopCondition extends
       this.methodEnd=methodEnd;
       this.methodStart=methodStart;
       this.condition = conditionEnabled ? computeTermForCondition(condition):TermBuilder.DF.tt(); 
+      this.conditionString = condition;
       createNewFactory();
       proof.getServices().setFactory(programVariableCollectorFactory);
+      hittedNodes = new HashMap<Integer, Boolean>();
    }
 
    /**
@@ -220,10 +224,10 @@ public abstract class AbstractBreakpointStopCondition extends
                      else {
                         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
                         if (activeStatement != null && activeStatement.getEndPosition().getLine() != -1) {
-                           IPath path = new Path(activeStatement.getPositionInfo().getParentClass());
+                           String path = activeStatement.getPositionInfo().getParentClass();
                            int line = activeStatement.getEndPosition().getLine();
                            try{
-                              if(shouldStopInLine(line, path)&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
+                              if(shouldStopInLine(line, path, node)&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
                                  // Increase number of set nodes on this goal and allow rule application
                                     executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                                     getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
@@ -275,31 +279,36 @@ public abstract class AbstractBreakpointStopCondition extends
     * Checks if the execution should stop in the given line for the given class.
     * 
     * @param line The current line of code, that the auto mode is evaluating
-    * @param path The {@link IPath} of the Class, that contains the currently evaluated code 
+    * @param path The path of the Class, that contains the currently evaluated code 
     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates to true and the Hitcount is exceeded, false otherwise
     */
-   protected boolean shouldStopInLine(int line, IPath path) {
+   protected boolean shouldStopInLine(int line, String path, Node node) {
             if (lineNumber == line && classPath.equals(path)) {
-               return hitcountExceeded()&&enabled;
+               return hitcountExceeded(node)&&enabled;
                }
       return false;
    }
-
+   
    /**
     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
     * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
     * 
     * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
-    * @throws CoreException
     */
-   private boolean hitcountExceeded(){
+   protected boolean hitcountExceeded(Node node){
       if (!(hitCount == -1)) {
-         if (hitCount == hitted + 1) {
-            hitted=0;
-            return true;
-         }
-         else {
-           hitted++;
+         if(!hittedNodes.containsKey(node.serialNr())){
+            if (hitCount == hitted + 1) {
+               hitted=0;
+               hittedNodes.put(node.serialNr(), Boolean.TRUE);
+               return true;
+            }
+            else {
+               hittedNodes.put(node.serialNr(), Boolean.FALSE);
+               hitted++;
+            }
+         }else {
+            return hittedNodes.get(node.serialNr());
          }
       }
       else {
@@ -345,6 +354,9 @@ public abstract class AbstractBreakpointStopCondition extends
     * @throws SLTranslationException if the Term could not be parsed
     */
    private Term computeTermForCondition(String condition) throws SLTranslationException {
+      if(condition==null){
+         return TermBuilder.DF.tt();
+      }
       //collect all variables needed to parse the condition
       selfVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(environment.getServices(), "self")), pm.getContainerType(), null, false, false);
       ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
@@ -362,7 +374,6 @@ public abstract class AbstractBreakpointStopCondition extends
       Set<LocationVariable> undeclaredVariables = variableCollector.result();
       for (LocationVariable x : undeclaredVariables) {
          varsForCondition = saveAddVariable(x, varsForCondition);
-         
       }
       JavaInfo info = environment.getServices().getJavaInfo();
       KeYJavaType kjt = pm.getContainerType();
@@ -559,6 +570,7 @@ public abstract class AbstractBreakpointStopCondition extends
     * @throws SLTranslationException if the parsing failed
     */
    public void setCondition(String condition) throws SLTranslationException {
+      this.conditionString = condition;
       this.condition = conditionEnabled? computeTermForCondition(condition) : TermBuilder.DF.tt();
    }
 
@@ -622,7 +634,7 @@ public abstract class AbstractBreakpointStopCondition extends
     * Returns the the path of the class the breakpoint is in.
     * @return the the path of the class the breakpoint is in
     */
-   public IPath getClassPath() {
+   public String getClassPath() {
       return classPath;
    }
    
@@ -632,5 +644,9 @@ public abstract class AbstractBreakpointStopCondition extends
     */
    public Set<LocationVariable> getToKeep() {
       return toKeep;
+   }
+
+   public String getConditionString() {
+      return conditionString;
    }
 }
