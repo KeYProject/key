@@ -125,7 +125,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       SetRuleFilter filter = new SetRuleFilter();
       filter.addRuleToSet(QuerySideProofRule.INSTANCE);
       if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(strategyProperties.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
-         return ConditionalFeature.createConditional(filter, longConst(-30000));
+         return ConditionalFeature.createConditional(filter, longConst(-3050)); // Rule must be preferred to rules with heuristic "query_axiom" and rule QueryExpand
       }
       else {
          return ConditionalFeature.createConditional(filter, inftyConst());
