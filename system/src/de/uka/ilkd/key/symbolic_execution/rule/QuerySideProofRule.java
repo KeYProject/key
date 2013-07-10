@@ -63,24 +63,28 @@ import de.uka.ilkd.key.util.Pair;
  * <ol>
  *    <li>
  *       <b>top level {@code <something> = <query>} or {@code <query> = <something>}</b><br>
- *       For each possible result value is a {@link SequentFormula} added to the antecedent of the form:
+ *       For each possible result value is a {@link SequentFormula} added to the {@link Sequent} of the form:
  *       <ul>
- *          <li>{@code <resultCondition> -> <something> = <result>} or </li>
- *          <li>{@code <resultCondition> -> <result> = <something>}</li>
+ *          <li>Antecedent: {@code <resultCondition> -> <something> = <result>} or </li>
+ *          <li>Antecedent: {@code <resultCondition> -> <result> = <something>}</li>
+ *          <li>Succedent: {@code <resultCondition> & <something> = <result>} or </li>
+ *          <li>Succedent: {@code <resultCondition> & <result> = <something>}</li>
  *       </ul>
  *    </li>
  *    <li>
  *       <b>right side of an implication on top level {@code <queryCondition> -> <something> = <query>} or {@code <queryCondition> -> <query> = <something>}</b><br>
- *       For each possible result value is a {@link SequentFormula} added to the antecedent of the form:
+ *       For each possible result value is a {@link SequentFormula} added to the {@link Sequent} of the form:
  *       <ul>
- *          <li>{@code <pre> -> (<resultCondition> -> <something> = <result>)} or </li>
- *          <li>{@code <pre> -> (<resultCondition> -> <result> = <something>)}</li>
+ *          <li>Antecedent: {@code <pre> -> (<resultCondition> -> <something> = <result>)} or </li>
+ *          <li>Antecedent: {@code <pre> -> (<resultCondition> -> <result> = <something>)}</li>
+ *          <li>Succedent: {@code <pre> -> (<resultCondition> & <something> = <result>)} or </li>
+ *          <li>Succedent: {@code <pre> -> (<resultCondition> & <result> = <something>)}</li>
  *       </ul>
  *    </li>
  *    <li>
  *       <b>everywhere else {@code ...(<something> = <query>)...} or {@code ...(<query> = <something>)...}</b><br>
- *       In the original {@link SequentFormula} is the {@code <query>} replaced by a new constant function named {@code QueryResult} and added to the antecedent.
- *       For each possible result value is an additional {@link SequentFormula} added to the antecedent of the form:
+ *       In the original {@link SequentFormula} is the {@code <query>} replaced by a new constant function named {@code QueryResult} and added to the antecedent/succedent in which it was contained before.
+ *       For each possible result value is an additional {@link SequentFormula} added to the <b>antecedent</b> of the form:
  *       <ul>
  *          <li>{@code <resultCondition> -> QueryResult = <result>} or </li>
  *          <li>{@code <resultCondition> -> <result> = QueryResult}</li>
@@ -93,7 +97,6 @@ import de.uka.ilkd.key.util.Pair;
  * </p>
  * @author Martin Hentschel
  */
-// TODO: What happens if a query occurs in the succedent?
 public final class QuerySideProofRule implements BuiltInRule {
    /**
     * The singleton instance of this class.
@@ -171,9 +174,10 @@ public final class QuerySideProofRule implements BuiltInRule {
    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
       try {
          // Extract required Terms from goal
+         PosInOccurrence pio = ruleApp.posInOccurrence();
          Sequent goalSequent = goal.sequent();
-         SequentFormula equalitySF = ruleApp.posInOccurrence().constrainedFormula();
-         Term equalityTerm = ruleApp.posInOccurrence().subTerm();
+         SequentFormula equalitySF = pio.constrainedFormula();
+         Term equalityTerm = pio.subTerm();
          Term queryTerm;
          Term varTerm;
          boolean varFirst;
@@ -255,21 +259,26 @@ public final class QuerySideProofRule implements BuiltInRule {
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();
-         resultGoal.removeFormula(ruleApp.posInOccurrence());
-         if (ruleApp.posInOccurrence().isTopLevel() || queryConditionTerm != null) {
+         resultGoal.removeFormula(pio);
+         if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-               Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
-                                                    varFirst ? TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm));
+               Term conditionTerm = TermBuilder.DF.or(conditionsAndResult.getValue());
+               Term newEqualityTerm = varFirst ? 
+                                      TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : 
+                                      TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm);
+               Term resultTerm = pio.isInAntec() ?
+                                 TermBuilder.DF.imp(conditionTerm, newEqualityTerm) :
+                                 TermBuilder.DF.and(conditionTerm, newEqualityTerm);
                if (queryConditionTerm != null) {
                   resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
                }
-               resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+               resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
             }
          }
          else {
             Function resultFunction = new Function(new Name(TermBuilder.DF.newName(services, "QueryResult")), varTerm.sort());
             Term resultFunctionTerm = TermBuilder.DF.func(resultFunction);
-            resultGoal.addFormula(replace(ruleApp.posInOccurrence(), varFirst ? TermBuilder.DF.equals(resultFunctionTerm, varTerm) : TermBuilder.DF.equals(resultFunctionTerm, varTerm)), true, false);
+            resultGoal.addFormula(replace(pio, varFirst ? TermBuilder.DF.equals(resultFunctionTerm, varTerm) : TermBuilder.DF.equals(resultFunctionTerm, varTerm)), pio.isInAntec(), false);
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
                Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
                                                     varFirst ? TermBuilder.DF.equals(resultFunctionTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), resultFunctionTerm));
