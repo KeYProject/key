@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -123,7 +124,7 @@ public class ClassTree extends JTree {
 	this(addContractTargets, 
 	     skipLibraryClasses, 
 	     services, 
-	     new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>());
+	     new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,Icon>());
     }
     
     

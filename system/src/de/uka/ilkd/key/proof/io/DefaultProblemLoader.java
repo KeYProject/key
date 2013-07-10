@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * <p>
@@ -331,15 +332,27 @@ public class DefaultProblemLoader {
       mediator.stopInterface(true); // first stop (above) is not enough
 
       String status = "";
+      List<Throwable> errors = null;
       if (envInput instanceof KeYUserProblemFile) {
-         IProofFileParser parser = new DefaultProofFileParser(this, proof,
+          DefaultProofFileParser parser = new DefaultProofFileParser(this, proof,
                                                               mediator);
          problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
          status = parser.getStatus();
+         errors = parser.getErrors();
       }
 
-      if ("".equals(status)) mediator.getUI().resetStatus(this);
-         else mediator.getUI().reportStatus(this, status);
+      if ("".equals(status)) { 
+          mediator.getUI().resetStatus(this);
+      } else {
+          mediator.getUI().reportStatus(this, status);         
+          if (errors != null &&
+                  !errors.isEmpty()) { 
+              throw new ProblemLoaderException(this, 
+                      "Proof could only be loaded partially. In summary " + errors.size() + 
+                      " not loadable rule application(s) have been detected." + 
+                      "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
+          }
+      }
    }
 
    /**

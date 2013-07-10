@@ -14,6 +14,9 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Performance tests
+provable: ./performance-test/disjoint-test-1.key
+provable: ./performance-test/disjoint-test-2.key
 
 # Tests for rule application restrictions
 provable: ./heap/polarity_tests/wellformed1.key
@@ -44,6 +47,7 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
+provable: ./heap/fm12_01_LCP/lcp.key
 provable: ./heap/information_flow/ArrayList_contains.key
 provable: ./heap/information_flow/ArrayList_get.key
 provable: ./heap/information_flow/ArrayList_size.key
@@ -154,7 +158,6 @@ provable: ./heap/SmansEtAl/Iterator_next.key
 provable: ./heap/SmansEtAl/Stack_footprint.key
 provable: ./heap/SmansEtAl/Stack_inv.key
 provable: ./heap/SmansEtAl/Stack_push.key
-provable: ./heap/SmansEtAl/Stack_size_dep.key
 provable: ./heap/SmansEtAl/Stack_size.key
 provable: ./heap/SmansEtAl/Stack_Stack.key
 provable: ./heap/SmansEtAl/Stack_switchContents.key
@@ -258,6 +261,8 @@ provable: ./standard_key/java_dl/attributes.key
 provable: ./standard_key/java_dl/break.key
 provable: ./standard_key/java_dl/char.key
 provable: ./standard_key/java_dl/compileTimeConstants.key
+provable: ./standard_key/java_dl/constructorException/test.key
+notprovable: ./standard_key/java_dl/constructorException/regressionTestBug1333.key
 provable: ./standard_key/java_dl/continue1.key
 provable: ./standard_key/java_dl/continue2.key
 provable: ./standard_key/java_dl/complexAssignment.key

@@ -65,14 +65,14 @@ class TacletMenu extends JMenu {
     private PosInSequent pos;
     private CurrentGoalView sequentView;
     private KeYMediator mediator;
-    private static final Set<Name> CLUTTER_RULESETS = new HashSet<Name>();
+    private static final Set<Name> CLUTTER_RULESETS = new LinkedHashSet<Name>();
 
     static {
         CLUTTER_RULESETS.add(new Name("notHumanReadable"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
     }
-    private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
+    private static final Set<Name> CLUTTER_RULES = new LinkedHashSet<Name>();
 
     static {
         CLUTTER_RULES.add(new Name("cut_direct_r"));

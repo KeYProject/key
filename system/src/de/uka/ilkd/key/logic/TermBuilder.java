@@ -16,7 +16,9 @@ package de.uka.ilkd.key.logic;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -62,6 +64,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -1339,23 +1342,36 @@ public class TermBuilder {
     }
 
 
-    public Term inv(Services services, Term h, Term o) {
-    return func(services.getJavaInfo().getInv(),
-            h,
-            o);
+    public Term inv(Services services, Term[] h, Term o) {
+        Term[] p = new Term[h.length + 1];
+        System.arraycopy(h, 0, p, 0, h.length);
+        p[h.length] = o;
+        return func(services.getJavaInfo().getInv(), p);
     }
 
 
     public Term inv(Services services, Term o) {
-    return inv(services, getBaseHeap(services),  o);
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i=0;
+        for(LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return inv(services, hs,  o);
     }
 
-    public Term staticInv(Services services, Term h, KeYJavaType t){
+    public Term staticInv(Services services, Term[] h, KeYJavaType t){
         return func(services.getJavaInfo().getStaticInv(t), h);
     }
 
     public Term staticInv(Services services, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), getBaseHeap(services));
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i=0;
+        for(LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 
 
@@ -1684,7 +1700,7 @@ public class TermBuilder {
     final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
     final Map<LocationVariable, LogicVariable> map
-        = new HashMap<LocationVariable, LogicVariable>();
+        = new LinkedHashMap<LocationVariable, LogicVariable>();
     map.put(heapLDT.getHeap(), heapLV);
     final OpReplacer or = new OpReplacer(map);
     t = or.replace(t);

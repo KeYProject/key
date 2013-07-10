@@ -65,19 +65,29 @@ public final class ProgramMethod extends ObserverFunction
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------     
-    
+    public ProgramMethod(MethodDeclaration method,
+        KeYJavaType container,
+    	KeYJavaType kjt,
+    	PositionInfo pi,
+    	final Sort heapSort) {
+    	this(method, container, kjt, pi, heapSort, 1);
+    }
+  
     public ProgramMethod(MethodDeclaration method, 
 			 KeYJavaType container, 
 			 KeYJavaType kjt,
                          PositionInfo pi,
-                         Sort heapSort) {
+                         Sort heapSort,
+                         int heapCount) {
         super(method.getProgramElementName().toString(), 
               kjt.getSort(),
               kjt,
               heapSort,
               container,
               method.isStatic(),
-              getParamTypes(method));
+              getParamTypes(method),
+              heapCount,
+              method.getStateCount());
         this.method  = method;
         this.returnType     = kjt;
         this.pi      = pi;

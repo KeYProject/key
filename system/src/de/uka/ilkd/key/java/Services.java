@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
@@ -78,7 +79,7 @@ public class Services{
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters = new HashMap<String, Counter>();
+    private HashMap<String, Counter> counters = new LinkedHashMap<String, Counter>();
 
     /**
      * specification repository

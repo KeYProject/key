@@ -40,6 +40,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -283,7 +284,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
 
 
-    public static List<PosInOccurrence> getSteps(PosInOccurrence pos,
+    public static List<PosInOccurrence> getSteps(
+    		              List<LocationVariable> heapContext,
+                          PosInOccurrence pos,
 	    				  Sequent seq,
 	    				  Services services) {
 	final Term focus = pos.subTerm();
@@ -302,19 +305,27 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 	//get raw steps
 	final List<Term> rawSteps = new LinkedList<Term>();
-	getRawSteps(focus.sub(0), seq, services, rawSteps);
-	if(rawSteps.size() > 0) {
-	    //get base occs
-	    final Map<Term, PosInOccurrence> baseOccs
-	    	= collectBaseOccs(focus, seq);
+	int index = 0;
+	final int stateCount = ((IObserverFunction)focus.op()).getStateCount();
+	final int numHeaps = ((IObserverFunction)focus.op()).getHeapCount(services);
+	while(index < stateCount*numHeaps) {
+	  getRawSteps(focus.sub(index++), seq, services, rawSteps);
+	  if(((IObserverFunction)focus.op()).getStateCount() == 2) {
+		  getRawSteps(focus.sub(index++), seq, services, rawSteps);
+	  }
+	  if(rawSteps.size() > 0) {
+	      //get base occs
+	      final Map<Term, PosInOccurrence> baseOccs
+	    	  = collectBaseOccs(focus, seq);
 
-	    //filter steps
-	    for(Term rawStep : rawSteps) {
-		final PosInOccurrence step = baseOccs.get(rawStep);
-		if(step != null) {
-		    result.add(step);
-		}
-	    }
+  	      //filter steps
+	      for(Term rawStep : rawSteps) {
+		    final PosInOccurrence step = baseOccs.get(rawStep);
+		    if(step != null) {
+		       result.add(step);
+	 	    }
+	      }
+	  }
 	}
 
 	return result;
@@ -381,16 +392,23 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	//heap term of observer must be store-term (or anon, create,
 	//memset, ...)
 	final Services services = goal.proof().getServices();
-	if(!hasRawSteps(focus.sub(0), goal.sequent(), services)) {
-	    return false;
-	}
-
-	//there must be contracts for the observer
 	final IObserverFunction target = (IObserverFunction) focus.op();
+    //final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+	boolean hasRawSteps = false;
+	for(int i = 0; i<target.getHeapCount(services) * target.getStateCount(); i++) {
+	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
+        hasRawSteps = true;		  
+	    break;
+	  }
+	}
+    if(!hasRawSteps) {
+    	return false;
+    }
+	//there must be contracts for the observer
 	final KeYJavaType kjt
 		= target.isStatic()
 		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(focus.sub(1).sort());
+	          : services.getJavaInfo().getKeYJavaType(focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
 	assert kjt != null : "could not determine receiver type for " + focus;
 	if(kjt.getSort() instanceof NullSort) {
 	    return false;
@@ -418,16 +436,17 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
-
+        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        
         final Term selfTerm;
         if (target.isStatic()) {
             selfTerm = null;
         } else {
-            selfTerm = focus.sub(1);
+            selfTerm = focus.sub(target.getHeapCount(services)*target.getStateCount());
         }
 
         ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
-        for(int i = target.isStatic() ? 1 : 2, n = focus.arity(); i < n; i++) {
+        for(int i = target.getHeapCount(services)*target.getStateCount() + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
             paramTerms = paramTerms.append(focus.sub(i));
         }
 
@@ -440,21 +459,109 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final PosInOccurrence step =
                 ((UseDependencyContractApp)ruleApp).step(goal.sequent(), services);
 
+        final boolean twoState = target.getStateCount() == 2;
+        final int obsHeapCount = target.getHeapCount(services);
+        Map<LocationVariable,Term> atPres = twoState ? new LinkedHashMap<LocationVariable, Term>() : null;
+        Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        int i=0;
+        for(LocationVariable heap : heaps) {
+        	if(i >= obsHeapCount) {
+        		break;
+        	}
+            heapTerms.put(heap, step.subTerm().sub(2*i));
+            if(twoState) {
+            	atPres.put(heap, step.subTerm().sub(2*i+1));
+            }
+            i++;
+        }
+        final Term mby = contract.hasMby()
+           	 ? contract.getMby(heapTerms, selfTerm, paramTerms, atPres, services) : null;
+
         assert !step.subTerm().equals(focus);
-
-        //get changed locs and used equalities
-        final Term subStep = step.subTerm().sub(0);
-
-        final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs
-            = getChangedLocsForStep(focus.sub(0),
+        
+        Term freePre = !target.isStatic() ? TB.not(TB.equals(selfTerm, TB.NULL(services))) : null;
+        Term disjoint = null;
+        Term pre = null;
+        final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
+        int heapExprIndex = 0;
+        boolean useful = false;
+        ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.<PosInOccurrence>nil();
+        int hc = 0;
+        for(LocationVariable heap : heaps) {
+          if(hc >= obsHeapCount) {
+        	  break;
+          }
+          for(boolean atPre : twoState ? new boolean[] { false, true } : new boolean[] { false } ) {
+            //get changed locs and used equalities
+            final Term subStep = step.subTerm().sub(heapExprIndex);
+            final Pair<Term,ImmutableList<PosInOccurrence>> changedLocs  = getChangedLocsForStep(focus.sub(heapExprIndex),
                         subStep,
                         goal.sequent(),
                         services);
 
-        assert changedLocs != null;
+            assert changedLocs != null;
+            //store insts 
+            ifInsts = ifInsts.append(changedLocs.second.prepend(step));
+            if(!target.isStatic()) {
+                final Term cr = TB.created(services, subStep, selfTerm);
+                if(freePre == null) {
+                	freePre = cr;
+                }else{
+                    freePre = TB.and(freePre, cr);
+                }
+            }
+            final Term wf = TB.and(TB.wellFormed(subStep, services), TB.wellFormed(focus.sub(heapExprIndex), services));
+            if(freePre == null) {
+            	freePre = wf;
+            }else{
+                freePre = TB.and(freePre, wf);
+            }
+            i = 0;
+    	    for(Term paramTerm : paramTerms) {
+    	    	assert freePre != null;
+    	        freePre = TB.and(freePre, TB.reachableValue(services,
+    					       		subStep,
+    					       		paramTerm,
+    					       		target.getParamType(i++)));
+    	    }
+    	    final Term dep = contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres, services);
+    	    final Term ds = TB.disjoint(services, changedLocs.first, dep);
+    	    if(disjoint == null) {
+               disjoint = ds;
+            } else {
+    	       disjoint = TB.and(disjoint, ds);
+            }
+            // check if helpful
+            if(!useful && !changedLocs.first.op().equals(locSetLDT.getEmpty())) {
+                final ImmutableSet<Term> changed
+                	= addEqualDefs(TB.unionToSet(
+                				      changedLocs.first,
+                				      services),
+                				      goal);
+                if(!changed.contains(dep)) {
+            	  useful = true;
+                }
+            }else{
+            	useful = true;
+            }
+            if(!atPre) {
+              final Term p = contract.getPre(heap, subStep, selfTerm, paramTerms, atPres, services);
+              if(p != null) {
+                if(pre == null) {
+            	  pre = p;
+                }else{
+                  pre = TB.and(pre, p);
+                }
+              }
+              subs[heapExprIndex] = subStep;
+            }
+            heapExprIndex++;
+          }
+          hc++;
+        }
 
         //store insts in rule app
-        ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(changedLocs.second.prepend(step));
+        ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(ifInsts);
 
         //create justification
         final RuleJustificationBySpec just
@@ -464,99 +571,27 @@ public final class UseDependencyContractRule implements BuiltInRule {
                     goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
 
-        //get precondition, dependency term, measured_by
-        Term freePre
-        	= TB.and(TB.wellFormed(subStep, services),
-        		 TB.wellFormed(focus.sub(0), services));
-	if(!target.isStatic()) {
-	    freePre = TB.and(freePre, TB.not(TB.equals(selfTerm, TB.NULL(services))));
-	    freePre = TB.and(freePre, TB.created(services,
-				                 subStep,
-        	                    		 selfTerm));
-	}
-	int i = 0;
-	for(Term paramTerm : paramTerms) {
-	    freePre = TB.and(freePre, TB.reachableValue(services,
-					       		subStep,
-					       		paramTerm,
-					       		target.getParamType(i++)));
-	}
-        final Term pre = contract.getPre(services.getTypeConverter().getHeapLDT().getHeap(),
-                                         subStep,
-        	                         selfTerm,
-        	                         paramTerms,
-                                         null,
-        	                         services);
-        final Term dep = contract.getDep(subStep,
-        				 selfTerm,
-        				 paramTerms,
-        				 services);
-        final Term mby = contract.hasMby()
-        	         ? contract.getMby(subStep,
-        	         	           selfTerm,
-        	         	           paramTerms,
-        	        	           services)
-                         : null;
-
-        //prepare cut formula
-        final Term disjoint
-        	= TB.disjoint(services, changedLocs.first, dep);
-	final ContractPO po
-		= services.getSpecificationRepository()
-			  .getPOForProof(goal.proof());
-	final Term mbyOk;
-	if(po != null && po.getMbyAtPre() != null && mby != null) {
-	    mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-		           TB.lt(mby, po.getMbyAtPre(), services));
-	} else {
-	    mbyOk = TB.tt();
-	}
-        final Term cutFormula
-        	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
-
-        //bail out if obviously not helpful
-        if(!changedLocs.first.op().equals(locSetLDT.getEmpty())) {
-            final ImmutableSet<Term> changed
-            	= addEqualDefs(TB.unionToSet(
-            				      changedLocs.first,
-            				      services),
-            				      goal);
-            if(changed.contains(dep)) {
-        	return goal.split(1);
-            }
+        if(!useful) {
+        	return goal.split(1);        	
         }
 
-//        //split goal into two branches
-//        final ImmutableList<Goal> result = goal.split(2);
-//        final Goal preGoal = result.head();
-//        final Goal postGoal = result.tail().head();
-//        final String changeString
-//        	= LogicPrinter.quickPrintTerm(changedLocs.first,
-//        				      services);
-//        preGoal.setBranchLabel("Dependencies changed by write to "
-//        	                + changeString);
-//        postGoal.setBranchLabel("Dependencies unchanged by write to "
-//        	                + changeString);
-//
-//        //create "Pre" branch
-//        preGoal.addFormula(new SequentFormula(cutFormula),
-//        		   false,
-//        		   true);
-//
-//        //create "Post" branch
-//        final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
-//        subs[0] = subStep;
-//        final Term termWithBaseHeap = TB.func(target, subs);
-//        postGoal.addFormula(new SequentFormula(TB.equals(focus, termWithBaseHeap)), true, false);
-//        postGoal.addFormula(new SequentFormula(cutFormula),
-//        	 	    true,
-//        	 	    false);
+        //prepare cut formula
+  	    final ContractPO po
+		    = services.getSpecificationRepository()
+			    .getPOForProof(goal.proof());
+	    final Term mbyOk;
+	    if(po != null && po.getMbyAtPre() != null && mby != null) {
+	        mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+		           TB.lt(mby, po.getMbyAtPre(), services));
+	    } else {
+	       mbyOk = TB.tt();
+	    }
+        final Term cutFormula
+        	= TB.and(new Term[]{freePre, pre, disjoint, mbyOk});
 
 
         //create "Post" branch
         final ImmutableList<Goal> result = goal.split(1);
-        final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
-        subs[0] = subStep;
         final Term termWithBaseHeap = TB.func(target, subs);
         final Term implication =
                 TB.imp(cutFormula, TB.equals(focus, termWithBaseHeap));

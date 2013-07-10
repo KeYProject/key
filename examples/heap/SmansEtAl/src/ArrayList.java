@@ -3,7 +3,8 @@ class ArrayList {
     private /*@nullable@*/ Object[] items;
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ ensures size() == 0;
       @ ensures \fresh(footprint);
       @*/
@@ -12,7 +13,8 @@ class ArrayList {
     }
     
     
-    /*@ assignable footprint;
+    /*@ normal_behavior
+      @ assignable footprint;
       @ ensures size() == \old(size()) + 1;
       @ ensures get(size() - 1) == o;
       @ ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
@@ -35,7 +37,8 @@ class ArrayList {
     }
     
     
-    /*@ requires 0 <= i && i < size();
+    /*@ normal_behavior
+      @ requires 0 <= i && i < size();
       @ assignable \nothing; 
       @ accessible footprint;
       @ ensures \result == get(i);
@@ -45,7 +48,8 @@ class ArrayList {
     }
 
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ accessible footprint;
       @ ensures \result == size();
       @ ensures 0 <= \result;

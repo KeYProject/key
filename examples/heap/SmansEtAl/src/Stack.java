@@ -2,7 +2,8 @@ class Stack {
     private ArrayList contents;
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ ensures size() == 0;
       @ ensures \fresh(footprint);
       @*/
@@ -11,7 +12,8 @@ class Stack {
     }
     
 
-    /*@ assignable footprint;
+    /*@ normal_behavior
+      @ assignable footprint;
       @ ensures size() == \old(size()) + 1;
       @ ensures \new_elems_fresh(footprint);
       @ diverges true;
@@ -21,7 +23,8 @@ class Stack {
     }
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ accessible footprint;
       @ ensures \result == size();
       @*/
@@ -42,7 +45,8 @@ class Stack {
       @*/
     
     
-    /*@ requires other.\inv;
+    /*@ normal_behavior
+      @ requires other.\inv;
       @ requires \disjoint(footprint, other.footprint);
       @ requires \typeof(other) == \type(Stack);
       @ assignable footprint, other.footprint;

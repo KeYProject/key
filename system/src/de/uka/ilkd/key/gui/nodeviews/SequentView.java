@@ -37,6 +37,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -71,7 +73,7 @@ public abstract class SequentView extends JTextArea
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
-            new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
+            new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
     SequentView() {
 

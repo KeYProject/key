@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -71,17 +72,17 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
         /**
          * Sorts that have been used while translating the set of taclets.
          */
-        private HashSet<Sort> usedSorts = new HashSet<Sort>();
+        private HashSet<Sort> usedSorts = new LinkedHashSet<Sort>();
 
         /**
          * Shema variables of the type Variable that have been used while
          * translating the set of taclets.
          */
-        private HashSet<QuantifiableVariable> usedQuantifiedVariable = new HashSet<QuantifiableVariable>();
+        private HashSet<QuantifiableVariable> usedQuantifiedVariable = new LinkedHashSet<QuantifiableVariable>();
 
         private Services services;
 
-        private HashSet<SchemaVariable> usedFormulaSV = new HashSet<SchemaVariable>();
+        private HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
 
         private boolean quitInstantiationFailuresWithException = false;
 

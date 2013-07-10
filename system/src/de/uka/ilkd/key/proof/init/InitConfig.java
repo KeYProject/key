@@ -25,6 +25,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -103,6 +104,9 @@ public class InitConfig {
         category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
                                               .getChoiceSettings()
         	                              .getDefaultChoices();
+  	    for(LDT ldt : getServices().getTypeConverter().getModels()) {
+  		  ldt.proofSettingsUpdated(ProofSettings.DEFAULT_SETTINGS);
+  	    }
     }
 
            
@@ -232,7 +236,7 @@ public class InitConfig {
 
     public Taclet lookupActiveTaclet(Name name) {
 	if (quickTacletMap == null) {
-            quickTacletMap = new HashMap<Name, Named>();
+            quickTacletMap = new LinkedHashMap<Name, Named>();
             Iterator<Taclet> it = activatedTaclets().iterator();
             while (it.hasNext())  {
                 Taclet t = it.next();
@@ -345,8 +349,13 @@ public class InitConfig {
 
     
     public void setSettings(ProofSettings settings) {
-	this.settings = settings;
-    }
+	  this.settings = settings;
+	  for(LDT ldt : getServices().getTypeConverter().getModels()) {
+		ldt.proofSettingsUpdated(settings);
+	  }
+	  // replace the <inv> symbol as it may have changed arity
+	  namespaces().functions().add(services.getJavaInfo().getInv());
+	}
     
     
     public ProofSettings getSettings() {

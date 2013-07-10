@@ -35,11 +35,11 @@ public class ChoiceSettings implements Settings, Cloneable {
     /** maps categories to a set of Strings(representing the choices
      * which are options for this category).*/
     private HashMap<String, Set<String>> category2Choices 
-    	= new HashMap<String, Set<String>>();
+    	= new LinkedHashMap<String, Set<String>>();
 
 
     public ChoiceSettings() {
-	category2Default = new HashMap<String, String>();
+	category2Default = new LinkedHashMap<String, String>();
     }
 
     
@@ -96,7 +96,7 @@ public class ChoiceSettings implements Settings, Cloneable {
      * @param remove remove entries not present in <code>choiceNS</code> */
     public void updateChoices(Namespace choiceNS, boolean remove){
 	Iterator<Named> it = choiceNS.allElements().iterator();
-	HashMap<String,Set<String>> c2C = new HashMap<String, Set<String>>();
+	HashMap<String,Set<String>> c2C = new LinkedHashMap<String, Set<String>>();
 	Choice c;
 	Set<String> soc;
 	while(it.hasNext()){
@@ -106,7 +106,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }else{
-		soc = new HashSet<String>();
+		soc = new LinkedHashSet<String>();
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }

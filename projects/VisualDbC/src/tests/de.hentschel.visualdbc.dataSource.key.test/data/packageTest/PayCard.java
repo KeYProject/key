@@ -28,7 +28,7 @@ public class PayCard {
       unsuccessfulOperations = 0;
    }
 
-   /*@
+   /*@ normal_behavior
      @ ensures \result.limit==100;
      @*/
    public static PayCard createJuniorCard() {
@@ -56,6 +56,7 @@ public class PayCard {
      @
      @ public exceptional_behavior
      @ requires amount <= 0;
+     @ signals_only IllegalArgumentException;
      @*/
    public boolean charge(int amount) throws IllegalArgumentException {
       if (amount <= 0) {

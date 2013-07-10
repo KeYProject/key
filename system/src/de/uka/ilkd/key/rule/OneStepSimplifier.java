@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -434,7 +435,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    				       Protocol protocol) {
 	//collect context formulas (potential if-insts for replace-known)
 	final Map<Term,PosInOccurrence> context
-		= new HashMap<Term,PosInOccurrence>();
+		= new LinkedHashMap<Term,PosInOccurrence>();
 	for(SequentFormula ante : seq.antecedent()) {
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
 		context.put(

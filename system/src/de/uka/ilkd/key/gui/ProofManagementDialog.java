@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -115,7 +116,7 @@ public final class ProofManagementDialog extends JDialog {
 	this.mediator = mediator;
 	
 	//create class tree
-	targetIcons = new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
+	targetIcons = new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
 	classTree = new ClassTree(true, true, services, targetIcons);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {

@@ -45,7 +45,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
       // Compute collect terms of sequent formulas
       Sequent sequent = goal.sequent();
-      Set<Term> topTerms = new HashSet<Term>();
+      Set<Term> topTerms = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
          topTerms.add(sf.formula());
       }

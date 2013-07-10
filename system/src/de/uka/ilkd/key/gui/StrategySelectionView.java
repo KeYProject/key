@@ -29,6 +29,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -62,7 +63,7 @@ public final class StrategySelectionView extends JPanel {
     private static final String JAVACARDDL_STRATEGY_NAME 
     	= "JavaCardDLStrategy";
 
-    private Map<String, JRadioButton> buttonHashmap = new HashMap<String, JRadioButton>();
+    private Map<String, JRadioButton> buttonHashmap = new LinkedHashMap<String, JRadioButton>();
     
 
    
@@ -1252,7 +1253,7 @@ public final class StrategySelectionView extends JPanel {
             hashmap.put(command, this);        
         }
 
-        static HashMap<String, JRadioButtonHashMap> hashmap = new HashMap<String, JRadioButtonHashMap>();
+        static HashMap<String, JRadioButtonHashMap> hashmap = new LinkedHashMap<String, JRadioButtonHashMap>();
 
         public static JRadioButton getButton(String command) {
             return hashmap.get(command);       

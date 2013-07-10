@@ -331,6 +331,13 @@ public class Main {
 	UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
+            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+                @Override
+                public void uncaughtException(Thread t, Throwable e) {
+                    e.printStackTrace();
+                    System.exit(-1);
+                }});
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);

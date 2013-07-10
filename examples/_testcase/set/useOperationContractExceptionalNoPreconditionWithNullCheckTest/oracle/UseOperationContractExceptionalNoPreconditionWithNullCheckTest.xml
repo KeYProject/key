@@ -7,7 +7,9 @@ pre: self.&lt;inv&gt;
 post: !exc = null
 &amp; (  (   java.lang.Exception::instance(exc) = TRUE
       -&gt; self.&lt;inv&gt;)
-   &amp; java.lang.Exception::instance(exc) = TRUE)
+   &amp; (    java.lang.RuntimeException::instance(exc)
+        = TRUE
+      | java.lang.Exception::instance(exc) = TRUE))
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
             <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
