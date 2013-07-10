@@ -1,5 +1,7 @@
 #! /usr/bin/perl
 
+use Getopt::Long;
+
 # see http://www.somacon.com/p114.php
 sub trim($) {
     my $string = shift;
@@ -9,8 +11,11 @@ sub trim($) {
     return $string;
 }
 
+my $targetDir = ".";
+my $projectName = "";
 
-my $statisticsFile = shift @ARGV;
+GetOptions ('directory|d=s' => \$targetDir,
+	    'project|p=s' => \$projectName);
 
 my @sum;
 my @columnNames;
@@ -37,9 +42,10 @@ while (<>) {
 }
 
 foreach (@columnNames) {
-    open (OUT, ">", $_ . ".sum.properties") or die $!;
+    print "creating $targetDir/$_.sum.properties\n";
+    open (OUT, ">", "$targetDir/$_.sum.properties") or die $!;
     print OUT "YVALUE=" . shift(@sum) . "\n";
-    print OUT "URL=http://abu.se.informatik.tu-darmstadt.de:8080/hudson/userContent\n";
+    print OUT "URL=http://abu.se.informatik.tu-darmstadt.de:8080/hudson/userContent/$projectName\n";
     close OUT;
 }
 

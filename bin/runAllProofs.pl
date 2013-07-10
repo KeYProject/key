@@ -163,10 +163,6 @@ if($option{'xml-junit'}) {
     &writeXmlReport($option{'xml-junit'});
 }
 
-if ($option{'printStatistics'}) {
-  &sumUpStatistics();
-}
-
 if($failures + $errors + scalar(@reloadFailed) > 0) {
     if($option{'stopfail'}) {
         print "Tests stopped after first failure.\n";
@@ -414,52 +410,4 @@ sub cleanDirectories {
 	}
     }
 
-}
-
-# see http://www.somacon.com/p114.php
-sub trim($) {
-    my $string = shift;
-    chomp $string;
-    $string =~ s/^\s+//;
-    $string =~ s/\s+$//;
-    return $string;
-}
-
-sub sumUpStatistics {
-    my $statisticsFile = "$option{'printStatistics'}";
-    my $statSumFile = "$statisticsFile.sum.properties";
-
-    open (CSV, "<", $statisticsFile) or die $!;
-
-    my @sum;
-    my @columnNames;
-    while (<CSV>) {
-	my @line = split /\s*\|\s*/, &trim($_);
-	# remove the name of the example (can not be summed up)
-	shift(@line);
-	if ($. == 1) {
-	    # first line with column names
-	    @columnNames = @line;
-	} elsif ($. == 2) {
-	    # second line: init sum
-	    die "wrong number of fields in line $." 
-		unless scalar(@line) == scalar(@columnNames);
-	    @sum = @line;
-	} else {
-	    # remaining lines: adding up
-	    die "wrong number of fields in line $." 
-		unless scalar(@line) == scalar(@columnNames);
-	    for (@sum) {
-		$_ = $_ + shift(@line);
-	    }
-	}
-    }
-    close CSV;
-    
-    open (OUT, ">", $statSumFile) or die $!;
-    for (@columnNames) {
-	print OUT $_."=".shift(@sum)."\n";
-    }
-    close OUT;
-    
 }
