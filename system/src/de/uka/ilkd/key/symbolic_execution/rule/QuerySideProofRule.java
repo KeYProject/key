@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -46,13 +47,18 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * <p>
  * This rule is only applicable on top level formulas of the form 
- * {@code <var> = <query>} or {@code <query> = <var>}. 
+ * {@code <var> = <query>},
+ * {@code <query> = <var>},
+ * {@code <pre> -> <var> = <query>} or
+ * {@code <pre> -> <query> = <var>}.
  * </p>
  * <p>
  * In the following Goal the equality term is removed and for each possible
  * result is a new top level formula of the form 
- * {@code <resultCondition> -> <var> = <result>} or 
- * {@code <resultCondition> -> <result> = <var>} 
+ * {@code <resultCondition> -> <var> = <result>}, 
+ * {@code <resultCondition> -> <result> = <var>},
+ * {@code <pre> -> <resultCondition> -> <var> = <result>} or 
+ * {@code <pre> -> <resultCondition> -> <result> = <var>} 
  * added. The side proof uses the default side proof settings (splitting = delayed) and is started
  * via {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}.
  * In case that at least one result branch has applicable rules an exception is thrown and the rule is aborted.
@@ -81,25 +87,32 @@ public final class QuerySideProofRule implements BuiltInRule {
     */
    @Override
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-      if (pio != null && pio.isTopLevel()) {
-         Term term = pio.subTerm();
-         if (term.op() == Equality.EQUALS) {
-            if (term.sub(0).op() instanceof LocationVariable) {
-               return isApplicableQuery(goal, term.sub(1), pio);
-            }
-            else if (term.sub(1).op() instanceof LocationVariable) {
-               return isApplicableQuery(goal, term.sub(0), pio);
-            }
-            else {
-               return false;
+      boolean applicable = false;
+      if (pio != null) {
+         Term term = null;
+         if (pio.isTopLevel()) {
+            term = pio.subTerm();
+         }
+         else {
+            Term topTerm = pio.constrainedFormula().formula();
+            if (topTerm.op() == Junctor.IMP) {
+               if (topTerm.sub(1) == pio.subTerm()) {
+                  term = pio.subTerm();
+               }
             }
          }
-         return false;
+         if (term != null) {
+            if (term.op() == Equality.EQUALS) {
+               if (term.sub(0).op() instanceof LocationVariable) {
+                  applicable = isApplicableQuery(goal, term.sub(1), pio);
+               }
+               else if (term.sub(1).op() instanceof LocationVariable) {
+                  applicable = isApplicableQuery(goal, term.sub(0), pio);
+               }
+            }
+         }
       }
-      else {
-         return false;
-      }
-      
+      return applicable;
    }
    
    /**
@@ -143,7 +156,7 @@ public final class QuerySideProofRule implements BuiltInRule {
    @Override
    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
       try {
-         // Compute sequent for side proof to compute query in.
+         // Extract required Terms from goal
          Sequent goalSequent = goal.sequent();
          SequentFormula equalitySF = ruleApp.posInOccurrence().constrainedFormula();
          Term equalityTerm = ruleApp.posInOccurrence().subTerm();
@@ -160,11 +173,11 @@ public final class QuerySideProofRule implements BuiltInRule {
             varTerm = equalityTerm.sub(1);
             varFirst = false;
          }
-         
-         Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, queryTerm.sort());
-         Term newTerm = TermBuilder.DF.func(newPredicate, queryTerm);
-         
-         
+         Term queryConditionTerm = null;
+         if (equalitySF.formula().op() == Junctor.IMP) {
+            queryConditionTerm = equalitySF.formula().sub(0); 
+         }
+         // Compute sequent for side proof to compute query in.
          Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
          for (SequentFormula sf : goalSequent.antecedent()) {
             if (sf != equalitySF) {
@@ -180,6 +193,12 @@ public final class QuerySideProofRule implements BuiltInRule {
                }
             }
          }
+         if (queryConditionTerm != null) {
+            // Add query condition to antecedent because it reduces the number of required steps to prove the result
+            sequentToProve = sequentToProve.addFormula(new SequentFormula(queryConditionTerm), true, false).sequent();
+         }
+         Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, queryTerm.sort());
+         Term newTerm = TermBuilder.DF.func(newPredicate, queryTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
          // Execute side proof
          ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(goal.proof(), sequentToProve, StrategyProperties.SPLITTING_DELAYED);
@@ -230,6 +249,9 @@ public final class QuerySideProofRule implements BuiltInRule {
          for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
             Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
                                                  varFirst ? TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm));
+            if (queryConditionTerm != null) {
+               resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
+            }
             resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
          }
          return goals;

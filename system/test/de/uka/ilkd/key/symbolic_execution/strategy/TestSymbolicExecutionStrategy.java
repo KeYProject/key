@@ -24,6 +24,48 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
    /**
     * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
     */
+   public void testNonExecutionBranchHidingComplexPrecondition_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingComplexPrecondition/test/ComplexPrecondition.java", 
+                          "ComplexPrecondition", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingComplexPrecondition/oracle/ComplexPrecondition_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
+    */
+   public void testNonExecutionBranchHidingComplexPrecondition_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingComplexPrecondition/test/ComplexPrecondition.java", 
+                          "ComplexPrecondition", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingComplexPrecondition/oracle/ComplexPrecondition_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects
+    */
    public void testNonExecutionBranchHidingQueryWithSideEffects_hiding_side_proof() throws Exception {
       doSETTestAndDispose(keyRepDirectory, 
                           "examples/_testcase/set/nonExecutionBranchHidingQueryWithSideEffects/test/QueryWithSideEffects.java", 
