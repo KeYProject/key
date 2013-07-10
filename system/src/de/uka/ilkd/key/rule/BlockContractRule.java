@@ -52,6 +52,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import java.util.*;
 
@@ -111,27 +112,6 @@ public class BlockContractRule implements BuiltInRule {
         Term varAtPost = TermBuilder.DF.var(varAtPostVar);
         return varAtPost;
     }
-
-//    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
-//                                                     Services services) {
-//        if (varTerms == null || varTerms.isEmpty()) {
-//            return varTerms;
-//        }
-//        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
-//        for(Term varTerm: varTerms) {
-//            assert varTerm.op() instanceof LocationVariable;
-//
-//            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-//
-//            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-//            LocationVariable varAtPreVar =
-//                    new LocationVariable(new ProgramElementName(name), resultType);
-//            register(varAtPreVar, services);
-//            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-//            renamedLocalIns = renamedLocalIns.append(varAtPre);
-//        }
-//        return renamedLocalIns;
-//    }
 
     private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
                                                            Services services) {
@@ -264,6 +244,20 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
+    private boolean isInfFlow(Goal goal) {
+        StrategyProperties stratProps =
+                goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
+        String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
+
+        boolean isOriginalIF =
+                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
+        // For loaded proofs, InfFlowCheckInfo is not correct without the following
+        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        return isOriginalIF || isLoadedIF;
+    }
+
     private Pair<Term, Term> buildInfFlowAssumptions(ProofObligationVars instVars,
                                                      ImmutableList<Term> localOuts,
                                                      ImmutableList<Term> localOutsAtPre,
@@ -271,10 +265,6 @@ public class BlockContractRule implements BuiltInRule {
                                                      Term baseHeap,
                                                      Term applPredTerm) {
         Term beforeAssumptions = TB.equals(instVars.pre.heap, baseHeap);
-//        Iterator<Term> newIns = instVars.newIns.iterator();
-//        for (Term locIn: instVars.localIns) {
-//            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
-//        }
         Iterator<Term> outsAtPre = localOutsAtPre.iterator();
         for (Term locOut: localOuts) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(outsAtPre.next(), locOut));
@@ -307,13 +297,7 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        boolean isInfFlowProof = // For loaded proofs, InfFlowCheckInfo is not correct without this
-                (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                    && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))
-                || goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties()
-                                         .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                                         .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-        if (isInfFlowProof && contract.hasModifiesClause() && contract.getInfFlowSpecs() != null) {
+        if (isInfFlow(goal) && contract.hasModifiesClause() && contract.hasInfFlowSpecs()) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +
@@ -406,8 +390,7 @@ public class BlockContractRule implements BuiltInRule {
             InfFlowPOSnippetFactory infFlowFactory =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
-            Pair<Sequent, Term> seqPostPair =
-                    buildBodyPreservesSequent(infFlowFactory, contract, goal, services);
+            Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory, goal);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
 
@@ -587,8 +570,7 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
-                                                  Goal goal, Services services) {
+    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Goal goal) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
