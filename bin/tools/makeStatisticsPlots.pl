@@ -110,7 +110,7 @@ foreach my $col (@COLUMNS) {
 	    if(exists $data{$key}) {
 		$data = $data{$key};
 	    }
-	    print GP "$prettyproblem $data\n";
+	    print GP "\"$prettyproblem\" $data\n";
 	}
 	print GP "e";
     }
