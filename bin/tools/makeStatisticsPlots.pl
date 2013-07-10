@@ -13,13 +13,29 @@
 
 use strict;
 
+# the arguments
+my @filenames = @ARGV;
+
+die "There were no file arguments" unless(@filenames);
+
 # use this string as a prefix to the generated image files; later to
 # be definable in a commandline option
 my $prefix = "";
 
 # List the names for columns in the statistics files.
-# The first line in the files is disregarded
-my @COLUMNS = ( "steps", "nodes", "branches", "time", "avg-time" );
+# These are read from the first line of the first file.
+my @columns;
+
+open IN, $filenames[0] or die "cannot open ".$filenames[0];
+# read first line
+my $line = <IN>;
+# remove "\n"
+chomp $line;
+# split at delimiter
+@columns = split(/\s*\|\s*/, $line);
+# remove first entry because it is the example name column
+shift @columns;
+close IN;
 
 # make a unique key from a set of strings.
 # we assume that '%' does not occurr in the strings.
@@ -40,21 +56,20 @@ sub extractProblemName {
     }
 }
 
-# the arguments
-my @filenames = ();
-
 # the collection of all found proof names
 my %problemnames = ();
 
 # the data table
 my %data = ();
 
-foreach my $filename (@ARGV) {
-    push @filenames, $filename;
+foreach my $filename (@filenames) {
     open IN, $filename or die "cannot open $filename";
     <IN>;  # skip over first line
     while(<IN>) {
+	# remove "\n"
 	chomp;
+	# ignore line if it is a comment or if it is empty
+	next if /^#/ or ($_ eq "");
 	my @elems = split /\s*\|\s*/, $_;
 	my $problem = shift @elems;
 	$problemnames{$problem} = 1;
@@ -76,10 +91,8 @@ foreach (@filenames) {
     print "Checking $_\n";
 }
 
-die "There were no file arguments" unless(@filenames);
-
 my $colNo = 0;
-foreach my $col (@COLUMNS) {
+foreach my $col (@columns) {
     open GP, "| gnuplot" or die "cannot launch gnuplot";
     print GP "set title 'Plot for $col'\n";
     print GP "set style data histogram\n";
@@ -89,7 +102,7 @@ foreach my $col (@COLUMNS) {
     print GP "set out '$prefix$col.svg'\n";
 #     print GP "set yrange [0:]\n";
     print GP "set logscale y\n";
-    print GP "set terminal svg size ".((values %data) * 3).",480\n";
+    print GP "set terminal svg size ".((values %data) * (2 + 0.1*@filenames)).",480\n";
 
     print GP "plot";
     my $first = 1;
@@ -113,7 +126,7 @@ foreach my $col (@COLUMNS) {
 	    }
 	    print GP "\"$prettyproblem\" $data\n";
 	}
-	print GP "e";
+	print GP "e\n";
     }
     close GP;
     $colNo ++;
