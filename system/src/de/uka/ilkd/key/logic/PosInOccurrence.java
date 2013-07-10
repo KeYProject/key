@@ -19,7 +19,7 @@ package de.uka.ilkd.key.logic;
  * SequentFormula and a PosInTerm determine an object of this 
  * class exactly. 
  */
-public class PosInOccurrence {
+public final class PosInOccurrence {
 
     public static PosInOccurrence findInSequent(Sequent seq, 
                                                 int formulaNumber, 
@@ -53,6 +53,7 @@ public class PosInOccurrence {
     public PosInOccurrence(SequentFormula cfma, 
             PosInTerm posInTerm,
             boolean inAntec) {	
+        assert posInTerm != null;
 	this.inAntec=inAntec;
 	this.cfma=cfma;	
 	this.posInTerm=posInTerm;	
