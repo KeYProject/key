@@ -70,7 +70,8 @@ public final class ProofManagementAction extends MainWindowAction {
 	    mainWindow.notify(
 		    new GeneralFailureEvent("Please load a proof first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
+	    MainWindow.getInstance().getProofManagementDialog()
+                    .showInstance(MainWindow.getInstance(), getMediator(), getMediator().getProof().env()
 		    .getInitConfig());
 	}
     }

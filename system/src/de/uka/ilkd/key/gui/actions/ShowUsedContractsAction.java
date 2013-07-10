@@ -16,7 +16,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -50,8 +49,9 @@ public class ShowUsedContractsAction extends MainWindowAction {
 		                    "If you wish to see the used contracts "
 		                            + "for a proof you have to load one first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
-		    .getInitConfig(), getMediator().getProof());
+            MainWindow.getInstance().getProofManagementDialog()
+                    .showInstance(MainWindow.getInstance(), getMediator(),
+                    getMediator().getProof().env().getInitConfig(), getMediator().getProof());
 	}
     }
 

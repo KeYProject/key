@@ -51,6 +51,7 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
     
+    private final MainWindow mainWindow;
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     LogicPrinter printer;
@@ -75,8 +76,8 @@ public abstract class SequentView extends JTextArea
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
-    SequentView() {
-
+    SequentView(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         setEditable(false);
@@ -128,12 +129,12 @@ public abstract class SequentView extends JTextArea
         try {
             unregisterListener();
         } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
         } finally {
             try {
                 super.finalize();
             } catch (Throwable e) {
-                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
             }
         }
     }
@@ -241,9 +242,9 @@ public abstract class SequentView extends JTextArea
             }
 
             if (info == null) {
-                MainWindow.getInstance().setStandardStatusLine();
+                mainWindow.setStandardStatusLine();
             } else {
-                MainWindow.getInstance().setStatusLine(info);
+                mainWindow.setStatusLine(info);
             }
 
         }
@@ -410,7 +411,7 @@ public abstract class SequentView extends JTextArea
     public void keyReleased(KeyEvent e) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
             showTermInfo = false;
-            MainWindow.getInstance().setStandardStatusLine();
+            mainWindow.setStandardStatusLine();
         }
     }
     

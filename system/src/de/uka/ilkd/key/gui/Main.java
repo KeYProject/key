@@ -32,7 +32,6 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
-import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -339,23 +338,18 @@ public class Main {
             ui = new ConsoleUserInterface(batch, VERBOSE_UI);
         } else {
             updateSplashScreen();
-
-            GuiUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    MainWindow.createInstance();
-                }
-            });
-
+            MainWindow mainWindow = new MainWindow();
+            
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
-                        MainWindow.getInstance().getRecentFiles().getMostRecent();
+                        mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
                     fileNameOnStartUp = mostRecent.getAbsolutePath();
                 }
             }
 
-            ui = MainWindow.getInstance().getUserInterface();
+            ui = mainWindow.getUserInterface();
 	    if (fileNameOnStartUp != null)
 	        System.out.println("Loading: "+fileNameOnStartUp);
         }

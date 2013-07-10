@@ -87,7 +87,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * @param mediator the KeYMediator allowing access to the
      *  current system status
      */
-    public CurrentGoalView(KeYMediator mediator) {
+    public CurrentGoalView(KeYMediator mediator, MainWindow mainWindow) {
+        super(mainWindow);
 	setMediator(mediator);
         setBackground(Color.white);
 	// disables selection
