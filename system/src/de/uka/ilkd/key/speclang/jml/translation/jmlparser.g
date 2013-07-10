@@ -287,7 +287,8 @@ options {
 	String sigString = "";
 	
 	for(SLExpression expr : signature) {
-	    sigString += expr.getType().getFullName() + ", ";
+	    final KeYJavaType t = expr.getType();
+	    sigString += (t==null? "<unknown type>": t.getFullName()) + ", ";
 	}
 	
 	return sigString.substring(0, sigString.length() - 2);
