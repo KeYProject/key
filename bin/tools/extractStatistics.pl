@@ -1,5 +1,6 @@
 #! /usr/bin/perl
 
+use strict;
 use Getopt::Long;
 
 # see http://www.somacon.com/p114.php
@@ -56,7 +57,7 @@ foreach (@columnNames) {
 # and finally for the total number of examples
 print "creating $targetDir/count.sum.properties\n";
 open OUT, ">", "$targetDir/count.sum.properties" or die $!;
-print OUT "YVALUE=$countProblems\n";
+print OUT "YVALUE=$countExamples\n";
 print OUT "URL=http://abu.se.informatik.tu-darmstadt.de:8080/hudson/userContent/$projectName\n";
 close OUT;
 
