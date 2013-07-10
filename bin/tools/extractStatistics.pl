@@ -22,26 +22,26 @@ my @sum;
 my @columnNames;
 my $countExamples = 0;
 while (<>) {
+    chomp;
     my @line = split /\s*\|\s*/, &trim($_);
     # remove the name of the example (can not be summed up)
     shift(@line);
+print $_."\n";
     if ($. == 1) {
 	# first line with column names
 	@columnNames = @line;
-    } elsif ($. == 2) {
-	# second line: init sum
+    } elsif (not /^--- SUM ---/) {
+	# skip comments
+	next if /^#/ or ($_ eq "");
+	# check and count line
+	die "wrong number of fields in line $." 
+	    unless scalar(@line) == scalar(@columnNames);
+	$countExamples ++;
+    } else {
+	# the line with the summas
 	die "wrong number of fields in line $." 
 	    unless scalar(@line) == scalar(@columnNames);
 	@sum = @line;
-	$countExamples ++;
-    } else {
-	# remaining lines: adding up
-	die "wrong number of fields in line $." 
-	    unless scalar(@line) == scalar(@columnNames);
-	for (@sum) {
-	    $_ = $_ + shift(@line);
-	}
-	$countExamples ++;
     }
 }
 

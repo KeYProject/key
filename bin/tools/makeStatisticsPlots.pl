@@ -24,18 +24,23 @@ my $prefix = "";
 
 # List the names for columns in the statistics files.
 # These are read from the first line of the first file.
-my @columns;
+my @columns = &extractColumnNames;
 
-open IN, $filenames[0] or die "cannot open ".$filenames[0];
-# read first line
-my $line = <IN>;
-# remove "\n"
-chomp $line;
-# split at delimiter
-@columns = split(/\s*\|\s*/, $line);
-# remove first entry because it is the example name column
-shift @columns;
-close IN;
+# Reads the column names from the first line of the first file.
+sub extractColumnNames {
+    # read first line
+    open IN, $filenames[0] or die "cannot open ".$filenames[0];
+    my $line = <IN>;
+    close IN;
+    # remove "\n"
+    chomp $line;
+    # split at delimiter
+    my @columns = split(/\s*\|\s*/, $line);
+    # remove first entry because it is the example name column
+    shift @columns;
+    
+    return @columns;
+}
 
 # make a unique key from a set of strings.
 # we assume that '%' does not occurr in the strings.
@@ -92,6 +97,8 @@ foreach (@filenames) {
 }
 
 my $colNo = 0;
+my $width = 150 + ((values %data) * (2 + 0.1*@filenames));
+my $hight = 1000;
 foreach my $col (@columns) {
     open GP, "| gnuplot" or die "cannot launch gnuplot";
     print GP "set title 'Plot for $col'\n";
@@ -102,7 +109,7 @@ foreach my $col (@columns) {
     print GP "set out '$prefix$col.svg'\n";
 #     print GP "set yrange [0:]\n";
     print GP "set logscale y\n";
-    print GP "set terminal svg size ".((values %data) * (2 + 0.1*@filenames)).",480\n";
+    print GP "set terminal svg size $width,$hight\n";
 
     print GP "plot";
     my $first = 1;

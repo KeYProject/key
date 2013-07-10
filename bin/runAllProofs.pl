@@ -163,6 +163,25 @@ if($option{'xml-junit'}) {
     &writeXmlReport($option{'xml-junit'});
 }
 
+if ($option{'printStatistics'}) {
+    # calculate Summas
+    my @sum = &calculateSummas($option{'printStatistics'});
+    
+    # append summas 
+    my $line = "--- SUM ---";
+    foreach my $s (@sum) {
+	$line = $line." | ".$s;
+    }
+    open OUT, ">>", $option{'printStatistics'} or die $!;
+    print OUT $line."\n";
+    
+    # append git commit hash
+    my $gitHash = `git rev-parse HEAD`;
+    print OUT "\n";
+    print OUT "# git commit $gitHash\n";
+    close OUT;
+}
+
 if($failures + $errors + scalar(@reloadFailed) > 0) {
     if($option{'stopfail'}) {
         print "Tests stopped after first failure.\n";
@@ -411,3 +430,49 @@ sub cleanDirectories {
     }
 
 }
+
+sub calculateSummas {
+    my $filename = shift @_;
+    my @sum;
+    my @columnNames;
+    my $countExamples = 0;
+    open IN, "<", $filename or die $!;
+    while (<IN>) {
+	my @line = split /\s*\|\s*/, &trim($_);
+	# remove the name of the example (can not be summed up)
+	shift(@line);
+	if ($. == 1) {
+	    # first line with column names
+	    @columnNames = @line;
+	} elsif ($. == 2) {
+	    # second line: init sum
+	    die "wrong number of fields in line $." 
+		unless scalar(@line) == scalar(@columnNames);
+	    @sum = @line;
+	    $countExamples ++;
+	} else {
+	    # remaining lines: adding up
+	    die "wrong number of fields in line $." 
+		unless scalar(@line) == scalar(@columnNames);
+	    for (@sum) {
+		$_ = $_ + shift(@line);
+	    }
+	    $countExamples ++;
+	}
+    }
+    close IN;
+    
+    # extra handling of the average time per step (which should be in the last column)
+    $sum[@sum-1] = $sum[@sum-1] / $countExamples;
+    return @sum;
+}
+
+# see http://www.somacon.com/p114.php
+sub trim($) {
+    my $string = shift;
+    chomp $string;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
+}
+
