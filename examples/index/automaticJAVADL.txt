@@ -262,6 +262,7 @@ provable: ./standard_key/java_dl/break.key
 provable: ./standard_key/java_dl/char.key
 provable: ./standard_key/java_dl/compileTimeConstants.key
 provable: ./standard_key/java_dl/constructorException/test.key
+notprovable: ./standard_key/java_dl/constructorException/regressionTestBug1333.key
 provable: ./standard_key/java_dl/continue1.key
 provable: ./standard_key/java_dl/continue2.key
 provable: ./standard_key/java_dl/complexAssignment.key
