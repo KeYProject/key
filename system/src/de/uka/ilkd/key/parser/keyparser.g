@@ -3615,6 +3615,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
+    | varcond_atomicFormula[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4106,6 +4107,16 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
+varcond_atomicFormula [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+   ISATOMICFORMULA
+        LPAREN x=varId RPAREN {
+           b.addVariableCondition(new AtomicFormulaCondition((TermSV) x));
+        }
+;
 
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
