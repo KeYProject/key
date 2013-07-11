@@ -2,6 +2,7 @@ package org.key_project.key4eclipse.resources.io;
 
 import java.io.File;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,10 +14,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
@@ -28,9 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -38,22 +32,34 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
+/**
+ * Writer for the meta files.
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaFileWriter {
    
-   private LinkedHashSet<KeYJavaType> addedTypes;
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   /**
+    * {@link LinkedHashSet} with the full names of all types already added to the meta file.
+    */
+   private LinkedHashSet<String> addedTypes;
    
-   public IFile writeMetaFile(ProofElement pe) {
-      IFile metaIFile = null;
+   
+   /**
+    * Creates the meta file for the given {@link ProofElement}.
+    * @param pe - the {@link ProofElement} to use
+    */
+   public void writeMetaFile(ProofElement pe) {
+      IFile metaIFile = pe.getMetaFile();
       try{
-         this.environment = pe.getKeYEnvironment();
-         this.addedTypes = new LinkedHashSet<KeYJavaType>();
+         this.addedTypes = new LinkedHashSet<String>();
          Document doc = createDoument(pe);
          
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
          DOMSource source = new DOMSource(doc);
-         metaIFile = createMetaFile(pe.getProofFile());
+         if(!metaIFile.exists()){
+            metaIFile.create(null, true, null);
+         }
          File metaFile = metaIFile.getLocation().toFile();
          StreamResult result = new StreamResult(metaFile);
          transformer.transform(source, result);
@@ -62,10 +68,15 @@ public class ProofMetaFileWriter {
       } catch (Exception e) {
          LogUtil.getLogger().createErrorStatus(e);
       }
-      return metaIFile;
    }
    
    
+   /**
+    * Creates the {@link Document} for the meta file of the given {@link ProofElement}.
+    * @param pe - the {@link ProofElement} to use
+    * @return the created {@link Document}
+    * @throws ParserConfigurationException
+    */
    private Document createDoument(ProofElement pe) throws ParserConfigurationException{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -75,32 +86,55 @@ public class ProofMetaFileWriter {
       Element rootElement = doc.createElement("ProofMetaFile");
       doc.appendChild(rootElement);
       
-      Element proofFileHashCode = doc.createElement("proofFileHashCode");
-      String hashCode = String.valueOf(pe.getProofFile().hashCode());
-      proofFileHashCode.appendChild(doc.createTextNode(hashCode));
-      rootElement.appendChild(proofFileHashCode);
+      Element proofFileMD5 = doc.createElement("proofFileMD5");
+      String md5 = KeY4EclipseResourcesUtil.computeContentMD5(pe.getProofFile());
+      proofFileMD5.appendChild(doc.createTextNode(md5));
+      rootElement.appendChild(proofFileMD5);
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
-         KeYJavaType kjt = getKeYJavaType(proofRef);
-         if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt)){
-            addedTypes.add(kjt);
-            Element typeElement = doc.createElement("type");
-            typeElement.appendChild(doc.createTextNode(kjt.getFullName()));
-            if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){
-               ImmutableList<KeYJavaType> subTypes = environment.getServices().getJavaInfo().getAllSubtypes(kjt);
+         if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){   
+            KeYJavaType kjt = getKeYJavaType(proofRef);
+            if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
+               kjt = getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment());
+               addedTypes.add(kjt.getFullName());
+               Element typeElement = doc.createElement("type");
+               typeElement.appendChild(doc.createTextNode(kjt.getFullName()));
+               ImmutableList<KeYJavaType> subTypes = pe.getKeYEnvironment().getServices().getJavaInfo().getAllSubtypes(kjt);
                for(KeYJavaType subType : subTypes){
                   Element subTypeElement = doc.createElement("subType");
                   subTypeElement.appendChild(doc.createTextNode(subType.getFullName()));
                   typeElement.appendChild(subTypeElement);
                }
+               rootElement.appendChild(typeElement);
             }
-            rootElement.appendChild(typeElement);
          }
       }
       return doc;
    }
    
    
+   /**
+    * Returns the equivalent {@link KeYJavaType} from the given {@link KeYEnvironment} for the given {@link KeYJavaType}.
+    * @param kjt - the {@link KeYJavaType} to use
+    * @param environment - the {@link KeYEnvironment} to use
+    * @return the {@link KeYJavaType} form the {@link KeYEnvironment}
+    */
+   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment){
+      Set<KeYJavaType> envKjts = environment.getJavaInfo().getAllKeYJavaTypes();
+      for(KeYJavaType envKjt : envKjts){
+         if(envKjt.getFullName().equals(kjt.getFullName())){
+            return envKjt;
+         }
+      }
+      return null;
+   }
+   
+   
+   /**
+    * Returns the {@link KeYJavaType} for the given {@link IProofReference}.
+    * @param proofRef - the {@link IProofReference} to use
+    * @return the {@link KeYJavaType}
+    */
    private KeYJavaType getKeYJavaType(IProofReference<?> proofRef){
       KeYJavaType kjt = null;
       Object target = proofRef.getTarget();
@@ -125,17 +159,5 @@ public class ProofMetaFileWriter {
          kjt = classAx.getKJT();
       }
       return kjt;
-   }
-
-   
-   private IFile createMetaFile(IFile proofFile) throws CoreException{
-      IPath proofFilePath = proofFile.getFullPath();
-      IPath metaFilePath = proofFilePath.addFileExtension("meta");
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFile metaFile = root.getFile(metaFilePath);
-      if(!metaFile.exists()){
-         metaFile.create(null, true, null);
-      }
-      return metaFile;
    }
 }

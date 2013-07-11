@@ -17,44 +17,48 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
+/**
+ * Properties for the ProofManagementPropertyPage.
+ * @author Stefan Käsdorf
+ */
 public final class KeYProjectProperties {
    
-   public static final QualifiedName PROP_BUILD_PROOFS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
-   public static final QualifiedName PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT = new QualifiedName("org.key_project.key4eclipse.resources", "enableEfficientProofManagement");
+   public static final QualifiedName PROP_ENABLE_BUILD_PROOFS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
+   public static final QualifiedName PROP_ENALBLE_BUILD_PROOFS_EFFICIENT = new QualifiedName("org.key_project.key4eclipse.resources", "enableEfficientProofManagement");
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
    public static final QualifiedName PROP_HIDE_META_FILES = new QualifiedName("org.key_project.key4eclipse.resources", "hideMetaFiles");
    
    
-   public static boolean isBuildProofs(IProject project) throws CoreException {
+   public static boolean isEnableBuildProofs(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_BUILD_PROOFS));
+         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENABLE_BUILD_PROOFS));
       }
       else {
          return false;
       }
    }
    
-   public static void setBuildProofs(IProject project,  boolean enabled) throws CoreException {
+   public static void setEnableBuildProofs(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
-         project.setPersistentProperty(PROP_BUILD_PROOFS, enabled + "");
+         project.setPersistentProperty(PROP_ENABLE_BUILD_PROOFS, enabled + "");
       }
    }
    
    
-   public static boolean isEnableEfficientProofManagement(IProject project) throws CoreException {
+   public static boolean isEnableBuildProofsEfficient(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT));
+         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENALBLE_BUILD_PROOFS_EFFICIENT));
       }
       else {
          return false;
       }
    }
    
-   public static void setEnableEfficientProofManagement(IProject project,  boolean enabled) throws CoreException {
+   public static void setEnableBuildProofsEfficient(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
-         project.setPersistentProperty(PROP_ENALBLE_EFFICIENT_PROOFMANAGEMENT, enabled + "");
+         project.setPersistentProperty(PROP_ENALBLE_BUILD_PROOFS_EFFICIENT, enabled + "");
       }
    }
    
@@ -81,7 +85,7 @@ public final class KeYProjectProperties {
             return Integer.parseInt(project.getPersistentProperty(PROP_NUMBER_OF_THREADS));
          }
          catch (Exception e) {
-            return 0;
+            return 1;
          }
       }
       else {

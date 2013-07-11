@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -131,6 +132,10 @@ public class KeY4EclipseResourcesTestUtil {
       TestUtilsUtil.waitForBuild();
    }
    
+   public static void cleanBuild(IProject project) throws CoreException{
+      project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
+      TestUtilsUtil.waitForBuild();
+   }
    
    /**
     * Loads a given proof{@linkIFile} and returns the loaded {@link Proof}.
@@ -188,24 +193,55 @@ public class KeY4EclipseResourcesTestUtil {
    public static LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
       LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerManager.CLOSEDMARKER_ID, res);
       allMarkerList.addAll(getKeYMarkerByType(MarkerManager.NOTCLOSEDMARKER_ID, res));
-      LinkedList<IMarker> problemLoaderExceptionMarker = getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, res);
-      if(allMarkerList.isEmpty())
-         return problemLoaderExceptionMarker;
-      else if(problemLoaderExceptionMarker.isEmpty()){
-         return allMarkerList;
-      }
-      else{
-         return null;
-      }
+      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.CYCLEDETECTEDMARKER_ID, res));
+      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, res));
+      return allMarkerList;
+   }
+   
+   public static int getMarkerCount(IResource res) throws CoreException{
+      return getAllKeYMarker(res).size();
    }
    
    
    public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean hideMetaFiles, boolean autoDeleteProofFiles) throws CoreException{
-      KeYProjectProperties.setBuildProofs(project, buildProofs);
-      KeYProjectProperties.setEnableEfficientProofManagement(project, buildProofsEfficient);
+      KeYProjectProperties.setEnableBuildProofs(project, buildProofs);
+      KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
       KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
       KeYProjectProperties.setHideMetaFiles(project, hideMetaFiles);
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
    }
+   
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean hideMetaFiles) throws CoreException, InterruptedException{
+      //turn off autobuild
+      enableAutoBuild(false);
+      //create a KeYProject
+      IJavaProject keyProject = createKeYProject(projectName);
+      IProject project = keyProject.getProject();
+      setKeYProjectProperties(project, buildProofs, buildProofsEfficient, enableMultiThreading, numberOfThreads, hideMetaFiles, autoDeleteProofFiles);
+      //build
+      KeY4EclipseResourcesTestUtil.build(project);
+      return project;
+   }
+   
+   public static boolean proofFolderExists(IProject project){
+      IFolder proofFolder = getProofFolder(project);
+      return proofFolder.exists();
+   }
+   
+   public static boolean fileExists(IPath path){
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      return root.getFile(path).exists();
+   }
+   
+   public static IFile getFile(IPath path){
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      return root.getFile(path);
+   }
+   
+   public static IFolder getFolder(IPath path){
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      return root.getFolder(path);
+   }
+   
 }

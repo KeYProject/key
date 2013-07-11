@@ -13,6 +13,11 @@
 
 package org.key_project.key4eclipse.resources.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -36,43 +41,17 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 
+/**
+ * @author Stefan Käsdorf
+ */
 public class KeY4EclipseResourcesUtil {
-   
-   
-   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){
-      Iterator<KeYJavaType> it = kjts.iterator();
-      while (it.hasNext()) {
-         KeYJavaType kjt = it.next();
-         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-               kjt.getJavaType() instanceof InterfaceDeclaration) || 
-             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
-            it.remove();
-         }
-      }
-      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
-      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
-         public int compare(KeYJavaType o1, KeYJavaType o2) {
-            return o1.getFullName().compareTo(o2.getFullName());
-         }
-      });
-      return kjtsarr;
-   }
-   
-   
-   public static boolean filterKeYJavaType(KeYJavaType kjt){
-      if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-            kjt.getJavaType() instanceof InterfaceDeclaration) || 
-          ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
-         return true;
-      }
-      return false;
-   }
    
    
    /**
@@ -83,16 +62,16 @@ public class KeY4EclipseResourcesUtil {
    public static void cleanBuildProject(final IProject project) throws CoreException{
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       IWorkspaceDescription desc = workspace.getDescription();
-      if(desc.isAutoBuilding()){ // TODO: Is die Unterschiedung wirklich nötig?
+      boolean autoBuilding = desc.isAutoBuilding();
+      if(autoBuilding){
          try {
             desc.setAutoBuilding(false);
             workspace.setDescription(desc);
             //build
             project.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
-            //reset auto build
          }
          finally {
-            desc.setAutoBuilding(true);
+            desc.setAutoBuilding(autoBuilding);
             workspace.setDescription(desc);
          }
       }
@@ -114,23 +93,14 @@ public class KeY4EclipseResourcesUtil {
          }.schedule();
       }
    }
-   
-   
-   public static void hideMetaFiles(IProject project, boolean hide) throws CoreException{
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append("Proofs");
-      IFolder proofFolder = root.getFolder(proofFolderPath);
-      if(proofFolder.exists()){
-         LinkedList<IFile> metaFiles = collectAllMetaFiles(proofFolder);
-         for(IFile metaFile : metaFiles){
-            metaFile.setHidden(hide);
-            //TODO: refresh gui
-         }
-      }
-      project.refreshLocal(IResource.DEPTH_INFINITE, null);
-   }
 
-   
+
+   /**
+    * Collects all meta{@link IFile}s in the given {@link IFolder} and all subfolders.
+    * @param folder - the {@link IFolder} to use
+    * @return a {@link LinkedList} with all meta{@link IFile}s
+    * @throws CoreException
+    */
    private static LinkedList<IFile> collectAllMetaFiles(IFolder folder) throws CoreException{
       LinkedList<IFile> metaFileList = new LinkedList<IFile>();
       IResource[] members = folder.members(IContainer.INCLUDE_HIDDEN);
@@ -147,5 +117,92 @@ public class KeY4EclipseResourcesUtil {
          }
       }
       return metaFileList;
+   }
+   
+   
+   /**
+    * Computes the MD5 Sum for the given {@link IFile} content.
+    * @param iFile - the {@link IFile} to use
+    * @return the MD5 Sum as {@link String}
+    */
+   public static String computeContentMD5(IFile iFile){
+      File file = iFile.getLocation().toFile();
+      String md5 = null;
+         try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            InputStream is = new FileInputStream(file);           
+            byte[] buffer = new byte[8192];
+            int read = 0;
+            while( (read = is.read(buffer)) > 0) {
+               digest.update(buffer, 0, read);
+            }     
+            byte[] md5sum = digest.digest();
+            BigInteger bigInt = new BigInteger(1, md5sum);
+            md5 = bigInt.toString(16);
+            is.close();
+         }
+         catch(Exception e) {
+            throw new RuntimeException("Unable to process file for MD5", e);
+         }
+      return md5;
+   }
+   
+   
+   /**
+    * Checks if the given {@link KeYJavaType} is part of the project or an external resource.
+    * @param kjt - the {@link KeYJavaType} to use
+    * @return false if the {@link KeYJavaType} is an internal resource
+    */
+   public static boolean filterKeYJavaType(KeYJavaType kjt){
+      if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+            kjt.getJavaType() instanceof InterfaceDeclaration) || 
+          ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
+         return true;
+      }
+      return false;
+   }
+   
+   
+   /**
+    * Filters the given {@link Set} of {@link KeYJavaType}s and sorts them.
+    * @param kjts - the {@link KeYJavaType}s to filter and sort
+    * @return the filtered and sorted {@link KeYJavaType[]}
+    */
+   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){
+      Iterator<KeYJavaType> it = kjts.iterator();
+      while (it.hasNext()) {
+         KeYJavaType kjt = it.next();
+         if (filterKeYJavaType(kjt)) {
+            it.remove();
+         }
+      }
+      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+         public int compare(KeYJavaType o1, KeYJavaType o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+         }
+      });
+      return kjtsarr;
+   }
+   
+   
+   /**
+    * Applies the {@link KeYProjectProperties#PROP_HIDE_META_FILES} to all metaFiles in the given {@link IProject}.
+    * @param project - the {@link IProject} to use
+    * @throws CoreException
+    */
+   public static void hideMetaFiles(IProject project) throws CoreException{
+      boolean hide = KeYProjectProperties.isHideMetaFiles(project);
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IPath proofFolderPath = project.getFullPath().append("Proofs");
+      IFolder proofFolder = root.getFolder(proofFolderPath);
+      if(proofFolder.exists()){
+         LinkedList<IFile> metaFiles = collectAllMetaFiles(proofFolder);
+         for(IFile metaFile : metaFiles){
+            metaFile.setHidden(hide);
+            //TODO: refresh gui
+         }
+      }
+      project.refreshLocal(IResource.DEPTH_INFINITE, null);
    }
 }

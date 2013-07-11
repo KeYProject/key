@@ -19,8 +19,13 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
+/**
+ * DeltaVisitor to visit every child of the given delta.
+ * @author Stefan Käsdorf
+ */
 public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
 
+   
    private LinkedList<IResourceDelta> deltas;
    public KeYProjectResourceDeltaVisitor() throws CoreException{
       this.deltas = new LinkedList<IResourceDelta>();
@@ -38,7 +43,6 @@ public class KeYProjectResourceDeltaVisitor implements IResourceDeltaVisitor{
    @Override
    public boolean visit(IResourceDelta delta) throws CoreException {
       deltas.add(delta);
-
       return true;
    }
    

@@ -25,6 +25,10 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * Provides methods to create and delete all KeY{@link IMarker}.
+ * @author Stefan Käsdorf
+ */
 public class MarkerManager {
    
    public final static String CLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker";
@@ -34,14 +38,19 @@ public class MarkerManager {
    
    
    /**
-    * Creates the {@link IMarker} for the given {@link Proof} in the given java{@link IFile}.
-    * @param proof - the {@link Proof} to use
-    * @param scl - the {@link SourceLocation} that provides the start- and end-char for the {@link IMarker}
-    * @param javaFile - the java{@link IFile} to create the {@link IMarker} at.
-    * @param proofFile - the proof{@link IFile} required to set the {@link IMarker} message
+    * Creates the {@link MarkerManager#CLOSEDMARKER_ID} or {@link MarkerManager#NOTCLOSEDMARKER_ID} for the given {@link ProofElement}.
+    * @param pe - the {@link ProofElement to use.
     * @throws CoreException
     */
-   public void setMarker(Proof proof, SourceLocation scl, IFile javaFile, IFile proofFile) throws CoreException {
+   public void setMarker(ProofElement pe) throws CoreException {
+      IMarker curMarker = pe.getMarker();
+      if(curMarker != null){
+         curMarker.delete();
+      }
+      SourceLocation scl = pe.getSourceLocation();
+      Proof proof = pe.getProof();
+      IFile javaFile = pe.getJavaFile();
+      IFile proofFile = pe.getProofFile();
       if(scl != null){
          if (proof != null && proof.closed()) {
             IMarker marker = javaFile.createMarker(CLOSEDMARKER_ID);
@@ -50,6 +59,7 @@ public class MarkerManager {
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+               pe.setMarker(marker);
             }
          }
          else {
@@ -59,6 +69,7 @@ public class MarkerManager {
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+               pe.setMarker(marker);
             }
          }
       }
@@ -66,7 +77,28 @@ public class MarkerManager {
    
    
    /**
-    * Sets the ProofLoaderException{@link IMarker} for the given {@link IResource}.
+    * Creates the {@link MarkerManager#CYCLEDETECTEDMARKER_ID} for the given {@ink ProofElement}.
+    * @param pe - the {@link ProofElement} to use
+    * @throws CoreException
+    */
+   public void setCycleDetectedMarker(ProofElement pe) throws CoreException{
+      IMarker curMarker = pe.getMarker();
+      if(curMarker != null){
+         curMarker.delete();
+      }
+      IMarker marker = pe.getJavaFile().createMarker(CYCLEDETECTEDMARKER_ID);
+      if (marker.exists()) {
+         marker.setAttribute(IMarker.MESSAGE, "Cycle detected");
+         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+         marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
+         marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
+         pe.setMarker(marker);
+      }
+   }
+   
+   
+   /**
+    * Creates the ProofLoaderException{@link IMarker} for the given {@link IResource}.
     * @param res - the {@link IResource} to use
     * @throws CoreException
     */
@@ -79,16 +111,32 @@ public class MarkerManager {
    }
    
    
-   public void setCycleDetectedMarker(ProofElement pe) throws CoreException{
-      IMarker marker = pe.getJavaFile().createMarker(CYCLEDETECTEDMARKER_ID);
-      if (marker.exists()) {
-         marker.setAttribute(IMarker.MESSAGE, "Cycle detected");
-         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-         marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
-         marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
+   /**
+    * Searchs the {@link IMarker} int the given {@link IFile} for the given {@link SourceLocation}.
+    * @param scl - the {@link SourceLocation} to use
+    * @param file - the {@link IFile} to use
+    * @return the {@link IMarker} if found. null otherwise
+    * @throws CoreException
+    */
+   public IMarker getMarkerForScl(SourceLocation scl, IFile file) throws CoreException{
+      LinkedList<IMarker> markerList = getAllKeYMarker(file);
+      for(IMarker marker : markerList){
+         Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+         Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+         if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
+            return marker;
+         }
       }
+      return null;
    }
    
+   
+   /**
+    * Collects all KeY{@link IMarker} for the given {@link IResource}.
+    * @param res - the {@link IResource} to use
+    * @return a {@link LinkedList} with all KeY{@link IMarker}
+    * @throws CoreException
+    */
    public LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       markerList.addAll(markerArrayToList(res.findMarkers(CLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
@@ -98,6 +146,12 @@ public class MarkerManager {
       return markerList;
    }
    
+   
+   /**
+    * Converts the given {@link IMarker[]} into a {@link LinkedList}.
+    * @param markerArr - the {@link IMarker[]} to use
+    * @return the {@link LinkedList} with all {@link IMarker} from the array
+    */
    private LinkedList<IMarker> markerArrayToList(IMarker[] markerArr){
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       for(IMarker marker : markerArr){
@@ -106,28 +160,9 @@ public class MarkerManager {
       return markerList;
    }
    
-   
-   public void deleteMarkerForSourceLocation(IFile javaFile, SourceLocation scl) throws CoreException{
-      if(scl != null){
-         LinkedList<IMarker> markerList = getAllKeYMarker(javaFile);
-         for(IMarker marker : markerList){
-            if(marker.exists()){
-               Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
-               Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
-               if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
-                  marker.delete();
-                  return;
-               }
-            }
-         }
-      }
-   }
-   
-   
-   
-   
+ 
    /**
-    * Removes all KeYResource {@link IMarker} from the given {@link IFile}.
+    * Removes all KeYResource {@link IMarker} from the given {@link IResource}.
     * @param res the {@link IResource} to use
     * @throws CoreException
     */
@@ -136,17 +171,5 @@ public class MarkerManager {
       res.deleteMarkers(NOTCLOSEDMARKER_ID, true, depth);
       res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, depth);
       res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, depth);
-   }
-
-   
-   /**
-    * Removes all KeYResource {@link IMarker} from the {@link IFile}s of the given {@link LinkedList}.
-    * @param files - the given {@link LinkedList}
-    * @throws CoreException
-    */
-   public void deleteKeYMarker(LinkedList<IFile> files) throws CoreException{
-      for(IFile file : files){
-         deleteKeYMarker(file, IResource.DEPTH_INFINITE);
-      }
    }
 }

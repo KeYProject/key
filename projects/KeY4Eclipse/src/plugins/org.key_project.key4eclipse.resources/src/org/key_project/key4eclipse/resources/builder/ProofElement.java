@@ -14,26 +14,28 @@
 package org.key_project.key4eclipse.resources.builder;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
+/**
+ * Object that represents a proof and provides all the required stuff for the build process.
+ * @author Stefan Käsdorf
+ */
 public class ProofElement {
 
    private IFile javaFile;
    private SourceLocation scl;
+   private IMarker marker;
    
    private IFolder proofFolder;
    private IFile proofFile;
@@ -47,7 +49,6 @@ public class ProofElement {
    private Proof proof;
    
    private LinkedHashSet<IProofReference<?>> proofReferences;
-   private KeYJavaType kjt;
    
    
 
@@ -56,6 +57,12 @@ public class ProofElement {
    }
    public SourceLocation getSourceLocation() {
       return scl;
+   }
+   public IMarker getMarker(){
+      return marker;
+   }
+   public void setMarker(IMarker marker){
+      this.marker = marker;
    }
    
    public IFolder getProofFolder(){
@@ -85,9 +92,6 @@ public class ProofElement {
    public Contract getContract(){
       return contract;
    }
-   public void setContracts(Contract contract){
-      this.contract = contract;
-   } 
    public ProofOblInput getProofObl() {
       return proofObl;
    }
@@ -109,15 +113,13 @@ public class ProofElement {
    }
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
       this.proofReferences = proofReferences;
-   }
-   public KeYJavaType getKeYJavaType(){
-      return kjt;
    } 
    
    
-   public ProofElement(IFile javaFile, SourceLocation scl, KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, KeYJavaType kjt, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl, IMarker marker, KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
+      this.marker =  marker;
       
       this.proofFolder = proofFolder;
       
@@ -128,6 +130,5 @@ public class ProofElement {
       this.proof = null;
       
       this.proofReferences = new LinkedHashSet<IProofReference<?>>();
-      this.kjt = kjt;
    }
 }

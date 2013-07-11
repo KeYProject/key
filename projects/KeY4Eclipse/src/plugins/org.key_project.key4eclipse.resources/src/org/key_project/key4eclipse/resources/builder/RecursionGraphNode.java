@@ -2,6 +2,10 @@ package org.key_project.key4eclipse.resources.builder;
 
 import java.util.LinkedHashSet;
 
+/**
+ * Node of the {@link RecursionGraph}.
+ * @author Stefan Käsdorf
+ */
 public class RecursionGraphNode {
 
    private ProofElement element;
@@ -9,6 +13,11 @@ public class RecursionGraphNode {
    private LinkedHashSet<RecursionGraphNode> succs;
    private LinkedHashSet<ProofElement> succElements;
    
+   /**
+    * The Constructor.
+    * @param pe - the {@link ProofElement} to create the node for
+    * @param succElements - the successors of the {@link ProofElement}
+    */
    public RecursionGraphNode(ProofElement pe, LinkedHashSet<ProofElement> succElements){
       element = pe;
       preds = new LinkedHashSet<RecursionGraphNode>();
@@ -32,19 +41,7 @@ public class RecursionGraphNode {
       succs.add(succ);
    }
    
-   public boolean hasSucc(){
-      return !succs.isEmpty();
-   }
-   
-   public boolean hasPred(){
-      return !preds.isEmpty();
-   }
-   
    public LinkedHashSet<RecursionGraphNode> getSuccs(){
       return succs;
-   }
-   
-   public LinkedHashSet<RecursionGraphNode> getPreds(){
-      return preds;
    }
 }

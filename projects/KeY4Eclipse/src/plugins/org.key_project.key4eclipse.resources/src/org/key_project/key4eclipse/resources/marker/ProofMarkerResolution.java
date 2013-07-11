@@ -26,6 +26,10 @@ import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
+/**
+ * Provides the QuickFixes for the KeY{@link IMarker}.
+ * @author Stefan Käsdorf
+ */
 public class ProofMarkerResolution implements IMarkerResolution2{
 
    private String label;
