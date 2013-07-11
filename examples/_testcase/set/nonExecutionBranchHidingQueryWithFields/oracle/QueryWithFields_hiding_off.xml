@@ -4,8 +4,7 @@
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <useOperationContract name="result = self.magic(x) catch(exc)
 pre: self.&lt;inv&gt;
-post: (exc = null -&gt; result = self.subMagic(x) &amp; self.&lt;inv&gt;)
-&amp; exc = null
+post: result = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -21,37 +20,37 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                </branchCondition>
                <branchCondition name="self.instanceField = 11" pathCondition="x &gt;= 0 &amp; self.instanceField = 11" pathConditionChanged="true" branchCondition="self.instanceField = 11" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <branchCondition name="QueryWithFields.classField = 66" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; QueryWithFields.classField = 66" pathConditionChanged="true" branchCondition="QueryWithFields.classField = 66" mergedBranchCondition="false" isBranchConditionComputed="true">
+&amp; QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="true" branchCondition="QueryWithFields.classField = 66" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return magicValue;" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; QueryWithFields.classField = 66" pathConditionChanged="false">
+&amp; QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; QueryWithFields.classField = 66" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 421166 as result of self.main(x);&gt;" isReturnValueComputed="true">
+&amp; QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 421166 as result of self.main(x);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="421166" returnValueString="421166" hasCondition="false">
                            </methodReturnValue>
                            <termination name="&lt;end&gt;" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; QueryWithFields.classField = 66" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                   <branchCondition name="!QueryWithFields.classField = 66" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; !QueryWithFields.classField = 66" pathConditionChanged="true" branchCondition="!QueryWithFields.classField = 66" mergedBranchCondition="false" isBranchConditionComputed="true">
+&amp; !QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="true" branchCondition="!QueryWithFields.classField = 66" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return magicValue;" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; !QueryWithFields.classField = 66" pathConditionChanged="false">
+&amp; !QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; !QueryWithFields.classField = 66" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.main(x);&gt;" isReturnValueComputed="true">
+&amp; !QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.main(x);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                            </methodReturnValue>
                            <termination name="&lt;end&gt;" pathCondition="  x &gt;= 0
-&amp; self.instanceField = 11
-&amp; !QueryWithFields.classField = 66" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; !QueryWithFields.classField = 66
+&amp; self.instanceField = 11" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>

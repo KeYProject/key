@@ -5,9 +5,13 @@ public class ComplexPrecondition {
 	    return magicValue;
 	}
 	
-	/*@ requires x >= 0 && y < 0;
+	/*@ normal_behavior
+	  @ requires x >= 0 && y < 0;
 	  @ ensures \result == subFirst(x, y);
+	  @
 	  @ also
+	  @
+	  @ normal_behavior
 	  @ requires !(x >= 0 && y < 0);
 	  @ ensures \result == subSecond(x, y);
 	  @*/
@@ -15,7 +19,8 @@ public class ComplexPrecondition {
 		return subFirst(x, y);
 	}
 	
-	/*@ requires x >= 0 && y < 0;
+	/*@ normal_behavior
+	  @ requires x >= 0 && y < 0;
 	  @ ensures \result == 42;
 	  @*/
 	public /*@ pure @*/ static int subFirst(int x, int y) {
@@ -27,7 +32,8 @@ public class ComplexPrecondition {
 		}
 	}
 	
-	/*@ requires !(x >= 0 && y < 0);
+	/*@ normal_behavior
+	  @ requires !(x >= 0 && y < 0);
 	  @ ensures \result == -4711;
 	  @*/
 	public /*@ pure @*/ static int subSecond(int x, int y) {

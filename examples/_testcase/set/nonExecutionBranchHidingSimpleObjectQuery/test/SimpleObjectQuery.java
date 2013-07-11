@@ -7,18 +7,20 @@ public class SimpleObjectQuery {
 	    return magicValue;
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == subMagic(x);
 	  @*/
 	public /*@ pure @*/ static int magic(Object x) {
 		return subMagic(x);
 	}
 	
-	/*@ requires x == INSTANCE;
+	/*@ normal_behavior
+	  @ requires x == INSTANCE;
 	  @ ensures \result == 42;
 	  @
 	  @ also
 	  @
+	  @ normal_behavior
 	  @ requires x != INSTANCE;
 	  @ ensures \result == -4711;
 	  @*/

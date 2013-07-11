@@ -4,19 +4,16 @@
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <useOperationContract name="result = self.magic(x) catch(exc)
 pre: self.&lt;inv&gt;
-post: (   exc = null
-   -&gt;   result = self.subMagic(x)
-      &amp; (  (x &gt;= 0 -&gt; self.instanceField = 12)
+post: result = self.subMagic(x)
+&amp; (  (x &gt;= 0 -&gt; self.instanceField = 12)
+   &amp; (  (   x &lt; 0
+         -&gt; self.instanceField = javaUnaryMinusInt(21))
+      &amp; (  (   x &gt;= 0
+            -&gt; QueryWithSideEffects.classField = 66)
          &amp; (  (   x &lt; 0
-               -&gt;   self.instanceField
-                  = javaUnaryMinusInt(21))
-            &amp; (  (   x &gt;= 0
-                  -&gt;   QueryWithSideEffects.classField
-                     = 66)
-               &amp; (  (   x &lt; 0
-                     -&gt;   QueryWithSideEffects.classField
-                        = javaUnaryMinusInt(55))
-                  &amp; self.&lt;inv&gt;)))))
+               -&gt;   QueryWithSideEffects.classField
+                  = javaUnaryMinusInt(55))
+            &amp; self.&lt;inv&gt;))))
 &amp; exc = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">

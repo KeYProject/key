@@ -5,18 +5,20 @@ public class SimpleBooleanQuery {
 	    return magicValue;
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == subMagic(x);
 	  @*/
 	public /*@ pure @*/ static int magic(boolean x) {
 		return subMagic(x);
 	}
 	
-	/*@ requires x;
+	/*@ normal_behavior
+	  @ requires x;
 	  @ ensures \result == 42;
 	  @
 	  @ also
 	  @
+	  @ normal_behavior
 	  @ requires !x;
 	  @ ensures \result == -4711;
 	  @*/

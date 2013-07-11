@@ -5,11 +5,9 @@
          <useOperationContract name="result = magic(x, y) catch(exc)
 pre: x &gt;= 0 &amp; y &lt; 0 | !(x &gt;= 0 &amp; y &lt; 0)
 post: (   x &gt;= 0 &amp; y &lt; 0
-   -&gt;   (exc = null -&gt; result = subFirst(x, y))
-      &amp; exc = null)
+   -&gt; result = subFirst(x, y) &amp; exc = null)
 &amp; (   !(x &gt;= 0 &amp; y &lt; 0)
-   -&gt;   (exc = null -&gt; result = subSecond(x, y))
-      &amp; exc = null)
+   -&gt; result = subSecond(x, y) &amp; exc = null)
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">

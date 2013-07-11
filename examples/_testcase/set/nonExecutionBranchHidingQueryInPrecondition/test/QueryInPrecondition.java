@@ -5,9 +5,11 @@ public class QueryInPrecondition {
 	    return magicValue;
 	}
 	
-	/*@ requires xPre(x) && y < 0;
+	/*@ normal_behavior
+	  @ requires xPre(x) && y < 0;
 	  @ ensures \result == subFirst(x, y);
 	  @ also
+	  @ normal_behavior
 	  @ requires !(xPre(x) && y < 0);
 	  @ ensures \result == subSecond(x, y);
 	  @*/
@@ -15,7 +17,8 @@ public class QueryInPrecondition {
 		return subFirst(x, y);
 	}
 	
-	/*@ requires xPre(x) && y < 0;
+	/*@ normal_behavior
+	  @ requires xPre(x) && y < 0;
 	  @ ensures \result == 42;
 	  @*/
 	public /*@ pure @*/ static int subFirst(int x, int y) {
@@ -27,7 +30,7 @@ public class QueryInPrecondition {
 		}
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == x >= 0;
 	  @*/
 	public /*@ pure @*/ static boolean xPre(int x) {
@@ -39,7 +42,8 @@ public class QueryInPrecondition {
 		}
 	}
 	
-	/*@ requires !(x >= 0 && y < 0);
+	/*@ normal_behavior
+	  @ requires !(x >= 0 && y < 0);
 	  @ ensures \result == -4711;
 	  @*/
 	public /*@ pure @*/ static int subSecond(int x, int y) {

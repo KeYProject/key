@@ -4,7 +4,7 @@
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <useOperationContract name="result = magic(x) catch(exc)
 pre: true
-post: (exc = null -&gt; result = subMagic(x)) &amp; exc = null
+post: result = subMagic(x) &amp; exc = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">

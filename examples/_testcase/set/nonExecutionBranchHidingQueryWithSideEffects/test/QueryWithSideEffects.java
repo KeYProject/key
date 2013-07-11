@@ -9,7 +9,7 @@ public class QueryWithSideEffects {
 	    return magicValue + instanceField + classField;
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == subMagic(x);
 	  @ ensures x >= 0 ==> instanceField == 12;
 	  @ ensures x < 0 ==> instanceField == -21;
@@ -20,13 +20,15 @@ public class QueryWithSideEffects {
 		return subMagic(x);
 	}
 	
-	/*@ requires x >= 0;
+	/*@ normal_behavior
+	  @ requires x >= 0;
 	  @ ensures \result == 42;
 	  @ ensures instanceField == 12;
 	  @ ensures classField == 66;
 	  @
 	  @ also
 	  @
+	  @ normal_behavior
 	  @ requires x < 0;
 	  @ ensures \result == -4711;
 	  @ ensures instanceField == -21;

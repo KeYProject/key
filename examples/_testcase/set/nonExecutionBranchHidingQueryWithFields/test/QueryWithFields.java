@@ -9,23 +9,26 @@ public class QueryWithFields {
 	    return magicValue;
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == subMagic(x);
 	  @*/
 	public /*@ pure @*/ int magic(int x) {
 		return subMagic(x);
 	}
 	
-	/*@ requires x >= 0 && (instanceField == 11 && classField == 66);
+	/*@ normal_behavior
+	  @ requires x >= 0 && (instanceField == 11 && classField == 66);
 	  @ ensures \result == 421166;
 	  @
 	  @ also
 	  @
+	  @ normal_behavior
 	  @ requires x >= 0 && (instanceField != 11 || classField != 66);
 	  @ ensures \result == 42;
 	  @
 	  @ also
 	  @
+	  @ normal_behavior
 	  @ requires x < 0;
 	  @ ensures \result == -4711;
 	  @*/
