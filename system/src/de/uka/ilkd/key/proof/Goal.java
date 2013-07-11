@@ -27,7 +27,9 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -599,7 +601,20 @@ public final class Goal  {
 
         final RuleApp ruleApp = p_ruleApp;
         if(ruleApp instanceof TacletApp) {
-            ((TacletApp)ruleApp).registerSkolemConstants(proof.getServices());
+            TacletApp tacletApp = (TacletApp)ruleApp;
+            tacletApp.registerSkolemConstants(proof.getServices());
+            Taclet t = tacletApp.taclet();
+
+            // bugfix #1336, see bugtracker
+            if (t instanceof RewriteTaclet) {
+                RewriteTaclet rwt = (RewriteTaclet) t;
+                MatchConditions matchConditions = tacletApp.matchConditions();
+                MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
+                        matchConditions, proof.getServices());
+                if(newConditions != matchConditions) {
+                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + ruleApp);
+                }
+            }
         }
 
         final Node n = node;
