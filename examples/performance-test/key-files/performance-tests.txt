@@ -1,3 +1,15 @@
+# provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_1()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_2()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_4()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_8()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain2(AccessChain2__foo_1()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain2(AccessChain2__foo_2()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain2(AccessChain2__foo_4()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain2(AccessChain2__foo_8()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_1()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_2()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_4()).JML_operation_contract.0.key
+# provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_8()).JML_operation_contract.0.key
 provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_1()).JML_operation_contract.0.key
 provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_2()).JML_operation_contract.0.key
 provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_4()).JML_operation_contract.0.key
