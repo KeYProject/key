@@ -17,18 +17,20 @@ public class SimpleIntQuery {
 	    return magicValue;
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == subMagic(x);
 	  @*/
 	public /*@ pure @*/ static int magic(int x) {
 		return subMagic(x);
 	}
 	
-	/*@ requires x >= 0;
+	/*@ normal_behavior
+	  @ requires x >= 0;
 	  @ ensures \result == 42;
 	  @
 	  @ also
 	  @
+	  @ normal_behavior
 	  @ requires x < 0;
 	  @ ensures \result == -4711;
 	  @*/
@@ -41,7 +43,8 @@ public class SimpleIntQuery {
 		}
 	}
 	
-	/*@ requires true;
+	/*@ normal_behavior
+	  @ requires true;
 	  @ ensures true;
 	  @*/
 	public /*@ pure @*/ static boolean preCheck(int x) {
