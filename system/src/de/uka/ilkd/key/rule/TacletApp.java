@@ -1036,7 +1036,12 @@ public abstract class TacletApp implements RuleApp {
 
     /**
      * returns a new PosTacletApp that is equal to this TacletApp except that
-     * the position is set to the given PosInOccurrence
+     * the position is set to the given PosInOccurrence.
+     * 
+     * <p><b>CAUTION:</b> If you call this method, consider to call 
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Services)} first (if
+     * applicable) as otherwise the TacletApp may become invalid. 
+     * (This happened sometimes during interactive proofs).
      * 
      * @param pos
      *            the PosInOccurrence of the newl created PosTacletApp
