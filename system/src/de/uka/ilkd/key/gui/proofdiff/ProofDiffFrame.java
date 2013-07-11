@@ -280,7 +280,7 @@ public class ProofDiffFrame extends JFrame {
     }
 
     private int getParent(int no) {
-        Proof proof = mainWindow.getMediator().getProof();
+        Proof proof = mainWindow.getMediator().getSelectedProof();
         if(proof == null) {
             throw new IllegalArgumentException("There is no open proof!");
         }
@@ -325,7 +325,7 @@ public class ProofDiffFrame extends JFrame {
      */
     private String getProofNodeText(int nodeNumber) {
 
-        Proof proof = mainWindow.getMediator().getProof();
+        Proof proof = mainWindow.getMediator().getSelectedProof();
 
         if(proof == null) {
             throw new IllegalArgumentException("There is no open proof!");

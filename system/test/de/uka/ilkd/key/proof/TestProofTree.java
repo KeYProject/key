@@ -20,14 +20,17 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 
 /** class tests the tree of proof
 */
@@ -110,7 +113,7 @@ public class TestProofTree extends TestCase {
 		SequentFormula(t_b7)).semisequent(),
 	     Semisequent.EMPTY_SEMISEQUENT); 
 
-	p=new Proof(new Services());
+	p=new Proof(new Services(AbstractProfile.getDefaultProfile()));
 
 	n1=new Node(p, s1);
 	n2=new Node(p, s2);

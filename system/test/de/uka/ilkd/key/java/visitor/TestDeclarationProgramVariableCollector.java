@@ -19,7 +19,6 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.visitor.DeclarationProgramVariableCollector;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;

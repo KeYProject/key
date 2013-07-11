@@ -14,16 +14,23 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -43,8 +50,6 @@ public class InitConfig {
      * program model
      */
     private final Services services;
-
-    private final Profile profile;
 
     /**
      * the proof environment this init config belongs to
@@ -92,9 +97,8 @@ public class InitConfig {
     //constructors
     //-------------------------------------------------------------------------
 
-    public InitConfig(Services services, Profile profile) {
+    public InitConfig(Services services) {
 	this.services  = services;
-	this.profile   = profile;
 	this.env       = new ProofEnvironment(this);
 		
         category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
@@ -127,7 +131,7 @@ public class InitConfig {
 
 
     public Profile getProfile() {
-	return profile;
+	return services.getProfile();
     }
 
 
@@ -270,6 +274,7 @@ public class InitConfig {
     /** returns the built-in rules of this initial configuration
      */
     public ImmutableList<BuiltInRule> builtInRules() {
+        Profile profile = getProfile();
         return (profile == null
         	? ImmutableSLList.<BuiltInRule>nil()
         	: profile.getStandardRules().getStandardBuiltInRules());
@@ -364,8 +369,7 @@ public class InitConfig {
      */
     @SuppressWarnings("unchecked")
     public InitConfig copy() {
-        InitConfig ic = new InitConfig(services.copyPreservesLDTInformation(),
-                                       profile);
+        InitConfig ic = new InitConfig(services.copyPreservesLDTInformation());
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
@@ -383,8 +387,7 @@ public class InitConfig {
      */
     @SuppressWarnings("unchecked")
     public InitConfig deepCopy() {
-        InitConfig ic = new InitConfig(services.copy(),
-                                       profile);
+        InitConfig ic = new InitConfig(services.copy());
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
