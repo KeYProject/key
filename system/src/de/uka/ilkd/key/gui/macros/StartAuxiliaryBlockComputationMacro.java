@@ -99,11 +99,9 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return;
         }
-        BlockContractBuiltInRuleApp blockRuleApp =
-                (BlockContractBuiltInRuleApp) app;
+        BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
         BlockContract contract = blockRuleApp.getContract();
-        IFProofObligationVars ifVars =
-                blockRuleApp.getInformationFlowProofObligationVars();
+        IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
 
         BlockExecutionPO blockExecPO =
                 new BlockExecutionPO(initConfig, contract, ifVars.symbExecVars,

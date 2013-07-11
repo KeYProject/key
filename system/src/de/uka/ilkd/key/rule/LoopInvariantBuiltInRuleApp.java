@@ -211,8 +211,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                                      rawInv.getInternalAtPres());
     }
 
-    protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv) {
+    private LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio, LoopInvariant inv) {
         this(rule, pio, null, inv, null);
 
     }
@@ -275,6 +274,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
+        assert inv != null;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
     }
     

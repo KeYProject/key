@@ -78,13 +78,13 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
         Services services = proof.getServices();
-        ContractPO poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
+        InitConfig initConfig = proof.env().getInitConfig();
+
+        ContractPO poForProof = services.getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return;
         }
         InfFlowContractPO po = (InfFlowContractPO) poForProof;
-        InitConfig initConfig = proof.env().getInitConfig();
 
         SymbolicExecutionPO symbExecPO =
                 new SymbolicExecutionPO(initConfig, po.getContract(),

@@ -1293,10 +1293,10 @@ public class JMLSpecFactory {
                 a = TB.union(services, a, translated);
              }
            }
-           
+
            mods.put(services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h)), a);
         }
-        
+
         ImmutableList<InfFlowSpec>
                 infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -1304,7 +1304,7 @@ public class JMLSpecFactory {
             infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, paramVars,
                                                            resultVar, originalInfFlowSpecs);
         }
-        
+
         Map<LocationVariable,
             ImmutableList<InfFlowSpec>>
                 infFlowSpecs = new LinkedHashMap<LocationVariable,
@@ -1322,13 +1322,13 @@ public class JMLSpecFactory {
                                             paramVars, null, null, atPres, Term.class, services);
             variant = translated;
         }
-        
+
         ImmutableList<Term> localIns = TB.var(MiscTools.getLocalIns(loop, services));
         ImmutableList<Term> localOuts = TB.var(MiscTools.getLocalOuts(loop, services));
-        
+
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
-        
+
         return new LoopInvariantImpl(loop,
                                      pm,
                                      null,
