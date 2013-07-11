@@ -723,4 +723,298 @@
    </extension>
 
    <!-- optionally, specify keybindings -->
+
+
+   <!-- ########################################################################### -->
+   <!-- ### Begin custom code for proof reference management ###################### -->
+   <!-- ########################################################################### -->
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="de.hentschel.visualdbc.category"
+            description="Defines if only selected, all or none proof references are shown."
+            id="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+            name="Define shown proof references">
+         <commandParameter
+               id="org.eclipse.ui.commands.radioStateParameter"
+               name="Radio Name"
+               optional="false">
+         </commandParameter>
+         <state
+               id="org.eclipse.ui.commands.radioState">
+            <class
+                  class="org.eclipse.ui.handlers.RadioState">
+               <parameter
+                     name="default"
+                     value="Show All">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>
+      </command>
+      <command
+            categoryId="de.hentschel.visualdbc.category"
+            id="de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand"
+            name="Highlight selected proof references">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+            icon="icons/ProofReferenceHidingShowSelected.gif">
+      </image>
+      <image
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand"
+            icon="icons/ProofReferenceHighlighting.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="de.hentschel.visualdbc.dbcmodel.diagram.handler.AutomaticProofReferenceHidingHandler"
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand">
+         <enabledWhen>
+            <reference
+                  definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="de.hentschel.visualdbc.dbcmodel.diagram.handler.AutomaticProofReferenceHighlightHandler"
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand">
+         <enabledWhen>
+            <reference
+                  definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+            </reference>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+            contextId="de.hentschel.visualdbc.dbcmodel.diagram.ui.diagramContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+5">
+         <parameter
+               id="org.eclipse.ui.commands.radioStateParameter"
+               value="Show All">
+         </parameter>
+      </key>
+      <key
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+            contextId="de.hentschel.visualdbc.dbcmodel.diagram.ui.diagramContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+         <parameter
+               id="org.eclipse.ui.commands.radioStateParameter"
+               value="Show Selected">
+         </parameter>
+      </key>
+      <key
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+            contextId="de.hentschel.visualdbc.dbcmodel.diagram.ui.diagramContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+7">
+         <parameter
+               id="org.eclipse.ui.commands.radioStateParameter"
+               value="Hide All">
+         </parameter>
+      </key>
+      <key
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand"
+            contextId="de.hentschel.visualdbc.dbcmodel.diagram.ui.diagramContext"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+8">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="TestHelloWorld.toolbars.sampleToolbar">
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+                  icon="icons/ProofReferenceHidingShowAll.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.showSelectedProofReferencesCommand"
+                  style="radio"
+                  tooltip="Show all proof references.">
+               <parameter
+                     name="org.eclipse.ui.commands.radioStateParameter"
+                     value="Show All">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+                  icon="icons/ProofReferenceHidingShowSelected.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.showSelectedProofReferencesCommand"
+                  style="radio"
+                  tooltip="Show only proof references of selected elements.">
+               <parameter
+                     name="org.eclipse.ui.commands.radioStateParameter"
+                     value="Show Selected">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+                  icon="icons/ProofReferenceHidingShowNone.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.hideAllProofReferencesCommand"
+                  style="radio"
+                  tooltip="Hide all proof references.">
+               <parameter
+                     name="org.eclipse.ui.commands.radioStateParameter"
+                     value="Hide All">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <separator
+                  name="de.hentschel.visualdbc.dbcmodel.diagram.proofManagementSeparator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand"
+                  icon="icons/ProofReferenceHighlighting.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.hideAllProofReferencesCommand"
+                  style="toggle"
+                  tooltip="Highlight selected proof references.">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="de.hentschel.visualdbc.dbcmodel.diagram.proofReferenceMenu"
+               label="Proof Reference Management"
+               mnemonic="M">
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+                  icon="icons/ProofReferenceHidingShowAll.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.showSelectedProofReferencesCommand"
+                  label="Show all proof references"
+                  style="radio">
+               <parameter
+                     name="org.eclipse.ui.commands.radioStateParameter"
+                     value="Show All">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+                  icon="icons/ProofReferenceHidingShowSelected.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.showSelectedProofReferencesCommand"
+                  label="Show only proof references of selected elements"
+                  style="radio">
+               <parameter
+                     name="org.eclipse.ui.commands.radioStateParameter"
+                     value="Show Selected">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand"
+                  icon="icons/ProofReferenceHidingShowNone.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.hideAllProofReferencesCommand"
+                  label="Hide all proof references"
+                  style="radio">
+               <parameter
+                     name="org.eclipse.ui.commands.radioStateParameter"
+                     value="Hide All">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <separator
+                  name="de.hentschel.visualdbc.dbcmodel.diagram.proofManagementSeparator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand"
+                  icon="icons/ProofReferenceHighlighting.gif"
+                  id="de.hentschel.visualdbc.dbcmodel.diagram.hideAllProofReferencesCommand"
+                  label="Highlight selected proof references"
+                  style="toggle">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="de.hentschel.visualdbc.dbcmodel.diagram.activeEditorIsDiagramEditorDefinition">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditorID">
+            </equals>
+         </with>
+      </definition>
+   </extension>
+
+   <!-- ########################################################################### -->
+   <!-- ### End custom code for proof reference management ######################## -->
+   <!-- ########################################################################### -->
+
 </plugin>

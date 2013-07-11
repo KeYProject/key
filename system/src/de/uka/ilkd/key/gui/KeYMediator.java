@@ -48,7 +48,7 @@ import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
-import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -96,12 +96,13 @@ public class KeYMediator {
     private boolean stupidMode; // minimize user interaction
     
     private TacletFilter filterForInteractiveProving;
-    
+
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
     public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
+	
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
@@ -132,7 +133,7 @@ public class KeYMediator {
     }
 
     public KeYExceptionHandler getExceptionHandler(){
-	if(getProof() != null){
+	if(getSelectedProof() != null){
 	    return getServices().getExceptionHandler();
 	}else{
 	    return defaultExceptionHandler;
@@ -143,66 +144,66 @@ public class KeYMediator {
      * @return the variable namespace 
      */
     public Namespace var_ns() {
-	return getProof().getNamespaces().variables();
+	return getSelectedProof().getNamespaces().variables();
     }
     
     /** returns the program variable namespace 
      * @return the program variable namespace 
      */
     public Namespace progVar_ns() {
-	return getProof().getNamespaces().programVariables();
+	return getSelectedProof().getNamespaces().programVariables();
     }
 
     /** returns the function namespace 
      * @return the function namespace 
      */
     public Namespace func_ns() {
-	return getProof().getNamespaces().functions();
+	return getSelectedProof().getNamespaces().functions();
     }
 
     /** returns the sort namespace 
      * @return the sort namespace 
      */
     public Namespace sort_ns() {
-	return getProof().getNamespaces().sorts();
+	return getSelectedProof().getNamespaces().sorts();
     }
 
     /** returns the heuristics namespace 
      * @return the heuristics namespace 
      */
     public Namespace heur_ns() {
-	return getProof().getNamespaces().ruleSets();
+	return getSelectedProof().getNamespaces().ruleSets();
     }
 
     /** returns the choice namespace
      * @return the choice namespace 
      */
     public Namespace choice_ns() {
-	return getProof().getNamespaces().choices();
+	return getSelectedProof().getNamespaces().choices();
     }
 
     /** returns the prog var namespace 
      * @return the prog var namespace 
      */
     public Namespace pv_ns() {
-	return getProof().getNamespaces().programVariables();
+	return getSelectedProof().getNamespaces().programVariables();
     }
 
     /** returns the namespace set
      * @return the  namespace set
      */
     public NamespaceSet namespaces() {
-	return getProof().getNamespaces();
+	return getSelectedProof().getNamespaces();
     }
 
     /** returns the JavaInfo with the java type information */
     public JavaInfo getJavaInfo() {
-       return getProof().getJavaInfo();
+       return getSelectedProof().getJavaInfo();
     }
 
     /** returns the Services with the java service classes */
     public Services getServices() {
-       return getProof().getServices();
+       return getSelectedProof().getServices();
     }
 
     /** simplified user interface? */
@@ -215,7 +216,7 @@ public class KeYMediator {
     }
 
     public boolean ensureProofLoaded() {
-    	return getProof() != null;
+    	return getSelectedProof() != null;
     }   
     
     /**
@@ -256,7 +257,7 @@ public class KeYMediator {
     }
 
     public void setBack(Goal goal) {
-    	if (getProof() != null) {
+    	if (getSelectedProof() != null) {
     		goal.proof().pruneProof(goal);
     		finishSetBack(goal.proof());
 
@@ -300,8 +301,8 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof p) {
-	if (getProof() != null) {
-	    getProof().removeProofTreeListener(proofTreeListener);
+	if (getSelectedProof() != null) {
+	    getSelectedProof().removeProofTreeListener(proofTreeListener);
 	}
 	if (p!=null) notationInfo.setAbbrevMap(p.abbreviations());
 	Proof proof = p;
@@ -321,21 +322,13 @@ public class KeYMediator {
     }
 
 
-    /** the proof the mediator handles with 
-     * @see #getSelectedProof()
-     */
-    public Proof getProof() {
-	return keySelectionModel.getSelectedProof();
-    }
-    
-
     /** sets the maximum number of rule applications allowed in
      * automatic mode
      * @param steps an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
-       if (getProof() != null) {
-           getProof().getSettings().getStrategySettings().setMaxSteps(steps);
+       if (getSelectedProof() != null) {
+           getSelectedProof().getSettings().getStrategySettings().setMaxSteps(steps);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
@@ -346,8 +339,8 @@ public class KeYMediator {
      * automatic mode
      */
     public int getMaxAutomaticSteps() {
-        if (getProof() != null) {
-            return getProof().getSettings().getStrategySettings().getMaxSteps();
+        if (getSelectedProof() != null) {
+            return getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
@@ -694,7 +687,7 @@ public class KeYMediator {
      */
     public void startAutoMode() {
 	if (ensureProofLoaded()) {
-	    startAutoMode(getProof().openEnabledGoals());
+	    startAutoMode(getSelectedProof().openEnabledGoals());
 	}
     }
 
@@ -725,19 +718,16 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive ( boolean b ) {
-        if (getProof() != null) {
+        if (getSelectedProof() != null) {
             if ( b  ) {
-                getProof().setRuleAppIndexToInteractiveMode ();
+                getSelectedProof().setRuleAppIndexToInteractiveMode ();
             } else {
-                getProof().setRuleAppIndexToAutoMode ();
+                getSelectedProof().setRuleAppIndexToAutoMode ();
             }
         }
     }
 
     private int goalsClosedByAutoMode=0;
-
-
-    private Profile profile;
 
     public void closedAGoal() { 
 	    goalsClosedByAutoMode++;
@@ -759,7 +749,7 @@ public class KeYMediator {
             ui.notifyAutoModeBeingStarted(); 
             if (b) {
                interactiveProver.fireAutoModeStarted(
-                  new ProofEvent(getProof()));
+                  new ProofEvent(getSelectedProof()));
             }
          }
       };
@@ -771,9 +761,9 @@ public class KeYMediator {
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
             if ( b )
-               interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
+               interactiveProver.fireAutoModeStopped (new ProofEvent(getSelectedProof()));
             ui.notifyAutomodeStopped(); 
-            if (getProof() != null)
+            if (getSelectedProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
          }
       };
@@ -838,7 +828,7 @@ public class KeYMediator {
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
 	    if (autoMode()) return;
-	    if (e.getSource() == getProof()) {
+	    if (e.getSource() == getSelectedProof()) {
 	        keySelectionModel.defaultSelection();
 	    }
 	}
@@ -874,7 +864,7 @@ public class KeYMediator {
      * Disable certain actions until a proof is loaded.
      */
     public void enableWhenProofLoaded(final Action a) {
-        a.setEnabled(getProof() != null);
+        a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             public void selectedNodeChanged(KeYSelectionEvent e) {}
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -897,14 +887,14 @@ public class KeYMediator {
     }
 
     /** return the chosen profile */
-    public Profile getProfile() {  
-        if (profile == null) {               
-            profile = ProofSettings.DEFAULT_SETTINGS.getProfile();   
-            if (profile == null) {
-                profile = new JavaProfile();
-            }
-        }
-        return profile;
+    public Profile getProfile() {
+       Proof selectedProof = getSelectedProof();
+       if (selectedProof != null) {
+          return selectedProof.getServices().getProfile();
+       }
+       else {
+          return AbstractProfile.getDefaultProfile();
+       }
     }
 
     /** 
@@ -913,8 +903,8 @@ public class KeYMediator {
      * @return the time in ms after which automatic rule application stops
      */
     public long getAutomaticApplicationTimeout() {      
-        if (getProof() != null) {
-            return getProof().getSettings().getStrategySettings().getTimeout();
+        if (getSelectedProof() != null) {
+            return getSelectedProof().getSettings().getStrategySettings().getTimeout();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getTimeout();
         }
@@ -925,8 +915,8 @@ public class KeYMediator {
      * @param timeout a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
-       if (getProof() != null) {
-           getProof().getSettings().getStrategySettings().setTimeout(timeout);
+       if (getSelectedProof() != null) {
+           getSelectedProof().getSettings().getStrategySettings().setTimeout(timeout);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
@@ -948,7 +938,7 @@ public class KeYMediator {
                             "Please supply a formula:",
                             null,
                             "",
-                    new InspectorForDecisionPredicates(getProof().getServices(),invokedNode,   
+                    new InspectorForDecisionPredicates(getSelectedProof().getServices(),invokedNode,   
                             DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
                             DelayedCutProcessor.getApplicationChecks()), true);    
             
@@ -956,9 +946,9 @@ public class KeYMediator {
                 return false;
             }
             
-            Term formula = InspectorForDecisionPredicates.translate(getProof().getServices(),result);
+            Term formula = InspectorForDecisionPredicates.translate(getSelectedProof().getServices(),result);
             
-            DelayedCutProcessor processor = new DelayedCutProcessor(getProof(),
+            DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(),
                     invokedNode,
                     formula,
                     DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
@@ -1017,7 +1007,7 @@ public class KeYMediator {
                         
                         @Override
                         public void run() {
-                            getProof().pruneProof(invokedNode);
+                            getSelectedProof().pruneProof(invokedNode);
                         }
                     });
                 }

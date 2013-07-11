@@ -40,7 +40,7 @@ public final class AbandonTaskAction extends MainWindowAction {
     	boolean removalConfirmed =
                 getMediator().getUI().confirmTaskRemoval("Are you sure?");
         if (removalConfirmed) {
-            getMediator().getUI().removeProof(getMediator().getProof());
+            getMediator().getUI().removeProof(getMediator().getSelectedProof());
         }
     }
     

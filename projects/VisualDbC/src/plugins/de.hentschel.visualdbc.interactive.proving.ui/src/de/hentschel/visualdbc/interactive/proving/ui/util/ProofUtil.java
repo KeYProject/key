@@ -60,8 +60,8 @@ import de.hentschel.visualdbc.dbcmodel.DbcProofStatus;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
-import de.hentschel.visualdbc.dbcmodel.diagram.custom.util.GMFUtil;
 import de.hentschel.visualdbc.dbcmodel.diagram.providers.DbCElementTypes;
+import de.hentschel.visualdbc.dbcmodel.diagram.util.GMFUtil;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDSFinder;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDbcFinder;
 

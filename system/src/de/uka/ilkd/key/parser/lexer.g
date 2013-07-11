@@ -119,6 +119,7 @@ tokens {
         WITHOPTIONS="\\withOptions";
         OPTIONSDECL="\\optionsDecl";
 	KEYSETTINGS = "\\settings";
+        PROFILE = "\\profile";
 
         // Those guys can stay being keywords
 	TRUE = "true";

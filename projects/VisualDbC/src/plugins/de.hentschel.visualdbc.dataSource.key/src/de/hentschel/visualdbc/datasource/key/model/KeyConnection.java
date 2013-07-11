@@ -309,7 +309,7 @@ public class KeyConnection extends MemoryConnection {
                try {
                   KeYMediator mediator = main.getMediator();
                   mediator.addGUIListener(mainGuiListener);
-                  DefaultProblemLoader loader = main.getUserInterface().load(location, classPathEntries, bootClassPath);
+                  DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPathEntries, bootClassPath);
                   init = loader.getProblemInitializer();
                   initConfig = loader.getInitConfig();
                   // Analyze classes, interfaces, enums and packages
@@ -1778,7 +1778,7 @@ public class KeyConnection extends MemoryConnection {
     * Closes the active task without user interaction.
     */
    public void closeTaskWithoutInteraction() {
-      main.getUserInterface().removeProof(main.getMediator().getProof());
+      main.getUserInterface().removeProof(main.getMediator().getSelectedProof());
    }
    
    /**
