@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 
@@ -39,15 +39,15 @@ public class StatementBlock extends JavaStatement
      */
     private final ImmutableArray<? extends Statement> body;
 
-    
+
     /**
      * contains all program prefix elements below and including itself
      */
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
     private PosInProgram firstActiveChildPos = null;
-    
-    
+
+
     public StatementBlock() {
 	body = new ImmutableArray<Statement>();
         prefixElementArray = new ImmutableArray<ProgramPrefix>(this);
@@ -57,30 +57,30 @@ public class StatementBlock extends JavaStatement
      *      Statement block.
      *  @param children an ExtList that contains the children
      */
-    
+
     public StatementBlock(ExtList children) {
         super(children);
         body = new
             ImmutableArray<Statement>(children.collect(Statement.class));
-        
+
         prefixElementArray = computePrefixElements(body);
     }
 
     public StatementBlock(ImmutableArray<? extends Statement> as) {
-	
+
 	// check for non-null elements (bug fix)
 	Debug.assertDeepNonNull(as, "statement block contructor");
-	
+
 	body = as;
         prefixElementArray = computePrefixElements(body);
     }
-        
+
 
     public StatementBlock(Statement as) {
 	this(new ImmutableArray<Statement>(as));
     }
 
-    public StatementBlock(Statement[] body) {
+    public StatementBlock(Statement... body) {
 	this(new ImmutableArray<Statement>(body));
     }
 
@@ -89,26 +89,26 @@ public class StatementBlock extends JavaStatement
     }
 
     /** computes the prefix elements for the given array of statment block */
-    public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b, 
+    public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b,
             int offset, ProgramPrefix current) {
         final ProgramPrefix[] pp;
 
         if (b.size()>0 && b.get(0) instanceof ProgramPrefix) {
             final ProgramPrefix prefixElement = (ProgramPrefix) b.get(0);
-            
-            final int prefixLength = 
+
+            final int prefixLength =
                 ((ProgramPrefix)b.get(0)).getPrefixLength();
-            pp = new ProgramPrefix[prefixLength + 1];            
-            prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);            
+            pp = new ProgramPrefix[prefixLength + 1];
+            prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);
         } else {
-            pp = new ProgramPrefix[1];            
-        }                
+            pp = new ProgramPrefix[1];
+        }
         pp[0] = current;
         return new ImmutableArray<ProgramPrefix>(pp);
     }
 
-   
-    
+
+
     /**
      *      Get body.
      *      @return the statement array wrapper.
@@ -127,11 +127,11 @@ public class StatementBlock extends JavaStatement
      *      Returns the number of children of this node.
      *      @return an int giving the number of children of this node
      */
-    
+
     public int getChildCount() {
         return body.size();
     }
-    
+
     /**
      *      Returns the child at the specified index in this node's "virtual"
      *      child array
@@ -234,11 +234,11 @@ public class StatementBlock extends JavaStatement
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
-    public int getPrefixLength() {        
+    public int getPrefixLength() {
         return prefixElementArray.size();
     }
 
-    public ProgramPrefix getPrefixElementAt(int i) {       
+    public ProgramPrefix getPrefixElementAt(int i) {
         return prefixElementArray.get(i);
     }
 
@@ -252,7 +252,7 @@ public class StatementBlock extends JavaStatement
         }
         return firstActiveChildPos;
     }
- 
+
 
 
 

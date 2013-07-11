@@ -69,6 +69,9 @@ public class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
 
+    /** The time of the program start in millis. */
+    private static long startTime;
+
     /**
      * The user interface modes KeY can operate in.
      */
@@ -153,6 +156,7 @@ public class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(String[] args) {
+        startTime = System.currentTimeMillis();
 
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +
@@ -439,5 +443,10 @@ public class Main {
      */
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
+    }
+
+    /** Returns the time of the program start in millis. */
+    public static long getStartTime() {
+        return startTime;
     }
 }

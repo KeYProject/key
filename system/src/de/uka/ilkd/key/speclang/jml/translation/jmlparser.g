@@ -286,7 +286,8 @@ options {
 	String sigString = "";
 
 	for(SLExpression expr : signature) {
-	    sigString += expr.getType().getFullName() + ", ";
+	    final KeYJavaType t = expr.getType();
+	    sigString += (t==null? "<unknown type>": t.getFullName()) + ", ";
 	}
 
 	return sigString.substring(0, sigString.length() - 2);
@@ -663,7 +664,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
-    |   n:NOT_SPECIFIED 
+    |   n:NOT_SPECIFIED
         { result = translator.createSkolemExprBool(n).getTerm(); }
     |   SAME
     ;
@@ -1716,15 +1717,15 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             }
             result = new SLExpression(TB.allFields(services, e1.getTerm()),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }        
-        
+        }
+
     |  ALLOBJECTS LPAREN t=storeref RPAREN
-        {          
+        {
             result = new SLExpression(TB.allObjects(services, t.sub(1)),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }                
+        }
     |   UNIONINF
-        LPAREN 
+        LPAREN
         declVars=quantifiedvardecls
         SEMI
         {

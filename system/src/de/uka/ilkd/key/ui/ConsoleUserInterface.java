@@ -65,9 +65,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             System.out.println("number of goals remaining open:" + 
                     info.getProof().openGoals().size());
             System.out.flush();
-            batchMode.finishedBatchMode ( info.getResult(), 
-                    info.getProof(), info.getTime(), 
-                    info.getAppliedRules());
+            batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
             System.out.println("  ... loading ]");
