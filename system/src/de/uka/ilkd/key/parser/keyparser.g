@@ -148,7 +148,9 @@ options {
    private ParserConfig parserConfig;
 
    private Term quantifiedArrayGuard = null;
-    
+
+   private String profileName;
+
    private TokenStreamSelector selector;
 
    /**
@@ -160,7 +162,7 @@ options {
 	this((lexer instanceof KeYLexer) ?
 	       ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector(), 2);
         this.selector = (lexer instanceof KeYLexer) ?
-                ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector();
+                ((KeYLexer)lexer).getSelector() : ((DeclPicker)lexer).getSelector();                
 	this.parserMode = mode;
 	if(isTacletParser()) {
 	    switchToSchemaMode();
@@ -218,34 +220,24 @@ options {
    }
 
 
-
-   /** ONLY FOR TEST CASES.
-    * Used to construct Global Declaration Term parser - for first-order
-    * terms and formulae. Variables in quantifiers are expected to be
-    * declared globally in the variable namespace.  This parser is used
-    * for test cases, where you want to know in advance which objects
-    * will represent bound variables.
-    */
-   public KeYParser(ParserMode mode,
-                    TokenStream lexer,
-	            JavaReader jr,
-		    NamespaceSet nss) {
-        this(lexer, null, new Services(), nss, mode);
-        this.scm = new AbbrevMap();
-        this.javaReader = jr;
-    }
-
+    /** ONLY FOR TEST CASES.
+     * Used to construct Global Declaration Term parser - for first-order 
+     * terms and formulae. Variables in quantifiers are expected to be
+     * declared globally in the variable namespace.  This parser is used
+     * for test cases, where you want to know in advance which objects
+     * will represent bound variables.
+     */
     public KeYParser(ParserMode mode, 
                      TokenStream lexer,
 		     Services services,
 		     NamespaceSet nss) {
-	this(mode, lexer, 
-	     new Recoder2KeY(services,
-		new KeYCrossReferenceServiceConfiguration(
-		   services.getExceptionHandler()), 
-		services.getJavaInfo().rec2key(), new NamespaceSet(), 
-		services.getTypeConverter()),
-   	     nss);
+        this(lexer, null, services, nss, mode);
+        this.scm = new AbbrevMap();
+        this.javaReader = new Recoder2KeY(services,
+                new KeYCrossReferenceServiceConfiguration(
+                   services.getExceptionHandler()), 
+                services.getJavaInfo().rec2key(), new NamespaceSet(), 
+                services.getTypeConverter());
     }
 
     /**
@@ -340,6 +332,10 @@ options {
     
     public String getProofObligation() {
         return proofObligation;
+    }
+    
+    public String getProfileName() {
+      return profileName;
     }
     
     public String getFilename() {
@@ -4359,7 +4355,7 @@ problem returns [ Term a = null ]
     String pref = null;
 }
     :
-
+        profile     
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
@@ -4479,6 +4475,11 @@ oneJavaSource returns [String s = null]
   )+ {
     s = b.toString();
   }
+;
+
+
+profile:
+        (PROFILE profileName=string_literal SEMI)? 
 ;
 
 preferences returns [String s = null]:

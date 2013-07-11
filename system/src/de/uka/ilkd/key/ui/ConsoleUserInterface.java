@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
@@ -65,9 +66,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             System.out.println("number of goals remaining open:" + 
                     info.getProof().openGoals().size());
             System.out.flush();
-            batchMode.finishedBatchMode ( info.getResult(), 
-                    info.getProof(), info.getTime(), 
-                    info.getAppliedRules());
+            batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
             System.out.println("  ... loading ]");
@@ -231,10 +230,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
    @Override
-   public ProblemInitializer createProblemInitializer() {
+   public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this, 
-            mediator.getProfile(), 
-            new Services(mediator.getExceptionHandler()), 
+            new Services(profile, mediator.getExceptionHandler()), 
             false, 
             this);
       return pi;

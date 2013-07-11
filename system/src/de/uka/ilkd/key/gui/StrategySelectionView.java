@@ -53,6 +53,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 public final class StrategySelectionView extends JPanel {
@@ -946,7 +947,7 @@ public final class StrategySelectionView extends JPanel {
 	defaultButton = new JButton("Defaults");
 	defaultButton.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
-		mediator.getProof()
+		mediator.getSelectedProof()
 		        .getSettings()
 		        .getStrategySettings()
 		        .setMaxSteps(10000);
@@ -1157,7 +1158,7 @@ public final class StrategySelectionView extends JPanel {
                 mediator.getProfile().getDefaultStrategyFactory().name());
         }
         return mediator != null ? mediator.getProfile().getDefaultStrategyFactory().create(proof, properties) :
-        	proof.getSettings().getProfile().getDefaultStrategyFactory().create(proof, properties);
+        	proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, properties);
     }
   
     private String removeLast(String str, int num) {
@@ -1205,7 +1206,7 @@ public final class StrategySelectionView extends JPanel {
     
     private void updateStrategySettings(String strategyName,
 	    				StrategyProperties p) {
-        final Proof proof = mediator.getProof();
+        final Proof proof = mediator.getSelectedProof();
         final Strategy strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().
@@ -1234,7 +1235,7 @@ public final class StrategySelectionView extends JPanel {
         public void actionPerformed(ActionEvent e) { 	
             StrategyProperties props = getProperties();        	
             updateStrategySettings(
-        	    mediator.getProof().getActiveStrategy().name().toString(),
+        	    mediator.getSelectedProof().getActiveStrategy().name().toString(),
                     props);
         }
     }

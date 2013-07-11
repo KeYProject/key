@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package de.hentschel.visualdbc.dbcmodel.diagram.custom.util;
+package de.hentschel.visualdbc.dbcmodel.diagram.util;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,11 +26,11 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionEditPart;
 import org.eclipse.gmf.runtime.notation.View;
-import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides utility methods for GMF.
  * @author Martin Hentschel
+ * @generated NOT
  */
 public final class GMFUtil {
    /**
@@ -66,7 +66,7 @@ public final class GMFUtil {
          Object entry = entryIter.next();
          Assert.isTrue(entry instanceof EditPart);
          EditPart editPart = (EditPart)entry;
-         if (ObjectUtil.equals(editPart.getAdapter(EObject.class), toSearch)) {
+         if (toSearch != null ? toSearch.equals(editPart.getAdapter(EObject.class)) : editPart.getAdapter(EObject.class) == null) {
             result.add(editPart);
          }
       }

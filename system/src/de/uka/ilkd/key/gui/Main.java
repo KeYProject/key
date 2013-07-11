@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -68,6 +68,9 @@ public class Main {
     public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
+
+    /** The time of the program start in millis. */
+    private static long startTime;
 
     /**
      * The user interface modes KeY can operate in.
@@ -153,6 +156,7 @@ public class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(String[] args) {
+        startTime = System.currentTimeMillis();
 
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +
@@ -227,10 +231,6 @@ public class Main {
      * @param commandline object cl
      */
     public static void evaluateOptions(CommandLine cl) {
-
-        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
-
-
         if(cl.isSet(AUTO)){
         	uiMode = UiMode.AUTO;
         }
@@ -390,7 +390,7 @@ public class Main {
             opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
             LemmataHandler handler = new LemmataHandler(opt,
-                    ProofSettings.DEFAULT_SETTINGS.getProfile());
+                    AbstractProfile.getDefaultProfile());
             handler.start();
 
         } catch(Exception e) {
@@ -439,5 +439,10 @@ public class Main {
      */
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
+    }
+
+    /** Returns the time of the program start in millis. */
+    public static long getStartTime() {
+        return startTime;
     }
 }
