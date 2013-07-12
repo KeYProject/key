@@ -1217,6 +1217,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
             bindRuleSet( d, "comprehension_split", 
                     SumFeature.createSum(new Feature[]{
+                            applyTF ( FocusFormulaProjection.INSTANCE,
+                                      ff.notContainsExecutable ),                            
                             forEach( splitInst, ComprehensionInstantiation.INSTANCE,
                                     add (instantiate ("middle", splitInst), longConst(500))),
                                     allowQuantifierSplitting(),
