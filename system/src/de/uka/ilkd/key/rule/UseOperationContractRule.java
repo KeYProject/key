@@ -47,6 +47,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -313,13 +314,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.func(anonHeapFunc);	
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), AuxiliaryTermLabel.INSTANCE);
 	final Term assumption = TB.equals(TB.anon(services, 
 				          TB.var(heap), 
 				          mod,
 				          anonHeap),
-		               TB.func(methodHeapFunc)); 
-	final Term anonUpdate = TB.elementary(services, heap, TB.func(methodHeapFunc));
+		               TB.label(TB.func(methodHeapFunc), AuxiliaryTermLabel.INSTANCE));
+	final Term anonUpdate = TB.elementary(services, heap, TB.label(TB.func(methodHeapFunc), AuxiliaryTermLabel.INSTANCE));
 	
 	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
     } 
