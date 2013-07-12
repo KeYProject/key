@@ -52,6 +52,7 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -511,13 +512,19 @@ public final class ProofManagementDialog extends JDialog {
             startButton.setEnabled(true);
         }
     }
-
+        
+    
+    private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
+        return p_class.getSort().isAbstract() && !obs.isStatic();
+    }
+    
     private void updateContractPanel() {
         ContractSelectionPanel pan = getActiveContractPanel();
 	if (pan == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
-	    if(entry != null && entry.target != null) {
-		final ImmutableSet<Contract> contracts
+	    if(entry != null && entry.target != null && 
+	            !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
+		final ImmutableSet<Contract> contracts 
 			= specRepos.getContracts(entry.kjt, entry.target);
 		pan.setContracts(contracts, "Contracts");
 	    } else {
@@ -544,6 +551,7 @@ public final class ProofManagementDialog extends JDialog {
         for (KeYJavaType kjt : kjts) {
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
             for (IObserverFunction target : targets) {
+	          if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
                 ImmutableSet<Contract> contracts = specRepos.getContracts(kjt, target);
                 boolean startedProving = false;
                 boolean allClosed = true;
@@ -571,7 +579,8 @@ public final class ProofManagementDialog extends JDialog {
                         : keyClosedIcon)
                         : keyIcon)
                         : null);
-            }
+              }
+		    }
         }
         classTree.updateUI();
 
