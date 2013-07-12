@@ -1032,7 +1032,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       ifZero(add ( or ( FocusInAntecFeature.INSTANCE,
                                         NotBelowQuantifierFeature.INSTANCE ),
                                    NotInScopeOfModalityFeature.INSTANCE),
-                             add ( longConst ( -150 ),
+                             add ( longConst ( -100 ),
                                    ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
                              inftyConst() ) );
 
