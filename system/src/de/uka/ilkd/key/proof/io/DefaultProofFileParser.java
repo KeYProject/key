@@ -273,7 +273,7 @@ public class DefaultProofFileParser implements IProofFileParser {
               currNode = null;
            } catch(Exception e) {
                skipBranch = 1;
-              reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
+               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'n' :
@@ -286,7 +286,7 @@ public class DefaultProofFileParser implements IProofFileParser {
                children = currNode.childrenIterator();
                currNode = null;
            } catch (SkipSMTRuleException e) {
-           // silently continue; status will be reported via polling
+               // silently continue; status will be reported via polling
            } catch (BuiltInConstructionException e) {
                skipBranch = 1;
                reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
