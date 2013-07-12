@@ -166,7 +166,7 @@ public final class RewriteTaclet extends FindTaclet {
 	
 	// this is assumed to hold
 	assert p_pos.posInTerm () != null;
-	
+
 	PIOPathIterator it = p_pos.iterator ();
 	Operator        op;
 	while ( it.next () != -1 ) {
@@ -177,7 +177,7 @@ public final class RewriteTaclet extends FindTaclet {
 	        // FIXME: Only seems to work if transformer-term in antecedent and for .key-files
 	        return null;
 	    }
-	    
+
 	    if ( op instanceof UpdateApplication &&
 	            it.getChild () == UpdateApplication.targetPos() &&
 	            getApplicationRestriction() != NONE) {
