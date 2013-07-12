@@ -66,12 +66,20 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     public void taskFinished(TaskFinishedInfo info) {
         if (verbosity > SILENT) System.out.print("[ DONE ");
+        final int openGoals = info.getProof().openGoals().size();
         if (info.getSource() instanceof ApplyStrategy) {
             if (verbosity > SILENT) {
-            System.out.println("  ... rule application ]");
-            System.out.println("number of goals remaining open:" +
-                    info.getProof().openGoals().size());
-            System.out.flush();
+                System.out.println("  ... rule application ]");
+                if (verbosity >= HIGH) {
+                    System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ "==");
+                    final Proof.Statistics stat = info.getProof().statistics();
+                    System.out.println("Proof steps: "+stat.nodes);
+                    System.out.println("Branches: "+stat.branches);
+                    System.out.println("Time: "+stat.autoModeTime+"ms");
+                }
+                System.out.println("Number of goals remaining open: " +
+                        openGoals);
+                System.out.flush();
             }
             batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
@@ -81,10 +89,10 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 if (verbosity > SILENT) System.out.println(info.getResult());
                     System.exit(-1);
             }
-            if(batchMode.isLoadOnly() ||  info.getProof().openGoals().size()==0) {
+            if(batchMode.isLoadOnly() ||  openGoals==0) {
                 if (verbosity > SILENT)
-                System.out.println("number of open goals after loading:" +
-                        info.getProof().openGoals().size());
+                System.out.println("Number of open goals after loading: " +
+                        openGoals);
                 System.exit(0);
             }
 
