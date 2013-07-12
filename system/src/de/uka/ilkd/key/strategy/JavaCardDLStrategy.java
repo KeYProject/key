@@ -106,6 +106,7 @@ import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.ComprehensionInstantiation;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
@@ -360,6 +361,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                      longConst ( 0 ), longConst ( 50 ) ) ) );
         bindRuleSet ( d, "gamma_destructive", inftyConst () );
 
+        bindRuleSet ( d, "comprehension_split",
+                add ( not ( isInstantiated ( "middle" ) ), longConst ( 0 ) ) );
+
+        
         setupReplaceKnown ( d );        
             
         bindRuleSet ( d, "confluence_restricted",
@@ -1207,8 +1212,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      forEach ( varInst, HeuristicInstantiation.INSTANCE,
                                add ( instantiate ( "t", varInst ),
                                      branchPrediction ) ) } ) );
+            final TermBuffer splitInst = new TermBuffer();
+            
+            
+            bindRuleSet( d, "comprehension_split", 
+                    SumFeature.createSum(new Feature[]{
+                            forEach( splitInst, ComprehensionInstantiation.INSTANCE,
+                                    add (instantiate ("middle", splitInst), longConst(500))),
+                                    allowQuantifierSplitting(),
+                                    longConst(1500)}
+                            ));        
         } else {
-            bindRuleSet ( d, "gamma", inftyConst () );            
+            bindRuleSet ( d, "gamma", inftyConst () );  
+            bindRuleSet ( d, "comprehension_split", inftyConst() );
         }
     }
 
@@ -1223,8 +1239,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      InstantiationCostScalerFeature.create
                              ( InstantiationCost.create ( instOf ( "t" ) ),
                                longConst ( 0 ) ) ) );
+            
+            final TermBuffer splitInst = new TermBuffer ();
+            bindRuleSet (d, "comprehension_split", 
+                    add (isInstantiated("middle"), 
+                    not ( sum ( splitInst, ComprehensionInstantiation.INSTANCE,
+                            not ( eq ( instOf ( "middle" ), splitInst ) ) ) ) ) );       
         } else {
-            bindRuleSet ( d, "gamma", inftyConst () );            
+            bindRuleSet ( d, "gamma", inftyConst () ); 
+            bindRuleSet ( d, "comprehension_split", inftyConst() );
         }
     }
 
@@ -2241,7 +2264,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	    					    inftyConst());
         }
 	
-	return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
+        return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
     }
     
     private RuleSetDispatchFeature setupApprovalDispatcher(Proof p_proof) {
