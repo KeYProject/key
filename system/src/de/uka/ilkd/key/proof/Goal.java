@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -608,11 +609,18 @@ public final class Goal  {
             // bugfix #1336, see bugtracker
             if (t instanceof RewriteTaclet) {
                 RewriteTaclet rwt = (RewriteTaclet) t;
-                MatchConditions matchConditions = tacletApp.matchConditions();
+                ImmutableList<UpdateLabelPair> oldUpdCtx = 
+                        tacletApp.matchConditions().getInstantiations().getUpdateContext();
                 MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
-                        matchConditions, proof.getServices());
-                if(newConditions != matchConditions) {
-                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + ruleApp);
+                        MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
+                ImmutableList<UpdateLabelPair> newUpdCtx = 
+                        newConditions.getInstantiations().getUpdateContext();
+
+                if(!oldUpdCtx.equals(newUpdCtx)) {
+                    System.err.println("old context: " + oldUpdCtx);
+                    System.err.println("new context: " + oldUpdCtx);
+                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
+                                + ruleApp);
                 }
             }
         }
