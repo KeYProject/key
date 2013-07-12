@@ -100,7 +100,7 @@ public class Main {
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
 
-    private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
+    private static byte verbosity = Verbosity.NORMAL;
 
     private static String statisticsFile = null;
 
@@ -158,6 +158,8 @@ public class Main {
     public static void main(String[] args) {
         startTime = System.currentTimeMillis();
 
+        if (Boolean.getBoolean("key.verbose-ui")) verbosity = Verbosity.DEBUG;
+
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +
                 "GNU General Public License\n");
@@ -202,6 +204,7 @@ public class Main {
         cl.addSection("Options for the KeY-Prover");
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
+        cl.addOption("--v", "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
@@ -253,10 +256,12 @@ public class Main {
         }
 
         if(cl.isSet(TIMEOUT)){
+            if (verbosity >= Verbosity.HIGH)
             System.out.println("Timeout is set");
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
+                if (verbosity >= Verbosity.HIGH)
                 System.out.println("Timeout is: "+ timeout+" ms");
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
@@ -272,10 +277,26 @@ public class Main {
             ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
         }
 
+        if(cl.isSet("--v")){ // verbosity
+            try {
+                verbosity = (byte)cl.getInteger("--v", Verbosity.HIGH);
+            } catch (CommandLineException e) {
+                if(Debug.ENABLE_DEBUG) {
+                    e.printStackTrace();
+                }
+                System.out.println(e.getMessage());
+            }
+
+            if (verbosity < 0) {
+                printUsageAndExit(false, "Illegal verbosity (must be a number >= 0)", -5);
+            }
+        }
+
         if(cl.isSet(EXAMPLES)){
             examplesDir = cl.getString(EXAMPLES, null);
         }
 
+        if (verbosity > Verbosity.SILENT) {
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         }
@@ -285,8 +306,10 @@ public class Main {
         } else {
             System.out.println("Not using assertions ...");
         }
+        }
 
         if(cl.isSet(EXPERIMENTAL)){
+            if (verbosity > Verbosity.SILENT)
             System.out.println("Running in experimental mode ...");
         } else {
             deactivateExperimentalFeatures();
@@ -332,7 +355,7 @@ public class Main {
      *         <code>uiMode</code>
      */
     private static UserInterface createUserInterface() {
-	UserInterface ui;
+        UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
@@ -344,7 +367,7 @@ public class Main {
                 }});
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+            ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
 
@@ -365,7 +388,7 @@ public class Main {
             }
 
             ui = MainWindow.getInstance().getUserInterface();
-	    if (fileNameOnStartUp != null)
+	    if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
 	        System.out.println("Loading: "+fileNameOnStartUp);
         }
 
@@ -444,5 +467,12 @@ public class Main {
     /** Returns the time of the program start in millis. */
     public static long getStartTime() {
         return startTime;
+    }
+
+    public static final class Verbosity {
+        public static final byte SILENT = 0;
+        public static final byte NORMAL = 1;
+        public static final byte HIGH = 2;
+        public static final byte DEBUG = 4;
     }
 }
