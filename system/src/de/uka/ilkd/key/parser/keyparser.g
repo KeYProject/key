@@ -3615,7 +3615,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_atomicFormula[b]
+    | varcond_atomic[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4107,14 +4107,14 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
-varcond_atomicFormula [TacletBuilder b]
+varcond_atomic [TacletBuilder b]
 {
   ParsableVariable x = null;
 }
 :
-   ISATOMICFORMULA
+   ISATOMIC
         LPAREN x=varId RPAREN {
-           b.addVariableCondition(new AtomicFormulaCondition((TermSV) x));
+           b.addVariableCondition(new AtomicCondition((TermSV) x));
         }
 ;
 

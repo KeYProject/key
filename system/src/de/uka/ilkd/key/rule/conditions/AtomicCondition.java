@@ -8,13 +8,12 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class AtomicFormulaCondition extends VariableConditionAdapter {
+public class AtomicCondition extends VariableConditionAdapter {
 
     private final TermSV t;
 
-    public AtomicFormulaCondition(TermSV t) {
+    public AtomicCondition(TermSV t) {
         this.t = t;
-        
     }
 
     @Override
@@ -25,7 +24,7 @@ public class AtomicFormulaCondition extends VariableConditionAdapter {
         if (!(var instanceof TermSV) || (TermSV)var != this.t) {
             return true;
         }
-        Term tInst = (Term) instMap.getInstantiation(t);        
+        Term tInst = (Term) instMap.getInstantiation(t);
         return tInst.arity() == 0;
     }
 

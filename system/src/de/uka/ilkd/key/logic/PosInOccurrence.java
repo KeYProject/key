@@ -33,7 +33,7 @@ public final class PosInOccurrence {
      */
     private final SequentFormula cfma;
 
-    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
     private final short hashCode;
     
@@ -177,7 +177,7 @@ public final class PosInOccurrence {
     /**
      * The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead.     
-     * describes the exact occurence of the refered term inside 
+     * describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()} 
      * @returns the position in the formula of the SequentFormula of
      * this PosInOccurrence. 

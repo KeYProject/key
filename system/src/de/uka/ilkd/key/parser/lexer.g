@@ -76,7 +76,7 @@ tokens {
 	ELEMSORT = "\\elemSort";        
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";
-	ISATOMICFORMULA="\\isAtomic";
+	ISATOMIC="\\isAtomic";
         ISENUMTYPE="\\isEnumType";
 	ISINDUCTVAR="\\isInductVar";	
 	ISLOCALVARIABLE = "\\isLocalVariable";
