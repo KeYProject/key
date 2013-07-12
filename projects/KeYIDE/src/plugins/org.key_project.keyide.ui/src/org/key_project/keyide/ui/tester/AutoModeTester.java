@@ -53,7 +53,7 @@ public class AutoModeTester extends PropertyTester {
          //initialize values
          KeYEditor editor = (KeYEditor) receiver;
          ConsoleUserInterface userInterface = editor.getEnvironment().getUi();
-         Proof proof = editor.getEnvironment().getMediator().getProof();
+         Proof proof = editor.getEnvironment().getMediator().getSelectedProof();
          if(!proof.closed()){
             //Set button states
             if (PROPERTY_START.equals(property)) {

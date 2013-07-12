@@ -40,10 +40,10 @@ public class BatchMode {
 
     
    public void finishedBatchMode (Object result, 
-            Proof proof, long time, int appliedRules) {
+            Proof proof) {
 
         if ( Main.getStatisticsFile() != null )
-            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
+            printStatistics ( Main.getStatisticsFile(), result, proof.statistics() );
 
         if ("Error".equals ( result ) ) {
             // Error in batchMode. Terminate with status -1.
@@ -100,21 +100,33 @@ public class BatchMode {
      * @param appliedRules the int giving the number of applied rules
      */
     private void printStatistics(String file, Object result, 
-            long time, int appliedRules) {
+                                 Proof.Statistics statistics) {
         try {
-            final FileWriter statistics = new FileWriter ( file, true );
-            final PrintWriter statPrinter = new PrintWriter ( statistics );
-            
+            final boolean fileExists = (new File(file)).exists();
+            final FileWriter statisticsFW = new FileWriter ( file, true );
+            final PrintWriter statPrinter = new PrintWriter ( statisticsFW );
+
+            if (!fileExists) {
+                statPrinter.println("Name | Total rule apps | Nodes | " +
+                        "Branches | Overall time | Automode time | " +
+                        "Time per step");
+            }
+
             String name = fileName;
             final int slashIndex = name.lastIndexOf ( "examples/" );
             if ( slashIndex >= 0 )
                 name = name.substring ( slashIndex );
             
-            statPrinter.print ( name + ", " );
+            statPrinter.print ( name + " | " );
             if ("Error".equals ( result ) )
-                statPrinter.println ( "-1, -1" );
+                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1" );
             else
-                statPrinter.println ( "" + appliedRules + ", " + time );                
+                statPrinter.println (statistics.totalRuleApps + " | " +
+                                     statistics.nodes + " | " +
+                                     statistics.branches + " | " +
+                                     statistics.time + " | " +
+                                     statistics.autoModeTime + " | " +
+                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps));
             statPrinter.close();
         } catch ( IOException e ) {
             e.printStackTrace();

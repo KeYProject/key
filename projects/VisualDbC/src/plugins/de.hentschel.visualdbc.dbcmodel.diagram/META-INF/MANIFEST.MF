@@ -10,7 +10,8 @@ Bundle-Localization: plugin
 Export-Package: de.hentschel.visualdbc.dbcmodel.diagram.edit.commands,
  de.hentschel.visualdbc.dbcmodel.diagram.edit.parts,
  de.hentschel.visualdbc.dbcmodel.diagram.part,
- de.hentschel.visualdbc.dbcmodel.diagram.providers
+ de.hentschel.visualdbc.dbcmodel.diagram.providers,
+ de.hentschel.visualdbc.dbcmodel.diagram.util
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.expressions,

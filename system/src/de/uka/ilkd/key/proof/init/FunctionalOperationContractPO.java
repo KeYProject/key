@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -22,11 +22,13 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import static de.uka.ilkd.key.java.KeYJavaASTFactory.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -39,6 +41,10 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
+import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
+import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -124,36 +130,49 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected KeYJavaType getCalleeKeYJavaType() {
        return getContract().getKJT();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected StatementBlock buildOperationBlock(ImmutableList<LocationVariable> formalParVars,
+    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                  ProgramVariable selfVar,
                                                  ProgramVariable resultVar) {
-       final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
+        final StatementBlock[] result = new StatementBlock[4];
+        final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
              new ProgramVariable[formalParVars.size()]));
 
-       if (getContract().getTarget().isConstructor()) {
+        if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
             assert resultVar == null;
+            final KeYJavaType type = getContract().getKJT();
+
             final Expression[] formalArray2 = formalArray.toArray(
                     new Expression[formalArray.size()]);
-            final New n = new New(formalArray2, new TypeRef(
-                    getContract().getKJT()), null);
-            final CopyAssignment ca = new CopyAssignment(selfVar, n);
-            return new StatementBlock(ca);
+            final New n = new New(formalArray2, new TypeRef(type), null);
+            final SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+
+            // construct what would be produced from rule instanceCreationAssignment
+            final Expression init = (Expression) (new CreateObject(n)).transform(n, services, svInst);
+            final Statement assignTmp = declare(selfVar,init,type);
+            result[0] = new StatementBlock(assignTmp);
+
+            // try block
+            final Statement constructorCall = (Statement)(new ConstructorCall(selfVar, n)).transform(n, services, svInst);
+            final Statement setInitialized = (Statement) (new PostWork(selfVar)).transform(selfVar, services, svInst);
+            result[1] = new StatementBlock(constructorCall, setInitialized);
         } else {
             final MethodBodyStatement call =
                     new MethodBodyStatement(getContract().getTarget(),
                                             selfVar,
                                             resultVar,
                                             formalArray);
-            return new StatementBlock(call);
+            result[1] = new StatementBlock(call);
         }
+       assert result[1] != null : "null body in method";
+       return ImmutableSLList.<StatementBlock>nil().prepend(result);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -174,39 +193,39 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         }
         return mbyAtPreDef;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Term getPre(List<LocationVariable> modHeaps,
-                          ProgramVariable selfVar, 
+                          ProgramVariable selfVar,
                           ImmutableList<ProgramVariable> paramVars,
-                          Map<LocationVariable, LocationVariable> atPreVars, 
+                          Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
        return contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, 
-                           ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, 
-                           ProgramVariable resultVar, 
-                           ProgramVariable exceptionVar, 
-                           Map<LocationVariable, LocationVariable> atPreVars, 
+    protected Term getPost(List<LocationVariable> modHeaps,
+                           ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+                           ProgramVariable resultVar,
+                           ProgramVariable exceptionVar,
+                           Map<LocationVariable, LocationVariable> atPreVars,
                            Services services) {
        return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, services);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                     Map<LocationVariable, Map<Term, Term>> heapToAtPre,
-                                    ProgramVariable selfVar, 
+                                    ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars) {
        Term frameTerm = null;
        for(LocationVariable heap : modHeaps) {
@@ -227,7 +246,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        }
        return frameTerm;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -235,7 +254,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected Modality getTerminationMarker() {
        return getContract().getModality();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -262,7 +281,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         }
         return update;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -286,7 +305,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     public Term getMbyAtPre() {
         return mbyAtPre;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -326,7 +345,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         super.fillSaveProperties(properties);
         properties.setProperty("contract", contract.getName());
     }
-    
+
     /**
      * Instantiates a new proof obligation with the given settings.
      * @param initConfig The already load {@link InitConfig}.

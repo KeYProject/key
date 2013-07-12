@@ -54,7 +54,7 @@ public class ShowKnownTypesAction extends MainWindowAction {
     }
     
     private void showTypeHierarchy() {
-        Proof currentProof = getMediator().getProof();
+        Proof currentProof = getMediator().getSelectedProof();
         if(currentProof == null) {
         	mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
                     "If you wish to see the types "

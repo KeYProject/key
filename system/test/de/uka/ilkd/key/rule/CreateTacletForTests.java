@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
@@ -84,7 +85,7 @@ public class CreateTacletForTests extends TestCase {
 
     public CreateTacletForTests(String name) {
 	super(name);
-	services = new Services();
+	services = new Services(AbstractProfile.getDefaultProfile());
     }
 
 

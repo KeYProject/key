@@ -91,4 +91,11 @@
             class="de.hentschel.visualdbc.interactive.proving.ui.finder.DefaultDSFinderFactory">
       </finder>
    </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="de.hentschel.visualdbc.dbcmodel.diagram.openProof"
+            icon="icons/OpenProof.gif">
+      </image>
+   </extension>
 </plugin>
