@@ -61,19 +61,15 @@ public class TestJMLTranslator extends TestCase {
     private static Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
 
 
-    protected void setUp() {        
+    protected synchronized void setUp() {        
         if (javaInfo == null) {
-            synchronized(this) {        
-                if (javaInfo == null) {
-                    javaInfo = new HelperClassForTests().parse(
-                            new File(testFile)).getFirstProof().getJavaInfo();
-                    services = javaInfo.getServices();
-                    testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-                    atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre",
-                            services.getTypeConverter().getHeapLDT().getHeap().sort(), false)));
+            javaInfo = new HelperClassForTests().parse(
+                    new File(testFile)).getFirstProof().getJavaInfo();
+            services = javaInfo.getServices();
+            testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
+            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre",
+                    services.getTypeConverter().getHeapLDT().getHeap().sort(), false)));
 
-                }
-            }
         }
     }
 
