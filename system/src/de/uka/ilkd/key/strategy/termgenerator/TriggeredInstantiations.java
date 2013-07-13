@@ -4,8 +4,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -17,6 +20,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -30,6 +34,8 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HandleArith;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
 public class TriggeredInstantiations implements TermGenerator {
 
@@ -37,7 +43,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private Sequent last = Sequent.EMPTY_SEQUENT;
     private Set<Term> lastCandidates = new HashSet<Term>();
-    private Set<Term> lastAxioms = new HashSet<Term>();
+    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
 
     @Override
     /**
@@ -51,14 +57,19 @@ public class TriggeredInstantiations implements TermGenerator {
             final Taclet taclet = tapp.taclet();
 
             final Set<Term> terms;
-            final Set<Term> axioms;
-
+            final Set<Term> axiomSet;
+            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
+ 
+            
             final Sequent seq = goal.sequent();
             if (seq != last) {
                 terms = new HashSet<Term>();
-                axioms = new HashSet<Term>();
+                axiomSet = new HashSet<Term>();
+                computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
+                for (Term axiom : axiomSet) {
+                    axioms = axioms.add(axiom);
+                }
 
-                computeAxiomAndCandidateSets(seq, terms, axioms, services);
                 synchronized (this) {
                     last = seq;
                     lastCandidates = terms;
@@ -148,31 +159,18 @@ public class TriggeredInstantiations implements TermGenerator {
         }
     }
 
-    private boolean isAvoidConditionProvable(Term cond, Set<Term> axioms,
+    private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
             Services services) {
-
-        Term isLEq = HandleArith.provedByArith(cond, services);
-        final Iterator<Term> ax = axioms.iterator();
-        do {
-            if (isLEq.op() == Junctor.TRUE) {
-                return true;
-            } else if (isLEq.op() == Junctor.FALSE) {
-                return false;
-            }
-            if (ax.hasNext()) {
-                final Term axiom = ax.next();
-                isLEq = HandleArith.provedByArith(cond, axiom, services);
-            } else {
-                break;
-            }
-        } while (true);
-        // safe case
-        return false;
+        
+        long cost = PredictCostProver.computerInstanceCost(
+                new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
+                cond, axioms, services);
+        return cost == -1;
     }
 
     private HashSet<Term> computeInstances(Services services,
             final Term comprehension, final Metavariable mv,
-            final Term trigger, Set<Term> terms, Set<Term> axioms, TacletApp app) {
+            final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms, TacletApp app) {
 
         final HashSet<Term> instances = new HashSet<Term>();
         final HashSet<Term> alreadyChecked = new HashSet<Term>();

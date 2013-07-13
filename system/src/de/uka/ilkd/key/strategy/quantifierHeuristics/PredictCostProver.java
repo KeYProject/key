@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 /**
  * TODO: rewrite, this seems pretty inefficient ...
  */
-class PredictCostProver {
+public class PredictCostProver {
 
     private final static TermBuilder tb = TermBuilder.DF;
 
