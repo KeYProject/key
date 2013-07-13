@@ -92,7 +92,7 @@ public class TriggeredInstantiations implements TermGenerator {
                             + sv.name()), svSort);
 
                     final Term trigger = instantiateTerm(
-                            taclet.getTriggerTerm(), services,
+                            taclet.getTrigger().getTerm(), services,
                             svInst.replace(sv, TermBuilder.DF.var(mv), services));
 
                     final Set<Term> instances = computeInstances(services,
@@ -184,7 +184,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 final Term middle = c.getInstantiation(mv);
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
-                    if (!app.taclet().getTriggerAvoidConditions().isEmpty()) {
+                    if (app.taclet().getTrigger().hasAvoidConditions()) {
                         ImmutableList<Term> conditions = instantiateConditions(services, app, middle);
                         for (Term condition : conditions) {
                             if (isAvoidConditionProvable(condition, axioms, services)) {
@@ -206,7 +206,7 @@ public class TriggeredInstantiations implements TermGenerator {
             TacletApp app, final Term middle) {
         ImmutableList<Term> conditions;
         conditions = ImmutableSLList.<Term> nil();
-        for (Term singleAvoidCond : app.taclet().getTriggerAvoidConditions()) {
+        for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
             conditions = conditions.append(instantiateTerm(
                     singleAvoidCond,
                     services,                    

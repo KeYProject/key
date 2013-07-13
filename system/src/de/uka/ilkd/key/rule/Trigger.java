@@ -28,7 +28,7 @@ public class Trigger {
         return triggerVar;
     }
 
-    public Term getTrigger() {
+    public Term getTerm() {
         return trigger;
     }
 

@@ -230,14 +230,6 @@ public abstract class Taclet implements Rule, Named {
     public Trigger getTrigger() {
         return trigger;
     }
-
-    public Term getTriggerTerm() {
-        return trigger.getTrigger();
-    }
-    
-    public ImmutableList<Term> getTriggerAvoidConditions() {
-        return trigger.getAvoidConditions();
-    }
     
     protected void cacheMatchInfo() {
 	boundVariables = getBoundVariables();
