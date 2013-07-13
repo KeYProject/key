@@ -13,13 +13,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -32,19 +32,30 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.HandleArith;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
 public class TriggeredInstantiations implements TermGenerator {
 
-    public static final TermGenerator INSTANCE = new TriggeredInstantiations();
-
+    public static TermGenerator create(boolean skipConditions) {
+        return new TriggeredInstantiations(skipConditions);
+    }
+    
     private Sequent last = Sequent.EMPTY_SEQUENT;
     private Set<Term> lastCandidates = new HashSet<Term>();
     private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
+    
+    private boolean checkConditions;
 
+    /**
+     * 
+     * @param checkConditions boolean indicating if conditions should be checked
+     */
+    public TriggeredInstantiations(boolean checkConditions) {
+        this.checkConditions = checkConditions;
+    }
+    
     @Override
     /**
      * Generates all instances 
@@ -135,26 +146,21 @@ public class TriggeredInstantiations implements TermGenerator {
     }
 
     private void computeAxiomAndCandidateSets(final Sequent seq,
-            final Set<Term> terms, final Set<Term> axioms, Services services) {
-        
-        final HashSet<Operator> comps = new HashSet<Operator>();
+            final Set<Term> terms, final Set<Term> axioms, Services services) {        
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        comps.add(integerLDT.getLessOrEquals());
-        comps.add(integerLDT.getLessThan());
-        comps.add(integerLDT.getGreaterOrEquals());
-        comps.add(integerLDT.getGreaterThan());
-        comps.add(Equality.EQUALS);
+        collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true);
+        collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false);
+    }
+
+    private void collectAxiomsAndCandidateTerms(final Set<Term> terms,
+            final Set<Term> axioms, final IntegerLDT integerLDT,
+            Semisequent antecedent, boolean inAntecedent) {
         
-        for (SequentFormula sf : seq.antecedent()) {
+        for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
-            if (comps.contains(sf.formula().op())) {
-                axioms.add(sf.formula());
-            }
-        }
-        for (SequentFormula sf : seq.succedent()) {
-            collectTerms(sf.formula(), terms, integerLDT);
-            if (comps.contains(sf.formula().op())) {
-                axioms.add(TermBuilder.DF.not(sf.formula()));
+            if (sf.formula().op() instanceof Function || 
+                    sf.formula().op() == Equality.EQUALS) {
+                axioms.add(inAntecedent ? sf.formula() : TermBuilder.DF.not(sf.formula()));
             }
         }
     }
@@ -182,7 +188,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 final Term middle = c.getInstantiation(mv);
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
-                    if (app.taclet().getTrigger().hasAvoidConditions()) {
+                    if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {
                         ImmutableList<Term> conditions = instantiateConditions(services, app, middle);
                         for (Term condition : conditions) {
                             if (isAvoidConditionProvable(condition, axioms, services)) {

@@ -1223,7 +1223,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     SumFeature.createSum(new Feature[]{                                                                                   
                             allowQuantifierSplitting(),
                             applyTF( FocusFormulaProjection.INSTANCE, ff.notContainsExecutable),
-                            forEach( splitInst, TriggeredInstantiations.INSTANCE,
+                            forEach( splitInst, TriggeredInstantiations.create(true),
                                     add (instantiateTriggeredVariable(splitInst), longConst(500))),
                                     longConst(1500)
                              }
@@ -1250,7 +1250,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             final TermBuffer splitInst = new TermBuffer ();
             bindRuleSet (d, "triggered", 
                     add ( isTriggerVariableInstantiated(), 
-                    not ( sum ( splitInst, TriggeredInstantiations.INSTANCE,
+                    not ( sum ( splitInst, TriggeredInstantiations.create(false),
                             not ( eq ( instOfTriggerVariable (), splitInst ) ) ) ) ) );       
         } else {
             bindRuleSet ( d, "gamma", inftyConst () ); 
