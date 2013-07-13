@@ -103,7 +103,7 @@ public class Config {
 	StringBuffer path = new StringBuffer();
 	path = readUntil(fr,']');
 
-	StringBuffer result = (StringBuffer) map.get(identifier);
+	StringBuffer result = map.get(identifier.toString());
 	if (map.get(identifier.toString()) == null) {
 	    map.put(identifier.toString(), path);
 	} else {
