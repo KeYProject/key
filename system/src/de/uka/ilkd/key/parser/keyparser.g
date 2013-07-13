@@ -3412,6 +3412,31 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
+triggers[TacletBuilder b]
+{
+   String id = null;
+   Term t = null;
+   Named triggerVar = null;
+   Term avoidCond = null;
+   ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
+} :
+   TRIGGER
+     LBRACE id = simple_ident 
+     	{  
+     	  triggerVar = variables().lookup(new Name(id));
+     	  if (triggerVar == null || !(triggerVar instanceof SchemaVariable)) {
+     	  	throw 
+     	  	  new KeYSemanticException("Undeclared schemavariable: " + id, 
+     	  	  getFilename(), getLine(), getColumn());
+     	  }  
+     	}   RBRACE     
+     t=term (AVOID avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);} 
+      (COMMA avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);})*)? SEMI
+   {
+     b.setTrigger(new Trigger((SchemaVariable)triggerVar, t, avoidConditions));
+   }
+;
+
 taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 { 
     Sequent ifSeq = Sequent.EMPTY_SEQUENT;
@@ -3470,6 +3495,7 @@ modifiers[TacletBuilder b]
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal
             {b.setHelpText(htext);}
+        | triggers[b]            
         ) *
     ;
 

@@ -106,7 +106,7 @@ import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.ComprehensionInstantiation;
+import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
@@ -361,8 +361,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                      longConst ( 0 ), longConst ( 50 ) ) ) );
         bindRuleSet ( d, "gamma_destructive", inftyConst () );
 
+        bindRuleSet (d, "triggered", 
+                add( not ( isTriggerVariableInstantiated() ), longConst(500) ) );
+        
         bindRuleSet ( d, "comprehension_split",
-                add ( not ( isInstantiated ( "middle" ) ), longConst ( 0 ) ) );
+                add (   applyTF ( FocusFormulaProjection.INSTANCE, ff.notContainsExecutable ),
+                        longConst( 5000 ) ) );
 
         
         setupReplaceKnown ( d );        
@@ -1215,18 +1219,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             final TermBuffer splitInst = new TermBuffer();
             
             
-            bindRuleSet( d, "comprehension_split", 
-                    SumFeature.createSum(new Feature[]{
-                            applyTF ( FocusFormulaProjection.INSTANCE,
-                                      ff.notContainsExecutable ),                            
-                            forEach( splitInst, ComprehensionInstantiation.INSTANCE,
-                                    add (instantiate ("middle", splitInst), longConst(500))),
-                                    allowQuantifierSplitting(),
-                                    longConst(1500)}
+            bindRuleSet( d, "triggered", 
+                    SumFeature.createSum(new Feature[]{                                                                                   
+                            allowQuantifierSplitting(),
+                            applyTF( FocusFormulaProjection.INSTANCE, ff.notContainsExecutable),
+                            forEach( splitInst, TriggeredInstantiations.INSTANCE,
+                                    add (instantiateTriggeredVariable(splitInst), longConst(500))),
+                                    longConst(1500)
+                             }
                             ));        
+            
         } else {
             bindRuleSet ( d, "gamma", inftyConst () );  
-            bindRuleSet ( d, "comprehension_split", inftyConst() );
+            bindRuleSet ( d, "triggered", inftyConst() );
         }
     }
 
@@ -1243,13 +1248,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                longConst ( 0 ) ) ) );
             
             final TermBuffer splitInst = new TermBuffer ();
-            bindRuleSet (d, "comprehension_split", 
-                    add (isInstantiated("middle"), 
-                    not ( sum ( splitInst, ComprehensionInstantiation.INSTANCE,
-                            not ( eq ( instOf ( "middle" ), splitInst ) ) ) ) ) );       
+            bindRuleSet (d, "triggered", 
+                    add ( isTriggerVariableInstantiated(), 
+                    not ( sum ( splitInst, TriggeredInstantiations.INSTANCE,
+                            not ( eq ( instOfTriggerVariable (), splitInst ) ) ) ) ) );       
         } else {
             bindRuleSet ( d, "gamma", inftyConst () ); 
-            bindRuleSet ( d, "comprehension_split", inftyConst() );
+            bindRuleSet ( d, "triggered", inftyConst() );
         }
     }
 
