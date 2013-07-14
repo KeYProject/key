@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -334,10 +335,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         Term newSelfTerm = replaceVariablesInTerm(selfTerm);
 
-        for(LocationVariable h : atPres.keySet()) {
-           final Term t = atPres.get(h);
+        for(Entry<LocationVariable, Term> h : atPres.entrySet()) {
+           final Term t = h.getValue();
            if(t == null) continue;
-           atPres.put(h, replaceVariablesInTerm(t));
+           atPres.put(h.getKey(), replaceVariablesInTerm(t));
         }
 
         LoopInvariant newInv

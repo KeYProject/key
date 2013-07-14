@@ -107,7 +107,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /** remember all function declarations */
 
-        protected class FunctionWrapper {
+        protected static class FunctionWrapper {
                 private StringBuffer name;
                 private Function function;
                 private boolean usedForUnique;

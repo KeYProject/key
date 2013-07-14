@@ -1847,7 +1847,7 @@ final class JMLTranslator {
      * @author bruns
      *
      */
-    private abstract class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
+    private abstract static class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
 
         protected void assertPost (Term heapAtPre) throws SLTranslationException{
             if (heapAtPre == null){

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ import de.uka.ilkd.key.util.LRUCache;
 public final class OneStepSimplifier implements BuiltInRule, 	
 						KeYSelectionListener {
     
-    public final class Protocol extends ArrayList<RuleApp> { }
+    public final static class Protocol extends ArrayList<RuleApp> { }
     
     // TODO: Remove the singleton instance or make the rule state less to allow parallelization of site proofs started via a ProofStarter which is currently not possible thanks to ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
     public static final OneStepSimplifier INSTANCE 
