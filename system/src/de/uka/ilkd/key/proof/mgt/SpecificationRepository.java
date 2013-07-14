@@ -60,6 +60,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -1244,7 +1245,26 @@ public final class SpecificationRepository {
 
     public void addWellDefinednessCheck(ClassInvariant ci) {
         // Class Invariant
-        // TODO
+        final KeYJavaType kjt = ci.getKJT();
+        final IObserverFunction target = ci.isStatic() ?
+                services.getJavaInfo().getStaticInv(ci.getKJT()) :
+                    services.getJavaInfo().getInv();
+        final Pair<KeYJavaType,IObserverFunction> pair =
+                new Pair<KeYJavaType,IObserverFunction>(kjt,target);
+        wdChecks.put(pair, getWdChecks(pair.first, pair.second)
+                .add(new ClassWellDefinedness(ci, target, services)));
+
+        // inherit non-private, non-static invariants
+        if(!ci.isStatic() && VisibilityModifier.allowsInheritance(ci.getVisibility())) {
+            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+            for(KeYJavaType sub : subs) {
+                ClassInvariant subCi = ci.setKJT(sub);
+                final Pair<KeYJavaType,IObserverFunction> sPair =
+                        new Pair<KeYJavaType,IObserverFunction>(sub,target);
+                wdChecks.put(sPair, getWdChecks(sPair.first, sPair.second)
+                        .add(new ClassWellDefinedness(subCi, target, services)));
+            }
+        }
     }
 
 
