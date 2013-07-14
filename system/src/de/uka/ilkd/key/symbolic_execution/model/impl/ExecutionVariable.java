@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;

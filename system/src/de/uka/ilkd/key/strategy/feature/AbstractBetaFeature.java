@@ -214,23 +214,23 @@ public abstract class AbstractBetaFeature implements Feature {
             return alwaysReplace ( p_t );
     }
 
-    private static Object candidateHelp (Term p_t, TermInfo p_ti) {
+    private static TermInfo.Candidate candidateHelp (Term p_t, TermInfo p_ti) {
         if ( p_t.op () == Junctor.IMP || p_t.op () == Junctor.OR )
-            return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.CAND_LEFT
-                                                      : TermInfo.CAND_NEVER;
+            return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.Candidate.CAND_LEFT
+                                                      : TermInfo.Candidate.CAND_NEVER;
         else if ( p_t.op () == Junctor.AND )
-            return isBetaCandidateHelp ( p_ti, true ) ? TermInfo.CAND_RIGHT
-                                                     : TermInfo.CAND_NEVER;
+            return isBetaCandidateHelp ( p_ti, true ) ? TermInfo.Candidate.CAND_RIGHT
+                                                     : TermInfo.Candidate.CAND_NEVER;
         else if ( p_t.op () == Equality.EQV ) {
             if ( isBetaCandidateHelp ( p_ti, true ) )
-                return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.CAND_BOTH
-                                                          : TermInfo.CAND_RIGHT;
+                return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.Candidate.CAND_BOTH
+                                                          : TermInfo.Candidate.CAND_RIGHT;
             else
-                return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.CAND_LEFT
-                                                          : TermInfo.CAND_NEVER;
+                return isBetaCandidateHelp ( p_ti, false ) ? TermInfo.Candidate.CAND_LEFT
+                                                          : TermInfo.Candidate.CAND_NEVER;
         }
 
-        return TermInfo.CAND_NEVER;
+        return TermInfo.Candidate.CAND_NEVER;
     }
 
     private static boolean isBetaCandidateHelp (TermInfo p_ti, boolean p_positive) {
@@ -300,20 +300,19 @@ public abstract class AbstractBetaFeature implements Feature {
      */
     protected static boolean isBetaCandidate (Term p_t, boolean p_inAntec) {
         TermInfo ti = termInfo ( p_t );
-        return ti.candidate == TermInfo.CAND_BOTH
-               || ti.candidate == ( p_inAntec ? TermInfo.CAND_LEFT
-                                             : TermInfo.CAND_RIGHT );
+        return ti.candidate == TermInfo.Candidate.CAND_BOTH
+               || ti.candidate == ( p_inAntec ? TermInfo.Candidate.CAND_LEFT
+                                             : TermInfo.Candidate.CAND_RIGHT );
     }
 
     /**
      * Informations about a term as cached within "betaCandidates"
      */
-    private static class TermInfo {
-
-        public static final Integer CAND_NEVER = Integer.valueOf ( 0 );
-        public static final Integer CAND_LEFT  = Integer.valueOf ( 1 );
-        public static final Integer CAND_RIGHT = Integer.valueOf ( 2 );
-        public static final Integer CAND_BOTH  = Integer.valueOf ( 3 );
+    static class TermInfo {
+        
+        enum Candidate {
+            CAND_NEVER, CAND_LEFT, CAND_RIGHT, CAND_BOTH;
+        }
 
         /** formula is positive (not negated) */
         public int                  maxPosPath_positive;
@@ -341,7 +340,7 @@ public abstract class AbstractBetaFeature implements Feature {
         public boolean              containsQuantifier;
 
         /** one of CAND_* */
-        public Object               candidate;
+        public Candidate            candidate;
     }
 
     /**

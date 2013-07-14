@@ -18,9 +18,6 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -868,7 +865,7 @@ public class TacletGenerator {
 
 
 
-    private class TermAndBoundVarPair {
+    private static class TermAndBoundVarPair {
 
         public Term term;
         public ImmutableSet<VariableSV> boundVars;

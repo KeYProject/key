@@ -106,6 +106,7 @@ import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
@@ -360,6 +361,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                      longConst ( 0 ), longConst ( 50 ) ) ) );
         bindRuleSet ( d, "gamma_destructive", inftyConst () );
 
+        bindRuleSet (d, "triggered", 
+                add( not ( isTriggerVariableInstantiated() ), longConst(500) ) );
+        
+        bindRuleSet ( d, "comprehension_split",
+                add (   applyTF ( FocusFormulaProjection.INSTANCE, ff.notContainsExecutable ),
+                        ifZero( allowQuantifierSplitting(), longConst(2500), longConst( 5000 ) ) ) );
+        
         setupReplaceKnown ( d );        
             
         bindRuleSet ( d, "confluence_restricted",
@@ -1207,8 +1215,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      forEach ( varInst, HeuristicInstantiation.INSTANCE,
                                add ( instantiate ( "t", varInst ),
                                      branchPrediction ) ) } ) );
+            final TermBuffer splitInst = new TermBuffer();
+            
+            
+            bindRuleSet( d, "triggered", 
+                    SumFeature.createSum(new Feature[]{                                                                                   
+                            forEach( splitInst, TriggeredInstantiations.create(true),
+                                    add (instantiateTriggeredVariable(splitInst), longConst(500))),
+                                    longConst(1500)
+                             }
+                            ));        
+            
         } else {
-            bindRuleSet ( d, "gamma", inftyConst () );            
+            bindRuleSet ( d, "gamma", inftyConst () );  
+            bindRuleSet ( d, "triggered", inftyConst() );
         }
     }
 
@@ -1223,8 +1243,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      InstantiationCostScalerFeature.create
                              ( InstantiationCost.create ( instOf ( "t" ) ),
                                longConst ( 0 ) ) ) );
+            
+            final TermBuffer splitInst = new TermBuffer ();
+            bindRuleSet (d, "triggered", 
+                    add ( isTriggerVariableInstantiated(), 
+                    not ( sum ( splitInst, TriggeredInstantiations.create(false),
+                            not ( eq ( instOfTriggerVariable (), splitInst ) ) ) ) ) );       
         } else {
-            bindRuleSet ( d, "gamma", inftyConst () );            
+            bindRuleSet ( d, "gamma", inftyConst () ); 
+            bindRuleSet ( d, "triggered", inftyConst() );
         }
     }
 
@@ -2241,7 +2268,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         	    					    inftyConst());
         }
 	
-	return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
+        return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
     }
     
     private RuleSetDispatchFeature setupApprovalDispatcher(Proof p_proof) {

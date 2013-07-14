@@ -142,6 +142,8 @@ tokens {
 	FIND = "\\find";
 	ADD = "\\add";
 	ASSUMES = "\\assumes";
+	TRIGGER = "\\trigger";
+	AVOID = "\\avoid";
 
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";

@@ -15,8 +15,8 @@ package de.uka.ilkd.key.logic;
 
 
 import java.io.StringReader;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +44,6 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -1054,34 +1053,50 @@ public class TermBuilder {
      * @param services Services which contains the number-functions
      * @param numberString String representing an integer
      * @return Term in Z-Notation representing the given number
+     * @throws NumberFormatException if <code>numberString</code> is not a number
      */
     public Term zTerm(Services services, String numberString) {
-        Operator v;
-        Term t;
+
+        if (numberString == null || numberString.isEmpty()) {
+            throw new NumberFormatException(numberString + " is not a number.");
+        }
+
+        Term numberLiteralTerm;
         boolean negate = false;
         int j = 0;
 
-        Namespace funcNS = services.getNamespaces().functions();
+        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
-        if (numberString.substring(0,1).equals("-")) {
+        if (numberString.charAt(0) == '-') {
             negate = true;
-            j=1;
+            j = 1;
         }
-        v=(Function)  funcNS.lookup(new Name("#"));
-        t = func((Function)v);
-        v = (Function) funcNS.lookup(new Name(numberString.substring(j,j+1)));
-        t = func((Function)v,t);
-        for(int i=j+1;i<numberString.length();i++){
-            v = (Function)funcNS.lookup(new Name(numberString.substring(i,i+1)));
-            t = func((Function)v,t);
+        numberLiteralTerm = func(intLDT.getNumberTerminator());
+
+        int digit;
+        for(int i = j, sz = numberString.length(); i<sz; i++){
+            switch(numberString.charAt(i)) {
+                case '0' : digit = 0; break;
+                case '1' : digit = 1; break;
+                case '2' : digit = 2; break;
+                case '3' : digit = 3; break;
+                case '4' : digit = 4; break;
+                case '5' : digit = 5; break;
+                case '6' : digit = 6; break;
+                case '7' : digit = 7; break;
+                case '8' : digit = 8; break;
+                case '9' : digit = 9; break;
+                default:
+                    throw new NumberFormatException(numberString + " is not a number.");
+            }
+
+            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
         if (negate) {
-            v=(Function) funcNS.lookup(new Name("neglit"));
-            t = func((Function) v, t);
+            numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        v = (Function) funcNS.lookup(new Name("Z"));
-        t = func((Function)v,t);
-        return t;
+        numberLiteralTerm = func(intLDT.getNumberSymbol(), numberLiteralTerm);
+        return numberLiteralTerm;
     }
 
 

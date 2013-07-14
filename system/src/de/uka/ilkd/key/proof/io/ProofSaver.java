@@ -104,11 +104,11 @@ public class ProofSaver {
    }
    
    public String writeProfile(Profile profile) {
-      return new String ("\\profile \""+escapeCharacters(profile.name())+"\";\n");
+      return "\\profile \""+escapeCharacters(profile.name())+"\";\n";
    }
 
    public String writeSettings(ProofSettings ps){
-    	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
+    	return "\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n";
    }
    
    public String save() throws IOException {

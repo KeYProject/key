@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
  * knowing that c>=d or c<=d;
  *   
  */
-class HandleArith {
+public class HandleArith {
 	
 	private final static TermBuilder tb = TermBuilder.DF;	
 	private final static Term trueT = tb.tt (), falseT = tb.ff ();

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;

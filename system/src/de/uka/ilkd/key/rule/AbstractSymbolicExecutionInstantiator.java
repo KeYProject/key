@@ -91,10 +91,8 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
    protected List<ITermLabel> keepLabels(Term termToUpdate) {
       List<ITermLabel> updatedLabels = new LinkedList<ITermLabel>();
       ITermLabel termLabel = getTermLabel(termToUpdate);
-      if (termLabel != null) {
-         if (termLabel != null && termToUpdate.containsLabel(termLabel)) {
-            updatedLabels.add(termLabel);
-         }
+      if (termLabel != null && termToUpdate.containsLabel(termLabel)) {
+          updatedLabels.add(termLabel);
       }
       return updatedLabels;
    }

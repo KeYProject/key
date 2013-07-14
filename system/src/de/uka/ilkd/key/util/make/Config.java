@@ -103,7 +103,7 @@ public class Config {
 	StringBuffer path = new StringBuffer();
 	path = readUntil(fr,']');
 
-	StringBuffer result = (StringBuffer) map.get(identifier);
+	StringBuffer result = map.get(identifier.toString());
 	if (map.get(identifier.toString()) == null) {
 	    map.put(identifier.toString(), path);
 	} else {
@@ -136,8 +136,19 @@ public class Config {
 	} catch (IOException io) {
 	    System.err.println("File "+filename+" can not be written.\n"+io);
 	    System.exit(-1);	   
+	} finally {
+	        try {
+	            if (fr != null) {
+	                fr.close();
+	            }
+	            if (fw != null) {
+	                fw.close();
+	            }
+            } catch (IOException e) {
+                // ignore
+            }
+	    }
 	}
-    }
 
     private static void writeToKeYConfig(File file, String header, 
 					 String key, String prop) {

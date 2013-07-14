@@ -16,7 +16,6 @@ package de.uka.ilkd.key.speclang;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
@@ -409,6 +408,8 @@ public final class SimpleBlockContract implements BlockContract {
 
     private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
 
+        private static final long serialVersionUID = -2339350643000987576L;
+
         public void replaceSelf(final ProgramVariable oldSelf, final S newSelf)
         {
             if (newSelf != null) {
@@ -472,6 +473,8 @@ public final class SimpleBlockContract implements BlockContract {
 
     private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
 
+        private static final long serialVersionUID = 8964634070766482218L;
+
         protected ProgramVariable convert(ProgramVariable variable)
         {
             return variable;
@@ -481,6 +484,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     private static class TermReplacementMap extends ReplacementMap<Term> {
 
+        private static final long serialVersionUID = 5465241780257247301L;
         private static final TermBuilder TB = TermBuilder.DF;
 
         public void replaceHeap(final Term newHeap, final Services services)

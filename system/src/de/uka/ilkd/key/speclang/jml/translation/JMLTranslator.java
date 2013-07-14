@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import recoder.java.SourceElement.Position;
-
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -293,8 +291,8 @@ final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Pair translate(SLTranslationExceptionManager excManager,
-                                  Object... params)
+            public Pair<IObserverFunction, Term> translate(SLTranslationExceptionManager excManager,
+                                                           Object... params)
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Term.class,
                                 Services.class);
@@ -2034,7 +2032,7 @@ final class JMLTranslator {
      * @author bruns
      *
      */
-    private abstract class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
+    private abstract static class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
 
         protected void assertPost (Term heapAtPre) throws SLTranslationException{
             if (heapAtPre == null){

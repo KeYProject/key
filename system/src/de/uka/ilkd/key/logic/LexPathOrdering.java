@@ -16,7 +16,6 @@ package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.LinkedHashMap;

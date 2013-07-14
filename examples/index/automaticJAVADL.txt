@@ -14,6 +14,16 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Comprehension Tests
+provable: ./heap/comprehensions/sum0.key
+provable: ./heap/comprehensions/sum1.key
+provable: ./heap/comprehensions/sum2.key
+provable: ./heap/comprehensions/sum3.key
+provable: ./heap/comprehensions/segsum.key
+provable: ./heap/comprehensions/bsumSplit.key
+provable: ./heap/comprehensions/bprodSplit.key
+notprovable: ./heap/comprehensions/bsumSplitInvalid.key
+
 # Performance tests
 provable: ./performance-test/disjoint-test-1.key
 provable: ./performance-test/disjoint-test-2.key

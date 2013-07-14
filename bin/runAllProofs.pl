@@ -83,6 +83,7 @@ open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 close AUTOMATIC;
 
 my $counter = 0;
+my $total = `grep provable $path_to_index | grep -v "\#" | wc -l`;
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
@@ -134,7 +135,7 @@ foreach my $dotkey (@automatic_JAVADL) {
    &reloadFile($dotkey) if ($reloadTests and $provable);
     
    unless($option{'silent'}) {
-      print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";
+      print "\nStatus: $counter / $total examples tested. $failures failures and $errors errors occurred.\n";
       print "Reload-Tests: " . 
          (($reloadTests and $provable) ? (scalar(@reloadFailed) . 
 					  " failures") : "disabled") 
@@ -144,7 +145,7 @@ foreach my $dotkey (@automatic_JAVADL) {
 
 chdir $orig_path;
 
-print "\n$correct/$counter prover runs according to spec.\n".
+print "\n$counter / $total prover runs according to spec.\n".
      "$failures failures and $errors errors occurred.\n";
 
 if($reloadTests) {

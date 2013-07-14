@@ -145,14 +145,10 @@ public class JavaProfile extends AbstractProfile {
      * </p>
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
-    public static JavaProfile getDefaultInstance() {
-       if (defaultInstance == null) {
-          synchronized (JavaProfile.class) {
-             if (defaultInstance == null) {
-                defaultInstance = new JavaProfile();
-             }
-          }
-       }
+    public static synchronized JavaProfile getDefaultInstance() {
+        if (defaultInstance == null) {
+            defaultInstance = new JavaProfile();
+        }
        return defaultInstance;
     }
 }

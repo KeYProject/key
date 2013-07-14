@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -30,7 +29,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 /**
  * TODO: rewrite, this seems pretty inefficient ...
  */
-class PredictCostProver {
+public class PredictCostProver {
 
     private final static TermBuilder tb = TermBuilder.DF;
 
