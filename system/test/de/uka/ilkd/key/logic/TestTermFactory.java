@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -311,6 +312,7 @@ public class TestTermFactory extends TestCase {
 	assertTrue(exc instanceof TermCreationException);
     }
 
+    
     /**
      * Tests the caching of {@link Term}s with and without {@link JavaBlock}s.
      */
