@@ -136,8 +136,19 @@ public class Config {
 	} catch (IOException io) {
 	    System.err.println("File "+filename+" can not be written.\n"+io);
 	    System.exit(-1);	   
+	} finally {
+	        try {
+	            if (fr != null) {
+	                fr.close();
+	            }
+	            if (fw != null) {
+	                fw.close();
+	            }
+            } catch (IOException e) {
+                // ignore
+            }
+	    }
 	}
-    }
 
     private static void writeToKeYConfig(File file, String header, 
 					 String key, String prop) {

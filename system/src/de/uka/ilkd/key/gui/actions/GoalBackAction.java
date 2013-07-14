@@ -124,13 +124,16 @@ public final class GoalBackAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {            
         Goal selGoal = getMediator().getSelectedGoal();
         
-        final Node selNode = getMediator().getSelectedNode();
-        if(!selNode.isClosed()){
-       	    if (selGoal == null) {
-       		    assert(selNode != null);
+        if (selGoal == null) { // determine one goal from the subtree below
+            final Node selNode = getMediator().getSelectedNode();
+            
+            if(selNode != null && !selNode.isClosed()){
        		    selGoal = getMediator().getSelectedProof().getSubtreeGoals(selNode).reverse().head();
        	    }        
-       	    getMediator().setBack(selGoal);
+        }
+
+        if (selGoal != null) {
+            getMediator().setBack(selGoal);            
         }
     }   	
 }

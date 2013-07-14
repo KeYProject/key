@@ -783,7 +783,7 @@ public class KeYProgModelInfo{
                 classes.toArray(new recoder.abstraction.ClassType[classes.size()]);
         java.util.Arrays.sort(classesArray, new java.util.Comparator<recoder.abstraction.ClassType>() {
             public int compare(ClassType o1, ClassType o2) {
-                return -o1.getFullName().compareTo(o2.getFullName());
+                return o2.getFullName().compareTo(o1.getFullName());
             }
         });
 

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -263,8 +264,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                ImmutableList<LocationVariable> formalParamVars,
                                Map<LocationVariable,LocationVariable> atPreVars) {
        Term update = null;
-       for(LocationVariable heap : atPreVars.keySet()) {
-          final Term u = TB.elementary(services, atPreVars.get(heap), heap == getSavedHeap() ? TB.getBaseHeap(services) : TB.var(heap));
+       for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
+          final LocationVariable heap = atPreEntry.getKey();
+          final Term u = TB.elementary(services, atPreEntry.getValue(), heap == getSavedHeap() ? 
+                  TB.getBaseHeap(services) : TB.var(heap));
           if(update == null) {
              update = u;
           }else{
