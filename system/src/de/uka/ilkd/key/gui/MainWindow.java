@@ -1117,7 +1117,6 @@ public final class MainWindow extends JFrame  {
                     getMediator(), this);
             sequentViewLocal = innerNodeView;
         }
-        sequentSearchBar.setSequentView(sequentViewLocal);
 
         if (SwingUtilities.isEventDispatchThread()) {
             goalView.setSequentView(sequentViewLocal);
@@ -1129,6 +1128,8 @@ public final class MainWindow extends JFrame  {
             };
             SwingUtilities.invokeLater(sequentUpdater);
         }
+        
+        sequentSearchBar.setSequentView(sequentViewLocal);
 
     }
 

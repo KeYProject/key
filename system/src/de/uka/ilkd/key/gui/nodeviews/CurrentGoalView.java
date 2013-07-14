@@ -232,7 +232,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	        errorocc = false;
 	        try {
 		    setText(printer.toString());
-
+                    MainWindow.getInstance().sequentSearchBar.search();
 	        } catch (Error e) {
 		    System.err.println("Error occurred while printing Sequent!");
 		    errorocc = true;

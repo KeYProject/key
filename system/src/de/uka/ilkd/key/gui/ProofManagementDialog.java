@@ -287,7 +287,7 @@ public final class ProofManagementDialog extends JDialog {
         cancelButton = null;
         //============================================
     }
-    
+
     private void selectKJTandTarget() {
 
         KeYJavaType selectedKJT = null;
@@ -341,17 +341,17 @@ public final class ProofManagementDialog extends JDialog {
                 }
             }
         }
-            
+
         validateNotNull(selectedKJT);
         validateNotNull(selectedTarget);
         select(selectedKJT, selectedTarget);
     }
-    
+
     /*
      * Check for Nullpointers.
      */
-    public static void validateNotNull(Object o){
-        if(o == null){
+    public static void validateNotNull(Object o) {
+        if (o == null) {
             System.err.println("Unexpected null value.");
             Thread.dumpStack();
         }
@@ -373,10 +373,10 @@ public final class ProofManagementDialog extends JDialog {
      * Shows the dialog.
      */
     public static void showInstance(InitConfig initConfig) {
-        
+
         MainWindow mainWindow = MainWindow.getInstance();
         ProofManagementDialog instance = mainWindow.getProofManagementDialog();
-        
+
         if (instance == null || instance.initConfig != initConfig) {
 
             // initConfig has changed --> create new instance
