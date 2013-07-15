@@ -49,7 +49,6 @@ import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
@@ -61,7 +60,6 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
 import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
 import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
-import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
@@ -108,12 +106,12 @@ import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -170,8 +168,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
         
-        final Feature splitF =
-            ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, 50);
+//        final Feature splitF =
+//            ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, 50);
 
 //        final Feature strengthenConstraints =
 //            ifHeuristics ( new String[] { "concrete", "closure" },
@@ -250,7 +248,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
               NonDuplicateAppFeature.INSTANCE,
-              splitF,
+//              splitF,
 //              strengthenConstraints, 
               AgeFeature.INSTANCE,
               oneStepSimplificationF,
@@ -333,8 +331,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         bindRuleSet ( d, "concrete", 
                 add( longConst(-11000), 
-                     ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ),
-                     ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 30.0 ) ) );        
+                     ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) );        
         bindRuleSet ( d, "simplify", -4500 );        
         bindRuleSet ( d, "simplify_enlarging", -2000 );   
         bindRuleSet ( d, "simplify_select", ifZero( applyTF(FocusFormulaProjection.INSTANCE,
@@ -349,11 +346,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         
         bindRuleSet (d, "update_elim", 
-                add( longConst(-8000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ),                
-                    ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 30.0 ) ) ); 
+                add( longConst(-8000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) ); 
         bindRuleSet (d, "update_apply_on_update", 
-                add( longConst(-7000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ),
-                        ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 30.0 ) ) );
+                add( longConst(-7000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) );
         bindRuleSet (d, "update_join", -4600);
         bindRuleSet (d, "update_apply", -4500);
              
