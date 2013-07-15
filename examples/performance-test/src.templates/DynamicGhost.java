@@ -28,6 +28,15 @@ class DynamicGhost {
     //@ normal_behavior
     //@ requires x > 0;
     //@ ensures x > 0;
+    void dynamicGhost_3 () {
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+    }
+
+    //@ normal_behavior
+    //@ requires x > 0;
+    //@ ensures x > 0;
     void dynamicGhost_4 () {
         x++; c.helper();
         x++; c.helper();
@@ -38,7 +47,58 @@ class DynamicGhost {
     //@ normal_behavior
     //@ requires x > 0;
     //@ ensures x > 0;
+    void dynamicGhost_5 () {
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+    }
+
+    //@ normal_behavior
+    //@ requires x > 0;
+    //@ ensures x > 0;
+    void dynamicGhost_6 () {
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+    }
+
+    //@ normal_behavior
+    //@ requires x > 0;
+    //@ ensures x > 0;
+    void dynamicGhost_7 () {
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+    }
+
+    //@ normal_behavior
+    //@ requires x > 0;
+    //@ ensures x > 0;
     void dynamicGhost_8 () {
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+        x++; c.helper();
+    }
+
+    //@ normal_behavior
+    //@ requires x > 0;
+    //@ ensures x > 0;
+    void dynamicGhost_9 () {
+        x++; c.helper();
         x++; c.helper();
         x++; c.helper();
         x++; c.helper();
