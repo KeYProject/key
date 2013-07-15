@@ -110,13 +110,13 @@ class TacletMenu extends JMenu {
 	       ImmutableList<TacletApp> findList, ImmutableList<TacletApp> rewriteList,
 	       ImmutableList<TacletApp> noFindList, ImmutableList<BuiltInRule> builtInList,
 	       PosInSequent pos) {
-        super();        
+        super();
 	this.sequentView = sequentView;
 	this.mediator = sequentView.getMediator();
  	this.pos = pos;
  	findList = removeObsolete(findList);
-    rewriteList = removeObsolete(rewriteList);
-    noFindList = removeObsolete(noFindList);
+	rewriteList = removeObsolete(rewriteList);
+	noFindList = removeObsolete(noFindList);
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
@@ -162,7 +162,7 @@ class TacletMenu extends JMenu {
     }
 
 
-    /** creates the menu by adding all submenus and items */
+    /** creates the menu by adding all sub-menus and items */
     private void createTacletMenu(ImmutableList<TacletApp> find,
 				  ImmutableList<TacletApp> noFind,
 				  ImmutableList<BuiltInRule> builtInList,

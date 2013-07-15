@@ -50,9 +50,9 @@ public final class PosInOccurrence {
      */
     private Term subTermCache = null;
 
-    public PosInOccurrence(SequentFormula cfma, 
-            PosInTerm posInTerm,
-            boolean inAntec) {	
+    public PosInOccurrence(SequentFormula cfma,
+                           PosInTerm posInTerm,
+                           boolean inAntec) {
         assert posInTerm != null;
 	this.inAntec=inAntec;
 	this.cfma=cfma;	

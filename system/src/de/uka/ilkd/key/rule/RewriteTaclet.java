@@ -163,7 +163,7 @@ public final class RewriteTaclet extends FindTaclet {
                                        Services        p_services) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
-	
+
 	// this is assumed to hold
 	assert p_pos.posInTerm () != null;
 
@@ -196,7 +196,7 @@ public final class RewriteTaclet extends FindTaclet {
 
 	if (getApplicationRestriction() == NONE)
             return p_mc;
-	
+
 	if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
 	        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
 	    return null;
@@ -207,7 +207,7 @@ public final class RewriteTaclet extends FindTaclet {
     /**
      * Compute polarity
      */
-    private int polarity(Operator op, PIOPathIterator it, int polarity) {
+    private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
                                                                 // toggle polarity if find term is
                                                                 // subterm of
         if ((op == Junctor.NOT) ||                              //   not
