@@ -240,7 +240,7 @@ public final class ProblemInitializer {
 	    throw new ProofInputException("You do not want to have "+
 	    "your home directory as the program model.");
 	} else { 
-	    String modelTag = "KeY_" + new Long((new java.util.Date()).getTime());
+	    String modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
 	    result = new JavaModel(javaPath, 
 		    		   modelTag,
 		    		   classPath,

@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -631,8 +632,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                               ImmutableList<LocationVariable> formalParamVars,
                               Map<LocationVariable, LocationVariable> atPreVars) {
       Term update = null;
-      for(LocationVariable heap : atPreVars.keySet()) {
-         final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
+      for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
+         final Term u = TB.elementary(services, atPreEntry.getValue(), TB.getBaseHeap(services));
          if(update == null) {
             update = u;
          }else{

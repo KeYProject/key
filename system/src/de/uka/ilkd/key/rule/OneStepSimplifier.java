@@ -15,7 +15,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
-    public final class Protocol extends ArrayList<RuleApp> {
+    public final static class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
 

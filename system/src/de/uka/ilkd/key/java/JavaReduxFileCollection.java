@@ -106,7 +106,7 @@ public class JavaReduxFileCollection implements FileCollection {
 
             resources.add(jl);
         }
-
+        r.close();
     }
 
     /**

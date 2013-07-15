@@ -89,7 +89,7 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     //internal classes
     //-------------------------------------------------------------------------
-    private class ContractClauses {
+    private static class ContractClauses {
 
         public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
         public Term measuredBy;

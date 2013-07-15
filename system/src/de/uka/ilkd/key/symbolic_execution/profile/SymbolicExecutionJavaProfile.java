@@ -82,14 +82,10 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * </p>
     * @return The default instance for usage in the {@link Thread} of the user interface.
     */
-   public static SymbolicExecutionJavaProfile getDefaultInstance() {
-      if (defaultInstance == null) {
-         synchronized (JavaProfile.class) {
-            if (defaultInstance == null) {
-               defaultInstance = new SymbolicExecutionJavaProfile();
-            }
-         }
-      }
+   public static synchronized SymbolicExecutionJavaProfile getDefaultInstance() {
+       if (defaultInstance == null) {
+           defaultInstance = new SymbolicExecutionJavaProfile();
+       }
       return defaultInstance;
    }
 }
