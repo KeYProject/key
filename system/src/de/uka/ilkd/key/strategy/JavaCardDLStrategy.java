@@ -249,9 +249,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         return SumFeature.createSum ( new Feature [] {
               AutomatedRuleFeature.INSTANCE,
-              splitF,
-              dispatcher,
               NonDuplicateAppFeature.INSTANCE,
+              splitF,
 //              strengthenConstraints, 
               AgeFeature.INSTANCE,
               oneStepSimplificationF,
@@ -261,7 +260,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               depSpecF,
               loopInvF,
               blockFeature,
-              ifMatchedF});
+              ifMatchedF,
+              dispatcher
+              });
     }
     
     private Feature loopInvFeature(Feature cost) {
@@ -331,14 +332,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_boolean", -200 );
         
         bindRuleSet ( d, "concrete", 
-                add( longConst(-10000), 
+                add( longConst(-11000), 
                      ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ),
-                     ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 10.0 ) ) );        
-        bindRuleSet ( d, "simplify", -4000 );        
-        bindRuleSet ( d, "simplify_enlarging", ifZero( applyTF(FocusFormulaProjection.INSTANCE,
-                ff.notContainsExecutable), longConst(-1800), longConst(-3900) ) );  
+                     ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 30.0 ) ) );        
+        bindRuleSet ( d, "simplify", -4500 );        
+        bindRuleSet ( d, "simplify_enlarging", -2000 );   
         bindRuleSet ( d, "simplify_select", ifZero( applyTF(FocusFormulaProjection.INSTANCE,
-                ff.notContainsExecutable), longConst(-1700), longConst(-3800) ) );
+                ff.update), longConst(-4200), longConst(-2000) ) );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
@@ -350,12 +350,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         bindRuleSet (d, "update_elim", 
                 add( longConst(-8000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ),                
-                    ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 10.0 ) ) ); 
+                    ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 30.0 ) ) ); 
         bindRuleSet (d, "update_apply_on_update", 
                 add( longConst(-7000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ),
-                        ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 10.0 ) ) );
-        bindRuleSet (d, "update_join", -6000);
-        bindRuleSet (d, "update_apply", -3950);
+                        ScaleFeature.createScaled ( IfThenElseMalusFeature.INSTANCE, 30.0 ) ) );
+        bindRuleSet (d, "update_join", -4600);
+        bindRuleSet (d, "update_apply", -4500);
              
         setUpStringNormalisation ( d, p_proof.getServices() );
         
@@ -450,7 +450,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                              longConst ( 200 ), longConst ( -100 ) ) ) );
                 
         
-        bindRuleSet (d, "simplify_prog_subset",	longConst(-3700));
+        bindRuleSet (d, "simplify_prog_subset",	longConst(-4000));
         bindRuleSet (d, "modal_tautology",	longConst(-10000));
         
         // features influenced by the strategy options
