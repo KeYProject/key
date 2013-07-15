@@ -36,7 +36,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -617,11 +616,11 @@ public final class Goal  {
             // bugfix #1336, see bugtracker
             if (t instanceof RewriteTaclet) {
                 RewriteTaclet rwt = (RewriteTaclet) t;
-                ImmutableList<UpdateLabelPair> oldUpdCtx = 
+                ImmutableList<Term> oldUpdCtx = 
                         tacletApp.matchConditions().getInstantiations().getUpdateContext();
                 MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
                         MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
-                ImmutableList<UpdateLabelPair> newUpdCtx = 
+                ImmutableList<Term> newUpdCtx = 
                         newConditions.getInstantiations().getUpdateContext();
 
                 if(!oldUpdCtx.equals(newUpdCtx)) {
