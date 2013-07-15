@@ -10,15 +10,39 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	res_subMagic_0 {x = null}, 
-	42 {!x = null &amp; SimpleObjectQuery.INSTANCE = x}, 
-	-4711 {!x = null &amp; !SimpleObjectQuery.INSTANCE = x}
+	res_subMagic_0 {result_0 = res_subMagic_0 &amp; x = null}, 
+	42 {    result_0 = res_subMagic_0
+  &amp; !x = null
+  &amp; SimpleObjectQuery.INSTANCE = x
+| result_0 = 42
+&amp; !result_0 = res_subMagic_0}, 
+	-4711 {    result_0 = res_subMagic_0
+  &amp; !x = null
+  &amp; !SimpleObjectQuery.INSTANCE = x
+| !result_0 = 42
+&amp; !result_0 = res_subMagic_0}
 as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="res_subMagic_0 {x = null}" returnValueString="res_subMagic_0" hasCondition="true" conditionString="x = null">
+                     <methodReturnValue name="res_subMagic_0 {result_0 = res_subMagic_0 &amp; x = null}" returnValueString="res_subMagic_0" hasCondition="true" conditionString="result_0 = res_subMagic_0 &amp; x = null">
                      </methodReturnValue>
-                     <methodReturnValue name="42 {!x = null &amp; SimpleObjectQuery.INSTANCE = x}" returnValueString="42" hasCondition="true" conditionString="!x = null &amp; SimpleObjectQuery.INSTANCE = x">
+                     <methodReturnValue name="42 {    result_0 = res_subMagic_0
+  &amp; !x = null
+  &amp; SimpleObjectQuery.INSTANCE = x
+| result_0 = 42
+&amp; !result_0 = res_subMagic_0}" returnValueString="42" hasCondition="true" conditionString="    result_0 = res_subMagic_0
+  &amp; !x = null
+  &amp; SimpleObjectQuery.INSTANCE = x
+| result_0 = 42
+&amp; !result_0 = res_subMagic_0">
                      </methodReturnValue>
-                     <methodReturnValue name="-4711 {!x = null &amp; !SimpleObjectQuery.INSTANCE = x}" returnValueString="-4711" hasCondition="true" conditionString="!x = null &amp; !SimpleObjectQuery.INSTANCE = x">
+                     <methodReturnValue name="-4711 {    result_0 = res_subMagic_0
+  &amp; !x = null
+  &amp; !SimpleObjectQuery.INSTANCE = x
+| !result_0 = 42
+&amp; !result_0 = res_subMagic_0}" returnValueString="-4711" hasCondition="true" conditionString="    result_0 = res_subMagic_0
+  &amp; !x = null
+  &amp; !SimpleObjectQuery.INSTANCE = x
+| !result_0 = 42
+&amp; !result_0 = res_subMagic_0">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
