@@ -24,6 +24,16 @@ class AccessChain2 {
   //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
   //@ requires a.a.x > 0;
   //@ ensures a.a.x > 0;
+  void foo_3 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
   void foo_4 () {
     a.a.x++; bar();
     a.a.x++; bar();
@@ -35,7 +45,106 @@ class AccessChain2 {
   //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
   //@ requires a.a.x > 0;
   //@ ensures a.a.x > 0;
+  void foo_5 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
+  void foo_6 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
+  void foo_7 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
   void foo_8 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
+  void foo_9 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
+  void foo_10 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+  }
+
+
+  //@ requires a != null && a.a != null && a.a.a != null && a.a.a.a != null;
+  //@ requires a.a.x > 0;
+  //@ ensures a.a.x > 0;
+  void foo_20 () {
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
+    a.a.x++; bar();
     a.a.x++; bar();
     a.a.x++; bar();
     a.a.x++; bar();
