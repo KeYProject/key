@@ -17,6 +17,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -225,15 +226,16 @@ public final class QuerySideProofRule implements BuiltInRule {
                throw new IllegalStateException("Side roof contains goal with automatic applicable rules.");
             }
             Sequent sequent = resultGoal.sequent();
-
-            Term condition = TermBuilder.DF.tt();
+            Set<Term> resultConditions = new LinkedHashSet<Term>();
             Term result = null;
             for (SequentFormula sf : sequent.antecedent()) {
                if (sf.formula().op() == newPredicate) {
                   throw new IllegalStateException("Result predicate found in antecedent.");
                }
                if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
-                  condition = TermBuilder.DF.and(condition, sf.formula());
+                  if (resultConditions.add(sf.formula())) {
+                     addNewNamesToNamespace(services, sf.formula());
+                  }
                }
             }
             for (SequentFormula sf : sequent.succedent()) {
@@ -245,7 +247,9 @@ public final class QuerySideProofRule implements BuiltInRule {
                }
                else {
                   if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
-                     condition = TermBuilder.DF.and(condition, TermBuilder.DF.not(sf.formula()));
+                     if (resultConditions.add(TermBuilder.DF.not(sf.formula()))) {
+                        addNewNamesToNamespace(services, sf.formula());
+                     }
                   }
                }
             }
@@ -254,7 +258,7 @@ public final class QuerySideProofRule implements BuiltInRule {
                conditions = new LinkedHashSet<Term>();
                conditionsAndResultsMap.put(result, conditions);
             }
-            conditions.add(condition);
+            conditions.add(TermBuilder.DF.and(resultConditions));
          }
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
@@ -262,27 +266,31 @@ public final class QuerySideProofRule implements BuiltInRule {
          resultGoal.removeFormula(pio);
          if (pio.isTopLevel() || queryConditionTerm != null) {
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-               Term conditionTerm = TermBuilder.DF.or(conditionsAndResult.getValue());
-               Term newEqualityTerm = varFirst ? 
-                                      TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : 
-                                      TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm);
-               Term resultTerm = pio.isInAntec() ?
-                                 TermBuilder.DF.imp(conditionTerm, newEqualityTerm) :
-                                 TermBuilder.DF.and(conditionTerm, newEqualityTerm);
-               if (queryConditionTerm != null) {
-                  resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
+               for (Term conditionTerm : conditionsAndResult.getValue()) { // Combining the different conditions for the same value with an OR does not work well because the strategy then tries to establish CNF by splitting or ausmultiplizieren
+                  Term newEqualityTerm = varFirst ? 
+                                         TermBuilder.DF.equals(varTerm, conditionsAndResult.getKey()) : 
+                                         TermBuilder.DF.equals(conditionsAndResult.getKey(), varTerm);
+                  Term resultTerm = pio.isInAntec() ?
+                                    TermBuilder.DF.imp(conditionTerm, newEqualityTerm) :
+                                    TermBuilder.DF.and(conditionTerm, newEqualityTerm);
+                  if (queryConditionTerm != null) {
+                     resultTerm = TermBuilder.DF.imp(queryConditionTerm, resultTerm);
+                  }
+                  resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                }
-               resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
             }
          }
          else {
-            Function resultFunction = new Function(new Name(TermBuilder.DF.newName(services, "QueryResult")), varTerm.sort());
+            String functionName = TermBuilder.DF.newName(services, "QueryResult");
+            Function resultFunction = new Function(new Name(functionName), varTerm.sort());
+            services.getNamespaces().functions().addSafely(resultFunction);
             Term resultFunctionTerm = TermBuilder.DF.func(resultFunction);
             resultGoal.addFormula(replace(pio, varFirst ? TermBuilder.DF.equals(resultFunctionTerm, varTerm) : TermBuilder.DF.equals(resultFunctionTerm, varTerm)), pio.isInAntec(), false);
             for (Entry<Term, Set<Term>> conditionsAndResult : conditionsAndResultsMap.entrySet()) {
-               Term resultTerm = TermBuilder.DF.imp(TermBuilder.DF.or(conditionsAndResult.getValue()), 
-                                                    varFirst ? TermBuilder.DF.equals(resultFunctionTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), resultFunctionTerm));
-               resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+               for (Term conditionTerm : conditionsAndResult.getValue()) { // Combining the different conditions for the same value with an OR does not work well because the strategy then tries to establish CNF by splitting or ausmultiplizieren
+                  Term resultTerm = TermBuilder.DF.imp(conditionTerm, varFirst ? TermBuilder.DF.equals(resultFunctionTerm, conditionsAndResult.getKey()) : TermBuilder.DF.equals(conditionsAndResult.getKey(), resultFunctionTerm));
+                  resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
+               }
             }
          }
          return goals;
@@ -293,14 +301,37 @@ public final class QuerySideProofRule implements BuiltInRule {
    }
    
    /**
+    * Makes sure that all used {@link Name}s in the given {@link Term}
+    * are registered in the {@link Namespace}s of the given {@link Services}.
+    * @param services The {@link Services} to use.
+    * @param term The {@link Term} to check its {@link Name}s.
+    */
+   protected void addNewNamesToNamespace(Services services, Term term) {
+      final Namespace functions = services.getNamespaces().functions();
+      final Namespace progVars = services.getNamespaces().programVariables();
+      // LogicVariables are always local bound
+      term.execPreOrder(new DefaultVisitor() {
+         @Override
+         public void visit(Term visited) {
+            if (visited.op() instanceof Function) {
+               functions.add((Function)visited.op());
+            }
+            else if (visited.op() instanceof IProgramVariable) {
+               progVars.add((IProgramVariable)visited.op());
+            }
+         }
+      });
+   }
+
+   /**
     * Extracts all {@link Operator}s from the given {@link Sequent} which
     * represents relevant things.
     * @param services The {@link Services} to use.
     * @param sequentToProve The {@link Sequent} to extract relevant things from.
     * @return The found relevant things.
     */
-   private Set<Operator> extractRelevantThings(final Services services, 
-                                               Sequent sequentToProve) {
+   protected Set<Operator> extractRelevantThings(final Services services, 
+                                                 Sequent sequentToProve) {
       final Set<Operator> result = new HashSet<Operator>();
       for (SequentFormula sf : sequentToProve) {
          sf.formula().execPreOrder(new DefaultVisitor() {
