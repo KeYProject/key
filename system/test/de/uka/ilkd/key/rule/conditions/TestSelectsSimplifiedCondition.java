@@ -36,8 +36,7 @@ public class TestSelectsSimplifiedCondition extends TestCase {
     public void testTermsWithLeagalSelects() throws Exception {
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         Term baseHeap = TB.var(services.getTypeConverter().getHeapLDT().getHeap());
-        Term nonAuxiliaryHeap = TB.func(new Function(new Name("heapFunc"), heapSort));
-        Term auxiliaryHeap = TB.label(nonAuxiliaryHeap, AuxiliaryTermLabel.INSTANCE);
+        Term auxiliaryHeap = TB.func(new Function(new Name("heapFunc"), heapSort));
         Term o = TB.NULL(services);
         Term f = TB.func(services.getTypeConverter().getHeapLDT().getCreated());
         Term selectOfBaseHeap = TB.select(services, heapSort, baseHeap, o, f);
@@ -55,23 +54,17 @@ public class TestSelectsSimplifiedCondition extends TestCase {
     public void testTermsWithIlleagalSelects() throws Exception {
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         Term baseHeap = TB.var(services.getTypeConverter().getHeapLDT().getHeap());
-        Term nonAuxiliaryHeap = TB.func(new Function(new Name("heapFunc"), heapSort));
-        Term auxiliaryHeap = TB.label(nonAuxiliaryHeap, AuxiliaryTermLabel.INSTANCE);
+        Term auxiliaryHeap = TB.func(new Function(new Name("heapFunc"), heapSort));
         Term o = TB.NULL(services);
         Term f = TB.func(services.getTypeConverter().getHeapLDT().getCreated());
         Term selectOfBaseHeap = TB.select(services, heapSort, TB.store(services, baseHeap, o, f, o), o, f);
         Term selectOfAuxiliaryHeap = TB.select(services, heapSort, TB.store(services, auxiliaryHeap, o, f, o), o, f);
-        Term selectOfNonAuxiliaryHeap = TB.select(services, heapSort, nonAuxiliaryHeap, o, f);
 
         Term term = selectOfBaseHeap;
         assertFalse(testCondition(term, false));
         assertTrue(testCondition(term, true));
 
         term = selectOfAuxiliaryHeap;
-        assertFalse(testCondition(term, false));
-        assertTrue(testCondition(term, true));
-
-        term = selectOfNonAuxiliaryHeap;
         assertFalse(testCondition(term, false));
         assertTrue(testCondition(term, true));
     }
