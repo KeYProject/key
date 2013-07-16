@@ -17,7 +17,7 @@
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null" pathConditionChanged="false">
                         <branchCondition name="!(  x.next[0].next.length &gt;= 0
-  &amp; (x.next[0].next = null | x.next[0].next.length &lt;= 0))" pathCondition="   x.next[0].next.length &gt;= 0 &amp; x.next.length &gt;= 0
+  &amp; (x.next[0].next = null | x.next[0].next.length &lt;= 0))" pathCondition="   x.next.length &gt;= 0 &amp; x.next[0].next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null
@@ -56,14 +56,14 @@
                                  </methodReturn>
                               </statement>
                            </branchCondition>
-                           <branchCondition name="x.next[0].next[0] = null" pathCondition="   x.next.length &gt;= 0 &amp; x.next[0].next.length &gt;= 0
+                           <branchCondition name="x.next[0].next[0] = null" pathCondition="   x.next[0].next.length &gt;= 0 &amp; x.next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null
    &amp; !(  x.next[0].next = null
        | x.next[0].next.length &lt;= 0)
    &amp; x.next[0].next[0] = null" pathConditionChanged="true" branchCondition="x.next[0].next[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   x.next.length &gt;= 0 &amp; x.next[0].next.length &gt;= 0
+                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   x.next[0].next.length &gt;= 0 &amp; x.next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)
    &amp; !x.next[0] = null
