@@ -43,7 +43,8 @@ public class BatchMode {
             Proof proof) {
 
         if ( Main.getStatisticsFile() != null )
-            printStatistics ( Main.getStatisticsFile(), result, proof.statistics() );
+            printStatistics ( Main.getStatisticsFile(), result,
+                              proof.statistics(), proof.closed() );
 
         if ("Error".equals ( result ) ) {
             // Error in batchMode. Terminate with status -1.
@@ -95,12 +96,14 @@ public class BatchMode {
      * used when in batch mode to write out some statistic data
      * @param file the String with the filename where to write the statistic data
      * @param result the Object encapsulating information about the result, e.g.
-     * String "Error" if an error has occurred. 
-     * @param time the long giving the needed time in ms 
-     * @param appliedRules the int giving the number of applied rules
+     *        String "Error" if an error has occurred.
+     * @param statistics the proof statistics object containing several proof
+     *        statistics like the number of applied rules and so on.
+     * @param proofClosed information whether the proof has been closed.
      */
     private void printStatistics(String file, Object result, 
-                                 Proof.Statistics statistics) {
+                                 Proof.Statistics statistics,
+                                 boolean proofClosed) {
         try {
             final boolean fileExists = (new File(file)).exists();
             final FileWriter statisticsFW = new FileWriter ( file, true );
@@ -109,7 +112,7 @@ public class BatchMode {
             if (!fileExists) {
                 statPrinter.println("Name | Total rule apps | Nodes | " +
                         "Branches | Overall time | Automode time | " +
-                        "Time per step");
+                        "Closed | Time per step");
             }
 
             String name = fileName;
@@ -119,13 +122,14 @@ public class BatchMode {
             
             statPrinter.print ( name + " | " );
             if ("Error".equals ( result ) )
-                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1" );
+                statPrinter.println ( "-1 | -1 | -1 | -1 | -1 | -1 | -1" );
             else
                 statPrinter.println (statistics.totalRuleApps + " | " +
                                      statistics.nodes + " | " +
                                      statistics.branches + " | " +
                                      statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
+                                     (proofClosed ? 1 : 0) + " | " +
                                      ((double)statistics.autoModeTime / (double)statistics.totalRuleApps));
             statPrinter.close();
         } catch ( IOException e ) {
