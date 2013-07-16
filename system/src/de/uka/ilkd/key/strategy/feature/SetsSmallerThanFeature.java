@@ -77,7 +77,9 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
         protected void collect(Term te) {
             final Operator op = te.op();
-            if (op == locSetLDT.getUnion() || op == locSetLDT.getIntersect()) {
+            if (op == locSetLDT.getUnion() ||
+                    op == locSetLDT.getIntersect() ||
+                      op == locSetLDT.getDisjoint()) {
                 collect(te.sub(0));
                 collect(te.sub(1));
             } else {
