@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.LRUCache;
@@ -70,7 +71,8 @@ public class TermTacletAppIndexCacheSet {
      * (well, almost), and that different proofs and different areas within one
      * proof compete for cache space
      */
-    private final static Map cacheBackend = new LRUCache ( MAX_INDEX_ENTRIES );//chrisg made public
+    private final static Map<CacheKey, TermTacletAppIndex> cacheBackend =
+            new LRUCache<CacheKey, TermTacletAppIndex> ( MAX_INDEX_ENTRIES );//chrisg made public
     
     /**
      * dummy cache that is not caching at all, and from which no other cache is
