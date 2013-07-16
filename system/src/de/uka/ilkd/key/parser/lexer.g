@@ -94,6 +94,7 @@ tokens {
 	NOT = "\\not";
         NOTFREEIN = "\\notFreeIn";
 	SAME = "\\same";
+        SIMP_SELECTS_VAR = "\\selectsSimplified";
 	STATIC = "\\static";
         STATICMETHODREFERENCE = "\\staticMethodReference";	
 	STRICT    = "\\strict";	

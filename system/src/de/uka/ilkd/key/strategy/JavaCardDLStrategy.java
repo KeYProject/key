@@ -336,6 +336,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_enlarging", -2000 );   
         bindRuleSet ( d, "simplify_select", ifZero( applyTF(FocusFormulaProjection.INSTANCE,
                 ff.update), longConst(-4200), longConst(-2000) ) );
+        bindRuleSet ( d, "simplify_simple_select", ifZero( applyTF(FocusFormulaProjection.INSTANCE,
+                ff.update), longConst(-4300), longConst(-2100) ) );
+        bindRuleSet ( d, "hide_auxiliary_eq", -5000 );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 

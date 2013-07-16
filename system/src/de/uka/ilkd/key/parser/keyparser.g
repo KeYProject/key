@@ -3604,6 +3604,7 @@ varexp[TacletBuilder b]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
         | varcond_induction_variable[b, negated]
+        | varcond_simplified_selects[b, negated]
       )
   )
 ;
@@ -4079,6 +4080,16 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
+varcond_simplified_selects [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   SIMP_SELECTS_VAR LPAREN x=varId RPAREN {
+     b.addVariableCondition(new SelectsSimplifiedCondition (
+       (SchemaVariable)x, negated ));
+   }
+;
 
 goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
