@@ -1580,7 +1580,7 @@ final class JMLTranslator {
     }
 
 
-    public <T> T translate(String jmlKeyWordName,
+    <T> T translate(String jmlKeyWordName,
                            Class<T> resultClass,
                            Object... params)
             throws SLTranslationException {
@@ -1608,17 +1608,17 @@ final class JMLTranslator {
         }
     }
 
-    public <T> T translate(JMLKeyWord keyword, Class<T> resultClass, Object... params)
+    <T> T translate(JMLKeyWord keyword, Class<T> resultClass, Object... params)
     throws SLTranslationException {
         return translate(keyword.toString(), resultClass, params);
     }
 
-    public SLExpression translate(String jmlKeyWordName, Object... params)
+    SLExpression translate(String jmlKeyWordName, Object... params)
     throws SLTranslationException {
         return translate(jmlKeyWordName, SLExpression.class, params);
     }
 
-    public SLExpression translate(JMLKeyWord keyword, Object...params)
+    SLExpression translate(JMLKeyWord keyword, Object...params)
     throws SLTranslationException {
         return translate(keyword.toString(), SLExpression.class, params);
     }
@@ -1626,28 +1626,28 @@ final class JMLTranslator {
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type int.
      */
-    public SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_INT, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type long.
      */
-    public SLExpression createSkolemExprLong(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprLong(Token jmlKeyWord, Services services) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_LONG, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type \bigint.
      */
-    public SLExpression createSkolemExprBigint(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprBigint(Token jmlKeyWord, Services services) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_BIGINT, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type Object.
      */
-    public SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
         assert services != null;
         final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
         assert objType != null;
@@ -1657,7 +1657,7 @@ final class JMLTranslator {
     /**
      * Create a nullary predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
      */
-    public SLExpression createSkolemExprBool(Token jmlKeyWord) {
+    SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         final int x = (new Random()).nextInt(1000); // function is unique anyway

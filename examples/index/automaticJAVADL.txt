@@ -14,6 +14,7 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+
 # Comprehension Tests
 provable: ./heap/comprehensions/sum0.key
 provable: ./heap/comprehensions/sum1.key
@@ -313,9 +314,7 @@ provable: ./standard_key/java_dl/simpleAssignment.key
 provable: ./standard_key/java_dl/simpleAssignment2.key
 provable: ./standard_key/java_dl/splittingWithQueries.key
 provable: ./standard_key/java_dl/strassen/strassen.key
-# commented out as proof gets too long
-# requires further investigations
-#provable: ./standard_key/java_dl/symmArray.key
+provable: ./standard_key/java_dl/symmArray.key
 provable: ./standard_key/java_dl/testcontext.key
 provable: ./standard_key/polySimp/simplify0.key
 provable: ./standard_key/polySimp/simplify1.key
