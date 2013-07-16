@@ -828,10 +828,15 @@ public class KeyConnection extends MemoryConnection {
     * @return {@code true} include, {@code false} do not include
     */
    public static boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
-      ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
-      return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
-             ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
-             CollectionUtil.contains(targets, classAxiom.getTarget())); // Make sure that everything that has an accessible clause is available.
+      if (classAxiom.getKJT() != type) {
+         return false; // Axiom is declared in different class, ignore it.
+      }
+      else {
+         ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+         return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
+                ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
+                CollectionUtil.contains(targets, classAxiom.getTarget())); // Make sure that everything that has an accessible clause is available.
+      }
    }
 
    /**

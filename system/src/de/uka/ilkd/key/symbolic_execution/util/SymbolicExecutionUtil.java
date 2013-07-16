@@ -30,7 +30,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -87,6 +86,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -2208,13 +2208,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is Null-Sort, {@code false} is something else.
     */
    public static boolean isNullSort(Sort sort, Services services) {
-      if (sort != null && services != null) {
-         JavaInfo javaInfo = services.getJavaInfo();
-         return javaInfo.getKeYJavaType(sort) == javaInfo.getNullType();
-      }
-      else {
-         return false;
-      }
+      return sort instanceof NullSort;
    }
 
    /**
@@ -2556,8 +2550,13 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is select, {@code false} is something else.
     */
    public static boolean isSelect(Services services, Term term) {
-      Function select = services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
-      return select == term.op();
+      if (!isNullSort(term.sort(), services)) {
+         Function select = services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
+         return select == term.op();
+      }
+      else {
+         return false;
+      }
    }
 
    /**
