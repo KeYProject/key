@@ -98,8 +98,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     }
 
     private Pair<JavaBlock, JavaBlock> buildJavaBlock(BasicSnippetData d) {
-        /*final KeYJavaType booleanKJT =
-                d.tb.getServices().getTypeConverter().getBooleanType();*/
         ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);        
 
@@ -107,12 +105,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
-        /*final VariableSpecification guardVarSpec
-        = new VariableSpecification((LocationVariable) inv.getGuard().op(), 
-                                    inv.getLoop().getGuardExpression(),
-                                    booleanKJT);*/
         final Assignment guardVarDecl =
-                //new LocalVariableDeclaration(new TypeRef(booleanKJT), guardVarSpec);
                 new CopyAssignment((LocationVariable)inv.getGuard().op(),
                                    inv.getLoop().getGuardExpression());
         final Statement guardVarMethodFrame =

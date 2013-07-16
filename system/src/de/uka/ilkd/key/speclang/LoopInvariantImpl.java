@@ -224,7 +224,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public Term getGuard() {        
+    public Term getGuard() {
+        assert guard != null;
         return guard;
     }
 
