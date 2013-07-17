@@ -95,6 +95,15 @@ public class StatementBlock extends JavaStatement
         }
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + super.hashCode();
+        hash =  67 * hash +
+                (this.getStartPosition().getLine() << 8);
+        return hash;
+    }
+
     private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
         return computePrefixElements(b,0,this);
     }
