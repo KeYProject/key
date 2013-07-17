@@ -90,10 +90,6 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public Term getInternalSelfTerm();
 
-    public ImmutableList<Term> getLocalIns();
-
-    public ImmutableList<Term> getLocalOuts();
-
     public Term getModifies();
 
     /**
@@ -118,6 +114,38 @@ public interface LoopInvariant extends SpecificationElement {
     public Map<LocationVariable,
                ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
 
+    public LoopInvariant create(LoopStatement loop,
+                                IProgramMethod pm,
+                                ExecutionContext innermostExecCont,
+                                Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> modifies,
+                                Map<LocationVariable,
+                                    ImmutableList<InfFlowSpec>> infFlowSpecs,
+                                Term variant,
+                                Term selfTerm,
+                                ImmutableList<Term> localIns,
+                                ImmutableList<Term> localOuts,
+                                Map<LocationVariable,Term> atPres);
+
+    public LoopInvariant create(LoopStatement loop,
+                                Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> modifies,
+                                Map<LocationVariable,
+                                    ImmutableList<InfFlowSpec>> infFlowSpecs,
+                                Term variant,
+                                Term selfTerm,
+                                ImmutableList<Term> localIns,
+                                ImmutableList<Term> localOuts,
+                                Map<LocationVariable,Term> atPres);
+
+    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants, Term variant);
+
+    public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+                                     Map<LocationVariable,Term> modifies,
+                                     Map<LocationVariable,
+                                         ImmutableList<InfFlowSpec>> infFlowSpecs,
+                                     Term variant);
+
     /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
@@ -128,7 +156,7 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant setExecutionContext(ExecutionContext execCont);
 
-    public void setGuard(Term guardTerm, Services services);
+    public LoopInvariant setGuard(Term guardTerm, Services services);
 
     /**
      * Returns a new loop invariant where the invariant formula has been

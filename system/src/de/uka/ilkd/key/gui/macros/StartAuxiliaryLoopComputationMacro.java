@@ -55,7 +55,9 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         }
         LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
+        LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        loopInv = loopInv != null ?
+                loopInv : loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {

@@ -35,7 +35,6 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -407,18 +406,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(newLoop, services));
         ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(newLoop, services));
 
-        LoopInvariant newInv
-            = new LoopInvariantImpl(newLoop,
-                                    inv.getTarget(),
-                                    inv.getExecutionContext(),
-                                    newInvariants,
-                                    newMods,
-                                    newInfFlowSpecs,
-                                    newVariant,
-                                    newSelfTerm,
-                                    newLocalIns,
-                                    newLocalOuts,
-                                    atPres);
+        LoopInvariant newInv = inv.create(newLoop, newInvariants, newMods, newInfFlowSpecs,
+                                          newVariant, newSelfTerm, newLocalIns,
+                                          newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
     }
 }

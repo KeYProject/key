@@ -952,8 +952,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Returns all proofs registered for the passed atomic contract, or for
      * combined contracts including the passed atomic contract
@@ -975,7 +975,7 @@ public final class SpecificationRepository {
         }
         return result;
     }    
-    
+
 
     /**
      * Returns all proofs registered for the passed target and its overriding
@@ -1004,8 +1004,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Returns all proofs registered with this specification repository.
      */
@@ -1017,8 +1017,8 @@ public final class SpecificationRepository {
 	}
 	return result;
     }
-    
-    
+
+
     /**
      * Returns the PO that the passed proof is about, or null.
      */
@@ -1065,7 +1065,7 @@ public final class SpecificationRepository {
        }
        return null;
     }
-    
+
     /**
      * Returns the target that the passed proof is about, or null.
      */
@@ -1073,7 +1073,7 @@ public final class SpecificationRepository {
 	final ContractPO po = getPOForProof(proof);
 	return po == null ? null : po.getContract().getTarget();
     }
-    
+
 
     /**
      * Registers the passed proof. 
@@ -1081,8 +1081,8 @@ public final class SpecificationRepository {
     public void registerProof(ProofOblInput po, Proof proof) {
         proofs.put(po, getProofs(po).add(proof));
     }    
-    
-    
+
+
     /**
      * Unregisters the passed proof.
      */
@@ -1101,8 +1101,8 @@ public final class SpecificationRepository {
             }
         }
     }
-        
-    
+
+
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
@@ -1134,12 +1134,12 @@ public final class SpecificationRepository {
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void addLoopInvariant(LoopInvariant inv) {
-        LoopStatement loop = inv.getLoop();
+    public void addLoopInvariant(final LoopInvariant inv) {
+        final LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
-    
-    
+
+
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         if (blockContracts.get(block) == null) {
             return DefaultImmutableSet.<BlockContract>nil();
@@ -1205,8 +1205,8 @@ public final class SpecificationRepository {
             }
         }
     }
-    
-    
+
+
     public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
@@ -1247,8 +1247,8 @@ public final class SpecificationRepository {
 	return new Pair<IObserverFunction,ImmutableSet<Taclet>>(limited, 
 							       taclets);
     }
-    
-    
+
+
     public IObserverFunction unlimitObs(IObserverFunction obs) {
 	IObserverFunction result = limitedToUnlimited.get(obs);
 	if(result == null) {

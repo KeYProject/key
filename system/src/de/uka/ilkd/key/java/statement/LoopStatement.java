@@ -102,7 +102,7 @@ public abstract class LoopStatement extends JavaStatement
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
-    
+
 
     /**
      *      Loop statement.

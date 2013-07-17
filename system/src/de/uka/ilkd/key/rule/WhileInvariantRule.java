@@ -122,6 +122,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	// try to get invariant from JML specification
 	LoopInvariant inv = app.getInvariant();
+	inv = inv != null ? inv : app.retrieveLoopInvariantFromSpecification(services);
 	assert inv != null : "No invariant found"; // FIXME: Remove after debugging
 	if (inv == null) // may happen after reloading proof 
 	    throw new RuleAbortException("no invariant found");
@@ -415,9 +416,10 @@ public final class WhileInvariantRule implements BuiltInRule {
                                      final ImmutableSet<ProgramVariable> localOuts,
                                      final ImmutableList<AnonUpdateData> anonUpdateDatas,
                                      final Term anonUpdate,
-                                     Services services) {
-        boolean isInfFlow = isInfFlow(goal);
-        boolean hasIFSpecs = inst.inv.hasInfFlowSpec(services);
+                                     Services services) throws RuleAbortException {
+        LoopInvariant inv = inst.inv;
+        final boolean isInfFlow = isInfFlow(goal);
+        final boolean hasIFSpecs = inv.hasInfFlowSpec(services);
 
         if (!isInfFlow || !hasIFSpecs) {
             return new InfFlowData();
@@ -435,8 +437,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         //heapContext.get(0);
         final Term guardTerm = TB.var(guardVar);
         final Term selfTerm = inst.selfTerm;
-        inst.inv.setGuard(guardTerm, services);
-        services.getSpecificationRepository().addLoopInvariant(inst.inv);
+        inv = inv.setGuard(guardTerm, services);
+        services.getSpecificationRepository().addLoopInvariant(inv);
+        ((LoopInvariantBuiltInRuleApp) ruleApp).setLoopInvariant(inv);
+        instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
 
         final Term heapAtPre = TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
                                                       baseHeap.sort(), false));
@@ -466,7 +470,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                 new InfFlowLoopInvariantTacletBuilder(services);
 
-        ifInvariantBuilder.setInvariant(inst.inv);
+        ifInvariantBuilder.setInvariant(inv);
         ifInvariantBuilder.setGuard(guardAtPre);
         ifInvariantBuilder.setGuardAtPost(guardAtPost);
         ifInvariantBuilder.setContextUpdate(/*inst.u*/);
@@ -500,7 +504,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                   informationFlowInvariantApp);
 
         // create information flow validity goal
-        Goal infFlowGoal = buildInfFlowValidityGoal(goal, inst.inv, instantiationVars,
+        Goal infFlowGoal = buildInfFlowValidityGoal(goal, inv, instantiationVars,
                                                     ruleApp, services);
         return infFlowData.addGoal(infFlowGoal);
     }

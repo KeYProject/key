@@ -1331,7 +1331,6 @@ public class JMLSpecFactory {
 
         return new LoopInvariantImpl(loop,
                                      pm,
-                                     null,
                                      invariants,
                                      mods,
                                      infFlowSpecs,

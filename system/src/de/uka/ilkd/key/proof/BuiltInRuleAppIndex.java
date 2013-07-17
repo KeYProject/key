@@ -113,17 +113,16 @@ public class BuiltInRuleAppIndex {
     }
 
 
-    private void scanSimplificationRule ( BuiltInRule rule, 
-                                          Goal goal, 
-                                          boolean antec, 
-                                          SequentFormula cfma, 
-                                          NewRuleListener listener ) {
-        final PosInOccurrence    pos = new PosInOccurrence 
-		( cfma, PosInTerm.TOP_LEVEL, antec );
+    private void scanSimplificationRule ( BuiltInRule rule,
+                                          Goal goal,
+                                          boolean antec,
+                                          SequentFormula cfma,
+                                          NewRuleListener listener) {
+        final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.TOP_LEVEL, antec);
         if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos );                            
+            IBuiltInRuleApp app = rule.createApp( pos );
             listener.ruleAdded ( app, pos );
         }
     }
