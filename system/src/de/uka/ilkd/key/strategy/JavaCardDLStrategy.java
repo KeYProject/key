@@ -343,8 +343,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                               longConst(-4300), longConst(-2100) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
                       ifZero(ApplyAuxiliaryEqFeature.INSTANCE ,
-                             longConst(-5100), inftyConst()) );
-        bindRuleSet ( d, "hide_auxiliary_eq", -5000 );
+                             longConst(-5500), inftyConst()) );
+        bindRuleSet ( d, "hide_auxiliary_eq", -5400 );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
