@@ -309,7 +309,7 @@ public class LexPathOrdering implements TermOrdering {
             theoryFunctionNames.add("clCons");
             theoryFunctionNames.add("C");
         
-            theoryFunctionNames.add("emptySet");
+            theoryFunctionNames.add("empty");
         }
 
 

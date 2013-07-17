@@ -2654,7 +2654,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
 //            directCutAllowed = add ( atom, not ( modalOperator ) );
             notExecutable = not ( program );
-            notContainsExecutable = rec ( any (), notExecutable );
+            
+            notContainsExecutable = not ( ContainsExecutableCodeTermFeature.PROGRAMS );
             
             cutAllowed =
                 add ( notContainsExecutable,

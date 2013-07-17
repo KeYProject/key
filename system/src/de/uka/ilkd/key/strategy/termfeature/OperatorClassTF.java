@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 
 /**
  * Term feature for checking whether the top operator of a term has an instance
@@ -22,13 +23,13 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class OperatorClassTF extends BinaryTermFeature {
 
-    private final Class opClass;
+    private final Class<? extends Operator> opClass;
 
-    private OperatorClassTF(Class op) {
+    private OperatorClassTF(Class<? extends Operator> op) {
         this.opClass = op;
     }
 
-    public static TermFeature create(Class op) {
+    public static TermFeature create(Class<? extends Operator> op) {
         return new OperatorClassTF ( op );
     }
 
