@@ -95,8 +95,8 @@ public class SchemaVariableFactory {
     }
     
 
-    public static AuxiliarySV createAuxiliarySV(Name name, Sort s) {
-        return new AuxiliarySV(name, s);
+    public static AuxiliaryHeapSV createAuxiliarySV(Name name, Sort s) {
+        return new AuxiliaryHeapSV(name, s);
     }
     
 

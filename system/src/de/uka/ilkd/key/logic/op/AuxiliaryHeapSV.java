@@ -24,12 +24,13 @@ import de.uka.ilkd.key.util.Debug;
 
 
 /** 
- * A schema variable that is used as placeholder for updates.
+ * A schema variable that is used as placeholder for auxiliary heap skolem
+ * constants.
  */  
-public final class AuxiliarySV extends AbstractSV {
+public final class AuxiliaryHeapSV extends AbstractSV {
 
   
-    AuxiliarySV(Name name, Sort s) {
+    AuxiliaryHeapSV(Name name, Sort s) {
         super(name, s, true, false);
     }
     
@@ -43,7 +44,10 @@ public final class AuxiliarySV extends AbstractSV {
             if (t.hasLabels() &&
                 t.containsLabel(AuxiliaryTermLabel.INSTANCE) &&
                 t.op().arity() == 0 &&
-                t.op() instanceof Function) {
+                t.op() instanceof Function &&
+                // the following is more or less a hack to match only on
+                // skolem constants introduced by select-rules
+                t.toString().startsWith("selectOf")) {
                 return addInstantiation((Term) subst, mc, services);
             }
         }
@@ -55,12 +59,12 @@ public final class AuxiliarySV extends AbstractSV {
     
     @Override
     public String toString() {
-        return toString("auxiliaryVar");
+        return toString("auxiliaryHeapVar");
     }
     
     
     @Override
     public String proofToString() {
-	return "\\schemaVar \\auxiliaryVar " + name() + ";\n";
+	return "\\schemaVar \\auxiliaryHeapVar " + name() + ";\n";
     }    
 }

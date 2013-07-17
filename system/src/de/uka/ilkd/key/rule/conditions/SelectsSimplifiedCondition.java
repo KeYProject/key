@@ -92,7 +92,9 @@ public final class SelectsSimplifiedCondition extends VariableConditionAdapter {
                                     visited.sub(0).op() == heapLDT.getHeap() ||
                                     // or the heap term of the select operator is an auxiliary heap symbol
                                     // (for instance an anonHeap function)
-                                    (   visited.sub(0).op().arity() == 0 &&
+                                    (   visited.sub(0).hasLabels() &&
+                                        visited.sub(0).containsLabel(AuxiliaryTermLabel.INSTANCE) &&
+                                        visited.sub(0).op().arity() == 0 &&
                                         visited.sub(0).op() instanceof Function));
         }
 
