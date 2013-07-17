@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -86,7 +87,11 @@ public final class SelectsSimplifiedCondition extends VariableConditionAdapter {
             HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             Boolean isSelectOp = heapLDT.getSortOfSelect(op) != null;
             selectsSimplified = selectsSimplified &&
-                                (   // either the operator is no select operator
+                                // we consider terms which still contain an
+                                // if-then-else not as simplified
+                                op != IfThenElse.IF_THEN_ELSE &&
+                                // else a term is simplified if
+                                (   // either the operator is not a select operator
                                     !isSelectOp ||
                                     // or the heap term of the select operator is the base heap
                                     visited.sub(0).op() == heapLDT.getHeap() ||
