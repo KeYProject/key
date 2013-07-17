@@ -742,10 +742,7 @@ public class ProofTreeView extends JPanel {
     class ProofTreePopupMenu extends JPopupMenu
 	implements ActionListener, ItemListener {
 
-	/**
-         *
-         */
-        private static final long serialVersionUID = 4071286598496826646L;
+        private static final long serialVersionUID = -8905927848074190941L;
     private JMenuItem expandAll   = new JMenuItem("Expand All");
 	private JMenuItem expandAllBelow   = new JMenuItem("Expand All Below");
 	private JMenuItem expandGoals = new JMenuItem("Expand Goals Only");
@@ -759,6 +756,8 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem nextSibling = new JMenuItem("Next Sibling");
 	private JCheckBoxMenuItem hideIntermediate =
 		new JCheckBoxMenuItem("Hide Intermediate Proofsteps");
+	    private JCheckBoxMenuItem hideAutomode =
+	            new JCheckBoxMenuItem("Hide Non-interactive Proofsteps");
 	private JCheckBoxMenuItem hideClosedSubtrees =
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
@@ -853,6 +852,10 @@ public class ProofTreeView extends JPanel {
 	    hideIntermediate.setSelected(delegateModel
 	        .isHidingIntermediateProofsteps());
 	    hideIntermediate.addItemListener(this);
+        this.add(hideAutomode);
+        hideAutomode.setSelected(delegateModel
+            .isHidingAutomodeProofsteps());
+        hideAutomode.addItemListener(this);
 	    this.add(hideClosedSubtrees);
 	    hideClosedSubtrees.setSelected(delegateModel
 	        .hideClosedSubtrees());
@@ -1069,9 +1072,29 @@ public class ProofTreeView extends JPanel {
 	}
 
         public void itemStateChanged(ItemEvent e) {
+            final boolean selected = e.getStateChange()
+                == ItemEvent.SELECTED;
             if (e.getSource() == hideIntermediate) {
-                delegateModel.hideIntermediateProofsteps(e.getStateChange()
-                    == ItemEvent.SELECTED);
+                delegateModel.hideIntermediateProofsteps(selected);
+
+                // implies hide non-interactive steps
+                hideAutomode.setEnabled(!selected);
+
+                if (branch == path) {
+                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                        TreeNode node = ((GUIAbstractTreeNode)delegateModel
+                            .getRoot()).findBranch(invokedNode);
+                        if (node instanceof GUIBranchNode) {
+                            selectBranchNode((GUIBranchNode)node);
+                        }
+                    }
+                } else {
+                    delegateView.scrollPathToVisible(path);
+                    delegateView.setSelectionPath(path);
+                }
+            }
+            if (e.getSource() == hideAutomode) {
+                delegateModel.setHideAutomodeProofsteps(selected);
                 if (branch == path) {
                     if (delegateModel.getRoot() instanceof GUIBranchNode) {
                         TreeNode node = ((GUIAbstractTreeNode)delegateModel
@@ -1086,8 +1109,7 @@ public class ProofTreeView extends JPanel {
                 }
             }
             if (e.getSource() == hideClosedSubtrees) {
-                delegateModel.setHideClosedSubtrees(e.getStateChange()
-                    == ItemEvent.SELECTED);
+                delegateModel.setHideClosedSubtrees(selected);
                 if (branch == path) {
                     if (e.getStateChange() != ItemEvent.SELECTED) {
                         if (delegateModel.getRoot() instanceof GUIBranchNode) {
