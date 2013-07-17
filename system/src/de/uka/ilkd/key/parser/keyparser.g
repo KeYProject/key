@@ -683,6 +683,7 @@ options {
     				 Sort s, 
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
+            			 boolean makeTermLabelSV,
             			 SchemaVariableModifierSet mods) 
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
@@ -704,6 +705,8 @@ options {
                 } else if(makeSkolemTermSV) {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
+                } else if (makeTermLabelSV) {
+                	 v = SchemaVariableFactory.createTermLabelSV(new Name(name));
                 } else { v = SchemaVariableFactory.createTermSV(
                 					new Name(name), 
                 					s, 
@@ -1755,6 +1758,7 @@ one_schema_var_decl
     Sort s = null;
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
+    boolean makeTermLabelSV  = false;
     String id = null;
     String parameter = null;
     String nameString = null;
@@ -1785,6 +1789,11 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.FORMULA;}
     ids = simple_ident_comma_list 
+  | TERMLABEL 
+    { makeTermLabelSV = true; }
+    { mods = new SchemaVariableModifierSet.TermLabelSV (); }
+    ( schema_modifiers[mods] ) ?   
+    ids = simple_ident_comma_list 
   | UPDATE
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
@@ -1795,7 +1804,7 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
     {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list
+    ids = simple_ident_comma_list  
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
@@ -1806,7 +1815,7 @@ one_schema_var_decl
       | (SKOLEMTERM 
          { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
-         ( schema_modifiers[mods] ) ?)
+         ( schema_modifiers[mods] ) ?)    	
     )
     s = any_sortId_check[true]
     ids = simple_ident_comma_list 
@@ -1817,7 +1826,8 @@ one_schema_var_decl
        schema_var_decl(it.next(),
                        s,
                        makeVariableSV,
-                       makeSkolemTermSV, 
+                       makeSkolemTermSV,
+                       makeTermLabelSV, 
 		       mods);
    }
  )
@@ -2995,9 +3005,14 @@ single_label returns [ITermLabel label=null]
   List<String> parameters = new LinkedList<String>();
 }
 :
-  (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
+  (name:IDENT {labelName=name.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
-  	label = LabelFactory.createLabel(labelName, parameters);
+  	if (inSchemaMode()) {
+  	  	label = (ITermLabel) variables().lookup(new Name(labelName));
+  	}
+  	if (label == null) {
+  	 	label = LabelFactory.createLabel(labelName, parameters);
+  	}
   }
  
 ;  exception
@@ -4109,6 +4124,7 @@ varcond_equalUnique [TacletBuilder b]
      	                                                   (FormulaSV) phi));
         } 
 ;
+
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
 {

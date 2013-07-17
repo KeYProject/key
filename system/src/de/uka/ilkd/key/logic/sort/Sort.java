@@ -32,7 +32,8 @@ public interface Sort extends Named {
     /**
      * Updates are represented as "terms" of this sort.
      */
-    final Sort UPDATE = new SortImpl(new Name("Update"));
+    final Sort UPDATE = new SortImpl(new Name("Update"));       
+    
     
     /**
      * Any is a supersort of all sorts.
