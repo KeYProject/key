@@ -207,11 +207,11 @@ public final class Main {
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
+        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states to a temporary location");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
-        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states to a temporary location");
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");

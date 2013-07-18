@@ -12,10 +12,10 @@ public final class AutoSaver implements ProverTaskListener {
 
     private final static String TMP_DIR = System.getProperty("java.io.tmpdir");
     private final static String PREFIX = TMP_DIR+File.separator+".autosave.";
-    private static AutoSaver INSTANCE;
+    private static AutoSaver INSTANCE = new AutoSaver(1000); // XXX for testing purposes
 
     private Proof proof;
-    private int interval = 0;
+    private int interval;
 
     public static void init ( int saveInterval ) {
         INSTANCE = new AutoSaver(saveInterval);
@@ -26,7 +26,7 @@ public final class AutoSaver implements ProverTaskListener {
     }
 
     private AutoSaver (int saveInterval) {
-        assert saveInterval > 0;
+        assert saveInterval >= 0;
         interval = saveInterval;
     }
 
@@ -40,7 +40,7 @@ public final class AutoSaver implements ProverTaskListener {
         if (proof == null) throw new IllegalStateException("please set a proof first");
         if (progress > 0 && progress % interval == 0) {
             final int quot = progress/interval;
-            final String filename = PREFIX+"."+quot+".key";
+            final String filename = PREFIX+quot+".key";
             save(filename);
         }
     }
@@ -52,7 +52,8 @@ public final class AutoSaver implements ProverTaskListener {
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        // currently not used
+        // unset proof
+        proof = null;
     }
 
     private void save(String filename) {
