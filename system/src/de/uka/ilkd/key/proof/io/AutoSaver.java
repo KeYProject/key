@@ -8,20 +8,26 @@ import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Debug;
 
-public class AutoSaver implements ProverTaskListener {
+public final class AutoSaver implements ProverTaskListener {
 
     private final static String TMP_DIR = System.getProperty("java.io.tmpdir");
     private final static String PREFIX = TMP_DIR+File.separator+".autosave.";
+    private static AutoSaver INSTANCE;
 
     private Proof proof;
-    private final int interval;
-    private final String basename;
+    private int interval = 0;
 
-    public AutoSaver (String basename, int saveInterval) {
-        assert basename != null;
+    public static void init ( int saveInterval ) {
+        INSTANCE = new AutoSaver(saveInterval);
+    }
+
+    public static AutoSaver getInstance() {
+        return INSTANCE;
+    }
+
+    private AutoSaver (int saveInterval) {
         assert saveInterval > 0;
         interval = saveInterval;
-        this.basename = basename;
     }
 
     public void setProof (Proof p) {
@@ -30,10 +36,11 @@ public class AutoSaver implements ProverTaskListener {
 
     @Override
     public void taskProgress(int progress) {
+        if (interval == 0) return;
         if (proof == null) throw new IllegalStateException("please set a proof first");
         if (progress > 0 && progress % interval == 0) {
             final int quot = progress/interval;
-            final String filename = PREFIX+basename+"."+quot+".key";
+            final String filename = PREFIX+"."+quot+".key";
             save(filename);
         }
     }

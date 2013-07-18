@@ -50,7 +50,6 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -98,7 +97,6 @@ public class KeYMediator {
 
     private TacletFilter filterForInteractiveProving;
 
-    private AutoSaver autoSaver;
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -110,8 +108,7 @@ public class KeYMediator {
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();
-    autoSaver           = new AutoSaver("test", 1000); // XXX
-	interactiveProver   = new InteractiveProver(this, autoSaver);
+	interactiveProver   = new InteractiveProver(this);
 
 	addRuleAppListener(proofListener);
 	addAutoModeListener(proofListener);

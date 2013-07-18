@@ -79,11 +79,9 @@ public class InteractiveProver implements InterruptListener {
 
     private boolean autoMode; // autoModeStarted has been fired
 
-    private final AutoSaver autoSaver;
-
     /** creates a new interactive prover object
      */
-    public InteractiveProver(KeYMediator mediator, AutoSaver autoSaver) {
+    public InteractiveProver(KeYMediator mediator) {
         selListener = new InteractiveProverKeYSelectionListener();
         this.mediator = mediator;
         mediator.addKeYSelectionListener(selListener);
@@ -93,12 +91,7 @@ public class InteractiveProver implements InterruptListener {
         applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getUI());
 
-        this.autoSaver = autoSaver;
-        if (autoSaver != null) applyStrategy.addProverTaskObserver(autoSaver);
-    }
-
-    public InteractiveProver(KeYMediator mediator) {
-        this (mediator, null);
+        applyStrategy.addProverTaskObserver(AutoSaver.getInstance());
     }
 
     /** returns the KeYMediator */
@@ -111,7 +104,7 @@ public class InteractiveProver implements InterruptListener {
      */
     public void setProof(Proof p) {
         proof = p;
-        if (autoSaver != null) autoSaver.setProof(p);
+        AutoSaver.getInstance().setProof(p);
     }
 
     public void addAutoModeListener(AutoModeListener p) {
