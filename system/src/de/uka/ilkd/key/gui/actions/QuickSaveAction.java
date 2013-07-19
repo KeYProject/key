@@ -34,9 +34,10 @@ public final class QuickSaveAction extends MainWindowAction {
 
     private static final long serialVersionUID = 8475988170848683884L;
     private static final String TMP_DIR = System.getProperty("java.io.tmpdir");
+    static final String QUICK_SAVE_PATH = TMP_DIR+File.separator+".quicksave.key";
 
     public QuickSaveAction(MainWindow mainWindow) {
-	super(mainWindow);
+        super(mainWindow);
         setName("Quicksave");
 //        setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof to a temporal location.");
@@ -48,7 +49,7 @@ public final class QuickSaveAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
-            final String filename = TMP_DIR+File.separator+".quicksave.key";
+            final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
             try {
                 new ProofSaver(proof, filename, de.uka.ilkd.key.gui.Main.INTERNAL_VERSION).save();

@@ -87,6 +87,7 @@ import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
 import de.uka.ilkd.key.gui.actions.PruneProofAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
@@ -229,6 +230,7 @@ public final class MainWindow extends JFrame  {
     private SaveFileAction saveFileAction;
 
     private QuickSaveAction quickSaveAction;
+    private QuickLoadAction quickLoadAction;
 
     /** action for opening the proof management dialog */
     private ProofManagementAction proofManagementAction;
@@ -398,6 +400,7 @@ public final class MainWindow extends JFrame  {
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
         quickSaveAction           = new QuickSaveAction(this);
+        quickLoadAction           = new QuickLoadAction(this);
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
@@ -726,6 +729,7 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
         fileMenu.add(quickSaveAction);
+        fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
 
