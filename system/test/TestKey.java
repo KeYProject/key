@@ -59,8 +59,7 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.rule.TestApplyTaclet.class,
 	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
 	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
-	de.uka.ilkd.key.rule.conditions.TestDropEffectlessElementary.class,
-        de.uka.ilkd.key.rule.conditions.TestSelectsSimplifiedCondition.class
+	de.uka.ilkd.key.rule.conditions.TestDropEffectlessElementary.class
     };
 
 

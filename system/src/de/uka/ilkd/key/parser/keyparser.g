@@ -692,9 +692,6 @@ options {
                 } else if(makeSkolemTermSV) {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
-                } else if (mods instanceof SchemaVariableModifierSet.AuxiliarySV) {
-                    v = SchemaVariableFactory.createAuxiliarySV(new Name(name),
-                    				                s);
                 } else { v = SchemaVariableFactory.createTermSV(
                 					new Name(name), 
                 					s, 
@@ -1793,9 +1790,6 @@ one_schema_var_decl
       | (SKOLEMTERM 
          { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
-         ( schema_modifiers[mods] ) ?)
-      | (AUXILIARY_VAR
-         { mods = new SchemaVariableModifierSet.AuxiliarySV (); }
          ( schema_modifiers[mods] ) ?)
     )
     s = any_sortId_check[true]
@@ -3604,7 +3598,6 @@ varexp[TacletBuilder b]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
         | varcond_induction_variable[b, negated]
-        | varcond_simplified_selects[b, negated]
       )
   )
 ;
@@ -4076,17 +4069,6 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
 :
    ISINDUCTVAR LPAREN x=varId RPAREN {
      b.addVariableCondition(new InductionVariableCondition (
-       (SchemaVariable)x, negated ));
-   }
-;
-
-varcond_simplified_selects [TacletBuilder b, boolean negated]
-{
-  ParsableVariable x = null;
-}
-:
-   SIMP_SELECTS_VAR LPAREN x=varId RPAREN {
-     b.addVariableCondition(new SelectsSimplifiedCondition (
        (SchemaVariable)x, negated ));
    }
 ;

@@ -15,32 +15,26 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * This feature checks that an auxiliary equation is not applied to itself.
- * This means that the constrainted formula of the focus of the rule application
- * must not be part of the  if-formulas. If the rule application is
- * admissible, zero is returned.
+ * This feature checks that the position of application is not contained in the
+ * if-formulas. If the rule application is admissible, zero is returned.
  */
-public class ApplyAuxiliaryEqFeature extends BinaryTacletAppFeature {
+public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
 
-    public static final Feature INSTANCE = new ApplyAuxiliaryEqFeature();
+    public static final Feature INSTANCE = new NoSelfApplicationFeature();
 
-    private ApplyAuxiliaryEqFeature () {}
+    private NoSelfApplicationFeature() {}
     
+    @Override
     protected boolean filter ( TacletApp p_app, PosInOccurrence pos, Goal goal ) {
         Debug.assertTrue ( pos != null, 
-                "Need to know the position of " +
-               "the application of the taclet" );
+                "NoSelfApplicationFeature: Need to know the position of the application of the taclet" );
 
         if(!p_app.ifInstsComplete()) {
             return true;
@@ -49,15 +43,14 @@ public class ApplyAuxiliaryEqFeature extends BinaryTacletAppFeature {
         ImmutableList<IfFormulaInstantiation> ifInsts = p_app.ifFormulaInstantiations();
 
         Debug.assertTrue ( ifInsts != null && !ifInsts.isEmpty(),
-                   "Need to know the equation the taclet" +
-                   " is used with" );
+                   "NoSelfApplicationFeature: Need to know the equation the taclet is used with" );
 
+        boolean noSelfApplication = true;
         for (IfFormulaInstantiation ifInst : ifInsts) {
-            if (ifInst.getConstrainedFormula() == pos.constrainedFormula()) {
-                return false;
-            }
+            noSelfApplication = noSelfApplication &&
+                                (ifInst.getConstrainedFormula() != pos.constrainedFormula());
         }
-        return true;
+        return noSelfApplication;
     }
 
 }

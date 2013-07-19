@@ -10,87 +10,51 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 // 
-package de.uka.ilkd.key.rule.conditions;
+package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.VariableConditionAdapter;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
-public final class SelectsSimplifiedCondition extends VariableConditionAdapter {
+public final class AllSelectsSimplifiedTermFeature extends BinaryTermFeature {
 
-    private final SchemaVariable reference;
+    private final HeapLDT heapLDT;
 
-    private final boolean negation;
-
-
-    public SelectsSimplifiedCondition(SchemaVariable reference,
-                                      boolean negation) {
-        this.reference = reference;
-        this.negation = negation;
+    private AllSelectsSimplifiedTermFeature(HeapLDT heapLDT) {
+        this.heapLDT = heapLDT;
     }
 
-
-    @Override
-    public boolean check(SchemaVariable var,
-                         SVSubstitute subst,
-                         SVInstantiations svInst,
-                         Services services) {
-        if (var == reference) {
-            if (subst instanceof Term) {
-                Term substTerm = (Term) subst;
-                SelectsSimplifiedVisitor visitor =
-                        new SelectsSimplifiedVisitor(services);
-                substTerm.execPreOrder(visitor);
-                return negation ^ visitor.getResult();
-            } else {
-                Logger.getGlobal().log(Level.WARNING,
-                                       "Warning: SelectsSimplifiedCondition " +
-                                       "expects a term as substitute.");
-                return false;
-            }
-        }
-        return true;
+    public static TermFeature create(HeapLDT heapLDT) {
+        return new AllSelectsSimplifiedTermFeature(heapLDT);
     }
 
-
     @Override
-    public String toString() {
-        return (negation ? " \\not " : "") + "\\selectsSimplified(" + reference +
-               ")";
+    protected boolean filter (Term t) {
+        SelectsSimplifiedVisitor visitor =
+                new SelectsSimplifiedVisitor(heapLDT);
+        t.execPreOrder(visitor);
+        return visitor.getResult();
     }
 
 
     private class SelectsSimplifiedVisitor implements Visitor {
         private boolean selectsSimplified;
-        private final Services services;
+        private final HeapLDT heapLDT;
 
-        public SelectsSimplifiedVisitor(Services services) {
-            this.services = services;
+        public SelectsSimplifiedVisitor(HeapLDT heapLDT) {
+            this.heapLDT = heapLDT;
             this.selectsSimplified = true;
         }
 
         @Override
         public void visit(Term visited) {
             Operator op = visited.op();
-            HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             Boolean isSelectOp = heapLDT.getSortOfSelect(op) != null;
             selectsSimplified = selectsSimplified &&
-                                // we consider terms which still contain an
-                                // if-then-else not as simplified
-                                op != IfThenElse.IF_THEN_ELSE &&
-                                // else a term is simplified if
                                 (   // either the operator is not a select operator
                                     !isSelectOp ||
                                     // or the heap term of the select operator is the base heap

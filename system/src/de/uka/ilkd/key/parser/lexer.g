@@ -55,7 +55,6 @@ tokens {
 	VARIABLES = "\\variables";
 	SKOLEMTERM = "\\skolemTerm";
 	SKOLEMFORMULA = "\\skolemFormula";
-        AUXILIARY_VAR = "\\auxiliaryHeapVar";
 	
         // used in contracts
 	MODIFIES = "\\modifies";
@@ -94,7 +93,6 @@ tokens {
 	NOT = "\\not";
         NOTFREEIN = "\\notFreeIn";
 	SAME = "\\same";
-        SIMP_SELECTS_VAR = "\\selectsSimplified";
 	STATIC = "\\static";
         STATICMETHODREFERENCE = "\\staticMethodReference";	
 	STRICT    = "\\strict";	

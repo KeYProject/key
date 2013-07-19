@@ -129,7 +129,8 @@ public class VariableNameProposer implements InstantiationProposer {
                                                                          SchemaVariable p_var) {
         final String result;
         final SchemaVariable v = p_app.taclet ().getNameCorrespondent ( p_var );
-        if ( v != null && p_app.instantiations ().isInstantiated ( v ) ) {
+        if ( v != null && p_app.instantiations ().isInstantiated ( v ) &&
+             v.name().toString().equals("selectSk")) {
             
             final Object inst = p_app.instantiations ().getInstantiation ( v );
             

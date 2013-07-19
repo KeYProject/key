@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -45,7 +46,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.ApplyAuxiliaryEqFeature;
+import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
@@ -76,6 +77,9 @@ import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.termfeature.SimpleHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.AllSelectsSimplifiedTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsAuxiliaryConstantTermFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SumFeature;
@@ -102,6 +106,7 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ContainsIfThenElseTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
@@ -154,6 +159,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         this.tf = new ArithTermFeatures ( p_proof.getServices ()
                                           .getTypeConverter ().getIntegerLDT () );
         this.ff = new FormulaTermFeatures ();        
+        HeapLDT heapLDT = p_proof.getServices().getTypeConverter().getHeapLDT();
+        this.vf = new ValueTermFeature(heapLDT);
         
         costComputationDispatcher = setupCostComputationF ( p_proof );
         approvalDispatcher = setupApprovalDispatcher ( p_proof );
@@ -318,6 +325,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     
     private RuleSetDispatchFeature setupCostComputationF(Proof p_proof) {
+        final HeapLDT heapLDT =
+                p_proof.getServices().getTypeConverter().getHeapLDT();
+
+
         final IntegerLDT numbers =
             p_proof.getServices().getTypeConverter().getIntegerLDT();
         final LocSetLDT locSetLDT =
@@ -334,17 +345,50 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add( longConst(-11000), 
                      ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) );        
         bindRuleSet ( d, "simplify", -4500 );        
-        bindRuleSet ( d, "simplify_enlarging", -2000 );   
-        bindRuleSet ( d, "simplify_select", ifZero( applyTF(FocusFormulaProjection.INSTANCE,
-                ff.update), longConst(-4200), longConst(-2000) ) );
-        bindRuleSet ( d, "simplify_simple_select",
-                      ifZero( applyTF(FocusFormulaProjection.INSTANCE,
-                                      ff.update),
-                              longConst(-4300), longConst(-2100) ) );
+        bindRuleSet ( d, "simplify_enlarging", -2000 );
+
+        bindRuleSet ( d, "pull_out_select",
+                      ifZero( not( applyTF( "h", SimpleHeapTermFeature.create(heapLDT) ) ),
+                              ifZero( applyTF(FocusFormulaProjection.INSTANCE, ff.update),
+                                      longConst(-4200),
+                                      longConst(-2000) ),
+                              inftyConst() ) );
+        bindRuleSet ( d, "apply_select_eq",
+                      ifZero( add( NoSelfApplicationFeature.INSTANCE ,
+                                   applyTFNonStrict("t1", IsAuxiliaryConstantTermFeature.INSTANCE),
+                                   not( applyTF( FocusProjection.INSTANCE,
+                                                 AllSelectsSimplifiedTermFeature.create(heapLDT) ) ) ),
+                              longConst(-5500),
+                              inftyConst() ) );
+        bindRuleSet ( d, "simplify_select",
+                      ifZero( add( applyTF("sk", IsAuxiliaryConstantTermFeature.INSTANCE),
+                                   not( applyTF( FocusProjection.INSTANCE,
+                                                 AllSelectsSimplifiedTermFeature.create(heapLDT) ) ) ),
+                              longConst(-5400),
+                              inftyConst() ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
-                      ifZero(ApplyAuxiliaryEqFeature.INSTANCE ,
-                             longConst(-5500), inftyConst()) );
-        bindRuleSet ( d, "hide_auxiliary_eq", -5400 );
+                      ifZero( add( NoSelfApplicationFeature.INSTANCE ,
+                                   applyTF("t1", IsAuxiliaryConstantTermFeature.INSTANCE),
+                                   applyTFNonStrict("s", AllSelectsSimplifiedTermFeature.create(heapLDT) ) ),
+                              ifZero( not( add( isInstantiated("s"),
+                                                applyTFNonStrict("s", ContainsIfThenElseTermFeature.INSTANCE) ) ),
+                                      longConst(-5500),
+                                      ifZero( add( isInstantiated("t2"),
+                                                   or( applyTF("t2", vf.nullTerm),
+                                                       applyTF("t2", vf.tt),
+                                                       applyTF("t2", vf.ff) ) ),
+                                              longConst(-200),
+                                              inftyConst() ) ),
+                              inftyConst() ) );
+        bindRuleSet ( d, "hide_auxiliary_eq",
+                      ifZero( add( applyTF("sk", IsAuxiliaryConstantTermFeature.INSTANCE),
+                                   applyTF( FocusProjection.INSTANCE,
+                                            AllSelectsSimplifiedTermFeature.create(heapLDT) ),
+                                   not( applyTF( FocusProjection.INSTANCE,
+                                                 ContainsIfThenElseTermFeature.INSTANCE) ) ),
+                              longConst(-5400),
+                              inftyConst() ) );
+
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
@@ -2452,6 +2496,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private final ArithTermFeatures tf;
     private final FormulaTermFeatures ff;
+    private final ValueTermFeature vf;
     
     private class ArithTermFeatures {
 
@@ -2686,7 +2731,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 rec ( any (), longTermConst ( 1 ) ) );
 //            directCutAllowed = add ( tf.intInEquation, notContainsQuery );
                      
-            
+
         }
 
         final TermFeature forF;
@@ -2720,5 +2765,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature cutAllowed;
         final TermFeature cutAllowedBelowQuantifier;
         final TermFeature cutPriority;
+    }
+
+    private class ValueTermFeature {
+
+        public ValueTermFeature(HeapLDT heapLDT) {
+            equals = op(Equality.EQUALS);
+            tt = op(Junctor.TRUE);
+            ff = op(Junctor.FALSE);
+            nullTerm = op(heapLDT.getNull());
+        }
+
+        final TermFeature equals;
+        final TermFeature tt;
+        final TermFeature ff;
+        final TermFeature nullTerm;
     }
 }

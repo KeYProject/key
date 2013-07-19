@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.strategy.termfeature.IsAuxiliaryConstantTermFeature;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -92,11 +93,6 @@ public class SchemaVariableFactory {
     
     public static UpdateSV createUpdateSV(Name name) {
 	return new UpdateSV(name);
-    }
-    
-
-    public static AuxiliaryHeapSV createAuxiliarySV(Name name, Sort s) {
-        return new AuxiliaryHeapSV(name, s);
     }
     
 
