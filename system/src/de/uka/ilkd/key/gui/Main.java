@@ -207,7 +207,7 @@ public final class Main {
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
-        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states to a temporary location");
+        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
@@ -264,6 +264,9 @@ public final class Main {
         if(cl.isSet(AUTOSAVE)){
             try {
                 int eachSteps = cl.getInteger(AUTOSAVE, 0);
+                if (eachSteps < 0) {
+                    printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5);
+                }
                 AutoSaver.init(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
