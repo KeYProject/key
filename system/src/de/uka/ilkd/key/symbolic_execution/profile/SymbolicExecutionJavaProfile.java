@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
@@ -60,6 +61,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
    protected ImmutableList<BuiltInRule> initBuiltInRules() { 
       ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
       builtInRules = builtInRules.prepend(QuerySideProofRule.INSTANCE);
+      builtInRules = builtInRules.prepend(ModalitySideProofRule.INSTANCE);
       return builtInRules;
    }
 

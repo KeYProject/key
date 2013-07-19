@@ -22,6 +22,48 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTestCase {
    
    /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery
+    */
+   public void testNonExecutionBranchHidingLoopInvariantWithSplittingQuery_hiding_side_proof() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery/test/LoopInvariantWithSplittingQuery.java", 
+                          "LoopInvariantWithSplittingQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery/oracle/LoopInvariantWithSplittingQuery_hiding_side_proof.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          true,
+                          false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery
+    */
+   public void testNonExecutionBranchHidingLoopInvariantWithSplittingQuery_hiding_off() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                          "examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery/test/LoopInvariantWithSplittingQuery.java", 
+                          "LoopInvariantWithSplittingQuery", 
+                          "main", 
+                          null,
+                          "examples/_testcase/set/nonExecutionBranchHidingLoopInvariantWithSplittingQuery/oracle/LoopInvariantWithSplittingQuery_hiding_off.xml",
+                          false,
+                          false,
+                          true,
+                          ALL_IN_ONE_RUN,
+                          false,
+                          true,
+                          true,
+                          false,
+                          false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/nonExecutionBranchHidingQueryInPrecondition
     */
    public void testNonExecutionBranchHidingQueryInPrecondition_hiding_side_proof() throws Exception {
