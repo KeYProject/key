@@ -606,15 +606,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
       }
 
       String axioms = "";
-      for(LocationVariable h : heapLDT.getAllHeaps()) {
-         if(originalAxioms.get(h) != null) {
-           String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services);
-           posts = posts
-                   + (includeHtmlMarkup ? "<br><b>" : "\n")
-                   + "axiom"
-                   + (h == baseHeap ? "" : "[" + h + "]")
-                   + (includeHtmlMarkup ? "</b> " : ": ")
-                   + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false) : printAxioms.trim());
+      if (originalAxioms != null) {
+         for(LocationVariable h : heapLDT.getAllHeaps()) {
+            if(originalAxioms.get(h) != null) {
+              String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services);
+              posts = posts
+                      + (includeHtmlMarkup ? "<br><b>" : "\n")
+                      + "axiom"
+                      + (h == baseHeap ? "" : "[" + h + "]")
+                      + (includeHtmlMarkup ? "</b> " : ": ")
+                      + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false) : printAxioms.trim());
+            }
          }
       }
       
