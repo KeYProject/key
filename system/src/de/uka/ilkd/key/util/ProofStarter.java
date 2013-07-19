@@ -215,8 +215,9 @@ public class ProofStarter {
                 new ApplyStrategy(proof.env().getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
 
         if (ptl != null) prover.addProverTaskObserver(ptl);
-        AutoSaver.getInstance().setProof(proof);
-        prover.addProverTaskObserver(AutoSaver.getInstance());
+        final AutoSaver autoSaver = AutoSaver.getInstance();
+        autoSaver.setProof(proof);
+        prover.addProverTaskObserver(autoSaver);
 
         ApplyStrategy.ApplyStrategyInfo result =
                 prover.start(proof, goals, maxSteps, timeout, false);
@@ -227,7 +228,7 @@ public class ProofStarter {
         }
 
         if (ptl != null) prover.removeProverTaskObserver(ptl);
-        prover.removeProverTaskObserver(AutoSaver.getInstance());
+        prover.removeProverTaskObserver(autoSaver);
 
         return result;
     }
