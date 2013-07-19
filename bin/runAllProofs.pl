@@ -368,7 +368,7 @@ sub runAuto {
   if ($option{'printStatistics'}) {
     $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
   }
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto $statisticsCmd '$dk'";
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto --autosave 1000 $statisticsCmd '$dk'";
    print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
