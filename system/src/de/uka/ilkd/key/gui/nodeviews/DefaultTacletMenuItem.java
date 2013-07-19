@@ -50,7 +50,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;	    	    
         StringBuffer taclet_sb = new StringBuffer();
-        Writer w = new StringWriter();
+        StringWriter w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
         LogicPrinter tp = new LogicPrinter(new ProgramPrinter(w,
@@ -64,36 +64,35 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         	       false);
         
         int nlcount = 0;
-        StringBuffer sb = new StringBuffer(w.toString());
+
+        StringBuffer sb = w.getBuffer();
+        int maxTooltipLines = ProofIndependentSettings.DEFAULT_INSTANCE.
+                getViewSettings().getMaxTooltipLines();
+        
+        // replaced the old code here to fix #1340. (MU)
         int sbl = sb.length();
-        for (int i = 0; i < sbl; i++) {
+        boolean truncated = false;
+        for (int i = 0; i < sbl && !truncated; i++) {
             if (sb.charAt(i) == '\n') {
         	nlcount += 1;
+        	if(nlcount > maxTooltipLines){
+        	    sb.setLength(i);
+        	    truncated = true;
+        	}
             }
         }
-        if(nlcount > ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines()){
-  //      if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
-    	    Debug.log4jDebug("No SchemaVariable instantiation printed, linecount is " 
-    			 + nlcount + " > " 
-    			 + ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines(),
-//    			 + ProofSettings.DEFAULT_SETTINGS.
-//    			 getViewSettings().getMaxTooltipLines(),
-    			 TacletMenu.class.getName());
-    	    taclet_sb = new StringBuffer();
-    	    w = new StringWriter();
-    	    backend = new WriterBackend(w, 68);
-    	    tp = new LogicPrinter
-    	    (new ProgramPrinter(w), notationInfo, backend, null, true);
-    	    tp.printTaclet(connectedTo.taclet());
 
+        taclet_sb.append("<html><pre>");
+        taclet_sb.append(ascii2html(sb));
+        taclet_sb.append("</pre>");
+        if(truncated) {
+            taclet_sb.append("\n<b>!!</b><i> Message has been truncated. " +
+                    "See View &rarr; ToolTip Options.</i>");
         }
 
-        taclet_sb.append(ascii2html(new StringBuffer(w.toString())));
-        taclet_sb.replace(0,0,"<html><pre>");
-        taclet_sb.append("</pre>");
-
-
         setToolTipText(taclet_sb.toString());
+        
+
     } 
     
     /**
