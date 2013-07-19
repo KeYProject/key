@@ -37,7 +37,10 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
-   public static final String PROP_AUTO_MODE = "autoMode";
+    private static final int PROGRESS_BAR_STEPS = 50;
+    private static final String PROGRESS_MARK = ">";
+
+    public static final String PROP_AUTO_MODE = "autoMode";
 
    /**
     * The used {@link PropertyChangeSupport}.
@@ -49,6 +52,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
+
+	// for a progress bar
+	private int progressMax = 0;
 
     public boolean isAutoMode() {
       return autoMode;
@@ -65,13 +71,16 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    }
 
     public void taskFinished(TaskFinishedInfo info) {
-        if (verbosity > SILENT) System.out.print("[ DONE ");
+        progressMax = 0; // reset progress bar marker
         final int openGoals = info.getProof().openGoals().size();
         if (info.getSource() instanceof ApplyStrategy) {
+            if (verbosity >= HIGH) {
+                System.out.println("]"); // end progress bar
+            }
             if (verbosity > SILENT) {
-                System.out.println("  ... rule application ]");
+                System.out.println(" [DONE  ... rule application ]");
                 if (verbosity >= HIGH) {
-                    System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ "==");
+                    System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
                     final Proof.Statistics stat = info.getProof().statistics();
                     System.out.println("Proof steps: "+stat.nodes);
                     System.out.println("Branches: "+stat.branches);
@@ -84,7 +93,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
-            if (verbosity > SILENT) System.out.println("  ... loading ]");
+            if (verbosity > SILENT) System.out.println(" [DONE ... loading ]");
             if (!"".equals(info.getResult())) {
                 if (verbosity > SILENT) System.out.println(info.getResult());
                     System.exit(-1);
@@ -167,17 +176,22 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     @Override
     public void taskProgress(int position) {
-        // TODO Implement ProverTaskListener.taskProgress
-        if(verbosity >= DEBUG) {
-            System.out.println("ConsoleUserInterface.taskProgress(" + position + ")");
+        if (verbosity >= HIGH && progressMax > 0) {
+            if ((position*PROGRESS_BAR_STEPS) % progressMax == 0) {
+                System.out.print(PROGRESS_MARK);
+            }
         }
     }
 
     @Override
     public void taskStarted(String message, int size) {
-        // TODO Implement ProverTaskListener.taskStarted
-        if(verbosity >= DEBUG) {
-            System.out.println("ConsoleUserInterface.taskStarted(" + message + "," + size + ")");
+        progressMax = size;
+        if (verbosity >= HIGH) {
+            if (ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {
+                System.out.print(message+" ["); // start progress bar
+            } else {
+                System.out.println(message);
+            }
         }
     }
 
