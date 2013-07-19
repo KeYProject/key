@@ -264,7 +264,7 @@ public final class Main {
         if(cl.isSet(AUTOSAVE)){
             try {
                 int eachSteps = cl.getInteger(AUTOSAVE, 0);
-                AutoSaver.init(eachSteps);
+                AutoSaver.init(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();

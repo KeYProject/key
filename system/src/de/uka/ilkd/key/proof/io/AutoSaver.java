@@ -12,22 +12,24 @@ public final class AutoSaver implements ProverTaskListener {
 
     private final static String TMP_DIR = System.getProperty("java.io.tmpdir");
     private final static String PREFIX = TMP_DIR+File.separator+".autosave.";
-    private static AutoSaver INSTANCE = new AutoSaver(1000); // XXX for testing purposes
+    private static AutoSaver INSTANCE = new AutoSaver(0, false);
 
     private Proof proof;
-    private int interval;
+    private final int interval;
+    private final boolean saveClosed;
 
-    public static void init ( int saveInterval ) {
-        INSTANCE = new AutoSaver(saveInterval);
+    public static void init ( int saveInterval, boolean saveClosedProof ) {
+        INSTANCE = new AutoSaver(saveInterval, saveClosedProof);
     }
 
     public static AutoSaver getInstance() {
         return INSTANCE;
     }
 
-    private AutoSaver (int saveInterval) {
+    private AutoSaver (int saveInterval, boolean saveClosedProof) {
         assert saveInterval >= 0;
         interval = saveInterval;
+        saveClosed = saveClosedProof;
     }
 
     public void setProof (Proof p) {
@@ -52,6 +54,11 @@ public final class AutoSaver implements ProverTaskListener {
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
+        // save proof if closed
+        if (saveClosed && proof.closed()) {
+            save(PREFIX+"proof");
+        }
+
         // unset proof
         proof = null;
     }
