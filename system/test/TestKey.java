@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 import junit.framework.TestCase;
@@ -27,7 +27,7 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.util.TestLexicographicComparator.class,
     de.uka.ilkd.key.util.TestMiscTools.class,
 	de.uka.ilkd.key.util.pp.TestLayouter.class
-    }; 
+    };
 
 
     static Class<? extends TestCase>[] logicModelTests = new Class[] {
@@ -36,7 +36,7 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.logic.TestTerm.class,
 	de.uka.ilkd.key.logic.TestNamespace.class,
 	de.uka.ilkd.key.logic.TestSemisequent.class,
-	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
+	de.uka.ilkd.key.logic.TestPosInOcc.class,
 	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
 	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
 	de.uka.ilkd.key.logic.TestVariableNamer.class,
@@ -86,8 +86,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
         de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
     };
-     
-     
+
+
     static Class<? extends TestCase>[] smtTests = new Class[] {
 	de.uka.ilkd.key.smt.test.TestSimplify.class,
 	de.uka.ilkd.key.smt.test.TestZ3.class,
@@ -108,13 +108,13 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
+//       de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
        de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
        de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
        de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
     };
-    
+
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
        de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
        de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
@@ -125,7 +125,7 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.proof_references.analyst.TestMethodCallProofReferencesAnalyst.class
     };
 
-     
+
      public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
 		public void run(TestResult result) {
@@ -142,14 +142,14 @@ public class TestKey extends TestSuite {
 	return suite;
     }
 
-     
+
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
 	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
-        
+
 	TestSuite suite = new TestSuite();
 	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
-	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));	
+	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
 	suite.addTest(createSuite(parserTests, "Testing Parsers"));
 	suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
 	suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
@@ -159,7 +159,7 @@ public class TestKey extends TestSuite {
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
    suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
-        
+
 	return suite;
     }
 
