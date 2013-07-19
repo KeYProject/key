@@ -40,6 +40,58 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopSplittingCondition
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testUseLoopInvariantLoopSplittingCondition() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopSplittingCondition/test/LoopSplittingCondition.java", 
+                "LoopSplittingCondition", 
+                "main", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopSplittingCondition/oracle/LoopSplittingCondition.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantTwoLoops
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testUseLoopInvariantTwoLoops() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantTwoLoops/test/TwoLoops.java", 
+                "TwoLoops", 
+                "main", 
+                null,
+                "examples/_testcase/set/useLoopInvariantTwoLoops/oracle/TwoLoops.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented
     * </p>
     * <p>
