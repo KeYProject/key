@@ -215,6 +215,7 @@ public class ProofStarter {
                 new ApplyStrategy(proof.env().getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
 
         if (ptl != null) prover.addProverTaskObserver(ptl);
+        AutoSaver.getInstance().setProof(proof);
         prover.addProverTaskObserver(AutoSaver.getInstance());
 
         ApplyStrategy.ApplyStrategyInfo result =
