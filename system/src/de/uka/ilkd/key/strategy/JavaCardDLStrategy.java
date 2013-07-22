@@ -358,13 +358,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    applyTFNonStrict("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
                                    not( applyTF( FocusProjection.INSTANCE,
                                                  AllSelectsSimplifiedTermFeature.create(heapLDT) ) ) ),
-                              longConst(-5500),
+                              longConst(-5700),
                               inftyConst() ) );
         bindRuleSet ( d, "simplify_select",
                       ifZero( add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
                                    not( applyTF( FocusProjection.INSTANCE,
                                                  AllSelectsSimplifiedTermFeature.create(heapLDT) ) ) ),
-                              longConst(-5400),
+                              longConst(-5600),
                               inftyConst() ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
                       ifZero( add( NoSelfApplicationFeature.INSTANCE ,
