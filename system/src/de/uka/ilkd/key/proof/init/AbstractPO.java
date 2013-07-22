@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -38,7 +39,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.AuxiliaryTermLabelInstantiator;
+import de.uka.ilkd.key.rule.ITermLabelWorker;
+import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -273,15 +279,24 @@ public abstract class AbstractPO implements IPersistablePO {
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath());
-        return new Proof(proofName,
-                         poTerm,
-                         header,
-                         initConfig.createTacletIndex(),
-                         initConfig.createBuiltInRuleIndex(),
-                         initConfig.getServices(),
-                         initConfig.getSettings() != null
-                         ? initConfig.getSettings()
-                         : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+        Proof proof = new Proof(proofName,
+                                poTerm,
+                                header,
+                                initConfig.createTacletIndex(),
+                                initConfig.createBuiltInRuleIndex(),
+                                initConfig.getServices(),
+                                initConfig.getSettings() != null
+                                ? initConfig.getSettings()
+                                : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+
+        // add label workers
+        ImmutableList<ITermLabelWorker> labelInstantiators =
+                ImmutableSLList.<ITermLabelWorker>nil();
+        labelInstantiators =
+                labelInstantiators.append(AuxiliaryTermLabelInstantiator.INSTANCE);
+        proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
+
+        return proof;
     }
 
 
