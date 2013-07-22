@@ -36,10 +36,6 @@ public final class IsAuxiliaryConstantTermFeature extends BinaryTermFeature {
         return t.hasLabels() &&
                t.containsLabel(AuxiliaryTermLabel.INSTANCE) &&
                t.op().arity() == 0 &&
-               t.op() instanceof Function &&
-               // the following is more or less a hack to match only on
-               // skolem constants introduced by select-rules
-               t.toString().startsWith("selectSK");
-
+               t.op() instanceof Function;
     }
 }
