@@ -855,14 +855,7 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (KeYTypeUtil.isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
-                  return explicitConstructor != null && 
-                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
-               }
-               else {
-                  return !pm.isImplicit(); // Do not include implicit methods, but always constructors
-               }
+               return isNotImplicite(node.proof().getServices(), pm);
             }
          }
          else {
@@ -871,6 +864,28 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link IProgramMethod} is not implicit.
+    * @param services The {@link Services} to use.
+    * @param pm The {@link IProgramMethod} to check.
+    * @return {@code true} is not implicite, {@code false} is implicite 
+    */
+   public static boolean isNotImplicite(Services services, IProgramMethod pm) {
+      if (pm != null) {
+         if (KeYTypeUtil.isImplicitConstructor(pm)) {
+            IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
+            return explicitConstructor != null && 
+                   !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
+         }
+         else {
+            return !pm.isImplicit(); // Do not include implicit methods, but always constructors
+         }
+      }
+      else {
+         return true;
       }
    }
    

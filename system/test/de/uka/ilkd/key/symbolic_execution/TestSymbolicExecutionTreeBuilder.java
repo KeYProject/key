@@ -38,6 +38,28 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor
+    */
+   public void testUseOperationContractStatementsInImpliciteConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/test/UseOperationContractStatementsInImpliciteConstructor.java", 
+                "UseOperationContractStatementsInImpliciteConstructor", 
+                "average", 
+                null,
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/oracle/UseOperationContractStatementsInImpliciteConstructor.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
    /**
     * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantLoopSplittingCondition
