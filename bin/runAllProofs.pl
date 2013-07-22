@@ -28,12 +28,13 @@ my $time_limit = 30*60;
 #
 # Command line options
 my %option = ();
-GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
+GetOptions(\%option, 'help|h', 'verbose|v', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$path_to_index\'.\n";
 #  print "\'$path_to_index\' can be found in the directory \'$key_path/$path_to_examples$path_to_automated\'.\n\n";
   print "Use '-h' or '--help' to get this text (very necessary this line).\n";
+  print "Use '-v' or '--verbose' to increase verbosity.\n";
   print "Use '-z' or '--silent' to reduce verbosity (only final results are displayed).\n";
   print "Use '-l' or '--reload' to save proofs and reload them directly afterwards. (Test cases for proof loading.)\n";
   print "Use '-d' or '--delete' to delete all files created automatically by a run of this script.\n";
@@ -368,7 +369,10 @@ sub runAuto {
   if ($option{'printStatistics'}) {
     $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
   }
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto --autosave 1000 $statisticsCmd '$dk'";
+  my $verbosity = "";
+  if ($option{'silent'}) { $verbosity = "--v 0"; }
+  if ($option{'verbose'}) { $verbosity = "--v 2"; }
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto --autosave 1000 $verbosity $statisticsCmd '$dk'";
    print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
