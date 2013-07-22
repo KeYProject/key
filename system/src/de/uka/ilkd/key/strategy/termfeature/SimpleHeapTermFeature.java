@@ -13,10 +13,9 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
+import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 
 
 public final class SimpleHeapTermFeature extends BinaryTermFeature {
@@ -35,10 +34,10 @@ public final class SimpleHeapTermFeature extends BinaryTermFeature {
     protected boolean filter (Term t) {
         return  // either the heap term is the base heap
                 t.op() == heapLDT.getHeap() ||
-                // or the heap term is an auxiliary heap symbol
+                // or the heap term is an anon heap symbol
                 // (for instance an anonHeap function)
                 (   t.hasLabels() &&
-                    t.containsLabel(AuxiliaryTermLabel.INSTANCE) &&
+                    t.containsLabel(AnonHeapTermLabel.INSTANCE) &&
                     t.op().arity() == 0 &&
                     t.op() instanceof Function);
     }

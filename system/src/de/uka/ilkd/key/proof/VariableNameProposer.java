@@ -130,7 +130,7 @@ public class VariableNameProposer implements InstantiationProposer {
         final String result;
         final SchemaVariable v = p_app.taclet ().getNameCorrespondent ( p_var );
         if ( v != null && p_app.instantiations ().isInstantiated ( v ) &&
-             // by now we need the unmodified name "selectSk" to label skolem
+             // by now we need the unmodified name "selectSK" to label skolem
              // constants introduced by select-rules as auxiliary
              // (doing the decision on the name of the skolem constant is may
              // be not the best idea -- but I didn't have a better one by now)

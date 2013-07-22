@@ -19,7 +19,8 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
+import de.uka.ilkd.key.logic.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
@@ -189,8 +190,11 @@ public final class TermLabelWorkerManagement {
       else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE;
       }
-      else if(AuxiliaryTermLabel.NAME.toString().equals(name)) {
-         return AuxiliaryTermLabelInstantiator.INSTANCE;
+      else if(SelectSkolemConstantTermLabel.NAME.toString().equals(name)) {
+         return SelectSkolemConstantTermLabelInstantiator.INSTANCE;
+      }
+      else if(AnonHeapTermLabel.NAME.toString().equals(name)) {
+         return AnonHeapTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;

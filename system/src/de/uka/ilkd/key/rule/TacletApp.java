@@ -748,7 +748,7 @@ public abstract class TacletApp implements RuleApp {
             // label skolem constants introduced by select-rules as auxiliary
             // (doing the decision on the name of the skolem constant is may
             // be not the best idea -- but I didn't have a better one by now)
-            term = TB.label(term, AuxiliaryTermLabel.INSTANCE);
+            term = TB.label(term, SelectSkolemConstantTermLabel.INSTANCE);
         }
 	return addInstantiation(sv, term, interesting, services);
     }

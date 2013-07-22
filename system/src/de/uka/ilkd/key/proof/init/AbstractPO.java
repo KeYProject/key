@@ -39,12 +39,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.AuxiliaryTermLabelInstantiator;
+import de.uka.ilkd.key.rule.AnonHeapTermLabelInstantiator;
+import de.uka.ilkd.key.rule.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.rule.ITermLabelWorker;
-import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
-import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -293,7 +291,9 @@ public abstract class AbstractPO implements IPersistablePO {
         ImmutableList<ITermLabelWorker> labelInstantiators =
                 ImmutableSLList.<ITermLabelWorker>nil();
         labelInstantiators =
-                labelInstantiators.append(AuxiliaryTermLabelInstantiator.INSTANCE);
+                labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+        labelInstantiators =
+                labelInstantiators.append(AnonHeapTermLabelInstantiator.INSTANCE);
         proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
 
         return proof;

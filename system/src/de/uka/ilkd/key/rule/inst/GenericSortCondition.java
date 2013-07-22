@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.strategy.termfeature.IsAuxiliaryConstantTermFeature;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;

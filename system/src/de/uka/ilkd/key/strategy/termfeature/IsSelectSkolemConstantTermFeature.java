@@ -12,7 +12,7 @@
 // 
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
+import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 
@@ -21,20 +21,20 @@ import de.uka.ilkd.key.logic.op.Function;
  * A schema variable that is used as placeholder for auxiliary heap skolem
  * constants.
  */
-public final class IsAuxiliaryConstantTermFeature extends BinaryTermFeature {
+public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
 
-    public static final IsAuxiliaryConstantTermFeature INSTANCE =
-            new IsAuxiliaryConstantTermFeature();
+    public static final IsSelectSkolemConstantTermFeature INSTANCE =
+            new IsSelectSkolemConstantTermFeature();
 
 
-    private IsAuxiliaryConstantTermFeature() {
+    private IsSelectSkolemConstantTermFeature() {
     }
 
 
     @Override
     protected boolean filter(Term t) {
         return t.hasLabels() &&
-               t.containsLabel(AuxiliaryTermLabel.INSTANCE) &&
+               t.containsLabel(SelectSkolemConstantTermLabel.INSTANCE) &&
                t.op().arity() == 0 &&
                t.op() instanceof Function;
     }

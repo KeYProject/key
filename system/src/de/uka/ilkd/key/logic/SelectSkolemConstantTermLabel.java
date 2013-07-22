@@ -14,25 +14,25 @@ package de.uka.ilkd.key.logic;
 
 
 /**
- * Label attached to auxiliary variables (skolem constants).
+ * Label attached to skolem constants introduced by the rule pullOutSelect.
  */
-public class AuxiliaryTermLabel implements ITermLabel {
+public class SelectSkolemConstantTermLabel implements ITermLabel {
 
     /**
      * The unique name of this label.
      */
-    public static final Name NAME = new Name("auxiliary");
+    public static final Name NAME = new Name("selectSK");
 
     /**
      * The only instance of this class.
      */
-    public static AuxiliaryTermLabel INSTANCE = new AuxiliaryTermLabel();
+    public static SelectSkolemConstantTermLabel INSTANCE = new SelectSkolemConstantTermLabel();
 
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private AuxiliaryTermLabel() {
+    private SelectSkolemConstantTermLabel() {
     }
 
 

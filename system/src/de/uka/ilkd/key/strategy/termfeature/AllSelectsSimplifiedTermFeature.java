@@ -13,7 +13,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
+import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
@@ -59,10 +59,10 @@ public final class AllSelectsSimplifiedTermFeature extends BinaryTermFeature {
                                     !isSelectOp ||
                                     // or the heap term of the select operator is the base heap
                                     visited.sub(0).op() == heapLDT.getHeap() ||
-                                    // or the heap term of the select operator is an auxiliary heap symbol
+                                    // or the heap term of the select operator is an anon heap symbol
                                     // (for instance an anonHeap function)
                                     (   visited.sub(0).hasLabels() &&
-                                        visited.sub(0).containsLabel(AuxiliaryTermLabel.INSTANCE) &&
+                                        visited.sub(0).containsLabel(AnonHeapTermLabel.INSTANCE) &&
                                         visited.sub(0).op().arity() == 0 &&
                                         visited.sub(0).op() instanceof Function));
         }

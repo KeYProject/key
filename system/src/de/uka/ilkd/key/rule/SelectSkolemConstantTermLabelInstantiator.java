@@ -13,7 +13,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.AuxiliaryTermLabel;
+import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -31,18 +31,18 @@ import java.util.List;
  * <p/>
  * @author Christoph Scheben
  */
-public final class AuxiliaryTermLabelInstantiator implements ITermLabelWorker {
+public final class SelectSkolemConstantTermLabelInstantiator implements ITermLabelWorker {
 
     /**
      * The only instance of this class.
      */
-    public static final AuxiliaryTermLabelInstantiator INSTANCE =
-            new AuxiliaryTermLabelInstantiator();
+    public static final SelectSkolemConstantTermLabelInstantiator INSTANCE =
+            new SelectSkolemConstantTermLabelInstantiator();
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private AuxiliaryTermLabelInstantiator() {
+    private SelectSkolemConstantTermLabelInstantiator() {
     }
 
     /**
@@ -50,7 +50,7 @@ public final class AuxiliaryTermLabelInstantiator implements ITermLabelWorker {
      */
     @Override
     public String getName() {
-        return AuxiliaryTermLabel.NAME.toString();
+        return SelectSkolemConstantTermLabel.NAME.toString();
     }
 
 
@@ -79,8 +79,8 @@ public final class AuxiliaryTermLabelInstantiator implements ITermLabelWorker {
                                          Goal goal) {
         // keep labels
         List<ITermLabel> updatedLabels = new LinkedList<ITermLabel>();
-        if (termToUpdate.containsLabel(AuxiliaryTermLabel.INSTANCE)) {
-            updatedLabels.add(AuxiliaryTermLabel.INSTANCE);
+        if (termToUpdate.containsLabel(SelectSkolemConstantTermLabel.INSTANCE)) {
+            updatedLabels.add(SelectSkolemConstantTermLabel.INSTANCE);
         }
         return updatedLabels;
     }

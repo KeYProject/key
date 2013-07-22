@@ -37,8 +37,11 @@ public class LabelFactory {
       else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabel.INSTANCE;
       }
-      else if (AuxiliaryTermLabel.NAME.toString().equals(name)) {
-          return AuxiliaryTermLabel.INSTANCE;
+      else if (SelectSkolemConstantTermLabel.NAME.toString().equals(name)) {
+          return SelectSkolemConstantTermLabel.INSTANCE;
+      }
+      else if (AnonHeapTermLabel.NAME.toString().equals(name)) {
+          return AnonHeapTermLabel.INSTANCE;
       }
       else {
          throw new UnknownLabelException(name);
