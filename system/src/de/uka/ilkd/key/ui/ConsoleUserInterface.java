@@ -78,7 +78,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 System.out.println("]"); // end progress bar
             }
             if (verbosity > SILENT) {
-                System.out.println(" [DONE  ... rule application ]");
+                System.out.println("[ DONE  ... rule application ]");
                 if (verbosity >= HIGH) {
                     System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
                     final Proof.Statistics stat = info.getProof().statistics();
@@ -93,7 +93,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
-            if (verbosity > SILENT) System.out.println(" [DONE ... loading ]");
+            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
             if (!"".equals(info.getResult())) {
                 if (verbosity > SILENT) System.out.println(info.getResult());
                     System.exit(-1);

@@ -70,7 +70,7 @@ public final class Main {
     public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
-    private static final String VERBOSITY = "--v";
+    private static final String VERBOSITY = "--verbose";
 
     /** The time of the program start in millis. */
     private static long startTime;
