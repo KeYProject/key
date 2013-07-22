@@ -351,7 +351,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       ifZero( not( applyTF( "h", SimpleHeapTermFeature.create(heapLDT) ) ),
                               ifZero( applyTF(FocusFormulaProjection.INSTANCE, ff.update),
                                       longConst(-4200),
-                                      longConst(-2000) ),
+                                      longConst(-1900) ),
                               inftyConst() ) );
         bindRuleSet ( d, "apply_select_eq",
                       ifZero( add( NoSelfApplicationFeature.INSTANCE ,
@@ -373,12 +373,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                               ifZero( not( add( isInstantiated("s"),
                                                 applyTFNonStrict("s", ContainsIfThenElseTermFeature.INSTANCE) ) ),
                                       longConst(-5500),
-                                      ifZero( add( isInstantiated("t2"),
-                                                   or( applyTF("t2", vf.nullTerm),
-                                                       applyTF("t2", vf.tt),
-                                                       applyTF("t2", vf.ff) ) ),
-                                              longConst(-200),
-                                              inftyConst() ) ),
+                                      inftyConst() ),
                               inftyConst() ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
                       ifZero( add( applyTF("sk", IsAuxiliaryConstantTermFeature.INSTANCE),
