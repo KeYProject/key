@@ -92,13 +92,20 @@ public final class AutoSaver implements ProverTaskListener {
         proof = null;
     }
 
-    private void save(String filename) {
-        try {
-            new ProofSaver(proof, filename, de.uka.ilkd.key.gui.Main.INTERNAL_VERSION).save();
-            Debug.out("File saved: "+filename);
-        } catch (IOException e) {
-            Debug.out("Autosaving file "+filename+" failed.",e);
-        }
+    private void save(final String filename) {
+        final Runnable r = new Runnable() {
+
+            // there may be concurrent changes to the proof... whatever
+            public void run() {
+                try {
+                    new ProofSaver(proof, filename, de.uka.ilkd.key.gui.Main.INTERNAL_VERSION).save();
+                    Debug.out("File saved: "+filename);
+                } catch (IOException e) {
+                    Debug.out("Autosaving file "+filename+" failed.",e);
+                }
+            }
+        };
+        (new Thread(null,r,"Autosaver")).run();
     }
 
 }
