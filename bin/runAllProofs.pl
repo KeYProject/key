@@ -372,7 +372,7 @@ sub runAuto {
   my $verbosity = "";
   if ($option{'silent'}) { $verbosity = "--verbose 0"; }
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto --autosave 1000 $verbosity $statisticsCmd '$dk'";
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto $verbosity $statisticsCmd '$dk'";
    print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
