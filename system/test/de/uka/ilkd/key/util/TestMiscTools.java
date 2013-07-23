@@ -80,7 +80,7 @@ public class TestMiscTools extends TestCase {
         assertEquals("Windows",u);
         // do stupid things
         try {
-            t = "/home/daniel";
+            t = File.separator + "home" + File.separator + "daniel";
             u = MiscTools.makeFilenameRelative(s, t);
             fail();
         } catch (RuntimeException e){

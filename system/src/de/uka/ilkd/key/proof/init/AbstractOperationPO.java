@@ -528,7 +528,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // label modality if required
       if (addSymbolicExecutionLabel) {
-         programTerm = TB.label(programTerm, new SymbolicExecutionTermLabel(SymbolicExecutionTermLabel.START_ID));
+         int labelID = services.getCounter(SymbolicExecutionTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+         programTerm = TB.label(programTerm, new SymbolicExecutionTermLabel(labelID));
       }
 
       // create update

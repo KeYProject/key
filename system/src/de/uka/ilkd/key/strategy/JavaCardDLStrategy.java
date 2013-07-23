@@ -1098,7 +1098,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
                              inftyConst() ) );
 
-        bindRuleSet ( d, "setEqualityBlastingRight", longConst(-150) );
+        bindRuleSet ( d, "setEqualityBlastingRight", longConst(-100) );
 
         bindRuleSet ( d, "cnf_setComm",
                       add ( SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
@@ -2451,11 +2451,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public final boolean isApprovedApp (RuleApp app,
                                         PosInOccurrence pio,
                                         Goal goal) {
-//	if(app.rule()==UseDependencyContractRule.INSTANCE) {
-//	    boolean result = !( approvalF.compute ( app, pio, goal ) instanceof TopRuleAppCost );
-//	    System.out.println("Approval for node " + goal.node().serialNr() + ": " + result);
-//	    return result;
-//	}	
         return !( approvalF.compute ( app, pio, goal ) instanceof TopRuleAppCost );
     }
     
@@ -2708,7 +2703,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
 //            directCutAllowed = add ( atom, not ( modalOperator ) );
             notExecutable = not ( program );
-            notContainsExecutable = rec ( any (), notExecutable );
+            
+            notContainsExecutable = not ( ContainsExecutableCodeTermFeature.PROGRAMS );
             
             cutAllowed =
                 add ( notContainsExecutable,

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
@@ -79,7 +80,7 @@ public class Services{
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters = new LinkedHashMap<String, Counter>();
+    private HashMap<String, Counter> counters;
 
     /**
      * specification repository
@@ -99,6 +100,7 @@ public class Services{
     public Services(Profile profile, KeYExceptionHandler exceptionHandler){
        assert profile != null;
        this.profile = profile;
+       this.counters = new LinkedHashMap<String, Counter>();
 	cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
 	if(exceptionHandler == null){
@@ -118,9 +120,11 @@ public class Services{
     
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, 
-		     KeYRecoderMapping rec2key) {
+		     KeYRecoderMapping rec2key, HashMap<String, Counter> counters) {
    assert profile != null;
+   assert counters != null;
    this.profile = profile;
+   this.counters = counters;
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
 	//	exceptionHandler = new KeYRecoderExcHandler();
@@ -218,7 +222,7 @@ public class Services{
 	     "services: tried to copy schema cross reference service config.");
 	Services s = new Services
 	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-	     getJavaInfo().getKeYProgModelInfo().rec2key().copy());
+	     getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters());
         s.specRepos = specRepos;
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setExceptionHandler(getExceptionHandler());
@@ -227,6 +231,18 @@ public class Services{
 	return s;
     }
     
+    /**
+     * Creates a deep copy of {@link #counters} which means that a new
+     * list is created with a copy of each contained {@link Counter}.
+     * @return The created deep copy with new {@link Counter} instances.
+     */
+    private HashMap<String, Counter> copyCounters() {
+       HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
+       for (Entry<String, Counter> entry : counters.entrySet()) {
+          result.put(entry.getKey(), entry.getValue().copy());
+       }
+       return result;
+    }
 
     /**
      * creates a new service object with the same ldt information 
@@ -247,7 +263,7 @@ public class Services{
     
     public Services copyProofSpecific(Proof p_proof) {
         final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key());
+                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters());
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
