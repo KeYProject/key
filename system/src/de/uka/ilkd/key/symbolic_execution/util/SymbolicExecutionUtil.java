@@ -486,6 +486,7 @@ public final class SymbolicExecutionUtil {
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
+      starter.getProof().getSettings().getLabelSettings().setLabelInstantiators(proof.getSettings().getLabelSettings().getLabelInstantiators()); // Use label instantiators of original proof also in side proof.
       return starter;
    }
    
@@ -855,14 +856,7 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (KeYTypeUtil.isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
-                  return explicitConstructor != null && 
-                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
-               }
-               else {
-                  return !pm.isImplicit(); // Do not include implicit methods, but always constructors
-               }
+               return isNotImplicite(node.proof().getServices(), pm);
             }
          }
          else {
@@ -871,6 +865,28 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link IProgramMethod} is not implicit.
+    * @param services The {@link Services} to use.
+    * @param pm The {@link IProgramMethod} to check.
+    * @return {@code true} is not implicite, {@code false} is implicite 
+    */
+   public static boolean isNotImplicite(Services services, IProgramMethod pm) {
+      if (pm != null) {
+         if (KeYTypeUtil.isImplicitConstructor(pm)) {
+            IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
+            return explicitConstructor != null && 
+                   !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
+         }
+         else {
+            return !pm.isImplicit(); // Do not include implicit methods, but always constructors
+         }
+      }
+      else {
+         return true;
       }
    }
    
@@ -1299,92 +1315,6 @@ public final class SymbolicExecutionUtil {
        */
       public Term getModality() {
          return modality;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param sequent The {@link Sequent} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Sequent sequent) {
-      if (sequent != null) {
-         int nextAntecedent = computeNextSymbolicExecutionLabelId(sequent.antecedent());
-         int nextSuccedent = computeNextSymbolicExecutionLabelId(sequent.succedent());
-         return nextAntecedent > nextSuccedent ? nextAntecedent : nextSuccedent;
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param semisequent The {@link Semisequent} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Semisequent semisequent) {
-      if (semisequent != null) {
-         int nextId = SymbolicExecutionTermLabel.START_ID;
-         for (SequentFormula sf : semisequent) {
-            int nextSfId = computeNextSymbolicExecutionLabelId(sf.formula());
-            if (nextSfId > nextId) {
-               nextId = nextSfId;
-            }
-         }
-         return nextId;
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param term The {@link Term} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Term term) {
-      if (term != null) {
-         NextSymbolicExecutionLabelIdVisitor visitor = new NextSymbolicExecutionLabelIdVisitor();
-         term.execPreOrder(visitor);
-         return visitor.getNextId();
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-   
-   /**
-    * Utility class used to compute the next unused ID of {@link SymbolicExecutionTermLabel}s
-    * used by {@link SymbolicExecutionUtil#computeNextSymbolicExecutionLabelId(Term)}.
-    * @author Martin Hentschel
-    */
-   private static final class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
-      /**
-       * The next unused ID.
-       */
-      private int nextId = SymbolicExecutionTermLabel.START_ID;
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void visit(Term visited) {
-         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
-         if (label != null) {
-            if (label.getId() + 1 > nextId) {
-               nextId = label.getId() + 1;
-            }
-         }
-      }
-
-      /**
-       * Returns the next unused ID.
-       * @return The next unused ID.
-       */
-      public int getNextId() {
-         return nextId;
       }
    }
 
