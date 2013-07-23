@@ -455,7 +455,7 @@ public final class Main {
     }
 
     private static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
-        final PrintStream ps = System.err;
+        PrintStream ps = exitValue==0 ? System.out : System.err;
         if(offending != null) {
             ps.println(offending);
         }

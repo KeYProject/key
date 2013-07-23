@@ -398,7 +398,7 @@ sub processReturn {
 
 sub reloadFile {
     my $file = $_[0];
-    if (not $option{'silent'}) {print "Try to reload proof result $file:\n";}
+    if (not $option{'silent'}) {print "\nTry to reload proof result $file:\n";}
 
     my $dk = &getcwd . "/$file";
     unless(-r $dk) {

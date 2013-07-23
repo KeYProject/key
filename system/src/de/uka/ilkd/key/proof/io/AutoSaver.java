@@ -69,7 +69,7 @@ public final class AutoSaver implements ProverTaskListener {
         if (progress > 0 && progress % interval == 0) {
             final int quot = progress/interval;
             final String filename = PREFIX+quot+".key";
-            save(filename);
+            save(filename,proof);
         }
     }
 
@@ -84,7 +84,7 @@ public final class AutoSaver implements ProverTaskListener {
         if (saveClosed) {
             if (proof == null) throw new IllegalStateException("please set a proof first");
             if (proof.closed()) {
-                save(PREFIX+"proof");
+                save(PREFIX+"proof",proof);
             }
         }
 
@@ -92,7 +92,7 @@ public final class AutoSaver implements ProverTaskListener {
         proof = null;
     }
 
-    private void save(final String filename) {
+    private void save(final String filename, final Proof proof) {
         final Runnable r = new Runnable() {
 
             // there may be concurrent changes to the proof... whatever
@@ -102,6 +102,9 @@ public final class AutoSaver implements ProverTaskListener {
                     Debug.out("File saved: "+filename);
                 } catch (IOException e) {
                     Debug.out("Autosaving file "+filename+" failed.",e);
+                } catch (Exception x) {
+                    // really should not happen, but catching prevents worse
+                    x.printStackTrace();
                 }
             }
         };
