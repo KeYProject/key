@@ -80,6 +80,7 @@ public class ProofIndependentSettings implements SettingsListener {
             for(Settings settings : settingsSet){
                 settings.readSettings(this,properties);
             }
+            in.close();
         }
         
         public void saveSettings(){

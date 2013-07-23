@@ -6,7 +6,9 @@
 pre: x &lt; 0 | x &gt;= 0
 post: (   x &lt; 0
    -&gt;   !exc = null
-      &amp; java.lang.Exception::instance(exc) = TRUE)
+      &amp; (    java.lang.RuntimeException::instance(exc)
+           = TRUE
+         | java.lang.Exception::instance(exc) = TRUE))
 &amp; (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
 mod: allLocs \cup allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">

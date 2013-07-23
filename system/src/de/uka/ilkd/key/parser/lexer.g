@@ -119,6 +119,7 @@ tokens {
         WITHOPTIONS="\\withOptions";
         OPTIONSDECL="\\optionsDecl";
 	KEYSETTINGS = "\\settings";
+        PROFILE = "\\profile";
 
         // Those guys can stay being keywords
 	TRUE = "true";
@@ -141,6 +142,8 @@ tokens {
 	FIND = "\\find";
 	ADD = "\\add";
 	ASSUMES = "\\assumes";
+	TRIGGER = "\\trigger";
+	AVOID = "\\avoid";
 
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";

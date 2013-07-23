@@ -563,6 +563,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term invTerm = null;
         for(LocationVariable heap : heapContext) {
             final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+      if(i == null) continue;
             if(invTerm == null) {
                 invTerm = i;
             } else{

@@ -316,6 +316,10 @@ public final class DLSpecFactory {
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
         posts.put(heapLDT.getHeap(), post);
       	
+        Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+        hasMod.put(heapLDT.getHeap(), true);
+        hasMod.put(heapLDT.getSavedHeap(), true);
+        
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
@@ -325,9 +329,10 @@ public final class DLSpecFactory {
 					 modality, 
 					 pres,
 					 null,// TODO measured_by in DL contracts not supported yet
-					 posts, 
+					 posts,
+					 null, // TODO no model methods in DL contracts
 					 mods, 
-					 true, // TODO strictly pure in DL contracts not supported yet
+					 hasMod, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 

@@ -90,7 +90,7 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
                 new SymbolicExecutionPO(initConfig, po.getContract(),
                                         po.getIFVars().symbExecVars, goal);
         ProblemInitializer pi =
-                new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
+                new ProblemInitializer(mediator.getUI(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
         try {

@@ -6,7 +6,7 @@ public class ConfigurationExtractorWithOperationContractsTest {
 		return add;
 	}
 	
-	/*@ 
+	/*@ normal_behavior
 	  @ ensures \result == x.value + y.value;
 	  @ */
 	public static int sub(IntWrapper x, IntWrapper y) {

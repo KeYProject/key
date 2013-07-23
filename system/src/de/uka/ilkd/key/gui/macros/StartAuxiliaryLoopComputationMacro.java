@@ -96,7 +96,7 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
                 new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars,
                                        goal, loopInv.getExecutionContext());
         ProblemInitializer pi =
-                new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
+                new ProblemInitializer(mediator.getUI(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
         try {

@@ -276,4 +276,14 @@ public class IFBlockExamples {
 
             low = l1;
         }
+
+        //@ respects low;
+        public void secure_5() {
+            //@ normal_behavior
+            //@ assignable low;
+            //@ respects low;
+            {   low++;
+            }
+        }
+
 }

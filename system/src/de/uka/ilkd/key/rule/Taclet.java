@@ -186,6 +186,8 @@ public abstract class Taclet implements Rule, Named {
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
     
+    private Trigger trigger;
+    
     /* TODO: find better solution*/
     private final boolean surviveSymbExec;
     
@@ -211,19 +213,29 @@ public abstract class Taclet implements Rule, Named {
            ImmutableSet<Choice> choices,
            boolean surviveSmbExec) {
 
-        this.name = name;
-        ifSequent = applPart.ifSequent();
-        varsNew = applPart.varsNew();
-        varsNotFreeIn = applPart.varsNotFreeIn();
+        this.name          = name;
+        ifSequent          = applPart.ifSequent();
+        varsNew            = applPart.varsNew();
+        varsNotFreeIn      = applPart.varsNotFreeIn();
         varsNewDependingOn = applPart.varsNewDependingOn();
         variableConditions = applPart.getVariableConditions();
         this.goalTemplates = goalTemplates;
-        this.ruleSets = ruleSets;
-        this.choices = choices;
-        this.prefixMap = prefixMap;
+        this.ruleSets      = ruleSets;
+        this.choices       = choices;
+        this.prefixMap     = prefixMap;
         this.displayName = attrs.displayName() == null
                            ? name.toString() : attrs.displayName();
         this.surviveSymbExec = surviveSmbExec;
+
+        this.trigger = attrs.getTrigger();
+    }
+
+    public boolean hasTrigger() {
+        return trigger != null;
+    }
+
+    public Trigger getTrigger() {
+        return trigger;
     }
 
     /**
@@ -248,7 +260,7 @@ public abstract class Taclet implements Rule, Named {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
              false);
     }
-        
+    
     protected void cacheMatchInfo() {
 	boundVariables = getBoundVariables();
         

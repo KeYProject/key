@@ -16,6 +16,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -90,6 +91,16 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    private KeYMediator mediator;
+   
+   
+   /** a value == 1 means the current branch is ignored; a value > 1 means that the "skipBranch - 1" parent branch of the
+    *  current branch is ignored.
+    *  a value == 0 means that no branch is ignored 
+    */
+   private int skipBranch;
+
+   private List<Throwable> errors = new LinkedList<Throwable>();
+
 
    public DefaultProofFileParser(DefaultProblemLoader loader, Proof proof, KeYMediator mediator) {
       super();
@@ -117,14 +128,18 @@ public class DefaultProofFileParser implements IProofFileParser {
 // note: Expressions without parameters only emit the endExpr signal
    @Override
    public void beginExpr(char id, String s) throws ProblemLoaderException {
-       //System.out.println("start "+id+"="+s);
 
        //start no new commands until the ignored branch closes
        //count sub-branches though
+       if (skipBranch > 0 && id != 'b') return;
+       
        switch (id) {
        case 'b' :
            stack.push(children);
            if (children.hasNext()) currNode = children.next();
+           if (skipBranch > 0) {
+               skipBranch ++;
+           }
            break;
   case 'r' :
            if (currNode == null) currNode = children.next();
@@ -235,10 +250,16 @@ public class DefaultProofFileParser implements IProofFileParser {
    @Override
    public void endExpr(char id, int linenr) throws ProblemLoaderException {
        //System.out.println("end "+id);
+
        //read no new commands until ignored branch closes
+       if (skipBranch > 0 && id != 'b') return;
+
        switch (id) {
        case 'b' :
            children = stack.pop();
+           if (skipBranch > 0) {
+               skipBranch--;
+           }
            break;
        case 'a' :
            if (currNode != null) {
@@ -251,8 +272,8 @@ public class DefaultProofFileParser implements IProofFileParser {
               children = currNode.childrenIterator();
               currNode = null;
            } catch(Exception e) {
-               throw new ProblemLoaderException(loader,ERROR_LOADING_PROOF_LINE+
-                   linenr+RULE+currTacletName+NOT_APPLICABLE,e);
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'n' :
@@ -265,10 +286,10 @@ public class DefaultProofFileParser implements IProofFileParser {
                children = currNode.childrenIterator();
                currNode = null;
            } catch (SkipSMTRuleException e) {
-           // silently continue; status will be reported via polling
+               // silently continue; status will be reported via polling
            } catch (BuiltInConstructionException e) {
-               throw new ProblemLoaderException(loader, ERROR_LOADING_PROOF_LINE+
-                   linenr+RULE+currTacletName+NOT_APPLICABLE,e);
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
@@ -281,8 +302,8 @@ public class DefaultProofFileParser implements IProofFileParser {
            } catch(RuntimeException e) {
 //        System.out.println("formula: " + currIfInstFormula);
 //        System.out.println("term: " + currIfInstPosInTerm);
-               throw new ProblemLoaderException(loader, ERROR_LOADING_PROOF_LINE+
-                   linenr +RULE+currTacletName+NOT_APPLICABLE,e);
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+linenr +RULE+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        }
@@ -290,14 +311,25 @@ public class DefaultProofFileParser implements IProofFileParser {
    }
 
 
+   
+   private void reportError(String string, Exception e) {       
+       status = "Errors while reading the proof. Not all branches could be load successfully.";
+       errors.add(new ProblemLoaderException(loader, string, e));
+   }
 
+   /** 
+    * returns list of errors that have been reported during parsing
+    * @return list of errors
+    */
+   @Override
+   public List<Throwable> getErrors() {
+       return errors;
+   }
+   
    public void loadPreferences(String preferences) {
        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
        proofSettings.loadSettingsFromString(preferences);
    }
-
-
-
 
    /**
     * Constructs rule application for UpdateSimplification from

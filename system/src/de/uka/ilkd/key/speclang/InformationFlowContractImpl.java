@@ -159,7 +159,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
         this(bc.getName(), null, bc.getKJT(), bc.getMethod(), bc.getTarget().getContainerType(),
              bc.getModality(), bc.getPre(services), null, bc.getMod(services),
-             bc.hasModifiesClause(), bc.getVariablesAsTerms().self,
+             bc.hasModifiesClause(services.getTypeConverter().getHeapLDT().getHeap()),
+             bc.getVariablesAsTerms().self,
              ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
              bc.getVariablesAsTerms().exception, TB.var(bc.getVariables()
                      .combineRemembranceVariables().get(services.getTypeConverter()
@@ -666,9 +667,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     
     @Override
     @Deprecated
-    public Term getMby(Term heapTerm,
+    public Term getMby(
+                       Map<LocationVariable, Term> heapTerms,
                        Term selfTerm,
                        ImmutableList<Term> paramTerms,
+                       Map<LocationVariable, Term> atPres,
                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. "
                 + "Please use the POSnippetFactory instead.");

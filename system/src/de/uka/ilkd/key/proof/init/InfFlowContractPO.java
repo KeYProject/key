@@ -193,31 +193,37 @@ public class InfFlowContractPO extends AbstractOperationPO
         properties.setProperty("Non-interference contract", contract.getName());
     }
 
+    @Override
     public InfFlowProofSymbols getIFSymbols() {
         assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
+    @Override
     public void addIFSymbol(Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
 
+    @Override
     public void addIFSymbol(Named n) {
         assert n != null;
         infFlowSymbols.add(n);
     }
 
+    @Override
     public void addLabeledIFSymbol(Term t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
 
+    @Override
     public void addLabeledIFSymbol(Named n) {
         assert n != null;
         infFlowSymbols.addLabeled(n);
     }
 
+    @Override
     public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
@@ -232,6 +238,17 @@ public class InfFlowContractPO extends AbstractOperationPO
             ProgramVariable resultVar) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
+    }
+
+
+    @Override
+    @Deprecated
+    protected ImmutableList<StatementBlock> buildOperationBlocks(
+                                                                 ImmutableList<LocationVariable> formalParVars,
+                                                                 ProgramVariable selfVar,
+                                                                 ProgramVariable resultVar) {
+        throw new UnsupportedOperationException("Not supported any more. " +
+                 "Please use the POSnippetFactory instead.");
     }
 
 
@@ -276,15 +293,6 @@ public class InfFlowContractPO extends AbstractOperationPO
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars) {
-        throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
-    }
-
-
-    @Override
-    @Deprecated
-    protected Term generateMbyAtPreDef(Term selfVar,
-                                       ImmutableList<Term> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }

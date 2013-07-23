@@ -248,23 +248,24 @@ public class ChoiceSelector extends JDialog {
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
-        if(explanationMap == null) {
-            explanationMap = new Properties();
-            InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
-            try {
-                if (is == null) {
-                    throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
-                }
-                explanationMap.loadFromXML(is);
-            } catch (InvalidPropertiesFormatException e) {
-                System.err.println("Cannot load help message in rule view (malformed XML).");
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.err.println("Cannot load help messages in rule view.");
-                e.printStackTrace();
-            } 
+        synchronized (ChoiceSelector.class) {
+            if(explanationMap == null) {
+                explanationMap = new Properties();
+                InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
+                try {
+                    if (is == null) {
+                        throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
+                    }
+                    explanationMap.loadFromXML(is);
+                } catch (InvalidPropertiesFormatException e) {
+                    System.err.println("Cannot load help message in rule view (malformed XML).");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    System.err.println("Cannot load help messages in rule view.");
+                    e.printStackTrace();
+                } 
+            }
         }
-        
         String result = explanationMap.getProperty(category);
         if(result == null) {
             result = "No explanation for " + category + " available.";

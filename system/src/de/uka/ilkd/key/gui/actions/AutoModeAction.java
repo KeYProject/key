@@ -72,7 +72,7 @@ public final class AutoModeAction extends MainWindowAction {
 
     public AutoModeAction(MainWindow mainWindow) {
         super(mainWindow);
-        associatedProof = getMediator().getProof();
+        associatedProof = getMediator().getSelectedProof();
         putValue("hideActionText", Boolean.TRUE);
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);

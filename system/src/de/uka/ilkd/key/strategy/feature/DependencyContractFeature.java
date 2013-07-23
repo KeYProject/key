@@ -19,11 +19,13 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 
 public final class DependencyContractFeature extends BinaryFeature {
@@ -57,8 +59,13 @@ public final class DependencyContractFeature extends BinaryFeature {
 	final Term focus = pos.subTerm();
 
 	//determine possible steps
+	
+	List<LocationVariable> heapContext =
+	     bapp.getHeapContext() != null ? bapp.getHeapContext() :
+		 HeapContext.getModHeaps(goal.proof().getServices(), false);
+
 	final List<PosInOccurrence> steps 
-		= UseDependencyContractRule.getSteps(pos, 
+		= UseDependencyContractRule.getSteps(heapContext, pos, 
 				goal.sequent(), 
 				goal.proof().getServices());
 	if(steps.isEmpty()) {

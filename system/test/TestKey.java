@@ -32,6 +32,7 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] logicModelTests = new Class[] {
 	de.uka.ilkd.key.logic.TestTermFactory.class,
+    de.uka.ilkd.key.logic.TestTermBuilder.class,
 	de.uka.ilkd.key.logic.TestTerm.class,
 	de.uka.ilkd.key.logic.TestNamespace.class,
 	de.uka.ilkd.key.logic.TestSemisequent.class,

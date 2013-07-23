@@ -34,6 +34,7 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
@@ -65,16 +66,19 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     
     private final Sort heapSort;
     
+    private final int heapCount;
     
     
 
     /** create the method builder for array implict creation methods */
     public CreateArrayMethodBuilder(KeYJavaType integerType,
             			    KeYJavaType objectType,
-            			    Sort heapSort) {
+            			    Sort heapSort,
+            			    int heapCount) {
         this.integerType = integerType;
         this.objectType = objectType;
         this.heapSort = heapSort;
+        this.heapCount = heapCount;
     }
 
     /**
@@ -227,7 +231,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         			 arrayType, 
         			 arrayType,
         			 PositionInfo.UNDEFINED,
-        			 heapSort);
+        			 heapSort,
+        			 heapCount);
     }
 
     protected StatementBlock getCreateArrayBody(TypeReference arrayRef,
@@ -334,7 +339,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         			 arrayType, 
         			 arrayType,
         			 PositionInfo.UNDEFINED,
-        			 heapSort);
+        			 heapSort,
+        			 heapCount);
     }
 
     /**
@@ -367,7 +373,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         			 arrayType, 
         			 arrayType,
         			 PositionInfo.UNDEFINED,
-        			 heapSort);
+        			 heapSort,
+        			 heapCount);
     }
 
     /**

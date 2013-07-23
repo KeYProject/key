@@ -416,14 +416,7 @@ is divided into following sections:
             <sequential>
                 <property name="junit.forkmode" value="perTest"/>
                 <junit dir="${work.dir}" errorproperty="tests.failed" failureproperty="tests.failed" fork="true" forkmode="${junit.forkmode}" showoutput="true" tempdir="${build.dir}">
-                    <batchtest todir="${build.test.results.dir}">
-                        <fileset dir="${test.test.dir}" excludes="@{excludes},${excludes}" includes="@{includes}">
-                            <filename name="@{testincludes}"/>
-                        </fileset>
-                        <fileset dir="${build.test.classes.dir}" excludes="@{excludes},${excludes},${test.binaryexcludes}" includes="${test.binaryincludes}">
-                            <filename name="${test.binarytestincludes}"/>
-                        </fileset>
-                    </batchtest>
+                    <test methods="@{testmethods}" name="@{testincludes}" todir="${build.test.results.dir}"/>
                     <syspropertyset>
                         <propertyref prefix="test-sys-prop."/>
                         <mapper from="test-sys-prop.*" to="*" type="glob"/>
@@ -679,8 +672,8 @@ is divided into following sections:
     </target>
     <target depends="-init-macrodef-test-debug-junit,-init-macrodef-test-debug-testng" name="-init-macrodef-test-debug"/>
     <!--
-        pre NB7.2 profiling section; consider it deprecated
-    -->
+                pre NB7.2 profiling section; consider it deprecated
+            -->
     <target depends="-profile-pre-init, init, -profile-post-init, -profile-init-macrodef-profile, -profile-init-check" if="profiler.info.jvmargs.agent" name="profile-init"/>
     <target if="profiler.info.jvmargs.agent" name="-profile-pre-init">
         <!-- Empty placeholder for easier customization. -->
@@ -727,8 +720,8 @@ is divided into following sections:
         <fail unless="profiler.info.jvmargs.agent">Must set profiler agent JVM arguments in profiler.info.jvmargs.agent</fail>
     </target>
     <!--
-        end of pre NB7.2 profiling section
-    -->
+                end of pre NB7.2 profiling section
+            -->
     <target depends="-init-debug-args" name="-init-macrodef-nbjpda">
         <macrodef name="nbjpdastart" uri="http://www.netbeans.org/ns/j2se-project/1">
             <attribute default="${main.class}" name="name"/>
@@ -1107,8 +1100,8 @@ is divided into following sections:
         =================
     -->
     <!--
-        pre NB7.2 profiler integration
-    -->
+                pre NB7.2 profiler integration
+            -->
     <target depends="profile-init,compile" description="Profile a project in the IDE." if="profiler.info.jvmargs.agent" name="-profile-pre72">
         <fail unless="netbeans.home">This target only works when run from inside the NetBeans IDE.</fail>
         <nbprofiledirect>
@@ -1165,8 +1158,8 @@ is divided into following sections:
         </junit>
     </target>
     <!--
-        end of pre NB72 profiling section
-    -->
+                end of pre NB72 profiling section
+            -->
     <target if="netbeans.home" name="-profile-check">
         <condition property="profiler.configured">
             <or>

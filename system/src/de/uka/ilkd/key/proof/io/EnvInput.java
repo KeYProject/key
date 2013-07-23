@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
@@ -71,4 +72,10 @@ public interface EnvInput {
      * others do.
      */
     void read() throws ProofInputException;
+    
+    /**
+     * Returns the {@link Profile} to use.
+     * @return The {@link Profile} to use.
+     */
+    public Profile getProfile();
 }

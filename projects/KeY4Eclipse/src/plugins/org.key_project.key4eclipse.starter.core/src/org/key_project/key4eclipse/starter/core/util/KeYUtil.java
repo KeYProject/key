@@ -74,6 +74,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -358,7 +359,7 @@ public final class KeYUtil {
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
                         // Load location
-                        InitConfig initConfig = internalLoad(location, classPaths, bootClassPath, true);
+                        InitConfig initConfig = internalLoad(null, location, classPaths, bootClassPath, true);
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -379,6 +380,7 @@ public final class KeYUtil {
     
     /**
      * Loads the given location in KeY and returns the opened {@link InitConfig}.
+     * @param profile The {@link Profile} to use.
      * @param location The location to load.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
@@ -386,7 +388,8 @@ public final class KeYUtil {
      * @return The opened {@link InitConfig}.
      * @throws Exception Occurred Exception.
      */
-    private static InitConfig internalLoad(final File location,
+    private static InitConfig internalLoad(final Profile profile,
+                                           final File location,
                                            final List<File> classPaths,
                                            final File bootClassPath,
                                            final boolean showKeYMainWindow) throws Exception {
@@ -405,7 +408,7 @@ public final class KeYUtil {
                     InitConfig initConfig = getInitConfig(location);
                     if (initConfig == null) {
                         // Load local file
-                        DefaultProblemLoader loader = main.getUserInterface().load(location, classPaths, bootClassPath);
+                        DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
                         initConfig = loader.getInitConfig();
                     }
                     setResult(initConfig);

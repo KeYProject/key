@@ -59,6 +59,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -223,7 +224,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       DefaultProblemLoader loader = ui.load(settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath()); 
+       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath()); 
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();

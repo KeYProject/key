@@ -24,6 +24,8 @@ public final class Behavior {
         = new Behavior("");
     public static final Behavior BEHAVIOR 
         = new Behavior("behavior ");
+    public static final Behavior MODEL_BEHAVIOR
+        = new Behavior("model_behavior ");
     public static final Behavior NORMAL_BEHAVIOR 
         = new Behavior("normal_behavior ");
     public static final Behavior EXCEPTIONAL_BEHAVIOR 

@@ -284,12 +284,12 @@ class Pipe<T>{
 		try{
 			queueLock.lock();
 			queue.add(message);
-	
 		}
 		finally{
-			postMessages.signalAll();
-			queueLock.unlock();
-		
+			if (postMessages != null) {
+			    postMessages.signalAll();
+			}
+			queueLock.unlock();		
 		}
 	}
 	

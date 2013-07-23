@@ -28,7 +28,7 @@ my $time_limit = 30*60;
 #
 # Command line options
 my %option = ();
-GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s');
+GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$path_to_index\'.\n";
@@ -41,6 +41,7 @@ if ($option{'help'}) {
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
   print "Use '-x <filename>' or '--xml-junit <filename>' to store the results in junit's xml result format to <filename>.\n";
+  print "Use '-p <filename>' or '--printStatistics <filename>' to generate a statistics file. The file is overridden in case it already exists.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
 #  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
@@ -51,6 +52,12 @@ my $reloadTests = $option{'reload'};
 if($option{'delete'}) {
     &cleanDirectories ($path_to_examples);
     exit 0;
+}
+
+if ($option{'printStatistics'}) {
+    $option{'printStatistics'} = realpath($option{'printStatistics'});
+    unlink($option{'printStatistics'}) 
+	if $option{'printStatistics'} && -e $option{'printStatistics'};
 }
 
 #
@@ -76,6 +83,7 @@ open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 close AUTOMATIC;
 
 my $counter = 0;
+my $total = `grep provable "$path_to_index" | grep -v "\#" | wc -l`;
 my $correct = 0;
 my $failures = 0;
 my $errors = 0;
@@ -127,7 +135,7 @@ foreach my $dotkey (@automatic_JAVADL) {
    &reloadFile($dotkey) if ($reloadTests and $provable);
     
    unless($option{'silent'}) {
-      print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";
+      print "\nStatus: $counter / $total examples tested. $failures failures and $errors errors occurred.\n";
       print "Reload-Tests: " . 
          (($reloadTests and $provable) ? (scalar(@reloadFailed) . 
 					  " failures") : "disabled") 
@@ -137,7 +145,7 @@ foreach my $dotkey (@automatic_JAVADL) {
 
 chdir $orig_path;
 
-print "\n$correct/$counter prover runs according to spec.\n".
+print "\n$counter / $total prover runs according to spec.\n".
      "$failures failures and $errors errors occurred.\n";
 
 if($reloadTests) {
@@ -154,6 +162,25 @@ if($option{'storefailed'}) {
 
 if($option{'xml-junit'}) {
     &writeXmlReport($option{'xml-junit'});
+}
+
+if ($option{'printStatistics'}) {
+    # calculate Summas
+    my @sum = &calculateSummas($option{'printStatistics'});
+    
+    # append summas 
+    my $line = "--- SUM ---";
+    foreach my $s (@sum) {
+	$line = $line." | ".$s;
+    }
+    open OUT, ">>", $option{'printStatistics'} or die $!;
+    print OUT $line."\n";
+    
+    # append git commit hash
+    my $gitHash = `git rev-parse HEAD`;
+    print OUT "\n";
+    print OUT "# git commit $gitHash\n";
+    close OUT;
 }
 
 if($failures + $errors + scalar(@reloadFailed) > 0) {
@@ -337,7 +364,11 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto '$dk'";
+  my $statisticsCmd = "";
+  if ($option{'printStatistics'}) {
+    $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
+  }
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto $statisticsCmd '$dk'";
    print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -400,3 +431,49 @@ sub cleanDirectories {
     }
 
 }
+
+sub calculateSummas {
+    my $filename = shift @_;
+    my @sum;
+    my @columnNames;
+    my $countExamples = 0;
+    open IN, "<", $filename or die $!;
+    while (<IN>) {
+	my @line = split /\s*\|\s*/, &trim($_);
+	# remove the name of the example (can not be summed up)
+	shift(@line);
+	if ($. == 1) {
+	    # first line with column names
+	    @columnNames = @line;
+	} elsif ($. == 2) {
+	    # second line: init sum
+	    die "wrong number of fields in line $." 
+		unless scalar(@line) == scalar(@columnNames);
+	    @sum = @line;
+	    $countExamples ++;
+	} else {
+	    # remaining lines: adding up
+	    die "wrong number of fields in line $." 
+		unless scalar(@line) == scalar(@columnNames);
+	    for (@sum) {
+		$_ = $_ + shift(@line);
+	    }
+	    $countExamples ++;
+	}
+    }
+    close IN;
+    
+    # extra handling of the average time per step (which should be in the last column)
+    $sum[@sum-1] = $sum[@sum-1] / $countExamples;
+    return @sum;
+}
+
+# see http://www.somacon.com/p114.php
+sub trim($) {
+    my $string = shift;
+    chomp $string;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
+}
+

@@ -160,7 +160,15 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         return containsModifier(Model.class);
     }
 
-    
+    /**
+     * Get the state count of the declaration
+     */
+    protected int getStateCount() {
+        if(containsModifier(TwoState.class)) { return 2; }
+        if(containsModifier(NoState.class)) { return 0; }
+        return 1;
+    }
+   
     /**
      * Test whether the declaration is ghost (the jml modifier is meant).
      */
