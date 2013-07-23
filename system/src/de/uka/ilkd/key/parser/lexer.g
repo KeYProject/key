@@ -55,6 +55,7 @@ tokens {
 	VARIABLES = "\\variables";
 	SKOLEMTERM = "\\skolemTerm";
 	SKOLEMFORMULA = "\\skolemFormula";
+	TERMLABEL = "\\termlabel";
 	
         // used in contracts
 	MODIFIES = "\\modifies";
