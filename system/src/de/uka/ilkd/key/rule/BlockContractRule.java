@@ -297,14 +297,15 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        if (isInfFlow(goal) && contract.hasModifiesClause() && contract.hasInfFlowSpecs()) {
-            // prepare information flow analysis
-            assert anonymisationHeaps.size() == 1 : "information flow " +
+            assert heaps.size() == 1 &&
+                   anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +
                                                     "moment not compatible " +
                                                     "with the non-base-heap " +
                                                     "setting";
 
+        if (isInfFlow(goal) && contract.hasModifiesClause(heaps.get(0)) && contract.hasInfFlowSpecs()) {
+            // prepare information flow analysis
             final LocationVariable baseHeap =
                     services.getTypeConverter().getHeapLDT().getHeap();
             // assert TB.var(heaps.get(0)) == baseHeap
@@ -450,9 +451,8 @@ public class BlockContractRule implements BuiltInRule {
                 MiscTools.getLocalIns(instantiation.block, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
                 MiscTools.getLocalOuts(instantiation.block, services);
-        final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
         final Map<LocationVariable, Function> anonymisationHeaps =
-                createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
+                createAndRegisterAnonymisationVariables(heaps, contract, services);
         //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(

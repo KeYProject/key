@@ -102,9 +102,9 @@ public class JMLSpecFactory {
                                                          clauses.requires.get(heap),
                                                          clauses.measuredBy,
                                                          clauses.assignables.get(heap),
-                                                         !clauses.strictlyPure,
+                                                         !clauses.hasMod.get(heap),
                                                          progVars,
-                                                         clauses.accessible,
+                                                         clauses.accessibles.get(heap),
                                                          clauses.infFlowSpecs,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
@@ -116,9 +116,9 @@ public class JMLSpecFactory {
                                                          clauses.requires.get(heap),
                                                          clauses.measuredBy,
                                                          clauses.assignables.get(heap),
-                                                         !clauses.strictlyPure,
+                                                         !clauses.hasMod.get(heap),
                                                          progVars,
-                                                         clauses.accessible,
+                                                         clauses.accessibles.get(heap),
                                                          clauses.infFlowSpecs,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
@@ -131,9 +131,9 @@ public class JMLSpecFactory {
                                                                 TB.not(clauses.diverges)),
                                                          clauses.measuredBy,
                                                          clauses.assignables.get(heap),
-                                                         !clauses.strictlyPure,
+                                                         !clauses.hasMod.get(heap),
                                                          progVars,
-                                                         clauses.accessible,
+                                                         clauses.accessibles.get(heap),
                                                          clauses.infFlowSpecs,
                                                          false);
                 InformationFlowContract symbData2 =
@@ -143,9 +143,9 @@ public class JMLSpecFactory {
                                                          clauses.requires.get(heap),
                                                          clauses.measuredBy,
                                                          clauses.assignables.get(heap),
-                                                         !clauses.strictlyPure,
+                                                         !clauses.hasMod.get(heap),
                                                          progVars,
-                                                         clauses.accessible,
+                                                         clauses.accessibles.get(heap),
                                                          clauses.infFlowSpecs,
                                                          false);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
@@ -1173,7 +1173,7 @@ public class JMLSpecFactory {
             clauses.ensures, clauses.infFlowSpecs,
             clauses.breaks, clauses.continues, clauses.returns, clauses.signals,
             clauses.signalsOnly, clauses.diverges, clauses.assignables,
-            !clauses.strictlyPure, services).create();
+            clauses.hasMod, services).create();
     }
 
     private ProgramVariableCollection

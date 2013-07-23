@@ -431,9 +431,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected abstract Term generateMbyAtPreDef(ProgramVariable selfVar,
                                                ImmutableList<ProgramVariable> paramVars);
 
-   protected abstract Term generateMbyAtPreDef(Term selfVar, 
-                                               ImmutableList<Term> paramVars);
-
    /**
     * Creates the precondition.
     * @param modHeaps The heaps.

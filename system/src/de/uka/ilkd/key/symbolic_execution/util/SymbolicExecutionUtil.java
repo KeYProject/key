@@ -127,6 +127,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
+import java.util.Iterator;
 
 /**
  * Provides utility methods for symbolic execution with KeY.
