@@ -16,6 +16,7 @@ my $path_to_examples = $path_to_key . "/examples/";
 my $path_to_automated = "index/";
 my $path_to_header = $path_to_examples . $path_to_automated . "headerJavaDL.txt";
 my $path_to_index = $path_to_examples . $path_to_automated . "automaticJAVADL.txt";
+my $path_to_tmp = "/tmp/"; # todo: change for other OS
 
 # time out set to 30 minutes
 my $time_limit = 30*60; 
@@ -28,7 +29,7 @@ my $time_limit = 30*60;
 #
 # Command line options
 my %option = ();
-GetOptions(\%option, 'help|h', 'verbose|v', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
+GetOptions(\%option, 'help|h', 'verbose|v', 'silent|z', 'delete|d', 'reload|l', 'autosave|a', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s', 'printStatistics|p=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$path_to_index\'.\n";
@@ -39,6 +40,7 @@ if ($option{'help'}) {
   print "Use '-l' or '--reload' to save proofs and reload them directly afterwards. (Test cases for proof loading.)\n";
   print "Use '-d' or '--delete' to delete all files created automatically by a run of this script.\n";
   print "Use '-t' or '--stopfail' to stop immediately upon a failure.\n";
+  print "Use '-a' or '--autosave' to test the autosave feature (requires reload).\n";
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
   print "Use '-x <filename>' or '--xml-junit <filename>' to store the results in junit's xml result format to <filename>.\n";
@@ -49,6 +51,7 @@ if ($option{'help'}) {
 }
 
 my $reloadTests = $option{'reload'};
+my $autosaveTests = $option{'autosave'};
 
 if($option{'delete'}) {
     &cleanDirectories ($path_to_examples);
@@ -369,10 +372,11 @@ sub runAuto {
   if ($option{'printStatistics'}) {
     $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
   }
-  my $verbosity = "";
+  my $verbosity = "--verbose 2"; # todo:remove
   if ($option{'silent'}) { $verbosity = "--verbose 0"; }
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
-  my $command = "'" . $path_to_key . "/bin/runProver' --auto $verbosity $statisticsCmd '$dk'";
+  my $autosaveoption = "--autosave 2000";
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto $verbosity $autosaveoption $statisticsCmd '$dk'";
    print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
