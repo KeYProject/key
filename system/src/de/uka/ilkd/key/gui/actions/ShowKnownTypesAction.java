@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
@@ -36,14 +37,14 @@ import de.uka.ilkd.key.proof.Proof;
 public class ShowKnownTypesAction extends MainWindowAction {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4368162229726580799L;
 
     public ShowKnownTypesAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Known Types...");
-	
+
 	getMediator().enableWhenProofLoaded(this);
 
     }
@@ -52,9 +53,9 @@ public class ShowKnownTypesAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
 	showTypeHierarchy();
     }
-    
+
     private void showTypeHierarchy() {
-        Proof currentProof = getMediator().getProof();
+        Proof currentProof = getMediator().getSelectedProof();
         if(currentProof == null) {
         	mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
                     "If you wish to see the types "
@@ -62,14 +63,16 @@ public class ShowKnownTypesAction extends MainWindowAction {
         } else {
             final JDialog dialog = new JDialog(mainWindow, "Known types for this proof", true);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            Container pane = dialog.getContentPane();
+            final Container pane = dialog.getContentPane();
             pane.setLayout(new BorderLayout());
-            {   
+            final JTabbedPane tabbedPane = new JTabbedPane();
+            pane.add(tabbedPane, BorderLayout.CENTER);
+            {
                 JScrollPane scrollpane = new JScrollPane();
                 ClassTree classTree = new ClassTree(false, false, currentProof.getServices());
                 classTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 scrollpane.setViewportView(classTree);
-                pane.add(scrollpane, BorderLayout.CENTER);
+                tabbedPane.addTab("Package view", scrollpane);
             }
             {
                 final JButton button = new JButton("OK");

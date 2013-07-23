@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.Services;
+
 /**
  * Label attached to a symbolic execution thread. 
  * Currently realized as singleton. In case one wants to track and distinguish 
@@ -25,9 +27,10 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
    public static final Name NAME = new Name("SE");
 
    /**
-    * The ID for the first modality with this label.
+    * The name used in {@link Services#getCounter(String)} to keep track
+    * of the already used IDs.
     */
-   public static final int START_ID = 1;
+   public static final String PROOF_COUNTER_NAME = "SE_LABEL_COUNTER";
    
    /**
     * The unique ID of this term label in the {@link Sequent}.

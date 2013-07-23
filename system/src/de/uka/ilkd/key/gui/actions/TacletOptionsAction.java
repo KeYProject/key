@@ -39,7 +39,7 @@ public class TacletOptionsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (getMediator().getProof() == null) {
+        if (getMediator().getSelectedProof() == null) {
             mainWindow.notify(
                     new GeneralInformationEvent(
                             "No contracts available.",

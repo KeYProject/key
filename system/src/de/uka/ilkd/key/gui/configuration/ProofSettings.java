@@ -27,8 +27,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -48,8 +46,6 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * </code>
  */
 public class ProofSettings {
-
-
     public static final File PROVER_CONFIG_FILE;
     public static final URL PROVER_CONFIG_FILE_TEMPLATE;
     public static final ProofSettings DEFAULT_SETTINGS;
@@ -72,9 +68,6 @@ public class ProofSettings {
     /** the default listener to settings */
     private ProofSettingsListener listener = new ProofSettingsListener();
 
-    
-    /** profile */
-    private Profile profile;
 
 //    private final static int STRATEGY_SETTINGS = 0;
 //    private final static int GENERAL_SETTINGS  = 1;
@@ -120,8 +113,6 @@ public class ProofSettings {
             settings[i].readSettings(this,result);
         }
         initialized = true;
-
-        setProfile(toCopy.getProfile());
     }
 
    
@@ -130,22 +121,6 @@ public class ProofSettings {
 	    loadSettings();
 	    initialized=true;	
 	}
-    }
-    
-    
-    public void setProfile(Profile profile) {
-        this.profile = profile;
-        profile.updateSettings(this);
-        ensureInitialized();
-    }
-
-    public Profile getProfile() {                
-        if (profile == null) {
-            //the following line should be removed
-            setProfile(new JavaProfile());
-            
-        }
-        return profile;
     }
     
     /** 

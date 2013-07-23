@@ -17,8 +17,6 @@ package de.uka.ilkd.key.rule;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.omg.CORBA.ORB;
-
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -188,6 +186,8 @@ public abstract class Taclet implements Rule, Named {
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
     
+    private Trigger trigger;
+    
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.  
@@ -207,20 +207,30 @@ public abstract class Taclet implements Rule, Named {
 	   ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 	   ImmutableSet<Choice> choices ){
 
-	this.name          = name;
-	ifSequent          = applPart.ifSequent();
-	varsNew            = applPart.varsNew();
-	varsNotFreeIn      = applPart.varsNotFreeIn();
-	varsNewDependingOn = applPart.varsNewDependingOn();
-	variableConditions = applPart.getVariableConditions();
-	this.goalTemplates = goalTemplates;
-	this.ruleSets      = ruleSets;
-	this.choices       = choices;
-	this.prefixMap     = prefixMap;
+        this.name          = name;
+        ifSequent          = applPart.ifSequent();
+        varsNew            = applPart.varsNew();
+        varsNotFreeIn      = applPart.varsNotFreeIn();
+        varsNewDependingOn = applPart.varsNewDependingOn();
+        variableConditions = applPart.getVariableConditions();
+        this.goalTemplates = goalTemplates;
+        this.ruleSets      = ruleSets;
+        this.choices       = choices;
+        this.prefixMap     = prefixMap;
         this.displayName   = attrs.displayName() == null ? 
                 name.toString() : attrs.displayName();
+
+        this.trigger = attrs.getTrigger();
     }
 
+    public boolean hasTrigger() {
+        return trigger != null;
+    }
+
+    public Trigger getTrigger() {
+        return trigger;
+    }
+    
     protected void cacheMatchInfo() {
 	boundVariables = getBoundVariables();
         

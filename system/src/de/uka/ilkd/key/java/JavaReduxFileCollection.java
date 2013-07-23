@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import recoder.io.DataLocation;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -58,7 +58,6 @@ public class JavaReduxFileCollection implements FileCollection {
      * The resource location
      */
     private String resourceLocation;
-
     
     /**
      * This list stores all resources to be retrieved. It is fed by the
@@ -75,17 +74,17 @@ public class JavaReduxFileCollection implements FileCollection {
      * @throws IOException
      *             if access to the resources fails
      */
-    public JavaReduxFileCollection() throws IOException {
+    public JavaReduxFileCollection(Profile profile) throws IOException {
 
 
 	resourceLocation = JAVA_SRC_DIR;
 	
-	if (!ProofSettings.DEFAULT_SETTINGS.getProfile().getInternalClassDirectory().isEmpty()) { 
-	    resourceLocation += "/" + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	if (!profile.getInternalClassDirectory().isEmpty()) { 
+	    resourceLocation += "/" + profile
 	                .getInternalClassDirectory();
 	}
 	String resourceString = resourceLocation + "/"	        
-	        + ProofSettings.DEFAULT_SETTINGS.getProfile()
+	        + profile
 	                .getInternalClasslistFilename();
 
 	URL jlURL = KeYResourceManager.getManager().getResourceFile(
@@ -107,7 +106,7 @@ public class JavaReduxFileCollection implements FileCollection {
 
             resources.add(jl);
         }
-
+        r.close();
     }
 
     /**

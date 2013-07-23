@@ -868,7 +868,7 @@ public class TacletGenerator {
 
 
 
-    private class TermAndBoundVarPair {
+    private static class TermAndBoundVarPair {
 
         public Term term;
         public ImmutableSet<VariableSV> boundVars;

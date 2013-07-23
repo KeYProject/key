@@ -205,7 +205,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 				case WAIT_FOR_RESULT:
 					 if(message.equals("unsat")){
 						 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-						 pipe.sendMessage("(get-proof)\n");
+						 // One cannot ask for proofs and models at one time
+						 // rather have modesl than proofs (MU, 2013-07-19)
+						 // pipe.sendMessage("(get-proof)\n");
 						 pipe.sendMessage("(exit)\n");
 						 sc.setState(WAIT_FOR_DETAILS);
 					 }

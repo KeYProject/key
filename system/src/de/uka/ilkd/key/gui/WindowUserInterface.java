@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
@@ -247,10 +248,9 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public ProblemInitializer createProblemInitializer() {
+	public ProblemInitializer createProblemInitializer(Profile profile) {
 	    ProblemInitializer pi = new ProblemInitializer(this, 
-	            mainWindow.getMediator().getProfile(), 
-	            new Services(mainWindow.getMediator().getExceptionHandler()), 
+	            new Services(profile, mainWindow.getMediator().getExceptionHandler()), 
 	            true, 
 	            this);
 	    return pi;
@@ -268,11 +268,11 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
-      return super.load(file, classPath, bootClassPath);
+      return super.load(profile, file, classPath, bootClassPath);
    }
 
    /**

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
-import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -32,6 +32,7 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
+import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -40,7 +41,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  *
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
-public class Main {
+public final class Main {
 /**
  * Command line options
  */
@@ -67,7 +68,11 @@ public class Main {
     public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
-    
+    private static final String VERBOSITY = "--v";
+
+    /** The time of the program start in millis. */
+    private static long startTime;
+
     /**
      * The user interface modes KeY can operate in.
      */
@@ -82,7 +87,7 @@ public class Main {
 	 */
 	AUTO
     }
-    private static UiMode uiMode = UiMode.INTERACTIVE;
+
 
     public static final String INTERNAL_VERSION =
             KeYResourceManager.getManager().getSHA1();
@@ -96,11 +101,20 @@ public class Main {
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
 
-    private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
+    /** Level of verbosity for command line outputs. */
+    private static byte verbosity = Verbosity.NORMAL;
 
     private static String statisticsFile = null;
 
     private static String examplesDir = null;
+
+    /**
+     * Determines which {@link UserInterface} is to be used.
+     *
+     * By specifying <code>AUTO</code> as command line argument this will be set
+     * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
+     */
+    private static UiMode uiMode = UiMode.INTERACTIVE;
 
     /**
      * Determines whether to actually prove or only load a problem when
@@ -144,10 +158,10 @@ public class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(String[] args) {
+        startTime = System.currentTimeMillis();
 
-        System.out.println("\nKeY Version " + VERSION);
-        System.out.println(COPYRIGHT + "\nKeY is protected by the " +
-                "GNU General Public License\n");
+        // this property overrides the default
+        if (Boolean.getBoolean("key.verbose-ui")) verbosity = Verbosity.DEBUG;
 
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
@@ -160,6 +174,7 @@ public class Main {
             UserInterface userInterface = createUserInterface();
             loadCommandLineFile(userInterface);
         } catch (CommandLineException e) {
+            printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
                 e.printStackTrace();
             }
@@ -194,6 +209,7 @@ public class Main {
         cl.addSection("Batchmode options:");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
+        cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
         cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
@@ -219,8 +235,20 @@ public class Main {
      */
     public static void evaluateOptions(CommandLine cl) {
 
-        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+        if(cl.isSet(VERBOSITY)){ // verbosity
+            try {
+                verbosity = (byte)cl.getInteger(VERBOSITY, Verbosity.HIGH);
+            } catch (CommandLineException e) {
+                if(Debug.ENABLE_DEBUG) {
+                    e.printStackTrace();
+                }
+                System.err.println(e.getMessage());
+            }
+        }
 
+        if (verbosity > Verbosity.SILENT) {
+            printHeader();
+        }
 
         if(cl.isSet(AUTO)){
         	uiMode = UiMode.AUTO;
@@ -244,16 +272,18 @@ public class Main {
         }
 
         if(cl.isSet(TIMEOUT)){
+            if (verbosity >= Verbosity.HIGH)
             System.out.println("Timeout is set");
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
+                if (verbosity >= Verbosity.HIGH)
                 System.out.println("Timeout is: "+ timeout+" ms");
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.out.println(e.getMessage());
+                System.err.println(e.getMessage());
             }
 
             if (timeout < -1) {
@@ -267,6 +297,7 @@ public class Main {
             examplesDir = cl.getString(EXAMPLES, null);
         }
 
+        if (verbosity > Verbosity.SILENT) {
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         }
@@ -276,8 +307,10 @@ public class Main {
         } else {
             System.out.println("Not using assertions ...");
         }
+        }
 
         if(cl.isSet(EXPERIMENTAL)){
+            if (verbosity > Verbosity.SILENT)
             System.out.println("Running in experimental mode ...");
         } else {
             deactivateExperimentalFeatures();
@@ -313,6 +346,13 @@ public class Main {
     }
 
 
+    /** Print a header text on to the console. */
+    private static void printHeader() {
+        System.out.println("\nKeY Version " + VERSION);
+        System.out.println(COPYRIGHT + "\nKeY is protected by the " +
+                "GNU General Public License\n");
+    }
+
     /**
      * Initializes the {@link UserInterface} to be used by KeY.
      *
@@ -323,19 +363,22 @@ public class Main {
      *         <code>uiMode</code>
      */
     private static UserInterface createUserInterface() {
-	UserInterface ui;
+        UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
-                    e.printStackTrace();
+                    if (verbosity > Verbosity.SILENT)
+                        System.out.println("Auto mode was terminated by an exception:");
+                    if (Debug.ENABLE_DEBUG) e.printStackTrace();
+                    System.err.println(e.getMessage());
                     System.exit(-1);
                 }});
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+            ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = new MainWindow();
@@ -350,7 +393,7 @@ public class Main {
             }
 
             ui = mainWindow.getUserInterface();
-	    if (fileNameOnStartUp != null)
+	    if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
 	        System.out.println("Loading: "+fileNameOnStartUp);
         }
 
@@ -375,7 +418,7 @@ public class Main {
             opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
             LemmataHandler handler = new LemmataHandler(opt,
-                    ProofSettings.DEFAULT_SETTINGS.getProfile());
+                    AbstractProfile.getDefaultProfile());
             handler.start();
 
         } catch(Exception e) {
@@ -424,5 +467,18 @@ public class Main {
      */
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
+    }
+
+    /** Returns the time of the program start in millis. */
+    public static long getStartTime() {
+        return startTime;
+    }
+
+    /** Command line output verbosity levels. */
+    public static final class Verbosity {
+        public static final byte SILENT = 0;
+        public static final byte NORMAL = 1;
+        public static final byte HIGH = 2;
+        public static final byte DEBUG = 4;
     }
 }

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStartNode;
@@ -40,7 +41,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesThreeLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services());
+      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -85,7 +86,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesTwoLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services());
+      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -122,7 +123,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesOneLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services());
+      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
       Node child1 = appendNode(proof, root);
       Node child2 = appendNode(proof, root);
@@ -158,7 +159,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       // Create tree to test
       UserInterface ui = new CustomConsoleUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
-      Proof proof = new Proof("target", new Services());
+      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
       Node root = appendRoot(proof);
       // Create execution test model
       ExecutionStartNode executionRoot = new ExecutionStartNode(mediator, root);

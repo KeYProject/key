@@ -127,10 +127,10 @@ class TestCommons extends TestCase {
 	try {
 
 	    KeYUserProblemFile po = new KeYUserProblemFile(file.getName(),
-		    file, null);
+		    file, null, pro);
 
 	    if(initializer == null){
-		initializer = new ProblemInitializer(pro);
+		initializer = new ProblemInitializer(po.getProfile());
 		
 	    }
 	
