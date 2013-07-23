@@ -41,13 +41,13 @@ public class OpenFileAction extends MainWindowAction {
         setTooltip("Browse and load problem or proof files.");
         setAcceleratorLetter(KeyEvent.VK_O);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser keYFileChooser = 
             GuiUtilities.getFileChooser("Select file to load proof or problem");
-        
+
         boolean loaded = keYFileChooser.showOpenDialog(mainWindow);
-        
+
         if (loaded) {
             File file = keYFileChooser.getSelectedFile();
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() &&

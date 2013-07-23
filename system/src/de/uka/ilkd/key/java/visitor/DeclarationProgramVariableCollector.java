@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -39,7 +38,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
  */
 public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
-    private Set result = new LinkedHashSet();
+    private Set<IProgramVariable> result = new LinkedHashSet<IProgramVariable>();
 
 
     /** creates a new declaration visitor */
@@ -53,7 +52,7 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 	walk(root());	
     }
 
-    public Set result() { 
+    public Set<IProgramVariable> result() {
 	return result;
     }    
 

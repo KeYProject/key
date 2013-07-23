@@ -37,7 +37,6 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -49,9 +48,11 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import java.util.*;
 
@@ -112,27 +113,6 @@ public class BlockContractRule implements BuiltInRule {
         return varAtPost;
     }
 
-//    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
-//                                                     Services services) {
-//        if (varTerms == null || varTerms.isEmpty()) {
-//            return varTerms;
-//        }
-//        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
-//        for(Term varTerm: varTerms) {
-//            assert varTerm.op() instanceof LocationVariable;
-//
-//            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-//
-//            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-//            LocationVariable varAtPreVar =
-//                    new LocationVariable(new ProgramElementName(name), resultType);
-//            register(varAtPreVar, services);
-//            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-//            renamedLocalIns = renamedLocalIns.append(varAtPre);
-//        }
-//        return renamedLocalIns;
-//    }
-
     private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
                                                            Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
@@ -183,48 +163,28 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
-    private static FindTaclet loadFindTaclet(BlockContract contract, Services services) {
-        Taclet res = null;
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        for (int j = 0; j < 10000; j++) {
-            String prefix =
-                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
-                                                contract.getUniqueName()).toString();
-            res = InfFlowContractPO.getTaclet(prefix);
-            if (res != null)
-                return (FindTaclet)res;
-        }
-        assert false; // This should not happen
-        return null;
-    }
-
-    public static Term loadFindTerm(BlockContract contract, Services services) {
-        return loadFindTaclet(contract, services).find();
-    }
-
-
-    private static ImmutableSet<BlockContract> getApplicableContracts(final SpecificationRepository specifications,
-                                                                      final StatementBlock block,
-                                                                      final Modality modality,
-                                                                      final Goal goal)
-    {
-        ImmutableSet<BlockContract> collectedContracts = specifications.getBlockContracts(block, modality);
+    private static ImmutableSet<BlockContract>
+                        getApplicableContracts(final SpecificationRepository specifications,
+                                               final StatementBlock block,
+                                               final Modality modality,
+                                               final Goal goal) {
+        ImmutableSet<BlockContract> collectedContracts =
+                specifications.getBlockContracts(block, modality);
         if (modality == Modality.BOX) {
-            collectedContracts = collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA));
+            collectedContracts = collectedContracts.union(
+                    specifications.getBlockContracts(block, Modality.DIA));
         }
         else if (modality == Modality.BOX_TRANSACTION) {
-            collectedContracts = collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+            collectedContracts = collectedContracts.union(
+                    specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
         return filterAppliedContracts(collectedContracts, block, goal);
     }
     
-    private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
-                                                                      final StatementBlock block,
-                                                                      final Goal goal)
-    {
+    private static ImmutableSet<BlockContract>
+                        filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
+                                               final StatementBlock block,
+                                               final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
             if (!contractApplied(contract, goal)) {
@@ -284,6 +244,20 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
+    private boolean isInfFlow(Goal goal) {
+        StrategyProperties stratProps =
+                goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
+        String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
+
+        boolean isOriginalIF =
+                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
+        // For loaded proofs, InfFlowCheckInfo is not correct without the following
+        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        return isOriginalIF || isLoadedIF;
+    }
+
     private Pair<Term, Term> buildInfFlowAssumptions(ProofObligationVars instVars,
                                                      ImmutableList<Term> localOuts,
                                                      ImmutableList<Term> localOutsAtPre,
@@ -291,16 +265,14 @@ public class BlockContractRule implements BuiltInRule {
                                                      Term baseHeap,
                                                      Term applPredTerm) {
         Term beforeAssumptions = TB.equals(instVars.pre.heap, baseHeap);
-//        Iterator<Term> newIns = instVars.newIns.iterator();
-//        for (Term locIn: instVars.localIns) {
-//            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
-//        }
         Iterator<Term> outsAtPre = localOutsAtPre.iterator();
         for (Term locOut: localOuts) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(outsAtPre.next(), locOut));
         }
-        Term resultEq = instVars.pre.result != null ? TB.equals(instVars.post.result, instVars.pre.result) : TB.tt();
-        Term exceptionEq = instVars.pre.exception != null ? TB.equals(instVars.post.exception, instVars.pre.exception) : TB.tt();
+        Term resultEq = instVars.pre.result != null ?
+                TB.equals(instVars.post.result, instVars.pre.result) : TB.tt();
+        Term exceptionEq = instVars.pre.exception != null ?
+                TB.equals(instVars.post.exception, instVars.pre.exception) : TB.tt();
         Term afterAssumptions = TB.and(TB.equals(instVars.post.heap, baseHeap),
                                        TB.equals(instVars.post.self, instVars.pre.self),
                                        resultEq,
@@ -325,9 +297,7 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
-        if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY)) &&
-            contract.hasModifiesClause() && contract.getInfFlowSpecs() != null) {
+        if (isInfFlow(goal) && contract.hasModifiesClause() && contract.hasInfFlowSpecs()) {
             // prepare information flow analysis
             assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +
@@ -356,8 +326,10 @@ public class BlockContractRule implements BuiltInRule {
             final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
             final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localIns, localOuts);
-            final ImmutableList<Term> localVarsAtPre = localInsWithoutOutDuplicates.append(localOutsAtPre);
-            final ImmutableList<Term> localVarsAtPost = localInsWithoutOutDuplicates.append(localOutsAtPost);
+            final ImmutableList<Term> localVarsAtPre =
+                    localInsWithoutOutDuplicates.append(localOutsAtPre);
+            final ImmutableList<Term> localVarsAtPost =
+                    localInsWithoutOutDuplicates.append(localOutsAtPost);
             Term resultAtPre = hasRes ? TB.var(variables.result) : TB.NULL(services);
             final Term resultAtPost =
                     hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : TB.NULL(services);
@@ -384,10 +356,6 @@ public class BlockContractRule implements BuiltInRule {
             // and associated taclet
             final Term contractApplTerm =
                     ifContractBuilder.buildContractApplPredTerm();
-            if (!InfFlowContractPO.hasSymbols()) {
-                InfFlowContractPO.newSymbols(
-                        services.getProof().env().getInitConfig().activatedTaclets());
-            }
             Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
 
             // generate proof obligation variables
@@ -396,15 +364,13 @@ public class BlockContractRule implements BuiltInRule {
                                   localVarsAtPre,
                                   heapAtPre,
                                   hasRes ? resultAtPre : null,
-                                  hasExc ? exceptionAtPre : null,
-                                  services);
+                                  hasExc ? exceptionAtPre : null);
             final StateVars instantiationPostVars =
                     new StateVars(hasSelf ? selfAtPost : null,
                                   localVarsAtPost,
                                   heapAtPost,
                                   hasRes ? resultAtPost : null,
-                                  hasExc ? exceptionAtPost : null,
-                                  services);
+                                  hasExc ? exceptionAtPost : null);
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(instantiationPreVars,
                                                 instantiationPostVars);
@@ -424,8 +390,7 @@ public class BlockContractRule implements BuiltInRule {
             InfFlowPOSnippetFactory infFlowFactory =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
-            Pair<Sequent, Term> seqPostPair =
-                    buildBodyPreservesSequent(infFlowFactory, contract, services);
+            Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory, goal);
             Sequent seq = seqPostPair.first;
             Term post = seqPostPair.second;
 
@@ -435,16 +400,21 @@ public class BlockContractRule implements BuiltInRule {
             // create and add split-post and remove-post taclets
             final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
             final ArrayList<Taclet> splitPostTaclets =
-                    splitPostTB.generateTaclets(post, services);
+                    splitPostTB.generateTaclets(post, ifVars, services);
             for (final Taclet t : splitPostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                goal.proof().addLabeledIFSymbol(t);
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
             final ArrayList<Taclet> removePostTaclets =
-                    removePostTB.generateTaclets(post, services);
+                    removePostTB.generateTaclets(post, ifVars, services);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                goal.proof().addLabeledIFSymbol(t);
             }
+            goal.proof().addIFSymbol(contractApplTerm);
+            goal.proof().addIFSymbol(informationFlowContractApp);
+            goal.proof().addGoalTemplates(informationFlowContractApp);
 
             return new InfFlowValidityData(infFlowAssumptions,
                                            informationFlowContractApp,
@@ -460,14 +430,15 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services, final RuleApp application) throws RuleAbortException
-    {
+    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+                                     final RuleApp application) throws RuleAbortException {
         assert application instanceof BlockContractBuiltInRuleApp;
         return apply(goal, services, (BlockContractBuiltInRuleApp) application);
     }
 
-    private ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException
-    {
+    private ImmutableList<Goal> apply(final Goal goal, final Services services,
+                                      final BlockContractBuiltInRuleApp application)
+                                              throws RuleAbortException {
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
@@ -475,31 +446,43 @@ public class BlockContractRule implements BuiltInRule {
         final Term contextUpdate = instantiation.update;
 
         final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(instantiation.block, services);
-        final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(instantiation.block, services);
+        final ImmutableSet<ProgramVariable> localInVariables =
+                MiscTools.getLocalIns(instantiation.block, services);
+        final ImmutableSet<ProgramVariable> localOutVariables =
+                MiscTools.getLocalOuts(instantiation.block, services);
         final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
-        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
+        final Map<LocationVariable, Function> anonymisationHeaps =
+                createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
         //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
         ).createAndRegister(instantiation.self);
 
-        final ConditionsAndClausesBuilder conditionsAndClausesBuilder = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self, services);
+        final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
+                new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self, services);
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
         final Term wellFormedHeapsCondition = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
-        final Term reachableInCondition = conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
-        final Map<LocationVariable, Term> modifiesClauses = conditionsAndClausesBuilder.buildModifiesClauses();
+        final Term reachableInCondition =
+                conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+        final Map<LocationVariable, Term> modifiesClauses =
+                conditionsAndClausesBuilder.buildModifiesClauses();
 
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
-        final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition = conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition = conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
+        final Term wellFormedAnonymisationHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(
+                        anonymisationHeaps);
+        final Term reachableOutCondition =
+                conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
+        final Term atMostOneFlagSetCondition =
+                conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
+        final Term anonymisationUpdate =
+                updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps,
+                         /*anonymisationLocalVariables, */modifiesClauses);
 
 
         InfFlowValidityData infFlowValitidyData =
@@ -545,13 +528,17 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final boolean isStrictlyPure, final Services services)
-    {
+    private Map<LocationVariable, Function>
+                    createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
+                                                            final boolean isStrictlyPure,
+                                                            final Services services) {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         if (!isStrictlyPure) {
             for (LocationVariable variable : variables) {
-                final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
-                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort(), true);
+                final String anonymisationName =
+                        TB.newName(services, ANONYMISATION_PREFIX + variable.name());
+                final Function anonymisationFunction =
+                        new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -583,13 +570,13 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, BlockContract contract,
-                                                  Services services) {
+    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Goal goal) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
+        goal.proof().addLabeledIFSymbol(selfComposedExec);
         Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
 
@@ -606,9 +593,9 @@ public class BlockContractRule implements BuiltInRule {
         public final StatementBlock block;
         public final ExecutionContext context;
 
-        public Instantiation(final Term update, final Term formula, final Modality modality, final Term self,
-                             final StatementBlock block, final ExecutionContext context)
-        {
+        public Instantiation(final Term update, final Term formula,
+                             final Modality modality, final Term self,
+                             final StatementBlock block, final ExecutionContext context) {
             assert update != null;
             assert update.sort() == Sort.UPDATE;
             assert formula != null;
@@ -701,9 +688,10 @@ public class BlockContractRule implements BuiltInRule {
             return (ExecutionContext) frame.getExecutionContext();
         }
 
-        private StatementBlock getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality,
-                                                                                     final JavaBlock java,
-                                                                                     final Goal goal) {
+        private StatementBlock
+                    getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality,
+                                                                          final JavaBlock java,
+                                                                          final Goal goal) {
             SourceElement element = java.program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock && ((StatementBlock) element).isEmpty())) {
@@ -736,8 +724,9 @@ public class BlockContractRule implements BuiltInRule {
         private final BlockContract.Variables placeholderVariables;
         private final Services services;
 
-        public VariablesCreatorAndRegistrar(final Goal goal, final BlockContract.Variables placeholderVariables, final Services services)
-        {
+        public VariablesCreatorAndRegistrar(final Goal goal,
+                                            final BlockContract.Variables placeholderVariables,
+                                            final Services services) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = services;
@@ -757,8 +746,8 @@ public class BlockContractRule implements BuiltInRule {
             );
         }
 
-        private Map<Label, ProgramVariable> createAndRegisterFlags(final Map<Label, ProgramVariable> placeholderFlags)
-        {
+        private Map<Label, ProgramVariable> createAndRegisterFlags(final Map<Label,
+                                                                   ProgramVariable> placeholderFlags) {
             Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
             for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
                 result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
@@ -766,11 +755,14 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
-        {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
-                result.put(remembranceVariable.getKey(), createAndRegisterVariable(remembranceVariable.getValue()));
+        private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(
+                final Map<LocationVariable, LocationVariable> remembranceVariables) {
+            final Map<LocationVariable, LocationVariable> result =
+                    new LinkedHashMap<LocationVariable, LocationVariable>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                    : remembranceVariables.entrySet()) {
+                result.put(remembranceVariable.getKey(),
+                           createAndRegisterVariable(remembranceVariable.getValue()));
             }
             return result;
         }
@@ -779,7 +771,9 @@ public class BlockContractRule implements BuiltInRule {
         {
             if (placeholderVariable != null) {
                 String newName = TB.newName(services, placeholderVariable.name().toString());
-                LocationVariable newVariable = new LocationVariable(new ProgramElementName(newName), placeholderVariable.getKeYJavaType());
+                LocationVariable newVariable =
+                        new LocationVariable(new ProgramElementName(newName),
+                                             placeholderVariable.getKeYJavaType());
                 goal.addProgramVariable(newVariable);
                 return newVariable;
             }
@@ -807,43 +801,51 @@ public class BlockContractRule implements BuiltInRule {
                 final Term update = elementary(variables.remembranceHeaps.get(heap), var(heap));
                 result = parallel(result, update);
             }
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.remembranceLocalVariables.entrySet()) {
-                result = parallel(result, elementary(remembranceVariable.getValue(), var(remembranceVariable.getKey())));
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
+                    : variables.remembranceLocalVariables.entrySet()) {
+                result = parallel(result, elementary(remembranceVariable.getValue(),
+                                                     var(remembranceVariable.getKey())));
             }
             return result;
         }
 
         public Term buildAnonymisationUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
-                                             /*final Map<LocationVariable, Function> anonymisationLocalVariables,*/
-                                             final Map<LocationVariable, Term> modifiesClauses)
-        {
+                                             /*final Map<LocationVariable, Function>
+                                              *                         anonymisationLocalVariables,*/
+                                             final Map<LocationVariable, Term> modifiesClauses) {
             Term result = buildLocalVariablesAnonymisationUpdate(/*anonymisationLocalVariables*/);
-            for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps.entrySet()) {
+            for (Map.Entry<LocationVariable, Function> anonymisationHeap
+                    : anonymisationHeaps.entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
                 if (!modifiesClause.equals(strictlyNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, func(anonymisationHeap.getValue()));
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause,
+                                                  func(anonymisationHeap.getValue()));
                 }
                 result = parallel(result, anonymisationUpdate);
             }
             return result;
         }
 
-        private Term buildLocalVariablesAnonymisationUpdate(/*final Map<LocationVariable, Function> anonymisationLocalVariables,*/)
-        {
+        private Term buildLocalVariablesAnonymisationUpdate(
+                /*final Map<LocationVariable, Function> anonymisationLocalVariables,*/) {
             Term result = skip();
-            final Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
+            final Collection<LocationVariable> localOutVariables =
+                    variables.remembranceLocalVariables.keySet();
             for (LocationVariable variable : localOutVariables) {
                 final String anonymisationName = newName(ANONYMISATION_PREFIX + variable.name());
-                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
+                final Function anonymisationFunction =
+                        new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);
             }
             return result;
             /*Term result = skip();
-            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable : anonymisationLocalVariables.entrySet()) {
-                result = parallel(result, elementary(anonymisationLocalVariable.getKey(), func(anonymisationLocalVariable.getValue())));
+            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable
+                        : anonymisationLocalVariables.entrySet()) {
+                result = parallel(result, elementary(anonymisationLocalVariable.getKey(),
+                                                     func(anonymisationLocalVariable.getValue())));
             }
             return result;*/
         }
@@ -857,9 +859,10 @@ public class BlockContractRule implements BuiltInRule {
         private final BlockContract.Variables variables;
         private final BlockContract.Terms terms;
 
-        public ConditionsAndClausesBuilder(final BlockContract contract, final List<LocationVariable> heaps,
-                                           final BlockContract.Variables variables, final Term self, final Services services)
-        {
+        public ConditionsAndClausesBuilder(final BlockContract contract,
+                                           final List<LocationVariable> heaps,
+                                           final BlockContract.Variables variables,
+                                           final Term self, final Services services) {
             super(services);
             this.contract = contract;
             this.heaps = heaps;
@@ -871,7 +874,9 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (LocationVariable heap : heaps) {
-                result = and(result, contract.getPrecondition(heap, getBaseHeap(services), terms.self, terms.remembranceHeaps, services));
+                result = and(result,
+                             contract.getPrecondition(heap, getBaseHeap(services), terms.self,
+                                                      terms.remembranceHeaps, services));
             }
             return result;
         }
@@ -924,7 +929,8 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (LocationVariable heap : heaps) {
-                result = and(result, contract.getPostcondition(heap, getBaseHeap(services), terms, services));
+                result = and(result, contract.getPostcondition(heap, getBaseHeap(services),
+                                                               terms, services));
             }
             return result;
         }
@@ -971,8 +977,8 @@ public class BlockContractRule implements BuiltInRule {
             return services.getTypeConverter().getHeapLDT().getHeap();
         }
 
-        public Term buildWellFormedAnonymisationHeapsCondition(final Map<LocationVariable, Function> anonymisationHeaps)
-        {
+        public Term buildWellFormedAnonymisationHeapsCondition(
+                final Map<LocationVariable, Function> anonymisationHeaps) {
             Term result = tt();
             for (Function anonymisationFunction : anonymisationHeaps.values()) {
                 result = and(result, wellFormed(func(anonymisationFunction)));
@@ -1043,12 +1049,15 @@ public class BlockContractRule implements BuiltInRule {
             this.services = services;
         }
 
-        public void setUpValidityGoal(final Goal goal, final Term[] updates, final Term[] assumptions, final Term[] postconditions)
-        {
+        public void setUpValidityGoal(final Goal goal, final Term[] updates,
+                                      final Term[] assumptions, final Term[] postconditions) {
             goal.setBranchLabel("Validity");
-            goal.addFormulaToAntecedent(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), false);
+            goal.addFormulaToAntecedent(new SequentFormula(
+                    TB.applySequential(updates, TB.and(assumptions))), false);
 
-            final StatementBlock block = new ValidityProgramConstructor(labels, instantiation.block, variables, services).construct();
+            final StatementBlock block =
+                    new ValidityProgramConstructor(labels, instantiation.block,
+                                                   variables, services).construct();
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             goal.changeFormula(new SequentFormula(
@@ -1084,7 +1093,9 @@ public class BlockContractRule implements BuiltInRule {
         private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement)
         {
             if (instantiation.isTransactional()) {
-                return new StatementBlock(new Statement[] {statement, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)});
+                return new StatementBlock(new Statement[]
+                        {statement, new TransactionStatement(de.uka.ilkd.key.java
+                                        .recoderext.TransactionStatement.FINISH)});
             }
             else {
                 if (statement instanceof StatementBlock) {
@@ -1096,10 +1107,11 @@ public class BlockContractRule implements BuiltInRule {
             }
         }
 
-        public void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions)
-        {
+        public void setUpPreconditionGoal(final Goal goal, final Term update,
+                                          final Term[] preconditions) {
             goal.setBranchLabel("Precondition");
-            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions), null)), occurrence);
+            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions), null)),
+                               occurrence);
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
@@ -1132,28 +1144,34 @@ public class BlockContractRule implements BuiltInRule {
         {
             return TB.prog(
                 instantiation.modality,
-                replaceBlock(instantiation.formula.javaBlock(), instantiation.block, constructAbruptTerminationIfCascade()),
+                replaceBlock(instantiation.formula.javaBlock(), instantiation.block,
+                             constructAbruptTerminationIfCascade()),
                 instantiation.formula.sub(0)
             );
         }
 
-        private JavaBlock replaceBlock(final JavaBlock java, final StatementBlock oldBlock, final StatementBlock newBlock)
-        {
-            Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services).replace(oldBlock, newBlock);
-            return JavaBlock.createJavaBlock(newProgram instanceof StatementBlock ? (StatementBlock) newProgram : new StatementBlock(newProgram));
+        private JavaBlock replaceBlock(final JavaBlock java, final StatementBlock oldBlock,
+                                       final StatementBlock newBlock) {
+            Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services)
+                                                                       .replace(oldBlock, newBlock);
+            return JavaBlock.createJavaBlock(newProgram instanceof StatementBlock ?
+                    (StatementBlock) newProgram : new StatementBlock(newProgram));
         }
 
         private StatementBlock constructAbruptTerminationIfCascade()
         {
             List<If> ifCascade = new ArrayList<If>();
             for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
-                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(), KeYJavaASTFactory.breakStatement(flag.getKey())));
+                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
+                        KeYJavaASTFactory.breakStatement(flag.getKey())));
             }
             for (Map.Entry<Label, ProgramVariable> flag : variables.continueFlags.entrySet()) {
-                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(), KeYJavaASTFactory.continueStatement(flag.getKey())));
+                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
+                        KeYJavaASTFactory.continueStatement(flag.getKey())));
             }
             if (variables.returnFlag != null) {
-                ifCascade.add(KeYJavaASTFactory.ifThen(variables.returnFlag, KeYJavaASTFactory.returnClause(variables.result)));
+                ifCascade.add(KeYJavaASTFactory.ifThen(variables.returnFlag,
+                        KeYJavaASTFactory.returnClause(variables.result)));
             }
             ifCascade.add(KeYJavaASTFactory.ifThen(
                 new NotEquals(new ExtList(new Expression[] {variables.exception, NullLiteral.NULL})),
@@ -1209,14 +1227,16 @@ public class BlockContractRule implements BuiltInRule {
 
         private void declareFlagFalse(final ProgramVariable flag)
         {
-            statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE, services.getJavaInfo().getKeYJavaType("boolean")));
+            statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
+                             services.getJavaInfo().getKeYJavaType("boolean")));
         }
 
         private void declareResultDefault()
         {
             if (occursReturnAndIsReturnTypeNotVoid()) {
                 KeYJavaType resultType = variables.result.getKeYJavaType();
-                statements.add(KeYJavaASTFactory.declare(variables.result, resultType.getDefaultValue(), resultType));
+                statements.add(KeYJavaASTFactory.declare(variables.result,
+                                resultType.getDefaultValue(), resultType));
             }
         }
 
@@ -1227,13 +1247,15 @@ public class BlockContractRule implements BuiltInRule {
 
         private void declareExceptionNull()
         {
-            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL, variables.exception.getKeYJavaType()));
+            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
+                                                     variables.exception.getKeYJavaType()));
         }
 
         private void executeBlockSafely()
         {
             final Label breakOutLabel = new ProgramElementName("breakOut");
-            final StatementBlock almostSafeBlock = replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
+            final StatementBlock almostSafeBlock =
+                    replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
             final Statement labeledAlmostSafeBlock = label(almostSafeBlock, labels);
             final Statement safeStatement = wrapInTryCatch(labeledAlmostSafeBlock);
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
@@ -1248,18 +1270,22 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block, final Label breakOutLabel)
-        {
+        private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block,
+                                                                     final Label breakOutLabel) {
             return new OuterBreakContinueAndReturnReplacer(
-                block, labels, breakOutLabel, variables.breakFlags, variables.continueFlags, variables.returnFlag, variables.result, services
+                block, labels, breakOutLabel, variables.breakFlags, variables.continueFlags,
+                variables.returnFlag, variables.result, services
             ).replace();
         }
 
         private Statement wrapInTryCatch(final Statement labeldBlock)
         {
-            ProgramVariable exceptionParameter = createLocalVariable("e", variables.exception.getKeYJavaType());
+            ProgramVariable exceptionParameter =
+                    createLocalVariable("e", variables.exception.getKeYJavaType());
             Catch katch = KeYJavaASTFactory.catchClause(
-                KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(), exceptionParameter.getKeYJavaType(), exceptionParameter),
+                KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(),
+                                                       exceptionParameter.getKeYJavaType(),
+                                                       exceptionParameter),
                 new StatementBlock(KeYJavaASTFactory.assign(variables.exception, exceptionParameter))
             );
             return new Try(new StatementBlock(labeldBlock), new Branch[] {katch});
@@ -1267,7 +1293,8 @@ public class BlockContractRule implements BuiltInRule {
 
         private ProgramVariable createLocalVariable(final String nameBase, final KeYJavaType type)
         {
-            return KeYJavaASTFactory.localVariable(services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
+            return KeYJavaASTFactory.localVariable(services.getVariableNamer()
+                                    .getTemporaryNameProposal(nameBase), type);
         }
 
     }

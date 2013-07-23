@@ -78,24 +78,24 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
         Services services = proof.getServices();
-        ContractPO poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
+        InitConfig initConfig = proof.env().getInitConfig();
+
+        ContractPO poForProof = services.getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return;
         }
         InfFlowContractPO po = (InfFlowContractPO) poForProof;
-        InitConfig initConfig = proof.env().getInitConfig();
 
         SymbolicExecutionPO symbExecPO =
                 new SymbolicExecutionPO(initConfig, po.getContract(),
                                         po.getIFVars().symbExecVars, goal);
-
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
         try {
-            pi.startProver(initConfig, symbExecPO, 0);
+            Proof p = pi.startProver(initConfig, symbExecPO, 0);
+            p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

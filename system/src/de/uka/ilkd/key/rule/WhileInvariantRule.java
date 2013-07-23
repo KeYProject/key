@@ -59,7 +59,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -72,6 +71,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 public final class WhileInvariantRule implements BuiltInRule {
 
@@ -121,7 +121,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final While loop = (While) app.getLoopStatement();
 
 	// try to get invariant from JML specification
-	LoopInvariant inv = app.getInvariant(); 
+	LoopInvariant inv = app.getInvariant();
+	assert inv != null : "No invariant found"; // FIXME: Remove after debugging
 	if (inv == null) // may happen after reloading proof 
 	    throw new RuleAbortException("no invariant found");
 
@@ -172,22 +173,15 @@ public final class WhileInvariantRule implements BuiltInRule {
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    LoopInvariant inv, Services services) {
-        final boolean loadedInfFlow = false;
-//                                    services.getProof().getSettings()
-//                                        .getStrategySettings().getActiveStrategyProperties()
-//                                        .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-//                                        .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
 	final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
-	if (!loadedInfFlow)
-	    services.getNamespaces().functions().addSafely(loopHeapFunc);
+	services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = TB.func(loopHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_LOOP"));
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
-	if (!loadedInfFlow)
-	    services.getNamespaces().functions().addSafely(anonHeapFunc);
+	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.func(anonHeapFunc);
 
 	// check for strictly pure loops
@@ -258,27 +252,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         return varAtPost;
     }
 
-//    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
-//                                                     Services services) {
-//        if (varTerms == null || varTerms.isEmpty()) {
-//            return varTerms;
-//        }
-//        ImmutableList<Term> localIns = ImmutableSLList.<Term>nil();
-//        for(final Term varTerm: varTerms) {
-//            assert varTerm.op() instanceof LocationVariable;
-//
-//            final KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-//
-//            final String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-//            final LocationVariable varAtPreVar =
-//                    new LocationVariable(new ProgramElementName(name), resultType);
-//            register(varAtPreVar, services);
-//            final Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-//            localIns = localIns.append(varAtPre);
-//        }
-//        return localIns;
-//    }
-
     private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
                                                            Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
@@ -329,32 +302,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    public static FindTaclet loadFindTaclet(LoopInvariant loopInv, Services services) {
-        Taclet res = null;
-        if (!InfFlowContractPO.hasSymbols()) {
-            InfFlowContractPO.newSymbols(
-                    services.getProof().env().getInitConfig().activatedTaclets());
-        }
-        for (int j = 0; j < 10000; j++) {
-            String name =
-                    MiscTools.toValidTacletName("unfold computed formula " + j + " of " +
-                            loopInv.getUniqueName()).toString();
-            res = InfFlowContractPO.getTaclet(name);
-            if (res != null)
-                return (FindTaclet)res;
-        }
-        assert false; // This should not happen
-        return null;
-    }
-
-    public static Term loadFindTerm(LoopInvariant loopInv, Services services) {
-        return loadFindTaclet(loopInv, services).find();
-    }
-
-    private Goal buildInfFlowValidityGoal(Goal goal, LoopInvariant inv,
+    private Goal buildInfFlowValidityGoal(Goal goal,
+                                          LoopInvariant inv,
                                           ProofObligationVars symbExecVars,
-                                          RuleApp ruleApp,                                          
-                                          Goal infFlowGoal,
+                                          RuleApp ruleApp,
                                           Services services) {
         // generate proof obligation variables
         final IFProofObligationVars ifVars =
@@ -369,32 +320,36 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
+        goal.proof().addLabeledIFSymbol(selfComposedExec);
 
         final Sequent seq =
                 Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
-        infFlowGoal = goal.getCleanGoal(seq);
+        Goal infFlowGoal = goal.getCleanGoal(seq);
         infFlowGoal.setBranchLabel("Information Flow Validity");
 
         // create and add split-post and remove-post taclets
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
         final ArrayList<Taclet> splitPostTaclets =
-                splitPostTB.generateTaclets(post, services);
+                splitPostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : splitPostTaclets) {                
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            goal.proof().addLabeledIFSymbol(t);
         }
         final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets =
-                removePostTB.generateTaclets(post, services);
+                removePostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : removePostTaclets) {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            goal.proof().addLabeledIFSymbol(t);
         }
 
         return infFlowGoal;
     }
 
-    private Goal addInfFlowAssumptionsAndTaclet(InfFlowData infData,
-                                                Term baseHeap,
+    private Goal addInfFlowAssumptionsAndTaclet(final InfFlowData infData,
+                                                final Term baseHeap,
                                                 Goal goal) {
+        assert infData != null;
         final ProofObligationVars symbExecVars = infData.symbExecVars;
         final Term heapAtPreEq =
                 TB.equals(symbExecVars.pre.heap, baseHeap);
@@ -404,10 +359,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                                         TB.box(infData.guardJb,
                                                TB.equals(infData.guardAtPre,
                                                          infData.guardTerm)));
-//        final Iterator<Term> newIns = symbExecVars.newIns.iterator();
-//        for (final Term locIn: symbExecVars.localIns) {
-//            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
-//        }
         Iterator<Term> outsAtPre = infData.localOutsAtPre.iterator();
         for (Term locOut: infData.localOuts) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(outsAtPre.next(), locOut));
@@ -434,8 +385,127 @@ public final class WhileInvariantRule implements BuiltInRule {
                         false);
         goal.addTaclet(infData.infFlowApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        goal.proof().addIFSymbol(infData.applPredTerm);
+        goal.proof().addIFSymbol(infData.infFlowApp);
+        goal.proof().addGoalTemplates(infData.infFlowApp);
 
         return goal;
+    }
+
+    private boolean isInfFlow(Goal goal) {
+        StrategyProperties stratProps =
+                goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
+        String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
+
+        boolean isOriginalIF =
+                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
+        // For loaded proofs, InfFlowCheckInfo is not correct without the following
+        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        return isOriginalIF || isLoadedIF;
+    }
+
+    private InfFlowData applyInfFlow(Goal goal,
+                                     RuleApp ruleApp,
+                                     final Instantiation inst,
+                                     final LocationVariable guardVar,
+                                     final JavaBlock guardJb,
+                                     final ImmutableSet<ProgramVariable> localIns,
+                                     final ImmutableSet<ProgramVariable> localOuts,
+                                     final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                                     final Term anonUpdate,
+                                     Services services) throws RuleAbortException {
+        LoopInvariant inv = inst.inv;
+        final boolean isInfFlow = isInfFlow(goal);
+        final boolean hasIFSpecs = inv.hasInfFlowSpec(services);
+
+        if (!isInfFlow || !hasIFSpecs) {
+            return new InfFlowData();
+        }
+
+        assert anonUpdateDatas.size() == 1 : "information flow " +
+                                             "extension is at the " +
+                                             "moment not compatible " +
+                                             "with the non-base-heap " +
+                                             "setting";
+        final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+
+        // prepare information flow validity goal
+        final Term baseHeap = anonUpdateData.loopHeapAtPre;
+        //heapContext.get(0);
+        final Term guardTerm = TB.var(guardVar);
+        final Term selfTerm = inst.selfTerm;
+        inv = inv.setGuard(guardTerm, services);
+        services.getSpecificationRepository().addLoopInvariant(inv);
+        ((LoopInvariantBuiltInRuleApp) ruleApp).setLoopInvariant(inv);
+        instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
+
+        final Term heapAtPre = TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
+                                                      baseHeap.sort(), false));
+        final Term heapAtPost = anonUpdateData.loopHeap;
+        final Term guardAtPre = buildBeforeVar(guardTerm, services);
+        final Term guardAtPost = buildAfterVar(guardTerm, services);
+        final Term selfAtPost = buildAtPostVar(selfTerm, "LOOP", services);
+        final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
+        final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
+        final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOutTerms, services);
+        final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
+        // localIns contains the local variables which might be read in the
+        // loop body, localOuts contains the local variables which might be
+        // assigned. Both sets might overlap. Hence we have to filter out
+        // those local variables from localIns which also appear in
+        // localOuts (not the other way around because we have to generate
+        // atPost variables for all local variables which might be assigned
+        // to).
+        final ImmutableList<Term> localInsWithoutOutDuplicates =
+                MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
+        final ImmutableList<Term> localVarsAtPre =
+                localInsWithoutOutDuplicates.append(localOutsAtPre);
+        final ImmutableList<Term> localVarsAtPost =
+                localInsWithoutOutDuplicates.append(localOutsAtPost);
+        final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
+
+        final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
+                new InfFlowLoopInvariantTacletBuilder(services);
+
+        ifInvariantBuilder.setInvariant(inv);
+        ifInvariantBuilder.setGuard(guardAtPre);
+        ifInvariantBuilder.setGuardAtPost(guardAtPost);
+        ifInvariantBuilder.setContextUpdate(/*inst.u*/);
+        ifInvariantBuilder.setHeapAtPre(heapAtPre);
+        ifInvariantBuilder.setHeapAtPost(heapAtPost);
+        ifInvariantBuilder.setSelfAtPre(selfTerm);
+        ifInvariantBuilder.setSelfAtPost(selfAtPost);
+        ifInvariantBuilder.setLocalVarsAtPre(localVarsAtPre);
+        ifInvariantBuilder.setLocalVarsAtPost(localVarsAtPost);
+
+        // generate information flow invariant application predicate
+        // and associated taclet
+        final Term loopInvApplPredTerm =
+                ifInvariantBuilder.buildContractApplPredTerm();
+        final Taclet informationFlowInvariantApp =
+                ifInvariantBuilder.buildContractApplTaclet();
+
+        // generate proof obligation variables
+        final StateVars instantiationPreVars =
+                new StateVars(selfTerm, guardAtPre, localVarsAtPre, heapAtPre);
+        final StateVars instantiationPostVars =
+                new StateVars(selfAtPost, guardAtPost, localVarsAtPost, heapAtPost);
+        final ProofObligationVars instantiationVars =
+                new ProofObligationVars(instantiationPreVars, instantiationPostVars);
+
+        InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre,
+                                                  guardAtPost, guardJb,
+                                                  guardTerm, localOutTerms,
+                                                  localOutsAtPre, localOutsAtPost,
+                                                  updates, loopInvApplPredTerm,
+                                                  informationFlowInvariantApp);
+
+        // create information flow validity goal
+        Goal infFlowGoal = buildInfFlowValidityGoal(goal, inv, instantiationVars,
+                                                    ruleApp, services);
+        return infFlowData.addGoal(infFlowGoal);
     }
 
     //-------------------------------------------------------------------------
@@ -538,30 +608,23 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term variantPO = dia ?
                 TB.and(variantNonNeg, TB.lt(variant, TB.var(variantPV), services))
                 : TB.tt();
+
         //prepare guard
         final ProgramElementName guardVarName = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
         services.getNamespaces().programVariables().addSafely(guardVar);
-        final VariableSpecification guardVarSpec 
-        = new VariableSpecification(guardVar, 
-                inst.loop.getGuardExpression(), 
-                booleanKJT);        
-        final LocalVariableDeclaration guardVarDecl 
-        = new LocalVariableDeclaration(new TypeRef(booleanKJT), 
-                guardVarSpec);
-        final Statement guardVarMethodFrame 
-        = inst.innermostExecutionContext == null 
-        ? guardVarDecl
-                : new MethodFrame(null, 
-                        inst.innermostExecutionContext,
-                        new StatementBlock(guardVarDecl));
-        final JavaBlock guardJb
-        = JavaBlock.createJavaBlock(new StatementBlock(
-                guardVarMethodFrame));
-        final Term guardTrueTerm = TB.equals(TB.var(guardVar),
-                TB.TRUE(services));
-        final Term guardFalseTerm = TB.equals(TB.var(guardVar),
-                TB.FALSE(services));
+        final VariableSpecification guardVarSpec =
+                new VariableSpecification(guardVar, inst.loop.getGuardExpression(), booleanKJT);
+        final LocalVariableDeclaration guardVarDecl =
+                new LocalVariableDeclaration(new TypeRef(booleanKJT), guardVarSpec);
+        final Statement guardVarMethodFrame =
+                inst.innermostExecutionContext == null ?
+                        guardVarDecl : new MethodFrame(null, inst.innermostExecutionContext,
+                                                       new StatementBlock(guardVarDecl));
+        final JavaBlock guardJb =
+                JavaBlock.createJavaBlock(new StatementBlock( guardVarMethodFrame));
+        final Term guardTrueTerm = TB.equals(TB.var(guardVar), TB.TRUE(services));
+        final Term guardFalseTerm = TB.equals(TB.var(guardVar), TB.FALSE(services));
 
         Term beforeLoopUpdate = null;
 
@@ -680,112 +743,15 @@ public final class WhileInvariantRule implements BuiltInRule {
             invTerm2 = invTerm;
         }
 
-        boolean isInfFlowProof =
-                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-        Goal infFlowGoal = null;
-        InfFlowData infFlowData = null;
-
-        if (isInfFlowProof && inst.inv.hasInfFlowSpec(services)) {
-            // prepare information flow validity goal
-
-            assert anonUpdateDatas.size() == 1 : "information flow " +
-                                                 "extension is at the " +
-                                                 "moment not compatible " +
-                                                 "with the non-base-heap " +
-                                                 "setting";
-            final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
-            final Term baseHeap = anonUpdateData.loopHeapAtPre;
-                    //heapContext.get(0);
-            final Term guardTerm = TB.var(guardVar);
-            final Term selfTerm = inst.selfTerm;
-            inst.inv.setGuard(guardTerm, services);
-            services.getSpecificationRepository().addLoopInvariant(inst.inv);
-
-            final Term heapAtPre = TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
-                                                          baseHeap.sort(), false));
-            final Term heapAtPost = anonUpdateData.loopHeap;
-            final Term guardAtPre = buildBeforeVar(guardTerm, services);
-            final Term guardAtPost = buildAfterVar(guardTerm, services);            
-            final Term selfAtPost = buildAtPostVar(selfTerm, "LOOP", services);
-            final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
-//            final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
-            final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
-            final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOutTerms, services);
-            final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
-            // localIns contains the local variables which might be read in the
-            // loop body, localOuts contains the local variables which might be
-            // assigned. Both sets might overlap. Hence we have to filter out
-            // those local variables from localIns which also appear in
-            // localOuts (not the other way around because we have to generate
-            // atPost variables for all local variables which might be assigned
-            // to).
-            final ImmutableList<Term> localInsWithoutOutDuplicates =
-                    MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
-            final ImmutableList<Term> localVarsAtPre =
-                    localInsWithoutOutDuplicates.append(localOutsAtPre);
-            final ImmutableList<Term> localVarsAtPost =
-                    localInsWithoutOutDuplicates.append(localOutsAtPost);
-            final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
-
-            final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
-                    new InfFlowLoopInvariantTacletBuilder(services);            
-
-            ifInvariantBuilder.setInvariant(inst.inv);
-            ifInvariantBuilder.setGuard(guardAtPre);
-            ifInvariantBuilder.setGuardAtPost(guardAtPost);
-            ifInvariantBuilder.setContextUpdate(/*inst.u*/);
-            ifInvariantBuilder.setHeapAtPre(heapAtPre);
-            ifInvariantBuilder.setHeapAtPost(heapAtPost);
-            ifInvariantBuilder.setSelfAtPre(selfTerm);
-            ifInvariantBuilder.setSelfAtPost(selfAtPost);
-            ifInvariantBuilder.setLocalVarsAtPre(localVarsAtPre);
-            ifInvariantBuilder.setLocalVarsAtPost(localVarsAtPost);
-
-            // generate information flow invariant application predicate
-            // and associated taclet
-            final Term loopInvApplPredTerm =
-                    ifInvariantBuilder.buildContractApplPredTerm();
-            if (!InfFlowContractPO.hasSymbols()) {
-                InfFlowContractPO.newSymbols(
-                        services.getProof().env().getInitConfig().activatedTaclets());
-            }
-            final Taclet informationFlowInvariantApp =
-                    ifInvariantBuilder.buildContractApplTaclet();
-
-            // generate proof obligation variables
-            final StateVars instantiationPreVars =
-                    new StateVars(selfTerm,
-                                  guardAtPre,
-                                  localVarsAtPre,
-                                  heapAtPre,
-                                  services);
-            final StateVars instantiationPostVars =
-                    new StateVars(selfAtPost,
-                                  guardAtPost,
-                                  localVarsAtPost,
-                                  heapAtPost,
-                                  services);
-            final ProofObligationVars instantiationVars =
-                new ProofObligationVars(instantiationPreVars, instantiationPostVars);
-
-            infFlowData = new InfFlowData(instantiationVars, guardAtPre,
-                                          guardAtPost, guardJb,
-                                          guardTerm, localOutTerms,
-                                          localOutsAtPre, localOutsAtPost,
-                                          updates, loopInvApplPredTerm,
-                                          informationFlowInvariantApp);
-
-            // create information flow validity goal
-            infFlowGoal = buildInfFlowValidityGoal(goal, inst.inv, instantiationVars,
-                                                   ruleApp, infFlowGoal, services);
-        }
+        InfFlowData infFlowData = applyInfFlow(goal, ruleApp, inst, guardVar, guardJb,
+                                               localIns, localOuts, anonUpdateDatas,
+                                               anonUpdate, services);
 
         //split goal into three branches
         final Goal initGoal;
         Goal useGoal;
         ImmutableList<Goal> result;
-        if (!isInfFlowProof) {
+        if (!infFlowData.isInfFlow) {
             result = goal.split(3);
             initGoal = result.tail().tail().head();
             final Goal bodyGoal = result.tail().head();
@@ -833,20 +799,19 @@ public final class WhileInvariantRule implements BuiltInRule {
             useGoal = result.head();
             initGoal.setBranchLabel("Invariant Initially Valid");
             useGoal.setBranchLabel("Use Case");
-            if (inst.inv.hasInfFlowSpec(services)) {
-                // add information flow validity goal
-                result = result.append(infFlowGoal);
-
-                // set infFlowAssumptions, add term and taclet to post goal
-                useGoal = addInfFlowAssumptionsAndTaclet(infFlowData, anonUpdateDatas.head().loopHeapAtPre, useGoal);
-            }
+            // add information flow validity goal
+            result = result.append(infFlowData.goal());
+            // set infFlowAssumptions, add term and taclet to post goal
+            useGoal = addInfFlowAssumptionsAndTaclet(
+                    infFlowData, anonUpdateDatas.head().loopHeapAtPre, useGoal);
         }
 
         //"Invariant Initially Valid":
         // \replacewith (==> inv );
         initGoal.changeFormula(new SequentFormula(TB.apply(inst.u,
                                                            TB.and(variantNonNeg,
-                                                                  TB.and(invTerm, reachableState)), null)),
+                                                                  TB.and(invTerm, reachableState)),
+                                                           null)),
                                ruleApp.posInOccurrence());
 
         // "Use Case":
@@ -858,7 +823,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+	Term restPsi =
+	        TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
+	                TermLabelWorkerManagement.instantiateLabels(
+	                        services, ruleApp.posInOccurrence(), this, useGoal, null,
+	                        inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)),
+	                        null, useJavaBlock));
         final Term guardFalseRestPsi = TB.imp(TB.box(guardJb,guardFalseTerm), restPsi);
         useGoal.changeFormula(new SequentFormula(TB.applySequential(uAnon, guardFalseRestPsi)),
                               ruleApp.posInOccurrence());
@@ -951,17 +921,22 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final Pair<Term, Term> updates;
         public final Term applPredTerm;
         public final Taclet infFlowApp;
+        private final Goal goal;
+        public final boolean isInfFlow;
 
-        public InfFlowData(ProofObligationVars symbExecVars,
-                           Term guardAtPre, Term guardAtPost,
-                           JavaBlock guardJb,
-                           Term guardTerm,
-                           ImmutableList<Term> localOuts,
-                           ImmutableList<Term> localOutsAtPre,
-                           ImmutableList<Term> localOutsAtPost,
-                           Pair<Term, Term> updates,
-                           Term applPredTerm,
-                           Taclet infFlowApp) {
+        private InfFlowData(ProofObligationVars symbExecVars,
+                            Term guardAtPre,
+                            Term guardAtPost,
+                            JavaBlock guardJb,
+                            Term guardTerm,
+                            ImmutableList<Term> localOuts,
+                            ImmutableList<Term> localOutsAtPre,
+                            ImmutableList<Term> localOutsAtPost,
+                            Pair<Term, Term> updates,
+                            Term applPredTerm,
+                            Taclet infFlowApp,
+                            Goal goal,
+                            boolean isInfFlow) {
             this.symbExecVars = symbExecVars;
             this.guardAtPre = guardAtPre;
             this.guardAtPost = guardAtPost;
@@ -973,6 +948,49 @@ public final class WhileInvariantRule implements BuiltInRule {
             this.updates = updates;
             this.infFlowApp = infFlowApp;
             this.applPredTerm = applPredTerm;
+            this.goal = goal;
+            this.isInfFlow = isInfFlow;
+        }
+
+        public InfFlowData() {
+            this(null, null, null, null, null, null, null, null, null, null, null, null, false);
+        }
+
+        public InfFlowData(ProofObligationVars symbExecVars,
+                           Term guardAtPre, Term guardAtPost,
+                           JavaBlock guardJb,
+                           Term guardTerm,
+                           ImmutableList<Term> localOuts,
+                           ImmutableList<Term> localOutsAtPre,
+                           ImmutableList<Term> localOutsAtPost,
+                           Pair<Term, Term> updates,
+                           Term applPredTerm,
+                           Taclet infFlowApp) {
+            this(symbExecVars, guardAtPre, guardAtPost, guardJb, guardTerm, localOuts,
+                 localOutsAtPre, localOutsAtPost, updates, applPredTerm, infFlowApp, null, true);
+            assert symbExecVars != null;
+            assert guardAtPre != null;
+            assert guardAtPost != null;
+            assert guardJb != null;
+            assert guardTerm != null;
+            assert localOuts != null;
+            assert localOutsAtPre != null;
+            assert localOutsAtPost != null;
+            assert updates != null;
+            assert applPredTerm != null;
+            assert infFlowApp != null;
+        }
+
+        public InfFlowData addGoal(Goal goal) {
+            assert goal != null;
+            return new InfFlowData(symbExecVars, guardAtPre, guardAtPost, guardJb,
+                                   guardTerm, localOuts, localOutsAtPre, localOutsAtPost,
+                                   updates, applPredTerm, infFlowApp, goal, isInfFlow);
+        }
+
+        public Goal goal() {
+            assert goal != null;
+            return goal;
         }
     }
 }

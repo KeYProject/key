@@ -545,23 +545,27 @@ public final class ProblemInitializer {
 	if(listener!= null){
 	    listener.progressStarted(this);
 	}
-        try {
-            //determine environment
-            initConfig = determineEnvironment(po, initConfig);
-           
-            //read problem
-    	    reportStatus("Loading problem \"" + po.name() + "\"");
-    	    po.readProblem();
-    	    ProofAggregate pa = po.getPO();
-    	    //final work
-    	    setUpProofHelper(po, pa, initConfig);
+	try {
+	    //determine environment
+	    initConfig = determineEnvironment(po, initConfig);
+
+	    //read problem
+	    reportStatus("Loading problem \"" + po.name() + "\"");
+	    po.readProblem();
+	    ProofAggregate pa = po.getPO();
+	    //final work
+	    setUpProofHelper(po, pa, initConfig);
 
 	    //done
-    	    if(listener != null){
-                listener.proofCreated(this, pa);
-            }
-          return pa.getProofs()[proofNum];
-               	    
+	    if(listener != null){
+	        listener.proofCreated(this, pa);
+	    }
+	    Proof p = pa.getProofs()[proofNum];
+	    if (po instanceof InfFlowRelatedPO) {
+	        p.unionIFSymbols(((InfFlowRelatedPO)po).getIFSymbols());
+	    }
+	    return p;
+
         } catch (ProofInputException e) {    
             if(listener != null){
         	listener.reportException(this, po, e);

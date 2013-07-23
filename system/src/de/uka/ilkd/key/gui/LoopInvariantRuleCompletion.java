@@ -40,8 +40,8 @@ public class LoopInvariantRuleCompletion implements
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
 
-        LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) app
-                .tryToInstantiate(goal);
+        LoopInvariantBuiltInRuleApp loopApp =
+                ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
         Term progPost = loopApp.programTerm();

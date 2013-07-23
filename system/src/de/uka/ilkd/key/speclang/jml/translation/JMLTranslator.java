@@ -271,7 +271,7 @@ final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Pair translate(SLTranslationExceptionManager excManager,
+            public Pair<IObserverFunction, Term> translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params, SLExpression.class, Term.class,
@@ -314,8 +314,8 @@ final class JMLTranslator {
                 if (result == null) {
                     result = TB.tt();
                 } else {
-                    Map /* Operator -> Operator */ replaceMap =
-                            new LinkedHashMap();
+                    Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
+                            new LinkedHashMap<LogicVariable, ProgramVariable>();
                     replaceMap.put(eVar, excVar);
                     OpReplacer excVarReplacer = new OpReplacer(replaceMap);
 
@@ -1524,12 +1524,12 @@ final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SEPARATES, new JMLTranslationMethod() {
 
             @Override
-            public ImmutableList translate(
+            public ImmutableList<?> translate(
                     SLTranslationExceptionManager excManager,
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
-                ImmutableList infFlowSpecList = (ImmutableList) params[0];
+                ImmutableList<?> infFlowSpecList = (ImmutableList<?>) params[0];
                 return infFlowSpecList;
             }
         });

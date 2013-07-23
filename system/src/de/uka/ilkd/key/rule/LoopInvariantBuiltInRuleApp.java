@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
 /**
  * The built in rule app for the loop invariant rule.
@@ -49,7 +47,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final While loop;
 
-    private final LoopInvariant inv;
+    private LoopInvariant inv;
     private final List<LocationVariable> heapContext;
     private IFProofObligationVars infFlowVars;
 
@@ -93,8 +91,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	// the guard is expected to be of the form "i < x" and we want to retrieve "i".
     	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
     	ProgramElement guardStatement = guard.getChildAt(0);
-    	skipIndex = !(guardStatement instanceof LessThan);
-    	Expression loopIndex = skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
+	skipIndex = !(guardStatement instanceof LessThan);
+	Expression loopIndex = skipIndex ? null :
+	    (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
 		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
     	
@@ -102,7 +101,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		Statement body = loop.getBody();
 		skipValues = !(body instanceof StatementBlock);
 		StatementBlock block = skipValues? null: ((StatementBlock)body);
-		Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
+		Statement last = (skipValues || block.getStatementCount() < 2) ? null :
+		    block.getStatementAt(1); // get the second statement
 		skipValues = skipValues || !(last instanceof CopyAssignment);
 		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
 		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
@@ -133,8 +133,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 			    	Term[] newSubs = new Term[subs.size()];
 			    	for (int i= 0; i < subs.size(); i++)
 			    		newSubs[i] = replace(subs.get(i));
-			    	return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-			    			visited.boundVars(), visited.javaBlock());
+				return tb.tf().createTerm(visited.op(),
+				                          new ImmutableArray<Term>(newSubs),
+				                          visited.boundVars(),
+				                          visited.javaBlock());
 			    }
 			}
 		};
@@ -198,22 +200,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (var != null) {
             v.visit(var);
             var = v.getResult();
-        }}        
-        return new LoopInvariantImpl(rawInv.getLoop(),
-                                     rawInv.getTarget(),
-                                     rawInv.getExecutionContext(),
-                                     newInvs,
-                                     rawInv.getInternalModifies(),
-                                     rawInv.getInternalInfFlowSpec(),
-                                     var,
-                                     rawInv.getInternalSelfTerm(),
-                                     rawInv.getLocalIns(),
-                                     rawInv.getLocalOuts(),
-                                     rawInv.getInternalAtPres());
+        }}
+        return rawInv.instantiate(newInvs, var);
     }
 
-    protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, LoopInvariant inv) {
+    private LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio, LoopInvariant inv) {
         this(rule, pio, null, inv, null);
 
     }
@@ -276,6 +267,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
+        assert inv != null;
+        if (this.loop == (While)inv.getLoop())
+            this.inv = inv;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
     }
     

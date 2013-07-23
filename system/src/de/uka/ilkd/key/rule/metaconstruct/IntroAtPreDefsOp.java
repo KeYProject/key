@@ -33,7 +33,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -160,17 +159,17 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
                 ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
                 final LoopInvariant newInv
-                       = new LoopInvariantImpl(loop,
-                               frame.getProgramMethod(),
-                               ec,
-                               newInvariants,
-                               newMods,
-                               newInfFlowSpecs,
-                               newVariant, 
-                               selfTerm,
-                               newLocalIns,
-                               newLocalOuts,
-                               atPres);
+                       = inv.create(loop,
+                                    frame.getProgramMethod(),
+                                    ec,
+                                    newInvariants,
+                                    newMods,
+                                    newInfFlowSpecs,
+                                    newVariant,
+                                    selfTerm,
+                                    newLocalIns,
+                                    newLocalOuts,
+                                    atPres);
                 services.getSpecificationRepository().addLoopInvariant(newInv);
             }
         }

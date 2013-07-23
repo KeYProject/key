@@ -38,6 +38,11 @@ import javax.swing.border.TitledBorder;
 @SuppressWarnings("serial")
 public class MainFrame extends JScrollPane {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -3194176155688759920L;
+
     public void setSequentView(SequentView sequentView) {
         Point oldViewpointPosition = getViewport().getViewPosition();
         setViewportView(new MainFrameBody(sequentView));
@@ -61,6 +66,11 @@ public class MainFrame extends JScrollPane {
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                 "copy");
         getActionMap().put("copy", new AbstractAction() {
+            /**
+             *
+             */
+            private static final long serialVersionUID = 5479208116653327369L;
+
             public void actionPerformed(ActionEvent e) {
                 GuiUtilities.copyHighlightToClipboard(MainWindow.getInstance().leafNodeView);
             }
@@ -70,6 +80,11 @@ public class MainFrame extends JScrollPane {
     }
 
     private static class MainFrameBody extends JPanel {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -3092090456993533533L;
 
         public MainFrameBody(SequentView sequentView) {
 

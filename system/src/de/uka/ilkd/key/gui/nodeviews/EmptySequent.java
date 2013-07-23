@@ -17,14 +17,16 @@
  */
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Font;
-
 /**
  *
  * @author Kai Wallisch
  */
 public class EmptySequent extends SequentView {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7572244482555772604L;
 
     public EmptySequent() {
     }

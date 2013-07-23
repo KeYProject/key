@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,6 +27,8 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -40,6 +43,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
@@ -49,12 +53,16 @@ import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
+import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -132,6 +140,11 @@ public class Proof implements Named {
      */
     private boolean disposed = false;
 
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
@@ -259,7 +272,7 @@ public class Proof implements Named {
 
     /**
      * Cut off all reference such that it does not lead to a big memory leak
-     * if someone still holds a refernce to this proof object.
+     * if someone still holds a reference to this proof object.
      */
     public void dispose() {
         if (isDisposed()) {
@@ -465,6 +478,71 @@ public class Proof implements Named {
     	return pis;
     }
 
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+    public void addIFSymbol(Object s) {
+        assert s != null;
+        if (s instanceof Term) {
+            infFlowSymbols.add((Term)s);
+        } else if (s instanceof Named) {
+            infFlowSymbols.add((Named)s);
+        } else {
+            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
+        }
+    }
+
+    public void addLabeledIFSymbol(Object s) {
+        assert s != null;
+        if (s instanceof Term) {
+            infFlowSymbols.addLabeled((Term)s);
+        } else if (s instanceof Named) {
+            infFlowSymbols.addLabeled((Named)s);
+        } else {
+            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
+        }
+    }
+
+    public void addTotalTerm(Term p) {
+        assert p != null;
+        infFlowSymbols.addTotalTerm(p);
+    }
+
+    public void addLabeledTotalTerm(Term p) {
+        assert p != null;
+        infFlowSymbols.addLabeledTotalTerm(p);
+    }
+
+    public void addGoalTemplates(Taclet t) {
+        assert t != null;
+        ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
+        assert temps != null;
+        for (TacletGoalTemplate tgt: temps) {
+            for (SequentFormula sf: tgt.sequent().antecedent().toList()) {
+                addLabeledTotalTerm(sf.formula());
+            }
+            for (SequentFormula sf: tgt.sequent().succedent().toList()) {
+                addLabeledTotalTerm(sf.formula());
+            }
+        }
+    }
+
+    public void unionIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.union(symbols);
+    }
+
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
+    }
+
+    public String printIFSymbols() {
+        return infFlowSymbols.printProofSymbols();
+    }
+
     /**
      * returns the list of open goals
      * @return list with the open goals
@@ -605,9 +683,40 @@ public class Proof implements Named {
 	return root.isClosed() && openGoals.isEmpty();
     }
 
+    /**
+     * save proof in file. If autoSave is on, this will potentially overwrite already
+     * existing proof files with the same name. Otherwise the save dialog pops up.
+     * Change: Now for loaded proofs both are turned off by default, i.e. only manual
+     * saving is possible, and the save dialog never pops up automatically (except
+     * for hitting the "Save ..." or "Save current proof" button).
+     */
+    public void saveProof() {
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
+                && !name().toString().endsWith(".proof")) {
+            // Save proof only if auto save is on and not a loaded proof
+            final MainWindow mainWindow = MainWindow.getInstance();
+            final KeYFileChooser jFC =
+                    GuiUtilities.getFileChooser("Choose filename to save proof");
+            final String defaultName =
+                    MiscTools.toValidFileName(this.name().toString()).toString();
+            boolean autoSave =
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
 
-
-
+            final Pair<Boolean, Pair<File, Boolean>> res =
+                    jFC.showSaveDialog(mainWindow, defaultName + ".proof", autoSave);
+            final boolean saved = res.first;
+            final boolean newDir = res.second.second;
+            if (saved) {
+                mainWindow.saveProof(jFC.getSelectedFile());
+            } else if (newDir) {
+                    final File dir = res.second.first;
+                    if (!dir.delete()) {
+                        dir.deleteOnExit();
+                    }
+                }
+            jFC.resetPath();
+        }
+    }
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.
@@ -876,6 +985,7 @@ public class Proof implements Named {
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofClosed(e);
 	}
+	saveProof();
     }
 
 

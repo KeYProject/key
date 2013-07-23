@@ -43,7 +43,7 @@ public final class SaveFileAction extends MainWindowAction {
         
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
@@ -54,7 +54,7 @@ public final class SaveFileAction extends MainWindowAction {
             		                            .toString()).toString();
 
             Pair<Boolean, Pair<File, Boolean>> res =
-                    jFC.showSaveDialog(mainWindow, defaultName + ".proof");
+                    jFC.showSaveDialog(mainWindow, defaultName + ".proof", false);
             boolean saved = res.first;
             boolean newDir = res.second.second;
             if (saved) {

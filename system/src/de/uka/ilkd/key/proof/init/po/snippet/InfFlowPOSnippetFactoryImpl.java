@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -44,7 +43,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         registerFactoryMethods();
     }
 
-
     InfFlowPOSnippetFactoryImpl(BlockContract contract,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
@@ -54,7 +52,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.poVars2 = vars2;
         registerFactoryMethods();
     }
-    
+
     InfFlowPOSnippetFactoryImpl(LoopInvariant invariant,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
@@ -112,7 +110,6 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                          "method for snippet \"" + snippet.name() + ".");
             }
             Term result = m.produce(data, poVars1, poVars2);
-            InfFlowContractPO.addSymbol(result, data.tb.getServices().getProof());
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " +

@@ -19,7 +19,7 @@ public interface BasicPOSnippetFactory {
         // free precondition (the "general assumption")
         FREE_PRE (BasicFreePreSnippet.class),
         
-     // free precondition (the "general assumption")
+        // free precondition (the "general assumption")
         FREE_INV (BasicFreeInvSnippet.class),
         
         // precondition of the contract (without free precondition)
@@ -92,10 +92,10 @@ public interface BasicPOSnippetFactory {
         
 
         // type of the factory method
-        public final Class c;
-        
-        // contructor
-        Snippet(Class c) {
+        public final Class<?> c;
+
+        // constructor
+        Snippet(Class<?> c) {
             this.c = c;
         }
     };

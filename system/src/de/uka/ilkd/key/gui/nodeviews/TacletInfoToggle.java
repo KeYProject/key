@@ -27,6 +27,10 @@ import javax.swing.event.ChangeListener;
  */
 public class TacletInfoToggle extends JCheckBox {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4218002380579593614L;
     InnerNodeView leafNodeView = null;
 
     public TacletInfoToggle() {

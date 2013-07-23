@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 import java.util.Iterator;
@@ -84,8 +83,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                     new LocationVariable(pen, paramVar.getKeYJavaType());
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
-
-            InfFlowContractPO.addSymbol(formalParamVar, tb.getServices().getProof());
+            tb.getServices().getProof().addIFSymbol(formalParamVar);
         }
 
         //create java block

@@ -44,7 +44,6 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -131,6 +130,9 @@ public class ProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
+              for (SequentFormula s: proof.root().sequent().succedent().toList()) {
+                  proof.addLabeledTotalTerm(s.formula());
+              }
           } else {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
@@ -138,9 +140,11 @@ public class ProofSaver {
           }
           ps.println(writeSettings(proof.getSettings()));
 
-          strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                                 StrategyProperties.INF_FLOW_CHECK_FALSE);
-          strategySettings.setActiveStrategyProperties(strategyProperties);
+          if (po instanceof InfFlowRelatedPO) {
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_FALSE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
+          }
 
           //declarations of symbols, sorts
           String header = proof.header();
@@ -164,7 +168,7 @@ public class ProofSaver {
               if (po instanceof InfFlowRelatedPO) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
-                  ps.print(InfFlowContractPO.printSymbols());
+                  ps.print(proof.printIFSymbols());
               }
               final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");

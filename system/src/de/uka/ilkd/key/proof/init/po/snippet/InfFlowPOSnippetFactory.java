@@ -48,10 +48,10 @@ public interface InfFlowPOSnippetFactory {
         SELFCOMPOSED_BLOCK_WITH_PRE_RELATION (SelfcomposedBlockSnippet.class);
 
         // type of the factory method
-        public final Class c;
+        public final Class<?> c;
 
-        // contructor
-        Snippet(Class c) {
+        // constructor
+        Snippet(Class<?> c) {
             this.c = c;
         }
     };

@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -124,9 +123,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                 throw new UnsupportedOperationException("Unknown factory "
                         + "method for snippet \"" + snippet.name() + ".");
             }
-            Term result = m.produce(data, poVars);
-            InfFlowContractPO.addSymbol(result, data.tb.getServices().getProof());
-            return result;
+            return m.produce(data, poVars);
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "
                     + "snippet \"" + snippet.name() + " threw "

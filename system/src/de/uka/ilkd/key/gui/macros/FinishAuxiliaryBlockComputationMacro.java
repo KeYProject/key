@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
@@ -74,18 +73,21 @@ public class FinishAuxiliaryBlockComputationMacro
         final BlockContractBuiltInRuleApp blockRuleApp =
                 (BlockContractBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();
-        final IFProofObligationVars ifVars =
-                blockRuleApp.getInformationFlowProofObligationVars();
+        final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
+        final IFProofObligationVars ifSchemaVars =
+                generateApplicationDataSVs(ifVars, proof.getServices());
 
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
-        final Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
-        InfFlowContractPO.addSymbol(rwTaclet, initiatingGoal.proof());
+        final Term result =  calculateResultingSVTerm(proof, ifVars, ifSchemaVars, initiatingGoal);
+        final Taclet rwTaclet = generateRewriteTaclet(result, contract, ifSchemaVars, services);
+        initiatingGoal.proof().addLabeledTotalTerm(result);
+        initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
+        initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
 
-        saveAuxiliaryProof();
+        proof.saveProof();
 
         // close auxiliary computation proof
         GuiUtilities.invokeAndWait(new Runnable() {

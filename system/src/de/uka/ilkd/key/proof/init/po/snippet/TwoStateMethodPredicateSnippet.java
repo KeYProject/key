@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import java.util.Iterator;
@@ -45,10 +44,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                 extractTermListForPredicate(poVars);
         final Function contApplPred =
                 generateContApplPredicate(nameString, termList, d.tb);
-        Term result = instantiateContApplPredicate(contApplPred, termList, d.tb);
-        InfFlowContractPO.addSymbol(result, d.tb.getServices().getProof());
-        InfFlowContractPO.addSymbols(termList, d.tb.getServices().getProof());
-        return result;
+        return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
 

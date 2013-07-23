@@ -27,7 +27,7 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      * {@inheritDoc}
      *
      * <p>
-     * The macros are allways started on the last active goal (in contrast
+     * The macros are always started on the last active goal (in contrast
      * to the same goal as it is done in the SequentialProofMacro).
      *
      * @throws InterruptedException

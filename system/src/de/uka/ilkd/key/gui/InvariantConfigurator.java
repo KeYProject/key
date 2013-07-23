@@ -47,9 +47,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * @author Dreiner, bruns
@@ -715,10 +713,8 @@ public class InvariantConfigurator {
                 }
 
                 if (requirementsAreMet) {
-                    newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, infFlowSpecs, variantTerm, loopInv
-                                    .getInternalSelfTerm(), loopInv.getLocalIns(),
-                                    loopInv.getLocalOuts(), loopInv.getInternalAtPres());
+                    newInvariant = loopInv.configurate(invariantTerm, modifiesTerm,
+                                                       infFlowSpecs, variantTerm);
                     return true;
                 } else
                     return false;

@@ -60,8 +60,7 @@ public class StateVars {
                      Term result,
                      Term exception,
                      Term heap,
-                     Term mbyAtPre,
-                     Services services) {
+                     Term mbyAtPre) {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
@@ -99,10 +98,8 @@ public class StateVars {
                      Term result,
                      Term exception,
                      Term heap,
-                     Term mbyAtPre,
-                     Services services) {
-        this(self, null, localVars, result, exception, heap,
-             mbyAtPre, services);
+                     Term mbyAtPre) {
+        this(self, null, localVars, result, exception, heap, mbyAtPre);
     }
 
 
@@ -129,9 +126,8 @@ public class StateVars {
     public StateVars(Term self,
                      Term guard,
                      ImmutableList<Term> localVars,
-                     Term heap,
-                     Services services) {
-        this(self, guard, localVars, null, null, heap, null, services);
+                     Term heap) {
+        this(self, guard, localVars, null, null, heap, null);
     }
 
 
@@ -140,9 +136,8 @@ public class StateVars {
                      ImmutableList<Term> localVars,
                      Term heap,
                      Term result,
-                     Term exception,
-                     Services services) {
-        this(self, guard, localVars, result, exception, heap, null, services);
+                     Term exception) {
+        this(self, guard, localVars, result, exception, heap, null);
     }
 
 
@@ -150,18 +145,15 @@ public class StateVars {
                      ImmutableList<Term> localVars,
                      Term heap,
                      Term result,
-                     Term exception,
-                     Services services) {
-        this(self, localVars, result, exception,
-             heap, null, services);
+                     Term exception) {
+        this(self, localVars, result, exception, heap, null);
     }
 
 
     public StateVars(Term self,
                      ImmutableList<Term> localVars,
-                     Term heap,
-                     Services services) {
-        this(self, localVars, heap, null, null, services);
+                     Term heap) {
+        this(self, localVars, heap, null, null);
     }
 
 
@@ -174,7 +166,7 @@ public class StateVars {
              copyLocationVariable(orig.result, postfix, services),
              copyLocationVariable(orig.exception, postfix, services),
              copyLocationVariable(orig.heap, postfix, services),
-             newFunction(orig.mbyAtPre, postfix, services), services);
+             newFunction(orig.mbyAtPre, postfix, services));
     }
 
 
@@ -226,10 +218,9 @@ public class StateVars {
     }
 
 
-    private static ImmutableList<Term> copyLocationVariable(
-            ImmutableList<Term> ts,
-            String postfix,
-            Services services) {
+    private static ImmutableList<Term> copyLocationVariable(ImmutableList<Term> ts,
+                                                            String postfix,
+                                                            Services services) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term t : ts) {
             result = result.append(copyLocationVariable(t, postfix, services));
@@ -261,8 +252,7 @@ public class StateVars {
              buildResultVar(pm, services, postfix),
              buildExceptionVar(services, postfix, pm),
              buildHeapVar(postfix, services),
-             buildMbyVar(postfix, services),
-             services);
+             buildMbyVar(postfix, services));
     }
 
 
@@ -274,8 +264,7 @@ public class StateVars {
                              buildResultVar(pm, services, ""),
                              buildExceptionVar(services, "", pm),
                              buildHeapVar("AtPre", services),
-                             buildMbyVar("", services),
-                             services);
+                             buildMbyVar("", services));
     }
 
 
@@ -289,8 +278,7 @@ public class StateVars {
                              buildResultVar(pm, services, postfix),
                              buildExceptionVar(services, postfix, pm),
                              buildHeapVar(postfix, services),
-                             preVars.mbyAtPre,
-                             services);
+                             preVars.mbyAtPre);
     }
 
 
@@ -344,8 +332,7 @@ public class StateVars {
                              result,
                              exception,
                              heap,
-                             mbyAtPre,
-                             services);
+                             mbyAtPre);
     }
 
 
@@ -395,15 +382,6 @@ public class StateVars {
             register(heapVar.op(LocationVariable.class), services);
             return heapVar;
         }
-    }
-
-
-    private static Term buildHeapAtPreVar(String postfix,
-                                          Services services) {
-        Term heapAtPreVar =
-                TB.var(TB.heapAtPreVar(services, "heapAtPre" + postfix, true));
-        register(heapAtPreVar.op(LocationVariable.class), services);
-        return heapAtPreVar;
     }
 
 

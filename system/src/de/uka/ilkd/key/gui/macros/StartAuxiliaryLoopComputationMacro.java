@@ -55,7 +55,9 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         }
         LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
+        LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        loopInv = loopInv != null ?
+                loopInv : loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
@@ -73,10 +75,12 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, ProverTaskListener listener) {
-        Services services = mediator.getServices();
+    public void applyTo(KeYMediator mediator,
+                        PosInOccurrence posInOcc,
+                        ProverTaskListener listener) {
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
+        Services services = proof.getServices();
         InitConfig initConfig = proof.env().getInitConfig();
 
         if (goal.node().parent() == null) {
@@ -86,23 +90,22 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return;
         }
-        LoopInvariantBuiltInRuleApp loopInvRuleApp =
-                (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv =
-                loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
-        IFProofObligationVars ifVars =
-                loopInvRuleApp.getInformationFlowProofObligationVars();
+        LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
+        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
+        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
+        IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+
 
         LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars,
                                        goal, loopInv.getExecutionContext());
-
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
                                        mediator.getServices(), true,
                                        mediator.getUI());
         try {
-            pi.startProver(initConfig, loopInvExecPO, 0);
+            Proof p = pi.startProver(initConfig, loopInvExecPO, 0);
+            p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time

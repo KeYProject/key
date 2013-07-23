@@ -15,7 +15,6 @@ package de.uka.ilkd.key.logic;
 
 
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;

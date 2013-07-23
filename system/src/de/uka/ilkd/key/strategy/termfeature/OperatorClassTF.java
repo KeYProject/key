@@ -22,13 +22,13 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class OperatorClassTF extends BinaryTermFeature {
 
-    private final Class opClass;
+    private final Class<?> opClass;
 
-    private OperatorClassTF(Class op) {
+    private OperatorClassTF(Class<?> op) {
         this.opClass = op;
     }
 
-    public static TermFeature create(Class op) {
+    public static TermFeature create(Class<?> op) {
         return new OperatorClassTF ( op );
     }
 

@@ -135,16 +135,4 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public ExecutionContext getExecutionContext() {
         return context;
     }
-
-    /*ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts,
-                                                StatementBlock block) {
-        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
-        for (BlockContract cont : ifContracts) {
-            if ((cont.getBlock().getStartPosition().getLine() ==
-                    block.getStartPosition().getLine())) {
-                result = result.add(cont);
-            }
-        }
-        return result;
-    }*/
 }

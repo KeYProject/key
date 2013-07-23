@@ -102,7 +102,7 @@ public abstract class LoopStatement extends JavaStatement
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
-    
+
 
     /**
      *      Loop statement.
@@ -390,4 +390,25 @@ public abstract class LoopStatement extends JavaStatement
      *      @return the boolean value.
      */
     public abstract boolean isCheckedBeforeIteration();
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof LoopStatement)) {
+            return false;
+        }
+
+        LoopStatement cmp = (LoopStatement)o;
+        return this.getClass() == cmp.getClass() &&
+               // XXX: line number not equal!!
+               this.getStartPosition().getLine() == cmp.getStartPosition().getLine();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + this.getClass().hashCode();
+        hash =  67 * hash + (this.getStartPosition().getLine() << 8);
+        return hash;
+    }
 }

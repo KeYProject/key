@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -37,6 +38,11 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     private final ExecutionContext context;
 
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     public LoopInvExecutionPO(InitConfig initConfig,
                               LoopInvariant loopInv,
@@ -85,12 +91,14 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
         // add class axioms
         Proof initiatingProof = initiatingGoal.proof();
-        AbstractOperationPO initatingPO =
-                (AbstractOperationPO) services.getSpecificationRepository()
-                                                    .getPOForProof(initiatingProof);
-        taclets = initatingPO.getInitialTaclets();
+        final AbstractOperationPO initiatingPO =
+                specRepos.getPOForProof(initiatingProof) != null ? // if proof is loaded
+                (AbstractOperationPO) specRepos.getPOForProof(initiatingProof)
+                : new SymbolicExecutionPO(initConfig, generatedIFContract,
+                                          symbExecVars, initiatingGoal);
+        taclets = initiatingPO.getInitialTaclets();
     }
-    
+
     @Override
     public boolean implies(ProofOblInput po) {
         if (!(po instanceof LoopInvExecutionPO)) {
@@ -163,6 +171,35 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     }
 
 
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+    public void addIFSymbol(Term t) {
+        assert t != null;
+        infFlowSymbols.add(t);
+    }
+
+    public void addIFSymbol(Named n) {
+        assert n != null;
+        infFlowSymbols.add(n);
+    }
+
+    public void addLabeledIFSymbol(Term t) {
+        assert t != null;
+        infFlowSymbols.addLabeled(t);
+    }
+
+    public void addLabeledIFSymbol(Named n) {
+        assert n != null;
+        infFlowSymbols.addLabeled(n);
+    }
+
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
+    }
 
     @Override
     @Deprecated

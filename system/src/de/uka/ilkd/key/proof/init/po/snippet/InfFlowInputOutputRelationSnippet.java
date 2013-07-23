@@ -223,10 +223,6 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             this.searchTerms = searchTerms;
         }
 
-        public boolean containsTerm() {
-            return termFound;
-        }
-
         @Override
         public void visit(Term visited) {
             for (Term searchTerm : searchTerms) {

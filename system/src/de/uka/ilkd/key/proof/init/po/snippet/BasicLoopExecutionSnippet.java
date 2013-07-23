@@ -6,11 +6,9 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -34,9 +32,10 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
+            Term origGuard = d.tb.var((LocationVariable) inv.getGuard().op());
             posts = posts.append(d.tb.box(guardJb,
                                           d.tb.equals(poVars.post.guard,
-                                                      d.tb.var((LocationVariable) inv.getGuard().op()))));
+                                                      origGuard)));
         }
         Iterator<Term> localVars = d.origVars.localVars.iterator();
         Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
@@ -99,8 +98,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     }
 
     private Pair<JavaBlock, JavaBlock> buildJavaBlock(BasicSnippetData d) {
-        Services services = d.tb.getServices();
-        final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);        
 
@@ -108,23 +105,17 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
-        final VariableSpecification guardVarSpec 
-        = new VariableSpecification((LocationVariable) inv.getGuard().op(), 
-                                    inv.getLoop().getGuardExpression(), 
-                                    booleanKJT);
-        final LocalVariableDeclaration guardVarDecl 
-        = new LocalVariableDeclaration(new TypeRef(booleanKJT), 
-                guardVarSpec);
-        final Statement guardVarMethodFrame 
-        = context == null 
-        ? guardVarDecl
-                : new MethodFrame(null, 
-                        context,
-                        new StatementBlock(guardVarDecl));
+        final Assignment guardVarDecl =
+                new CopyAssignment((LocationVariable)inv.getGuard().op(),
+                                   inv.getLoop().getGuardExpression());
+        final Statement guardVarMethodFrame =
+                context == null ?
+                        guardVarDecl : new MethodFrame(null, context,
+                                                       new StatementBlock(guardVarDecl));
 
         //create java block
-        final JavaBlock guardJb
-        = JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
+        final JavaBlock guardJb =
+                JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 

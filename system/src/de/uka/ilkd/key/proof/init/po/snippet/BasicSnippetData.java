@@ -97,15 +97,15 @@ class BasicSnippetData {
         LABELS(Label[].class),
         CONTEXT(ExecutionContext.class); // this does not fit well here
 
-        private final Class type;
+        private final Class<?> type;
 
 
-        Key(Class type) {
+        Key(Class<?> type) {
             this.type = type;
         }
 
 
-        public Class getType() {
+        public Class<?> getType() {
             return type;
         }
     };
@@ -127,7 +127,7 @@ class BasicSnippetData {
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(), heap,
-                              contract.getResult(), contract.getExc(), services);
+                              contract.getResult(), contract.getExc());
     }
     
     BasicSnippetData(LoopInvariant invariant,
@@ -156,8 +156,7 @@ class BasicSnippetData {
 
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  invariant.getGuard(),
-                                 localVarsTerms, heap,
-                                 services);
+                                 localVarsTerms, heap);
     }
     
     
@@ -186,7 +185,7 @@ class BasicSnippetData {
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new StateVars(contract.getSelf(), contract.getParams(), heap,
-                              contract.getResult(), contract.getExc(), services);
+                              contract.getResult(), contract.getExc());
     }
 
 
@@ -221,8 +220,7 @@ class BasicSnippetData {
         final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
 
         origVars = new StateVars(vars.self, localVarsTerms, heap,
-                                 vars.result, vars.exception,
-                                 services);
+                                 vars.result, vars.exception);
     }
 
 

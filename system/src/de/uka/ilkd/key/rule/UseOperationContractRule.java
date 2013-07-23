@@ -67,7 +67,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -76,7 +75,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.properties.Properties.Property;
 
 
 /**
@@ -311,17 +310,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 	assert pm != null;
 	assert mod != null;
 
-	final boolean loadedInfFlow = services.getProof().getSettings()
-	                                  .getStrategySettings().getActiveStrategyProperties()
-	                                  .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-	                                  .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
-
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
-	if (!loadedInfFlow)
-	    services.getNamespaces().functions().addSafely(methodHeapFunc);
-    final Term methodHeap = TB.func(methodHeapFunc);
+	services.getNamespaces().functions().addSafely(methodHeapFunc);
+	final Term methodHeap = TB.func(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -438,7 +431,83 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return result;	
     }
 
-    
+
+    private boolean isInfFlow(Goal goal) {
+        StrategyProperties stratProps =
+                goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
+        String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
+
+        boolean isOriginalIF =
+                (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
+        // For loaded proofs, InfFlowCheckInfo is not correct without the following
+        boolean isLoadedIF = stratProps.getProperty(ifStrat).equals(ifTrue);
+        return isOriginalIF || isLoadedIF;
+    }
+
+
+    private void applyInfFlow(Goal goal,
+                              final FunctionalOperationContract contract,
+                              final Instantiation inst,
+                              final Term self,
+                              final ImmutableList<Term> params,
+                              final Term result,
+                              final Term exception,
+                              final Term atPreUpdates,
+                              final Term finalPreTerm,
+                              final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                              Services services) {
+        if (!isInfFlow(goal)) {
+            return;
+        }
+
+        // prepare information flow analysis
+        assert anonUpdateDatas.size() == 1 : "information flow extension " +
+                                             "is at the moment not " +
+                                             "compatible with the " +
+                                             "non-base-heap setting";
+        AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+
+        final Term heapAtPre = anonUpdateData.methodHeapAtPre;
+        final Term heapAtPost = anonUpdateData.methodHeap;
+
+        InfFlowMethodContractTacletBuilder ifContractBuilder =
+                new InfFlowMethodContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
+        ifContractBuilder.setHeapAtPre(heapAtPre);
+        ifContractBuilder.setSelfAtPre(self);
+        ifContractBuilder.setLocalVarsAtPre(params);
+        ifContractBuilder.setResultAtPre(result);
+        ifContractBuilder.setExceptionAtPre(exception);
+        ifContractBuilder.setHeapAtPost(heapAtPost);
+        ifContractBuilder.setSelfAtPost(self);
+        ifContractBuilder.setLocalVarsAtPost(params);
+        ifContractBuilder.setResultAtPost(result);
+        ifContractBuilder.setExceptionAtPost(exception);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
+
+        // add term and taclet to post goal
+        goal.addFormula(new SequentFormula(contractApplPredTerm),
+                true,
+                false);
+        goal.addTaclet(informationFlowContractApp,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+        // information flow proofs might get easier if we add the (proved)
+        // method contract precondition as an assumption to the post goal
+        // (in case the precondition cannot be proved easily)
+        goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+        goal.proof().addIFSymbol(contractApplPredTerm);
+        goal.proof().addIFSymbol(informationFlowContractApp);
+        goal.proof().addGoalTemplates(informationFlowContractApp);
+    }
+
 
     //-------------------------------------------------------------------------
     //public interface
@@ -494,7 +563,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        ec, 
 	        services);
-	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
+	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+
+	                    staticType+", execution context: "+ec;
 	final Term actualSelf = getActualSelf(mr, pm, ec, services);
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
@@ -565,11 +635,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext =
+                HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars =
+                HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -782,12 +854,15 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final Term normalPost = TB.apply(anonUpdate, 
-                                         TB.prog(inst.mod, 
-                                                 postJavaBlock, 
-                                                 inst.progPost.sub(0),
-                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
-                                         null);
+        final Term normalPost =
+                TB.apply(anonUpdate,
+                         TB.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
+                                 TermLabelWorkerManagement
+                                     .instantiateLabels(services, ruleApp.posInOccurrence(),
+                                                        this, postGoal, null, inst.mod,
+                                                        new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                                        null, postJavaBlock)),
+                         null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
@@ -797,64 +872,22 @@ public final class UseOperationContractRule implements BuiltInRule {
         	            true, 
         	            false);
 
-        if ((goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
-            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))) {
-            // prepare information flow analysis
-            assert anonUpdateDatas.size() == 1 : "information flow extension " +
-                                                 "is at the moment not " +
-                                                 "compatible with the " +
-                                                 "non-base-heap setting";
-            final Term heapAtPre = anonUpdateDatas.head().methodHeapAtPre;
-            final Term heapAtPost = anonUpdateDatas.head().methodHeap;
-
-            InfFlowMethodContractTacletBuilder ifContractBuilder =
-                    new InfFlowMethodContractTacletBuilder(services);
-            ifContractBuilder.setContract(contract);
-            ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
-            ifContractBuilder.setHeapAtPre(heapAtPre);
-            ifContractBuilder.setSelfAtPre(contractSelf);
-            ifContractBuilder.setLocalVarsAtPre(contractParams);
-            ifContractBuilder.setResultAtPre(contractResult);
-            ifContractBuilder.setExceptionAtPre(TB.var(excVar));
-            ifContractBuilder.setHeapAtPost(heapAtPost);
-            ifContractBuilder.setSelfAtPost(contractSelf);
-            ifContractBuilder.setLocalVarsAtPost(contractParams);
-            ifContractBuilder.setResultAtPost(contractResult);
-            ifContractBuilder.setExceptionAtPost(TB.var(excVar));
-
-            // generate information flow contract application predicate
-            // and associated taclet
-            Term contractApplPredTerm =
-                    ifContractBuilder.buildContractApplPredTerm();
-            if (!InfFlowContractPO.hasSymbols()) {
-                InfFlowContractPO.newSymbols(
-                        services.getProof().env().getInitConfig().activatedTaclets());
-            }
-            Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
-
-            // add term and taclet to post goal
-            postGoal.addFormula(new SequentFormula(contractApplPredTerm),
-                                true,
-                                false);
-            postGoal.addTaclet(informationFlowContractApp,
-                               SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-
-            // information flow proofs might get easier if we add the (proofed)
-            // method contract precondition as an assumption to the post goal
-            // (in case the precondition cannot be proofed easily)
-            postGoal.addFormula(new SequentFormula(finalPreTerm), true, false);
-        }
+        applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
+                     TB.var(excVar), atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term excPost = TB.apply(anonUpdate, 
-                                      TB.prog(inst.mod, 
-                                              excJavaBlock, 
-                                              inst.progPost.sub(0),
-                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
-                                      null);
+        final Term excPost =
+                TB.apply(anonUpdate,
+                         TB.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
+                                 TermLabelWorkerManagement
+                                     .instantiateLabels(services, ruleApp.posInOccurrence(),
+                                                        this, excPostGoal, null, inst.mod,
+                                                        new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                                        null, excJavaBlock)),
+                         null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        

@@ -291,7 +291,7 @@ public abstract class AbstractPO implements IPersistablePO {
                 // this is a hack and has to be changed by time
                 p.getSettings().getStrategySettings().getActiveStrategyProperties()
                                .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                               .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);;
+                               .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         if (isInfFlowProof) {
             StrategyInfoUndoMethod undo =
                     new StrategyInfoUndoMethod() {

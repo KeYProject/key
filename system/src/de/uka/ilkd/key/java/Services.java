@@ -37,8 +37,8 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services{
-    
+public class Services {
+
     /**
      * the proof
      */
@@ -63,7 +63,7 @@ public class Services{
      * the information object on the Java model
      */
     private final JavaInfo javainfo;
-        
+
     /**
      * variable namer for inner renaming
      */
@@ -73,7 +73,6 @@ public class Services{
      * the exception-handler
      */
     private KeYExceptionHandler exceptionHandler;
-    
 
     /**
      * map of names to counters
@@ -85,11 +84,9 @@ public class Services{
      */
     private SpecificationRepository specRepos 
     	= new SpecificationRepository(this);
-    
 
     private NameRecorder nameRecorder;
-    
-    
+
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -281,5 +278,4 @@ public class Services{
     public Proof getProof() {
 	return proof;
     }
-
 }

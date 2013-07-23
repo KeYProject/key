@@ -87,8 +87,10 @@ public final class SpecificationRepository {
     
     private final Map<Pair<KeYJavaType,IObserverFunction>, ImmutableSet<Contract>> contracts 
     		= new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,ImmutableSet<Contract>>();
-    private final Map<Pair<KeYJavaType,IProgramMethod>, ImmutableSet<FunctionalOperationContract>> operationContracts 
-    		= new LinkedHashMap<Pair<KeYJavaType,IProgramMethod>,ImmutableSet<FunctionalOperationContract>>();    
+    private final Map<Pair<KeYJavaType,IProgramMethod>,
+                      ImmutableSet<FunctionalOperationContract>> operationContracts
+		= new LinkedHashMap<Pair<KeYJavaType,IProgramMethod>,
+		                    ImmutableSet<FunctionalOperationContract>>();
     private final Map<String,Contract> contractsByName
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<IObserverFunction>> contractTargets
@@ -123,7 +125,8 @@ public final class SpecificationRepository {
      * and such the default reference check is done which off cause always fails in case of different references.
      * </p>
      */
-    private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> allClassAxiomsCache = new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
+    private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> allClassAxiomsCache
+                = new LinkedHashMap<KeYJavaType, ImmutableSet<ClassAxiom>>();
     
     private final Services services;
     
@@ -415,7 +418,8 @@ public final class SpecificationRepository {
 
     
     private void registerContract(Contract contract) {
-        final Pair<KeYJavaType, IObserverFunction> target = new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(), contract.getTarget());
+        final Pair<KeYJavaType, IObserverFunction> target =
+                new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(), contract.getTarget());
         registerContract(contract, target);
     }
 
@@ -428,7 +432,7 @@ public final class SpecificationRepository {
 
     
     private void registerContract(Contract contract,
-            Pair<KeYJavaType, IObserverFunction> targetPair) {
+                                  Pair<KeYJavaType, IObserverFunction> targetPair) {
         final KeYJavaType targetKJT = targetPair.first;
         final IObserverFunction targetMethod = targetPair.second;
         contract = contract.setTarget(targetKJT, targetMethod);
@@ -446,10 +450,11 @@ public final class SpecificationRepository {
                   getContracts(targetKJT, targetMethod).add(contract));
         
         if(contract instanceof FunctionalOperationContract) {
-        operationContracts.put(new Pair<KeYJavaType,IProgramMethod>(targetKJT, (IProgramMethod)targetMethod), 
-                           getOperationContracts(targetKJT, 
-                                             (IProgramMethod)targetMethod)
-                                      .add((FunctionalOperationContract)contract));
+            operationContracts.put(
+                    new Pair<KeYJavaType,IProgramMethod>(targetKJT, (IProgramMethod)targetMethod),
+                    getOperationContracts(targetKJT,
+                                          (IProgramMethod)targetMethod)
+                                          .add((FunctionalOperationContract)contract));
         }
         contractsByName.put(contract.getName(), contract);
         final ImmutableSet<IObserverFunction> oldTargets = getContractTargets(targetKJT);
@@ -461,11 +466,14 @@ public final class SpecificationRepository {
     /** Removes the contract from the repository, but keeps its target. */
     private void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
-        final Pair<KeYJavaType,IObserverFunction> tp = new Pair<KeYJavaType, IObserverFunction>(kjt, contract.getTarget());
-        final Pair<KeYJavaType,IProgramMethod> tp2 = new Pair<KeYJavaType, IProgramMethod>(kjt, (IProgramMethod) contract.getTarget());
+        final Pair<KeYJavaType,IObserverFunction> tp =
+                new Pair<KeYJavaType, IObserverFunction>(kjt, contract.getTarget());
+        final Pair<KeYJavaType,IProgramMethod> tp2 =
+                new Pair<KeYJavaType, IProgramMethod>(kjt, (IProgramMethod) contract.getTarget());
         contracts.put(tp, contracts.get(tp).remove(contract));
         if (contract instanceof FunctionalOperationContract){
-            operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
+            operationContracts.put(tp2,
+                    operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
         }
         contractsByName.remove(contract.getName());
     }
@@ -563,12 +571,16 @@ public final class SpecificationRepository {
 	    				       IProgramMethod pm,
 	    				       Modality modality) {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
-	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-	final Modality matchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
-	          Modality.BOX) : modality;
+	final boolean transactionModality =
+	        (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
+	final Modality matchModality =
+	        transactionModality ?
+	                ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX) :
+	                    modality;
 	for(FunctionalOperationContract contract : result) {
             if(!contract.getModality().equals(matchModality)
-             || (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))) {
+             || (transactionModality && !contract.transactionApplicableContract()
+                     && !contract.isReadOnlyContract(services))) {
 		result = result.remove(contract);
 	    }
 	}
@@ -665,7 +677,8 @@ public final class SpecificationRepository {
         		        		              contract.getTarget()));
         
         registerContract(contract, impls);
-        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
+        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) :
+            "target "+contract.getTarget()+" missing for contract "+contract;
     }
     
     /** Registers the passed (atomic) contract without inheriting it. */
@@ -939,8 +952,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Returns all proofs registered for the passed atomic contract, or for
      * combined contracts including the passed atomic contract
@@ -962,7 +975,7 @@ public final class SpecificationRepository {
         }
         return result;
     }    
-    
+
 
     /**
      * Returns all proofs registered for the passed target and its overriding
@@ -991,8 +1004,8 @@ public final class SpecificationRepository {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Returns all proofs registered with this specification repository.
      */
@@ -1004,8 +1017,8 @@ public final class SpecificationRepository {
 	}
 	return result;
     }
-    
-    
+
+
     /**
      * Returns the PO that the passed proof is about, or null.
      */
@@ -1052,7 +1065,7 @@ public final class SpecificationRepository {
        }
        return null;
     }
-    
+
     /**
      * Returns the target that the passed proof is about, or null.
      */
@@ -1060,7 +1073,7 @@ public final class SpecificationRepository {
 	final ContractPO po = getPOForProof(proof);
 	return po == null ? null : po.getContract().getTarget();
     }
-    
+
 
     /**
      * Registers the passed proof. 
@@ -1068,8 +1081,8 @@ public final class SpecificationRepository {
     public void registerProof(ProofOblInput po, Proof proof) {
         proofs.put(po, getProofs(po).add(proof));
     }    
-    
-    
+
+
     /**
      * Unregisters the passed proof.
      */
@@ -1088,8 +1101,8 @@ public final class SpecificationRepository {
             }
         }
     }
-        
-    
+
+
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
@@ -1121,12 +1134,12 @@ public final class SpecificationRepository {
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void addLoopInvariant(LoopInvariant inv) {
-        LoopStatement loop = inv.getLoop();
+    public void addLoopInvariant(final LoopInvariant inv) {
+        final LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
-    
-    
+
+
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         if (blockContracts.get(block) == null) {
             return DefaultImmutableSet.<BlockContract>nil();
@@ -1136,13 +1149,14 @@ public final class SpecificationRepository {
         }
     }
 
-    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality)
-    {
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
+                                                         final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
             if (!contract.getModality().equals(matchModality)
-                    || (modality.transaction() && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                    || (modality.transaction() && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
         }
@@ -1191,13 +1205,14 @@ public final class SpecificationRepository {
             }
         }
     }
-    
-    
+
+
     public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
 	       : " observer is already limited: " + obs;
-	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProtramMethod?
+	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
+	    // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProgramMethod?
 	    return null;
 	}
 	
@@ -1232,8 +1247,8 @@ public final class SpecificationRepository {
 	return new Pair<IObserverFunction,ImmutableSet<Taclet>>(limited, 
 							       taclets);
     }
-    
-    
+
+
     public IObserverFunction unlimitObs(IObserverFunction obs) {
 	IObserverFunction result = limitedToUnlimited.get(obs);
 	if(result == null) {

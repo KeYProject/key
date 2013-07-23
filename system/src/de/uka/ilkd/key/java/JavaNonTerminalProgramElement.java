@@ -103,19 +103,7 @@ public abstract class JavaNonTerminalProgramElement
     
     @Override    
     public int hashCode(){
-	if (hashCode == 0) {
-	    int result = 17;
-	    result = 37 * result + getChildCount();
-	    for (int i = 0, cc = getChildCount(); i<cc; i++) {
-	        result = 37 * result + getChildAt(i).hashCode();
-	    }
-	    if (result == 0) { 
-		hashCode = 1;
-	    } else {
-		hashCode = result;
-	    }
-	}
-    	return hashCode;
+	return super.hashCode();
     }
     
   

@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
@@ -108,20 +107,14 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
         }
-        InfFlowContractPO.addSymbol(contractApplPredTerm, services.getProof());
         return contractApplPredTerm;
     }
 
 
     public Taclet buildContractApplTaclet() {
         ProofObligationVars appData = getProofObligationVars();
-        Taclet result = genInfFlowContractApplTaclet(appData, services);
-        InfFlowContractPO.addSymbol(result, services.getProof());
-        return result;
+        return genInfFlowContractApplTaclet(appData, services);
     }
-
-
-    abstract Taclet loadContractApplTaclet();
 
 
     abstract Name generateName();
@@ -138,19 +131,16 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private ProofObligationVars getProofObligationVars() {
         StateVars pre =
                 new StateVars(contractSelfAtPre, loopGuardAtPre, localVarsAtPre,
-                              heapAtPre, contractResultAtPre, exceptionVarAtPre, services);
+                              heapAtPre, contractResultAtPre, exceptionVarAtPre);
         StateVars post =
                 new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
-                              heapAtPost, contractResultAtPost, exceptionVarAtPost, services);
+                              heapAtPost, contractResultAtPost, exceptionVarAtPost);
         assert pre.paddedTermList.size() == post.paddedTermList.size();
         return new ProofObligationVars(pre, post);
     }
 
 
     abstract Term getContractApplPred(ProofObligationVars appData);
-
-
-    abstract Term loadContractApplPred();
 
 
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
@@ -194,7 +184,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                                                services));
             }
         }
-        
+
         Term guardAtPostSV = (appData.pre.guard == appData.post.guard ?
                 guardAtPreSV :
                 createTermSV(appData.post.guard, schemaPrefix, services));
@@ -211,14 +201,14 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         // build state vararibale container for pre and post state
         StateVars pre =
                 new StateVars(selfAtPreSV, guardAtPreSV,
-                                        localVarsAtPreSVs, resAtPreSV,
-                                        excAtPreSV, heapAtPreSV,
-                                        mbyAtPreSV, services);
+                              localVarsAtPreSVs, resAtPreSV,
+                              excAtPreSV, heapAtPreSV,
+                              mbyAtPreSV);
         StateVars post =
                 new StateVars(selfAtPostSV, guardAtPostSV,
-                                        localVarsAtPostSVs, resAtPostSV,
-                                        excAtPostSV, heapAtPostSV,
-                                        null, services);
+                              localVarsAtPostSVs, resAtPostSV,
+                              excAtPostSV, heapAtPostSV,
+                              null);
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post);
