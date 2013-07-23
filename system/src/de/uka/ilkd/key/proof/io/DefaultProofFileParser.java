@@ -347,7 +347,6 @@ public class DefaultProofFileParser implements IProofFileParser {
 
        final ImmutableSet<IBuiltInRuleApp> ruleApps =
            mediator.getBuiltInRuleApplications(currTacletName, pos);
-
        if (ruleApps.size() != 1) {
            if (ruleApps.size() < 1) {
                throw new BuiltInConstructionException

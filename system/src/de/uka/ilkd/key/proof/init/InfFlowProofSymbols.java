@@ -6,7 +6,9 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -286,6 +288,17 @@ public class InfFlowProofSymbols {
         if (!containsProgramVariable(pv)) {
             programVariables = programVariables.add(new Pair<ProgramVariable, Boolean>(pv, !labeled));
         }
+    }
+
+    public static ProgramVariable searchPV(String s, Services services) {
+        Namespace ns = services.getNamespaces().programVariables();
+        Named n = ns.lookup(s);
+        int i = 0;
+        while (n == null && i < 1000) {
+            n = ns.lookup(s + "_" + i);
+        }
+        assert n instanceof ProgramVariable;
+        return (ProgramVariable)n;
     }
 
     public void add(Named symb) {

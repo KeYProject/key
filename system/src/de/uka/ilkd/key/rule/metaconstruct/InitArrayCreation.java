@@ -189,7 +189,7 @@ public class InitArrayCreation extends InitArray {
 				       	    baseTypeRef, 
 				       	    baseType, 
 				       	    null, 
-				       	    dimensions.length - 1)));
+					    dimensions.length - 1)));
 
 	    bodyStmnts.add(forLoop);
 	}

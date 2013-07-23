@@ -53,9 +53,9 @@ public class Unpack extends ProgramTransformer {
 
 	loopInitStatementList
 	[loopInitStatementList.length - 1] = new For(null,
-		astFor.getGuard(), 
-		astFor.getIForUpdates(), 
-		astFor.getBody());
+	                                             astFor.getGuard(),
+	                                             astFor.getIForUpdates(),
+	                                             astFor.getBody());
 	return new StatementBlock(loopInitStatementList);
     }
 }

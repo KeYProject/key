@@ -1212,13 +1212,13 @@ public class JMLSpecFactory {
         return null;
     }
 
-    public LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
-                                                LoopStatement loop,
-                                                Map<String,ImmutableList<PositionedString>>
+    private LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
+                                                 LoopStatement loop,
+                                                 Map<String,ImmutableList<PositionedString>>
                                                         originalInvariants,
-                                                Map<String,ImmutableList<PositionedString>>
+                                                 Map<String,ImmutableList<PositionedString>>
                                                         originalAssignables,
-                                                ImmutableList<PositionedString>
+                                                 ImmutableList<PositionedString>
                                                         originalInfFlowSpecs,
                                                 PositionedString originalVariant)
             throws SLTranslationException {

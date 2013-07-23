@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
@@ -153,10 +154,15 @@ class BasicSnippetData {
         final ImmutableList<Term> localInsWithoutOutDuplicates =
                     MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
         final ImmutableList<Term> localVarsTerms = localInsWithoutOutDuplicates.append(localOutTerms);
-
+        Term guard = invariant.hasGuard() ?
+                invariant.getGuard() : tb.var(InfFlowProofSymbols.searchPV("b", services));
+        if (!invariant.hasGuard()) {
+            invariant = invariant.setGuard(guard, services);
+            contractContents.put(Key.LOOP_INVARIANT, invariant);
+            contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
+        }
         origVars = new StateVars(invariant.getInternalSelfTerm(),
-                                 invariant.getGuard(),
-                                 localVarsTerms, heap);
+                                 guard, localVarsTerms, heap);
     }
     
     
