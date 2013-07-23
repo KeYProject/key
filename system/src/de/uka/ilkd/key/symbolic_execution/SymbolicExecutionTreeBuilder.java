@@ -25,10 +25,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -38,6 +40,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
@@ -46,6 +50,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -681,30 +686,49 @@ public class SymbolicExecutionTreeBuilder {
                }
             }
             else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-               result = new ExecutionBranchNode(mediator, node);
+               if (isNotInImpliciteMethod(node)) {
+                  result = new ExecutionBranchNode(mediator, node);
+               }
             }
             else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-               if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-                  result = new ExecutionLoopNode(mediator, node);
+               if (isNotInImpliciteMethod(node)) {
+                  if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
+                     result = new ExecutionLoopNode(mediator, node);
+                  }
                }
             }
             else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-               result = new ExecutionStatement(mediator, node);
+               if (isNotInImpliciteMethod(node)) {
+                  result = new ExecutionStatement(mediator, node);
+               }
             }
          }
          else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
-            result = new ExecutionUseOperationContract(mediator, node);
+            if (isNotInImpliciteMethod(node)) {
+               result = new ExecutionUseOperationContract(mediator, node);
+            }
          }
          else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
-            result = new ExecutionUseLoopInvariant(mediator, node);
-            // Initialize new call stack of the preserves loop invariant branch
-            initNewLoopBodyMethodCallStack(node);
+            if (isNotInImpliciteMethod(node)) {
+               result = new ExecutionUseLoopInvariant(mediator, node);
+               // Initialize new call stack of the preserves loop invariant branch
+               initNewLoopBodyMethodCallStack(node);
+            }
          }
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
          result = new ExecutionTermination(mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
       }
       return result;
+   }
+   
+   protected boolean isNotInImpliciteMethod(Node node) {
+      Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+      term = TermBuilder.DF.goBelowUpdates(term);
+      Services services = proof.getServices();
+      IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
+      IProgramMethod pm = ec.getMethodContext();
+      return SymbolicExecutionUtil.isNotImplicite(services, pm);
    }
    
    /**
@@ -797,7 +821,7 @@ public class SymbolicExecutionTreeBuilder {
             Node stackEntry = stackIter.next();
             if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
                IExecutionNode executionNode = getExecutionNode(stackEntry);
-               assert executionNode != null : "Can't find execution node for KeY's proof node \"" + stackEntry + "\".";
+               assert executionNode != null : "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
                callStack.add(executionNode);
             }
          }

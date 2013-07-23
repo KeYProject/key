@@ -31,8 +31,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> measuredBy =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> accessible =
-            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> signals =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> signalsOnly =
@@ -52,6 +50,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     
     private Map<String, ImmutableList<PositionedString>>
+      accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
       assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     private Map<String, ImmutableList<PositionedString>>
@@ -59,6 +60,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private Map<String, ImmutableList<PositionedString>>
       ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
@@ -69,6 +73,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
+          axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
     
@@ -112,14 +119,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addAccessible(PositionedString ps) {
-        accessible = accessible.append(ps);
+    	addGeneric(accessibles, ps);
     }
 
 
     public void addAccessible(ImmutableList<PositionedString> l) {
-        accessible = accessible.append(l);
+        for(PositionedString ps : l) {
+          addAccessible(ps);
+        }
     }
-
 
     public void addEnsures(PositionedString ps) {
         addGeneric(ensures, ps);
@@ -197,6 +205,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         returns = returns.append(l);
     }
 
+    public void addAxioms(PositionedString ps) {
+        addGeneric(axioms, ps);
+    }
+    	
+    public void addAxioms(ImmutableList<PositionedString> l) {
+        for(PositionedString ps : l) {
+	           addAxioms(ps);
+        }
+    }
 
     public void addInfFlowSpecs(PositionedString ps) {
         infFlowSpecs = infFlowSpecs.append(ps);
@@ -235,9 +252,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public ImmutableList<PositionedString> getAccessible() {
-        return accessible;
+    	return accessibles.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
+    public ImmutableList<PositionedString> getAccessible(String hName) {
+    	return accessibles.get(hName);
+    }
 
     public ImmutableList<PositionedString> getEnsures() {
         return ensures.get(HeapLDT.BASE_HEAP_NAME.toString());
@@ -247,6 +267,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return ensures.get(hName);
     }
 
+    public ImmutableList<PositionedString> getAxioms() {
+      return axioms.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+    
+    public ImmutableList<PositionedString> getAxioms(String hName) {
+      return axioms.get(hName);
+    }
 
     public String getName() {
         return name;
@@ -316,14 +343,26 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             sb.append("assignable<"+h+">: " + it.next() + "\n");
           }
         }
-        it = accessible.iterator();
-        while (it.hasNext()) {
-            sb.append("accessible: " + it.next() + "\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = accessibles.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("accessible<"+h+">: " + it.next() + "\n");
+          }
+          it = accessibles.get(h.toString()+"AtPre").iterator();
+          while(it.hasNext()) {
+            sb.append("accessible<"+h+"AtPre>: " + it.next() + "\n");
+          }
         }
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
           it = ensures.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("ensures<"+h+">: " + it.next() + "\n");
+          }
+        }
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = axioms.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("axioms<"+h+">: " + it.next() + "\n");
           }
         }
         it = signals.iterator();
@@ -372,7 +411,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
                && assignables.equals(sc.assignables)
-               && accessible.equals(sc.accessible)
+               && accessibles.equals(sc.accessibles)
+               && axioms.equals(sc.axioms)
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
@@ -391,7 +431,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + behavior.hashCode()
                + requires.hashCode()
                + assignables.hashCode()
-               + accessible.hashCode()
+               + accessibles.hashCode()
+               + axioms.hashCode()
                + ensures.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()

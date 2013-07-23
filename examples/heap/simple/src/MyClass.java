@@ -9,8 +9,10 @@ class MyClass {
     //@ invariant attr2 != 0;
     //@ accessible \inv: footprint;
 
-    //@ assignable \nothing;
-    //@ ensures \fresh(footprint);
+    /*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures \fresh(footprint);
+      @*/
     MyClass() {
 	attr2++;
     }

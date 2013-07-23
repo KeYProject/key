@@ -36,6 +36,7 @@ import de.uka.ilkd.key.parser.AmbigiousDeclException;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 
 
 public class TestDeclParser extends TestCase {
@@ -48,7 +49,7 @@ public class TestDeclParser extends TestCase {
     }
 
     public void setUp() {
-	serv = new Services ();
+	serv = new Services(AbstractProfile.getDefaultProfile());
 	nss = serv.getNamespaces();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";

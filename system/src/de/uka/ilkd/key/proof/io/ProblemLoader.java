@@ -24,6 +24,7 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -38,8 +39,8 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
    private SwingWorker worker;
    private ProverTaskListener ptl;
 
-   public ProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
-      super(file, classPath, bootClassPath, mediator);
+   public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
+      super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
    }
 
    public void addTaskListener(ProverTaskListener ptl) {

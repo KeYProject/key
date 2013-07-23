@@ -150,6 +150,8 @@ options {
 
     private Term quantifiedArrayGuard = null;
     
+    private String profileName;
+    
     private TokenStreamSelector selector;
 
     /**
@@ -224,27 +226,18 @@ options {
      * declared globally in the variable namespace.  This parser is used
      * for test cases, where you want to know in advance which objects
      * will represent bound variables.
-     */  
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
-		     JavaReader jr,
-		     NamespaceSet nss) {
-        this(lexer, null, new Services(), nss, mode);
-        this.scm = new AbbrevMap();
-        this.javaReader = jr;
-    }
-
+     */
     public KeYParser(ParserMode mode, 
                      TokenStream lexer,
 		     Services services,
 		     NamespaceSet nss) {
-	this(mode, lexer, 
-	     new Recoder2KeY(services,
-		new KeYCrossReferenceServiceConfiguration(
-		   services.getExceptionHandler()), 
-		services.getJavaInfo().rec2key(), new NamespaceSet(), 
-		services.getTypeConverter()),
-   	     nss);
+        this(lexer, null, services, nss, mode);
+        this.scm = new AbbrevMap();
+        this.javaReader = new Recoder2KeY(services,
+                new KeYCrossReferenceServiceConfiguration(
+                   services.getExceptionHandler()), 
+                services.getJavaInfo().rec2key(), new NamespaceSet(), 
+                services.getTypeConverter());
     }
 
     /**
@@ -339,6 +332,10 @@ options {
     
     public String getProofObligation() {
       return proofObligation;
+    }
+    
+    public String getProfileName() {
+      return profileName;
     }
     
     public String getFilename() {
@@ -3415,6 +3412,31 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
+triggers[TacletBuilder b]
+{
+   String id = null;
+   Term t = null;
+   Named triggerVar = null;
+   Term avoidCond = null;
+   ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
+} :
+   TRIGGER
+     LBRACE id = simple_ident 
+     	{  
+     	  triggerVar = variables().lookup(new Name(id));
+     	  if (triggerVar == null || !(triggerVar instanceof SchemaVariable)) {
+     	  	throw 
+     	  	  new KeYSemanticException("Undeclared schemavariable: " + id, 
+     	  	  getFilename(), getLine(), getColumn());
+     	  }  
+     	}   RBRACE     
+     t=term (AVOID avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);} 
+      (COMMA avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);})*)? SEMI
+   {
+     b.setTrigger(new Trigger((SchemaVariable)triggerVar, t, avoidConditions));
+   }
+;
+
 taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 { 
     Sequent ifSeq = Sequent.EMPTY_SEQUENT;
@@ -3473,6 +3495,7 @@ modifiers[TacletBuilder b]
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal
             {b.setHelpText(htext);}
+        | triggers[b]            
         ) *
     ;
 
@@ -4299,7 +4322,7 @@ problem returns [ Term a = null ]
     String pref = null;
 }
     :
-
+        profile     
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
@@ -4419,6 +4442,11 @@ oneJavaSource returns [String s = null]
   )+ {
     s = b.toString();
   }
+;
+
+
+profile:
+        (PROFILE profileName=string_literal SEMI)? 
 ;
 
 preferences returns [String s = null]:

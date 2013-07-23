@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

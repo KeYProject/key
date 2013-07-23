@@ -15,6 +15,11 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -24,10 +29,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 
 /**
@@ -58,10 +65,13 @@ public final class DependencyContractPO extends AbstractPO
     //internal methods
     //-------------------------------------------------------------------------    
     
-    private Term buildFreePre(ProgramVariable selfVar,
+    private Term buildFreePre(
+    		              List<LocationVariable> heaps,
+    		              Collection<LocationVariable> preHeaps,
+    		              ProgramVariable selfVar,
 	                      KeYJavaType selfKJT,
 	                      ImmutableList<ProgramVariable> paramVars,
-	                      Term anonHeap) 
+	                      Term wellFormedHeaps) 
     		throws ProofInputException {
         //"self != null"
 	final Term selfNotNull 
@@ -69,12 +79,31 @@ public final class DependencyContractPO extends AbstractPO
               ? TB.tt()
               : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
               
-        //"self.<created> = TRUE"
-        final Term selfCreated
-           = selfVar == null
-             ? TB.tt()
-             : TB.created(services, TB.var(selfVar));
-	
+        //"self.<created> = TRUE" for all heaps
+
+        Term selfCreated = null;
+        if(selfVar != null) {
+            for(LocationVariable h : heaps) {
+                final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
+                if(selfCreated == null) {
+                    selfCreated = sc;
+                }else{
+                    selfCreated = TB.and(selfCreated, sc);
+                }
+            }
+            if(preHeaps != null) {
+                for(LocationVariable h : preHeaps) {
+                    final Term sc = TB.created(services, TB.var(h), TB.var(selfVar));
+                    if(selfCreated == null) {
+                       selfCreated = sc;
+                    }else{
+                       selfCreated = TB.and(selfCreated, sc);
+                    }
+                }
+            }
+        }else{
+            selfCreated = TB.tt();
+        }
         	      
         //"MyClass::exactInstance(self) = TRUE"
         final Term selfExactType
@@ -109,8 +138,7 @@ public final class DependencyContractPO extends AbstractPO
             mbyAtPreDef = TB.tt();
         }        
              
-        return TB.and(new Term[]{TB.wellFormed(TB.getBaseHeap(services), services), 
-        			 TB.wellFormed(anonHeap, services),
+        return TB.and(new Term[]{wellFormedHeaps,
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
@@ -141,52 +169,88 @@ public final class DependencyContractPO extends AbstractPO
 	final ImmutableList<ProgramVariable> paramVars
 		= TB.paramVars(services, target, true);
 
-	//prepare anon heap
-	final Name anonHeapName 
-		= new Name(TB.newName(services, "anonHeap"));
-	final Function anonHeapFunc = new Function(anonHeapName,
-		heapLDT.targetSort());
-	final Term anonHeap = TB.func(anonHeapFunc);
+	final boolean twoState = (contract.getTarget().getStateCount() == 2);
+	final int heapCount = contract.getTarget().getHeapCount(services);
 	
+	final Map<LocationVariable,LocationVariable> preHeapVars = new LinkedHashMap<LocationVariable, LocationVariable>();
+	final Map<LocationVariable,LocationVariable> preHeapVarsReverse = new LinkedHashMap<LocationVariable, LocationVariable>();
+    List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+    int hc = 0;
+	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+		  if(hc >= heapCount) {
+			  break;
+		  }
+		  heaps.add(h);
+	      LocationVariable preVar = twoState ?
+	        TB.heapAtPreVar(services, h.name()+"AtPre", h.sort(), true)
+	        : null ;
+	      if(preVar != null) { register(preVar); }
+	      preHeapVars.put(h, preVar);
+	      if(preVar != null) {
+	    	  preHeapVarsReverse.put(preVar, h);
+	      }
+	}
+    if(twoState) {
+    	heaps.addAll(preHeapVars.values());
+    }
+
         //register the variables and anon heap so they are declared in proof 
 	//header if the proof is saved to a file
         register(selfVar);	
         register(paramVars);
+
+
+    Term wellFormedHeaps = null;
+    Term update = null;
+    for(LocationVariable h : heaps) {
+        final Term wellFormedHeap = TB.wellFormed(h, services);
+        if(wellFormedHeaps == null) {
+            wellFormedHeaps = wellFormedHeap;
+        }else{
+            wellFormedHeaps = TB.and(wellFormedHeaps, wellFormedHeap);
+        }
+     	//prepare anon heap
+     	final Name anonHeapName = new Name(TB.newName(services, "anon_"+h.toString()));
+	    final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
         register(anonHeapFunc);	
+	    final Term anonHeap = TB.func(anonHeapFunc);
+	    final Term wellFormedAnonHeap = TB.wellFormed(anonHeap, services);
+	    if(wellFormedHeaps == null) {
+	        wellFormedHeaps = wellFormedAnonHeap;
+	    }else{
+	        wellFormedHeaps = TB.and(wellFormedHeaps,wellFormedAnonHeap);
+	    }
+		//prepare update
+	    final boolean atPre = preHeapVars.values().contains(h);
+		final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, services);	    
+		final Term changedHeap = TB.anon(services, TB.var(h), TB.setMinus(services, TB.allLocs(services), dep), anonHeap);
+		final Term u = TB.elementary(services, h, changedHeap);
+		if(update == null) {
+		    update = u;
+		}else{
+		    update = TB.parallel(update, u);
+		}
+    }
 	
 	//translate contract
-	final Term pre = TB.and(buildFreePre(selfVar, 
-			                     contract.getKJT(), 
-					     paramVars,
-					     anonHeap),
-			        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
-	final Term dep = getContract().getDep(selfVar, paramVars, services);
+	final Term pre = TB.and(
+	   buildFreePre(heaps, twoState ? preHeapVars.values() : null, selfVar, 
+		            contract.getKJT(), paramVars, wellFormedHeaps),
+       contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
 	
-	//prepare update
-	final Term changedHeap 
-		= TB.anon(services, 
-			  TB.getBaseHeap(services), 
-			  TB.setMinus(services, 
-				      TB.allLocs(services), 
-				      dep), 
-                          anonHeap);
-	final Term update = TB.elementary(services, 
-					  heapLDT.getHeap(), 
-					  changedHeap);
-	
+	assert heaps.size() == heapCount;
 	//prepare target term
 	final Term[] subs
-		= new Term[paramVars.size() + (target.isStatic() ? 1 : 2)];
-	subs[0] = TB.getBaseHeap(services);
-	int offset = 1;
+	    = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
+	int offset = 0;
+	for(LocationVariable heap : heaps) {
+	    subs[offset++] = TB.var(heap);
+    }
 	if(!target.isStatic()) {
-	    subs[1] = TB.var(selfVar);
-	    offset++;
+	    subs[offset++] = TB.var(selfVar);
 	}
 	for(ProgramVariable paramVar : paramVars) {
-	    subs[offset] = TB.var(paramVar);
-	    subs[offset] = TB.var(paramVar);
-	    offset++;
+	    subs[offset++] = TB.var(paramVar);
 	}
 	final Term targetTerm = TB.func(target, subs);
 	

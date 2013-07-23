@@ -31,13 +31,9 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
-import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
-import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
-import de.uka.ilkd.key.rule.metaconstruct.WhileLoopTransformation;
 
 public class TestProgramMetaConstructs extends TestCase {
 
@@ -60,7 +56,7 @@ public class TestProgramMetaConstructs extends TestCase {
 	
 	ProgramElement result = rmLabel.
 	    transform
-	    (rmLabel.body(), new Services(),
+	    (rmLabel.body(), new Services(AbstractProfile.getDefaultProfile()),
 	     SVInstantiations.EMPTY_SVINSTANTIATIONS);
 	assertTrue(result instanceof Break);
     }
@@ -83,13 +79,13 @@ public class TestProgramMetaConstructs extends TestCase {
  	    new WhileLoopTransformation(block2, 
 					new ProgramElementName("l1"), 
 					new ProgramElementName("l2"),
-                                        new Services());
+                                        new Services(AbstractProfile.getDefaultProfile()));
  	trans.start();
  	System.out.println("Result:"+trans);	
     }
 
     public void testTypeOf() { //this is no really sufficient test
-	Services services = new Services();
+	Services services = new Services(AbstractProfile.getDefaultProfile());
 	//but I can't access programs here
  	StatementBlock block = (StatementBlock)
  	    TacletForTests.parsePrg(" { int i; int j; i=j; }");
@@ -112,7 +108,7 @@ public class TestProgramMetaConstructs extends TestCase {
 
 	SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 	try {
-	    wlt.transform( l, new Services (), inst );
+	    wlt.transform( l, new Services (AbstractProfile.getDefaultProfile()), inst );
 	} catch ( java.util.NoSuchElementException e ) {
 	    assertTrue ( " Problem with empty while-blocks. See Bug #183 ", false); 
 	}

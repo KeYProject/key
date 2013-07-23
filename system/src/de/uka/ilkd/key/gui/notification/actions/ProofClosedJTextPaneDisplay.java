@@ -46,7 +46,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
             Proof proof = ((ProofClosedNotificationEvent)pcne).getProof();
             if (proof != null) {
                 String statistics = "";
-                for (Pair<String, String> x: proof.statistics()) {
+                for (Pair<String, String> x: proof.statistics().getSummary()) {
                     if ("".equals(x.second)) statistics += "\n";
                     statistics += x.first+": "+ x.second+"\n";
                 }

@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -45,8 +47,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         cApp = cApp.tryToInstantiateContract(services);
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(
+        		app.getHeapContext(),
                 cApp.posInOccurrence(), goal.sequent(), services);
-        PosInOccurrence step = letUserChooseStep(steps, forced, services);
+        PosInOccurrence step = letUserChooseStep(app.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
         }
@@ -62,6 +65,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @return
      */
     private static PosInOccurrence letUserChooseStep(
+    		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
 
         if (steps.size() == 0) {
@@ -76,42 +80,52 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         lp.setLineWidth(120);
 
         for (PosInOccurrence step : steps) {
-            final Term heap = step.subTerm().sub(0);
-            lp.reset();
-            try {
-                lp.printTerm(heap);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            String prettyprint = lp.toString();
-            prettyprint = "<html><tt>"
-                    + LogicPrinter.escapeHTML(prettyprint, true)
-                    + "</tt></html>";
-            heaps[i++] = new TermStringWrapper(heap, prettyprint);
+        	final Term[] heapTerms = new Term[((IObserverFunction)step.subTerm().op()).getStateCount()*heapContext.size()];
+        	String prettyprint = "<html><tt>" + (heapTerms.length > 1 ? "[" : "");
+        	for(int j =0 ; j < heapTerms.length; j++) {
+              final Term heap = step.subTerm().sub(j);
+              heapTerms[j] = heap;
+              lp.reset();
+              try {
+                  lp.printTerm(heap);
+              } catch (IOException e) {
+                  throw new RuntimeException(e);
+              }
+              prettyprint += (j>0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+        	}
+        	prettyprint += (heapTerms.length > 1 ? "]" : "")+"</tt></html>";
+            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
         }
 
-        final Term heap;
+        final Term[] resultHeaps;
         if (!forced) {
             // open dialog
             final TermStringWrapper heapWrapper = (TermStringWrapper) JOptionPane
                     .showInputDialog(MainWindow.getInstance(),
-                            "Please select a base heap:", "Instantiation",
+                            "Please select base heap configuration:", "Instantiation",
                             JOptionPane.QUESTION_MESSAGE, null, heaps,
                             heaps.length > 0 ? heaps[0] : null);
 
             if (heapWrapper == null) {
                 return null;
             }
-            heap = heapWrapper.term;
+            resultHeaps = heapWrapper.terms;
         } else {
-            heap = heaps[0].term;
+            resultHeaps = heaps[0].terms;
         }
 
         // find corresponding step
         for (PosInOccurrence step : steps) {
-            if (step.subTerm().sub(0).equals(heap)) {
-                return step;
+            boolean match = true;
+            for(int j = 0; j<resultHeaps.length; j++) {
+               if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
+                  match = false;
+                  break;
+               }
             }
+            if(match) {
+                return step;
+             }
         }
 
         assert false;
@@ -119,11 +133,11 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     }
 
     private static final class TermStringWrapper {
-        final Term term;
+        final Term[] terms;
         final String string;
 
-        TermStringWrapper(Term term, String string) {
-            this.term = term;
+        TermStringWrapper(Term[] terms, String string) {
+            this.terms = terms;
             this.string = string;
         }
 

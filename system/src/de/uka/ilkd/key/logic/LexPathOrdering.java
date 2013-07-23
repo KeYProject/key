@@ -16,11 +16,11 @@ package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -303,22 +303,39 @@ public class LexPathOrdering implements TermOrdering {
             intFunctionNames.add("neglit");
         }
 
-        private final Set<String> stringFunctionNames = new LinkedHashSet<String> ();
+        private final Set<String> theoryFunctionNames = new LinkedHashSet<String> ();
         {
-            stringFunctionNames.add("strPool");            
-            stringFunctionNames.add("clEmpty");
-            stringFunctionNames.add("clCons");
-            stringFunctionNames.add("C");
+            theoryFunctionNames.add("strPool");            
+            theoryFunctionNames.add("clEmpty");
+            theoryFunctionNames.add("clCons");
+            theoryFunctionNames.add("C");
+        
+            theoryFunctionNames.add("empty");
         }
+
 
         
         protected Integer getWeight(Operator p_op) {
+
             final String opStr = p_op.name ().toString ();
 
-            if ( intFunctionNames.contains ( opStr ) || stringFunctionNames.contains ( opStr ) )
+            if (intFunctionNames.contains ( opStr ) || theoryFunctionNames.contains ( opStr )) 
                 return Integer.valueOf ( 0 );
-            
+               
+            if (opStr.equals("allLocs")) {
+                return Integer.valueOf(1);
+            } else if (opStr.equals("allObjects")) {
+                return Integer.valueOf(2);                    
+            } else if (opStr.equals("allFields")) {
+                return Integer.valueOf(3);
+            } else if (opStr.equals("singleton")) {
+                return Integer.valueOf(4);
+            } else if (opStr.equals("freshLocs")) {
+                return Integer.valueOf(5);
+            }
+
             if ( opStr.equals ( "neg" ) ) return Integer.valueOf ( 1 );
+
             if ( p_op.name ().equals ( IntegerLDT.CHAR_ID_NAME ) )
                 return Integer.valueOf ( 1 );
             if ( p_op instanceof Function
@@ -350,10 +367,8 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals("heap")) return Integer.valueOf(0);
             if ( p_op instanceof Function && ((Function)p_op).isUnique()) return Integer.valueOf(5);
             if ( opStr.equals("pair")) return Integer.valueOf(10);
-            //if ( opStr.endsWith ( "::<get>" ) ) return Integer.valueOf ( 10 );
-            //if ( opStr.endsWith ( "<nextToCreate>" ) ) return Integer.valueOf ( 20 );
-            
 
+            
 /*            if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
 
             if ( p_op instanceof AttributeOp ) return new Integer ( 20 );

@@ -249,6 +249,7 @@ public interface Constraint {
 	 *         any value according to the new constraint (the possible
 	 *         values of other variables are not modified)
 	 */
+	@Override
 	public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
 	    // the constraint will still be unsatisfiable, as the
 	    // other variables have no valid instantiations

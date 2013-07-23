@@ -528,13 +528,11 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Map<LocationVariable, Function>
-                    createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
-                                                            final boolean isStrictlyPure,
-                                                            final Services services) {
+    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final BlockContract contract, final Services services)
+    {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
-        if (!isStrictlyPure) {
-            for (LocationVariable variable : variables) {
+        for (LocationVariable variable : variables) {
+            if(contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
                         TB.newName(services, ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction =
@@ -943,7 +941,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(strictlyNothing()) && var(heap) == getBaseHeap()) {
+                if (modifiesClause.equals(strictlyNothing())) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {

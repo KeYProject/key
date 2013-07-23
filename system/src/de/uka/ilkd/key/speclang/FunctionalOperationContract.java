@@ -79,6 +79,15 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
 
+    /**
+      * Returns the model method definition for model method contracts
+      */
+    public Term getRepresentsAxiom(LocationVariable heap,
+        ProgramVariable selfVar,
+        ImmutableList<ProgramVariable> paramVars,
+        ProgramVariable resultVar,
+        Map<LocationVariable,? extends ProgramVariable> atPreVars,
+        Services services);    
 
     public String getBaseName();
     public Term getPre();

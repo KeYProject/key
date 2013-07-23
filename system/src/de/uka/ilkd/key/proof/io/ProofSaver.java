@@ -45,6 +45,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InfFlowRelatedPO;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
@@ -104,9 +105,13 @@ public class ProofSaver {
        }
     return logstr;
    }
+   
+   public String writeProfile(Profile profile) {
+      return "\\profile \""+escapeCharacters(profile.name())+"\";\n";
+   }
 
    public String writeSettings(ProofSettings ps){
-    	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
+    	return "\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n";
    }
 
    public String save() throws IOException {
@@ -123,6 +128,9 @@ public class ProofSaver {
                   proof.getServices().getSpecificationRepository().getProofOblInput(proof);
           printer = createLogicPrinter(proof.getServices(), false);
 
+          //profile
+          ps.println(writeProfile(proof.getServices().getProfile()));
+          
           //settings
           final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
           final StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
@@ -207,7 +215,6 @@ public class ProofSaver {
       }	  
       return errorMsg; // null if success
    }
-
 
    /** Searches in the header for absolute paths to Java files and tries to replace them
     * by paths relative to the proof file to be saved.

@@ -562,6 +562,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term invTerm = null;
         for(LocationVariable heap : heapContext) {
             final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+      if(i == null) continue;
             if(invTerm == null) {
                 invTerm = i;
             } else{
@@ -683,7 +684,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-          if (TB.strictlyNothing().equals(m) &&
+          if(TB.strictlyNothing().equals(m)) {
                   heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
             } else{

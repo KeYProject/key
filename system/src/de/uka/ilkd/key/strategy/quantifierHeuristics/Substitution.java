@@ -33,7 +33,7 @@ import de.uka.ilkd.key.util.Debug;
  * This class decribes a substitution,which store a map(varMap) from quantifiable 
  * variable to a term(instance).
  */
-class Substitution {
+public class Substitution {
 
     private final TermBuilder tb = TermBuilder.DF;
     

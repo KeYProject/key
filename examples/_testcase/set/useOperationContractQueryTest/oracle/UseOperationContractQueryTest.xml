@@ -5,8 +5,7 @@
          <callStackEntry path="/0"/>
          <useOperationContract name="result = magicTransformation(value) catch(exc)
 pre: true
-post: (exc = null -&gt; result = javaMulInt(value, 2))
-&amp; exc = null
+post: result = javaMulInt(value, 2) &amp; exc = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <callStackEntry path="/0"/>
