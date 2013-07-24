@@ -86,7 +86,7 @@ public interface Contract extends SpecificationElement {
 	    	       Services services);
 
 
-    public Term getGlobalDefs(Map<LocationVariable, Term> heapTerms, Term selfTerm,
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services);
 
     /**
