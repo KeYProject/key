@@ -38,6 +38,26 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArrayAverage
+    */
+   public void testUseLoopInvariantArrayAverage() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArrayAverage/test/ArrayAverage.java", 
+                "ArrayAverage", 
+                "average", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArrayAverage/oracle/ArrayAverage.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
    
    /**
     * Tests example: examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor

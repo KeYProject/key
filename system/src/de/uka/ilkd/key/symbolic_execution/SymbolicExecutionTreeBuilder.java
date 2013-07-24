@@ -744,14 +744,18 @@ public class SymbolicExecutionTreeBuilder {
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
       assert label != null;
       JavaBlock jb = newModality.javaBlock();
-      MethodFrameCounterJavaASTVisitor counter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
-      int count = counter.run();
+      MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
+      int newCount = newCounter.run();
+      Term oldModality = node.getAppliedRuleApp().posInOccurrence().subTerm();
+      oldModality = TermBuilder.DF.goBelowUpdates(oldModality);
+      MethodFrameCounterJavaASTVisitor oldCounter = new MethodFrameCounterJavaASTVisitor(oldModality.javaBlock().program(), proof.getServices());
+      int oldCount = oldCounter.run();
       LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
       LinkedList<Node> newMethodCallStack = getMethodCallStack(label.getId());
       Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.getId());
       assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
-      ListIterator<Node> currentIter = currentMethodCallStack.listIterator(currentMethodCallStack.size());
-      for (int i = 0; i < count; i++) {
+      ListIterator<Node> currentIter = currentMethodCallStack.listIterator(oldCount);
+      for (int i = 0; i < newCount; i++) {
          assert currentIter.hasPrevious();
          Node previous = currentIter.previous();
          newMethodCallStack.add(previous);
