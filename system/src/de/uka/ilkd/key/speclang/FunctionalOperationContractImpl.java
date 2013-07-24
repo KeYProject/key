@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -160,6 +161,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert posts != null;
         assert modality != null;
         assert (selfVar == null) == pm.isStatic();
+        assert globalDefs == null || globalDefs.sort() == Sort.UPDATE;
         assert paramVars != null;
         assert paramVars.size() >= pm.getParameterDeclarationCount();
         // may be more parameters in specifications (ghost parameters)
