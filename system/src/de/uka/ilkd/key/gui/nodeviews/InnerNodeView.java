@@ -59,15 +59,15 @@ public class InnerNodeView extends SequentView {
     
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
+    Node node;
     
     public InnerNodeView(Node node, KeYMediator mediator) {
-
+        
+        this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(null),
+        printer = new LogicPrinter(new ProgramPrinter(),
                 mediator.getNotationInfo(),
                 mediator.getServices());
-        printer.printSequent(filter);
-        setText(printer.toString());
         setSelectionColor(new Color(10,180,50));
         
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
@@ -76,14 +76,8 @@ public class InnerNodeView extends SequentView {
                 new MatteBorder(3,0,0,0,Color.black),
                 new EmptyBorder(new Insets(4,0,0,0))));
         
-        posTable = printer.getInitialPositionTable();
         updateUI();
-
-        RuleApp app = node.getAppliedRuleApp();
-        if (app != null) {
-            highlightRuleAppPosition(app);
-        }
-        
+        printSequent();
     }
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
@@ -313,6 +307,19 @@ public class InnerNodeView extends SequentView {
 
     public String getTitle() {
         return "Inner Node";
+    }
+    
+    public synchronized void printSequent() {
+        
+        setLineWidth(computeLineWidth());
+        printer.update(filter, getLineWidth());
+        setText(printer.toString());
+        posTable = printer.getInitialPositionTable();
+        
+        RuleApp app = node.getAppliedRuleApp();
+        if (app != null) {
+            highlightRuleAppPosition(app);
+        }
     }
     
 }

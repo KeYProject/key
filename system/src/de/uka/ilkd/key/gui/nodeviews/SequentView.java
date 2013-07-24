@@ -51,6 +51,22 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
     
+    /* 
+     * The current line width. Static declaration for this prevents constructors from
+     * using lineWidth 0.
+     */
+    private static int lineWidth;
+    
+    public static void setLineWidth(int i) {
+        if (i != 0) {
+            lineWidth = i;
+        }
+    }
+    
+    public static int getLineWidth() {
+        return lineWidth;
+    }
+    
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     LogicPrinter printer;
@@ -93,6 +109,11 @@ public abstract class SequentView extends JTextArea
         dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
 
+        // add a SeqViewChangeListener to this component
+        SeqViewChangeListener changeListener = new SeqViewChangeListener(this);
+        addComponentListener(changeListener);
+        addPropertyChangeListener("font", changeListener);
+        addHierarchyBoundsListener(changeListener);
     }
     
     public void setFont() {
@@ -419,5 +440,19 @@ public abstract class SequentView extends JTextArea
         super.updateUI();
         setFont();
     }
+    
+    /**
+     * computes the line width
+     */
+    public int computeLineWidth() {
+        // assumes we have a uniform font width
+        int maxChars = (int) 
+            (getVisibleRect().getWidth()/getFontMetrics(getFont()).charWidth('W'));
+        
+        if (maxChars > 1) maxChars-=1;
+        return maxChars;
+    }
+    
+    public abstract void printSequent();
 
 }
