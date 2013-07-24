@@ -255,21 +255,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    @Deprecated
-    protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm,
+    protected Map<Term, Term> getReplaceMap(Map<LocationVariable,Term> heapTerms,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
-        return getReplaceMap(heap, heapTerm, selfTerm, paramTerms, null, null, null, services);
-    }
-
-    @Deprecated
-    protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms, Term resultTerm,
-            Term excTerm, Term atPre, Services services) {
-        Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
-        heapTerms.put(heap, heapTerm);
-        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
-        heapTerms.put(heap, atPre);
-        return getReplaceMap(heapTerms, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
+        return getReplaceMap(heapTerms, selfTerm, paramTerms, null, null, null, services);
     }
 
     protected Map<Term, Term> getReplaceMap(
@@ -959,16 +947,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getAnyMod(heap, this.originalMods.get(heap), heapTerm, selfTerm, paramTerms, services);
     }
 
+
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+    public Term getGlobalDefs(Map<LocationVariable, Term> heapTerms,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
-        assert heapTerm != null;
+        assert heapTerms != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         paramTerms = addGhostParamTerms(paramTerms);
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm,
+        final Map<Term, Term> replaceMap = getReplaceMap(heapTerms,
                 selfTerm,
                 paramTerms,
                 services);

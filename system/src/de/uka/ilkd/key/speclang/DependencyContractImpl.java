@@ -451,7 +451,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+    public Term getGlobalDefs(Map<LocationVariable, Term> heapTerms,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
         // TODO Auto-generated method stub
         assert false: "old clauses are not yet supported for dependency contracts";
