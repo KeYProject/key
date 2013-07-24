@@ -102,27 +102,27 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     DependencyContractImpl(String baseName,
-                           KeYJavaType kjt,
-                           IObserverFunction target,
-                           KeYJavaType specifiedIn,
-                           Map<LocationVariable,Term> pres,
-                           Term mby,
-                           Map<ProgramVariable,Term> deps,
-                           ProgramVariable selfVar,
-                           ImmutableList<ProgramVariable> paramVars,
-                           Map<LocationVariable,? extends ProgramVariable> atPreVars) {
-	this(baseName,
-             null,
-             kjt,
-             target,
-             specifiedIn,
-             pres,
-             mby,
-             deps,
-             selfVar,
-             paramVars,
-             atPreVars,
-             INVALID_ID);
+            KeYJavaType kjt,
+            IObserverFunction target,
+            KeYJavaType specifiedIn,
+            Map<LocationVariable,Term> pres,
+            Term mby,
+            Map<ProgramVariable,Term> deps,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable,? extends ProgramVariable> atPreVars) {
+        this(baseName,
+                null,
+                kjt,
+                target,
+                specifiedIn,
+                pres,
+                mby,
+                deps,
+                selfVar,
+                paramVars,
+                atPreVars,
+                INVALID_ID);
     }
 
 
@@ -132,322 +132,322 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public String getName() {
-	return name;
+        return name;
     }
 
 
     @Override
     public int id() {
-	return id;
+        return id;
     }
 
 
     @Override
     public KeYJavaType getKJT() {
-	return kjt;
+        return kjt;
     }
 
 
     @Override
     public IObserverFunction getTarget() {
-	return target;
+        return target;
     }
 
 
     @Override
     public boolean hasMby() {
-	return originalMby != null;
+        return originalMby != null;
     }
 
 
     @Override
     public Term getPre(LocationVariable heap,
-                       ProgramVariable selfVar,
-	    	       ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-	    	       Services services) {
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-	if (originalSelfVar != null) {
-	    map.put(originalSelfVar, selfVar);
-	}
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(originalParamVar, paramVars.head());
-	    paramVars = paramVars.tail();
-	}
-	if(atPreVars != null && originalAtPreVars != null) {
-	   for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-	       ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
-	       if(atPreVars.get(h) != null && originalAtPreVar != null) {
-	           map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
-	       }
-	   }
-	}
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        if (originalSelfVar != null) {
+            map.put(originalSelfVar, selfVar);
+        }
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(originalParamVar, paramVars.head());
+            paramVars = paramVars.tail();
+        }
+        if(atPreVars != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(atPreVars.get(h) != null && originalAtPreVar != null) {
+                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                }
+            }
+        }
 
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalPres.get(heap));
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalPres.get(heap));
     }
 
     public Term getPre(List<LocationVariable> heapContext,
-                       ProgramVariable selfVar,
-	    	       ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-	    	       Services services) {
-       Term result = null;
-       for(LocationVariable heap : heapContext) {
-          final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
-          if(result == null) {
-            result = p;
-          }else{
-            result = TB.and(result, p);
-          }
-       }
-       return result;
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Services services) {
+        Term result = null;
+        for(LocationVariable heap : heapContext) {
+            final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
+            if(result == null) {
+                result = p;
+            }else{
+                result = TB.and(result, p);
+            }
+        }
+        return result;
     }
 
 
     @Override
     public Term getPre(LocationVariable heap,
-                       Term heapTerm,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable,Term> atPres,
-	    	       Services services) {
-	assert heapTerm != null;
-	assert (selfTerm == null) == (originalSelfVar == null);
-	assert paramTerms != null;
-	assert paramTerms.size() == originalParamVars.size();
-	assert services != null;
-	Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.var(heap), heapTerm);
-	if (originalSelfVar != null) {
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Map<LocationVariable,Term> atPres,
+            Services services) {
+        assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        map.put(TB.var(heap), heapTerm);
+        if (originalSelfVar != null) {
             map.put(TB.var(originalSelfVar), selfTerm);
         }
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(TB.var(originalParamVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}
-	if(atPres != null && originalAtPreVars != null) {
-	    for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-	         ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
-	         if(atPres.get(h) != null && originalAtPreVar != null) {
-	              map.put(TB.var(originalAtPreVar), atPres.get(h));
-		     }
-		}
-    }
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalPres.get(heap));
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(TB.var(originalParamVar), paramTerms.head());
+            paramTerms = paramTerms.tail();
+        }
+        if(atPres != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(atPres.get(h) != null && originalAtPreVar != null) {
+                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                }
+            }
+        }
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalPres.get(heap));
     }
 
 
     public Term getPre(List<LocationVariable> heapContext,
-                       Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm,
-	    	       ImmutableList<Term> paramTerms,
-                       Map<LocationVariable,Term> atPres,
-	    	       Services services) {
-       Term result = null;
-       for(LocationVariable heap : heapContext) {
-          final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
-          if(result == null) {
-            result = p;
-          }else{
-            result = TB.and(result, p);
-          }
-       }
-       return result;
+            Map<LocationVariable,Term> heapTerms,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Map<LocationVariable,Term> atPres,
+            Services services) {
+        Term result = null;
+        for(LocationVariable heap : heapContext) {
+            final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+            if(result == null) {
+                result = p;
+            }else{
+                result = TB.and(result, p);
+            }
+        }
+        return result;
     }
 
     @Override
     public Term getMby(ProgramVariable selfVar,
-	               ImmutableList<ProgramVariable> paramVars,
-	               Services services) {
-	assert hasMby();
+            ImmutableList<ProgramVariable> paramVars,
+            Services services) {
+        assert hasMby();
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-	if (originalSelfVar != null) {
-	    map.put(originalSelfVar, selfVar);
-	}
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(originalParamVar, paramVars.head());
-	    paramVars = paramVars.tail();
-	}
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalMby);
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        if (originalSelfVar != null) {
+            map.put(originalSelfVar, selfVar);
+        }
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(originalParamVar, paramVars.head());
+            paramVars = paramVars.tail();
+        }
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalMby);
     }
 
 
     @Override
     public Term getMby(Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm,
-	               ImmutableList<Term> paramTerms,
-	               Map<LocationVariable,Term> atPres,
-	               Services services) {
-	assert hasMby();
-	assert heapTerms != null;
-	assert (selfTerm == null) == (originalSelfVar == null);
-	assert paramTerms != null;
-	assert paramTerms.size() == originalParamVars.size();
-	assert services != null;
-	Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-	for(LocationVariable heap : heapTerms.keySet()) {
-		map.put(TB.var(heap), heapTerms.get(heap));
-	}
-	if (originalSelfVar != null) {
-	    map.put(TB.var(originalSelfVar), selfTerm);
-	}
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(TB.var(originalParamVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}
-	if(atPres != null && originalAtPreVars != null) {
-	    for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-	         ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
-	         if(atPres.get(h) != null && originalAtPreVar != null) {
-	             map.put(TB.var(originalAtPreVar), atPres.get(h));
-	         }
-	    }
-    }
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalMby);
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Map<LocationVariable,Term> atPres,
+            Services services) {
+        assert hasMby();
+        assert heapTerms != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        for(LocationVariable heap : heapTerms.keySet()) {
+            map.put(TB.var(heap), heapTerms.get(heap));
+        }
+        if (originalSelfVar != null) {
+            map.put(TB.var(originalSelfVar), selfTerm);
+        }
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(TB.var(originalParamVar), paramTerms.head());
+            paramTerms = paramTerms.tail();
+        }
+        if(atPres != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(atPres.get(h) != null && originalAtPreVar != null) {
+                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                }
+            }
+        }
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalMby);
     }
 
 
     @Override
     public String getPlainText(Services services) {
-       return getText(false, services);
+        return getText(false, services);
     }
 
     @Override
     public String getHTMLText(Services services) {
-       return getText(true, services);
+        return getText(true, services);
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
-    	String pres = "";
-    	for(LocationVariable h : originalPres.keySet()) {
-             Term originalPre = originalPres.get(h);
-             if(originalPre != null) {
-                  pres = pres + "<b>pre</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPre, services),false)+"<br>";
-             }
+        String pres = "";
+        for(LocationVariable h : originalPres.keySet()) {
+            Term originalPre = originalPres.get(h);
+            if(originalPre != null) {
+                pres = pres + "<b>pre</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPre, services),false)+"<br>";
+            }
         }
         String deps = "";
         for(ProgramVariable h : originalDeps.keySet()) {
             if(h.name().toString().endsWith("AtPre") && target.getStateCount() == 1) {
-                 continue;
+                continue;
             }
             Term originalDep = originalDeps.get(h);
             if(originalDep != null) {
                 deps = deps + "<b>dep</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalDep, services),false)+"<br>";
             }
         }
-    	final String mby = hasMby()
-        	           ? LogicPrinter.quickPrintTerm(originalMby, services)
-        	           : null;
+        final String mby = hasMby()
+                ? LogicPrinter.quickPrintTerm(originalMby, services)
+                        : null;
 
-        if (includeHtmlMarkup) {
-           return "<html>"
-                 + pres
-                 + deps
-                 + (mby != null
-                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby,
-                                         false)
-                    : "")
-                 + "</html>";
-        }
-        else {
-           return "pre: "
-                 + pres
-                 + "\ndep: "
-                 + deps
-                 + (hasMby() ? "\nmeasured-by: " + mby : "");
-        }
+                if (includeHtmlMarkup) {
+                    return "<html>"
+                            + pres
+                            + deps
+                            + (mby != null
+                            ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby,
+                                    false)
+                                    : "")
+                                    + "</html>";
+                }
+                else {
+                    return "pre: "
+                            + pres
+                            + "\ndep: "
+                            + deps
+                            + (hasMby() ? "\nmeasured-by: " + mby : "");
+                }
     }
 
 
     @Override
     public boolean toBeSaved() {
-	return false; //because dependency contracts currently cannot be
-	              //specified directly in DL
+        return false; //because dependency contracts currently cannot be
+        //specified directly in DL
     }
 
 
     @Override
     public String proofToString(Services services) {
-	assert false;
-	return null;
+        assert false;
+        return null;
     }
 
 
     @Override
     public Term getDep(LocationVariable heap, boolean atPre,
-                   ProgramVariable selfVar,
-	               ImmutableList<ProgramVariable> paramVars,
-	               Map<LocationVariable,? extends ProgramVariable> atPreVars,
-	               Services services) {
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Map<LocationVariable,? extends ProgramVariable> atPreVars,
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-	if (originalSelfVar != null) {
-	    map.put(originalSelfVar, selfVar);
-	}
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(originalParamVar, paramVars.head());
-	    paramVars = paramVars.tail();
-	}
-	if(atPreVars != null && originalAtPreVars != null) {
-	    for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-	        ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
-	        if(atPreVars.get(h) != null && originalAtPreVar != null) {
-	            map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
-	        }
-	    }
-	}
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        if (originalSelfVar != null) {
+            map.put(originalSelfVar, selfVar);
+        }
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(originalParamVar, paramVars.head());
+            paramVars = paramVars.tail();
+        }
+        if(atPreVars != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(atPreVars.get(h) != null && originalAtPreVar != null) {
+                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                }
+            }
+        }
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
 
     @Override
     public Term getDep(LocationVariable heap, boolean atPre,
-    		       Term heapTerm,
-	               Term selfTerm,
-	               ImmutableList<Term> paramTerms,
-	               Map<LocationVariable, Term> atPres,
-	               Services services) {
-	assert heapTerm != null;
-	assert (selfTerm == null) == (originalSelfVar == null);
-	assert paramTerms != null;
-	assert paramTerms.size() == originalParamVars.size();
-	assert services != null;
-	Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.var(heap), heapTerm);
-	if (originalSelfVar != null) {
+            Term heapTerm,
+            Term selfTerm,
+            ImmutableList<Term> paramTerms,
+            Map<LocationVariable, Term> atPres,
+            Services services) {
+        assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        map.put(TB.var(heap), heapTerm);
+        if (originalSelfVar != null) {
             map.put(TB.var(originalSelfVar), selfTerm);
         }
-	for(ProgramVariable originalParamVar : originalParamVars) {
-	    map.put(TB.var(originalParamVar), paramTerms.head());
-	    paramTerms = paramTerms.tail();
-	}
-	if(atPres != null && originalAtPreVars != null) {
-	    for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-	        ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
-	        if(originalAtPreVar != null && atPres.get(h) != null) {
-	            map.put(TB.var(originalAtPreVar), atPres.get(h));
-	        }
-	    }
-	}
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(TB.var(originalParamVar), paramTerms.head());
+            paramTerms = paramTerms.tail();
+        }
+        if(atPres != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(originalAtPreVar != null && atPres.get(h) != null) {
+                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                }
+            }
+        }
 
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
 
@@ -461,20 +461,20 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public String toString() {
-	return originalDeps.toString();
+        return originalDeps.toString();
     }
 
 
     @Override
     public String getDisplayName() {
         return ContractFactory.generateDisplayName(baseName, kjt, target,
-                                                   specifiedIn, id);
+                specifiedIn, id);
     }
 
 
     @Override
     public VisibilityModifier getVisibility() {
-	return null;
+        return null;
     }
 
     @Override
@@ -484,50 +484,50 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
-	    Contract contract) {
-	return new DependencyContractPO(initConfig,
-	        (DependencyContract) contract);
+            Contract contract) {
+        return new DependencyContractPO(initConfig,
+                (DependencyContract) contract);
     }
 
 
     @Override
     public DependencyContract setID(int newId) {
         return new DependencyContractImpl(baseName,
-                                          null,
-                                          kjt,
-                                          target,
-                                          specifiedIn,
-                                          originalPres,
-                                          originalMby,
-                                          originalDeps,
-                                          originalSelfVar,
-                                          originalParamVars,
-                                          originalAtPreVars,
-                                          newId);
+                null,
+                kjt,
+                target,
+                specifiedIn,
+                originalPres,
+                originalMby,
+                originalDeps,
+                originalSelfVar,
+                originalParamVars,
+                originalAtPreVars,
+                newId);
     }
 
 
     @Override
     public Contract setTarget(KeYJavaType newKJT,
-                              IObserverFunction newPM) {
+            IObserverFunction newPM) {
         return new DependencyContractImpl(baseName,
-                                          null,
-                                          newKJT,
-                                          newPM,
-                                          specifiedIn,
-                                          originalPres,
-                                          originalMby,
-                                          originalDeps,
-                                          originalSelfVar,
-                                          originalParamVars,
-                                          originalAtPreVars,
-                                          id);
+                null,
+                newKJT,
+                newPM,
+                specifiedIn,
+                originalPres,
+                originalMby,
+                originalDeps,
+                originalSelfVar,
+                originalParamVars,
+                originalAtPreVars,
+                id);
     }
 
 
     @Override
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
-                                                        specifiedIn);
+                specifiedIn);
     }
 }
