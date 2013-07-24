@@ -66,7 +66,7 @@ public class InnerNodeView extends SequentView {
         printer = new LogicPrinter(new ProgramPrinter(null),
                 mediator.getNotationInfo(),
                 mediator.getServices());
-        printer.printSequent(null, filter);
+        printer.printSequent(filter);
         setText(printer.toString());
         setSelectionColor(new Color(10,180,50));
         

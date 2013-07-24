@@ -224,7 +224,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         lineWidth = computeLineWidth();
         
         if (printer != null) {
-            printer.update(null, filter, lineWidth);
+            printer.update(filter, lineWidth);
 	    boolean errorocc;
 	    do {
 	        errorocc = false;
