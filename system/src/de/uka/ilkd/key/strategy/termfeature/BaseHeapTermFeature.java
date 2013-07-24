@@ -13,33 +13,24 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 
 
-public final class SimpleHeapTermFeature extends BinaryTermFeature {
+public final class BaseHeapTermFeature extends BinaryTermFeature {
 
     private final HeapLDT heapLDT;
 
-    private SimpleHeapTermFeature(HeapLDT heapLDT) {
+    private BaseHeapTermFeature(HeapLDT heapLDT) {
         this.heapLDT = heapLDT;
     }
 
     public static TermFeature create(HeapLDT heapLDT) {
-        return new SimpleHeapTermFeature(heapLDT);
+        return new BaseHeapTermFeature(heapLDT);
     }
     
     @Override
     protected boolean filter (Term t) {
-        return  // either the heap term is the base heap
-                t.op() == heapLDT.getHeap() ||
-                // or the heap term is an anon heap symbol
-                // (for instance an anonHeap function)
-                (   t.hasLabels() &&
-                    t.containsLabel(AnonHeapTermLabel.INSTANCE) &&
-                    t.op().arity() == 0 &&
-                    t.op() instanceof Function);
+        return  t.op() == heapLDT.getHeap();
     }
 
 }
