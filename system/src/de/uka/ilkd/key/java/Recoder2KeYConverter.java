@@ -53,6 +53,8 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
+import de.uka.ilkd.key.java.declaration.modifier.NoState;
+import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -162,6 +164,7 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -1129,16 +1132,18 @@ public class Recoder2KeYConverter {
         .getCrossReferenceSourceInfo().getContainingClassType(
                 (recoder.abstraction.Member) cd);
 
-        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+        final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+        Sort heapSort = heapLDT == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+                            : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result
         	= new ProgramMethod(consDecl,
         			    containerKJT,
         			    KeYJavaType.VOID_TYPE,
         			    positionInfo(cd),
-        			    heapSort);
+        			    heapSort,
+        			    heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         insertToMap(cd, result);
         return result;
     }
@@ -1153,14 +1158,16 @@ public class Recoder2KeYConverter {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
                 dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
-        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+        final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+        Sort heapSort = heapLDT == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+                            : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result = new ProgramMethod(consDecl,
                 containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
-                heapSort);
+                heapSort,
+                heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         insertToMap(dc, result);
         return result;
     }
@@ -1295,9 +1302,10 @@ public class Recoder2KeYConverter {
             	= getServiceConfiguration().getCrossReferenceSourceInfo()
             	                           .getContainingClassType((recoder.abstraction.Member) md);
 
-            Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+            final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+            Sort heapSort = heapLDT == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+                            : heapLDT.targetSort();
             final KeYJavaType containerType = getKeYJavaType(cont);
             assert containerType != null;
             final Type returnType = md.getReturnType();
@@ -1306,7 +1314,8 @@ public class Recoder2KeYConverter {
             result = new ProgramMethod(methDecl,
         	    		       containerType,
                     		       returnKJT, positionInfo(md),
-                    		       heapSort);
+                    		       heapSort,
+                    		       heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
 
             insertToMap(md, result);
         }
@@ -2185,4 +2194,14 @@ public class Recoder2KeYConverter {
     public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {
         return new Model(collectComments(m));
     }
-}
+
+    public TwoState convert(de.uka.ilkd.key.java.recoderext.TwoState m) {
+        return new TwoState(collectComments(m));
+    }
+
+    public NoState convert(de.uka.ilkd.key.java.recoderext.NoState m) {
+        return new NoState(collectComments(m));
+    }
+
+}	
+

@@ -24,15 +24,18 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     
     private final PositionedString decl;
     private final String methodName;
+    private final PositionedString methodDefinition;
     
     
     public TextualJMLMethodDecl(ImmutableList<String> mods, 
                                 PositionedString decl, 
-                                String methodName) {
+                                String methodName,
+                                PositionedString methodDefinition) {
         super(mods);
         assert decl != null;
         this.decl = decl;
         this.methodName = methodName;
+        this.methodDefinition = methodDefinition;
     }
     
     
@@ -44,7 +47,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     public String getMethodName() {
         return methodName;
     }
-    
+
+    public PositionedString getMethodDefinition() {
+    	return methodDefinition;
+    }
     
     @Override
     public String toString() {
@@ -60,12 +66,20 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         TextualJMLMethodDecl md = (TextualJMLMethodDecl) o;
         return mods.equals(md.mods) 
                && decl.equals(md.decl) 
+               && methodDefinition.equals(md.methodDefinition) 
                && methodName.equals(md.methodName);
     }
     
     
     @Override
     public int hashCode() {
-        return mods.hashCode() + decl.hashCode() + methodName.hashCode();
+        return mods.hashCode() + decl.hashCode() + methodName.hashCode() + methodDefinition.hashCode();
     }
+
+    public int getStateCount() {
+        if(mods.contains("two_state")) { return 2; }
+        if(mods.contains("no_state")) { return 0; }
+        return 1;
+    }
+
 }

@@ -45,10 +45,16 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc = null
-      &amp;   java.lang.RuntimeException::instance(exc)
-        = TRUE)
+      &amp; (    java.lang.RuntimeException::instance(exc)
+           = TRUE
+         |   java.lang.RuntimeException::instance(exc)
+           = TRUE))
 &amp; (   !array = null &amp; i &gt;= 0
-   -&gt; (result = TRUE &lt;-&gt; i &lt; array.length) &amp; exc = null)
+   -&gt;     result
+        = \if (i &lt; array.length)
+              \then (TRUE)
+              \else (FALSE)
+      &amp; exc = null)
 mod: allLocs \cup allLocs \cup allLocs
           \cup allLocs
      \cup allLocs
@@ -160,10 +166,16 @@ termination: diamond" pathCondition="   array.length &gt;= 0
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc = null
-      &amp;   java.lang.RuntimeException::instance(exc)
-        = TRUE)
+      &amp; (    java.lang.RuntimeException::instance(exc)
+           = TRUE
+         |   java.lang.RuntimeException::instance(exc)
+           = TRUE))
 &amp; (   !array = null &amp; i &gt;= 0
-   -&gt; (result = TRUE &lt;-&gt; i &lt; array.length) &amp; exc = null)
+   -&gt;     result
+        = \if (i &lt; array.length)
+              \then (TRUE)
+              \else (FALSE)
+      &amp; exc = null)
 mod: allLocs \cup allLocs \cup allLocs
           \cup allLocs
      \cup allLocs

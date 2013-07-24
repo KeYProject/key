@@ -4,7 +4,7 @@ public class UseOperationContractQueryTest {
 		return magicTransformation(value);
 	}
 	
-	/*@
+	/*@ normal_behavior
 	  @ ensures \result == value * 2;
 	  @*/
 	public static int magicTransformation(int value) {

@@ -16,8 +16,10 @@ header {
     package de.uka.ilkd.key.speclang.jml.pretranslation;
 
     import java.io.StringReader;
+    import java.util.ArrayList;
     import java.util.Iterator;
-
+    import java.util.List;
+    
     import de.uka.ilkd.key.collection.*;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
@@ -109,9 +111,22 @@ options {
     }
 
     private PositionedString flipHeaps(String declString, PositionedString result) {
+       return flipHeaps(declString, result, false);
+    }
+
+    private PositionedString flipHeaps(String declString, PositionedString result, boolean allowPreHeaps) {
       String t = result.text;
       String p = declString+" ";
+
+      List<Name> validHeapNames = new ArrayList<Name>();
+
       for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+         validHeapNames.add(heapName);
+         if(allowPreHeaps) {
+           validHeapNames.add(new Name(heapName.toString()+"AtPre"));
+        }
+      }
+      for(Name heapName : validHeapNames) {
         t = t.trim();
 	String l = "<"+heapName+">";
         if(t.startsWith(l)) {
@@ -250,6 +265,8 @@ modifier returns [String result = null]:
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }
+    |   tst:TWO_STATE           { result = tst.getText(); }
+    |   nst:NO_STATE            { result = nst.getText(); }
     |   sjm:SPEC_JAVA_MATH      { result = sjm.getText(); }
     |   ssm:SPEC_SAVE_MATH      { result = ssm.getText(); }
     |   sbm:SPEC_BIGINT_MATH    { result = sbm.getText(); }
@@ -404,6 +421,7 @@ heavyweight_spec_case[ImmutableList<String> mods]
 	    |   result=continue_behavior_spec_case[mods]
 	    |   result=exceptional_behavior_spec_case[mods]
       	|   result=normal_behavior_spec_case[mods]
+      	|   result=model_behavior_spec_case[mods]
       	|   result=return_behavior_spec_case[mods]
     )
 ;
@@ -440,6 +458,20 @@ normal_behavior_keyword
     | 	NORMAL_BEHAVIOUR
 ;
 
+model_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    model_behavior_keyword
+    result=generic_spec_case[mods, Behavior.MODEL_BEHAVIOR]
+;
+
+
+model_behavior_keyword
+:
+      MODEL_BEHAVIOR
+    | MODEL_BEHAVIOUR
+;
 
 exceptional_behavior_spec_case[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
@@ -679,7 +711,7 @@ accessible_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    accessible_keyword result=expression { result = result.prepend("accessible "); }
+    accessible_keyword result=expression { result = flipHeaps("accessible", result, true); }
 ;
 
 
@@ -906,6 +938,7 @@ method_declaration[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 {
     StringBuffer sb = new StringBuffer();
+    StringBuffer sbDefinition = new StringBuffer();
     String s;
 }
 :
@@ -913,13 +946,40 @@ method_declaration[ImmutableList<String> mods]
     name:IDENT 	   	{ sb.append(name.getText()); }
     params:PARAM_LIST   { sb.append(params.getText()); }
     (
-    	    body:BODY  	    { sb.append(body.getText()); }
-    	|   semi:SEMICOLON  { sb.append(semi.getText()); }
+    	    body:BODY  	    { sbDefinition.append(body.getText()); }
+    	|   semi:SEMICOLON
     )
     {
+	sb.append(";");
         PositionedString ps = createPositionedString(sb.toString(), type);
-    	TextualJMLMethodDecl md
-    		= new TextualJMLMethodDecl(mods, ps, name.getText());
+        PositionedString psDefinition = null;
+        if(sbDefinition.length() > 0) {
+          String paramsString = params.getText().trim();
+          String bodyString = new String(sbDefinition).trim();
+          assert paramsString.charAt(0) == '(' && paramsString.charAt(paramsString.length()-1) == ')';
+          paramsString = paramsString.substring(1, paramsString.length()-1).trim();
+          if(!paramsString.equals("")) {
+            StringBuffer stmp = new StringBuffer();
+            for(String t : paramsString.split(",")) {
+              t = t.trim();
+              t = t.substring(t.indexOf(" ")+1);
+              if(stmp.length() > 0) stmp.append(", ");
+              stmp.append(t);
+            }
+            paramsString = "("+new String(stmp) +")";
+          }else{
+            paramsString = "()";
+          }
+          assert bodyString.charAt(0) == '{' && bodyString.charAt(bodyString.length()-1) == '}';
+          bodyString = bodyString.substring(1, bodyString.length()-1).trim();
+          assert bodyString.startsWith("return ");
+          bodyString = bodyString.substring(bodyString.indexOf(" ") + 1);
+          // TODO Other heaps? There is only one return statement.....
+          psDefinition = createPositionedString("<heap> "+name.getText() +
+               paramsString + " == "+bodyString, type);
+        }
+    	TextualJMLMethodDecl md 
+    		= new TextualJMLMethodDecl(mods, ps, name.getText(), psDefinition);
     	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(md);
     }
 ;

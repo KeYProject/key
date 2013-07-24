@@ -88,6 +88,7 @@ final class JMLTranslator {
         ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
+        MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         SIGNALS ("signals"),
@@ -277,7 +278,18 @@ final class JMLTranslator {
                 return TB.convertToFormula(ensuresTerm, services);
             }
         });
-        translationMethods.put(JMLKeyWord.REPRESENTS,
+        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
+
+        	@Override
+        	public Term translate(SLTranslationExceptionManager excManager, Object... params)
+        	              throws SLTranslationException {
+        	    checkParameters(params, Term.class, Services.class);
+        	    Term axiomsTerm = (Term) params[0];
+        	    Services services = (Services) params[1];
+        	    return TB.convertToFormula(axiomsTerm, services);
+        	}
+       });
+       translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 
             @Override
@@ -1568,7 +1580,7 @@ final class JMLTranslator {
     }
 
 
-    public <T> T translate(String jmlKeyWordName,
+    <T> T translate(String jmlKeyWordName,
                            Class<T> resultClass,
                            Object... params)
             throws SLTranslationException {
@@ -1596,17 +1608,17 @@ final class JMLTranslator {
         }
     }
 
-    public <T> T translate(JMLKeyWord keyword, Class<T> resultClass, Object... params)
+    <T> T translate(JMLKeyWord keyword, Class<T> resultClass, Object... params)
     throws SLTranslationException {
         return translate(keyword.toString(), resultClass, params);
     }
 
-    public SLExpression translate(String jmlKeyWordName, Object... params)
+    SLExpression translate(String jmlKeyWordName, Object... params)
     throws SLTranslationException {
         return translate(jmlKeyWordName, SLExpression.class, params);
     }
 
-    public SLExpression translate(JMLKeyWord keyword, Object...params)
+    SLExpression translate(JMLKeyWord keyword, Object...params)
     throws SLTranslationException {
         return translate(keyword.toString(), SLExpression.class, params);
     }
@@ -1614,28 +1626,28 @@ final class JMLTranslator {
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type int.
      */
-    public SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprInt(Token jmlKeyWord, Services services) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_INT, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type long.
      */
-    public SLExpression createSkolemExprLong(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprLong(Token jmlKeyWord, Services services) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_LONG, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type \bigint.
      */
-    public SLExpression createSkolemExprBigint(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprBigint(Token jmlKeyWord, Services services) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_BIGINT, services);
     }
 
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type Object.
      */
-    public SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
+    SLExpression createSkolemExprObject(Token jmlKeyWord, Services services) {
         assert services != null;
         final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
         assert objType != null;
@@ -1645,7 +1657,7 @@ final class JMLTranslator {
     /**
      * Create a nullary predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
      */
-    public SLExpression createSkolemExprBool(Token jmlKeyWord) {
+    SLExpression createSkolemExprBool(Token jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
         final String shortName = jmlKeyWord.getText().replace("\\", "");
         final int x = (new Random()).nextInt(1000); // function is unique anyway
@@ -2022,7 +2034,7 @@ final class JMLTranslator {
      * @author bruns
      *
      */
-    private abstract class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
+    private abstract static class JMLPostExpressionTranslationMethod implements JMLTranslationMethod {
 
         protected void assertPost (Term heapAtPre) throws SLTranslationException{
             if (heapAtPre == null){
@@ -2133,6 +2145,9 @@ final class JMLTranslator {
             try {
                 if (a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
                     result = TB.equals(a, b);
+                // Special case so that model methods are handled better
+                } else if(a.sort() == services.getTypeConverter().getBooleanLDT().targetSort() && b.sort() == Sort.FORMULA) {
+                    result = TB.equals(a, TB.ife(b, TB.TRUE(services), TB.FALSE(services)));
                 } else {
                     result = TB.equals(TB.convertToFormula(a, services),
                                        TB.convertToFormula(b, services));

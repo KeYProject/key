@@ -32,6 +32,7 @@ header {
     import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.parser.ParserException;
     import de.uka.ilkd.key.proof.OpReplacer;
+    import de.uka.ilkd.key.speclang.HeapContext;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
@@ -285,7 +286,8 @@ options {
 	String sigString = "";
 
 	for(SLExpression expr : signature) {
-	    sigString += expr.getType().getFullName() + ", ";
+	    final KeYJavaType t = expr.getType();
+	    sigString += (t==null? "<unknown type>": t.getFullName()) + ", ";
 	}
 
 	return sigString.substring(0, sigString.length() - 2);
@@ -344,6 +346,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = declassifyclause
     |   result = ensuresclause
     |   result = representsclause
+    |   result = axiomsclause
     |   result = requiresclause
     |   result = respectsclause
     |   result = returnsclause
@@ -418,6 +421,11 @@ ensuresclause returns [Term result = null] throws SLTranslationException
             { result = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
+axiomsclause returns [Term result = null] throws SLTranslationException
+:
+    axm:MODEL_METHOD_AXIOM result=termexpression
+            { result = translator.translate(axm.getText(), Term.class, result, services); }
+    ;
 
 representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTranslationException
 {
@@ -656,7 +664,7 @@ specarrayrefexpr[SLExpression receiver, String fullyQualifiedName, Token lbrack]
 predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
-    |   n:NOT_SPECIFIED 
+    |   n:NOT_SPECIFIED
         { result = translator.createSkolemExprBool(n).getTerm(); }
     |   SAME
     ;
@@ -1315,11 +1323,24 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	}
 	l:LPAREN (params=expressionlist)? RPAREN
 	{
+            ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
+            for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+              Term p;
+              if(atPres == null || atPres.get(heap) == null) { p = TB.NULL(services); } else { p = atPres.get(heap); }
+              preHeapParams = preHeapParams.append(new SLExpression(p));
+            }
+            params = params.prepend(preHeapParams);
+
 	    result = lookupIdentifier(lookupName, receiver, new SLParameters(params), l);
 	    if (result == null) {
 		raiseError("Method " + lookupName + "("
 		           + createSignatureString(params) + ") not found!", l);
 	    }
+            if(((IProgramMethod)result.getTerm().op()).getStateCount() > 1 &&
+               (atPres == null || atPres.get(getBaseHeap()) == null)) {
+               raiseError("Two-state model method " + lookupName + " not allowed in this context!", l);
+            }
+
 	}
     |
 	lbrack:LBRACKET result=specarrayrefexpr[receiver, fullyQualifiedName, lbrack] RBRACKET
@@ -1696,15 +1717,15 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             }
             result = new SLExpression(TB.allFields(services, e1.getTerm()),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }        
-        
+        }
+
     |  ALLOBJECTS LPAREN t=storeref RPAREN
-        {          
+        {
             result = new SLExpression(TB.allObjects(services, t.sub(1)),
                                       javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-        }                
+        }
     |   UNIONINF
-        LPAREN 
+        LPAREN
         declVars=quantifiedvardecls
         SEMI
         {

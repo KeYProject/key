@@ -14,17 +14,22 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -68,15 +73,18 @@ class Instantiation {
     private static Sequent lastSequent = null;
     private static Instantiation lastResult = null;
 
-    static Instantiation create(Term qf, Sequent seq, Services services) {
-	if (qf == lastQuantifiedFormula && seq == lastSequent)
-	    return lastResult;
-
-	lastQuantifiedFormula = qf;
-	lastSequent = seq;
-	lastResult = new Instantiation(qf, seq, services);
-
-	return lastResult;
+    static Instantiation create(Term qf, Sequent seq, Services services) {	
+        synchronized(Instantiation.class) {
+            if (qf == lastQuantifiedFormula && seq == lastSequent)
+                return lastResult;
+        }
+        final Instantiation result = new Instantiation(qf, seq, services);
+        synchronized(Instantiation.class) {
+            lastQuantifiedFormula = qf;
+            lastSequent = seq;
+            lastResult = new Instantiation(qf, seq, services);
+        }
+        return result;
     }
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {

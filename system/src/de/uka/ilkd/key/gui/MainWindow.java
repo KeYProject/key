@@ -87,6 +87,8 @@ import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
 import de.uka.ilkd.key.gui.actions.PruneProofAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
@@ -227,6 +229,9 @@ public final class MainWindow extends JFrame  {
     /** action for saving a proof (attempt) */
     private SaveFileAction saveFileAction;
 
+    private QuickSaveAction quickSaveAction;
+    private QuickLoadAction quickLoadAction;
+
     /** action for opening the proof management dialog */
     private ProofManagementAction proofManagementAction;
 
@@ -308,7 +313,6 @@ public final class MainWindow extends JFrame  {
     private void setLaF() {
         try{
         	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
-//            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -395,6 +399,8 @@ public final class MainWindow extends JFrame  {
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
+        quickSaveAction           = new QuickSaveAction(this);
+        quickLoadAction           = new QuickLoadAction(this);
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
@@ -661,7 +667,7 @@ public final class MainWindow extends JFrame  {
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
-            getMediator().getProof().fireProofGoalsChanged();
+            getMediator().getSelectedProof().fireProofGoalsChanged();
         }
     }
 
@@ -722,6 +728,8 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
+        fileMenu.add(quickSaveAction);
+        fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
 
@@ -1396,7 +1404,7 @@ public final class MainWindow extends JFrame  {
             MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
 	    	return;
 	    }
-	    final Proof proof = mediator.getProof();
+	    final Proof proof = mediator.getSelectedProof();
 
 	    Thread thread = new Thread(new Runnable() {
 	        @Override

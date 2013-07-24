@@ -99,9 +99,10 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the measured_by clause of the contract.
      */
-    public Term getMby(Term heapTerm,
+    public Term getMby(Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
+                   Map<LocationVariable, Term> atPres,
 	               Services services);
 
     /**

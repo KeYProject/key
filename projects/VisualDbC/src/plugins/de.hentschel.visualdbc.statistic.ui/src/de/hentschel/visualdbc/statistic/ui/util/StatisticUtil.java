@@ -28,8 +28,8 @@ import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
 import de.hentschel.visualdbc.dbcmodel.DbcProofStatus;
 import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
-import de.hentschel.visualdbc.dbcmodel.diagram.custom.util.GMFUtil;
 import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
+import de.hentschel.visualdbc.dbcmodel.diagram.util.GMFUtil;
 import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
 
 /**

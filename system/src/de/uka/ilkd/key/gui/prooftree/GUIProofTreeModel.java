@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.gui.prooftree;
@@ -27,14 +27,11 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 /** An implementation of TreeModel that can be displayed using the
@@ -45,7 +42,7 @@ import de.uka.ilkd.key.util.Debug;
  * following each other on a long branch are represented as kin, while
  * new sutrees are displayed for branching points.
  *
- * <p>There are thus two kinds of node in this TreeModel, 
+ * <p>There are thus two kinds of node in this TreeModel,
  * {@link de.uka.ilkd.key.gui.prooftree.GUIProofTreeNode}s, representing nodes of
  * the displayed proof, and {@link de.uka.ilkd.key.gui.prooftree.GUIBranchNode}s
  * representing branching points.  (There is also one at the root.)
@@ -53,30 +50,25 @@ import de.uka.ilkd.key.util.Debug;
 
 class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 7853478051421478043L;
+    private static final long serialVersionUID = 2939190138370826940L;
     private Proof proof;
     private ProofTreeListener proofTreeListener;
 
     private EventListenerList listenerList = new EventListenerList();
 
     private boolean attentive = true;
-    
+
 
     /** construct a GUIProofTreeModel that mirrors the given
-     * Proof. 
+     * Proof.
      */
     public GUIProofTreeModel(Proof p) {
-	if (p == null) {
-	    throw new IllegalArgumentException("null proof in "
-					       +"GUIProofTreeModel().");
-	}
-	this.proof = p;
-	proofTreeListener = new ProofTreeListener();
-	
-//	proof.addProofTreeListener(proofTreeListener);
+        if (p == null) {
+            throw new IllegalArgumentException("null proof in "
+                    +"GUIProofTreeModel().");
+        }
+        this.proof = p;
+        proofTreeListener = new ProofTreeListener();
     }
 
    class ProofTreeListener extends ProofTreeAdapter {
@@ -100,8 +92,8 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
       }
 
-      public void proofIsBeingPruned(ProofTreeEvent e){    
-            pruningInProcess = e.getNode();   
+      public void proofIsBeingPruned(ProofTreeEvent e){
+            pruningInProcess = e.getNode();
       }
 
       /** The proof tree under the node mentioned in the ProofTreeEvent
@@ -111,9 +103,9 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
        * The method proofPruned is called, when the nodes are disconnect from
        * node.
        */
-      public void proofPruned(ProofTreeEvent e){        
+      public void proofPruned(ProofTreeEvent e){
               updateTree(getProofTreeNode(pruningInProcess));
-              pruningInProcess = null;   
+              pruningInProcess = null;
       }
 
       public void proofGoalRemoved (ProofTreeEvent e) {
@@ -142,7 +134,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     public void unregister() {
 	proof.removeProofTreeListener(proofTreeListener);
     }
-    
+
     public void register() {
 	proof.addProofTreeListener(proofTreeListener);
     }
@@ -154,7 +146,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	Debug.out("setAttentive:", b);
 	if ( b != attentive ) {
 	    if ( b ) {
-		proof.addProofTreeListener(proofTreeListener);		
+		proof.addProofTreeListener(proofTreeListener);
 		//		updateTree(null);
                 if ( hideClosedSubtrees () ) {
                     updateTree((TreeNode) null);
@@ -167,7 +159,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     }
 
     /** returns true if the model respond to changes in the proof
-     * immediately */ 
+     * immediately */
     public boolean isAttentive() {
 	return attentive;
     }
@@ -188,31 +180,25 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      *
      * @see     #addTreeModelListener
      * @param   l       the listener to remove
-     */  
-    public void removeTreeModelListener(TreeModelListener l) {	
+     */
+    public void removeTreeModelListener(TreeModelListener l) {
 	listenerList.remove(TreeModelListener.class, l);
     }
-    
+
 
     public boolean hideClosedSubtrees () {
     	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideClosedSubtrees();
-//        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-  //          .getHideClosedSubtrees();
     }
 
     public void setHideClosedSubtrees (boolean hide) {
         if ( hide != hideClosedSubtrees() ) {
         	ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideClosedSubtrees(hide);
-//            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-//                .setHideClosedSubtrees(hide);
             updateTree((TreeNode) null);
         }
     }
 
     public boolean isHidingIntermediateProofsteps() {
     	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideIntermediateProofsteps();
-//        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-//            .getHideIntermediateProofsteps();
     }
 
     /**
@@ -222,10 +208,19 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     public void hideIntermediateProofsteps(boolean hide) {
 	if (hide != isHidingIntermediateProofsteps()) {
 		ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideIntermediateProofsteps(hide);
-//            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-//                .setHideIntermediateProofsteps(hide);
             updateTree((TreeNode) null);
 	}
+    }
+
+    public boolean isHidingAutomodeProofsteps() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideAutomodeProofsteps();
+    }
+
+    public void setHideAutomodeProofsteps (boolean hide) {
+        if ( hide != isHidingAutomodeProofsteps() ) {
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideAutomodeProofsteps(hide);
+            updateTree((TreeNode) null);
+        }
     }
 
     /**
@@ -236,10 +231,15 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * TreeModel).
      */
     private boolean countChild(TreeNode child, TreeNode parent) {
-        if (!isHidingIntermediateProofsteps()) {
-            return true;
-        }
         if (child instanceof GUIProofTreeNode) {
+            final GUIProofTreeNode node = (GUIProofTreeNode)child;
+            final boolean interactive = node.getNode().getNodeInfo().getInteractiveRuleApplication();
+
+            if (!isHidingIntermediateProofsteps()
+                && (interactive || !isHidingAutomodeProofsteps())) {
+                return true;
+            }
+
             int pos = -1;
             for (int i = 0; i < parent.getChildCount();i++) {
                 if (parent.getChildAt(i) == child) {
@@ -252,7 +252,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
             }
             // count if child is inlined by hide closed subtrees
             if (hideClosedSubtrees() && !(parent.getChildAt(pos + 1) instanceof
-                    GUIBranchNode) &&((GUIProofTreeNode)child).getNode()
+                    GUIBranchNode) &&node.getNode()
                     .childrenCount() != 1) {
                 return true;
             }
@@ -274,25 +274,25 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * @return  the child of <I>parent</I> at index <I>index</I>
      */
     public Object getChild(Object parent, int index) {
-	if (isHidingIntermediateProofsteps()) {
-		TreeNode child;
-		int count = -1;
-		for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
-			child = ((TreeNode) parent).getChildAt(i);
-			if (countChild(child, (TreeNode) parent)) {
-				count++;
-				if (index == count) {
-					return child;
-				}
-			}
-		}
-	} else {
-		TreeNode guiParent = (TreeNode)parent;
-		if (guiParent.getChildCount()>index) {
-	    	return guiParent.getChildAt(index);
-		}
-	}
-	return null;
+        if (isHidingIntermediateProofsteps() || isHidingAutomodeProofsteps()) {
+            TreeNode child;
+            int count = -1;
+            for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
+                child = ((TreeNode) parent).getChildAt(i);
+                if (countChild(child, (TreeNode) parent)) {
+                    count++;
+                    if (index == count) {
+                        return child;
+                    }
+                }
+            }
+        } else {
+            TreeNode guiParent = (TreeNode)parent;
+            if (guiParent.getChildCount()>index) {
+                return guiParent.getChildAt(index);
+            }
+        }
+        return null;
     }
 
     /**
@@ -304,7 +304,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * @return  the number of children of the node <I>parent</I>
      */
     public int getChildCount(Object parent) {
-	if (isHidingIntermediateProofsteps()) {
+	if (isHidingIntermediateProofsteps() || isHidingAutomodeProofsteps()) {
 		TreeNode child;
 		int count = 0;
 		for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
@@ -318,7 +318,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 		return ((TreeNode) parent).getChildCount();
 	}
     }
-    
+
     /**
      * Returns the index of child in parent.
      *
@@ -330,7 +330,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     public int getIndexOfChild(Object parent, Object child) {
 	TreeNode guiParent = (TreeNode)parent;
 	int count = -1;
-	if (isHidingIntermediateProofsteps()) {
+	if (isHidingIntermediateProofsteps() || isHidingAutomodeProofsteps()) {
 		for (int i = 0; i < guiParent.getChildCount();i++) {
 			if (countChild(guiParent.getChildAt(i), guiParent)) {
 				count++;
@@ -358,7 +358,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     public Object getRoot() {
 	return getBranchNode(proof.root(),"Proof Tree");
     }
-    
+
     /**
      * Returns true if <I>node</I> is a leaf.  It is possible for this method
      * to return false even if <I>node</I> has no children.  A directory in a
@@ -368,7 +368,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * @param   guiNode a node in the tree, obtained from this data source
      * @return  true if <I>node</I> is a leaf
      */
-    public boolean isLeaf(Object guiNode){	
+    public boolean isLeaf(Object guiNode){
 	return ((TreeNode)guiNode).isLeaf();
     }
 
@@ -426,7 +426,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
             if ( p == null ||( (GUIAbstractTreeNode)trn ).findChild(p) == null ) break;
             n = p;
         }
-        
+
         flushCaches ( n );
     }
 
@@ -443,16 +443,16 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
                 if ( nextN == null ) break;
                 node = nextN;
             }
-           
+
             for ( int i = 0; i != node.childrenCount (); ++i )
-                if (!treeNode.getProofTreeModel().hideClosedSubtrees() || 
+                if (!treeNode.getProofTreeModel().hideClosedSubtrees() ||
                 	!node.child ( i ).isClosed () )
                 workingList.add ( node.child ( i ) );
         }
     }
-    
+
     /** Notify all listeners that have registered interest for
-     * notification on treeStructureChanged events. 
+     * notification on treeStructureChanged events.
      */
     protected void fireTreeStructureChanged(Object[] path) {
 	TreeModelEvent event = null;
@@ -470,13 +470,13 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	    }
 	}
     }
- 
+
     // caches for the GUIProofTreeNode and GUIBranchNode objects
     // generated to represent the nodes resp. subtrees of the Proof.
-    
+
     private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes = new WeakHashMap<Node, GUIAbstractTreeNode>();
     private WeakHashMap<Node, GUIBranchNode> branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
-    
+
     /** Return the GUIProofTreeNode corresponding to node n, if one
      * has already been generated, and null otherwise.
      */
@@ -504,9 +504,9 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	return branchNodes.get(n);
     }
 
-    /** 
+    /**
      * Return the GUIBranchNode corresponding to the subtree rooted
-     * at n.  Generate one if necessary, using label as the the 
+     * at n.  Generate one if necessary, using label as the the
      * subtree label.
      */
     public GUIBranchNode getBranchNode(Node n,
@@ -518,11 +518,11 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	}
 	return res;
     }
-    
-    
-    
+
+
+
     Collection expansionState = Collections.EMPTY_SET;
-    
+
     public void storeExpansionState(Collection c) {
        expansionState = c;
 //System.err.println("Proof "+proof.name()+" stor. state: "+ expansionState   );
@@ -532,15 +532,15 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 //System.err.println("Proof "+proof.name()+" retr. state: "+ expansionState   );
        return expansionState;
     }
-    
+
     TreePath selection;
-    
+
     public void storeSelection(TreePath t) {
         selection = t;
     }
-    
+
     public TreePath getSelection() {
         return selection;
     }
-    
+
 }

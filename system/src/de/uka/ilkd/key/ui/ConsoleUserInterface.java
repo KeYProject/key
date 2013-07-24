@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -21,6 +21,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
+import static de.uka.ilkd.key.gui.Main.Verbosity.*;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
@@ -29,55 +30,78 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
-   public static final String PROP_AUTO_MODE = "autoMode";
-   
+    private static final int PROGRESS_BAR_STEPS = 50;
+    private static final String PROGRESS_MARK = ">";
+
+    public static final String PROP_AUTO_MODE = "autoMode";
+
    /**
     * The used {@link PropertyChangeSupport}.
     */
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    
+
     private final BatchMode batchMode;
-    private final boolean verbose;
+    private final byte verbosity;
 	private ProofStarter ps;
 	private KeYMediator mediator;
 	private boolean autoMode;
-	
+
+	// for a progress bar
+	private int progressMax = 0;
+
     public boolean isAutoMode() {
       return autoMode;
    }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
     	this.batchMode = batchMode;
-        this.verbose = verbose;
+    	this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
     }
 
+   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+       this(batchMode, verbose? DEBUG: NORMAL);
+   }
+
     public void taskFinished(TaskFinishedInfo info) {
-        System.out.print("[ DONE ");
+        progressMax = 0; // reset progress bar marker
+        final int openGoals = info.getProof().openGoals().size();
         if (info.getSource() instanceof ApplyStrategy) {
-            System.out.println("  ... rule application ]");
-            System.out.println("number of goals remaining open:" + 
-                    info.getProof().openGoals().size());
-            System.out.flush();
-            batchMode.finishedBatchMode ( info.getResult(), 
-                    info.getProof(), info.getTime(), 
-                    info.getAppliedRules());
+            if (verbosity >= HIGH) {
+                System.out.println("]"); // end progress bar
+            }
+            if (verbosity > SILENT) {
+                System.out.println("[ DONE  ... rule application ]");
+                if (verbosity >= HIGH) {
+                    System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
+                    final Proof.Statistics stat = info.getProof().statistics();
+                    System.out.println("Proof steps: "+stat.nodes);
+                    System.out.println("Branches: "+stat.branches);
+                    System.out.println("Time: "+stat.autoModeTime+"ms");
+                }
+                System.out.println("Number of goals remaining open: " +
+                        openGoals);
+                System.out.flush();
+            }
+            batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
-            System.out.println("  ... loading ]");
+            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
             if (!"".equals(info.getResult())) {
-                System.out.println(info.getResult());
+                if (verbosity > SILENT) System.out.println(info.getResult());
                     System.exit(-1);
-            } 
-            if(batchMode.isLoadOnly() ||  info.getProof().openGoals().size()==0) {
-                System.out.println("number of open goals after loading:" + 
-                        info.getProof().openGoals().size());              
+            }
+            if(batchMode.isLoadOnly() ||  openGoals==0) {
+                if (verbosity > SILENT)
+                System.out.println("Number of open goals after loading: " +
+                        openGoals);
                 System.exit(0);
             }
 
@@ -86,7 +110,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             mediator.setInteractive(false);
 
             final Object result = ps.start();
-            if (verbose) {
+            if (verbosity >= HIGH) {
             	System.out.println(result);
             }
         }
@@ -95,14 +119,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.progressStarted(" + sender + ")");
         }
     }
 
     @Override
     public void progressStopped(Object sender) {
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.progressStopped(" + sender + ")");
         }
     }
@@ -120,7 +144,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
         // TODO Implement ProblemInitializerListener.reportException
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.reportException(" + sender + "," + input + "," + e + ")");
             e.printStackTrace();
         }
@@ -129,7 +153,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void reportStatus(Object sender, String status, int progress) {
         // TODO Implement ProblemInitializerListener.reportStatus
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.reportStatus(" + sender + "," + status + "," + progress + ")");
         }
     }
@@ -137,7 +161,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void reportStatus(Object sender, String status) {
         // TODO Implement ProblemInitializerListener.reportStatus
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.reportStatus(" + sender + "," + status + ")");
         }
     }
@@ -145,31 +169,36 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void resetStatus(Object sender) {
         // TODO Implement ProblemInitializerListener.resetStatus
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.resetStatus(" + sender + ")");
         }
     }
 
     @Override
     public void taskProgress(int position) {
-        // TODO Implement ProverTaskListener.taskProgress
-        if(verbose) {
-            System.out.println("ConsoleUserInterface.taskProgress(" + position + ")");
+        if (verbosity >= HIGH && progressMax > 0) {
+            if ((position*PROGRESS_BAR_STEPS) % progressMax == 0) {
+                System.out.print(PROGRESS_MARK);
+            }
         }
     }
 
     @Override
     public void taskStarted(String message, int size) {
-        // TODO Implement ProverTaskListener.taskStarted
-        if(verbose) {
-            System.out.println("ConsoleUserInterface.taskStarted(" + message + "," + size + ")");
+        progressMax = size;
+        if (verbosity >= HIGH) {
+            if (ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {
+                System.out.print(message+" ["); // start progress bar
+            } else {
+                System.out.println(message);
+            }
         }
     }
 
     @Override
     public void setMaximum(int maximum) {
         // TODO Implement ProgressMonitor.setMaximum
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.setMaximum(" + maximum + ")");
         }
     }
@@ -177,7 +206,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void setProgress(int progress) {
         // TODO Implement ProgressMonitor.setProgress
-        if(verbose) {
+        if(verbosity >= DEBUG) {
             System.out.println("ConsoleUserInterface.setProgress(" + progress + ")");
         }
     }
@@ -198,14 +227,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     @Override
     public void notify(NotificationEvent event) {
-        if(verbose) {
+        if(verbosity >= DEBUG) {
         	System.out.println(event);
         }
     }
 
     @Override
     public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
-        if(verbose) {
+        if(verbosity >= DEBUG) {
         	System.out.println("Taclet match completion not supported by console.");
         }
     }
@@ -231,11 +260,10 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
    @Override
-   public ProblemInitializer createProblemInitializer() {
-      ProblemInitializer pi = new ProblemInitializer(this, 
-            mediator.getProfile(), 
-            new Services(mediator.getExceptionHandler()), 
-            false, 
+   public ProblemInitializer createProblemInitializer(Profile profile) {
+      ProblemInitializer pi = new ProblemInitializer(this,
+            new Services(profile, mediator.getExceptionHandler()),
+            false,
             this);
       return pi;
    }
@@ -253,7 +281,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     * @return {@code true} verbose is active, {@code false} verbose is deactivated.
     */
    public boolean isVerbose() {
-      return verbose;
+      return verbosity >= DEBUG;
    }
 
    /**
@@ -273,7 +301,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
          proof.dispose();
       }
    }
-   
+
    /**
     * Returns the used {@link PropertyChangeSupport}.
     * @return the used {@link PropertyChangeSupport}.
@@ -281,7 +309,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    protected PropertyChangeSupport getPcs() {
        return pcs;
    }
-   
+
    /**
     * Adds the given listener.
     * @param listener The listener to add.
@@ -289,7 +317,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public void addPropertyChangeListener(PropertyChangeListener listener) {
        pcs.addPropertyChangeListener(listener);
    }
-   
+
    /**
     * Adds the given listener for the given property only.
     * @param propertyName The property to observe.
@@ -298,7 +326,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
        pcs.addPropertyChangeListener(propertyName, listener);
    }
-   
+
    /**
     * Removes the given listener.
     * @param listener The listener to remove.
@@ -306,7 +334,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public void removePropertyChangeListener(PropertyChangeListener listener) {
        pcs.removePropertyChangeListener(listener);
    }
-   
+
    /**
     * Removes the given listener from the given property.
     * @param propertyName The property to no longer observe.
@@ -315,7 +343,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
        pcs.removePropertyChangeListener(propertyName, listener);
    }
-   
+
    /**
     * Fires the event to all available listeners.
     * @param propertyName The property name.
@@ -326,7 +354,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
    }
-   
+
    /**
     * Fires the event to all available listeners.
     * @param propertyName The property name.
@@ -337,18 +365,18 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
    }
-   
+
    /**
     * Fires the event to all available listeners.
     * @param propertyName The property name.
     * @param index The changed index.
     * @param oldValue The old value.
     * @param newValue The new value.
-    */    
+    */
    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
    }
-   
+
    /**
     * Fires the event to all listeners.
     * @param evt The event to fire.
@@ -356,7 +384,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    protected void firePropertyChange(PropertyChangeEvent evt) {
        pcs.firePropertyChange(evt);
    }
-   
+
    /**
     * Fires the event to all listeners.
     * @param propertyName The changed property.
@@ -366,7 +394,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
        pcs.firePropertyChange(propertyName, oldValue, newValue);
    }
-   
+
    /**
     * Fires the event to all listeners.
     * @param propertyName The changed property.
@@ -376,7 +404,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
        pcs.firePropertyChange(propertyName, oldValue, newValue);
    }
-   
+
    /**
     * Fires the event to all listeners.
     * @param propertyName The changed property.

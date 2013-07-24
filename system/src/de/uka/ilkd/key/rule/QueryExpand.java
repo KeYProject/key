@@ -62,6 +62,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -105,8 +106,11 @@ public class QueryExpand implements BuiltInRule {
         // The following additional rewrite taclet increases performance
         // (sometimes significantly, e.g. by factor 10).
         RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        tb.setName(new Name("replaceKnownQuery"));
+        Name tacletName = MiscTools.toValidTacletName("replaceKnownQuery_" + query.toString());
+        tb.setName(tacletName);
+        tb.setDisplayName("replaceKnownQuery");
         tb.setFind(query);
+        tb.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tb.addGoalTerm(queryEval.second);
         tb.addRuleSet(new RuleSet(new Name("concrete")));
 
@@ -345,7 +349,7 @@ public class QueryExpand implements BuiltInRule {
     	}
     	final Operator op = t.op();
     	final int nextLevel = level+1;
-    	if(op instanceof IProgramMethod){ //Query found
+    	if(op instanceof IProgramMethod && !((IProgramMethod)op).isModel()){ //Query found
     		//System.out.println("Query found:"+t+ " position:"+(qepIsPositive?"positive":"negative"));
     		QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>)pathInTerm.clone(), qepLevel+1, instVars, qepIsPositive);
     		qeps.add(qep);
@@ -422,7 +426,7 @@ public class QueryExpand implements BuiltInRule {
     	}
     	// What about checking if an update is encountered?
 
-    	if(t.op() instanceof IProgramMethod){ //Query found
+    	if(t.op() instanceof IProgramMethod && !((IProgramMethod)t.op()).isModel()){ //Query found
     		//System.out.println("Query found:"+t);
     		result.add(t);
     		return;
@@ -613,6 +617,9 @@ public class QueryExpand implements BuiltInRule {
         if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
+            if(pm.isModel()) {
+              return false;
+            }
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) &&
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
