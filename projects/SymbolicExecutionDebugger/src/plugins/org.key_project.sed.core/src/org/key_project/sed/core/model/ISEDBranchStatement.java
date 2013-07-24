@@ -14,25 +14,26 @@
 package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.model.IStackFrame;
-import org.key_project.sed.core.model.impl.AbstractSEDLoopCondition;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
+import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
 
 /**
- * A node in the symbolic execution tree which represents a loop condition,
- * e.g. {@code x >= 0}.
+ * A node in the symbolic execution tree which represents a node which
+ * creates multiple child branches defined by branch conditions ({@link ISEDBranchCondition}),
+ * e.g. {@code if(x >= 0)}.
  * <p>
- * A symbolic loop statement is also a normal stack frame ({@link IStackFrame})
+ * A symbolic branch statement is also a normal stack frame ({@link IStackFrame})
  * for compatibility reasons with the Eclipse debug API.
  * </p>
  * <p>
  * Clients may implement this interface. It is recommended to subclass
- * from {@link AbstractSEDLoopCondition} instead of implementing this
- * interface directly. {@link SEDMemoryLoopCondition} is also a default
+ * from {@link AbstractSEDBranchStatement} instead of implementing this
+ * interface directly. {@link SEDMemoryBranchStatement} is also a default
  * implementation that stores all values in the memory.
  * </p>
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDLoopCondition extends ISEDDebugNode, IStackFrame {
+public interface ISEDBranchStatement extends ISEDDebugNode, IStackFrame {
 
 }

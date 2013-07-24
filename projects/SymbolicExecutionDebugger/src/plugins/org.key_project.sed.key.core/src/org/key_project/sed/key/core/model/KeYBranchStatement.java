@@ -15,30 +15,50 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.impl.AbstractSEDThread;
+import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDThread} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEDBranchStatement} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IExecutionStart> {
+public class KeYBranchStatement extends AbstractSEDBranchStatement implements IKeYSEDDebugNode<IExecutionBranchStatement> {
    /**
-    * The {@link IExecutionStart} to represent by this debug node.
+    * The {@link IExecutionBranchStatement} to represent by this debug node.
     */
-   private IExecutionStart executionNode;
+   private IExecutionBranchStatement executionNode;
 
    /**
     * The contained children.
     */
    private IKeYSEDDebugNode<?>[] children;
+
+   /**
+    * The source name.
+    */
+   private String sourceName;
+   
+   /**
+    * The {@link SourceLocation} of this {@link IStackFrame}.
+    */
+   private SourceLocation sourceLocation;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
 
    /**
     * The method call stack.
@@ -48,14 +68,19 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
-    * @param executionNode The {@link IExecutionStart} to represent by this debug node.
+    * @param parent The parent in that this node is contained as child.
+    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param executionNode The {@link IExecutionBranchStatement} to represent by this debug node.
     */
-   public KeYThread(KeYDebugTarget target, IExecutionStart executionNode) {
-      super(target);
+   public KeYBranchStatement(KeYDebugTarget target, 
+                             IKeYSEDDebugNode<?> parent, 
+                             ISEDThread thread, 
+                             IExecutionBranchStatement executionNode) {
+      super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
    }
-
+   
    /**
     * {@inheritDoc}
     */
@@ -93,7 +118,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public IExecutionStart getExecutionNode() {
+   public IExecutionBranchStatement getExecutionNode() {
       return executionNode;
    }
 
@@ -107,6 +132,89 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      if (sourceName == null) {
+         sourceName = SymbolicExecutionUtil.getSourcePath(executionNode.getActivePositionInfo());
+      }
+      return sourceName;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      if (sourceLocation == null) {
+         sourceLocation = computeSourceLocation();
+      }
+      return sourceLocation.getLineNumber();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      if (sourceLocation == null) {
+         sourceLocation = computeSourceLocation();
+      }
+      return sourceLocation.getCharStart();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      if (sourceLocation == null) {
+         sourceLocation = computeSourceLocation();
+      }
+      return sourceLocation.getCharEnd();
+   }
+   
+   /**
+    * Computes the {@link SourceLocation} which values are returned via
+    * {@link #getLineNumber()}, {@link #getCharStart()} and {@link #getCharEnd()}.
+    * @return The computed {@link SourceLocation}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected SourceLocation computeSourceLocation() throws DebugException {
+      SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
+      return KeYModelUtil.updateLocationFromAST(this, location);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
 
@@ -169,6 +277,38 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public void stepReturn() throws DebugException {
       getDebugTarget().stepReturn(this);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canResume() {
+      return getDebugTarget().canResume(this);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void resume() throws DebugException {
+      getDebugTarget().resume(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canSuspend() {
+      return getDebugTarget().canSuspend(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void suspend() throws DebugException {
+      getDebugTarget().suspend(this);
    }
 
    /**

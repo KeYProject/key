@@ -32,25 +32,25 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
-import org.key_project.sed.key.core.model.KeYBranchNode;
+import org.key_project.sed.key.core.model.KeYBranchStatement;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
-import org.key_project.sed.key.core.model.KeYLoopNode;
+import org.key_project.sed.key.core.model.KeYLoopStatement;
 import org.key_project.sed.key.core.model.KeYMethodCall;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
-import org.key_project.sed.key.core.model.KeYUseLoopInvariant;
-import org.key_project.sed.key.core.model.KeYUseOperationContract;
+import org.key_project.sed.key.core.model.KeYLoopInvariant;
+import org.key_project.sed.key.core.model.KeYOperationContract;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -58,8 +58,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
@@ -143,14 +143,14 @@ public final class KeYModelUtil {
       if (executionNode instanceof IExecutionBranchCondition) {
          result = new KeYBranchCondition(target, parent, thread, (IExecutionBranchCondition)executionNode);
       }
-      else if (executionNode instanceof IExecutionBranchNode) {
-         result = new KeYBranchNode(target, parent, thread, (IExecutionBranchNode)executionNode);
+      else if (executionNode instanceof IExecutionBranchStatement) {
+         result = new KeYBranchStatement(target, parent, thread, (IExecutionBranchStatement)executionNode);
       }
       else if (executionNode instanceof IExecutionLoopCondition) {
          result = new KeYLoopCondition(target, parent, thread, (IExecutionLoopCondition)executionNode);
       }
-      else if (executionNode instanceof IExecutionLoopNode) {
-         result = new KeYLoopNode(target, parent, thread, (IExecutionLoopNode)executionNode);
+      else if (executionNode instanceof IExecutionLoopStatement) {
+         result = new KeYLoopStatement(target, parent, thread, (IExecutionLoopStatement)executionNode);
       }
       else if (executionNode instanceof IExecutionMethodCall) {
          result = new KeYMethodCall(target, parent, thread, (IExecutionMethodCall)executionNode);
@@ -161,11 +161,11 @@ public final class KeYModelUtil {
       else if (executionNode instanceof IExecutionStatement) {
          result = new KeYStatement(target, parent, thread, (IExecutionStatement)executionNode);
       }
-      else if (executionNode instanceof IExecutionUseOperationContract) {
-         result = new KeYUseOperationContract(target, parent, thread, (IExecutionUseOperationContract)executionNode);
+      else if (executionNode instanceof IExecutionOperationContract) {
+         result = new KeYOperationContract(target, parent, thread, (IExecutionOperationContract)executionNode);
       }
-      else if (executionNode instanceof IExecutionUseLoopInvariant) {
-         result = new KeYUseLoopInvariant(target, parent, thread, (IExecutionUseLoopInvariant)executionNode);
+      else if (executionNode instanceof IExecutionLoopInvariant) {
+         result = new KeYLoopInvariant(target, parent, thread, (IExecutionLoopInvariant)executionNode);
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
