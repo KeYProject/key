@@ -328,7 +328,8 @@ public class JMLSpecFactory {
     }
 
 
-    /** register abbreviations in contracts (aka. old clauses)
+    /** register abbreviations in contracts (aka. old clauses).
+     * creates update terms.
      * @throws SLTranslationException */
     private ImmutableList<Term> registerAbbreviationVariables(
             TextualJMLSpecCase textualSpecCase, KeYJavaType inClass,
@@ -343,7 +344,7 @@ public class JMLSpecFactory {
             progVars.paramVars = progVars.paramVars.append(abbrVar); // treat as (ghost) parameter
             final Term rhs = JMLTranslator.translate(abbrv.third,
                     inClass, progVars.selfVar, progVars.paramVars, progVars.resultVar, progVars.excVar, progVars.atPres, Term.class, services);
-            clauses.abbreviations = clauses.abbreviations.append(TB.equals(TB.var(abbrVar), rhs));
+            clauses.abbreviations = clauses.abbreviations.append(TB.elementary(services, TB.var(abbrVar), rhs));
         }
         return clauses.abbreviations;
     }
@@ -710,7 +711,7 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
 
         final Term abbrvLhs = clauses.abbreviations.isEmpty()? null:
-                TB.convertToFormula(TB.and(clauses.abbreviations), services);
+                TB.parallel(clauses.abbreviations);
 
         // requires
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
