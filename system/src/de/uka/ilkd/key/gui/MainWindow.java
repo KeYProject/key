@@ -33,7 +33,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,10 +119,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -1096,21 +1091,14 @@ public final class MainWindow extends JFrame  {
         if (getMediator() == null
                 || getMediator().getSelectedProof() == null) {
             //There is no proof. Either not loaded yet or it is abandoned
-            final LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(null), null, null);
-            leafNodeView.setPrinter(printer, null);
+            leafNodeView.setPrinterNoProof();
             return;
         }
 
         Goal goal = getMediator().getSelectedGoal();
         final SequentView sequentViewLocal;
         if (goal != null && !goal.node().isClosed()) {
-            SequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
-            final LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
-                    getMediator().getNotationInfo(),
-                    mediator.getServices());
-
-            leafNodeView.setPrinter(printer, filter, null);
+            leafNodeView.setPrinter(goal);
             leafNodeView.printSequent();
             sequentViewLocal = leafNodeView;
         } else {

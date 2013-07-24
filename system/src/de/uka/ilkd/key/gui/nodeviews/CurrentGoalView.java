@@ -32,10 +32,13 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 import java.util.Vector;
@@ -58,9 +61,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     // the current line width
     int lineWidth;
-    
-    // the used sequent
-    private Sequent seq;
 
     // the mediator
     private KeYMediator mediator;
@@ -167,8 +167,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void updateUpdateHighlights() {
         if (printer == null) return;
-        LogicPrinter printer = this.printer;
-
+        
         for (Object updateHighlight : updateHighlights) {
             removeHighlight(updateHighlight);
         }
@@ -225,7 +224,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         lineWidth = computeLineWidth();
         
         if (printer != null) {
-            printer.update(seq, filter, lineWidth);
+            printer.update(null, filter, lineWidth);
 	    boolean errorocc;
 	    do {
 	        errorocc = false;
@@ -264,25 +263,26 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	}
     }
     
-    /** sets the LogicPrinter to use
+    /** sets the LogicPrinter to use in case there is no proof available.
      * @param sp the LogicPrinter that is used
      */
-    public void setPrinter(LogicPrinter sp, Sequent s) {
-    	setPrinter ( sp, null, s );
+    public void setPrinterNoProof() {
+    	printer = new LogicPrinter(new ProgramPrinter(null), null, null);
     }
-
-    protected SequentPrintFilter getSequentPrintFilter() {
-    	return filter;
-    }
-
+    
     /** sets the LogicPrinter to use
      * @param sp the LogicPrinter that is used
      * @param f the SequentPrintFilter that is used
      */
-    public void setPrinter(LogicPrinter sp, SequentPrintFilter f, Sequent s) {
-        printer = sp;
-        filter  = f;
-        seq = s;
+    public void setPrinter(Goal goal) {
+        filter = new IdentitySequentPrintFilter(goal.sequent());
+        printer = new LogicPrinter(new ProgramPrinter(null),
+                getMediator().getNotationInfo(),
+                mediator.getServices());
+    }
+
+    protected SequentPrintFilter getSequentPrintFilter() {
+    	return filter;
     }
 
     /** return used LogicPrinter

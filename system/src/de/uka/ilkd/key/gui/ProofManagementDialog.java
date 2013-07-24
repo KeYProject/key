@@ -25,7 +25,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +54,6 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -133,6 +131,7 @@ public final class ProofManagementDialog extends JDialog {
          */
         private static final long serialVersionUID = -7810888250050777877L;
 
+        @Override
         public Component getListCellRendererComponent(JList list, 
 	     					   	  Object value, 
 		     					  int index, 
@@ -191,6 +190,7 @@ public final class ProofManagementDialog extends JDialog {
 	//create contract panel by method
 	contractPanelByMethod = new ContractSelectionPanel(services, false);
 	contractPanelByMethod.addMouseListener(new MouseAdapter() {
+            @Override
 	    public void mouseClicked(MouseEvent e){
 		if(e.getClickCount() == 2){
 		    startButton.doClick();
@@ -208,6 +208,7 @@ public final class ProofManagementDialog extends JDialog {
 	//create contract panel by proof
 	contractPanelByProof = new ContractSelectionPanel(services, false);
 	contractPanelByProof.addMouseListener(new MouseAdapter() {
+            @Override
 	    public void mouseClicked(MouseEvent e){
 		updateStartButton();
 		if(e.getClickCount() == 2){
@@ -438,7 +439,7 @@ public final class ProofManagementDialog extends JDialog {
         ImmutableSet<Proof> proofs = specRepos.getProofs(po);
         
         //no proofs?
-        if(proofs.size() == 0) {
+        if(proofs.isEmpty()) {
             return null;
         }
         
