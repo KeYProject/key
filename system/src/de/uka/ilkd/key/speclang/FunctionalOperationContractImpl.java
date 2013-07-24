@@ -90,6 +90,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     //constructors
     //-------------------------------------------------------------------------
 
+    @Deprecated
     FunctionalOperationContractImpl(String baseName,
             String name,
             KeYJavaType kjt,
@@ -115,6 +116,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     /**
      * Creates an operation contract.
+     * Using this constructor is discouraged: it may change in the future.
+     * Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
      * @param baseName base name of the contract (does not have to be unique)
      * @param pm the IProgramMethod to which the contract belongs
      * @param modality the modality of the contract
@@ -208,6 +211,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param excVar the variable used for the thrown exception
      * @param heapAtPreVar the variable used for the pre-heap
      */
+    @Deprecated
     FunctionalOperationContractImpl(String baseName,
             KeYJavaType kjt,
             IProgramMethod pm,
@@ -247,31 +251,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 toBeSaved,
                 transaction);
     }
-
-
-    /* *
-     * Creates an operation contract.
-     *
-     * @param baseName base name of the contract (does not have to be unique)
-     * @param pm 	the IProgramMethod to which the contract belongs
-     * @param modality the modality of the contract
-     * @param pre 	the precondition of the contract
-     * @param mby 	the measured_by clause of the contract
-     * @param post 	the postcondition of the contract
-     * @param mod 	the modifies clause of the contract
-     * @param progVars collection of variables for the receiver object,
-     * 			operation parameters, operation result, thrown exception
-     * 			and the pre-heap
-     */
-    //    FunctionalOperationContractImpl(String baseName, IProgramMethod pm,
-    //	    Modality modality, Term pre, Term mby, Term post, Term mod, boolean hasMod, Term modBackup,
-    //	    ProgramVariableCollection progVars, boolean toBeSaved) {
-    //	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
-    //	        post, mod, hasMod, modBackup, progVars.selfVar, progVars.paramVars,
-    //	        progVars.resultVar, progVars.excVar, progVars.heapAtPreVar, progVars.savedHeapAtPreVar,
-    //	        INVALID_ID, toBeSaved);
-    //    }
-
 
 
     //-------------------------------------------------------------------------

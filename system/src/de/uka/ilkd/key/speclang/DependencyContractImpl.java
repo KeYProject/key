@@ -14,7 +14,6 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
@@ -456,6 +454,7 @@ public final class DependencyContractImpl implements DependencyContract {
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
         // TODO Auto-generated method stub
+        assert false: "old clauses are not yet supported for dependency contracts";
         return null;
     }
 

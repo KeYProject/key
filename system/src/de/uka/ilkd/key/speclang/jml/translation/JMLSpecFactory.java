@@ -709,7 +709,8 @@ public class JMLSpecFactory {
             Map<LocationVariable,Term> axioms) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
 
-        final Term abbrvLhs = TB.convertToFormula(TB.and(clauses.abbreviations), services);
+        final Term abbrvLhs = clauses.abbreviations.isEmpty()? null:
+                TB.convertToFormula(TB.and(clauses.abbreviations), services);
 
         // requires
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
@@ -730,11 +731,13 @@ public class JMLSpecFactory {
                     name, pm, true, pres,
                     clauses.measuredBy, posts, axioms, clauses.assignables,
                     clauses.hasMod, progVars);
+            contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
                     name, pm, false, pres,
                     clauses.measuredBy, posts, axioms, clauses.assignables, clauses.hasMod, progVars);
+            contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -748,9 +751,11 @@ public class JMLSpecFactory {
                     pres,
                     clauses.measuredBy, posts, axioms, clauses.assignables,
                     clauses.hasMod, progVars);
+            contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 =
                     cf.func(name, pm, false, clauses.requires, clauses.measuredBy, posts, axioms,
                         clauses.assignables, clauses.hasMod, progVars);
+            contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
         return result;
