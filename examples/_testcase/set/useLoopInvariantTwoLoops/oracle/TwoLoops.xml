@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="TwoLoops.main(x);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (x&gt;=0) {while ( x&gt;0 ) {     x--;   } }else  {ghostint originalX = x;while ( x&lt;0 ) {     x++;   } }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&gt;=0) {while ( x&gt;0 ) {     x--;   } }else  {ghostint originalX = x;while ( x&lt;0 ) {     x++;   } }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <useLoopInvariant name="invariants: {heap=geq(x,Z(0(#)))};
+            <loopInvariant name="invariants: {heap=geq(x,Z(0(#)))};
 modifies: {heap=false};
 variant: x" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="x &gt;= 1 &amp; x_0 &gt;= 0" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="true" branchCondition="x &gt;= 1 &amp; x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
@@ -22,11 +22,11 @@ variant: x" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyVa
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </useLoopInvariant>
+            </loopInvariant>
          </branchCondition>
          <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="ghostint originalX = x;" pathCondition="!x &gt;= 0" pathConditionChanged="false">
-               <useLoopInvariant name="invariants: {heap=leq(x,Z(0(#)))};
+               <loopInvariant name="invariants: {heap=leq(x,Z(0(#)))};
 modifies: {heap=false};
 variant: javaSubInt(originalX,x)" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyValid="true">
                   <branchCondition name="!x_4 &gt;= 1" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="true" branchCondition="!x_4 &gt;= 1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
@@ -45,9 +45,9 @@ variant: javaSubInt(originalX,x)" pathCondition="!x &gt;= 0" pathConditionChange
                         </methodReturn>
                      </statement>
                   </branchCondition>
-               </useLoopInvariant>
+               </loopInvariant>
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

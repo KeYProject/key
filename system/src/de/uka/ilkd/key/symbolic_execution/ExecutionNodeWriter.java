@@ -177,12 +177,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
    /**
     * Tag name to store {@link IExecutionStart}s.
     */
-   public static final String TAG_START = "startNode";
+   public static final String TAG_START = "start";
 
    /**
     * Tag name to store {@link IExecutionBranchStatement}s.
     */
-   public static final String TAG_BRANCH_STATEMENT = "branchNode";
+   public static final String TAG_BRANCH_STATEMENT = "branchStatement";
 
    /**
     * Tag name to store {@link IExecutionLoopCondition}s.
@@ -192,7 +192,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
    /**
     * Tag name to store {@link IExecutionLoopStatement}s.
     */
-   public static final String TAG_LOOP_STATEMENT = "loopNode";
+   public static final String TAG_LOOP_STATEMENT = "loopStatement";
 
    /**
     * Tag name to store {@link IExecutionMethodCall}s.
@@ -222,12 +222,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
    /**
     * Tag name to store {@link IExecutionOperationContract}s.
     */
-   public static final String TAG_OPERATION_CONTRACT = "useOperationContract";
+   public static final String TAG_OPERATION_CONTRACT = "operationContract";
 
    /**
     * Tag name to store {@link IExecutionLoopInvariant}s.
     */
-   public static final String TAG_LOOP_INVARIANT = "useLoopInvariant";
+   public static final String TAG_LOOP_INVARIANT = "loopInvariant";
 
    /**
     * Tag name to store {@link IExecutionVariable}s.
