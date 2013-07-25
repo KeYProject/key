@@ -9,7 +9,7 @@
   </proofs>
   <types xsi:type="dbcmodel:DbcClass" name="Main">
     <methods signature="main()" returnType="int">
-      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> result = 84 &amp; self.&lt;inv>) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> result = 84 &amp; self.&lt;inv>)&#xA;&amp; (   !exc = null&#xA;   ->   (   java.lang.Exception::instance(exc) = TRUE&#xA;         -> self.&lt;inv>)&#xA;      &amp;   java.lang.RuntimeException::instance(exc)&#xA;        = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
   </types>
   <types xsi:type="dbcmodel:DbcClass" name="Util">
