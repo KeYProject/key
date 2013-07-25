@@ -710,8 +710,10 @@ public class JMLSpecFactory {
             Map<LocationVariable,Term> axioms) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
 
-        final Term abbrvLhs = clauses.abbreviations.isEmpty()? null:
-                TB.parallel(clauses.abbreviations);
+        Term abbrvLhs = null;
+        if (!clauses.abbreviations.isEmpty()) {
+            abbrvLhs = TB.sequential(clauses.abbreviations);
+        }
 
         // requires
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
