@@ -1420,7 +1420,7 @@ public final class MainWindow extends JFrame  {
 			            proof.getServices());
 
 	        }
-	    });
+	    },"SMTRunner");
 	    thread.start();
 
 	}
