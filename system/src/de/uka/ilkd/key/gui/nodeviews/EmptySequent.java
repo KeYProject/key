@@ -34,4 +34,8 @@ public class EmptySequent extends SequentView {
     public String getTitle() {
         return "No proof loaded";
     }
+
+    @Override
+    public void printSequent() {}
+    
 }
