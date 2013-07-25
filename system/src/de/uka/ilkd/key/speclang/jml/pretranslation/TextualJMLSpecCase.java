@@ -215,7 +215,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addAxioms(PositionedString ps) {
         addGeneric(axioms, ps);
     }
-    	
+
     public void addAxioms(ImmutableList<PositionedString> l) {
         for(PositionedString ps : l) {
 	           addAxioms(ps);
@@ -267,7 +267,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getAxioms() {
       return axioms.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
-    
+
     public ImmutableList<PositionedString> getAxioms(String hName) {
       return axioms.get(hName);
     }
@@ -329,7 +329,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         sb.append(behavior).append("\n");
 
         for (Triple<PositionedString, PositionedString, PositionedString> t: abbreviations) {
-            sb.append("abbreviations: ");
+            sb.append("old: ");
             sb.append(t.first.toString());
             sb.append(" ");
             sb.append(t.second.toString());

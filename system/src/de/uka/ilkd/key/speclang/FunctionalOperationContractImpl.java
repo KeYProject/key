@@ -964,6 +964,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        if (globalDefs==null) return null;
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1043,6 +1044,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 originalResultVar,
                 originalExcVar,
                 originalAtPreVars,
+                globalDefs,
                 newId,
                 toBeSaved,
                 transaction);
@@ -1070,6 +1072,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 originalResultVar,
                 originalExcVar,
                 originalAtPreVars,
+                globalDefs,
                 id,
                 toBeSaved && newKJT.equals(
                         kjt), transaction);
