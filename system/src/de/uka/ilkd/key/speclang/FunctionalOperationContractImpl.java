@@ -91,29 +91,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     //constructors
     //-------------------------------------------------------------------------
 
-    @Deprecated
-    FunctionalOperationContractImpl(String baseName,
-            String name,
-            KeYJavaType kjt,
-            IProgramMethod pm,
-            KeYJavaType specifiedIn,
-            Modality modality,
-            Map<LocationVariable,Term> pres,
-            Term mby,
-            Map<LocationVariable,Term> posts,
-            Map<LocationVariable,Term> axioms,
-            Map<LocationVariable,Term> mods,
-            Map<LocationVariable,Boolean> hasRealMod,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            Map<LocationVariable, LocationVariable> atPreVars,
-            int id,
-            boolean toBeSaved,
-            boolean transaction) {
-        this(baseName,name,kjt,pm,specifiedIn,modality,pres,mby,posts,mods,axioms, hasRealMod,selfVar,paramVars,resultVar,excVar,atPreVars,null,id,toBeSaved,transaction);
-    }
 
     /**
      * Creates an operation contract.

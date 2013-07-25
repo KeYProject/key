@@ -414,6 +414,7 @@ public class ContractFactory {
                                                    t.originalResultVar,
                                                    t.originalExcVar,
                                                    t.originalAtPreVars,
+                                                   t.globalDefs,
                                                    Contract.INVALID_ID,
                                                    t.toBeSaved,
                                                    t.transaction);
