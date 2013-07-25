@@ -174,7 +174,6 @@ public final class RewriteTaclet extends FindTaclet {
 	    op = t.op ();
 
 	    if (op instanceof TransformerProcedure) {
-	        // FIXME: Only seems to work if transformer-term in antecedent and for .key-files
 	        return null;
 	    }
 

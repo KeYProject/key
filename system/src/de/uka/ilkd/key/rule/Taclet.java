@@ -382,7 +382,6 @@ public abstract class Taclet implements Rule, Named {
                                                    SVSubstitute instantiationCandidate,
                                                    MatchConditions matchCond,
                                                    Services services) {
-
 	if (instantiationCandidate instanceof Term) {
 	    Term term = (Term) instantiationCandidate;
 	    if (!(term.op() instanceof QuantifiableVariable)) {
@@ -395,7 +394,6 @@ public abstract class Taclet implements Rule, Named {
 		}
 	    }
 	}
-    
 	// check generic conditions
 	for (final VariableCondition vc : variableConditions) {
 	    matchCond = vc.check(var, instantiationCandidate, matchCond, services);	    
@@ -528,7 +526,7 @@ public abstract class Taclet implements Rule, Named {
      * @param term the Term the Template should match
      * @param template the Term tried to be instantiated so that it matches term
      * @param matchCond the MatchConditions to be obeyed by a
-     * successfull match
+     * successful match
      * @return the new MatchConditions needed to match template with
      * term, if possible, null otherwise
      *
@@ -542,8 +540,8 @@ public abstract class Taclet implements Rule, Named {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
-	final Operator sourceOp   = term.op ();
-    final Operator templateOp = template.op ();
+	final Operator sourceOp   =     term.op ();
+	final Operator templateOp = template.op ();
                 
     if (template.hasLabels()) {
         final ImmutableArray<ITermLabel> labels = template.getLabels();
@@ -551,10 +549,12 @@ public abstract class Taclet implements Rule, Named {
             Debug.out("FAILED 3x.");
             return null; ///FAILED
         } else {
-            final MatchConditions cond = ((SchemaVariable)labels.get(0)).match(term, matchCond, services);
+            final MatchConditions cond =
+                    ((SchemaVariable)labels.get(0)).match(term, matchCond, services);
             if (cond == null) {
                 return null;
             }
+            matchCond = cond;
         }
     }
     

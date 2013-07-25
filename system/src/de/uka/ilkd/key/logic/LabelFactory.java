@@ -37,6 +37,9 @@ public class LabelFactory {
       else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabel.INSTANCE;
       }
+      else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
+          return ShortcutEvaluationTermLabel.INSTANCE;
+       }
       else {
          throw new UnknownLabelException(name);
       }

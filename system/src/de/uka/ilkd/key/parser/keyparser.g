@@ -3656,7 +3656,6 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_atomic[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3673,6 +3672,8 @@ varexp[TacletBuilder b]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
         | varcond_induction_variable[b, negated]
+        | varcond_atomic[b, negated]
+        | varcond_label[b, negated]
       )
   )
 ;
@@ -4149,14 +4150,26 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
    }
 ;
 
-varcond_atomic [TacletBuilder b]
+varcond_atomic [TacletBuilder b, boolean negated]
 {
   ParsableVariable x = null;
 }
 :
    ISATOMIC
         LPAREN x=varId RPAREN {
-           b.addVariableCondition(new AtomicCondition((TermSV) x));
+           b.addVariableCondition(new AtomicCondition((TermSV) x, negated ));
+        }
+;
+
+varcond_label [TacletBuilder b, boolean negated]
+{
+  ParsableVariable label = null;
+  String name = null;
+}
+:
+   ISLABEL
+        LPAREN label=varId COMMA name=simple_ident RPAREN {
+           b.addVariableCondition(new TermLabelCondition((TermLabelSV) label, name, negated ));
         }
 ;
 

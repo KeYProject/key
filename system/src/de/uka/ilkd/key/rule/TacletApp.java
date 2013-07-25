@@ -637,7 +637,9 @@ public abstract class TacletApp implements RuleApp {
             nv = it.next();
             if(nv.first() == sv) {
                 Term term = (Term) instantiations.getInstantiation(nv.second());
-                term.execPostOrder(vcv);
+                if (term != null) {
+                    term.execPostOrder(vcv);
+                }
             }
         }
 

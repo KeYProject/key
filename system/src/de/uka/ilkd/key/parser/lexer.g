@@ -79,7 +79,8 @@ tokens {
 	ISARRAYLENGTH="\\isArrayLength";
 	ISATOMIC="\\isAtomic";
         ISENUMTYPE="\\isEnumType";
-	ISINDUCTVAR="\\isInductVar";	
+	ISINDUCTVAR="\\isInductVar";
+	ISLABEL="\\isLabel";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	ISOBSERVER = "\\isObserver";
 	DIFFERENT = "\\different";		

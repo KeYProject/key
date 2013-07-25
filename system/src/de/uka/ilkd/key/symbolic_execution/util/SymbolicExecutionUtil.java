@@ -112,6 +112,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.ShortcutEvaluationTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
@@ -2452,10 +2453,16 @@ public final class SymbolicExecutionUtil {
     */
    public static void configureProof(Proof proof) {
       if (proof != null) {
-         ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
-         labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         ImmutableList<ITermLabelWorker> labelInstantiators =
+                 ImmutableSLList.<ITermLabelWorker>nil();
+         labelInstantiators = labelInstantiators.append(
+                 SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(
+                 LoopBodyTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(
+                 LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(
+                 ShortcutEvaluationTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }

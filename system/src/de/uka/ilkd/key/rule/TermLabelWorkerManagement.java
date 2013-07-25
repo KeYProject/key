@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -187,6 +188,9 @@ public final class TermLabelWorkerManagement {
       }
       else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE;
+      }
+      else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
+          return ShortcutEvaluationTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;
