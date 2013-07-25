@@ -171,7 +171,7 @@ public final class SEDImages {
            path = "icons/termination.gif";
         }
         else if (BRANCH_STATEMENT.equals(key)) {
-           path = "icons/branch_node.gif";
+           path = "icons/branch_statement.gif";
         }
         else if (BRANCH_CONDITION.equals(key)) {
            path = "icons/branch_condition.gif";
@@ -180,28 +180,28 @@ public final class SEDImages {
            path = "icons/exceptional_termination.gif";
         }
         else if (LOOP_STATEMENT.equals(key)) {
-           path = "icons/loop_node.gif";
+           path = "icons/loop_statement.gif";
         }
         else if (LOOP_CONDITION.equals(key)) {
            path = "icons/loop_condition.gif";
         }
         else if (OPERATION_CONTRACT.equals(key)) {
-           path = "icons/use_operation_contract.gif";
+           path = "icons/operation_contract.gif";
         }
         else if (OPERATION_CONTRACT_NOT_PRE.equals(key)) {
-           path = "icons/use_operation_contract_not_pre.gif";
+           path = "icons/operation_contract_not_pre.gif";
         }
         else if (OPERATION_CONTRACT_NOT_NPC.equals(key)) {
-           path = "icons/use_operation_contract_not_npc.gif";
+           path = "icons/operation_contract_not_npc.gif";
         }
         else if (OPERATION_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
-           path = "icons/use_operation_contract_not_pre_not_npc.gif";
+           path = "icons/operation_contract_not_pre_not_npc.gif";
         }
         else if (LOOP_INVARIANT.equals(key)) {
-           path = "icons/use_loop_invariant.gif";
+           path = "icons/loop_invariant.gif";
         }
         else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
-           path = "icons/use_loop_invariant _initially_invalid.gif";
+           path = "icons/loop_invariant _initially_invalid.gif";
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
