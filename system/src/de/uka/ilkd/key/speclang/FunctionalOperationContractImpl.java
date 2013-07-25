@@ -598,6 +598,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
 
+        String globalUpdates = "";
+        if (globalDefs!=null){
+            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs,services);
+            globalUpdates = (includeHtmlMarkup? "<br><b>": "\n")
+                    + "defs" + (includeHtmlMarkup? "</b> " : ": ")
+                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates,false) : printUpdates.trim());
+        }
+
         String pres = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPres.get(h) != null) {
@@ -644,6 +652,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     + "<i>"
                     + LogicPrinter.escapeHTML(sig.toString(), false)
                     + "</i>"
+                    + globalUpdates
                     + pres
                     + posts
                     + axioms
@@ -657,6 +666,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         else {
             return sig.toString()
+                    + globalUpdates
                     + pres
                     + posts
                     + axioms
