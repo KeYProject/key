@@ -52,6 +52,7 @@ public final class DependencyContractImpl implements DependencyContract {
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final Map<LocationVariable, ? extends ProgramVariable> originalAtPreVars;
+    final Term globalDefs;
     final int id;
 
 
@@ -70,6 +71,7 @@ public final class DependencyContractImpl implements DependencyContract {
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+            Term globalDefs,
             int id) {
         assert baseName != null;
         assert kjt != null;
@@ -95,10 +97,12 @@ public final class DependencyContractImpl implements DependencyContract {
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
         this.originalAtPreVars = atPreVars;
+        this.globalDefs = globalDefs;
         this.id = id;
     }
 
 
+    @Deprecated
     DependencyContractImpl(String baseName,
             KeYJavaType kjt,
             IObserverFunction target,
@@ -120,6 +124,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 selfVar,
                 paramVars,
                 atPreVars,
+                null,
                 INVALID_ID);
     }
 
@@ -502,6 +507,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 originalSelfVar,
                 originalParamVars,
                 originalAtPreVars,
+                globalDefs,
                 newId);
     }
 
@@ -520,6 +526,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 originalSelfVar,
                 originalParamVars,
                 originalAtPreVars,
+                globalDefs,
                 id);
     }
 

@@ -780,6 +780,12 @@ public class JMLSpecFactory {
             ProgramVariableCollection progVars,
             ContractClauses clauses) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+
+        Term abbrvLhs = null;
+        if (!clauses.abbreviations.isEmpty()) {
+            abbrvLhs = TB.sequential(clauses.abbreviations);
+        }
+
         boolean createContract = true;
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)){
              if(clauses.accessibles.get(heap).equalsModRenaming(TB.allLocs(services))) {
@@ -809,7 +815,7 @@ public class JMLSpecFactory {
                     pm.getContainerType(), pm, pm.getContainerType(),
                     pres, clauses.measuredBy,
                     clauses.accessibles, progVars.selfVar,
-                    progVars.paramVars, progVars.atPreVars);
+                    progVars.paramVars, progVars.atPreVars, abbrvLhs);
             result = result.add(depContract);
         }
         return result;

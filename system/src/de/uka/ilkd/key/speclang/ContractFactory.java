@@ -179,10 +179,11 @@ public class ContractFactory {
                                   Map<ProgramVariable,Term> accessibles,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
-                                  Map<LocationVariable,? extends ProgramVariable> atPreVars) {
+                                  Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                                  Term globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return dep("JML accessible clause", containerType, pm, specifiedIn,
-                   requires, measuredBy, accessibles, selfVar, paramVars, atPreVars);
+                   requires, measuredBy, accessibles, selfVar, paramVars, atPreVars, globalDefs);
     }
 
     public DependencyContract dep(KeYJavaType kjt,
@@ -197,7 +198,7 @@ public class ContractFactory {
         Map<ProgramVariable,Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         accessibles.put(services.getTypeConverter().getHeapLDT().getHeap(), dep.second);
         // TODO: insert static invariant??
-        return dep(kjt, dep.first, dep.first.getContainerType(), pres, dep.third, accessibles, selfVar, paramVars, null);
+        return dep(kjt, dep.first, dep.first.getContainerType(), pres, dep.third, accessibles, selfVar, paramVars, null, null);
     }
 
     public DependencyContract dep(String string,
@@ -209,11 +210,12 @@ public class ContractFactory {
                                   Map<ProgramVariable, Term> accessibles,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
-                                  Map<LocationVariable,? extends ProgramVariable> atPreVars) {
+                                  Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                                  Term globalDefs) {
         assert (selfVar == null) == pm.isStatic();
-        return new DependencyContractImpl(string, containerType, pm, specifiedIn,
+        return new DependencyContractImpl(string, null, containerType, pm, specifiedIn,
                                           requires, measuredBy, accessibles,
-                                          selfVar, paramVars, atPreVars);
+                                          selfVar, paramVars, atPreVars, globalDefs, Contract.INVALID_ID);
     }
 
     @Override
