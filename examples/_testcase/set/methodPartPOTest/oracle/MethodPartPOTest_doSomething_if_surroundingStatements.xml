@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <statement name="int x = 0;" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!asdf &gt;= 0" pathCondition="!asdf &gt;= 0" pathConditionChanged="true" branchCondition="!asdf &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="x=x*-1;" pathCondition="!asdf &gt;= 0" pathConditionChanged="false">
                <statement name="x+=2;" pathCondition="!asdf &gt;= 0" pathConditionChanged="false">
@@ -20,6 +20,6 @@
                </statement>
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </statement>
-</startNode>
+</start>

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -49,6 +50,7 @@ public final class Main {
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
     private static final String AUTO_LOADONLY = "--auto-loadonly";
+    private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
     private static final String NO_DEBUG = "--no_debug";
@@ -68,7 +70,7 @@ public final class Main {
     public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
-    private static final String VERBOSITY = "--v";
+    private static final String VERBOSITY = "--verbose";
 
     /** The time of the program start in millis. */
     private static long startTime;
@@ -205,6 +207,7 @@ public final class Main {
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
+        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
@@ -256,6 +259,21 @@ public final class Main {
         if(cl.isSet(AUTO_LOADONLY)){
         	uiMode = UiMode.AUTO;
         	loadOnly = true;
+        }
+
+        if(cl.isSet(AUTOSAVE)){
+            try {
+                int eachSteps = cl.getInteger(AUTOSAVE, 0);
+                if (eachSteps < 0) {
+                    printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5);
+                }
+                AutoSaver.init(eachSteps, uiMode == UiMode.INTERACTIVE);
+            } catch (CommandLineException e) {
+                if(Debug.ENABLE_DEBUG) {
+                    e.printStackTrace();
+                }
+                System.err.println(e.getMessage());
+            }
         }
 
         if(cl.isSet(HELP)){
@@ -437,7 +455,7 @@ public final class Main {
     }
 
     private static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
-        final PrintStream ps = System.err;
+        PrintStream ps = exitValue==0 ? System.out : System.err;
         if(offending != null) {
             ps.println(offending);
         }

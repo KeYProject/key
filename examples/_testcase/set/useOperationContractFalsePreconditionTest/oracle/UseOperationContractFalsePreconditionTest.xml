@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractFalsePreconditionTest.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
-         <useOperationContract name="result = magic(x) catch(exc)
+         <operationContract name="result = magic(x) catch(exc)
 pre: false
 post: result = 42 &amp; exc = null
 mod: allLocs
@@ -17,7 +17,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   </statement>
                </statement>
             </branchCondition>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="ArrayInstanceCreationTest.classArray=new int[]{1 };" pathCondition="true" pathConditionChanged="false">
          <statement name="this.instanceArray=new int[]{2 };" pathCondition="true" pathConditionChanged="false">
-            <branchNode name="if (this.next!=null) {   this.next.instanceArray=new int[]{3 };  int[] localArray = {4,5 };return    localArray[0]+localArray[1]; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (this.next!=null) {   this.next.instanceArray=new int[]{3 };  int[] localArray = {4,5 };return    localArray[0]+localArray[1]; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
                <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="this.next.instanceArray=new int[]{3 };" pathCondition="!self.next = null" pathConditionChanged="false">
                      <statement name="int[] localArray = {4,5 };" pathCondition="!self.next = null" pathConditionChanged="false">
@@ -24,8 +24,8 @@
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </branchNode>
+            </branchStatement>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

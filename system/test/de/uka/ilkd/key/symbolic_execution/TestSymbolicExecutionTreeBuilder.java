@@ -15,9 +15,9 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
@@ -38,6 +38,48 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArrayAverage
+    */
+   public void testUseLoopInvariantArrayAverage() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArrayAverage/test/ArrayAverage.java", 
+                "ArrayAverage", 
+                "average", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArrayAverage/oracle/ArrayAverage.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor
+    */
+   public void testUseOperationContractStatementsInImpliciteConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/test/UseOperationContractStatementsInImpliciteConstructor.java", 
+                "UseOperationContractStatementsInImpliciteConstructor", 
+                "average", 
+                null,
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/oracle/UseOperationContractStatementsInImpliciteConstructor.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
    /**
     * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantLoopSplittingCondition
@@ -648,12 +690,12 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                                false);
       try {
          // Find both statements "mid = y;".
-         IExecutionStartNode startNode = env.getBuilder().getStartNode();
+         IExecutionStart startNode = env.getBuilder().getStartNode();
          IExecutionMethodCall methodCall = (IExecutionMethodCall)startNode.getChildren()[0];
          IExecutionStatement intMidZ = (IExecutionStatement)methodCall.getChildren()[0];
-         IExecutionBranchNode ifYZ = (IExecutionBranchNode)intMidZ.getChildren()[0];
+         IExecutionBranchStatement ifYZ = (IExecutionBranchStatement)intMidZ.getChildren()[0];
          IExecutionBranchCondition notXY = (IExecutionBranchCondition)ifYZ.getChildren()[0];
-         IExecutionBranchNode ifXZ = (IExecutionBranchNode)notXY.getChildren()[0];
+         IExecutionBranchStatement ifXZ = (IExecutionBranchStatement)notXY.getChildren()[0];
          IExecutionBranchCondition not1X = (IExecutionBranchCondition)ifXZ.getChildren()[0];
          IExecutionStatement midThenBranch = (IExecutionStatement)not1X.getChildren()[0];
          IExecutionBranchCondition not1Y = (IExecutionBranchCondition)ifYZ.getChildren()[1];

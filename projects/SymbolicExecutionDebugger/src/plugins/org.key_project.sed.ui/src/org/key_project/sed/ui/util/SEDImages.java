@@ -21,17 +21,17 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchNode;
+import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopNode;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDUseLoopInvariant;
-import org.key_project.sed.core.model.ISEDUseOperationContract;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
+import org.key_project.sed.core.model.ISEDOperationContract;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
@@ -63,9 +63,9 @@ public final class SEDImages {
     public static final String TERMINATION = "org.key_project.sed.ui.images.termination";
     
     /**
-     * The key for the image that is used for branch node.
+     * The key for the image that is used for branch statement.
      */
-    public static final String BRANCH_NODE = "org.key_project.sed.ui.images.branchNode";
+    public static final String BRANCH_STATEMENT = "org.key_project.sed.ui.images.branchStatement";
     
     /**
      * The key for the image that is used for branch condition.
@@ -78,9 +78,9 @@ public final class SEDImages {
     public static final String EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.exceptionalTermination";
     
     /**
-     * The key for the image that is used for loop node.
+     * The key for the image that is used for loop statement.
      */
-    public static final String LOOP_NODE = "org.key_project.sed.ui.images.loopNode";
+    public static final String LOOP_STATEMENT = "org.key_project.sed.ui.images.loopStatement";
     
     /**
      * The key for the image that is used for loop condition.
@@ -88,34 +88,34 @@ public final class SEDImages {
     public static final String LOOP_CONDITION = "org.key_project.sed.ui.images.loopCondition";
     
     /**
-     * The key for the image that is used for use operation contract.
+     * The key for the image that is used for operation contract.
      */
-    public static final String USE_OPERATION_CONTRACT = "org.key_project.sed.ui.images.useOperationContract";
+    public static final String OPERATION_CONTRACT = "org.key_project.sed.ui.images.operationContract";
     
     /**
-     * The key for the image that is used for use operation contract.
+     * The key for the image that is used for operation contract.
      */
-    public static final String USE_OPERATION_CONTRACT_NOT_PRE = "org.key_project.sed.ui.images.useOperationContractNotPre";
+    public static final String OPERATION_CONTRACT_NOT_PRE = "org.key_project.sed.ui.images.operationContractNotPre";
     
     /**
-     * The key for the image that is used for use operation contract.
+     * The key for the image that is used for operation contract.
      */
-    public static final String USE_OPERATION_CONTRACT_NOT_NPC = "org.key_project.sed.ui.images.useOperationContractNotNpc";
+    public static final String OPERATION_CONTRACT_NOT_NPC = "org.key_project.sed.ui.images.operationContractNotNpc";
     
     /**
-     * The key for the image that is used for use operation contract.
+     * The key for the image that is used for operation contract.
      */
-    public static final String USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC = "org.key_project.sed.ui.images.useOperationContractNotPreNotNpc";
+    public static final String OPERATION_CONTRACT_NOT_PRE_NOT_NPC = "org.key_project.sed.ui.images.operationContractNotPreNotNpc";
     
     /**
-     * The key for the image that is used for use loop invariant.
+     * The key for the image that is used for loop invariant.
      */
-    public static final String USE_LOOP_INVARIANT = "org.key_project.sed.ui.images.useLoopInvariant";
+    public static final String LOOP_INVARIANT = "org.key_project.sed.ui.images.loopInvariant";
     
     /**
-     * The key for the image that is used for use loop invariant.
+     * The key for the image that is used for loop invariant.
      */
-    public static final String USE_LOOP_INVARIANT_INITIALLY_INVALID = "org.key_project.sed.ui.images.useLoopInvariantInitiallyInvalid";
+    public static final String LOOP_INVARIANT_INITIALLY_INVALID = "org.key_project.sed.ui.images.loopInvariantInitiallyInvalid";
     
     /**
      * The key for the image that is used for loop body termination.
@@ -137,11 +137,17 @@ public final class SEDImages {
      * @return The {@link Image} or {@code null} if it was not possible to get it.
      */
     public static Image getImage(String key) {
-        Image image = Activator.getDefault().getImageRegistry().get(key);
+        ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();  
+        Image image = imageRegistry.get(key);
         if (image == null) {
-            image = createImage(key);
-            if (image != null) {
-                Activator.getDefault().getImageRegistry().put(key, image);
+            synchronized (imageRegistry) { // Make sure that the image is created only once
+               image = imageRegistry.get(key); // Make sure that the image is still not available
+               if (image == null) { 
+                  image = createImage(key);
+                  if (image != null) {
+                     imageRegistry.put(key, image);
+                  }
+               }
             }
         }
         return image;
@@ -164,8 +170,8 @@ public final class SEDImages {
         else if (TERMINATION.equals(key)) {
            path = "icons/termination.gif";
         }
-        else if (BRANCH_NODE.equals(key)) {
-           path = "icons/branch_node.gif";
+        else if (BRANCH_STATEMENT.equals(key)) {
+           path = "icons/branch_statement.gif";
         }
         else if (BRANCH_CONDITION.equals(key)) {
            path = "icons/branch_condition.gif";
@@ -173,29 +179,29 @@ public final class SEDImages {
         else if (EXCEPTIONAL_TERMINATION.equals(key)) {
            path = "icons/exceptional_termination.gif";
         }
-        else if (LOOP_NODE.equals(key)) {
-           path = "icons/loop_node.gif";
+        else if (LOOP_STATEMENT.equals(key)) {
+           path = "icons/loop_statement.gif";
         }
         else if (LOOP_CONDITION.equals(key)) {
            path = "icons/loop_condition.gif";
         }
-        else if (USE_OPERATION_CONTRACT.equals(key)) {
-           path = "icons/use_operation_contract.gif";
+        else if (OPERATION_CONTRACT.equals(key)) {
+           path = "icons/operation_contract.gif";
         }
-        else if (USE_OPERATION_CONTRACT_NOT_PRE.equals(key)) {
-           path = "icons/use_operation_contract_not_pre.gif";
+        else if (OPERATION_CONTRACT_NOT_PRE.equals(key)) {
+           path = "icons/operation_contract_not_pre.gif";
         }
-        else if (USE_OPERATION_CONTRACT_NOT_NPC.equals(key)) {
-           path = "icons/use_operation_contract_not_npc.gif";
+        else if (OPERATION_CONTRACT_NOT_NPC.equals(key)) {
+           path = "icons/operation_contract_not_npc.gif";
         }
-        else if (USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
-           path = "icons/use_operation_contract_not_pre_not_npc.gif";
+        else if (OPERATION_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
+           path = "icons/operation_contract_not_pre_not_npc.gif";
         }
-        else if (USE_LOOP_INVARIANT.equals(key)) {
-           path = "icons/use_loop_invariant.gif";
+        else if (LOOP_INVARIANT.equals(key)) {
+           path = "icons/loop_invariant.gif";
         }
-        else if (USE_LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
-           path = "icons/use_loop_invariant _initially_invalid.gif";
+        else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
+           path = "icons/loop_invariant _initially_invalid.gif";
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
@@ -240,19 +246,19 @@ public final class SEDImages {
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
                registry.remove(BRANCH_CONDITION);
-               registry.remove(BRANCH_NODE);
+               registry.remove(BRANCH_STATEMENT);
                registry.remove(EXCEPTIONAL_TERMINATION);
                registry.remove(LOOP_CONDITION);
-               registry.remove(LOOP_NODE);
+               registry.remove(LOOP_STATEMENT);
                registry.remove(METHOD_CALL);
                registry.remove(METHOD_RETURN);
                registry.remove(TERMINATION);
-               registry.remove(USE_LOOP_INVARIANT);
-               registry.remove(USE_LOOP_INVARIANT_INITIALLY_INVALID);
-               registry.remove(USE_OPERATION_CONTRACT);
-               registry.remove(USE_OPERATION_CONTRACT_NOT_NPC);
-               registry.remove(USE_OPERATION_CONTRACT_NOT_PRE);
-               registry.remove(USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
+               registry.remove(LOOP_INVARIANT);
+               registry.remove(LOOP_INVARIANT_INITIALLY_INVALID);
+               registry.remove(OPERATION_CONTRACT);
+               registry.remove(OPERATION_CONTRACT_NOT_NPC);
+               registry.remove(OPERATION_CONTRACT_NOT_PRE);
+               registry.remove(OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
                registry.remove(LOOP_BODY_TERMINATION);
             }
          });
@@ -283,41 +289,41 @@ public final class SEDImages {
        else if (element instanceof ISEDBranchCondition) {
           return getImage(SEDImages.BRANCH_CONDITION);
        }
-       else if (element instanceof ISEDBranchNode) {
-          return getImage(SEDImages.BRANCH_NODE);
+       else if (element instanceof ISEDBranchStatement) {
+          return getImage(SEDImages.BRANCH_STATEMENT);
        }
-       else if (element instanceof ISEDLoopNode) {
-          return getImage(SEDImages.LOOP_NODE);
+       else if (element instanceof ISEDLoopStatement) {
+          return getImage(SEDImages.LOOP_STATEMENT);
        }
        else if (element instanceof ISEDLoopCondition) {
           return getImage(SEDImages.LOOP_CONDITION);
        }
-       else if (element instanceof ISEDUseOperationContract) {
-          ISEDUseOperationContract node = (ISEDUseOperationContract)element;
+       else if (element instanceof ISEDOperationContract) {
+          ISEDOperationContract node = (ISEDOperationContract)element;
           if (node.isPreconditionComplied()) {
              if (!node.hasNotNullCheck() || node.isNotNullCheckComplied()) {
-                return getImage(SEDImages.USE_OPERATION_CONTRACT);
+                return getImage(SEDImages.OPERATION_CONTRACT);
              }
              else {
-                return getImage(SEDImages.USE_OPERATION_CONTRACT_NOT_NPC);
+                return getImage(SEDImages.OPERATION_CONTRACT_NOT_NPC);
              }
           }
           else {
              if (!node.hasNotNullCheck() || node.isNotNullCheckComplied()) {
-                return getImage(SEDImages.USE_OPERATION_CONTRACT_NOT_PRE);
+                return getImage(SEDImages.OPERATION_CONTRACT_NOT_PRE);
              }
              else {
-                return getImage(SEDImages.USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
+                return getImage(SEDImages.OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
              }
           }
        }
-       else if (element instanceof ISEDUseLoopInvariant) {
-          ISEDUseLoopInvariant node = (ISEDUseLoopInvariant)element;
+       else if (element instanceof ISEDLoopInvariant) {
+          ISEDLoopInvariant node = (ISEDLoopInvariant)element;
           if (node.isInitiallyValid()) {
-             return getImage(SEDImages.USE_LOOP_INVARIANT);
+             return getImage(SEDImages.LOOP_INVARIANT);
           }
           else {
-             return getImage(SEDImages.USE_LOOP_INVARIANT_INITIALLY_INVALID);
+             return getImage(SEDImages.LOOP_INVARIANT_INITIALLY_INVALID);
           }
        }
        else {

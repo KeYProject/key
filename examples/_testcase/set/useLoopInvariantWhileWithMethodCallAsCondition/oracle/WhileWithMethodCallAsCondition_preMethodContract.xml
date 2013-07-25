@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="WhileWithMethodCallAsCondition.size(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
+            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
@@ -34,7 +34,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
          &amp; array.length &gt;= i_0
       -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <useOperationContract name="result = goOnNice(array, i) catch(exc)
+                  <operationContract name="result = goOnNice(array, i) catch(exc)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc = null
@@ -79,7 +79,7 @@ termination: diamond" pathCondition="!(  array.length &gt;= 0
                            </termination>
                         </statement>
                      </statement>
-                  </useOperationContract>
+                  </operationContract>
                </branchCondition>
                <branchCondition name="!(    i_0 &gt;= 1
     &amp; array.length &gt;= 0
@@ -130,8 +130,8 @@ termination: diamond" pathCondition="!(  array.length &gt;= 0
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </useLoopInvariant>
+            </loopInvariant>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

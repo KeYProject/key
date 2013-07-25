@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="LabelTest.lost();" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 3;" pathCondition="true" pathConditionChanged="false">
          <statement name="i++;" pathCondition="true" pathConditionChanged="false">
@@ -16,4 +16,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

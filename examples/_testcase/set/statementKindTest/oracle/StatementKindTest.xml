@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="foo();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="self.foo();" pathCondition="true" pathConditionChanged="false">
@@ -44,4 +44,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.tryCatchFinally(input);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="result_1=1/input;" pathCondition="true" pathConditionChanged="false">
@@ -28,4 +28,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>
