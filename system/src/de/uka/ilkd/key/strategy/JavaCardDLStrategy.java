@@ -1106,8 +1106,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       ifZero(add ( or ( FocusInAntecFeature.INSTANCE,
                                         NotBelowQuantifierFeature.INSTANCE ),
                                    NotInScopeOfModalityFeature.INSTANCE),
-                             add ( longConst ( -100 ),
-                                   ScaleFeature.createScaled(FindDepthFeature.INSTANCE, -10) ),
+                             add ( longConst ( -150 ),
+                                   ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 20) ),
                              inftyConst() ) );
 
         bindRuleSet ( d, "setEqualityBlastingRight", longConst(-100) );
