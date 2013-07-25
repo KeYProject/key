@@ -606,9 +606,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    longConst(-4200),
                                    longConst(-1900) ) ) );
         bindRuleSet ( d, "apply_select_eq",
-                     add( not( applyTF( FocusProjection.INSTANCE,
+                     ifZero( not( applyTF( FocusProjection.INSTANCE,
                                         AllSelectsSimplifiedTermFeature.create(heapLDT) ) ),
-                          longConst(-5700) ) );
+                             longConst(-1700) ) );
         bindRuleSet ( d, "simplify_select",
                       add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
                            not( applyTF( FocusProjection.INSTANCE,
@@ -2379,8 +2379,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSplittingApproval ( d );
 
         bindRuleSet ( d, "apply_select_eq",
-              add( NoSelfApplicationFeature.INSTANCE ,
-                   applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE) ) );
+              or( applyTF( FocusProjection.INSTANCE,
+                           AllSelectsSimplifiedTermFeature.create(heapLDT) ),
+                  add( NoSelfApplicationFeature.INSTANCE ,
+                       applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE) ) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
               add( NoSelfApplicationFeature.INSTANCE ,
                    applyTF("s", add( AllSelectsSimplifiedTermFeature.create(heapLDT),
