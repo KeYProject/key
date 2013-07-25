@@ -215,7 +215,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
          final Term post = TB.and(postTerm, frameTerm);
          final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-         final Term globalUpdate = getGlobalDefs(baseHeap, TB.getBaseHeap(services), TB.var(selfVar), TB.var(paramVars), services);
+         final Term selfVarTerm = selfVar==null? null: TB.var(selfVar);
+         final Term globalUpdate = getGlobalDefs(baseHeap, TB.getBaseHeap(services), selfVarTerm, TB.var(paramVars), services);
 
          final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar, exceptionVar, atPreVars, post, sb);
          final Term preImpliesProgPost = TB.imp(pre, progPost);
