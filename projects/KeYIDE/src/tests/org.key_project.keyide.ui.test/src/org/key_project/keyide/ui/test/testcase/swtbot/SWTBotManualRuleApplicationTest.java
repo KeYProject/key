@@ -95,8 +95,8 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
                              return null;
                           }
                        },
-                       28,
-                       108,
+                       30, // x of false in text control of editor
+                       6, // y of false in text control of editor
                        "closeFalse",
                        true);
    }
@@ -117,8 +117,8 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        starter,
                        null,
-                       114,
-                       161,
+                       100, // x of assignment text control of editor
+                       160, // y of assignment text control of editor
                        "assignment",
                        false);
    }
