@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 
@@ -50,14 +50,14 @@ public class RecentFileMenu {
      * on the menu items */
     private ActionListener lissy;
 
-    /** 
+    /**
      * list of recent files
      */
     private HashMap<JMenuItem, RecentFileEntry> recentFiles;
 
 
     private RecentFileEntry mostRecentFile;
-    
+
     /**
      * Create a new RecentFiles list.
      * @param listener the ActionListener that will be notified of the user
@@ -70,10 +70,10 @@ public class RecentFileMenu {
      * files to be displayed initially.
      * Or <code>null</code> to use no initial information.
      */
-    public RecentFileMenu(ActionListener listener, int maxNumberOfEntries, 
+    public RecentFileMenu(ActionListener listener, int maxNumberOfEntries,
 			  Properties p) {
 	this.menu = new JMenu("Recent Files");
-	
+
         this.lissy = listener;
         this.maxNumberOfEntries = maxNumberOfEntries;
 
@@ -82,7 +82,7 @@ public class RecentFileMenu {
         if (p != null) load(p);
 
 	menu.setEnabled(menu.getItemCount()!=0);
-	
+
     }
 
     /**
@@ -96,13 +96,16 @@ public class RecentFileMenu {
      * add file name to the menu
      */
     private void addToModelAndView(final String name) {
+        // do not add quick save location to recent files
+        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(name)) return;
+
         final RecentFileEntry entry = new RecentFileEntry(name);
         if (new File(entry.getAbsolutePath()).exists()) {
-            JMenuItem item = new JMenuItem(entry.getFileName());	    
+            JMenuItem item = new JMenuItem(entry.getFileName());
             item.setToolTipText(entry.getAbsolutePath());
             recentFiles.put(item, entry);
             item.addActionListener(lissy);
-            menu.insert(item, 0);	
+            menu.insert(item, 0);
             mostRecentFile = entry;
         }
     }
@@ -127,7 +130,7 @@ public class RecentFileMenu {
         //check whether this name is already there
 	Debug.out("recentfilemenu: add file: ", name);
 	Debug.out("recentfilemenu: at menu count:", menu.getItemCount());
-        int index = -1;	
+        int index = -1;
 	JMenuItem item = null;
         for (int i = 0; i < menu.getItemCount(); i++) {
             if (menu.getItem(i)==null) {
@@ -146,14 +149,14 @@ public class RecentFileMenu {
         }
 
         if (index != -1) {
-            //move the name to the first position	    
-	    removeFromModelAndView(item, index);	    
-        } 
+            //move the name to the first position
+	    removeFromModelAndView(item, index);
+        }
 	// if appropriate, remove the last entry.
 	if (menu.getItemCount() == maxNumberOfEntries ) {
-	    removeFromModelAndView(menu.getItem(menu.getItemCount()-1), 
+	    removeFromModelAndView(menu.getItem(menu.getItemCount()-1),
 				   menu.getItemCount()-1);
-	} 
+	}
 	addToModelAndView(name);
 	menu.setEnabled(menu.getItemCount()!=0);
     }
@@ -229,7 +232,7 @@ public class RecentFileMenu {
 		      ioe);
 	} finally {
 	    try {
-	        if (propStream != null) { 
+	        if (propStream != null) {
 	            propStream.close();
 	        }
 	    } catch (IOException e) {
@@ -252,16 +255,16 @@ public class RecentFileMenu {
 	File localRecentFiles = new File(filename);
 	FileInputStream fin = null;
 	FileOutputStream fout = null;
-	Properties p = new Properties();	
+	Properties p = new Properties();
 	try {
 	    // creates a new file if it does not exist yet
-	    localRecentFiles.createNewFile();            
+	    localRecentFiles.createNewFile();
 	    fin = new FileInputStream(localRecentFiles);
 	    fout = new FileOutputStream(localRecentFiles);
 	    p.load(fin);
             store(p);
             p.store(fout, "recent files");
-	} catch (IOException ex) {            
+	} catch (IOException ex) {
             System.err.println("Cound not write recentFileList due to "+
 		      ex.toString()+"::"+localRecentFiles);
         } finally {
@@ -278,7 +281,7 @@ public class RecentFileMenu {
         }
     }
 
-    
+
     public static class RecentFileEntry {
 
 	private String fileName;
@@ -287,8 +290,8 @@ public class RecentFileMenu {
 	public RecentFileEntry(String absolutePath) {
 	    this.absolutePath = absolutePath;
 	    int lastIndex = absolutePath.lastIndexOf(File.separatorChar);
-	    
-	    this.fileName = (lastIndex == -1 ? absolutePath : 
+
+	    this.fileName = (lastIndex == -1 ? absolutePath :
 		absolutePath.substring(lastIndex+1, absolutePath.length()));
 	}
 
@@ -303,6 +306,6 @@ public class RecentFileMenu {
 	public String toString() {
 	    return fileName;
 	}
-	
+
     }
 }

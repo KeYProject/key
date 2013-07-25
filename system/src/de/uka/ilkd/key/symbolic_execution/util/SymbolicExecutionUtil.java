@@ -487,6 +487,9 @@ public final class SymbolicExecutionUtil {
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
+      if (!proof.isDisposed()) {
+         starter.getProof().getSettings().getLabelSettings().setLabelInstantiators(proof.getSettings().getLabelSettings().getLabelInstantiators()); // Use label instantiators of original proof also in side proof.
+      }
       return starter;
    }
    
@@ -856,14 +859,7 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (KeYTypeUtil.isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
-                  return explicitConstructor != null && 
-                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
-               }
-               else {
-                  return !pm.isImplicit(); // Do not include implicit methods, but always constructors
-               }
+               return isNotImplicite(node.proof().getServices(), pm);
             }
          }
          else {
@@ -876,27 +872,49 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the given node should be represented as branch node.
+    * Checks if the given {@link IProgramMethod} is not implicit.
+    * @param services The {@link Services} to use.
+    * @param pm The {@link IProgramMethod} to check.
+    * @return {@code true} is not implicite, {@code false} is implicite 
+    */
+   public static boolean isNotImplicite(Services services, IProgramMethod pm) {
+      if (pm != null) {
+         if (KeYTypeUtil.isImplicitConstructor(pm)) {
+            IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
+            return explicitConstructor != null && 
+                   !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
+         }
+         else {
+            return !pm.isImplicit(); // Do not include implicit methods, but always constructors
+         }
+      }
+      else {
+         return true;
+      }
+   }
+   
+   /**
+    * Checks if the given node should be represented as branch statement.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @param statement The statement ({@link SourceElement}).
     * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as branch node, {@code false} represent node as something else. 
+    * @return {@code true} represent node as branch statement, {@code false} represent node as something else. 
     */
-   public static boolean isBranchNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isBranchStatement(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
       return isStatementNode(node, ruleApp, statement, posInfo) &&
              (statement instanceof BranchStatement); 
    }
    
    /**
-    * Checks if the given node should be represented as loop node.
+    * Checks if the given node should be represented as loop statement.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @param statement The statement ({@link SourceElement}).
     * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as loop node, {@code false} represent node as something else. 
+    * @return {@code true} represent node as loop statement, {@code false} represent node as something else. 
     */
-   public static boolean isLoopNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isLoopStatement(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
       return isStatementNode(node, ruleApp, statement, posInfo) &&
              (statement instanceof LoopStatement);
    }
@@ -975,12 +993,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given node should be represented as use operation contract.
+    * Checks if the given node should be represented as operation contract.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-    * @return {@code true} represent node as use operation contract, {@code false} represent node as something else. 
+    * @return {@code true} represent node as operation contract, {@code false} represent node as something else. 
     */
-   public static boolean isUseOperationContract(Node node, RuleApp ruleApp) {
+   public static boolean isOperationContract(Node node, RuleApp ruleApp) {
       return "Use Operation Contract".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
 
@@ -990,7 +1008,7 @@ public final class SymbolicExecutionUtil {
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @return {@code true} represent node as use loop invariant, {@code false} represent node as something else. 
     */
-   public static boolean isUseLoopInvariant(Node node, RuleApp ruleApp) {
+   public static boolean isLoopInvariant(Node node, RuleApp ruleApp) {
       return "Loop Invariant".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
    
@@ -1304,92 +1322,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param sequent The {@link Sequent} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Sequent sequent) {
-      if (sequent != null) {
-         int nextAntecedent = computeNextSymbolicExecutionLabelId(sequent.antecedent());
-         int nextSuccedent = computeNextSymbolicExecutionLabelId(sequent.succedent());
-         return nextAntecedent > nextSuccedent ? nextAntecedent : nextSuccedent;
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param semisequent The {@link Semisequent} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Semisequent semisequent) {
-      if (semisequent != null) {
-         int nextId = SymbolicExecutionTermLabel.START_ID;
-         for (SequentFormula sf : semisequent) {
-            int nextSfId = computeNextSymbolicExecutionLabelId(sf.formula());
-            if (nextSfId > nextId) {
-               nextId = nextSfId;
-            }
-         }
-         return nextId;
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param term The {@link Term} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Term term) {
-      if (term != null) {
-         NextSymbolicExecutionLabelIdVisitor visitor = new NextSymbolicExecutionLabelIdVisitor();
-         term.execPreOrder(visitor);
-         return visitor.getNextId();
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-   
-   /**
-    * Utility class used to compute the next unused ID of {@link SymbolicExecutionTermLabel}s
-    * used by {@link SymbolicExecutionUtil#computeNextSymbolicExecutionLabelId(Term)}.
-    * @author Martin Hentschel
-    */
-   private static final class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
-      /**
-       * The next unused ID.
-       */
-      private int nextId = SymbolicExecutionTermLabel.START_ID;
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void visit(Term visited) {
-         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
-         if (label != null) {
-            if (label.getId() + 1 > nextId) {
-               nextId = label.getId() + 1;
-            }
-         }
-      }
-
-      /**
-       * Returns the next unused ID.
-       * @return The next unused ID.
-       */
-      public int getNextId() {
-         return nextId;
-      }
-   }
-
-   /**
     * Checks if the given {@link Node} in KeY's proof tree represents
     * also a {@link Node} in a symbolic execution tree.
     * @param node The {@link Node} of KeY's proof tree to check.
@@ -1403,10 +1335,10 @@ public final class SymbolicExecutionUtil {
          if (isMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
-         else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
+         else if (isLoopStatement(node, ruleApp, statement, posInfo)) { 
             return isFirstLoopIteration(node, ruleApp, statement);
          }
-         else if (isBranchNode(node, ruleApp, statement, posInfo) ||
+         else if (isBranchStatement(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
                   isStatementNode(node, ruleApp, statement, posInfo) ||
                   isTerminationNode(node, ruleApp)) {
@@ -1417,10 +1349,10 @@ public final class SymbolicExecutionUtil {
                    !isDoWhileLoopCondition(node, statement) && 
                    !isForLoopCondition(node, statement);
          }
-         else if (isUseOperationContract(node, ruleApp)) {
+         else if (isOperationContract(node, ruleApp)) {
             return true;
          }
-         else if (isUseLoopInvariant(node, ruleApp)) {
+         else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
          else {

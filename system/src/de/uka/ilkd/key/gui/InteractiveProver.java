@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.gui;
@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -50,10 +51,10 @@ public class InteractiveProver implements InterruptListener {
 
     /** the proof the interactive prover works on */
     private Proof proof;
-    
+
     /** the user focused goal */
     private Goal focusedGoal;
-    
+
     /** the central strategy processor including GUI signalling */
     private ApplyStrategy applyStrategy;
     private final ProverTaskListener focussedAutoModeTaskListener =
@@ -71,15 +72,14 @@ public class InteractiveProver implements InterruptListener {
 
     /** the mediator */
     private KeYMediator mediator;
-    
+
     private boolean resumeAutoMode = false;
 
     private AutoModeWorker worker;
 
     private boolean autoMode; // autoModeStarted has been fired
 
-
-    /** creates a new interactive prover object 
+    /** creates a new interactive prover object
      */
     public InteractiveProver(KeYMediator mediator) {
         selListener = new InteractiveProverKeYSelectionListener();
@@ -90,6 +90,8 @@ public class InteractiveProver implements InterruptListener {
 
         applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getUI());
+
+        applyStrategy.addProverTaskObserver(AutoSaver.getInstance());
     }
 
     /** returns the KeYMediator */
@@ -97,13 +99,16 @@ public class InteractiveProver implements InterruptListener {
 	return mediator;
     }
 
-    /** sets up a new proof 
+    /** sets up a new proof
      * @param p a Proof that contains the root of the proof tree
      */
     public void setProof(Proof p) {
-	proof = p;
+        proof = p;
+        if (p != null) { // Will be null if last proof is removed from user interface
+           AutoSaver.getInstance().setProof(p);
+        }
     }
-    
+
     public void addAutoModeListener(AutoModeListener p) {
         listenerList = listenerList.prepend(p);
     }
@@ -131,7 +136,7 @@ public class InteractiveProver implements InterruptListener {
     void setResumeAutoMode(boolean b) {
        resumeAutoMode = b;
     }
- 
+
 
     public boolean resumeAutoMode() {
 	return resumeAutoMode;
@@ -139,13 +144,13 @@ public class InteractiveProver implements InterruptListener {
 
 
     /**
-     * Apply a RuleApp and continue with update simplification or strategy 
+     * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.
      * @param app
      * @param goal
      */
     public void applyInteractive ( RuleApp app, Goal goal ) {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true); 		        
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         goal.apply(app);
     }
 
@@ -153,7 +158,7 @@ public class InteractiveProver implements InterruptListener {
     private long getTimeout() {
         return mediator().getAutomaticApplicationTimeout();
     }
-    
+
     /**
      *  returns the proof the interactive prover is working on
      * @return the proof the interactive prover is working on
@@ -161,7 +166,7 @@ public class InteractiveProver implements InterruptListener {
     public Proof getProof() {
 	return proof;
     }
-    
+
     /**
      * Checks if the auto mode is currently running.
      * @return {@code true} auto mode is running, {@code false} auto mode is not running.
@@ -169,13 +174,13 @@ public class InteractiveProver implements InterruptListener {
     public boolean isAutoMode() {
         return autoMode;
     }
-    
+
     /** starts the execution of rules with active strategy. The
      * strategy will only be applied on the goals of the list that
      * is handed over and on the new goals an applied rule adds
      */
     public void startAutoMode ( ImmutableList<Goal> goals) {
-        if ( goals.isEmpty () ) {                        
+        if ( goals.isEmpty () ) {
         	mediator ().notify(new GeneralInformationEvent("No enabled goals available."));
         	return;
         }
@@ -184,12 +189,12 @@ public class InteractiveProver implements InterruptListener {
         worker = new AutoModeWorker(goals);
         worker.start();
     }
-    
+
     /** stops the execution of rules */
     public void interruptionPerformed () {
         if (worker != null) worker.stop();
     }
-    
+
     /**
      * starts the execution of rules with active strategy. Restrict the
      * application of rules to a particular goal and (for
@@ -198,10 +203,10 @@ public class InteractiveProver implements InterruptListener {
      */
     public void startFocussedAutoMode (PosInOccurrence focus, Goal goal) {
         applyStrategy.addProverTaskObserver ( focussedAutoModeTaskListener );
-        
+
         if ( focus != null ) {
             // exchange the rule app manager of that goal to filter rule apps
-                        
+
             final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager ();
             goal.setRuleAppManager ( null );
             final AutomatedRuleApplicationManager focusManager =
@@ -229,7 +234,7 @@ public class InteractiveProver implements InterruptListener {
             }
         }
     }
-    
+
     private final class FocussedAutoModeTaskListener implements ProverTaskListener {
         public void taskStarted ( String message, int size ) {}
         public void taskProgress ( int position ) {}
@@ -245,7 +250,7 @@ public class InteractiveProver implements InterruptListener {
     /**
      * collects all built-in rules that are applicable at the given sequent
      * position 'pos'.
-     * 
+     *
      * @param pos
      *            the PosInSequent where to look for applicable rules
      */
@@ -275,16 +280,16 @@ public class InteractiveProver implements InterruptListener {
     /**
      * collects all built-in rule applications for the given rule that are
      * applicable at position 'pos' and the current user constraint
-     * 
+     *
      * @param rule
      *            the BuiltInRule for which the applications are collected
      * @param pos
      *            the PosInSequent the position information
      * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
-    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(BuiltInRule rule, 
+    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(BuiltInRule rule,
 					  PosInOccurrence     pos) {
-	
+
 	ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
 
         for (final IBuiltInRuleApp app : getInteractiveRuleAppIndex().
@@ -296,7 +301,7 @@ public class InteractiveProver implements InterruptListener {
 
 	return result;
     }
-    
+
     /**
      * collects all applications of a rule given by its name at a give position in the sequent
      * @param name
@@ -310,39 +315,39 @@ public class InteractiveProver implements InterruptListener {
     {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
-                
+
         //get all possible rules for current position in sequent
         ImmutableList<BuiltInRule> list = getBuiltInRule(pos);
-        
+
         Iterator<BuiltInRule> iter = list.iterator();
-        
+
         //find all rules that match given name
         while (iter.hasNext()) {
             BuiltInRule rule = iter.next();
             if (rule.name().toString().equals(name)) match = match.append(rule);
         }
-        
+
         iter = match.iterator();
-        
+
         //find all applications for matched rules
         while (iter.hasNext()) {
             result = result.union(getBuiltInRuleApp(iter.next(), pos));
         }
-        
+
         return result;
     }
-    
+
     /**
 	 * collects all applicable NoFindTaclets of the current goal (called by the
 	 * SequentViewer)
-	 * 
+	 *
 	 * @return a list of Taclets with all applicable NoFindTaclets
 	 */
     ImmutableList<TacletApp> getNoFindTaclet() {
 	return filterTaclet(getInteractiveRuleAppIndex ().
 		       getNoFindTaclet(TacletFilter.TRUE,
 				       mediator.getServices()), null);
-    }    
+    }
 
     /** collects all applicable FindTaclets of the current goal
      * (called by the SequentViewer)
@@ -359,7 +364,7 @@ public class InteractiveProver implements InterruptListener {
 	}
 	return ImmutableSLList.<TacletApp>nil();
     }
-    
+
     /** collects all applicable RewriteTaclets of the current goal
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable RewriteTaclets
@@ -369,7 +374,7 @@ public class InteractiveProver implements InterruptListener {
 	    return filterTaclet(getInteractiveRuleAppIndex ().
 		   getRewriteTaclet(TacletFilter.TRUE,
 				    pos.getPosInOccurrence(),
-				    mediator.getServices()), pos); 
+				    mediator.getServices()), pos);
 	}
 
 	return ImmutableSLList.<TacletApp>nil();
@@ -377,32 +382,32 @@ public class InteractiveProver implements InterruptListener {
 
 
 
-    /** 
+    /**
      * collects all Taclet applications at the given position of the specified
      * taclet
      * @param goal the Goal for which the applications should be returned
      * @param name the String with the taclet names whose applications are looked for
      * @param pos the PosInOccurrence describing the position
      * @return a list of all found rule applications of the given rule at
-     * position pos  
+     * position pos
      */
-    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name, 
+    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
             PosInOccurrence pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
-    
-    
-    /** 
-     * collects all taclet applications for the given position and taclet 
+
+
+    /**
+     * collects all taclet applications for the given position and taclet
      * (identified by its name) matching the filter condition
      * @param goal the Goal for which the applications should be returned
      * @param name the String with the taclet names whose applications are looked for
      * @param pos the PosInOccurrence describing the position
-     * @param filter the TacletFilter expressing restrictions 
+     * @param filter the TacletFilter expressing restrictions
      * @return a list of all found rule applications of the given rule at
      * position <tt>pos</tt> passing the filter
      */
-     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name, 
+     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
                                             PosInOccurrence pos,
                                             TacletFilter filter) {
 	ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
@@ -413,9 +418,9 @@ public class InteractiveProver implements InterruptListener {
         for (NoPosTacletApp noPosTacletApp : index.getNoFindTaclet(filter,
                 mediator.getServices()))
             fittingApps = fittingApps.prepend(noPosTacletApp);
-        } else 
+        } else
             fittingApps = index.getTacletAppAt ( filter,
-                                                 pos, 
+                                                 pos,
 			                         mediator.getServices() );
 
         // filter fitting applications
@@ -427,11 +432,11 @@ public class InteractiveProver implements InterruptListener {
 //if (result.size()==0) System.err.println("Available was "+fittingApps);
 	return result;
     }
-    
+
     /** listener to KeYSelection Events in order to be informed if the
      * current proof changed
      */
-    private class InteractiveProverKeYSelectionListener 
+    private class InteractiveProverKeYSelectionListener
 	implements KeYSelectionListener {
 
 	/** focused node has changed */
@@ -440,7 +445,7 @@ public class InteractiveProver implements InterruptListener {
 	}
 
 	/** the selected proof has changed (e.g. a new proof has been
-	 * loaded) */ 
+	 * loaded) */
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    Debug.out("InteractiveProver: initialize with new proof");
             Proof newProof = e.getSource().getSelectedProof();
@@ -453,12 +458,12 @@ public class InteractiveProver implements InterruptListener {
 	}
 
     }
-    
-    /**The purpose is to reset the interactiveProver to prevent memory leaking. This 
-     * method is used, e.g., by {@code TaskTree.removeTaskWithoutInteraction}. 
-     * An alternative would be to reset the InteractiveProver in 
-     * {@code InteractiveProverKeYSelectionListener.selectedProofChanged} but 
-     * there we don't know whether the proof has been abandoned or not. 
+
+    /**The purpose is to reset the interactiveProver to prevent memory leaking. This
+     * method is used, e.g., by {@code TaskTree.removeTaskWithoutInteraction}.
+     * An alternative would be to reset the InteractiveProver in
+     * {@code InteractiveProverKeYSelectionListener.selectedProofChanged} but
+     * there we don't know whether the proof has been abandoned or not.
      * @author gladisch */
     public void clear(){
         if(applyStrategy!=null){
@@ -489,7 +494,7 @@ public class InteractiveProver implements InterruptListener {
                 if (ifCandidates.size() == 0) continue; // skip this app
                 if (ifCandidates.size() == 1 && pos!=null) {
                     TacletApp a = ifCandidates.head();
-                    ImmutableList<IfFormulaInstantiation> ifs = 
+                    ImmutableList<IfFormulaInstantiation> ifs =
                         a.ifFormulaInstantiations();
                     if (ifs!=null && ifs.size()==1 &&
                         ifs.head() instanceof IfFormulaInstSeq) {
@@ -512,9 +517,9 @@ public class InteractiveProver implements InterruptListener {
        	return result;
     }
 
-    /**     
-     * adds a proverTaskListener to apply strategy. 
-     * 
+    /**
+     * adds a proverTaskListener to apply strategy.
+     *
      * @param ptl the ProverTaskListener to be added
      */
     public void addProverTaskListener(ProverTaskListener ptl) {
@@ -523,13 +528,13 @@ public class InteractiveProver implements InterruptListener {
 
     /**
      * removes <code>ptl</code> from the list of proverTaskListeners
-     *  
+     *
      * @param ptl the proverTaskListener to be removed
      */
-    public void removeProverTaskListener(ProverTaskListener ptl) {      
-        applyStrategy.removeProverTaskObserver(ptl);        
+    public void removeProverTaskListener(ProverTaskListener ptl) {
+        applyStrategy.removeProverTaskObserver(ptl);
     }
-    
+
     /* <p>
      * Invoking start() on the SwingWorker causes a new Thread
      * to be created that will call construct(), and then
@@ -540,24 +545,24 @@ public class InteractiveProver implements InterruptListener {
      * <p>
      * <b>Attention:</b> Before this thread is started it is required to
      * freeze the MainWindow via
-     * {@code 
+     * {@code
      * mediator().stopInterface(true);
      *   mediator().setInteractive(false);
-     * }. The thread itself unfreezes the UI when it is finished. 
+     * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */
     private class AutoModeWorker extends SwingWorker {
-        
+
         private ImmutableList<Goal> goals;
 
         public AutoModeWorker(ImmutableList<Goal> goals) {
             this.goals = goals;
-        }        
-        
+        }
+
         public Object construct() {
             return doWork();
         }
-        
+
         public Object doWork() {
             boolean stopMode = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties().getProperty(
@@ -571,7 +576,7 @@ public class InteractiveProver implements InterruptListener {
              * In retreatMode, the proof on the node of each previous
              * goal is pruned, unless it was closed in the automatic proof.
              * Other than in standard mode, in retreatMode this is done for
-             * each goal (sequentially), even if we get stuck in a goal before. 
+             * each goal (sequentially), even if we get stuck in a goal before.
              */
             if(retreatMode) {
                 return applyStrategy.startRetreat ( proof, goals, mediator ().getMaxAutomaticSteps(),
@@ -580,10 +585,10 @@ public class InteractiveProver implements InterruptListener {
                 return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
                         getTimeout(), stopMode );
         }
-        
+
         /**
-         * Called by the "Stop" button, interrupts the worker thread 
-         * which is running this.doWork().  Note that the doWork() 
+         * Called by the "Stop" button, interrupts the worker thread
+         * which is running this.doWork().  Note that the doWork()
          * method handles InterruptedExceptions cleanly.
          */
         public void stop () {
@@ -591,15 +596,15 @@ public class InteractiveProver implements InterruptListener {
         }
 
         public void finished() {
-            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();            
-            
-            mediator().setInteractive( true );            
+            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();
+
+            mediator().setInteractive( true );
             mediator().startInterface( true );
 
             if (result.isError()) {
                 mediator ().notify
-                (new GeneralFailureEvent("An exception occurred during" 
-                        + " strategy execution.\n Exception:" + result.getException()));  
+                (new GeneralFailureEvent("An exception occurred during"
+                        + " strategy execution.\n Exception:" + result.getException()));
             }
 
             // make it possible to free memory

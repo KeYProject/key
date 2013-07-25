@@ -36,9 +36,9 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, ITe
         }
 
         final Term t = (Term)subst;
-        if (!t.hasLabels()) {
-            return null;
-        }
+        /*if (!t.hasLabels()) { statements about the non-existence
+            return null;        of term labels should also be
+        }                       possible.*/
         final SVInstantiations svInsts = mc.getInstantiations();
         final TermLabelInstantiationEntry inst =
                 (TermLabelInstantiationEntry) svInsts.getInstantiation(this);

@@ -483,7 +483,7 @@ class TacletMenu extends JMenu {
 			            goal.proof().getServices());
 
 
-        	}});
+        	}},"SMTRunner");
         	thread.start();
             }
             else if (e.getSource() instanceof BuiltInRuleMenuItem) {

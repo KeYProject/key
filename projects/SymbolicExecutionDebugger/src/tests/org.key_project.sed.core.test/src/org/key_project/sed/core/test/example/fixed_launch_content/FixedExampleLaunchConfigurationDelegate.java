@@ -19,24 +19,24 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchNode;
+import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopNode;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
-import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
@@ -57,7 +57,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryVariable;
  *    Fixed Example Target ({@link ISEDDebugTarget})
  *         Fixed Example Thread ({@link ISEDThread})
  *            int x = 1; ({@link ISEDStatement})
- *               while (x == 1) ({@link ISEDLoopNode})
+ *               while (x == 1) ({@link ISEDLoopStatement})
  *                  x == 1 ({@link ISEDLoopCondition})
  *                     x++; ({@link ISEDStatement})
  *                        int y = 2; ({@link ISEDStatement})
@@ -66,7 +66,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryVariable;
  *                                 throws DivisionByZeroException() ({@link ISEDExceptionalTermination}) 
  *                              z != 0 ({@link ISEDBranchCondition})
  *                                 foo(result) ({@link ISEDMethodCall})
- *                                    if (result >= 0) ({@link ISEDBranchNode})
+ *                                    if (result >= 0) ({@link ISEDBranchStatement})
  *                                       result < 0 ({@link ISEDBranchCondition})
  *                                          return -1 ({@link ISEDMethodReturn})
  *                                             <end> ({@link ISEDTermination})
@@ -110,7 +110,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s1.setCharEnd(5);
        thread.addChild(s1);
        
-       SEDMemoryLoopNode ln = new SEDMemoryLoopNode(target, s1, thread);
+       SEDMemoryLoopStatement ln = new SEDMemoryLoopStatement(target, s1, thread);
        ln.setName("while (x == 1)");
        ln.setPathCondition("pc3");
        s1.addChild(ln);
@@ -155,7 +155,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        call.setPathCondition("pc11");
        bnotzero.addChild(call);
 
-       SEDMemoryBranchNode branch = new SEDMemoryBranchNode(target, call, thread);
+       SEDMemoryBranchStatement branch = new SEDMemoryBranchStatement(target, call, thread);
        branch.setName("if (result >= 0)");
        branch.setPathCondition("pc12");
        branch.setCallStack(new ISEDDebugNode[] {call});

@@ -10,8 +10,24 @@
 # expects the gnuplot tool to be installed.
 #
 # written by Mattias Ulbrich
+# (modified by Christoph Scheben)
 
 use strict;
+use Getopt::Long;
+
+# Command line options
+my %option = ();
+GetOptions(\%option, 'help|h', 'verbose|v', 'silent|s', 'nologscale|n', 'fullproblemnames|f','withLables|l');
+
+if ($option{'help'}) {
+  print "Use '-h' or '--help' to get this text (very necessary this line).\n";
+  print "Use '-v' or '--verbose' to increase verbosity.\n";
+  print "Use '-s' or '--silent' to reduce verbosity (only final results are displayed).\n";
+  print "Use '-n' or '--nologscale' to set the y axis to normal scale (default is log scale).\n";
+  print "Use '-f' or '--fullproblemnames' to display the full problem names including the path to the examples.\n";
+  print "Use '-l' or '--withLables' to display the hight of the bars over the bars of the diagram.\n";
+  exit;
+}
 
 # the arguments
 my @filenames = @ARGV;
@@ -56,7 +72,7 @@ sub extractProblemName {
 	# print $1 . " " . $a ."\n";
 	return $1;
     } else {
-	print "Warning: cannot extract short name from '$a'\n";
+	print "Warning: cannot extract short name from '$a'\n" unless ($option{'silent'});;
 	return $a;
     }
 }
@@ -93,7 +109,7 @@ foreach my $filename (@filenames) {
 #}
 
 foreach (@filenames) {
-    print "Checking $_\n";
+    print "Checking $_\n" unless ($option{'silent'});
 }
 
 my $colNo = 0;
@@ -107,8 +123,9 @@ foreach my $col (@columns) {
     print GP "set style fill solid border -1\n";
     print GP "set xtic rotate by -45\n";
     print GP "set out '$prefix$col.svg'\n";
-#     print GP "set yrange [0:]\n";
-    print GP "set logscale y\n";
+    print GP "set logscale y\n" unless ($option{'nologscale'});
+    print GP "set yrange [0.1:]\n" unless ($option{'nologscale'});
+    print GP "set yrange [0:]\n" if ($option{'nologscale'});
     print GP "set terminal svg size $width,$hight\n";
 
     print GP "plot";
@@ -119,7 +136,9 @@ foreach my $col (@columns) {
 	} else {
 	    print GP ",";
 	}
-	print GP " '-' using 2:xtic(1) title '$filename'" ;
+	print GP " '-' using 2:xtic(1)" ;
+	print GP ", '-' using 0:2:3 with labels" if ($option{'withLables'});
+	print GP " title '$filename'" ;
     }
     print GP "\n";
     
@@ -131,9 +150,33 @@ foreach my $col (@columns) {
 	    if(exists $data{$key}) {
 		$data = $data{$key};
 	    }
-	    print GP "\"$prettyproblem\" $data\n";
+	    if ($option{'fullproblemnames'}) {
+		print GP "\"$problem\" $data\n";
+		print "added \"$problem\" $data (file $filename)\n" if ($option{'verbose'});
+	    } else {
+		print GP "\"$prettyproblem\" $data\n";
+		print "added \"$prettyproblem\" $data (file $filename)\n" if ($option{'verbose'});
+	    }
 	}
 	print GP "e\n";
+	if ($option{'withLables'}) {
+	    foreach my $problem (sort (keys %problemnames)) {
+		my $prettyproblem = &extractProblemName($problem);	    
+		my $key = &makeKey($filename, $problem, $colNo);
+		my $data = "0";
+		if(exists $data{$key}) {
+		    $data = $data{$key};
+		}
+		my $ypos;
+		if (not $option{'nologscale'}) {
+		    $ypos = 1.5 * $data;
+		} else {
+		    $ypos = 2 + $data;
+		}
+		print GP "\"$problem\" $ypos $data\n";
+	    }
+	    print GP "e\n";
+	}
     }
     close GP;
     $colNo ++;
