@@ -800,12 +800,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term excPost = TB.apply(anonUpdate,
+        final Term originalExcPost = TB.apply(anonUpdate,
                                       TB.prog(inst.mod,
                                               excJavaBlock,
                                               inst.progPost.sub(0),
                                               TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
                                       null);
+        final Term excPost = globalDefs==null? originalExcPost: TB.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
                 	       true,
                 	       false);
