@@ -7,15 +7,15 @@
   </proofs>
   <types xsi:type="dbcmodel:DbcClass" name="Main">
     <methods signature="main()" returnType="int">
-      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> result = 84 &amp; self.&lt;inv>) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> result = 84 &amp; self.&lt;inv>)&#xA;&amp; (   !exc = null&#xA;   ->   (   java.lang.Exception::instance(exc) = TRUE&#xA;         -> self.&lt;inv>)&#xA;      &amp;   java.lang.RuntimeException::instance(exc)&#xA;        = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
   </types>
   <types xsi:type="dbcmodel:DbcClass" name="Util">
     <methods signature="getMagic()" static="true" returnType="int">
-      <operationContracts name="Util[Util::getMagic()].JML operation contract.0" pre="true" post="(exc = null -> result = 42) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="Util[Util::getMagic()].JML operation contract.0" pre="true" post="(exc = null -> result = 42)&#xA;&amp; (   !exc = null&#xA;   -> java.lang.RuntimeException::instance(exc) = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
     <methods signature="add(a : int, b : int)" static="true" returnType="int">
-      <operationContracts name="Util[Util::add(int,int)].JML operation contract.0" pre="true" post="(exc = null -> result = javaAddInt(a, b)) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="Util[Util::add(int,int)].JML operation contract.0" pre="true" post="(exc = null -> result = javaAddInt(a, b))&#xA;&amp; (   !exc = null&#xA;   -> java.lang.RuntimeException::instance(exc) = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
   </types>
 </dbcmodel:DbcModel>
