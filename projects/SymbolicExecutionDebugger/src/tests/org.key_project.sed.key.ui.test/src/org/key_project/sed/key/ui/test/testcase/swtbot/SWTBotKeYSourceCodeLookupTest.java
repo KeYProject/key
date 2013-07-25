@@ -112,9 +112,9 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Make sure that no editor is opened
          assertEquals(0, bot.editors().size());
          // Test statements
-         assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 1}, method, target, true);
-         assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 2}, method, target, false);
-         assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 3}, method, target, true);
+         assertSelectedStatement(bot, debugView, new int[] {0, 0, 0, 1}, method, target, true);
+         assertSelectedStatement(bot, debugView, new int[] {0, 0, 0, 2}, method, target, false);
+         assertSelectedStatement(bot, debugView, new int[] {0, 0, 0, 3}, method, target, true);
       }
       finally {
          // Restore timeout
@@ -131,7 +131,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
    /**
     * Tests the opened editor by the debug API and the annotated line.
     * @param bot The {@link SWTWorkbenchBot} to use.
-    * @param debugTree The debug tree to select in.
+    * @param debugView The debug view to select in.
     * @param pathToStatementInTree The path to the item to select in the debug tree.
     * @param method The tested {@link IMethod}.
     * @param target The launched {@link IDebugTarget}.
@@ -140,13 +140,13 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
     * @throws BadLocationException Occurred Exception
     */
    protected void assertSelectedStatement(SWTWorkbenchBot bot, 
-                                          SWTBotTree debugTree, 
+                                          SWTBotView debugView, 
                                           int[] pathToStatementInTree,
                                           IMethod method,
                                           IDebugTarget target,
                                           boolean closeEditor) throws CoreException, BadLocationException {
       // Select statement in debug tree
-      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToStatementInTree);
+      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToStatementInTree);
       // Get statement that should be selected in opened editor.
       ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
       // Make sure that an editor is opened

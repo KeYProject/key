@@ -34,7 +34,9 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.services.IEvaluationService;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractBeanViewPart;
 import org.key_project.util.java.ObjectUtil;
@@ -245,7 +247,7 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
    @SuppressWarnings("rawtypes")
    @Override
    public Object getAdapter(Class adapter) {
-      Object result = editorPart.getAdapter(adapter);
+      Object result = editorPart != null ? editorPart.getAdapter(adapter) : null;
       if (result != null) {
          return result;
       }
@@ -325,7 +327,12 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       updateEditorsGlobalEnablement(editorShown && isEditorEnabled());
       firePropertyChange(PROP_EDITOR_SHOWN, oldEditorShown, editorShown);
       firePropertyChange(PROP_MESSAGE_SHOWN, oldMessageShown, isMessageShown());
-      firePropertyChange(PROP_DIRTY); // Fire event to update save and saveAs in workbench window
+      if (editorPart != null) { // Do not fire the event if no edit part is available, e.g. after dispose()
+         IEvaluationService service = (IEvaluationService)PlatformUI.getWorkbench().getService(IEvaluationService.class);
+         if (service != null) { // Otherwise org.eclipse.ui.internal.handlers.DirtyStateTracker.update() throws java.lang.NullPointerException
+            firePropertyChange(PROP_DIRTY); // Fire event to update save and saveAs in workbench window
+         }
+      }
    }
    
    /**

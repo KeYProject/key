@@ -224,7 +224,7 @@ public final class WorkbenchUtil {
      * @return {@code true} if the editor was successfully closed, and {@code false} if the editor is still open.
      */
     public static boolean closeEditor(IEditorPart editor, boolean save) {
-        if (editor != null) {
+        if (editor != null && editor.getSite().getPage().isPartVisible(editor)) {
             boolean closed = false;
             IEditorSite site = editor.getEditorSite();
             if (site != null) {

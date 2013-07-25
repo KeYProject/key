@@ -559,7 +559,7 @@ public final class TestInteractiveProvingUtil {
     */
    public static void openProof(LogStartProofJobListener startProofListener, SWTBotTree tree, int waitCount) {
       int oldCount = startProofListener.getFinishCount();
-      tree.contextMenu("Open Proof").click();
+      TestUtilsUtil.clickContextMenu(tree, "Open Proof");
       waitForProofOpening(startProofListener, oldCount, waitCount);
    }
    

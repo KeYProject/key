@@ -41,11 +41,14 @@ import org.eclipse.debug.internal.ui.InstructionPointerManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -90,6 +93,7 @@ import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -1474,8 +1478,14 @@ public final class TestSedCoreUtil {
     * @param debugTree The debug tree.
     * @param indexPathToItem The indices on parents to select.
     * @return The selected {@link SWTBotTreeItem}.
+    * @throws DebugException Occurred Exception.
     */
-   public static SWTBotTreeItem selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
+   public static SWTBotTreeItem selectInDebugTree(SWTBotView debugView, int... indexPathToItem) throws DebugException {
+      SWTBotTree debugTree = debugView.bot().tree();
+      IDebugView view = (IDebugView)debugView.getReference().getView(true);
+      TreeViewer viewer = (TreeViewer)view.getViewer();
+      ILazyTreePathContentProvider lazyContentProvider = (ILazyTreePathContentProvider)viewer.getContentProvider();
+
       TestCase.assertNotNull(indexPathToItem);
       TestCase.assertTrue(indexPathToItem.length >= 1);
       SWTBotTreeItem item = null;
@@ -1485,7 +1495,7 @@ public final class TestSedCoreUtil {
          if (!item.isExpanded()) {
             item.expand();
          }
-         TestUtilsUtil.waitForJobs();
+         SEDUIUtil.waitForPendingRequests(lazyContentProvider);
       }
       return item;
    }

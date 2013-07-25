@@ -1120,7 +1120,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.computeTargetName(method));
             // Resume launch
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0); // Select first debug target
             item.contextMenu("Resume").click();
             TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
             assertTrue(launch.canTerminate());
@@ -1363,7 +1363,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertTrue(aliasCheckCombo.isEnabled());
             aliasCheckCombo.setSelection(aliasChecks ? SymbolicExecutionSettingsView.ALIAS_CHECK_IMMEDIATELY : SymbolicExecutionSettingsView.ALIAS_CHECK_NEVER);
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0); // Select first debug target
             // Create tree
             if (stepIntoInsteadOfRun) {
                // Step into on each SET node
@@ -1530,7 +1530,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
             // Disconnect
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
             item.contextMenu("Disconnect").click();
             assertTrue(launch.canTerminate());
             assertTrue(launch.isTerminated()); // Also disconnected debug targets are seen as terminated by the Eclipse Debug API.
@@ -1632,7 +1632,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
             // Terminate launch
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
             item.contextMenu("Terminate").click();
             TestSedCoreUtil.waitUntilLaunchIsTerminated(bot, launch);
             assertFalse(launch.canTerminate());

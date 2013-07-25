@@ -112,6 +112,7 @@ public class SaveAsAction extends CommandAction implements IDisposable {
                if (ObjectUtil.equals(fixedPart, WorkbenchUtil.getActivePart())) {
                   if (commandEvent.isHandledChanged() || commandEvent.isEnabledChanged()) {
                      if (commandEvent.getCommand().isDefined()) {
+                        // TODO: Find out why commandEvent.getCommand().isEnabled() is false after the button was clicked!
                         setEnabled(commandEvent.getCommand().isEnabled());
                      }
                   }

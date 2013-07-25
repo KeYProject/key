@@ -19,7 +19,6 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.SWTGefBot;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPageLayout;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
@@ -41,8 +40,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDThread selectThread(SWTBotTree debugTree) throws Exception {
-      ISEDThread result = super.selectThread(debugTree);
+   protected ISEDThread selectThread(SWTBotView debugView) throws Exception {
+      ISEDThread result = super.selectThread(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -51,8 +50,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDStatement selectStatement(SWTBotTree debugTree) throws Exception {
-      ISEDStatement result = super.selectStatement(debugTree);
+   protected ISEDStatement selectStatement(SWTBotView debugView) throws Exception {
+      ISEDStatement result = super.selectStatement(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -61,8 +60,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugTarget selectDebugTarget(SWTBotTree debugTree) throws Exception {
-      ISEDDebugTarget result = super.selectDebugTarget(debugTree);
+   protected ISEDDebugTarget selectDebugTarget(SWTBotView debugView) throws Exception {
+      ISEDDebugTarget result = super.selectDebugTarget(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }
@@ -71,8 +70,8 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected ISEDMethodReturn selectMethodReturn(SWTBotTree debugTree) {
-      ISEDMethodReturn result = super.selectMethodReturn(debugTree);
+   protected ISEDMethodReturn selectMethodReturn(SWTBotView debugView) throws Exception {
+      ISEDMethodReturn result = super.selectMethodReturn(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
       return result;
    }

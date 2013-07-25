@@ -15,6 +15,7 @@ package org.key_project.sed.ui.test.testcase.swtbot;
 
 import junit.framework.TestCase;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -58,25 +59,25 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
          // Get properties view
          SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
          // Make sure that all nodes to test are loaded and that the automatic selection set to the debug target by the Debug API is done.
-         selectDebugTarget(debugTree);
-         selectThread(debugTree);
-         selectStatement(debugTree);
-         selectMethodReturn(debugTree);
+         selectDebugTarget(debugView);
+         selectThread(debugView);
+         selectStatement(debugView);
+         selectMethodReturn(debugView);
          Thread.sleep(1000); // Some extra time for the Debug API to set the selection
          // Select and test debug target in once because otherwise the selection can be changed by Eclipse itself.
-         selectDebugTarget(debugTree);
+         selectDebugTarget(debugView);
          steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView));
          // Select first thread
-         selectThread(debugTree);
+         selectThread(debugView);
          steps.assertThread(debugTree, propertiesView, getPropertiesTabs(propertiesView));
          // Select first statement
-         selectStatement(debugTree);
+         selectStatement(debugView);
          steps.assertStatement(debugTree, propertiesView, getPropertiesTabs(propertiesView));
          // Select debug target
-         selectDebugTarget(debugTree);
+         selectDebugTarget(debugView);
          steps.assertDebugTarget(debugTree, propertiesView, getPropertiesTabs(propertiesView));
          // Select method return
-         selectMethodReturn(debugTree);
+         selectMethodReturn(debugView);
          steps.assertMethodReturn(debugTree, propertiesView, getPropertiesTabs(propertiesView));
       }
       finally {
@@ -99,60 +100,61 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
 
    /**
     * Selects an {@link ISEDMethodReturn}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @return The selected {@link ISEDMethodReturn}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDMethodReturn selectMethodReturn(SWTBotTree debugTree) {
-      Object data = selectInDebugTree(debugTree, 0, 0, 0, 5, 1, 1, 0, 0);
+   protected ISEDMethodReturn selectMethodReturn(SWTBotView debugView) throws Exception {
+      Object data = selectInDebugTree(debugView, 0, 0, 0, 5, 1, 1, 0, 0);
       assertTrue(data instanceof ISEDMethodReturn);
       return (ISEDMethodReturn)data;
    }
 
    /**
     * Selects an {@link ISEDDebugTarget}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @return The selected {@link ISEDDebugTarget}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDDebugTarget selectDebugTarget(SWTBotTree debugTree) throws Exception {
-      Object data = selectInDebugTree(debugTree, 0, 0);
+   protected ISEDDebugTarget selectDebugTarget(SWTBotView debugView) throws Exception {
+      Object data = selectInDebugTree(debugView, 0, 0);
       assertTrue(data instanceof ISEDDebugTarget);
       return (ISEDDebugTarget)data;
    }
 
    /**
     * Selects an {@link ISEDThread}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @return The selected {@link ISEDThread}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDThread selectThread(SWTBotTree debugTree) throws Exception {
-      Object data = selectInDebugTree(debugTree, 0, 0, 0);
+   protected ISEDThread selectThread(SWTBotView debugView) throws Exception {
+      Object data = selectInDebugTree(debugView, 0, 0, 0);
       assertTrue(data instanceof ISEDThread);
       return (ISEDThread)data;
    }
 
    /**
     * Selects an {@link ISEDStatement}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @return The selected {@link ISEDStatement}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDStatement selectStatement(SWTBotTree debugTree) throws Exception {
-      Object data = selectInDebugTree(debugTree, 0, 0, 0, 0);
+   protected ISEDStatement selectStatement(SWTBotView debugView) throws Exception {
+      Object data = selectInDebugTree(debugView, 0, 0, 0, 0);
       assertTrue(data instanceof ISEDStatement);
       return (ISEDStatement)data;
    }
    
    /**
     * Selects the element at the given index. 
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @param indexPathToItem The path to the item to select.
     * @return The selected object.
+    * @throws DebugException Occurred Exception
     */
-   protected Object selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
-      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, indexPathToItem);
+   protected Object selectInDebugTree(SWTBotView debugView, int... indexPathToItem) throws DebugException {
+      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, indexPathToItem);
       return TestUtilsUtil.getTreeItemData(item);
    }
 

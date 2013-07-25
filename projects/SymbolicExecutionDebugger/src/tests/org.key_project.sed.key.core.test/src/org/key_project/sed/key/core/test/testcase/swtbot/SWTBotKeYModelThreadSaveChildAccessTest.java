@@ -52,7 +52,7 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
             // Resume
             resume(bot, item, target);
             // Start with threads

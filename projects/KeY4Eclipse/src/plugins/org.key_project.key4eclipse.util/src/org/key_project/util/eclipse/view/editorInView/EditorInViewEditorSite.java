@@ -77,7 +77,7 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    public EditorInViewEditorSite(IViewSite wrapperViewSite, 
                                  EditorInViewWorkbenchPage page, 
                                  IEditorActionBarContributor wrappedEditorContributor) {
-      super(null, null, page);
+      super(((PartSite)wrapperViewSite).getModel(), wrapperViewSite.getPart(), null, null);
       Assert.isNotNull(page);
       Assert.isNotNull(wrapperViewSite);
       this.page = page;

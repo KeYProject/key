@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.INavigationHistory;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartListener2;
@@ -1484,5 +1485,31 @@ public class EditorInViewWorkbenchPage implements IWorkbenchPage, IDisposable {
    @Override
    public IEditorReference[] openEditors(IEditorInput[] inputs, String[] editorIDs, int matchFlags) throws MultiPartInitException {
       return wrapperViewSite.getPage().openEditors(inputs, editorIDs, matchFlags);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public IEditorReference[] openEditors(IEditorInput[] inputs, String[] editorIDs, IMemento[] mementos, int matchFlags, int activateIndex) throws MultiPartInitException {
+      return wrapperViewSite.getPage().openEditors(inputs, editorIDs, mementos, matchFlags, activateIndex);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public IMemento[] getEditorState(IEditorReference[] editorRefs, boolean includeInputState) {
+      return wrapperViewSite.getPage().getEditorState(editorRefs, includeInputState);
    }
 }

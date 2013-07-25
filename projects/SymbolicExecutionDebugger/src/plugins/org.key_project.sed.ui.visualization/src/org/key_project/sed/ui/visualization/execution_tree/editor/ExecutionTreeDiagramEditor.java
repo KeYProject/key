@@ -34,6 +34,7 @@ import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificati
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
 import org.key_project.sed.ui.visualization.util.CustomizableDiagramEditorContextMenuProvider;
+import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
@@ -66,6 +67,14 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
     * {@inheritDoc}
     */
    @Override
+   protected EmptyDiagramPersistencyBehavior createPersistencyBehavior() {
+      return new EmptyDiagramPersistencyBehavior(this);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean isSaveAsAllowed() {
       return true;
    }
@@ -81,20 +90,18 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
    @Override
-   protected void registerBOListener() {
-      super.registerBOListener();
+   protected void registerBusinessObjectsListener() {
+      super.registerBusinessObjectsListener();
       DebugPlugin.getDefault().addDebugEventListener(debugListener);
    }
 
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
    @Override
-   protected void unregisterBOListener() {
-      super.unregisterBOListener();
+   protected void unregisterBusinessObjectsListener() {
+      super.unregisterBusinessObjectsListener();
       DebugPlugin.getDefault().removeDebugEventListener(debugListener);
    }
 
@@ -223,7 +230,7 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    protected ContextMenuProvider createContextMenuProvider() {
       return new CustomizableDiagramEditorContextMenuProvider(getGraphicalViewer(), 
                                                               getActionRegistry(), 
-                                                              getConfigurationProvider(),
+                                                              getDiagramTypeProvider(),
                                                               !isReadOnly(),
                                                               !isReadOnly());
    }

@@ -25,9 +25,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.emf.workspace.WorkspaceEditingDomainFactory;
 import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -35,7 +33,6 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
@@ -269,38 +266,6 @@ public class GraphitiUtilTest extends TestCase {
          assertEquals(uri, diagram.eResource().getURI());
          assertTrue(file.exists());
          assertFalse(newFile.exists());
-      }
-   }
-   
-   /**
-    * Tests {@link GraphitiUtil#getFile(org.eclipse.graphiti.ui.editor.DiagramEditorInput)}
-    */
-   @Test
-   public void testGetFile_DiagramEditorInput() throws IOException {
-      File tempFile = File.createTempFile("Diagram", ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
-      try {
-         // Create workspace model
-         IProject project = TestUtilsUtil.createProject("GraphitiUtilTest_testGetFile_DiagramEditorInput");
-         IFile diagramFile = project.getFile("Diagram" + ExecutionTreeUtil.DIAGRAM_FILE_EXTENSION_WITH_DOT);
-         Diagram diagramInResource = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
-         TransactionalEditingDomain domainResource = WorkspaceEditingDomainFactory.INSTANCE.createEditingDomain();
-         Resource resource = domainResource.getResourceSet().createResource(URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true));
-         domainResource.getCommandStack().execute(new AddCommand(domainResource, resource.getContents(), diagramInResource));
-         resource.save(Collections.EMPTY_MAP);
-         // Create file system model
-         Diagram diagramInFileSystem = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, "Test", true);
-         TransactionalEditingDomain domainFileSystem = WorkspaceEditingDomainFactory.INSTANCE.createEditingDomain();
-         Resource resourceOS = domainFileSystem.getResourceSet().createResource(URI.createFileURI(tempFile.getAbsolutePath()));
-         domainFileSystem.getCommandStack().execute(new AddCommand(domainFileSystem, resourceOS.getContents(), diagramInFileSystem));
-         resourceOS.getContents().add(diagramInFileSystem);
-         resourceOS.save(Collections.EMPTY_MAP);
-         // Test results
-         assertNull(GraphitiUtil.getFile((DiagramEditorInput)null));
-         assertEquals(diagramFile, GraphitiUtil.getFile(DiagramEditorInput.createEditorInput(diagramInResource, domainResource, ExecutionTreeDiagramTypeProvider.PROVIDER_ID, true)));
-         assertNull(GraphitiUtil.getFile(DiagramEditorInput.createEditorInput(diagramInFileSystem, domainFileSystem, ExecutionTreeDiagramTypeProvider.PROVIDER_ID, true)));
-      }
-      finally {
-         tempFile.delete();
       }
    }
    

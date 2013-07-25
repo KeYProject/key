@@ -15,9 +15,6 @@ package org.key_project.sed.ui.visualization.object_diagram.editor;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -26,10 +23,9 @@ import org.eclipse.ui.ide.IDE;
 import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
 import org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
-import org.key_project.sed.ui.visualization.util.GraphitiUtil;
+import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.StringUtil;
 
 /**
  * Read-only {@link ObjectDiagramEditor}.
@@ -74,14 +70,8 @@ public class ReadonlyObjectDiagramEditor extends ObjectDiagramEditor {
     * @throws PartInitException Occurred Exception.
     */
    public static ReadonlyObjectDiagramEditor openEditor(IWorkbenchPage page, String diagramName, String uniqueId) throws PartInitException {
-      // Create empty diagram
-      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ObjectDiagramTypeProvider.TYPE, 
-                                                                    StringUtil.toSingleLinedString(diagramName), 
-                                                                    true);
-      // Create editing domain and resource that contains the diagram
-      URI uri = URI.createURI(uniqueId + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT);
-      TransactionalEditingDomain domain = GraphitiUtil.createDomainAndResource(diagram, uri);
-      IEditorInput input = NonPersistableDiagramEditorInput.createEditorInput(diagram, domain, ObjectDiagramTypeProvider.PROVIDER_ID, true);
+      URI uri = URI.createGenericURI(EmptyDiagramPersistencyBehavior.SCHEME, uniqueId + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT, null);
+      IEditorInput input = new NonPersistableDiagramEditorInput(uri, ObjectDiagramTypeProvider.PROVIDER_ID);
       // Open editor
       IEditorPart editorPart = IDE.openEditor(page, 
                                               input, 

@@ -17,32 +17,23 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.SnapToGrid;
-import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
-import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
-import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.gef.ui.palette.FlyoutPaletteComposite;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.context.IContext;
-import org.eclipse.graphiti.internal.command.CommandContainer;
-import org.eclipse.graphiti.internal.command.GenericFeatureCommandWithContext;
 import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.internal.action.AbstractPreDefinedAction;
-import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
-import org.eclipse.graphiti.ui.internal.config.IConfigurationProvider;
-import org.eclipse.graphiti.ui.internal.editor.DiagramEditorInternal;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
@@ -221,26 +212,6 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
          super.registerAction(wrapper);
       }
    }
-
-   /**
-    * Executes the given {@link IFeature} with the given {@link IContext}.
-    * @param feature The {@link IFeature} to execute.
-    * @param context the {@link IContext} to use.
-    */
-   public void executeFeature(IFeature feature, IContext context) {
-      CommandContainer commandContainer = new CommandContainer(feature.getFeatureProvider());
-      commandContainer.add(new GenericFeatureCommandWithContext(feature, context));
-      executeCommand(commandContainer);
-   }
-   
-   /**
-    * Executes the given {@link ICommand} on the editing domain.
-    * @param command The {@link ICommand} to execute.
-    */
-   protected void executeCommand(ICommand command) {
-      CommandStack commandStack = getEditDomain().getCommandStack();
-      commandStack.execute(new GefCommandWrapper(command, getEditingDomain()));
-   }
    
    /**
     * Checks if the grid is visible.
@@ -257,8 +228,9 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
     */
    public void setGridVisible(boolean showGrid) {
       IAction action = getActionRegistry().getAction(GEFActionConstants.TOGGLE_GRID_VISIBILITY);
-      Assert.isNotNull(action);
-      action.run();
+      if (action != null) {
+         action.run();
+      }
    }
    
    /**
@@ -278,103 +250,6 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    }
    
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */
-   @Override
-   public IDiagramTypeProvider getDiagramTypeProvider() {
-      return super.getDiagramTypeProvider();
-   }
-   
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */
-   @Override
-   public void selectPictogramElements(PictogramElement[] pictogramElements) {
-      super.selectPictogramElements(pictogramElements);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */
-   @Override
-   public void refreshContent() {
-      super.refreshContent();
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */
-   @Override
-   public PictogramElement[] getSelectedPictogramElements() {
-      return super.getSelectedPictogramElements();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected FlyoutPreferences getPalettePreferences() {
-      final FlyoutPreferences superPreferences = super.getPalettePreferences(); // Modification of this preferences is not possible, because the changes are shared with real editors
-      if (isPaletteHidden()) {
-         // Disable the palette: see http://www.eclipse.org/forums/index.php/t/263112/
-         return new FlyoutPreferences() {
-            @Override
-            public int getDockLocation() {
-               return superPreferences.getDockLocation();
-            }
-
-            @Override
-            public int getPaletteState() {
-               return 8; // org.eclipse.gef.ui.palette.FlyoutPaletteComposite.STATE_HIDDEN
-            }
-
-            @Override
-            public int getPaletteWidth() {
-               return superPreferences.getPaletteWidth();
-            }
-
-            @Override
-            public void setDockLocation(int location) {
-               superPreferences.setDockLocation(location);
-            }
-
-            @Override
-            public void setPaletteState(int state) {
-               superPreferences.setPaletteState(state);
-            }
-
-            @Override
-            public void setPaletteWidth(int width) {
-               superPreferences.setPaletteWidth(width);
-            }
-         };
-      }
-      else {
-         return superPreferences;
-      }
-   }
-   
-   /**
     * Checks if the palette is hidden or not.
     * @return {@code true} palette is hidden, {@code false} palette is visible.
     */
@@ -388,6 +263,12 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
     */
    public void setPaletteHidden(boolean paletteHidden) {
       this.paletteHidden = paletteHidden;
+      if (this.paletteHidden) {
+         getPalettePreferences().setPaletteState(8); // FlyoutPaletteComposite.STATE_HIDDEN
+      }
+      else {
+         getPalettePreferences().setPaletteState(FlyoutPaletteComposite.STATE_PINNED_OPEN);
+      }
    }
    
    /**
@@ -417,71 +298,5 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
       for (IGlobalEnablement child : childGlobalEnablements) {
          child.setGlobalEnabled(globalEnabled);
       }
-   }
-   
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */   
-   @SuppressWarnings("rawtypes")
-   @Override
-   public Object getAdapter(Class type) {
-      return super.getAdapter(type);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */   
-   @Override
-   public boolean isDirty() {
-      return super.isDirty();
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */   
-   @Override
-   public GraphicalViewer getGraphicalViewer() {
-      return super.getGraphicalViewer();
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */   
-   @Override
-   public IConfigurationProvider getConfigurationProvider() {
-      return super.getConfigurationProvider();
-   }
-   
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Overwritten to ignore warnings.
-    * </p>
-    */   
-   @Override
-   protected void configureGraphicalViewer() {
-      super.configureGraphicalViewer();
    }
 }

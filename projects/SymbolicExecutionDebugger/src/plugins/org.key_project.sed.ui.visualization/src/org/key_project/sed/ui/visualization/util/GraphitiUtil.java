@@ -48,7 +48,6 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.internal.datatypes.impl.DimensionImpl;
 import org.eclipse.graphiti.internal.datatypes.impl.LocationImpl;
-import org.eclipse.graphiti.internal.services.impl.GaServiceImpl;
 import org.eclipse.graphiti.mm.StyleContainer;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
@@ -62,8 +61,9 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
-import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
+import org.eclipse.graphiti.services.impl.GaServiceImpl;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 import org.eclipse.graphiti.ui.internal.services.impl.GefService;
 import org.eclipse.graphiti.ui.internal.util.DataTypeTransformation;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
@@ -164,7 +164,7 @@ public final class GraphitiUtil {
       if (diagram != null && diagram.eResource() != null) {
          throw new IllegalArgumentException("The Diagram is already contained in a Resource.");
       }
-      TransactionalEditingDomain domain = DiagramEditorFactory.createResourceSetAndEditingDomain();
+      TransactionalEditingDomain domain = GraphitiUiInternal.getEmfService().createResourceSetAndEditingDomain();
       final Resource resource = domain.getResourceSet().createResource(uri);
       if (diagram != null) {
          domain.getCommandStack().execute(new RecordingCommand(domain) {
@@ -229,23 +229,6 @@ public final class GraphitiUtil {
       else {
          return size;
       }
-   }
-   
-   /**
-    * Returns the {@link IFile} which is specified by the given {@link DiagramEditorInput}
-    * if available.
-    * @param input The {@link DiagramEditorInput}.
-    * @return The specified {@link IFile} or {@code null} if no {@link IFile} is specified.
-    */
-   public static IFile getFile(DiagramEditorInput input) {
-      IFile result = null;
-      if (input != null) {
-         EObject obj = input.getEObject();
-         if (obj != null) {
-            result = getFile(obj);
-         }
-      }
-      return result;
    }
    
    /**

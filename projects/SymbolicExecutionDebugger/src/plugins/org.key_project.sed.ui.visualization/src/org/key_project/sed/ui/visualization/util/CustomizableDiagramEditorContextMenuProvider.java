@@ -15,9 +15,9 @@ package org.key_project.sed.ui.visualization.util;
 
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditorContextMenuProvider;
 import org.eclipse.graphiti.ui.internal.action.UpdateAction;
-import org.eclipse.graphiti.ui.internal.config.IConfigurationProvider;
 import org.eclipse.jface.action.IMenuManager;
 
 /**
@@ -41,16 +41,16 @@ public class CustomizableDiagramEditorContextMenuProvider extends DiagramEditorC
     * Constructor.
     * @param viewer The EditPartViewer, for which the context-menu shall be displayed.
     * @param registry The action-registry, which contains the actions corresponding to the menu-items.
-    * @param configurationProvider the configuration provider
+    * @param diagramTypeProvider the diagram type provider
     * @param undoGroupAvailable {@code true} undo/redo group is available, {@code false} undo/redo group is not available.
     * @param updateActionAvailable {@code true} update action is available in context menu, {@code false} update action is not available in context menu.
     */
    public CustomizableDiagramEditorContextMenuProvider(EditPartViewer viewer, 
                                                        ActionRegistry registry, 
-                                                       IConfigurationProvider configurationProvider, 
+                                                       IDiagramTypeProvider diagramTypeProvider, 
                                                        boolean undoGroupAvailable,
                                                        boolean updateActionAvailable) {
-      super(viewer, registry, configurationProvider);
+      super(viewer, registry, diagramTypeProvider);
       this.undoGroupAvailable = undoGroupAvailable;
       this.updateActionAvailable = updateActionAvailable;
    }

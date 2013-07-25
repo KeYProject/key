@@ -1,16 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
- *                    Technical University Darmstadt, Germany
- *                    Chalmers University of Technology, Sweden
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Technical University Darmstadt - initial API and implementation and/or initial documentation
- *******************************************************************************/
-
 package org.key_project.sed.ui.util;
 
 import java.util.Deque;
@@ -23,6 +10,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.internal.ui.viewers.model.TreeModelContentProvider;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
@@ -37,13 +25,11 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
-import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
-import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -54,6 +40,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * SED UI easier.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class SEDUIUtil {
    /**
     * Forbid instances.
@@ -110,7 +97,7 @@ public final class SEDUIUtil {
                      }
                   }
                   // Select new elements
-                  monitor.subTask("Select element");
+                  monitor.beginTask("Select element", 1);
                   ISelection newSelection = SWTUtil.createSelection(selection);
                   SWTUtil.select(debugViewer, newSelection, true);
                   monitor.worked(1);
@@ -215,9 +202,9 @@ public final class SEDUIUtil {
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected static void injectElements(final TreeViewer treeViewer, 
+   protected static void injectElements(TreeViewer treeViewer, 
                                         Deque<Object> injectQue,
-                                        final IProgressMonitor monitor) throws DebugException {
+                                        IProgressMonitor monitor) throws DebugException {
       // Check if something must be done
       if (!CollectionUtil.isEmpty(injectQue)) {
          // Check if the provider is of the expected form.
@@ -240,53 +227,91 @@ public final class SEDUIUtil {
                final int viewIndex = ArrayUtil.indexOf(getChildren(parent), toInject);
                // Create tree path to current element
                final TreePath tp = new TreePath(tpElements.toArray());
-               // Create job collector to collect update jobs started by the Debug API
-               IFilter<Job> jobFilter = new IFilter<Job>() {
+               // Inject the element into the TreeViewer
+               runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
                   @Override
-                  public boolean select(Job element) {
-                     String className = element.getClass().getName();
-                     return className.startsWith("org.eclipse.debug") ||
-                            className.startsWith("org.eclipse.ui.internal.progress");
-                  }
-               };
-               ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
-               try {
-                  // Start collecting update jobs started by the debug view
-                  collector.start();
-                  IRunnableWithException run = new AbstractRunnableWithException() {
-                     @Override
-                     public void run() {
-                        try {
-                           // Inject the element into the TreeViewer
-                           lazyContentProvider.updateChildCount(tp, 0);
-                           lazyContentProvider.updateElement(tp, viewIndex);
-                        }
-                        catch (Exception e) {
-                           setException(e);
-                        }
+                  public void run() {
+                     try {
+                        lazyContentProvider.updateChildCount(tp, 0);
                      }
-                  };
-                  treeViewer.getControl().getDisplay().syncExec(run);
-                  if (run.getException() != null) {
-                     throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                     catch (Exception e) {
+                        setException(e);
+                     }
                   }
-               }
-               finally {
-                  // Stop collecting update jobs
-                  collector.stop();
-               }
-               // Wait until all update jobs have finished before
-               Job[] jobs = collector.getJobs();
-               for (Job job : jobs) {
-                  SWTUtil.checkCanceled(monitor);
-                  JobUtil.waitFor(job, 10);
-               }         
+               });
+               runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
+                  @Override
+                  public void run() {
+                     try {
+                        lazyContentProvider.updateElement(tp, viewIndex);
+                     }
+                     catch (Exception e) {
+                        setException(e);
+                     }
+                  }
+               });
                // Update tree path for next loop iteration
                tpElements.add(toInject);
                // Update monitor
                monitor.worked(1);
             }
          }
+      }
+   }
+   
+   /**
+    * Executes the given {@link IRunnableWithResult} and waits until
+    * the {@link ILazyTreeContentProvider} has done his work. 
+    * @param treeViewer The {@link TreeViewer} to use.
+    * @param lazyContentProvider The {@link ILazyTreePathContentProvider} to use.
+    * @param run The {@link IRunnableWithException} to execute.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void runInViewerThread(TreeViewer treeViewer, 
+                                           ILazyTreePathContentProvider lazyContentProvider, 
+                                           IRunnableWithException run) throws DebugException {
+      treeViewer.getControl().getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+      }
+      // Wait until all pending requests in content provider are done
+      waitForPendingRequests(lazyContentProvider);
+   }
+
+   /**
+    * Blocks the current thread until the given {@link ILazyTreeContentProvider}
+    * has no pending requests.
+    * @param lazyContentProvider The {@link ILazyTreeContentProvider} to wait for.
+    * @throws DebugException Occurred Exception.
+    */
+   public static void waitForPendingRequests(ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
+      while (hasPendingRequests(lazyContentProvider)) {
+         try {
+            Thread.sleep(10);
+         }
+         catch (InterruptedException e) {
+         }
+      }
+   }
+
+   /**
+    * Checks if the given {@link ILazyTreeContentProvider} has pending requests.
+    * @param lazyContentProvider The {@link ILazyTreeContentProvider} to check.
+    * @return {@code true} has pending requests, {@code false} no pending requests.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static boolean hasPendingRequests(ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
+      try {
+         if (lazyContentProvider instanceof TreeModelContentProvider){
+            Boolean result = ObjectUtil.invoke(lazyContentProvider, "areRequestsPending");
+            return result != null && result.booleanValue();
+         }
+         else {
+            return false;
+         }
+      }
+      catch (Exception e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't check if content provider \"" + lazyContentProvider + "\" has pending requests.", e));
       }
    }
 }

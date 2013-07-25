@@ -46,26 +46,26 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Resume on thread
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
             resume(bot, item, target);
             // Get properties view
             SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
             // Select first thread
-            selectThread(debugTree);
+            selectThread(debugView);
             SWTBotTabbedPropertyList tabs = SWTBotTabbedPropertyList.tabbedPropertyList(propertiesView.bot());
             assertNotNull(tabs);
             steps.assertThread(debugTree, propertiesView, tabs);
             // Select first statement
-            selectStatement(debugTree);
+            selectStatement(debugView);
             steps.assertStatement(debugTree, propertiesView, tabs);
             // Select debug target
-            selectDebugTarget(debugTree);
+            selectDebugTarget(debugView);
             steps.assertDebugTarget(debugTree, propertiesView, tabs);
             // Select method return
-            selectMethodReturn(debugTree);
+            selectMethodReturn(debugView);
             steps.assertMethodReturn(debugTree, propertiesView, tabs);
             // Select launch
-            selectLaunch(debugTree);
+            selectLaunch(debugView);
             steps.assertLaunch(debugTree, propertiesView, tabs);
          }
       };
@@ -87,47 +87,47 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
 
    /**
     * Selects an {@link ISEDMethodReturn}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
-   protected void selectLaunch(SWTBotTree debugTree) {
-      TestSedCoreUtil.selectInDebugTree(debugTree, 0);
+   protected void selectLaunch(SWTBotView debugView) throws Exception {
+      TestSedCoreUtil.selectInDebugTree(debugView, 0);
    }
 
    /**
     * Selects an {@link ISEDMethodReturn}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
-   protected void selectMethodReturn(SWTBotTree debugTree) {
-      TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 4);
+   protected void selectMethodReturn(SWTBotView debugView) throws Exception {
+      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 4);
    }
 
    /**
     * Selects an {@link ISEDDebugTarget}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
-   protected void selectDebugTarget(SWTBotTree debugTree) throws Exception {
-      TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0);
+   protected void selectDebugTarget(SWTBotView debugView) throws Exception {
+      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0);
    }
 
    /**
     * Selects an {@link ISEDThread}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
-   protected void selectThread(SWTBotTree debugTree) throws Exception {
-      TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
+   protected void selectThread(SWTBotView debugView) throws Exception {
+      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
    }
 
    /**
     * Selects an {@link ISEDStatement}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @throws Exception Occurred Exception.
     */
-   protected void selectStatement(SWTBotTree debugTree) throws Exception {
-      TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1);
+   protected void selectStatement(SWTBotView debugView) throws Exception {
+      TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1);
    }
 
    /**

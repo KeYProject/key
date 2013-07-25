@@ -19,11 +19,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -49,13 +46,13 @@ import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObject
 import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
 import org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
+import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
@@ -108,7 +105,6 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
    @Override
    public void createPartControl(Composite parent) {
       // Create root
@@ -314,14 +310,8 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
     * @throws PartInitException Occurred Exception.
     */
    public static ConfigurationObjectDiagramEditor openEditor(IWorkbenchPage page, String diagramName, String uniqueId) throws PartInitException {
-      // Create empty diagram
-      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ObjectDiagramTypeProvider.TYPE, 
-                                                                    StringUtil.toSingleLinedString(diagramName), 
-                                                                    true);
-      // Create editing domain and resource that contains the diagram
-      URI uri = URI.createURI(uniqueId + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT);
-      TransactionalEditingDomain domain = GraphitiUtil.createDomainAndResource(diagram, uri);
-      IEditorInput input = NonPersistableDiagramEditorInput.createEditorInput(diagram, domain, ObjectDiagramTypeProvider.PROVIDER_ID, true);
+      URI uri = URI.createGenericURI(EmptyDiagramPersistencyBehavior.SCHEME, uniqueId + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT, null);
+      IEditorInput input = new NonPersistableDiagramEditorInput(uri, ObjectDiagramTypeProvider.PROVIDER_ID);
       // Open editor
       IEditorPart editorPart = IDE.openEditor(page, 
                                               input, 

@@ -23,6 +23,7 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSEDNodeCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.SaveAsObjectDiagramWizard;
+import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
 import org.key_project.util.java.StringUtil;
 
@@ -42,6 +43,14 @@ public class ObjectDiagramEditor extends PaletteHideableDiagramEditor {
    public ObjectDiagramEditor() {
       setGlobalEnabled(true);
       setDefaultSelectionSynchronizationEnabled(false);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected EmptyDiagramPersistencyBehavior createPersistencyBehavior() {
+      return new EmptyDiagramPersistencyBehavior(this);
    }
    
    /**
