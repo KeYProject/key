@@ -57,20 +57,20 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -89,7 +89,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  * <p>
  * A symbolic execution tree consists of {@link IExecutionNode}s which 
  * represents the executed statements and other Java constructs. The root
- * of a symbolic execution tree is an {@link IExecutionStartNode} which is
+ * of a symbolic execution tree is an {@link IExecutionStart} which is
  * available via {@link #getProof()}.
  * </p>
  * <p>
@@ -137,7 +137,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  * @author Martin Hentschel
  * @see FunctionalOperationContractPO#isAddUninterpretedPredicate()
  * @see IExecutionNode
- * @see IExecutionStartNode
+ * @see IExecutionStart
  * @see SymbolicExecutionStrategy
  * @see ExecutionNodePreorderIterator
  */
@@ -155,7 +155,7 @@ public class SymbolicExecutionTreeBuilder {
    /**
     * The start node of the symbolic execution tree.
     */
-   private ExecutionStartNode startNode;
+   private ExecutionStart startNode;
    
    /**
     * Maps a {@link Node} of KeY's proof tree to his execution tree model representation
@@ -212,7 +212,7 @@ public class SymbolicExecutionTreeBuilder {
       this.proof = proof;
       this.mergeBranchConditions = mergeBranchConditions;
       this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
-      this.startNode = new ExecutionStartNode(mediator, proof.root());
+      this.startNode = new ExecutionStart(mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
       initMethodCallStack(proof.root(), proof.getServices());
    }
@@ -414,7 +414,7 @@ public class SymbolicExecutionTreeBuilder {
     * Returns the start node of the symbolic execution tree.
     * @return The start node of the symbolic execution tree.
     */
-   public IExecutionStartNode getStartNode() {
+   public IExecutionStart getStartNode() {
       return startNode;
    }
 
@@ -482,7 +482,7 @@ public class SymbolicExecutionTreeBuilder {
          parentToAddTo = analyzeNode(visitedNode, parentToAddTo);
          addToMapping.put(visitedNode, parentToAddTo);
          // Check if the current node has branch conditions which should be added to the execution tree model
-         if (!(parentToAddTo instanceof IExecutionStartNode) && // Ignore branch conditions before starting with code execution
+         if (!(parentToAddTo instanceof IExecutionStart) && // Ignore branch conditions before starting with code execution
              hasBranchCondition(visitedNode)) {
             NodeIterator iter = visitedNode.childrenIterator();
             while (iter.hasNext()) {
@@ -685,15 +685,15 @@ public class SymbolicExecutionTreeBuilder {
                   result = new ExecutionTermination(mediator, node, exceptionVariable, null);
                }
             }
-            else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+            else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImpliciteMethod(node)) {
-                  result = new ExecutionBranchNode(mediator, node);
+                  result = new ExecutionBranchStatement(mediator, node);
                }
             }
-            else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+            else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImpliciteMethod(node)) {
                   if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-                     result = new ExecutionLoopNode(mediator, node);
+                     result = new ExecutionLoopStatement(mediator, node);
                   }
                }
             }
@@ -703,14 +703,14 @@ public class SymbolicExecutionTreeBuilder {
                }
             }
          }
-         else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
+         else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
             if (isNotInImpliciteMethod(node)) {
-               result = new ExecutionUseOperationContract(mediator, node);
+               result = new ExecutionOperationContract(mediator, node);
             }
          }
-         else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
+         else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
             if (isNotInImpliciteMethod(node)) {
-               result = new ExecutionUseLoopInvariant(mediator, node);
+               result = new ExecutionLoopInvariant(mediator, node);
                // Initialize new call stack of the preserves loop invariant branch
                initNewLoopBodyMethodCallStack(node);
             }
@@ -744,14 +744,18 @@ public class SymbolicExecutionTreeBuilder {
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
       assert label != null;
       JavaBlock jb = newModality.javaBlock();
-      MethodFrameCounterJavaASTVisitor counter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
-      int count = counter.run();
+      MethodFrameCounterJavaASTVisitor newCounter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
+      int newCount = newCounter.run();
+      Term oldModality = node.getAppliedRuleApp().posInOccurrence().subTerm();
+      oldModality = TermBuilder.DF.goBelowUpdates(oldModality);
+      MethodFrameCounterJavaASTVisitor oldCounter = new MethodFrameCounterJavaASTVisitor(oldModality.javaBlock().program(), proof.getServices());
+      int oldCount = oldCounter.run();
       LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
       LinkedList<Node> newMethodCallStack = getMethodCallStack(label.getId());
       Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.getId());
       assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
-      ListIterator<Node> currentIter = currentMethodCallStack.listIterator(currentMethodCallStack.size());
-      for (int i = 0; i < count; i++) {
+      ListIterator<Node> currentIter = currentMethodCallStack.listIterator(oldCount);
+      for (int i = 0; i < newCount; i++) {
          assert currentIter.hasPrevious();
          Node previous = currentIter.previous();
          newMethodCallStack.add(previous);
@@ -866,7 +870,7 @@ public class SymbolicExecutionTreeBuilder {
     * @return {@code true} has branch condition, {@code false} has no branch condition.
     */
    protected boolean hasBranchCondition(Node node) {
-      if (node.childrenCount() >= 2) { // Check if it is a possible branch node, otherwise there is no need for complex computation to filter out not relevant branches
+      if (node.childrenCount() >= 2) { // Check if it is a possible branch statement, otherwise there is no need for complex computation to filter out not relevant branches
          int openChildrenCount = 0;
          NodeIterator childIter = node.childrenIterator();
          while (childIter.hasNext()) {
