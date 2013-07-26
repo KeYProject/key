@@ -336,7 +336,7 @@ public class Sequent implements Iterable<SequentFormula> {
     }
   
     public void prettyprint(de.uka.ilkd.key.pp.LogicPrinter printer, SequentPrintFilter filter) {
-	printer.printSequent(this, filter);
+	printer.printSequent(this, true);
     }
 
  

@@ -50,6 +50,24 @@ import javax.swing.text.Highlighter;
  */
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
+
+    private final MainWindow mainWindow;
+    
+    /* 
+     * The current line width. Static declaration for this prevents constructors from
+     * using lineWidth 0.
+     */
+    private static int lineWidth;
+    
+    public static void setLineWidth(int i) {
+        if (i != 0) {
+            lineWidth = i;
+        }
+    }
+    
+    public static int getLineWidth() {
+        return lineWidth;
+    }
     
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
@@ -75,7 +93,8 @@ public abstract class SequentView extends JTextArea
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
-    SequentView() {
+    SequentView(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -93,6 +112,11 @@ public abstract class SequentView extends JTextArea
         dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
 
+        // add a SeqViewChangeListener to this component
+        SeqViewChangeListener changeListener = new SeqViewChangeListener(this);
+        addComponentListener(changeListener);
+        addPropertyChangeListener("font", changeListener);
+        addHierarchyBoundsListener(changeListener);
     }
     
     public void setFont() {
@@ -128,12 +152,12 @@ public abstract class SequentView extends JTextArea
         try {
             unregisterListener();
         } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
         } finally {
             try {
                 super.finalize();
             } catch (Throwable e) {
-                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
             }
         }
     }
@@ -241,9 +265,9 @@ public abstract class SequentView extends JTextArea
             }
 
             if (info == null) {
-                MainWindow.getInstance().setStandardStatusLine();
+                mainWindow.setStandardStatusLine();
             } else {
-                MainWindow.getInstance().setStatusLine(info);
+                mainWindow.setStatusLine(info);
             }
 
         }
@@ -410,7 +434,7 @@ public abstract class SequentView extends JTextArea
     public void keyReleased(KeyEvent e) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
             showTermInfo = false;
-            MainWindow.getInstance().setStandardStatusLine();
+            mainWindow.setStandardStatusLine();
         }
     }
     
@@ -419,5 +443,19 @@ public abstract class SequentView extends JTextArea
         super.updateUI();
         setFont();
     }
+    
+    /**
+     * computes the line width
+     */
+    public int computeLineWidth() {
+        // assumes we have a uniform font width
+        int maxChars = (int) 
+            (getVisibleRect().getWidth()/getFontMetrics(getFont()).charWidth('W'));
+        
+        if (maxChars > 1) maxChars-=1;
+        return maxChars;
+    }
+    
+    public abstract void printSequent();
 
 }

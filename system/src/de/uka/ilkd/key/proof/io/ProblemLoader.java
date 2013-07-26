@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker;
@@ -112,7 +113,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
 
    @Override
    protected ProblemLoaderException selectProofObligation() {
-      ProofManagementDialog.showInstance(getMediator(), getInitConfig());
+      ProofManagementDialog.showInstance(getInitConfig());
       if (ProofManagementDialog.startedProof()) {
          return null;
       }
