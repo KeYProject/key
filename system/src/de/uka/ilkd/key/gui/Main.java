@@ -406,8 +406,8 @@ public final class Main {
             ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
-            MainWindow mainWindow = new MainWindow();
-            
+            MainWindow mainWindow = MainWindow.getInstance();
+
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
                         mainWindow.getRecentFiles().getMostRecent();

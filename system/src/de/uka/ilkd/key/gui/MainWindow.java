@@ -138,9 +138,9 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
-    
+
     private static MainWindow instance = null;
-    
+
     private ProofManagementDialog proofManagementDialog = null;
     public ProofManagementDialog getProofManagementDialog() {
         return proofManagementDialog;
@@ -273,17 +273,8 @@ public final class MainWindow extends JFrame  {
     /*
      * This class should only be instantiated once!
      */
-    public MainWindow() {
-        if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
-            System.err.println("Please use the --auto option to start KeY in batch mode.");
-            System.err.println("Use the --help option for more command line options.");
-            System.exit(-1);
-        }
-        if (instance != null) {
-            throw new Error("MainWindow already instantiated!");
-        }
-        
+    private MainWindow() {
+
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLaF();
         setIconImage(IconFactory.keyLogo());
@@ -298,7 +289,20 @@ public final class MainWindow extends JFrame  {
         ToolTipManager.sharedInstance().setDismissDelay(30000);
         addWindowListener(exitMainAction.windowListener);
         setVisible(true);
-        instance = this;
+    }
+
+
+    public static MainWindow getInstance() {
+        if (GraphicsEnvironment.isHeadless()) {
+            System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
+            System.err.println("Please use the --auto option to start KeY in batch mode.");
+            System.err.println("Use the --help option for more command line options.");
+            System.exit(-1);
+        }
+        if (instance == null) {
+            instance = new MainWindow();
+        }
+        return instance;
     }
 
     /**
@@ -1125,7 +1129,7 @@ public final class MainWindow extends JFrame  {
             };
             SwingUtilities.invokeLater(sequentUpdater);
         }
-        
+
         sequentSearchBar.setSequentView(sequentViewLocal);
 
     }
@@ -1136,7 +1140,7 @@ public final class MainWindow extends JFrame  {
         MainProofListener(MainWindow mainWindow){
             this.mainWindow = mainWindow;
         }
-        
+
         Proof proof = null;
         private final MainWindow mainWindow;
 
@@ -1456,14 +1460,6 @@ public final class MainWindow extends JFrame  {
     public void notify(NotificationEvent event) {
         if (notificationManager != null) {
             notificationManager.notify(event);
-        }
-    }
-
-    public static MainWindow getInstance() {
-        if (instance != null) {
-            return instance;
-        } else {
-            throw new Error("No MainWindow instance existent.");
         }
     }
 
