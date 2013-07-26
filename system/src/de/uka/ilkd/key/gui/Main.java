@@ -388,10 +388,12 @@ public final class Main {
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
-                    if (verbosity > Verbosity.SILENT)
+                    if (verbosity > Verbosity.SILENT) {
                         System.out.println("Auto mode was terminated by an exception:");
-                    if (Debug.ENABLE_DEBUG) e.printStackTrace();
-                    System.err.println(e.getMessage());
+                        if (Debug.ENABLE_DEBUG) e.printStackTrace();
+                        final String msg = e.getMessage();
+                        if (msg!=null) System.err.println(msg);
+                    }
                     System.exit(-1);
                 }});
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
