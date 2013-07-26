@@ -644,7 +644,7 @@ public final class TestSedCoreUtil {
          }
       });
    }
-
+   
    /**
     * Waits until the given {@link IDisconnect} is terminated.
     * @param bot The {@link SWTBot} to use.
