@@ -40,6 +40,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private Term heapAtPost;
     private Term loopGuardAtPre;
     private Term loopGuardAtPost;
+    private Term mbyAtPre;
 
 
     public AbstractInfFlowContractTacletBuilder(final Services services) {
@@ -101,6 +102,10 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         this.exceptionVarAtPost = exceptionAtPost;
     }
 
+    public void setMbyAtPre(Term mby) {
+        this.mbyAtPre = mby;
+    }
+
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = getProofObligationVars();
         Term contractApplPredTerm = getContractApplPred(appData);
@@ -131,10 +136,11 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private ProofObligationVars getProofObligationVars() {
         StateVars pre =
                 new StateVars(contractSelfAtPre, loopGuardAtPre, localVarsAtPre,
-                              heapAtPre, contractResultAtPre, exceptionVarAtPre);
+                              contractResultAtPre, exceptionVarAtPre, heapAtPre,
+                              mbyAtPre);
         StateVars post =
                 new StateVars(contractSelfAtPost, loopGuardAtPost, localVarsAtPost,
-                              heapAtPost, contractResultAtPost, exceptionVarAtPost);
+                              contractResultAtPost, exceptionVarAtPost, heapAtPost);
         assert pre.paddedTermList.size() == post.paddedTermList.size();
         return new ProofObligationVars(pre, post);
     }

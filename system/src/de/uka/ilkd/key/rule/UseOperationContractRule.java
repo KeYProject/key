@@ -466,6 +466,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                               final ImmutableList<Term> params,
                               final Term result,
                               final Term exception,
+                              final Term mby,
                               final Term atPreUpdates,
                               final Term finalPreTerm,
                               final ImmutableList<AnonUpdateData> anonUpdateDatas,
@@ -491,6 +492,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ifContractBuilder.setHeapAtPre(heapAtPre);
         ifContractBuilder.setSelfAtPre(self);
         ifContractBuilder.setLocalVarsAtPre(params);
+        ifContractBuilder.setMbyAtPre(mby);
         ifContractBuilder.setResultAtPre(result);
         ifContractBuilder.setExceptionAtPre(exception);
         ifContractBuilder.setHeapAtPost(heapAtPost);
@@ -883,7 +885,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	            false);
 
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
-                     TB.var(excVar), atPreUpdates,finalPreTerm, anonUpdateDatas, services);
+                     TB.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 

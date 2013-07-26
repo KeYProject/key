@@ -134,18 +134,18 @@ public class StateVars {
     public StateVars(Term self,
                      Term guard,
                      ImmutableList<Term> localVars,
-                     Term heap,
                      Term result,
-                     Term exception) {
+                     Term exception,
+                     Term heap) {
         this(self, guard, localVars, result, exception, heap, null);
     }
 
 
     public StateVars(Term self,
                      ImmutableList<Term> localVars,
-                     Term heap,
                      Term result,
-                     Term exception) {
+                     Term exception,
+                     Term heap) {
         this(self, localVars, result, exception, heap, null);
     }
 
@@ -153,7 +153,7 @@ public class StateVars {
     public StateVars(Term self,
                      ImmutableList<Term> localVars,
                      Term heap) {
-        this(self, localVars, heap, null, null);
+        this(self, localVars, null, null, heap);
     }
 
 
