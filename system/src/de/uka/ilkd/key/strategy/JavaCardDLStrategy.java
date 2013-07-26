@@ -78,7 +78,7 @@ import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.AllSelectsSimplifiedTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
@@ -606,22 +606,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    longConst(-4200),
                                    longConst(-1900) ) ) );
         bindRuleSet ( d, "apply_select_eq",
-                     ifZero( not( applyTF( FocusProjection.INSTANCE,
-                                        AllSelectsSimplifiedTermFeature.create(heapLDT) ) ),
+                     ifZero( applyTF( "s",
+                                      not( rec( any(), SimplifiedSelectTermFeature.create(heapLDT) ) ) ),
                              longConst(-1700) ) );
         bindRuleSet ( d, "simplify_select",
                       add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
-                           not( applyTF( FocusProjection.INSTANCE,
-                                         AllSelectsSimplifiedTermFeature.create(heapLDT) ) ),
+                           applyTF( sub( FocusProjection.INSTANCE, 0),
+                                    not( SimplifiedSelectTermFeature.create(heapLDT) ) ),
                            longConst(-5600) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
                       add( applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
                            longConst(-5500) ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
                       add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
-                           applyTF( FocusProjection.INSTANCE,
-                                    add( AllSelectsSimplifiedTermFeature.create(heapLDT),
-                                         rec( any(), not( ff.ifThenElse ) ) ) ),
+                           applyTF( "t", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
+                                                     not( ff.ifThenElse ) ) ) ),
                            longConst(-5400) ) );
     }
 
@@ -2379,14 +2378,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSplittingApproval ( d );
 
         bindRuleSet ( d, "apply_select_eq",
-              or( applyTF( FocusProjection.INSTANCE,
-                           AllSelectsSimplifiedTermFeature.create(heapLDT) ),
+              or( applyTF( "s", rec( any(), SimplifiedSelectTermFeature.create(heapLDT) ) ),
                   add( NoSelfApplicationFeature.INSTANCE ,
                        applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE) ) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
               add( NoSelfApplicationFeature.INSTANCE ,
-                   applyTF("s", add( AllSelectsSimplifiedTermFeature.create(heapLDT),
-                                     rec( any(), not( ff.ifThenElse ) ) ) ) ) );
+                   applyTF("s", rec( any(),
+                                     add( SimplifiedSelectTermFeature.create(heapLDT),
+                                          not( ff.ifThenElse ) ) ) ) ) );
 
         return d;
     }
