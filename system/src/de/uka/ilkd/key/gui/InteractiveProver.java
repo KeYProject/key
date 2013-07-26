@@ -104,7 +104,9 @@ public class InteractiveProver implements InterruptListener {
      */
     public void setProof(Proof p) {
         proof = p;
-        AutoSaver.getInstance().setProof(p);
+        if (p != null) { // Will be null if last proof is removed from user interface
+           AutoSaver.getInstance().setProof(p);
+        }
     }
 
     public void addAutoModeListener(AutoModeListener p) {

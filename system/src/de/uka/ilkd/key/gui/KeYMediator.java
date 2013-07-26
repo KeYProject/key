@@ -1016,7 +1016,7 @@ public class KeYMediator {
             this.stopInterface(true);
 
 
-            Thread thread = new Thread(processor);
+            Thread thread = new Thread(processor,"DelayedCutListener");
             thread.start();
         }
         return true;

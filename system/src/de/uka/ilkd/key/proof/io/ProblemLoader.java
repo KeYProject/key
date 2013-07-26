@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.proof.io;
@@ -45,7 +45,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
 
    public void addTaskListener(ProverTaskListener ptl) {
       this.ptl = ptl;
-   }    
+   }
 
    public void run() {
       /*
@@ -60,7 +60,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          @Override
          public Object construct() {
             time = System.currentTimeMillis();
-            String res = doWork();
+            Object res = doWork();
             time = System.currentTimeMillis() - time;
             return res;
          }
@@ -68,7 +68,7 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          @Override
          public void finished() {
             getMediator().startInterface(true);
-            final String msg = (String) get();
+            final Object msg = get();
             if (ptl != null) {
                final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
                ptl.taskFinished(tfi);
@@ -81,9 +81,9 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       }
       worker.start();
    }
-    
-   private String doWork() {
-      String status = "";
+
+   private Throwable doWork() {
+      Throwable status = null;
       try {
          try {
             status = load(true);
@@ -94,15 +94,14 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          }
          catch (Throwable thr) {
             getExceptionHandler().reportException(thr);
-            status = thr.getMessage();
-            System.err.println("2");
+            status = thr;
          }
       }
       catch (ExceptionHandlerException ex) {
          String errorMessage = "Failed to load " + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
          getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, ex));
          getMediator().getUI().reportStatus(this, errorMessage);
-         status = ex.toString();
+         status = ex;
       }
       return status;
    }
@@ -110,15 +109,15 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
    public KeYExceptionHandler getExceptionHandler() {
        return getMediator().getExceptionHandler();
    }
-   
+
    @Override
-   protected String selectProofObligation() {
+   protected ProblemLoaderException selectProofObligation() {
       ProofManagementDialog.showInstance(getMediator(), getInitConfig());
       if (ProofManagementDialog.startedProof()) {
-         return "";
+         return null;
       }
       else {
-         return "Aborted.";
+         return new ProblemLoaderException(this, "Aborted.");
       }
    }
 }
