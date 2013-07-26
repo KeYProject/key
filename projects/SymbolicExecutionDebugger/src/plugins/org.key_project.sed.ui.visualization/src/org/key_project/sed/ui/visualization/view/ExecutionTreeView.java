@@ -13,6 +13,7 @@
 
 package org.key_project.sed.ui.visualization.view;
 
+import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,9 +38,16 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.part.PageBookView;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.PropertySheet;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.ui.util.SEDUIUtil;
@@ -51,6 +59,7 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -191,6 +200,8 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       if (ObjectUtil.equals(event.getSource(), getDebugView().getViewer())) {
          // Update diagram
          updateDiagram(event.getSelection());
+         // Update selection in property sheet page of this view
+         updatePropertyPage(this);
       }
    }
    
@@ -221,10 +232,48 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             businessObjects.add(element);
          }
          // Select in debug viewer
-         SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
+         Runnable finishTask = new Runnable() {
+            @Override
+            public void run() {
+               Display.getDefault().syncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     // Update selection in property sheet page of debug view
+                     updatePropertyPage(getDebugView());
+                  }
+               });
+            }
+         };
+         SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects, finishTask);
       }
    }
    
+   /**
+    * Updates the selection in the {@link IPropertySheetPage} of the given
+    * {@link IWorkbenchPart} if it is available.
+    * @param part The {@link IWorkbenchPart} to update its {@link IPropertySheetPage} if it is available.
+    */
+   protected void updatePropertyPage(IWorkbenchPart part) {
+      try {
+         IViewPart propView = WorkbenchUtil.findView(IPageLayout.ID_PROP_SHEET);
+         if (propView instanceof PropertySheet) {
+            PropertySheet ps = (PropertySheet)propView;
+            Method method = ObjectUtil.findMethod(PageBookView.class, "getPageRec", IWorkbenchPart.class);
+            Object result = ObjectUtil.invoke(ps, method, part);
+            if (result != null) {
+               IPage page = ObjectUtil.get(result, "page");
+               if (page instanceof IPropertySheetPage) {
+                  ISelection selection = part.getSite().getSelectionProvider().getSelection();
+                  ((IPropertySheetPage)page).selectionChanged(part, selection);
+               }
+            }
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
+      }      
+   }
    
    /**
     * Updates the {@link Diagram} in a way that only {@link ISEDDebugTarget}
