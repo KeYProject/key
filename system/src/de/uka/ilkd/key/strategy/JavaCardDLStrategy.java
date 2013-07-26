@@ -600,24 +600,41 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
         bindRuleSet ( d, "pull_out_select",
+                      // pull out select only if it can be simplified
+                      // (the heap term may not be the base heap or an anon heap
+                      // function symbol)
                       add( applyTF( "h", not( or( BaseHeapTermFeature.create(heapLDT),
                                                   AnonHeapTermFeature.INSTANCE ) ) ),
                            ifZero( applyTF(FocusFormulaProjection.INSTANCE, ff.update),
                                    longConst(-4200),
                                    longConst(-1900) ) ) );
         bindRuleSet ( d, "apply_select_eq",
-                     ifZero( applyTF( "s",
+                      // replace non-simplified select by the skolem constant
+                      // of the corresponding pull out; at least one select
+                      // needs to be not simplified yet; additional restrictions
+                      // in isApproved()
+                      ifZero( applyTF( "s",
                                       not( rec( any(), SimplifiedSelectTermFeature.create(heapLDT) ) ) ),
+                             // together with the costs of apply_equations the
+                             // resulting costs are about -5700
                              longConst(-1700) ) );
         bindRuleSet ( d, "simplify_select",
+                      // simplify_select term in pulled out equation (right hand
+                      // side has to be a skolem constant which has been
+                      // introduced by a select pull out; left hand side needs
+                      // to be a select term on a non-base- and
+                      // non-anon-heap)
                       add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
                            applyTF( sub( FocusProjection.INSTANCE, 0),
                                     not( SimplifiedSelectTermFeature.create(heapLDT) ) ),
                            longConst(-5600) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
+                      // replace skolem constant by it's computed value
                       add( applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
                            longConst(-5500) ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
+                      // hide auxiliary equation after the skolem constatns have
+                      // been replaced by it's computed value
                       add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
                            applyTF( "t", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
                                                      not( ff.ifThenElse ) ) ) ),
