@@ -13,10 +13,12 @@
 
 package org.key_project.sed.key.ui.property;
 
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -32,6 +34,9 @@ public class KeYGraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilte
    protected boolean accept(PictogramElement pe) {
       IWorkbenchPart part = WorkbenchUtil.getActivePart();
       if (part != null) {
+         if (IDebugUIConstants.ID_DEBUG_VIEW.equals(part.getSite().getId())) {
+            part = WorkbenchUtil.findView(ExecutionTreeView.VIEW_ID);
+         }
          KeYGraphitiDebugNodePropertySection section = new KeYGraphitiDebugNodePropertySection();
          section.setInput(part, null);
          return section.getDebugNode(pe) != null;
