@@ -21,6 +21,7 @@ import junit.framework.AssertionFailedError;
 
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -1532,6 +1533,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Disconnect
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
             item.contextMenu("Disconnect").click();
+            assertTrue(launch instanceof IDisconnect);
+            TestSedCoreUtil.waitUntilLaunchIsDisconnected(bot, (IDisconnect)launch);
             assertTrue(launch.canTerminate());
             assertTrue(launch.isTerminated()); // Also disconnected debug targets are seen as terminated by the Eclipse Debug API.
             assertTrue(target instanceof ISEDDebugTarget);
@@ -1645,7 +1648,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertTrue(target.isSuspended());
             assertTrue(target.isTerminated());
             // Remove terminated launch
-            item.contextMenu("Remove All Terminated").click();
+            TestUtilsUtil.clickContextMenu(debugTree, "Remove All Terminated");
             assertEquals(0, debugTree.getAllItems().length);
          }
       };

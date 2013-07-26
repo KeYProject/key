@@ -31,7 +31,9 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
@@ -79,14 +81,14 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.model.ISEDOperationContract;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDOperationContract;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
@@ -471,10 +473,17 @@ public final class TestSedCoreUtil {
          // Terminate all items
          SWTBotTreeItem[] launchItems = debugTree.getAllItems();
          for (SWTBotTreeItem item : launchItems) {
+            boolean terminated = false;
+            Object data = TestUtilsUtil.getTreeItemData(item);
+            if (data instanceof ITerminate) {
+               terminated = ((ITerminate)data).isTerminated();
+            }
             item.select();
             item.contextMenu("Terminate and Remove").click();
-            SWTBotShell dialog = bot.shell("Terminate and Remove");
-            dialog.bot().button("Yes").click();
+            if (!terminated) {
+               SWTBotShell dialog = bot.shell("Terminate and Remove");
+               dialog.bot().button("Yes").click();
+            }
          }
          // Wait until all items are removed
          bot.waitWhile(Conditions.treeHasRows(debugTree, 1));
@@ -632,6 +641,31 @@ public final class TestSedCoreUtil {
          @Override
          public String getFailureMessage() {
             return "ILaunch \"" + launch + "\" is not terminated.";
+         }
+      });
+   }
+
+   /**
+    * Waits until the given {@link IDisconnect} is terminated.
+    * @param bot The {@link SWTBot} to use.
+    * @param disconnect The {@link IDisconnect} to wait for.
+    */
+   public static void waitUntilLaunchIsDisconnected(SWTBot bot, final IDisconnect disconnect) {
+      TestCase.assertNotNull(bot);
+      TestCase.assertNotNull(disconnect);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return disconnect.isDisconnected();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "ILaunch \"" + disconnect + "\" is not terminated.";
          }
       });
    }
