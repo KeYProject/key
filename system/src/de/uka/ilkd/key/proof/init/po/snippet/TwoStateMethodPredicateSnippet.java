@@ -41,7 +41,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                 (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
         final ImmutableList<Term> termList =
-                extractTermListForPredicate(poVars);
+                extractTermListForPredicate(pm, poVars);
         final Function contApplPred =
                 generateContApplPredicate(nameString, termList, d.tb);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
@@ -101,13 +101,17 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @return
      */
     private ImmutableList<Term> extractTermListForPredicate(
+            IProgramMethod pm,
             ProofObligationVars poVars) {
         ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
         ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
 
-        // self is relevant in the pre and post state for constructors
-        relevantPreVars = relevantPreVars.append(poVars.pre.self);
-        relevantPostVars = relevantPostVars.append(poVars.post.self);
+        if (!pm.isStatic()) {
+            // self is relevant in the pre and post state for constructors
+            // (if the method is static, then there is no self)
+            relevantPreVars = relevantPreVars.append(poVars.pre.self);
+            relevantPostVars = relevantPostVars.append(poVars.post.self);
+        }
 
         // local variables which are not changed during execution or whose
         // changes are not observable (like for parameters) are relevant only
