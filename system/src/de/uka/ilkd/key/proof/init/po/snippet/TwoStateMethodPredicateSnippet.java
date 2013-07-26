@@ -41,7 +41,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                 (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
         final ImmutableList<Term> termList =
-                extractTermListForPredicate(poVars);
+                extractTermListForPredicate(pm, poVars, d.hasMby);
         final Function contApplPred =
                 generateContApplPredicate(nameString, termList, d.tb);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
@@ -101,13 +101,18 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @return
      */
     private ImmutableList<Term> extractTermListForPredicate(
-            ProofObligationVars poVars) {
+            IProgramMethod pm,
+            ProofObligationVars poVars,
+            boolean hasMby) {
         ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
         ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
 
-        // self is relevant in the pre and post state for constructors
-        relevantPreVars = relevantPreVars.append(poVars.pre.self);
-        relevantPostVars = relevantPostVars.append(poVars.post.self);
+        if (!pm.isStatic()) {
+            // self is relevant in the pre and post state for constructors
+            // (if the method is static, then there is no self)
+            relevantPreVars = relevantPreVars.append(poVars.pre.self);
+            relevantPostVars = relevantPostVars.append(poVars.post.self);
+        }
 
         // local variables which are not changed during execution or whose
         // changes are not observable (like for parameters) are relevant only
@@ -139,6 +144,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         if (poVars.post.exception != null) {
             // TODO: only null for loop invariants?
             relevantPostVars = relevantPostVars.append(poVars.post.exception);
+        }
+
+        if (hasMby) {
+            // if the contract has a mesured by clause, then mbyAtPre is also
+            // relevant
+            relevantPreVars = relevantPreVars.append(poVars.pre.mbyAtPre);
         }
 
         // the heap is relevant in the pre and post state

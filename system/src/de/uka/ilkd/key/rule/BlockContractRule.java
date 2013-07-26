@@ -296,14 +296,14 @@ public class BlockContractRule implements BuiltInRule {
                                          final ImmutableSet<ProgramVariable> localOutVariables,
                                          final BlockContractBuiltInRuleApp application,
                                          final Instantiation instantiation) {
+        if (isInfFlow(goal) && contract.hasModifiesClause(heaps.get(0)) && contract.hasInfFlowSpecs()) {
             assert heaps.size() == 1 &&
-                   anonymisationHeaps.size() == 1 : "information flow " +
+                   anonymisationHeaps.size() <= 1 : "information flow " +
                                                     "extension is at the " +
                                                     "moment not compatible " +
                                                     "with the non-base-heap " +
                                                     "setting";
 
-        if (isInfFlow(goal) && contract.hasModifiesClause(heaps.get(0)) && contract.hasInfFlowSpecs()) {
             // prepare information flow analysis
             final LocationVariable baseHeap =
                     services.getTypeConverter().getHeapLDT().getHeap();
@@ -362,15 +362,13 @@ public class BlockContractRule implements BuiltInRule {
             final StateVars instantiationPreVars =
                     new StateVars(hasSelf ? selfAtPre : null,
                                   localVarsAtPre,
-                                  heapAtPre,
                                   hasRes ? resultAtPre : null,
-                                  hasExc ? exceptionAtPre : null);
+                                  hasExc ? exceptionAtPre : null, heapAtPre);
             final StateVars instantiationPostVars =
                     new StateVars(hasSelf ? selfAtPost : null,
                                   localVarsAtPost,
-                                  heapAtPost,
                                   hasRes ? resultAtPost : null,
-                                  hasExc ? exceptionAtPost : null);
+                                  hasExc ? exceptionAtPost : null, heapAtPost);
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(instantiationPreVars,
                                                 instantiationPostVars);
@@ -734,7 +732,7 @@ public class BlockContractRule implements BuiltInRule {
         public BlockContract.Variables createAndRegister(Term self)
         {
             return new BlockContract.Variables(
-                self.op(ProgramVariable.class),
+                self != null ? self.op(ProgramVariable.class) : null,
                 createAndRegisterFlags(placeholderVariables.breakFlags),
                 createAndRegisterFlags(placeholderVariables.continueFlags),
                 createAndRegisterVariable(placeholderVariables.returnFlag),
