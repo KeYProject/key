@@ -17,6 +17,7 @@
  */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  *
@@ -26,10 +27,15 @@ public class EmptySequent extends SequentView {
 
     private static final long serialVersionUID = 7572244482555772604L;
 
-    public EmptySequent() {
+    public EmptySequent(MainWindow mainWindow) {
+        super(mainWindow);
     }
 
     public String getTitle() {
         return "No proof loaded";
     }
+
+    @Override
+    public void printSequent() {}
+    
 }

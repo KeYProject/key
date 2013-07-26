@@ -91,6 +91,7 @@ public class SequentSearchBar extends SearchBar {
 
     @Override
     public void setVisible(boolean vis) {
+        super.setVisible(vis);
         if (sequentView != null) {
             if (vis) {
                 search();
@@ -98,7 +99,6 @@ public class SequentSearchBar extends SearchBar {
                 clearSearchResults();
             }
         }
-        super.setVisible(vis);
     }
     
     /**
@@ -107,7 +107,8 @@ public class SequentSearchBar extends SearchBar {
     public boolean search(String search) {
         clearSearchResults();
 
-        if (sequentView == null || sequentView.getText() == null || search.equals("")) {
+        if (sequentView == null || sequentView.getText() == null || search.equals("")
+                || !this.isVisible()) {
             return true;
         }
         
