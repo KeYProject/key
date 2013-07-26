@@ -201,7 +201,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
          // Update diagram
          updateDiagram(event.getSelection());
          // Update selection in property sheet page of this view
-         updatePropertyPage(this);
+         updatePropertyPage(this, getDebugView());
       }
    }
    
@@ -239,7 +239,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                   @Override
                   public void run() {
                      // Update selection in property sheet page of debug view
-                     updatePropertyPage(getDebugView());
+                     updatePropertyPage(getDebugView(), ExecutionTreeView.this);
                   }
                });
             }
@@ -253,13 +253,19 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * {@link IWorkbenchPart} if it is available.
     * @param part The {@link IWorkbenchPart} to update its {@link IPropertySheetPage} if it is available.
     */
-   protected void updatePropertyPage(IWorkbenchPart part) {
+   protected void updatePropertyPage(IWorkbenchPart part, IWorkbenchPart parthWithFocus) {
       try {
          IViewPart propView = WorkbenchUtil.findView(IPageLayout.ID_PROP_SHEET);
          if (propView instanceof PropertySheet) {
             PropertySheet ps = (PropertySheet)propView;
             Method method = ObjectUtil.findMethod(PageBookView.class, "getPageRec", IWorkbenchPart.class);
             Object result = ObjectUtil.invoke(ps, method, part);
+            if (result == null) {
+               // Give the workbench the chance to create the property sheet page.
+               part.setFocus();
+               parthWithFocus.setFocus();
+               result = ObjectUtil.invoke(ps, method, part);
+            }
             if (result != null) {
                IPage page = ObjectUtil.get(result, "page");
                if (page instanceof IPropertySheetPage) {
