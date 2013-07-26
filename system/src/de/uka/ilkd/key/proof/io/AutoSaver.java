@@ -108,7 +108,7 @@ public final class AutoSaver implements ProverTaskListener {
                 }
             }
         };
-        (new Thread(null,r,"Autosaver")).run();
+        (new Thread(null,r,"ProofAutosaver")).run();
     }
 
 }
