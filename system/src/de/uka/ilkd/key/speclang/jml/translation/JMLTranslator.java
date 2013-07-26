@@ -475,6 +475,7 @@ final class JMLTranslator {
             }
         });
         translationMethods.put(JMLKeyWord.BSUM, new JMLTranslationMethod() {
+            // TODO: the bsum keyword in JML is deprecated
 
             @Override
             public SLExpression translate(
@@ -503,6 +504,8 @@ final class JMLTranslator {
                 }
                 LogicVariable qv = (LogicVariable) declVars.head();
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
+                		"Please use the standard \\sum syntax."));
                 return new SLExpression(resultTerm,
                         promo.getJavaType() == PrimitiveType.JAVA_BIGINT ?
                                 promo : t.getType());
