@@ -296,12 +296,10 @@ public final class LogicPrinter {
      *   (the actual taken linewidth is the max of
      *   {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      */
-    public void update(Sequent seq, 
-	    	       SequentPrintFilter filter,
-	    	       int lineWidth) {
+    public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
         reset();
-        printSequent(seq, filter);
+        printSequent(filter);
     }
 
 
@@ -567,17 +565,18 @@ public final class LogicPrinter {
                 layouter.brk(1,-2).print(")").end();
     }
 
-    protected void printTextSequent(Sequent seq,
-                                    String text,
-                                    boolean frontbreak) throws IOException{
+    protected void printTextSequent(Sequent seq, String text,
+            boolean frontbreak) throws IOException {
 
-                if (frontbreak) {
-                    layouter.brk();
-                }
+        if (frontbreak) {
+            layouter.brk();
+        }
 
-                layouter.beginC(2).print(text).print(" (");
-                printSequent(seq, null, false);
-                layouter.brk(1,-2).print(")").end();
+        layouter.beginC(2).print(text).print(" (");
+        if (seq != null) {
+            printSequent(seq, false);
+        }
+        layouter.brk(1, -2).print(")").end();
     }
 
     protected void printGoalTemplates(Taclet taclet) throws IOException{
@@ -732,27 +731,6 @@ public final class LogicPrinter {
         layouter.brk(1,-2).print(")").end();
     }
 
-
-    /**
-     * Pretty-print a sequent.
-     * The sequent arrow is rendered as <code>==&gt;</code>.  If the
-     * sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae
-     * are indented w.r.t. the arrow.
-     * @param seq The Sequent to be pretty-printed
-     * @param filter The SequentPrintFilter for seq
-     * @param finalbreak Print an additional line-break at the end of the sequent.
-     */
-    public void printSequent(Sequent seq,
-                             SequentPrintFilter filter,
-                             boolean finalbreak) {
-        if ( seq != null ) {
-            printSequent(seq,finalbreak);
-        } else if ( filter != null ) {
-            printSequent(filter,finalbreak);
-        }
-    }
-
     public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
@@ -813,8 +791,10 @@ public final class LogicPrinter {
      * @param seq The Sequent to be pretty-printed
      * @param filter The SequentPrintFilter for seq
      */
-    public void printSequent(Sequent seq, SequentPrintFilter filter) {
-        printSequent(seq, filter, true);
+    public void printSequent(SequentPrintFilter filter) {
+        if (filter != null) {
+            printSequent(filter, true);
+        }
     }
 
     /**

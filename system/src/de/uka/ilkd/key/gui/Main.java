@@ -33,7 +33,6 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
-import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -210,6 +209,7 @@ public final class Main {
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
+        cl.addOption(DEBUG, null, "start KeY in debug mode");
         cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
@@ -344,6 +344,10 @@ public final class Main {
             evaluateLemmataOptions(cl);
         }
 
+        if (cl.isSet(DEBUG)) {
+            Debug.ENABLE_DEBUG = true;
+        }
+
         //arguments not assigned to a command line option may be files
 
         if(!fileArguments.isEmpty()){
@@ -385,40 +389,35 @@ public final class Main {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
                         System.out.println("Auto mode was terminated by an exception:");
                         if (Debug.ENABLE_DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
-                        if (msg!=null) System.err.println(msg);
+                        if (msg!=null) System.out.println(msg);
                     }
                     System.exit(-1);
-                }});
+                }
+            });
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
             ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
-
-            GuiUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    MainWindow key = MainWindow.getInstance();
-                    key.setVisible(true);
-                }
-            });
+            MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
-                        MainWindow.getInstance().getRecentFiles().getMostRecent();
+                        mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
                     fileNameOnStartUp = mostRecent.getAbsolutePath();
                 }
             }
 
-            ui = MainWindow.getInstance().getUserInterface();
+            ui = mainWindow.getUserInterface();
 	    if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
 	        System.out.println("Loading: "+fileNameOnStartUp);
         }
