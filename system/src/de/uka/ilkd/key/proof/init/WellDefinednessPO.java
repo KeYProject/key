@@ -36,7 +36,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
-        final IProgramMethod pm = getProgramMethod();
+        //final IProgramMethod pm = getProgramMethod();
         // TODO: Build problem here
         Triple<Term, ImmutableList<Term>, Term> po = check.createPOTerm();
         ImmutableList<Term> c = ImmutableSLList.<Term>nil();
