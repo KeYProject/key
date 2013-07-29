@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.gui.smt;
@@ -77,11 +77,11 @@ public class SolverListener implements SolverLauncherListener {
                 public SMTProblem getProblem() {
                         return problem;
                 }
-                
+
                 private void addInformation(String title, String content){
                         information.add(new Information(title, content, solver.name()));
                 }
-                
+
                 public boolean createInformation(){
                         if (solver.getException() != null) {
 
@@ -93,8 +93,8 @@ public class SolverListener implements SolverLauncherListener {
                                                 .toString()
                                                 + "\n\n"
                                                 + writer
-                                                                .toString());     
-                                
+                                                                .toString());
+
 
                         }
                         addInformation("Translation", solver.getTranslation());
@@ -125,14 +125,14 @@ public class SolverListener implements SolverLauncherListener {
                         }
                         return solver.getException() != null;
                 }
-                
+
                 @Override
                 public String toString() {
                         return solver.name() +" applied on "+problem.getName();
                 }
 
         }
-        
+
 
         public SolverListener(SMTSettings settings) {
                 this.settings = settings;
@@ -143,7 +143,7 @@ public class SolverListener implements SolverLauncherListener {
                         Collection<SMTSolver> problemSolvers) {
                 timer.cancel();
                 refreshDialog();
-  
+
                 storeInformation();
                 List<InternSMTProblem> problemsWithException = new LinkedList<InternSMTProblem>();
                 progressModel.setEditable(true);
@@ -180,8 +180,8 @@ public class SolverListener implements SolverLauncherListener {
         private void applyResults() {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                        	IBuiltInRuleApp app = 
-                        			( (RuleAppSMT) 
+                        	IBuiltInRuleApp app =
+                        			( (RuleAppSMT)
                         					(RuleAppSMT.rule.createApp( null ) )).
                         					     setTitle( getTitle(problem) );
                         	problem.getGoal().apply(app);
@@ -189,7 +189,7 @@ public class SolverListener implements SolverLauncherListener {
                 }
 
         }
-        
+
         private void showInformation(InternSMTProblem problem){
                 new InformationWindow(problem.information,"Information for "+ problem.toString());
         }
@@ -201,7 +201,7 @@ public class SolverListener implements SolverLauncherListener {
                 progressModel = new ProgressModel();
 
                 String[] captions = new String[smtProblems.size()];
-               
+
                 int i = 0;
                 for (SMTProblem problem : smtproblems) {
                         captions[i] = problem.getName();
@@ -220,7 +220,7 @@ public class SolverListener implements SolverLauncherListener {
                         i++;
                 }
 
-                
+
                 String names[] = new String[smtproblems.size()];
                 int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
@@ -233,32 +233,32 @@ public class SolverListener implements SolverLauncherListener {
                         names[x] = problem.getName();
                         x++;
                 }
-       
-                
+
+
                 ProgressDialogListener listener = new ProgressDialogListener() {
-                        
+
                         @Override
                         public void infoButtonClicked(int column, int row) {
                                 InternSMTProblem problem = getProblem(column, row);
                                 showInformation(problem);
-                                
+
                         }
-                        
+
                         @Override
                         public void stopButtonClicked() {
-                           
-                                stopEvent(launcher); 
+
+                                stopEvent(launcher);
                         }
-                        
+
                         @Override
                         public void applyButtonClicked() {
                                 applyEvent(launcher);
-                                
+
                         }
 
                         @Override
                         public void discardButtonClicked() {
-                                discardEvent(launcher);                                
+                                discardEvent(launcher);
                         }
 
                         @Override
@@ -273,14 +273,14 @@ public class SolverListener implements SolverLauncherListener {
                                           null,
                                           null);
                           	  }else if(obj instanceof InternSMTProblem){
-                        		  showInformation((InternSMTProblem)obj);   
+                        		  showInformation((InternSMTProblem)obj);
                         	  }
                         }
                 };
-                
-               
-                
-                    
+
+
+
+
 
                 progressDialog = new ProgressDialog(
                                 progressModel,listener,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
@@ -290,7 +290,7 @@ public class SolverListener implements SolverLauncherListener {
                 		addWarning(type);
                 	}
                 }
-         
+
                 SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -300,8 +300,8 @@ public class SolverListener implements SolverLauncherListener {
                 });
 
         }
-        
-       
+
+
 
 		private InternSMTProblem getProblem(int col,int row){
                 for(InternSMTProblem problem : problems){
@@ -332,7 +332,7 @@ public class SolverListener implements SolverLauncherListener {
                         final Collection<SolverType> solverTypes,
                         final SolverLauncher launcher) {
                 prepareDialog(smtproblems, solverTypes, launcher);
-               
+
                 setProgressText(0);
                 timer.schedule(new TimerTask() {
                         @Override
@@ -364,7 +364,7 @@ public class SolverListener implements SolverLauncherListener {
                 return Math.max((float) temp / 10.0f, 0);
         }
 
- 
+
 
         private boolean refreshProgessOfProblem(InternSMTProblem problem) {
                 SolverState state = problem.solver.getState();
@@ -394,23 +394,23 @@ public class SolverListener implements SolverLauncherListener {
                 float remainingTime = calculateRemainingTime(problem);
                 progressModel.setText(Float.toString(remainingTime) + " sec.", problem.getSolverIndex(),problem.getProblemIndex());
         }
-        
+
         private void setProgressText(int value){
                 JProgressBar bar = progressDialog.getProgressBar();
                 if(bar.getMaximum() == 1){
                         bar.setString(value == 0 ? "Processing...": "Finished.");
-                        bar.setStringPainted(true); 
+                        bar.setStringPainted(true);
                 }else{
                         bar.setString("Processed " + value + " of " + bar.getMaximum() + " problems.");
                         bar.setStringPainted(true);
                 }
-                        
+
         }
 
         private void stopped(InternSMTProblem problem) {
                 int x = problem.getSolverIndex();
                 int y = problem.getProblemIndex();
-                
+
                 if(!problemProcessed[x][y]){
                         finishedCounter++;
                         progressDialog.setProgress(finishedCounter);
@@ -419,20 +419,20 @@ public class SolverListener implements SolverLauncherListener {
                         setProgressText(finishedCounter);
                         problemProcessed[x][y] = true;
                 }
-    
+
                 if (problem.solver.wasInterrupted()) {
                         interrupted(problem);
                 } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-        
+
                         successfullyStopped(problem,x,y);
                 } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
-   
+
                         unsuccessfullyStopped(problem,x,y);
                 } else {
-                 
+
                         unknownStopped(problem,x,y);
                 }
-           
+
         }
 
         private void interrupted(InternSMTProblem problem) {
@@ -445,8 +445,8 @@ public class SolverListener implements SolverLauncherListener {
                         progressModel.setProgress(0,x,y);
                         progressModel.setTextColor(RED,x,y);
                         progressModel.setText("Exception!",x,y);
-               
-            
+
+
 
                         break;
                 case NoInterruption:
@@ -454,9 +454,9 @@ public class SolverListener implements SolverLauncherListener {
                                         "This position should not be reachable!");
 
                 case Timeout:
-                        progressModel.setProgress(0, x,y);                        
+                        progressModel.setProgress(0, x,y);
                         progressModel.setText("Timeout.",x,y);
-        
+
                         break;
                 case User:
                         progressModel.setText("Interrupted by user.",x,y);
@@ -465,11 +465,11 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void successfullyStopped(InternSMTProblem problem, int x, int y) {
-                
+
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(GREEN,x,y);
                 progressModel.setText("Valid.",x,y);
-               
+
         }
 
         private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
@@ -482,7 +482,7 @@ public class SolverListener implements SolverLauncherListener {
         private void unknownStopped(InternSMTProblem problem, int x, int y) {
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(Color.BLUE,x,y);
-                progressModel.setText("Unkown.",x,y);
+                progressModel.setText("Unknown.",x,y);
         }
 
         private void storeInformation() {
@@ -560,25 +560,25 @@ public class SolverListener implements SolverLauncherListener {
                 return path;
         }
 
-		
+
 		public void addWarning(SolverType type) {
 			StringBuffer message = new StringBuffer();
 			message.append("You are using a version of "+type.getName()+
 					         " which has not been tested for this version of KeY.\nIt can therefore be that" +
 					         " errors occur that would not occur\nusing " +
-					         (type.getSupportedVersions().length > 1 ? 
+					         (type.getSupportedVersions().length > 1 ?
 					         "one of the following versions:\n" :
 					        	 "the following version:\n"));
 			for (String v: type.getSupportedVersions()){
 			    message.append(v + ", ");
 			}
 			message.deleteCharAt(message.lastIndexOf(","));
-			
-			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message.toString());			
-				
-		
+
+			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message.toString());
+
+
 		}
-	
+
 
 
 }
