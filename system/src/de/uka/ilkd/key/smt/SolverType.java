@@ -270,7 +270,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                     return "cvc3";
                 };
 
-                private boolean useNewParameterSchema () {
+                private boolean useNewVersion () {
                     final String solverVersion = getRawVersion();
                     return "version 2.4.1".equals(solverVersion);
                 }
@@ -285,14 +285,18 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public String getDefaultSolverParameters() {
                     // version 2.4.1 uses different parameters
-                    if (useNewParameterSchema())
+                    if (useNewVersion())
                         return "-lang smt -interactive";
+//                      return "-lang smt2 -interactive";
                     else
                         return "+lang smt +model +int";
                 }
 
                 public String[] getDelimiters() {
-                	return new String [] {"CVC>","C>"};
+                    if (useNewVersion())
+                        return new String[]{"\n","\r"};
+                    else
+                        return new String [] {"CVC>","C>"};
                 };
 
                 public String[] getSupportedVersions() {
@@ -305,8 +309,11 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 @Override
                 public SMTTranslator createTranslator(Services services) {
-                        return new SmtLibTranslator(services,
-                                        new Configuration(false,true));
+                    final Configuration conf = new Configuration(false, true);
+//                    if (useNewParameterSchema())
+//                        return new SmtLib2Translator(services, conf);
+//                    else
+                        return new SmtLibTranslator(services,conf);
                 }
 
                 public boolean supportsIfThenElse() {
@@ -331,11 +338,10 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 					 }
 
 					 if(sc.getState() == WAIT_FOR_RESULT ){
-						 if(message.indexOf(" sat") > -1){
+                         if(message.indexOf("unsat") > -1){
+                             sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+                         } else if(message.indexOf("sat") > -1){
 							 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-						 }
-						 if(message.indexOf(" unsat") > -1){
-							 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
 						 }
 						 sc.setState(FINISH);
 					     pipe.close();
