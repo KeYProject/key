@@ -78,7 +78,7 @@
                                     <sedValue xml:id="_8696d2ae-7f4b-4124-b373-7e6102318c88" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedLoopNode xml:id="_e3a802f1-6f5f-46dc-aec2-6fe4ab947ced" name="while ( y%2!=0 ) {if (res_1%2==0) {     res_1=2*res_1+(y%2);     y=y/2;   }else  {     res_1=2*res_1;   } }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="117" charEnd="250">
+                                 <sedLoopStatement xml:id="_e3a802f1-6f5f-46dc-aec2-6fe4ab947ced" name="while ( y%2!=0 ) {if (res_1%2==0) {     res_1=2*res_1+(y%2);     y=y/2;   }else  {     res_1=2*res_1;   } }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="117" charEnd="250">
                                     <sedVariable xml:id="_3711fe80-5c30-4576-8830-f25045b903dd" name="xValue" referenceTypeName="int">
                                        <sedValue xml:id="_c4f3e343-791b-437d-be7b-90ad2d2d1c5d" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                        </sedValue>
@@ -112,7 +112,7 @@
                                           <sedValue xml:id="_00758aa6-b995-4720-aa7c-3d108556c442" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
                                           </sedValue>
                                        </sedVariable>
-                                       <sedBranchNode xml:id="_2913b60b-5665-4d83-a541-7f920a9f7a1e" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
+                                       <sedBranchStatement xml:id="_2913b60b-5665-4d83-a541-7f920a9f7a1e" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
                                           <sedVariable xml:id="_484f1c35-950c-456a-819c-b928d62bd2f8" name="xValue" referenceTypeName="int">
                                              <sedValue xml:id="_9465e5c8-a25b-4cc5-8236-1bd1637e5201" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                              </sedValue>
@@ -180,7 +180,7 @@
                                                       <sedValue xml:id="_810acc6e-4c43-4de9-851e-34e29f925a51" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
                                                       </sedValue>
                                                    </sedVariable>
-                                                   <sedBranchNode xml:id="_543798c7-9805-496a-9e47-17c185f270ce" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
+                                                   <sedBranchStatement xml:id="_543798c7-9805-496a-9e47-17c185f270ce" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
                                                       <sedVariable xml:id="_0205ba6f-e054-4a64-9840-077bee69d0d8" name="xValue" referenceTypeName="int">
                                                          <sedValue xml:id="_91350491-9c25-434e-9605-8faae59adeae" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                          </sedValue>
@@ -231,7 +231,7 @@
                                                                <sedValue xml:id="_3a1a29bb-614d-4b1f-bcaf-2dd1288373ae" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
                                                                </sedValue>
                                                             </sedVariable>
-                                                            <sedBranchNode xml:id="_e9826e81-eaec-44e4-bafc-29e47b5fd573" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
+                                                            <sedBranchStatement xml:id="_e9826e81-eaec-44e4-bafc-29e47b5fd573" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
                                                                <sedVariable xml:id="_fafece2f-694b-4c78-8831-5ee63bb122a8" name="xValue" referenceTypeName="int">
                                                                   <sedValue xml:id="_e721a5b8-bd50-4e91-8a86-9591945e02ca" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                                   </sedValue>
@@ -299,7 +299,7 @@
                                                                            <sedValue xml:id="_504f5a3f-c548-4f5d-9ec8-02083ee02487" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
                                                                            </sedValue>
                                                                         </sedVariable>
-                                                                        <sedBranchNode xml:id="_7bb3cc72-d8d1-40d4-9918-17d1aa772959" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
+                                                                        <sedBranchStatement xml:id="_7bb3cc72-d8d1-40d4-9918-17d1aa772959" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
                                                                            <sedVariable xml:id="_5bfe3ecd-02bc-4a4b-bdb4-7ac94e1b8594" name="xValue" referenceTypeName="int">
                                                                               <sedValue xml:id="_28c7734e-f6c0-411f-9d39-bc290a16f0f1" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                                               </sedValue>
@@ -350,7 +350,7 @@
                                                                                     <sedValue xml:id="_c6b026eb-9f38-459e-9422-cf4cf90b0959" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
                                                                                     </sedValue>
                                                                                  </sedVariable>
-                                                                                 <sedBranchNode xml:id="_d67dffd5-a086-4720-ba2c-800a88fb99cb" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
+                                                                                 <sedBranchStatement xml:id="_d67dffd5-a086-4720-ba2c-800a88fb99cb" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="142" charEnd="245">
                                                                                     <sedVariable xml:id="_6afc38f3-a910-4050-80b8-87f465707380" name="xValue" referenceTypeName="int">
                                                                                        <sedValue xml:id="_6eb22bff-ac14-4d48-ae3a-cb2985a20447" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                                                        </sedValue>
@@ -447,23 +447,23 @@
                                                                                           </sedLoopCondition>
                                                                                        </sedStatement>
                                                                                     </sedStatement>
-                                                                                 </sedBranchNode>
+                                                                                 </sedBranchStatement>
                                                                               </sedLoopCondition>
                                                                            </sedStatement>
-                                                                        </sedBranchNode>
+                                                                        </sedBranchStatement>
                                                                      </sedLoopCondition>
                                                                   </sedStatement>
                                                                </sedStatement>
-                                                            </sedBranchNode>
+                                                            </sedBranchStatement>
                                                          </sedLoopCondition>
                                                       </sedStatement>
-                                                   </sedBranchNode>
+                                                   </sedBranchStatement>
                                                 </sedLoopCondition>
                                              </sedStatement>
                                           </sedStatement>
-                                       </sedBranchNode>
+                                       </sedBranchStatement>
                                     </sedLoopCondition>
-                                 </sedLoopNode>
+                                 </sedLoopStatement>
                               </sedStatement>
                            </sedMethodReturn>
                         </sedStatement>
@@ -508,7 +508,7 @@
                                     <sedValue xml:id="_9c3d0a0a-e976-4b43-8366-7ba6f54c5e45" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedLoopNode xml:id="_254470d9-e9d5-47fe-bd2b-51c2bdc6e8ce" name="while ( y%2!=0 ) {if (res%2==0) {     res=2*res+(y%2);     y=y/2;   }else  {     res=2*res;   } }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="117" charEnd="250">
+                                 <sedLoopStatement xml:id="_254470d9-e9d5-47fe-bd2b-51c2bdc6e8ce" name="while ( y%2!=0 ) {if (res%2==0) {     res=2*res+(y%2);     y=y/2;   }else  {     res=2*res;   } }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="117" charEnd="250">
                                     <sedVariable xml:id="_963effaa-78fa-440c-a9de-f7a17420d2db" name="xValue" referenceTypeName="int">
                                        <sedValue xml:id="_ba7bf64d-b376-4e11-8477-83a9d07d625e" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                        </sedValue>
@@ -542,7 +542,7 @@
                                           <sedValue xml:id="_bf359c11-3b5d-40c2-91cd-c2eb4bb1ab2d" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
                                           </sedValue>
                                        </sedVariable>
-                                       <sedBranchNode xml:id="_00f29cec-0d99-453b-9d6f-f068cb063516" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
+                                       <sedBranchStatement xml:id="_00f29cec-0d99-453b-9d6f-f068cb063516" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
                                           <sedVariable xml:id="_c56d8fcb-fe41-4e72-ab19-e1aa03104ebd" name="xValue" referenceTypeName="int">
                                              <sedValue xml:id="_bf5c7b1d-2cb2-462f-8dca-f6db310dd5a3" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                              </sedValue>
@@ -610,7 +610,7 @@
                                                       <sedValue xml:id="_97c8891f-288b-4cce-b8fa-06388e0b7677" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
                                                       </sedValue>
                                                    </sedVariable>
-                                                   <sedBranchNode xml:id="_6aade949-d41c-4c91-b041-3fd6bc252d96" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
+                                                   <sedBranchStatement xml:id="_6aade949-d41c-4c91-b041-3fd6bc252d96" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
                                                       <sedVariable xml:id="_2abb2d97-5409-4358-b0a2-70bc964ecbad" name="xValue" referenceTypeName="int">
                                                          <sedValue xml:id="_22092153-0dcc-4347-a245-027cebd162ea" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                          </sedValue>
@@ -661,7 +661,7 @@
                                                                <sedValue xml:id="_bad9524d-1434-42e4-b035-04d30c945fc3" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
                                                                </sedValue>
                                                             </sedVariable>
-                                                            <sedBranchNode xml:id="_12771067-5765-41c1-a445-d4015c9b19d2" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
+                                                            <sedBranchStatement xml:id="_12771067-5765-41c1-a445-d4015c9b19d2" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
                                                                <sedVariable xml:id="_6b03aadf-9c99-4c55-8229-424efe530fbd" name="xValue" referenceTypeName="int">
                                                                   <sedValue xml:id="_263d059f-975a-4dcc-84c3-abf9d3c3d719" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                                   </sedValue>
@@ -729,7 +729,7 @@
                                                                            <sedValue xml:id="_006a8dc0-b6c7-4416-be1e-d094d7580dda" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
                                                                            </sedValue>
                                                                         </sedVariable>
-                                                                        <sedBranchNode xml:id="_0f663f49-3fa8-4dc9-9bb4-8ce525909106" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
+                                                                        <sedBranchStatement xml:id="_0f663f49-3fa8-4dc9-9bb4-8ce525909106" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
                                                                            <sedVariable xml:id="_2f5c46ac-b7e5-4303-8b19-3cd0e9f95811" name="xValue" referenceTypeName="int">
                                                                               <sedValue xml:id="_a06fa147-cc4e-42d3-ae77-5046035d8269" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                                               </sedValue>
@@ -780,7 +780,7 @@
                                                                                     <sedValue xml:id="_258e3127-d10f-454f-8d1a-6972a5709be5" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
                                                                                     </sedValue>
                                                                                  </sedVariable>
-                                                                                 <sedBranchNode xml:id="_0658d8de-6da9-477b-a96f-002bcc2f6ac6" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
+                                                                                 <sedBranchStatement xml:id="_0658d8de-6da9-477b-a96f-002bcc2f6ac6" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="142" charEnd="245">
                                                                                     <sedVariable xml:id="_2cf15c23-07d3-4146-87be-78bedd075fe8" name="xValue" referenceTypeName="int">
                                                                                        <sedValue xml:id="_da324abc-f6bc-4805-9d97-df8383743fbe" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
                                                                                        </sedValue>
@@ -877,23 +877,23 @@
                                                                                           </sedLoopCondition>
                                                                                        </sedStatement>
                                                                                     </sedStatement>
-                                                                                 </sedBranchNode>
+                                                                                 </sedBranchStatement>
                                                                               </sedLoopCondition>
                                                                            </sedStatement>
-                                                                        </sedBranchNode>
+                                                                        </sedBranchStatement>
                                                                      </sedLoopCondition>
                                                                   </sedStatement>
                                                                </sedStatement>
-                                                            </sedBranchNode>
+                                                            </sedBranchStatement>
                                                          </sedLoopCondition>
                                                       </sedStatement>
-                                                   </sedBranchNode>
+                                                   </sedBranchStatement>
                                                 </sedLoopCondition>
                                              </sedStatement>
                                           </sedStatement>
-                                       </sedBranchNode>
+                                       </sedBranchStatement>
                                     </sedLoopCondition>
-                                 </sedLoopNode>
+                                 </sedLoopStatement>
                               </sedStatement>
                            </sedMethodReturn>
                         </sedStatement>

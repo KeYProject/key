@@ -7,7 +7,7 @@
                <sedMethodCall xml:id="_8eba6ba0-075b-4f77-9e19-6e130d26a182" name="UseOperationContractInvalidPreconditionTest();" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                   <sedMethodReturn xml:id="_9e041f2c-2784-4773-a156-8b9abc1897a5" name="&lt;return of UseOperationContractInvalidPreconditionTest();&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedStatement xml:id="_5e214eaf-5917-42f3-a9c7-1c4b68dc5419" name="int magicNumber = obj.magic(-123);" pathCondition="true" lineNumber="-1" charStart="278" charEnd="312">
-                        <sedUseOperationContract xml:id="_e41fdc60-ea31-438d-8994-579e7e30cebf" name="result = self.magic(x) catch(exc)
+                        <sedOperationContract xml:id="_e41fdc60-ea31-438d-8994-579e7e30cebf" name="result = self.magic(x) catch(exc)
 pre: x &gt;= 0 &amp; self.&lt;inv&gt;
 post: result = 42 &amp; self.&lt;inv&gt; &amp; exc = null
 mod: allLocs
@@ -22,7 +22,7 @@ termination: diamond" pathCondition="true" lineNumber="-1" charStart="553" charE
                                  </sedStatement>
                               </sedStatement>
                            </sedBranchCondition>
-                        </sedUseOperationContract>
+                        </sedOperationContract>
                      </sedStatement>
                   </sedMethodReturn>
                </sedMethodCall>

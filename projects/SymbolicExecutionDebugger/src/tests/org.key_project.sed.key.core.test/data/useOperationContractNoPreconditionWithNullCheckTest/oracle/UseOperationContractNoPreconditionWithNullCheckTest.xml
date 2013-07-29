@@ -4,7 +4,7 @@
       <sedThread xml:id="_75bb62a4-6c75-4d44-bc22-63a10dc786e3" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_b70f9c90-fc0c-4c9e-8d09-0d27145dffab" name="UseOperationContractNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="93">
             <sedStatement xml:id="_215002f4-9bab-44de-a02b-fe3c5fa9ad7a" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="156" charEnd="189">
-               <sedUseOperationContract xml:id="_a2e3fd69-339a-4da8-845a-730cd9dc1cf9" name="result = self.magic(x) catch(exc)
+               <sedOperationContract xml:id="_a2e3fd69-339a-4da8-845a-730cd9dc1cf9" name="result = self.magic(x) catch(exc)
 pre: self.&lt;inv&gt;
 post: result = 42 &amp; self.&lt;inv&gt; &amp; exc = null
 mod: allLocs
@@ -19,7 +19,7 @@ termination: diamond" pathCondition="true" lineNumber="-1" charStart="355" charE
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-               </sedUseOperationContract>
+               </sedOperationContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

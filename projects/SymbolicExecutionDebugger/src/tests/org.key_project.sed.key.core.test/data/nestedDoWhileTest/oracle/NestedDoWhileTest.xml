@@ -5,9 +5,9 @@
          <sedMethodCall xml:id="_4d5a8375-f7e7-4107-b4a6-40ef8f495ed4" name="self.main();" pathCondition="true" lineNumber="-1" charStart="97" charEnd="101">
             <sedStatement xml:id="_51d93d1b-0264-41e4-93f1-db3e145c7d13" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="109" charEnd="124">
                <sedStatement xml:id="_563d624f-d614-488f-812d-d0146128a59a" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="128" charEnd="138">
-                  <sedLoopNode xml:id="_f910de7c-b2ae-4687-a347-4ef55dafae3b" name="do {do {do {result_1++;i++;}while ( i&lt;2 );     result_1++;     i++;   }  while ( i&lt;3 );   result_1++;   i++; }while ( i&lt;3 );" pathCondition="true" lineNumber="-1" charStart="142" charEnd="318">
-                     <sedLoopNode xml:id="_602fffdc-bed1-4b9d-90bd-58051107db6b" name="do {do {result_1++;i++;}while ( i&lt;2 );   result_1++;   i++; }while ( i&lt;3 );" pathCondition="true" lineNumber="-1" charStart="151" charEnd="271">
-                        <sedLoopNode xml:id="_4ea450e9-a873-4cf7-b5da-4445e15e6ab9" name="do {result_1++;i++;}while ( i&lt;2 );" pathCondition="true" lineNumber="-1" charStart="161" charEnd="220">
+                  <sedLoopStatement xml:id="_f910de7c-b2ae-4687-a347-4ef55dafae3b" name="do {do {do {result_1++;i++;}while ( i&lt;2 );     result_1++;     i++;   }  while ( i&lt;3 );   result_1++;   i++; }while ( i&lt;3 );" pathCondition="true" lineNumber="-1" charStart="142" charEnd="318">
+                     <sedLoopStatement xml:id="_602fffdc-bed1-4b9d-90bd-58051107db6b" name="do {do {result_1++;i++;}while ( i&lt;2 );   result_1++;   i++; }while ( i&lt;3 );" pathCondition="true" lineNumber="-1" charStart="151" charEnd="271">
+                        <sedLoopStatement xml:id="_4ea450e9-a873-4cf7-b5da-4445e15e6ab9" name="do {result_1++;i++;}while ( i&lt;2 );" pathCondition="true" lineNumber="-1" charStart="161" charEnd="220">
                            <sedStatement xml:id="_8fce669e-fb86-4afa-a39a-d87e89ceaabb" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="172" charEnd="182">
                               <sedStatement xml:id="_d5322e02-6ee3-4da2-b42c-278cc8d9cef7" name="i++;" pathCondition="true" lineNumber="-1" charStart="189" charEnd="193">
                                  <sedLoopCondition xml:id="_4fbf8c72-2630-43db-9bd3-6096d285e524" name="i&lt;2" pathCondition="true" lineNumber="-1" charStart="213" charEnd="218">
@@ -38,9 +38,9 @@
                                  </sedLoopCondition>
                               </sedStatement>
                            </sedStatement>
-                        </sedLoopNode>
-                     </sedLoopNode>
-                  </sedLoopNode>
+                        </sedLoopStatement>
+                     </sedLoopStatement>
+                  </sedLoopStatement>
                </sedStatement>
             </sedStatement>
          </sedMethodCall>

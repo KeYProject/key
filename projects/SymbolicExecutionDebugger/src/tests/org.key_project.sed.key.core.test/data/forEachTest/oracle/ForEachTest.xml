@@ -5,7 +5,7 @@
          <sedMethodCall xml:id="_f936c868-e768-43a3-a16d-3fe3f0995336" name="self.main();" pathCondition="true" lineNumber="-1" charStart="91" charEnd="95">
             <sedStatement xml:id="_3ad24821-bcb7-467f-afe5-abffc731b1e3" name="int[] array = new int[3];" pathCondition="true" lineNumber="-1" charStart="103" charEnd="128">
                <sedStatement xml:id="_3c4fb512-0e90-406c-89f1-498074064a02" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="132" charEnd="147">
-                  <sedLoopNode xml:id="_32ab4c44-5c44-4a17-949f-60a562de868b" name="for (int element : array) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="151" charEnd="198">
+                  <sedLoopStatement xml:id="_32ab4c44-5c44-4a17-949f-60a562de868b" name="for (int element : array) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="151" charEnd="198">
                      <sedStatement xml:id="_217a65bc-e75c-4dea-b1e8-58bc1ba666e8" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193">
                         <sedStatement xml:id="_3ec76ecb-2ac0-434f-87ff-0e4b2fd011a0" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193">
                            <sedStatement xml:id="_d7e7ec9b-8f41-4493-b564-4d9f361070af" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193">
@@ -18,7 +18,7 @@
                            </sedStatement>
                         </sedStatement>
                      </sedStatement>
-                  </sedLoopNode>
+                  </sedLoopStatement>
                </sedStatement>
             </sedStatement>
          </sedMethodCall>

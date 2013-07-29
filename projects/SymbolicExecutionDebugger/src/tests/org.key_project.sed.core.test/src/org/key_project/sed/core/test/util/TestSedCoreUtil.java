@@ -971,7 +971,7 @@ public final class TestSedCoreUtil {
                   compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else if (expectedChildren[i] instanceof ISEDLoopStatement) {
-                  TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopStatement);
+                  TestCase.assertTrue("Expected ISEDLoopStatement on " + ((ISEDLoopStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopStatement);
                   compareLoopStatement((ISEDLoopStatement)expectedChildren[i], (ISEDLoopStatement)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else if (expectedChildren[i] instanceof ISEDMethodCall) {

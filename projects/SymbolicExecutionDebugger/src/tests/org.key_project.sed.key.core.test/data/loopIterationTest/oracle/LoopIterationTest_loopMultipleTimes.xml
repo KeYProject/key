@@ -6,7 +6,7 @@
             <sedStatement xml:id="_e5afdab8-129c-4bf8-adf9-828d26d7da59" name="doLoop();" pathCondition="true" lineNumber="-1" charStart="74" charEnd="83">
                <sedMethodCall xml:id="_dd0c09db-8544-4875-9b83-9511a43113c4" name="self.doLoop();" pathCondition="true" lineNumber="-1" charStart="118" charEnd="124">
                   <sedStatement xml:id="_1067f057-7962-4921-9089-6fdfff28abad" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="132" charEnd="142">
-                     <sedLoopNode xml:id="_c567f23d-c9fe-49eb-8e9b-c41947252afb" name="while ( i&lt;3 ) {   i+=innerLoop(); }" pathCondition="true" lineNumber="-1" charStart="146" charEnd="187">
+                     <sedLoopStatement xml:id="_c567f23d-c9fe-49eb-8e9b-c41947252afb" name="while ( i&lt;3 ) {   i+=innerLoop(); }" pathCondition="true" lineNumber="-1" charStart="146" charEnd="187">
                         <sedLoopCondition xml:id="_78584fbf-2d39-4807-b264-687f812cd16a" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
                            <sedStatement xml:id="_bbe34d7d-5764-48a5-9541-584d0b89c0ef" name="i+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
                               <sedMethodCall xml:id="_9ab04336-38aa-4d96-bef4-92e4a97348a6" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
@@ -27,7 +27,7 @@
                                                                            <sedStatement xml:id="_764fdfae-d672-4d52-a7e1-2f94ddfb6c08" name="doLoop();" pathCondition="true" lineNumber="-1" charStart="87" charEnd="96">
                                                                               <sedMethodCall xml:id="_fafbe5c4-37c2-4491-ac43-59349e39cbee" name="self.doLoop();" pathCondition="true" lineNumber="-1" charStart="118" charEnd="124">
                                                                                  <sedStatement xml:id="_f32e4f15-64a0-40ca-af50-593b902cca92" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="132" charEnd="142">
-                                                                                    <sedLoopNode xml:id="_14540576-c284-4d0d-a67c-85678467bf33" name="while ( i_1&lt;3 ) {   i_1+=innerLoop(); }" pathCondition="true" lineNumber="-1" charStart="146" charEnd="187">
+                                                                                    <sedLoopStatement xml:id="_14540576-c284-4d0d-a67c-85678467bf33" name="while ( i_1&lt;3 ) {   i_1+=innerLoop(); }" pathCondition="true" lineNumber="-1" charStart="146" charEnd="187">
                                                                                        <sedLoopCondition xml:id="_ad4b4a88-2a51-4605-89de-bbfcfd7a22cc" name="i_1&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
                                                                                           <sedStatement xml:id="_ad5a4881-f2d3-4e79-8748-579d2b251644" name="i_1+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
                                                                                              <sedMethodCall xml:id="_ba6382b3-90cd-48ce-9348-f99dcaa8c28a" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
@@ -66,7 +66,7 @@
                                                                                              </sedMethodCall>
                                                                                           </sedStatement>
                                                                                        </sedLoopCondition>
-                                                                                    </sedLoopNode>
+                                                                                    </sedLoopStatement>
                                                                                  </sedStatement>
                                                                               </sedMethodCall>
                                                                            </sedStatement>
@@ -87,7 +87,7 @@
                               </sedMethodCall>
                            </sedStatement>
                         </sedLoopCondition>
-                     </sedLoopNode>
+                     </sedLoopStatement>
                   </sedStatement>
                </sedMethodCall>
             </sedStatement>
