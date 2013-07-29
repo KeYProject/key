@@ -2395,11 +2395,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSplittingApproval ( d );
 
         bindRuleSet ( d, "apply_select_eq",
-              or( applyTF( "s", rec( any(), SimplifiedSelectTermFeature.create(heapLDT) ) ),
-                  add( NoSelfApplicationFeature.INSTANCE ,
-                       applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE) ) ) );
+              add( isInstantiated("s"),
+                   isInstantiated("t1"),
+                   or( applyTF( "s", rec( any(), SimplifiedSelectTermFeature.create(heapLDT) ) ),
+                       add( NoSelfApplicationFeature.INSTANCE ,
+                            applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE) ) ) ) );
         bindRuleSet ( d, "apply_auxiliary_eq",
               add( NoSelfApplicationFeature.INSTANCE ,
+                   isInstantiated("s"),
                    applyTF("s", rec( any(),
                                      add( SimplifiedSelectTermFeature.create(heapLDT),
                                           not( ff.ifThenElse ) ) ) ) ) );
