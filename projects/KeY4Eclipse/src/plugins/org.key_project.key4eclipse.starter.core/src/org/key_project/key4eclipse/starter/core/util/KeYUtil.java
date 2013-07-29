@@ -247,7 +247,7 @@ public final class KeYUtil {
                         InitConfig alreadyLoadedConfig = getInitConfig(location); 
                         if (alreadyLoadedConfig != null) {
                             // Open proof management dialog
-                            ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), alreadyLoadedConfig);
+                            ProofManagementDialog.showInstance(alreadyLoadedConfig);
                         }
                         else {
                             // Load local file
@@ -364,7 +364,7 @@ public final class KeYUtil {
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                         // Start proof by showing the proof management dialog
-                        ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), initConfig, pm.getContainerType(), pm);
+                        ProofManagementDialog.showInstance(initConfig, pm.getContainerType(), pm);
                     }
                     catch (Exception e) {
                         setException(e);

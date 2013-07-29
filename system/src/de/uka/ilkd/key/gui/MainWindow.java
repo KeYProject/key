@@ -304,6 +304,20 @@ public final class MainWindow extends JFrame  {
         }
         return instance;
     }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * <b>This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a {@link MainWindow} instance exists.</b>
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
+    }
 
     /**
      * Tries to set the system look and feel if this option is activated.
