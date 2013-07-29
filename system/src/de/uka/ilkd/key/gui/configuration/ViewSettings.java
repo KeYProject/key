@@ -39,6 +39,7 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
     private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
     private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
+    private static final String CONFIRM_EXIT = "[View]ConfirmExit";
 
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
@@ -59,6 +60,8 @@ public class ViewSettings implements Settings, Cloneable {
     /** Pretty Syntax is true by default, use Unicode symbols not */
     private boolean usePretty = true;
     private boolean useUnicode = false;
+    /** confirm exiting by default */
+    private boolean confirmExit = true;
 
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
@@ -226,6 +229,7 @@ public class ViewSettings implements Settings, Cloneable {
 		String val7 = props.getProperty(SHOW_JAVA_WARNING);
 		String val8 = props.getProperty(PRETTY_SYNTAX);
 		String val9 = props.getProperty(USE_UNICODE);
+		String confirmExit = props.getProperty(CONFIRM_EXIT);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		}
@@ -258,6 +262,9 @@ public class ViewSettings implements Settings, Cloneable {
 		if (val9 != null) {
 		    useUnicode = Boolean.valueOf(val9).booleanValue();
 		}
+		if (confirmExit != null) {
+		    this.confirmExit = Boolean.valueOf(confirmExit);
+		}
 	}
 
 
@@ -284,6 +291,7 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(SHOW_JAVA_WARNING, "" + notifyLoadBehaviour);
     	props.setProperty(PRETTY_SYNTAX, ""+ usePretty);
     	props.setProperty(USE_UNICODE, "" + useUnicode);
+    	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
     }
 
     /** sends the message that the state of this setting has been
@@ -336,5 +344,16 @@ public void setUseUnicode(boolean useUnicode) {
 	}
 	fireSettingsChanged();
 }
+
+    /** Whether to display the confirmation dialog upon exiting the main window. */
+    public boolean confirmExit() {
+        return confirmExit;
+    }
+
+    /** Set whether to display the confirmation dialog upon exiting the main window. */
+    public void setConfirmExit(boolean confirmExit) {
+        this.confirmExit = confirmExit;
+        fireSettingsChanged();
+    }
 
 }

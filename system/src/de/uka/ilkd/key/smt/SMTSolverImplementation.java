@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.smt;
@@ -37,7 +37,7 @@ interface SolverListener {
 }
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
- 
+
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
 
@@ -49,7 +49,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         /** starts a external process and returns the result */
         private ExternalProcessLauncher<SolverCommunication> processLauncher;
-   
+
         /**
          * The services object is stored in order to have the possibility to
          * access it in every method
@@ -60,7 +60,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * it also contains the final result.
          */
         private SolverCommunication solverCommunication = SolverCommunication.EMPTY;
-      
+
 
         /**
          * This lock variable is responsible for the state variable
@@ -100,10 +100,10 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * this attribute
          */
         private Throwable exception;
-        
+
         private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
 
- 
+
 
 
         SMTSolverImplementation(SMTProblem problem, SolverListener listener,
@@ -120,12 +120,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * Starts a solver process. This method should be accessed only by an
          * instance of <code>SolverLauncher</code>. If you want to start a
          * solver please have a look at <code>SolverLauncher</code>.
-         * 
+         *
          * @param timeout
          * @param settings
          */
         public void start(SolverTimeout timeout, SMTSettings settings) {
-                thread = new Thread(this);
+                thread = new Thread(this,"SMTProcessor");
                 solverTimeout = timeout;
                 smtSettings = settings;
                 thread.start();
@@ -235,20 +235,20 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                         solverTimeout.cancel();
                         return;
                 }
-     
+
 
                 // start the external process.
                 try {
                         processLauncher.launch(commands,type.modifyProblem(problemString),type);
-                 
+
                         solverCommunication = processLauncher.getCommunication();
-                        if(solverCommunication.exceptionHasOccurred() && 
-                          !solverCommunication.resultHasBeenSet()){ 
-                        	// if the result has already been set, the exceptions 
+                        if(solverCommunication.exceptionHasOccurred() &&
+                          !solverCommunication.resultHasBeenSet()){
+                        	// if the result has already been set, the exceptions
                         	// must have occurred while doing the remaining communication, which is not that important.
                         	throw new AccumulatedException(solverCommunication.getExceptions());
                         }
-                                      
+
                         // uncomment for testing
                       //  Thread.sleep(3000);
                         // uncomment for testing
@@ -290,7 +290,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-        
+
         private static String indent(String string) {
 
             StringBuilder sb = new StringBuilder();
@@ -326,7 +326,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
                 problemString = indent(trans.translateProblem(term, services,
                                 smtSettings).toString());
-            
+
                 tacletTranslation = ((AbstractSMTTranslator) trans)
                                 .getTacletSetTranslation();
                 exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
@@ -379,8 +379,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         public String getSolverOutput() {
          		String output = "";
         		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
-      	
-      
+
+
         		for(String s : solverCommunication.getMessages()){
         			output += s+"\n";
         		}
@@ -389,7 +389,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         @Override
         public Collection<Throwable> getExceptionsOfTacletTranslation() {
-                
+
                 return exceptionsForTacletTranslation;
         }
 
