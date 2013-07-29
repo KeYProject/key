@@ -107,6 +107,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
         /**
          * Retrieve the version string without check for support.
+         * Returns null if the solver is not installed.
          */
         public String getRawVersion();
 
@@ -157,6 +158,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
+                    if (tmp==null) return null;
                     return tmp.substring(tmp.indexOf("version"));
                 }
 
@@ -277,6 +279,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
+                    if (tmp==null) return null;
                     return tmp.substring(tmp.indexOf("version"));
                 }
 
@@ -463,6 +466,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
+                    if (tmp==null) return null;
                     return tmp.substring(tmp.indexOf("version"));
                 }
 
@@ -643,7 +647,9 @@ abstract class AbstractSolverType implements SolverType {
 		}
 
         public String getRawVersion() {
-            return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
+            if (isInstalled(true))
+                return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
+            else return null;
         }
 
 
