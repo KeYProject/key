@@ -104,6 +104,12 @@ public interface SolverType extends PipeListener<SolverCommunication> {
          * Returns the current version that is installed, if it has already been checked, otherwise null.
          *    */
         public String getVersion();
+
+        /**
+         * Retrieve the version string without check for support.
+         */
+        public String getRawVersion();
+
         /**
          * Returns whether the currently installed version is supported.
          *     */
@@ -147,7 +153,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 public String getVersionParameter() {
                 	return "-version";
                 };
-                
+
+                @Override
+                public String getRawVersion () {
+                    final String tmp = super.getRawVersion();
+                    return tmp.substring(tmp.indexOf("version"));
+                }
+
                 public String[] getSupportedVersions() {
                 	return new String[] {"version 3.2","version 4.1","version 4.3.0"};
                 	// version 4.3.1 is not supported, see bug #1236
@@ -256,10 +268,25 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 public String getDefaultSolverCommand() {
                     return "cvc3";
                 };
-                
+
+                private boolean useNewParameterSchema () {
+                    final String solverVersion = getRawVersion();
+                    return "version 2.4.1".equals(solverVersion);
+                }
+
+                @Override
+                public String getRawVersion () {
+                    final String tmp = super.getRawVersion();
+                    return tmp.substring(tmp.indexOf("version"));
+                }
+
                 @Override
                 public String getDefaultSolverParameters() {
-                    return "+lang smt +model +int";
+                    // version 2.4.1 uses different parameters
+                    if (useNewParameterSchema())
+                        return "-lang smt -interactive";
+                    else
+                        return "+lang smt +model +int";
                 }
                 
                 public String[] getDelimiters() {
@@ -267,7 +294,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 };
                 
                 public String[] getSupportedVersions() {
-                	return new String[] {"version 2.2"};
+                	return new String[] {"version 2.2", "version 2.4.1"};
                 };
                 
                 public String getVersionParameter() {
@@ -432,7 +459,13 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 public String[] getSupportedVersions() {
                 	return new String []{"version 1.5.4"};
                 };
-                
+
+                @Override
+                public String getRawVersion () {
+                    final String tmp = super.getRawVersion();
+                    return tmp.substring(tmp.indexOf("version"));
+                }
+
                 public String[] getDelimiters() {
                 	return new String [] {">"};
                 };
@@ -553,7 +586,7 @@ abstract class AbstractSolverType implements SolverType {
         		return false;
         	}
         	supportHasBeenChecked = true;
-            solverVersion = VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
+            solverVersion = getRawVersion();
             if(solverVersion == null){
             	solverVersion = "";
             	isSupportedVersion = false;
@@ -608,8 +641,12 @@ abstract class AbstractSolverType implements SolverType {
         public String getVersion() {
 			return solverVersion;
 		}
-        
-        
+
+        public String getRawVersion() {
+            return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
+        }
+
+
         @Override
         public void exceptionOccurred(Pipe<SolverCommunication> pipe,
         	Throwable exception) {
