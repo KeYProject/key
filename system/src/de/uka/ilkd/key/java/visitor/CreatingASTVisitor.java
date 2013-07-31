@@ -398,7 +398,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnFor(For x) {
+    public void performActionOnFor(final For x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 For newFor = new For(changeList);
@@ -409,7 +409,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
     
-    public void performActionOnEnhancedFor(EnhancedFor x) {
+    public void performActionOnEnhancedFor(final EnhancedFor x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 EnhancedFor enhancedFor = new EnhancedFor(changeList);

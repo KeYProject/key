@@ -206,6 +206,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
+    public boolean hasGuard() {
+        return guard != null;
+    }
+
+    @Override
     public Term getGuard() {
         assert guard != null;
         return guard;

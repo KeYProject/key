@@ -457,8 +457,9 @@ public class Recoder2KeYTypeConverter {
                     initArrayMethodBuilder();
                 }	
 
-                final IProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
-										       parentReference, length, defaultValue, fields);
+                final IProgramMethod prepare =
+                        arrayMethodBuilder.getPrepareArrayMethod(parentReference, length,
+                                                                 defaultValue, fields);
 
                 members.add(arrayMethodBuilder
                         .getArrayInstanceAllocatorMethod(parentReference));

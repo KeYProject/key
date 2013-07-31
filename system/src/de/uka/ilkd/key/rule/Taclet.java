@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -574,10 +575,22 @@ public abstract class Taclet implements Rule, Named {
 	final Operator sourceOp   = term.op ();
     final Operator templateOp = template.op ();
                 
+    if (template.hasLabels()) {
+        final ImmutableArray<ITermLabel> labels = template.getLabels();
+        if (labels.size() > 1 || !(labels.get(0) instanceof SchemaVariable)) {
+            Debug.out("FAILED 3x.");
+            return null; ///FAILED
+        } else {
+            final MatchConditions cond = ((SchemaVariable)labels.get(0)).match(term, matchCond, services);
+            if (cond == null) {
+                return null;
+            }
+        }
+    }
     
 	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
 	    return templateOp.match(term, matchCond, services);
-        }
+	}
     
 	matchCond = templateOp.match (sourceOp, matchCond, services);
 	if(matchCond == null) {

@@ -89,8 +89,8 @@ public final class UseOperationContractRule implements BuiltInRule {
     private static final Name NAME = new Name("Use Operation Contract");
     private static final TermBuilder TB = TermBuilder.DF;
     
-    private Term lastFocusTerm;
-    private Instantiation lastInstantiation;   
+    private static Term lastFocusTerm;
+    private static Instantiation lastInstantiation;
     
 
     //-------------------------------------------------------------------------
@@ -428,7 +428,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
         
 
-    private Instantiation instantiate(Term focusTerm, Services services) {
+    private static Instantiation instantiate(Term focusTerm, Services services) {
 	//result cached?
 	if(focusTerm == lastFocusTerm) {
 	    return lastInstantiation;
@@ -444,7 +444,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private boolean isInfFlow(Goal goal) {
+    private static boolean isInfFlow(Goal goal) {
         StrategyProperties stratProps =
                 goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
         Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
@@ -459,18 +459,18 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private void applyInfFlow(Goal goal,
-                              final FunctionalOperationContract contract,
-                              final Instantiation inst,
-                              final Term self,
-                              final ImmutableList<Term> params,
-                              final Term result,
-                              final Term exception,
-                              final Term mby,
-                              final Term atPreUpdates,
-                              final Term finalPreTerm,
-                              final ImmutableList<AnonUpdateData> anonUpdateDatas,
-                              Services services) {
+    private static void applyInfFlow(Goal goal,
+                                     final FunctionalOperationContract contract,
+                                     final Instantiation inst,
+                                     final Term self,
+                                     final ImmutableList<Term> params,
+                                     final Term result,
+                                     final Term exception,
+                                     final Term mby,
+                                     final Term atPreUpdates,
+                                     final Term finalPreTerm,
+                                     final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                                     Services services) {
         if (!isInfFlow(goal)) {
             return;
         }
@@ -1020,5 +1020,4 @@ public final class UseOperationContractRule implements BuiltInRule {
             this.anonHeap = anonHeap;
         }
     }
-
 }

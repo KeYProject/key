@@ -86,18 +86,18 @@ public abstract class LoopStatement extends JavaStatement
      *      Loop statement.
      *      @param body a statement.
      */
-    public LoopStatement(Expression guard,Statement body,ExtList comments) {
+    public LoopStatement(Expression guard, Statement body, ExtList comments) {
 	super(comments);
-        this.body    = body;
+	this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
 
 
-    public LoopStatement(Expression guard,Statement body,ExtList comments, PositionInfo pos) {
+    public LoopStatement(Expression guard, Statement body, ExtList comments, PositionInfo pos) {
 	super(add(comments,pos));
-        this.body    = body;
+	this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
@@ -108,17 +108,17 @@ public abstract class LoopStatement extends JavaStatement
      *      Loop statement.
      *      @param body a statement.
      */
-    public LoopStatement(Expression guard,Statement body) {
+    public LoopStatement(Expression guard, Statement body) {
         this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
 
-    public LoopStatement(Expression guard, Statement body, 
+    public LoopStatement(Expression guard, Statement body,
                          PositionInfo pos) {
 	super(pos);
-        this.body    = body;
+	this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
@@ -185,7 +185,7 @@ public abstract class LoopStatement extends JavaStatement
     * @param body the body of the loop   
     */
     public LoopStatement(ILoopInit inits, IGuard guard, 
-			 IForUpdates updates, Statement body){
+			 IForUpdates updates, Statement body) {
         this.body    = body;
 	this.updates = updates;
 	this.inits   = inits;
@@ -391,7 +391,6 @@ public abstract class LoopStatement extends JavaStatement
      */
     public abstract boolean isCheckedBeforeIteration();
 
-
     @Override
     public boolean equals(Object o) {
         if (o == null || !(o instanceof LoopStatement)) {
@@ -399,15 +398,14 @@ public abstract class LoopStatement extends JavaStatement
         }
 
         LoopStatement cmp = (LoopStatement)o;
-        return this.getClass() == cmp.getClass() &&
-               // XXX: line number not equal!!
-               this.getStartPosition().getLine() == cmp.getStartPosition().getLine();
+        return super.equals(cmp)
+                && this.getStartPosition().getLine()
+                    == cmp.getStartPosition().getLine();
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + this.getClass().hashCode();
+        int hash = super.hashCode();
         hash =  67 * hash + (this.getStartPosition().getLine() << 8);
         return hash;
     }

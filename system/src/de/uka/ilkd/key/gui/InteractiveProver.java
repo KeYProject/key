@@ -310,25 +310,25 @@ public class InteractiveProver implements InterruptListener {
     {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
-                
+
         //get all possible rules for current position in sequent
         ImmutableList<BuiltInRule> list = getBuiltInRule(pos);
-        
+
         Iterator<BuiltInRule> iter = list.iterator();
-        
+
         //find all rules that match given name
         while (iter.hasNext()) {
             BuiltInRule rule = iter.next();
             if (rule.name().toString().equals(name)) match = match.append(rule);
         }
-        
+
         iter = match.iterator();
-        
+
         //find all applications for matched rules
         while (iter.hasNext()) {
             result = result.union(getBuiltInRuleApp(iter.next(), pos));
         }
-        
+
         return result;
     }
     

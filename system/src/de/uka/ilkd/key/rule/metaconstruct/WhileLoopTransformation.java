@@ -518,7 +518,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    IForUpdates updates = null;
 
 	    //the unchanged updates need to be extracted to initialize the
-	    //remainding 'for' statement
+	    //remaining 'for' statement
 	    IForUpdates unchangedUpdates = x.getIForUpdates();
 
 	    Guard guard;
@@ -574,7 +574,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             
 	    outerBlockStatements[initSize] = 
 	            new If(guard.getExpression(),
-	                    new Then(new StatementBlock(new ImmutableArray<Statement>(innerBlockStatements))));
+	                    new Then(new StatementBlock(
+	                            new ImmutableArray<Statement>(innerBlockStatements))));
 	    
 	    if (outerLabelNeeded() && breakOuterLabel!=null) {
 	        addChild(new LabeledStatement
@@ -590,7 +591,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             if (changeList.getFirst() == CHANGED) {
 	    	changeList.removeFirst();
-	    	For newLoop = new For(changeList);
+		For newLoop = new For(changeList);
 	    	services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 	    	addChild(newLoop);
 	    	changed();

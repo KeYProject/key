@@ -45,6 +45,8 @@ public interface LoopInvariant extends SpecificationElement {
 
     public ExecutionContext getExecutionContext();
 
+    public boolean hasGuard();
+
     public Term getGuard();
 
     /** Returns the invariant formula. */

@@ -53,12 +53,10 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return false;
         }
-        LoopInvariantBuiltInRuleApp loopInvRuleApp =
+        final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv = loopInvRuleApp.getInvariant();
-        loopInv = loopInv != null ?
-                loopInv : loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
-        IFProofObligationVars ifVars =
+        final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        final IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
             return false;
@@ -80,7 +78,6 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
                         ProverTaskListener listener) {
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
-        Services services = proof.getServices();
         InitConfig initConfig = proof.env().getInitConfig();
 
         if (goal.node().parent() == null) {
@@ -90,10 +87,9 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return;
         }
-        LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
-        loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
-        IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
+        final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
 
 
         LoopInvExecutionPO loopInvExecPO =

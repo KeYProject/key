@@ -178,12 +178,11 @@ public class BlockContractRule implements BuiltInRule {
             collectedContracts = collectedContracts.union(
                     specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
-        return filterAppliedContracts(collectedContracts, block, goal);
+        return filterAppliedContracts(collectedContracts, goal);
     }
     
     private static ImmutableSet<BlockContract>
                         filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
-                                               final StatementBlock block,
                                                final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
@@ -224,7 +223,7 @@ public class BlockContractRule implements BuiltInRule {
             return false;
         }
     }
-    
+
     private BlockContractRule() {
     }
 
@@ -244,7 +243,7 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
-    private boolean isInfFlow(Goal goal) {
+    private static boolean isInfFlow(Goal goal) {
         StrategyProperties stratProps =
                 goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
         Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
@@ -258,12 +257,12 @@ public class BlockContractRule implements BuiltInRule {
         return isOriginalIF || isLoadedIF;
     }
 
-    private Pair<Term, Term> buildInfFlowAssumptions(ProofObligationVars instVars,
-                                                     ImmutableList<Term> localOuts,
-                                                     ImmutableList<Term> localOutsAtPre,
-                                                     ImmutableList<Term> localOutsAtPost,
-                                                     Term baseHeap,
-                                                     Term applPredTerm) {
+    private static Pair<Term, Term> buildInfFlowAssumptions(ProofObligationVars instVars,
+                                                            ImmutableList<Term> localOuts,
+                                                            ImmutableList<Term> localOutsAtPre,
+                                                            ImmutableList<Term> localOutsAtPost,
+                                                            Term baseHeap,
+                                                            Term applPredTerm) {
         Term beforeAssumptions = TB.equals(instVars.pre.heap, baseHeap);
         Iterator<Term> outsAtPre = localOutsAtPre.iterator();
         for (Term locOut: localOuts) {
@@ -423,8 +422,7 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
-    private boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence)
-    {
+    private static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
         return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
 
@@ -458,9 +456,11 @@ public class BlockContractRule implements BuiltInRule {
         ).createAndRegister(instantiation.self);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-                new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self, services);
+                new ConditionsAndClausesBuilder(contract, heaps, variables,
+                                                instantiation.self, services);
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+        final Term wellFormedHeapsCondition =
+                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final Term reachableInCondition =
                 conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Map<LocationVariable, Term> modifiesClauses =
@@ -526,8 +526,10 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final BlockContract contract, final Services services)
-    {
+    private static Map<LocationVariable, Function>
+                    createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables,
+                                                            final BlockContract contract,
+                                                            final Services services) {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
         for (LocationVariable variable : variables) {
             if(contract.hasModifiesClause(variable)) {
@@ -566,7 +568,7 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Goal goal) {
+    static Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Goal goal) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -676,7 +678,7 @@ public class BlockContractRule implements BuiltInRule {
             return MiscTools.getSelfTerm(frame, services);
         }
 
-        private ExecutionContext extractExecutionContext(final MethodFrame frame)
+        private static ExecutionContext extractExecutionContext(final MethodFrame frame)
         {
             if (frame == null) {
                 return null;
@@ -711,7 +713,6 @@ public class BlockContractRule implements BuiltInRule {
             return !getApplicableContracts(services.getSpecificationRepository(),
                                            block, modality, goal).isEmpty();
         }
-
     }
 
     private static final class VariablesCreatorAndRegistrar {

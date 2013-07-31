@@ -81,8 +81,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static final Name NAME = new Name("Use Loop Invariant");
     private static final TermBuilder TB = TermBuilder.DF;
 
-    private Term lastFocusTerm;
-    private Instantiation lastInstantiation;
+    private static Term lastFocusTerm;
+    private static Instantiation lastInstantiation;
 
 
     //-------------------------------------------------------------------------
@@ -97,8 +97,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private Instantiation instantiate(final LoopInvariantBuiltInRuleApp app, Services services)
-            throws RuleAbortException {
+    private static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
+                                             Services services) throws RuleAbortException {
     final Term focusTerm = app.posInOccurrence().subTerm();
 
     if(focusTerm == lastFocusTerm &&
@@ -151,7 +151,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
+    private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+                                              Services services) {
         Term anonUpdate = null;
         for(ProgramVariable pv : localOuts) {
             final Name anonFuncName = new Name(TB.newName(services, pv.name().toString()));
@@ -302,11 +303,11 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    private Goal buildInfFlowValidityGoal(Goal goal,
-                                          LoopInvariant inv,
-                                          ProofObligationVars symbExecVars,
-                                          RuleApp ruleApp,
-                                          Services services) {
+    private static Goal buildInfFlowValidityGoal(Goal goal,
+                                                 LoopInvariant inv,
+                                                 ProofObligationVars symbExecVars,
+                                                 RuleApp ruleApp,
+                                                 Services services) {
         // generate proof obligation variables
         final IFProofObligationVars ifVars =
                 new IFProofObligationVars(symbExecVars, services);
@@ -346,9 +347,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         return infFlowGoal;
     }
 
-    private Goal addInfFlowAssumptionsAndTaclet(final InfFlowData infData,
-                                                final Term baseHeap,
-                                                Goal goal) {
+    private static Goal addInfFlowAssumptionsAndTaclet(final InfFlowData infData,
+                                                       final Term baseHeap,
+                                                       Goal goal) {
         assert infData != null;
         final ProofObligationVars symbExecVars = infData.symbExecVars;
         final Term heapAtPreEq =
@@ -392,7 +393,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         return goal;
     }
 
-    private boolean isInfFlow(Goal goal) {
+    private static boolean isInfFlow(Goal goal) {
         StrategyProperties stratProps =
                 goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
         Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
@@ -406,16 +407,16 @@ public final class WhileInvariantRule implements BuiltInRule {
         return isOriginalIF || isLoadedIF;
     }
 
-    private InfFlowData applyInfFlow(Goal goal,
-                                     RuleApp ruleApp,
-                                     final Instantiation inst,
-                                     final LocationVariable guardVar,
-                                     final JavaBlock guardJb,
-                                     final ImmutableSet<ProgramVariable> localIns,
-                                     final ImmutableSet<ProgramVariable> localOuts,
-                                     final ImmutableList<AnonUpdateData> anonUpdateDatas,
-                                     final Term anonUpdate,
-                                     Services services) throws RuleAbortException {
+    private static InfFlowData applyInfFlow(Goal goal,
+                                            RuleApp ruleApp,
+                                            final Instantiation inst,
+                                            final LocationVariable guardVar,
+                                            final JavaBlock guardJb,
+                                            final ImmutableSet<ProgramVariable> localIns,
+                                            final ImmutableSet<ProgramVariable> localOuts,
+                                            final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                                            final Term anonUpdate,
+                                            Services services) throws RuleAbortException {
         LoopInvariant inv = inst.inv;
         final boolean isInfFlow = isInfFlow(goal);
         final boolean hasIFSpecs = inv.hasInfFlowSpec(services);

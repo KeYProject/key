@@ -86,21 +86,21 @@ public class StatementBlock extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof SourceElement) {
-            SourceElement b = (SourceElement) o;
-            return super.equals(o) &&
-                    this.getStartPosition().getLine() == b.getStartPosition().getLine();
-        } else {
-            return super.equals(o);
+        if (o == null || !(o instanceof StatementBlock)) {
+            return false;
         }
+        StatementBlock block = (StatementBlock)o;
+
+        return super.equals(block)
+                && this.getStartPosition().getLine()
+                    == block.getStartPosition().getLine();
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 67 * hash + super.hashCode();
-        hash =  67 * hash +
-                (this.getStartPosition().getLine() << 8);
+        hash =  67 * hash + (getStartPosition().getLine() << 8);
         return hash;
     }
 
