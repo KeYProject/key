@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ObjectArrayIndexReadAccess.compute(array);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (array!=null) {if (array.length==1) {if (array[0].value==42) {return 42;     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null) {if (array.length==1) {if (array[0].value==42) {return 42;     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchNode name="if (array.length==1) {if (array[0].value==42) {return 42;   }else  {return      -300;   } }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
+            <branchStatement name="if (array.length==1) {if (array[0].value==42) {return 42;   }else  {return      -300;   } }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
                <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <branchNode name="if (array[0].value==42) {return 42; }else  {return    -300; }" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
+                  <branchStatement name="if (array[0].value==42) {return 42; }else  {return    -300; }" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                      <branchCondition name="!array[0] = null" pathCondition="   array.length &gt;= 0
 -&gt; !array = null &amp; array.length = 1 &amp; !array[0] = null" pathConditionChanged="true" branchCondition="!array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <branchCondition name="array[0].value = 42" pathCondition="   array.length &gt;= 0
@@ -63,7 +63,7 @@
 -&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                         </termination>
                      </branchCondition>
-                  </branchNode>
+                  </branchStatement>
                </branchCondition>
                <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
@@ -73,7 +73,7 @@
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </branchNode>
+            </branchStatement>
          </branchCondition>
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
@@ -83,6 +83,6 @@
                </methodReturn>
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

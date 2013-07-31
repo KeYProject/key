@@ -299,6 +299,8 @@ provable: ./standard_key/java_dl/jml-bigint/cast.key
 # commented out as proof gets too long
 # requires further investigations
 #provable: ./standard_key/java_dl/jml-information-flow.key
+notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
+notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
 provable: ./standard_key/java_dl/methodCall1.key
 provable: ./standard_key/java_dl/methodCall1box.key

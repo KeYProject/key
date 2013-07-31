@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="LoopUsageBranchClosed.deadCodeAfterLoop();" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 2;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <useLoopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
+         <loopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
 modifies: {heap=false};
 variant: i" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
             <callStackEntry path="/0"/>
             <termination name="&lt;loop body end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="LOOP_BODY">
             </termination>
-         </useLoopInvariant>
+         </loopInvariant>
       </statement>
    </methodCall>
-</startNode>
+</start>

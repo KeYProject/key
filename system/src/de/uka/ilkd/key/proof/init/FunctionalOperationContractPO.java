@@ -220,6 +220,11 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, services);
     }
 
+    @Override
+    protected Term getGlobalDefs (LocationVariable heap, Term heapTerm, Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -266,7 +271,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
           final LocationVariable heap = atPreEntry.getKey();
-          final Term u = TB.elementary(services, atPreEntry.getValue(), heap == getSavedHeap() ? 
+          final Term u = TB.elementary(services, atPreEntry.getValue(), heap == getSavedHeap() ?
                   TB.getBaseHeap(services) : TB.var(heap));
           if(update == null) {
              update = u;

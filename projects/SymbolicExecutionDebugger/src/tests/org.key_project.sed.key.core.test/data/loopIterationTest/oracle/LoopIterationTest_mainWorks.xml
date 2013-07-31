@@ -4,7 +4,7 @@
       <sedThread xml:id="_45584af7-bebb-4705-85ae-5b4b79aab28c" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_e0b62e9c-4b9a-4300-9d29-4b25fcab3135" name="self.mainWorks();" pathCondition="true" lineNumber="-1" charStart="332" charEnd="341">
             <sedStatement xml:id="_0e7d5767-bfd3-4c02-afb6-353eb901cc3f" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="349" charEnd="359">
-               <sedLoopNode xml:id="_6000e913-2e52-4fbd-aff1-c7d20ad5f1cb" name="while ( i&lt;3 ) {   i++; }" pathCondition="true" lineNumber="-1" charStart="363" charEnd="392">
+               <sedLoopStatement xml:id="_6000e913-2e52-4fbd-aff1-c7d20ad5f1cb" name="while ( i&lt;3 ) {   i++; }" pathCondition="true" lineNumber="-1" charStart="363" charEnd="392">
                   <sedLoopCondition xml:id="_be38480a-d565-4535-8cce-8913bca21188" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375">
                      <sedStatement xml:id="_f4ba3862-490f-4d30-9e81-3770399d6a50" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387">
                         <sedLoopCondition xml:id="_3834bcc7-97cb-47f2-a00c-2938b51d57e0" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375">
@@ -25,7 +25,7 @@
                         </sedLoopCondition>
                      </sedStatement>
                   </sedLoopCondition>
-               </sedLoopNode>
+               </sedLoopStatement>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

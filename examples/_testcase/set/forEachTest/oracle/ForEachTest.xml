@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int[] array = new int[3];" pathCondition="true" pathConditionChanged="false">
          <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopNode name="for (int element : array) {   result_1++; }" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="for (int element : array) {   result_1++; }" pathCondition="true" pathConditionChanged="false">
                <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                   <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                      <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
@@ -16,8 +16,8 @@
                      </statement>
                   </statement>
                </statement>
-            </loopNode>
+            </loopStatement>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

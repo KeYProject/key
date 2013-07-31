@@ -473,6 +473,7 @@ final class JMLTranslator {
             }
         });
         translationMethods.put(JMLKeyWord.BSUM, new JMLTranslationMethod() {
+            // TODO: the bsum keyword in JML is deprecated
 
             @Override
             public SLExpression translate(
@@ -501,6 +502,8 @@ final class JMLTranslator {
                 }
                 LogicVariable qv = (LogicVariable) declVars.head();
                 Term resultTerm = TB.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
+                		"Please use the standard \\sum syntax."));
                 return new SLExpression(resultTerm,
                         promo.getJavaType() == PrimitiveType.JAVA_BIGINT ?
                                 promo : t.getType());
@@ -562,21 +565,18 @@ final class JMLTranslator {
                     Object... params)
                             throws SLTranslationException {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
-                Term guard = (Term) params[0];
+                final Services services = (Services) params[5];
+                Term guard = TB.convertToFormula((Term) params[0],services);
                 assert guard.sort() == Sort.FORMULA;
                 final Term body = (Term) params[1];
                 final KeYJavaType type = (KeYJavaType) params[2];
-                if (((ImmutableList<?>)params[3]).size() != 1)
-                    throw excManager.createException("\\min may only have one variable");
-                final QuantifiableVariable qv = (QuantifiableVariable)((ImmutableList<?>) params[3]).head();
-                final Services services = (Services) params[5];
-                final KeYJavaType intType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
-                final KeYJavaType bigIntType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                @SuppressWarnings("unchecked")
+                final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                if (!(type == intType || type == bigIntType))
-                    throw excManager.createException("\\min variable may only be of type int or \\bigint");
-                assert body.sort() == intSort;
-                return TB.min(qv, guard, body, type==bigIntType, services);
+                if (body.sort() != intSort)
+                    throw excManager.createException("body of \\min expression must be integer type");
+                final Term min = TB.min(qvs, guard, body, type, services);
+                return new SLExpression(min,type);
             }
 
 
@@ -590,21 +590,17 @@ final class JMLTranslator {
                     Object... params)
                             throws SLTranslationException {
                 checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
-                Term guard = (Term) params[0];
-                assert guard.sort() == Sort.FORMULA;
+                final Services services = (Services) params[5];
+                Term guard = TB.convertToFormula((Term) params[0],services);
                 final Term body = (Term) params[1];
                 final KeYJavaType type = (KeYJavaType) params[2];
-                if (((ImmutableList<?>)params[3]).size() != 1)
-                    throw excManager.createException("\\max may only have one variable");
-                final QuantifiableVariable qv = (QuantifiableVariable)((ImmutableList<?>) params[3]).head();
-                final Services services = (Services) params[5];
-                final KeYJavaType intType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
-                final KeYJavaType bigIntType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                @SuppressWarnings("unchecked")
+                final ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>) params[3];
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                if (!(type == intType || type == bigIntType))
-                    throw excManager.createException("\\max variable may only be of type int or \\bigint");
-                assert body.sort() == intSort;
-                return TB.max(qv, guard, body, type==bigIntType, services);
+                if (body.sort() != intSort)
+                    throw excManager.createException("body of \\max expression must be integer type");
+                final Term min = TB.max(qvs, guard, body, type, services);
+                return new SLExpression(min, type);
             }
 
         });

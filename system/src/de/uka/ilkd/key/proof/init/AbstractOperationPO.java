@@ -205,7 +205,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
 
          // build program block to execute in try clause (must be done before pre condition is created.
-         final ImmutableList<StatementBlock> sb = buildOperationBlocks(formalParamVars, selfVar, resultVar);
+         final ImmutableList<StatementBlock> sb =
+                 buildOperationBlocks(formalParamVars, selfVar, resultVar);
 
          // build precondition
          final Term pre = TB.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps),
@@ -224,9 +225,17 @@ public abstract class AbstractOperationPO extends AbstractPO {
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars);
 
          final Term post = TB.and(postTerm, frameTerm);
+         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+         final Term selfVarTerm = selfVar==null? null: TB.var(selfVar);
+         final Term globalUpdate = getGlobalDefs(baseHeap, TB.getBaseHeap(services), selfVarTerm,
+                                                 TB.var(paramVars), services);
+
          final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
                                                 exceptionVar, atPreVars, post, sb);
-         termPOs.add(TB.imp(pre, progPost));
+         final Term preImpliesProgPost = TB.imp(pre, progPost);
+         final Term applyGlobalUpdate = globalUpdate == null ?
+                 preImpliesProgPost : TB.apply(globalUpdate, preImpliesProgPost);
+         termPOs.add(applyGlobalUpdate);
          if (poNames != null) {
             poNames[nameIndex++] = buildPOName(transactionFlag);
          }
@@ -433,6 +442,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    ProgramVariable exceptionVar,
                                    Map<LocationVariable, LocationVariable> atPreVars,
                                    Services services);
+
+   protected abstract Term getGlobalDefs (LocationVariable heap, Term heapTerm, Term selfTerm, ImmutableList<Term> paramTerms, Services services);
 
    /**
     * Checks if an uninterpreted predicate is added to the postcondition or not.

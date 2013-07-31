@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.average(array);" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchNode name="if (array!=null) {int sum = sum(array);return    sum/array.length; }else  {throw new IllegalArgumentException (&quot;Array can&apos;t be null.&quot;); }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null) {int sum = sum(array);return    sum/array.length; }else  {throw new IllegalArgumentException (&quot;Array can&apos;t be null.&quot;); }" pathCondition="true" pathConditionChanged="false">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -45,7 +45,7 @@
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <useOperationContract name="result = self.sum(array) catch(exc)
+               <operationContract name="result = self.sum(array) catch(exc)
 pre: !array = null &amp; (self.&lt;inv&gt; &amp; !array = null)
 post: result = bsum{int i;}(0, array.length, array[i])
 &amp; self.&lt;inv&gt;
@@ -134,7 +134,7 @@ as result of self.average(array);&gt;" isReturnValueComputed="true">
                         </methodReturn>
                      </branchCondition>
                   </statement>
-               </useOperationContract>
+               </operationContract>
             </statement>
          </branchCondition>
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -157,6 +157,6 @@ as result of self.average(array);&gt;" isReturnValueComputed="true">
                </termination>
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

@@ -4,7 +4,7 @@
       <sedThread xml:id="_43ad5d45-1b10-4eea-8513-0bf17e63ec37" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_f39b5a4d-840d-4734-9cf6-be0995c713a1" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="413" charEnd="416">
             <sedStatement xml:id="_b0e95af5-e1a7-4019-b84a-e7add16ae203" name="int result;" pathCondition="true" lineNumber="-1" charStart="436" charEnd="447">
-               <sedBranchNode xml:id="_e1d91850-ae3a-46ac-a76d-bf9ee59c6b2f" name="if (i&lt;j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="451" charEnd="515">
+               <sedBranchStatement xml:id="_e1d91850-ae3a-46ac-a76d-bf9ee59c6b2f" name="if (i&lt;j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="451" charEnd="515">
                   <sedBranchCondition xml:id="_6091ac16-8fee-427e-b338-a5bd9391b403" name="!j &lt;= i" pathCondition="!j &lt;= i">
                      <sedStatement xml:id="_8b6d7dd6-94aa-4634-b1d4-f182e395132f" name="result_1=i;" pathCondition="!j &lt;= i" lineNumber="-1" charStart="468" charEnd="479">
                         <sedStatement xml:id="_3091d143-1050-42ce-91e1-dafbb26a6943" name="return result_1;" pathCondition="!j &lt;= i" lineNumber="-1" charStart="519" charEnd="533">
@@ -25,7 +25,7 @@
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-               </sedBranchNode>
+               </sedBranchStatement>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

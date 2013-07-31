@@ -4,7 +4,7 @@
       <sedThread xml:id="_55f88225-f7a5-4b5e-bdd8-8b36e6e45fcd" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_305db768-c601-4175-ae2f-4d0837064601" name="self.switchCase(x);" pathCondition="true" lineNumber="-1" charStart="45" charEnd="55">
             <sedStatement xml:id="_27986de9-dece-492a-b183-08fb226b52e5" name="int a;" pathCondition="true" lineNumber="-1" charStart="68" charEnd="74">
-               <sedBranchNode xml:id="_76084d30-38ee-41a8-b82e-753245ef88e9" name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" lineNumber="-1" charStart="78" charEnd="280">
+               <sedBranchStatement xml:id="_76084d30-38ee-41a8-b82e-753245ef88e9" name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" lineNumber="-1" charStart="78" charEnd="280">
                   <sedBranchCondition xml:id="_6313362e-2c8d-497b-abeb-c2e5ac7e23ac" name="x = 0" pathCondition="x = 0">
                      <sedStatement xml:id="_b2558d1d-de22-4d25-a0b0-f39218b9b151" name="a=1;" pathCondition="x = 0" lineNumber="-1" charStart="106" charEnd="112">
                         <sedStatement xml:id="_3a60d656-2846-4e1c-b41d-cc0867098269" name="return a;" pathCondition="x = 0" lineNumber="-1" charStart="284" charEnd="293">
@@ -75,7 +75,7 @@
                         </sedBranchCondition>
                      </sedBranchCondition>
                   </sedBranchCondition>
-               </sedBranchNode>
+               </sedBranchStatement>
             </sedStatement>
          </sedMethodCall>
       </sedThread>
