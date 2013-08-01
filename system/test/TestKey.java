@@ -32,13 +32,15 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] logicModelTests = new Class[] {
 	de.uka.ilkd.key.logic.TestTermFactory.class,
+    de.uka.ilkd.key.logic.TestTermBuilder.class,
 	de.uka.ilkd.key.logic.TestTerm.class,
 	de.uka.ilkd.key.logic.TestNamespace.class,
 	de.uka.ilkd.key.logic.TestSemisequent.class,
 	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
 	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
 	de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
-	de.uka.ilkd.key.logic.TestVariableNamer.class
+	de.uka.ilkd.key.logic.TestVariableNamer.class,
+	de.uka.ilkd.key.logic.LabeledTermImplTest.class
     };
 
 
@@ -112,6 +114,16 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
        de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
     };
+    
+    static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
+       de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
+       de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
+       de.uka.ilkd.key.proof_references.analyst.TestProgramVariableReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestClassAxiomAndInvariantProofReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestContractProofReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestMethodBodyExpandProofReferencesAnalyst.class,
+       de.uka.ilkd.key.proof_references.analyst.TestMethodCallProofReferencesAnalyst.class
+    };
 
      
      public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
@@ -145,6 +157,7 @@ public class TestKey extends TestSuite {
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+   suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;

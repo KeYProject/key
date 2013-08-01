@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="LoopInvariantWithSplittingQuery.main(x);" pathCondition="true" pathConditionChanged="false">
+      <loopInvariant name="invariants: {heap=geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#)))};
+modifies: {heap=false};
+variant: LoopInvariantWithSplittingQuery::magic(heap,x)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+         <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+            <methodCall name="LoopInvariantWithSplittingQuery.magic(x_14);" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (x_14==0) {return 0; }else if (x_14&gt;=0) {return x_14;   }else  {return      -x_14;   }" pathCondition="true" pathConditionChanged="false">
+                  <branchStatement name="if (x_14&gt;=0) {return x_14; }else  {return    -x_14; }" pathCondition="true" pathConditionChanged="false">
+                     <branchCondition name="!x_0 &lt;= -1" pathCondition="!x_0 &lt;= -1" pathConditionChanged="true" branchCondition="!x_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <statement name="return x_14;" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_14);&gt;" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_14);&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
+                              </methodReturnValue>
+                              <statement name="x--;" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
+                                 <termination name="&lt;loop body end&gt;" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                                 </termination>
+                              </statement>
+                           </methodReturn>
+                        </statement>
+                     </branchCondition>
+                     <branchCondition name="!x_0 &gt;= 0" pathCondition="!x_0 &gt;= 0" pathConditionChanged="true" branchCondition="!x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <statement name="return -x_14;" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_14);&gt;" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_14);&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
+                              </methodReturnValue>
+                              <statement name="x--;" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
+                                 <termination name="&lt;loop body end&gt;" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                                 </termination>
+                              </statement>
+                           </methodReturn>
+                        </statement>
+                     </branchCondition>
+                  </branchStatement>
+               </branchStatement>
+            </methodCall>
+         </branchCondition>
+         <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+            <statement name="return x;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 0 as result of LoopInvariantWithSplittingQuery.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="0" returnValueString="0" hasCondition="false">
+                  </methodReturnValue>
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+      </loopInvariant>
+   </methodCall>
+</start>

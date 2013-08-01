@@ -33,13 +33,13 @@ public class TacletOptionsAction extends MainWindowAction {
 	setName("Taclet Options...");
 	setAcceleratorLetter(KeyEvent.VK_T);
 	
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (getMediator().getProof() == null) {
+        if (getMediator().getSelectedProof() == null) {
             mainWindow.notify(
                     new GeneralInformationEvent(
                             "No contracts available.",

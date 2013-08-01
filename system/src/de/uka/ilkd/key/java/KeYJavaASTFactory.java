@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.java;
 
@@ -51,7 +51,35 @@ import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Case;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.Default;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.Finally;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.ForUpdates;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.IForUpdates;
+import de.uka.ilkd.key.java.statement.IGuard;
+import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.java.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -59,17 +87,24 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.ExtList;
 
-
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
  */
 public abstract class KeYJavaASTFactory {
 
-    /** 
+    /**
      * creates an assignment <code> lhs:=rhs </code>
      */
     public static CopyAssignment assign(Expression lhs, Expression rhs) {
 	return new CopyAssignment(lhs, rhs);
+    }
+
+    /**
+     * creates an assignment <code> lhs:=rhs </code>
+     */
+    public static CopyAssignment assign(Expression lhs, Expression rhs,
+	    PositionInfo posInfo) {
+	return assign(new ExtList(new Object[] { lhs, rhs, posInfo }));
     }
 
     /**
@@ -90,20 +125,19 @@ public abstract class KeYJavaASTFactory {
     /**
      * creates an attribute access <code>prefix.field </code>
      */
-    public static Expression attribute(ReferencePrefix prefix, 
-				       ProgramVariable field) {
+    public static Expression attribute(ReferencePrefix prefix,
+	    ProgramVariable field) {
 	return new FieldReference(field, prefix);
     }
 
-
     /**
-     * creates a local variable declaration <code> typeRef name; </code>     
+     * creates a local variable declaration <code> typeRef name; </code>
      */
     public static LocalVariableDeclaration declare
 	(ProgramElementName name, TypeReference typeRef) {
 	return new LocalVariableDeclaration
 	    (typeRef, new VariableSpecification
-	     (new LocationVariable(name, 
+	     (new LocationVariable(name,
 				  typeRef.getKeYJavaType())));
     }
 
@@ -136,9 +170,9 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare
 	(ProgramElementName name, Expression init, KeYJavaType type) {
 	return new LocalVariableDeclaration
-	    (new TypeRef(type), 
+	    (new TypeRef(type),
 	     new VariableSpecification
-		 (new LocationVariable(name, type), 
+		 (new LocationVariable(name, type),
 		  init, type));
     }
 
@@ -215,27 +249,25 @@ public abstract class KeYJavaASTFactory {
 	return KeYJavaASTFactory.declare(var, null, type);
     }
 
-
     /**
      * create a local variable declaration
      */
     public static LocalVariableDeclaration declare(String name, KeYJavaType type) {
 	return new LocalVariableDeclaration
-	    (new TypeRef(type), 
+	    (new TypeRef(type),
 	     new VariableSpecification
 		 (new LocationVariable(new ProgramElementName(name), type)));
     }
 
-
-    /** 
+    /**
      * create a parameter declaration
      */
 
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo,
-							    KeYJavaType kjt, 
+							    KeYJavaType kjt,
 							    String name) {
 	return new ParameterDeclaration
-	    (new Modifier[0], javaInfo.createTypeReference(kjt), 
+	    (new Modifier[0], javaInfo.createTypeReference(kjt),
 	     new VariableSpecification(localVariable(name, kjt)), false);
     }
 
@@ -257,19 +289,19 @@ public abstract class KeYJavaASTFactory {
      *         type <code>kjt</code>
      */
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo,
-							    KeYJavaType kjt, 
+							    KeYJavaType kjt,
 							    IProgramVariable var) {
 	return new ParameterDeclaration
-	    (new Modifier[0], javaInfo.createTypeReference(kjt), 
+	    (new Modifier[0], javaInfo.createTypeReference(kjt),
 	     new VariableSpecification(var), false);
     }
 
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo,
-							    String type, 
+							    String type,
 							    String name) {
 	KeYJavaType kjt = javaInfo.getKeYJavaType(type);
 	return new ParameterDeclaration
-	    (new Modifier[0], javaInfo.createTypeReference(kjt), 
+	    (new Modifier[0], javaInfo.createTypeReference(kjt),
 	     new VariableSpecification(localVariable(name, kjt)), false);
     }
 
@@ -307,8 +339,7 @@ public abstract class KeYJavaASTFactory {
 	return passive;
     }
 
-
-    /** 
+    /**
      * create a local variable
      */
     public static ProgramVariable localVariable(String name,
@@ -316,14 +347,14 @@ public abstract class KeYJavaASTFactory {
 	return localVariable(new ProgramElementName(name), kjt);
     }
 
-    /** 
+    /**
      * create a local variable
      */
     public static ProgramVariable localVariable(ProgramElementName name,
-						KeYJavaType kjt) {
+	    KeYJavaType kjt) {
 	return new LocationVariable(name, kjt);
     }
-    
+
     /**
      * Create a local variable with a unique name.
      * 
@@ -403,12 +434,12 @@ public abstract class KeYJavaASTFactory {
 	return clause;
     }
 
-    /** 
+    /**
      * create a catch clause
      */
 
-    public static Catch catchClause(ParameterDeclaration param, 
-				    StatementBlock body) {
+    public static Catch catchClause(ParameterDeclaration param,
+	    StatementBlock body) {
 
 	return new Catch(param, body);
     }
@@ -456,8 +487,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Catch} with parameter <code>param</code> of static
      *         type <code>kjt</code> and body <code>body</code>
      */
-    public static Catch catchClause(JavaInfo javaInfo, String param, 
-				    KeYJavaType kjt, StatementBlock body) {
+    public static Catch catchClause(JavaInfo javaInfo, String param,
+	    KeYJavaType kjt, StatementBlock body) {
 
 	return new Catch(parameterDeclaration(javaInfo, kjt, param), body);
     }
@@ -483,13 +514,13 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Catch} with parameter <code>param</code> of static
      *         type <code>type</code> and body <code>body</code>
      */
-    public static Catch catchClause(JavaInfo javaInfo, String param, 
-				    String type, StatementBlock body) {
+    public static Catch catchClause(JavaInfo javaInfo, String param,
+	    String type, StatementBlock body) {
 
-	return catchClause(javaInfo, param, 
+	return catchClause(javaInfo, param,
 			   javaInfo.getKeYJavaType(type), body);
     }
-    
+
     /**
      * Create a throw clause.
      * 
@@ -605,7 +636,7 @@ public abstract class KeYJavaASTFactory {
      * @return an {@link If} with expression <code>guard</code> and then branch
      *         <code>then</code>
      */
-    public static If ifThen(Expression guard, 
+    public static If ifThen(Expression guard,
 			    Statement then) {
 	final If statement = KeYJavaASTFactory.ifThen(guard, new Then(then));
 
@@ -690,7 +721,7 @@ public abstract class KeYJavaASTFactory {
      * @return an {@link If} with expression <code>guard</code>, then branch
      *         <code>then</code> and else branch <code>els</code>
      */
-    public static If ifElse(Expression guard, 
+    public static If ifElse(Expression guard,
 		     Then then,
 		     Else els) {
 	return new If(guard, then, els);
@@ -737,6 +768,10 @@ public abstract class KeYJavaASTFactory {
      */
     public static Break breakStatement(Label l) {
 	return new Break(l);
+    }
+
+    public static Statement breakStatement(Label label, PositionInfo positionInfo) {
+       return new Break(new ExtList(new Object[] {label, positionInfo}));
     }
 
     /**
@@ -805,7 +840,7 @@ public abstract class KeYJavaASTFactory {
     }
 
     public static Continue continueStatement(Label label) {
-        return new Continue(label);
+	return new Continue(label);
     }
 
     /**
@@ -919,30 +954,30 @@ public abstract class KeYJavaASTFactory {
 	return statementBlock;
     }
 
-    /** inserts the given statements at the begin of the block 
+    /** inserts the given statements at the begin of the block
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
      */
-    public static StatementBlock insertStatementInBlock(Statement[] stmnt, 
-							StatementBlock b) {
-	
+    public static StatementBlock insertStatementInBlock(Statement[] stmnt,
+	    StatementBlock b) {
+
 	Statement[] block = new Statement[b.getStatementCount()+
 					  stmnt.length];
 	System.arraycopy(stmnt, 0, block, 0, stmnt.length);
 	b.getBody().arraycopy(0, block, stmnt.length, b.getStatementCount());
-	return new StatementBlock(new ImmutableArray<Statement>(block));	
+	return new StatementBlock(new ImmutableArray<Statement>(block));
     }
 
-    /** inserts the given statements at the begin of the block 
+    /** inserts the given statements at the begin of the block
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
      */
-    public static StatementBlock insertStatementInBlock(StatementBlock stmnt, 
-							StatementBlock b) {
+    public static StatementBlock insertStatementInBlock(StatementBlock stmnt,
+	    StatementBlock b) {
 	Statement[] stmnts = new Statement[stmnt.getStatementCount()];
 	for (int i=0; i<stmnt.getStatementCount(); i++)
 	    stmnts[i]=stmnt.getStatementAt(i);
-	return  
+	return
 	    insertStatementInBlock(stmnts, b);
     }
 
@@ -1249,12 +1284,15 @@ public abstract class KeYJavaASTFactory {
      * 
      * @param expressions
      *            the initial value {@link Expression}s
+     * @param type
+     *            the array type {@link KeYJavaType}
      * @return a new {@link ArrayInitializer} which contains
-     *         <code>expressions</code>
+     *         <code>expressions</code> and is of type <code>type</code>
      */
     public static ArrayInitializer arrayInitializer(
-	    final Expression[] expressions) {
-	final ArrayInitializer initializer = new ArrayInitializer(expressions);
+	    final Expression[] expressions, final KeYJavaType type) {
+	final ArrayInitializer initializer = new ArrayInitializer(expressions,
+		type);
 
 	return initializer;
     }
@@ -1983,7 +2021,7 @@ public abstract class KeYJavaASTFactory {
 
 	return call;
     }
-    
+
     /**
      * Create a method call.
      * 
@@ -2010,7 +2048,7 @@ public abstract class KeYJavaASTFactory {
 
 	return call;
     }
-    
+
     /**
      * Create a method call.
      * 

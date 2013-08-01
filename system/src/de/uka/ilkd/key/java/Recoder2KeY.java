@@ -47,7 +47,9 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -132,6 +134,8 @@ public class Recoder2KeY implements JavaReader {
      * defined. For those classe types a dummy stub is created at parse time.
      */
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
+    
+    private final Services services;
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -208,6 +212,7 @@ public class Recoder2KeY implements JavaReader {
         if(!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
             throw new IllegalArgumentException("Recoder2KeY needs a KeyRecoderExcHandler as exception handler");
 
+        this.services = services;
         this.servConf = servConf;
         this.mapping = rec2key;
         this.converter = makeConverter(services, nss);
@@ -489,7 +494,7 @@ public class Recoder2KeY implements JavaReader {
         FileCollection bootCollection;
         FileCollection.Walker walker = null;
         if(bootClassPath == null) {
-            bootCollection = new JavaReduxFileCollection();
+            bootCollection = new JavaReduxFileCollection(services.getProfile());
             walker = bootCollection.createWalker(".java");
         } else {
             bootCollection = new DirectoryFileCollection(bootClassPath);
@@ -945,7 +950,7 @@ public class Recoder2KeY implements JavaReader {
             recoder.service.CrossReferenceSourceInfo csi) {
 
         HashMap<String, recoder.java.declaration.VariableSpecification> names2var = 
-            new HashMap<String, recoder.java.declaration.VariableSpecification>();
+            new LinkedHashMap<String, recoder.java.declaration.VariableSpecification>();
         Iterator<ProgramVariable> it = vars.iterator();
         java.util.HashSet<String> names = new java.util.HashSet<String>();
         ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -83,7 +83,9 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!b = a" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!b = a" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 5 as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="5" returnValueString="5" hasCondition="false">
+                     </methodReturnValue>
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -108,7 +110,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="!b = a" pathConditionChanged="false" exceptionalTermination="false">
+                     <termination name="&lt;end&gt;" pathCondition="!b = a" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>
@@ -139,7 +141,9 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="b = a" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;6&apos; as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="b = a" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 6 as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="6" returnValueString="6" hasCondition="false">
+                     </methodReturnValue>
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -164,7 +168,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="b = a" pathConditionChanged="false" exceptionalTermination="false">
+                     <termination name="&lt;end&gt;" pathCondition="b = a" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>
@@ -172,4 +176,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

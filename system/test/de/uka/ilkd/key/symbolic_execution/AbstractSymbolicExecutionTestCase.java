@@ -59,22 +59,24 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -204,20 +206,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param oraclePathInBaseDirFile The path in example directory.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
+    * @param saveReturnValues Save method return values?
     * @throws IOException Occurred Exception
     * @throws ProofInputException Occurred Exception
     */
    protected static void createOracleFile(IExecutionNode node, 
                                           String oraclePathInBaseDirFile, 
                                           boolean saveVariables,
-                                          boolean saveCallStack) throws IOException, ProofInputException {
+                                          boolean saveCallStack,
+                                          boolean saveReturnValues) throws IOException, ProofInputException {
       if (tempNewOracleDirectory != null && tempNewOracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(tempNewOracleDirectory, oraclePathInBaseDirFile);
          oracleFile.getParentFile().mkdirs();
          // Create oracle file
          ExecutionNodeWriter writer = new ExecutionNodeWriter();
-         writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile, saveVariables, saveCallStack);
+         writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile, saveVariables, saveCallStack, saveReturnValues);
          // Print message to the user.
          printOracleDirectory();
       }
@@ -248,13 +252,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareVariables Compare variables?
     * @param compareCallStack Compare call stack?
     * @param compareChildOrder Is the order of children relevant?
+    * @param compareReturnValues Compare return values?
     * @throws ProofInputException Occurred Exception.
     */
    public static void assertExecutionNodes(IExecutionNode expected, 
                                            IExecutionNode current,
                                            boolean compareVariables,
                                            boolean compareCallStack,
-                                           boolean compareChildOrder) throws ProofInputException {
+                                           boolean compareChildOrder,
+                                           boolean compareReturnValues) throws ProofInputException {
       if (compareChildOrder) {
          // Order of children must be the same.
          ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
@@ -262,7 +268,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          while (expectedIter.hasNext() && currentIter.hasNext()) {
             IExecutionNode expectedNext = expectedIter.next();
             IExecutionNode currentNext = currentIter.next();
-            assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack);
+            assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack, compareReturnValues);
          }
          assertFalse(expectedIter.hasNext());
          assertFalse(currentIter.hasNext());
@@ -277,7 +283,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             if (!currentVisitedNodes.add(currentNext)) {
                fail("Node " + currentNext + " visited twice.");
             }
-            assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack);
+            assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack, compareReturnValues);
          }
          // Make sure that each current node was visited
          ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
@@ -339,9 +345,18 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       int i = 0;
       IExecutionNode[] children = parentToSearchIn.getChildren();
       while (result == null && i < children.length) {
-         if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
-             children[i].getElementType().equals(directChildToSearch.getElementType())) {
-            result = children[i];
+         if (children[i] instanceof IExecutionBranchCondition && directChildToSearch instanceof IExecutionBranchCondition) {
+            if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
+                JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)children[i]).getAdditionalBranchLabel(), ((IExecutionBranchCondition)directChildToSearch).getAdditionalBranchLabel()) &&
+                children[i].getElementType().equals(directChildToSearch.getElementType())) {
+                 result = children[i];
+              }
+         }
+         else{
+            if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
+                  children[i].getElementType().equals(directChildToSearch.getElementType())) {
+                 result = children[i];
+              }
          }
          i++;
       }
@@ -358,13 +373,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareChildren Compare direct children?
     * @param compareVariables Compare variables?
     * @param compareCallStack Compare call stack?
+    * @param compareReturnValues Compare return values?
     * @throws ProofInputException Occurred Exception.
     */
    protected static void assertExecutionNode(IExecutionNode expected, 
                                              IExecutionNode current, 
                                              boolean compareParent,
                                              boolean compareVariables,
-                                             boolean compareCallStack) throws ProofInputException {
+                                             boolean compareCallStack,
+                                             boolean compareReturnValues) throws ProofInputException {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
@@ -376,25 +393,26 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
+         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
       }
-      else if (expected instanceof IExecutionStartNode) {
-         assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStartNode);
+      else if (expected instanceof IExecutionStart) {
+         assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
       }
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
-         assertEquals(((IExecutionTermination)expected).isExceptionalTermination(), ((IExecutionTermination)current).isExceptionalTermination());
+         assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
       }
-      else if (expected instanceof IExecutionBranchNode) {
-         assertTrue("Expected IExecutionBranchNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchNode);
-         assertVariables((IExecutionBranchNode)expected, (IExecutionBranchNode)current, compareVariables);
+      else if (expected instanceof IExecutionBranchStatement) {
+         assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
+         assertVariables((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareVariables);
       }
       else if (expected instanceof IExecutionLoopCondition) {
          assertTrue("Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopCondition);
          assertVariables((IExecutionLoopCondition)expected, (IExecutionLoopCondition)current, compareVariables);
       }
-      else if (expected instanceof IExecutionLoopNode) {
-         assertTrue("Expected IExecutionLoopNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopNode);
-         assertVariables((IExecutionLoopNode)expected, (IExecutionLoopNode)current, compareVariables);
+      else if (expected instanceof IExecutionLoopStatement) {
+         assertTrue("Expected IExecutionLoopStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopStatement);
+         assertVariables((IExecutionLoopStatement)expected, (IExecutionLoopStatement)current, compareVariables);
       }
       else if (expected instanceof IExecutionMethodCall) {
          assertTrue("Expected IExecutionMethodCall but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodCall);
@@ -402,25 +420,30 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
-         assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
-         assertEquals(((IExecutionMethodReturn)expected).isReturnValueComputed(), ((IExecutionMethodReturn)current).isReturnValueComputed());
+         if (compareReturnValues) {
+            assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+         }
+         assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
+         if (compareReturnValues) {
+            assertReturnValues(((IExecutionMethodReturn)expected).getReturnValues(), ((IExecutionMethodReturn)current).getReturnValues());
+         }
       }
       else if (expected instanceof IExecutionStatement) {
          assertTrue("Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStatement);
          assertVariables((IExecutionStatement)expected, (IExecutionStatement)current, compareVariables);
       }
-      else if (expected instanceof IExecutionUseOperationContract) {
-         assertTrue("Expected IExecutionUseOperationContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionUseOperationContract);
-         assertEquals(((IExecutionUseOperationContract)expected).isPreconditionComplied(), ((IExecutionUseOperationContract)current).isPreconditionComplied());
-         assertEquals(((IExecutionUseOperationContract)expected).hasNotNullCheck(), ((IExecutionUseOperationContract)current).hasNotNullCheck());
-         assertEquals(((IExecutionUseOperationContract)expected).isNotNullCheckComplied(), ((IExecutionUseOperationContract)current).isNotNullCheckComplied());
-         assertVariables((IExecutionUseOperationContract)expected, (IExecutionUseOperationContract)current, compareVariables);
+      else if (expected instanceof IExecutionOperationContract) {
+         assertTrue("Expected IExecutionOperationContract but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionOperationContract);
+         assertEquals(((IExecutionOperationContract)expected).isPreconditionComplied(), ((IExecutionOperationContract)current).isPreconditionComplied());
+         assertEquals(((IExecutionOperationContract)expected).hasNotNullCheck(), ((IExecutionOperationContract)current).hasNotNullCheck());
+         assertEquals(((IExecutionOperationContract)expected).isNotNullCheckComplied(), ((IExecutionOperationContract)current).isNotNullCheckComplied());
+         assertVariables((IExecutionOperationContract)expected, (IExecutionOperationContract)current, compareVariables);
       }
-      else if (expected instanceof IExecutionUseLoopInvariant) {
-         assertTrue("Expected IExecutionUseLoopInvariant but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionUseLoopInvariant);
-         assertEquals(((IExecutionUseLoopInvariant)expected).isInitiallyValid(), ((IExecutionUseLoopInvariant)current).isInitiallyValid());
-         assertVariables((IExecutionUseLoopInvariant)expected, (IExecutionUseLoopInvariant)current, compareVariables);
+      else if (expected instanceof IExecutionLoopInvariant) {
+         assertTrue("Expected IExecutionLoopInvariant but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopInvariant);
+         assertEquals(((IExecutionLoopInvariant)expected).isInitiallyValid(), ((IExecutionLoopInvariant)current).isInitiallyValid());
+         assertVariables((IExecutionLoopInvariant)expected, (IExecutionLoopInvariant)current, compareVariables);
       }
       else {
          fail("Unknown execution node \"" + expected + "\".");
@@ -433,7 +456,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertNotNull("Call stack of \"" + current + "\" should not be null.", currentStack);
             assertEquals("Node: " + expected, expectedStack.length, currentStack.length);
             for (int i = 0; i < expectedStack.length; i++) {
-               assertExecutionNode(expectedStack[i], currentStack[i], false, false, false);
+               assertExecutionNode(expectedStack[i], currentStack[i], false, false, false, false);
             }
          }
          else{
@@ -442,8 +465,38 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       // Optionally compare parent
       if (compareParent) {
-         assertExecutionNode(expected, current, false, compareVariables, compareCallStack);
+         assertExecutionNode(expected, current, false, compareVariables, compareCallStack, compareReturnValues);
       }
+   }
+
+   /**
+    * Makes sure that the given nodes contains the same {@link IExecutionMethodReturnValue}s.
+    * @param expected The expected {@link IExecutionMethodReturnValue}s.
+    * @param current The current {@link IExecutionMethodReturnValue}s.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertReturnValues(IExecutionMethodReturnValue[] expected, IExecutionMethodReturnValue[] current) throws ProofInputException {
+      assertNotNull(expected);
+      assertNotNull(current);
+      assertEquals(expected.length, current.length);
+      for (int i = 0; i < expected.length; i++) {
+         assertReturnValue(expected[i], current[i]);
+      }
+   }
+
+   /**
+    * Makes sure that the given {@link IExecutionMethodReturnValue}s are the same.
+    * @param expected The expected {@link IExecutionMethodReturnValue}.
+    * @param current The current {@link IExecutionMethodReturnValue}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertReturnValue(IExecutionMethodReturnValue expected, IExecutionMethodReturnValue current) throws ProofInputException {
+      assertNotNull(expected);
+      assertNotNull(current);
+      assertTrue(expected.getName() + " does not match " + current.getName(), JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+      assertTrue(expected.getReturnValueString() + " does not match " + current.getReturnValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(), current.getReturnValueString()));
+      assertEquals(expected.hasCondition(), current.hasCondition());
+      assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), JavaUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
    }
 
    /**
@@ -637,7 +690,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -671,7 +723,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -703,7 +754,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -733,7 +783,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -757,7 +806,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                 String oraclePathInBaseDirFile, 
                                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-         createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, false, false);
+         createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, false, false, false);
       }
       else {
          // Read oracle file
@@ -766,7 +815,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          IExecutionNode oracleRoot = reader.read(oracleFile);
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
-         assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false);
+         assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false, false);
       }
    }
    
@@ -810,6 +859,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             return methodFullName.equals(element.getFullName());
          }
       });
+      if (pm == null) {
+         pms = javaInfo.getConstructors(containerKJT);
+         pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+            @Override
+            public boolean select(IProgramMethod element) {
+               return methodFullName.equals(element.getFullName());
+            }
+         });
+      }
       assertNotNull(pm);
       return pm;
    }
@@ -824,6 +882,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
@@ -835,20 +894,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
+                                                                                                                boolean nonExecutionBranchHidingSideProofs,
                                                                                                                 boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(javaFile, null, null);
+      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
-      ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true);
+      ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
+      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -868,6 +929,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
@@ -881,20 +943,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
+                                                                                                                boolean nonExecutionBranchHidingSideProofs,
                                                                                                                 boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(javaFile, null, null);
+      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
-      ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true);
+      ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
+      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -910,6 +974,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
@@ -919,16 +984,17 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
+                                                                                                                boolean nonExecutionBranchHidingSideProofs,
                                                                                                                 boolean aliasChecks) throws ProblemLoaderException {
       // Make sure that required files exists
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
       // Load java file
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(proofFile, null, null);
+      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -950,6 +1016,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvarints Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
@@ -965,20 +1032,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 boolean mergeBranchConditions,
                                                                                                                 boolean useOperationContracts,
                                                                                                                 boolean useLoopInvarints,
+                                                                                                                boolean nonExecutionBranchHidingSideProofs,
                                                                                                                 boolean aliasChecks) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(javaFile, null, null);
+      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
-      ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true);
+      ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
+      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, aliasChecks);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
@@ -1035,7 +1104,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof from saved *.proof file
-         reloadedEnv = KeYEnvironment.load(tempFile, null, null);
+         reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), tempFile, null, null);
          Proof reloadedProof = reloadedEnv.getLoadedProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
@@ -1138,10 +1207,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
     * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
     * @param maximalNumberOfExecutedSetNodesPerRun The number of executed set nodes per auto mode run. The whole test is executed for each defined value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -1157,10 +1228,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                             String oraclePathInBaseDirFile,
                             boolean includeVariables,
                             boolean includeCallStack,
+                            boolean includeReturnValues,
                             int[] maximalNumberOfExecutedSetNodesPerRun,
                             boolean mergeBranchConditions,
                             boolean useOperationContracts,
                             boolean useLoopInvariants,
+                            boolean nonExecutionBranchHidingSideProofs,
                             boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
@@ -1172,10 +1245,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                   oraclePathInBaseDirFile, 
                                                                                   includeVariables, 
                                                                                   includeCallStack,
+                                                                                  includeReturnValues,
                                                                                   maximalNumberOfExecutedSetNodesPerRun[i],
                                                                                   mergeBranchConditions,
                                                                                   useOperationContracts,
                                                                                   useLoopInvariants,
+                                                                                  nonExecutionBranchHidingSideProofs,
                                                                                   aliasChecks);
          env.dispose();
       }
@@ -1191,10 +1266,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
     * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
@@ -1211,12 +1288,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                       String oraclePathInBaseDirFile,
                                       boolean includeVariables,
                                       boolean includeCallStack,
+                                      boolean includeReturnValues,
                                       int maximalNumberOfExecutedSetNodes,
                                       boolean mergeBranchConditions,
                                       boolean useOperationContracts,
                                       boolean useLoopInvariants,
+                                      boolean nonExecutionBranchHidingSideProofs,
                                       boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeVariables, includeCallStack, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, aliasChecks);
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
       env.dispose();
    }
 
@@ -1240,10 +1319,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
     * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
@@ -1260,10 +1341,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                 String oraclePathInBaseDirFile,
                                                                                 boolean includeVariables,
                                                                                 boolean includeCallStack,
+                                                                                boolean includeReturnValues,
                                                                                 int maximalNumberOfExecutedSetNodes,
                                                                                 boolean mergeBranchConditions,
                                                                                 boolean useOperationContracts,
                                                                                 boolean useLoopInvariants,
+                                                                                boolean nonExecutionBranchHidingSideProofs,
                                                                                 boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
       try {
@@ -1279,14 +1362,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, aliasChecks);
+            SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
             env.dispose();
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, aliasChecks);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
          // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
          ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
          env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
@@ -1296,7 +1379,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             // Store the number of nodes before start of the auto mode 
             nodeCount = env.getProof().countNodes();
             // Run proof
-            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(env.getProof());
             env.getUi().startAndWaitForAutoMode(env.getProof());
             // Update symbolic execution tree 
             env.getBuilder().analyse();
@@ -1308,13 +1390,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             }
          } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
          // Create new oracle file if required in a temporary directory
-         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
+         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues);
          // Read oracle file
          ExecutionNodeReader reader = new ExecutionNodeReader();
          IExecutionNode oracleRoot = reader.read(oracleFile);
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
-         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false);
+         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues);
          return env;
       }
       finally {

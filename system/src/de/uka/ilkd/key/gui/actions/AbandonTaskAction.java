@@ -33,14 +33,14 @@ public final class AbandonTaskAction extends MainWindowAction {
 	setAcceleratorLetter(KeyEvent.VK_W);
 	setTooltip("Drop current proof.");
 
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
     }
 
     public synchronized void actionPerformed(ActionEvent e) {
     	boolean removalConfirmed =
                 getMediator().getUI().confirmTaskRemoval("Are you sure?");
         if (removalConfirmed) {
-            getMediator().getUI().removeProof(getMediator().getProof());
+            getMediator().getUI().removeProof(getMediator().getSelectedProof());
         }
     }
     

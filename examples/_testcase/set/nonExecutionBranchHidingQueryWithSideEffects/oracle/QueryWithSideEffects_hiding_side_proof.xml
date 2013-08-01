@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result = self.magic(x) catch(exc)
+pre: self.&lt;inv&gt;
+post: result = self.subMagic(x)
+&amp; (  (x &gt;= 0 -&gt; self.instanceField = 12)
+   &amp; (  (   x &lt; 0
+         -&gt; self.instanceField = javaUnaryMinusInt(21))
+      &amp; (  (   x &gt;= 0
+            -&gt; QueryWithSideEffects.classField = 66)
+         &amp; (  (   x &lt; 0
+               -&gt;   QueryWithSideEffects.classField
+                  = javaUnaryMinusInt(55))
+            &amp; self.&lt;inv&gt;))))
+&amp; exc = null
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <statement name="return magicValue+this.instanceField+classField;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	120 {!x &lt;= -1}, 
+	-4787 {!x &gt;= 0}
+as result of self.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="120 {!x &lt;= -1}" returnValueString="120" hasCondition="true" conditionString="!x &lt;= -1">
+                  </methodReturnValue>
+                  <methodReturnValue name="-4787 {!x &gt;= 0}" returnValueString="-4787" hasCondition="true" conditionString="!x &gt;= 0">
+                  </methodReturnValue>
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

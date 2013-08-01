@@ -1,33 +1,25 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 
 package de.uka.ilkd.key.proof;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the goal, especially the split and set back mechanism. */
@@ -42,7 +34,7 @@ public class TestGoal extends TestCase {
 
         public void setUp() {
                 TacletForTests.parse();
-                proof = new Proof(new Services());
+                proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
 
         }
 

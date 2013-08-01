@@ -74,6 +74,8 @@ public class ObjectUtilTest extends TestCase {
     */
    @Test
    public void testGetAndSet_Object_Field() {
+      ClassA.staticField = -42;
+      ClassA.staticBooleanField = false;
       ClassA a = new ClassA();
       ClassB b = new ClassB();
       // Test null object
@@ -89,34 +91,15 @@ public class ObjectUtilTest extends TestCase {
          fail(e.getMessage());
       }
       try {
-         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "privateField"), null);
-         fail();
+         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "staticField"), -4711);
       }
-      catch (IllegalArgumentException e) {
-         assertEquals("Object is undefined (null).", e.getMessage());
-      }      
       catch (Exception e) {
          e.printStackTrace();
          fail(e.getMessage());
       }
       try {
-         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "privateField"), true);
-         fail();
+         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "staticBooleanField"), true);
       }
-      catch (IllegalArgumentException e) {
-         assertEquals("Object is undefined (null).", e.getMessage());
-      }      
-      catch (Exception e) {
-         e.printStackTrace();
-         fail(e.getMessage());
-      }
-      try {
-         ObjectUtil.set(null, ObjectUtil.findField(ClassA.class, "privateField"), 42);
-         fail();
-      }
-      catch (IllegalArgumentException e) {
-         assertEquals("Object is undefined (null).", e.getMessage());
-      }      
       catch (Exception e) {
          e.printStackTrace();
          fail(e.getMessage());
@@ -176,6 +159,8 @@ public class ObjectUtilTest extends TestCase {
          assertEquals(4, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "defaultField")));
          assertEquals("A", ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "onlyInA")));
          assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "booleanField")));
+         assertEquals(-4711, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "staticField")));
+         assertEquals(true, ObjectUtil.get(a, ObjectUtil.findField(ClassA.class, "staticBooleanField")));
          // Change values in A
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "privateField"), 42);
          ObjectUtil.set(a, ObjectUtil.findField(ClassA.class, "protectedField"), 43);
@@ -495,6 +480,9 @@ public class ObjectUtilTest extends TestCase {
     */
    @Test
    public void testGetAndSet_Object_Class_String() {
+      ClassA.staticField = -42;
+      ClassA.staticBooleanField = false;
+      ClassA.staticStringField = null;
       ClassA a = new ClassA();
       ClassB b = new ClassB();
       // Test null object
@@ -510,34 +498,22 @@ public class ObjectUtilTest extends TestCase {
          fail(e.getMessage());
       }
       try {
-         ObjectUtil.set(null, a.getClass(), "privateField", null);
-         fail();
+         ObjectUtil.set(null, a.getClass(), "staticBooleanField", true);
       }
-      catch (IllegalArgumentException e) {
-         assertEquals("Object is undefined (null).", e.getMessage());
-      }      
       catch (Exception e) {
          e.printStackTrace();
          fail(e.getMessage());
       }
       try {
-         ObjectUtil.set(null, a.getClass(), "privateField", true);
-         fail();
+         ObjectUtil.set(null, a.getClass(), "staticStringField", "Hello");
       }
-      catch (IllegalArgumentException e) {
-         assertEquals("Object is undefined (null).", e.getMessage());
-      }      
       catch (Exception e) {
          e.printStackTrace();
          fail(e.getMessage());
       }
       try {
-         ObjectUtil.set(null, a.getClass(), "privateField", 42);
-         fail();
+         ObjectUtil.set(null, a.getClass(), "staticField", -4711);
       }
-      catch (IllegalArgumentException e) {
-         assertEquals("Object is undefined (null).", e.getMessage());
-      }      
       catch (Exception e) {
          e.printStackTrace();
          fail(e.getMessage());
@@ -643,6 +619,9 @@ public class ObjectUtilTest extends TestCase {
          assertEquals(4, ObjectUtil.get(a, ClassA.class, "defaultField"));
          assertEquals("A", ObjectUtil.get(a, ClassA.class, "onlyInA"));
          assertEquals(true, ObjectUtil.get(a, ClassA.class, "booleanField"));
+         assertEquals(-4711, ObjectUtil.get(a, ClassA.class, "staticField"));
+         assertEquals(true, ObjectUtil.get(a, ClassA.class, "staticBooleanField"));
+         assertEquals("Hello", ObjectUtil.get(a, ClassA.class, "staticStringField"));
          // Change values in A
          ObjectUtil.set(a, ClassA.class, "privateField", 42);
          ObjectUtil.set(a, ClassA.class, "protectedField", 43);

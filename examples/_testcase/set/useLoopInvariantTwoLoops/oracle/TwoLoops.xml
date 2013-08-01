@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="TwoLoops.main(x);" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&gt;=0) {while ( x&gt;0 ) {     x--;   } }else  {ghostint originalX = x;while ( x&lt;0 ) {     x++;   } }" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="invariants: {heap=geq(x,Z(0(#)))};
+modifies: {heap=false};
+variant: x" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="x &gt;= 1 &amp; x_0 &gt;= 0" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="true" branchCondition="x &gt;= 1 &amp; x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <statement name="x--;" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="false">
+                     <termination name="&lt;loop body end&gt;" pathCondition="x &gt;= 1 &amp; x_0 &gt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                     </termination>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="x &lt;= 0 &amp; x_0 &gt;= 0" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="true" branchCondition="x &lt;= 0 &amp; x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return x;" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of TwoLoops.main(x);&gt;" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 0 as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="0" returnValueString="0" hasCondition="false">
+                        </methodReturnValue>
+                        <termination name="&lt;end&gt;" pathCondition="x = 0 &amp; x_0 &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </branchCondition>
+         <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="ghostint originalX = x;" pathCondition="!x &gt;= 0" pathConditionChanged="false">
+               <loopInvariant name="invariants: {heap=leq(x,Z(0(#)))};
+modifies: {heap=false};
+variant: javaSubInt(originalX,x)" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyValid="true">
+                  <branchCondition name="!x_4 &gt;= 1" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="true" branchCondition="!x_4 &gt;= 1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                     <statement name="x++;" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="false">
+                        <termination name="&lt;loop body end&gt;" pathCondition="x &lt;= -1 &amp; x_4 &lt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                        </termination>
+                     </statement>
+                  </branchCondition>
+                  <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                     <statement name="return x;" pathCondition="false" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of TwoLoops.main(x);&gt;" pathCondition="false" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 0 as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
+                           <methodReturnValue name="0" returnValueString="0" hasCondition="false">
+                           </methodReturnValue>
+                           <termination name="&lt;end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="NORMAL">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </branchCondition>
+               </loopInvariant>
+            </statement>
+         </branchCondition>
+      </branchStatement>
+   </methodCall>
+</start>

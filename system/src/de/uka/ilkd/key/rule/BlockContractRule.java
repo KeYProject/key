@@ -9,7 +9,7 @@
 //
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
+// 
 
 package de.uka.ilkd.key.rule;
 
@@ -88,7 +88,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return filterAppliedContracts(collectedContracts, block, goal);
     }
-    
+
     private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
                                                                       final StatementBlock block,
                                                                       final Goal goal)
@@ -120,7 +120,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         return false;
     }
-    
+
     private BlockContractRule() {
     }
 
@@ -163,8 +163,8 @@ public class BlockContractRule implements BuiltInRule {
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(instantiation.block, services);
         final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(instantiation.block, services);
-        final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
-        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
+        // final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
+        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, application.getContract(), services);
         //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
@@ -208,11 +208,11 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final boolean isStrictlyPure, final Services services)
+    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final BlockContract contract, final Services services)
     {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
-        if (!isStrictlyPure) {
-            for (LocationVariable variable : variables) {
+        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        for (LocationVariable variable : variables) {
+            if(contract.hasModifiesClause(variable)) {
                 final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -585,7 +585,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(strictlyNothing()) && heap == getBaseHeap()) {
+                if (modifiesClause.equals(strictlyNothing())) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {
@@ -730,7 +730,7 @@ public class BlockContractRule implements BuiltInRule {
         public void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions)
         {
             goal.setBranchLabel("Precondition");
-            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
+            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions), null)), occurrence);
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates, final Term[] assumptions)

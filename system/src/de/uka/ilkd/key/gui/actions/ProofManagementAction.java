@@ -56,9 +56,9 @@ public final class ProofManagementAction extends MainWindowAction {
     }
 
     private boolean enabled() {
-	return getMediator().getProof() != null
-	        && getMediator().getProof().getJavaModel() != null
-	        && !getMediator().getProof().getJavaModel().isEmpty();
+	return getMediator().getSelectedProof() != null
+	        && getMediator().getSelectedProof().getJavaModel() != null
+	        && !getMediator().getSelectedProof().getJavaModel().isEmpty();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -66,12 +66,12 @@ public final class ProofManagementAction extends MainWindowAction {
     }
 
     private void showProofManagement() {
-	if (getMediator().getProof() == null) {
+	if (getMediator().getSelectedProof() == null) {
 	    mainWindow.notify(
 		    new GeneralFailureEvent("Please load a proof first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
-		    .getInitConfig());
+	    ProofManagementDialog
+                    .showInstance(getMediator().getSelectedProof().env().getInitConfig());
 	}
     }
 }

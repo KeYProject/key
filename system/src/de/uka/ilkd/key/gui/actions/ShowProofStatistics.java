@@ -33,7 +33,7 @@ public class ShowProofStatistics extends MainWindowAction {
 	super(mainWindow);
 	setName("Show Proof Statistics...");
 	
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
 
     }
 
@@ -49,7 +49,7 @@ public class ShowProofStatistics extends MainWindowAction {
             final int openGoals = proof.openGoals().size();
             String stats = (openGoals > 0)? ""+openGoals+" open goals.": "Closed.";
             stats += "\n\n";
-            for (Pair<String,String> x: proof.statistics()) {
+            for (Pair<String,String> x: proof.statistics().getSummary()) {
                 if ("".equals(x.second)) stats +="\n";
                 stats += x.first+": "+ x.second+"\n";
             }

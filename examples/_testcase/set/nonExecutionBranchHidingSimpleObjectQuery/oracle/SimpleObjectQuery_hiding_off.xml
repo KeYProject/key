@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleObjectQuery.main(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result = magic(x) catch(exc)
+pre: &lt;$inv&gt; &amp; !x = null
+post: result = subMagic(x) &amp; &lt;$inv&gt; &amp; exc = null
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <branchCondition name="SimpleObjectQuery.INSTANCE = x" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="true" branchCondition="SimpleObjectQuery.INSTANCE = x" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return magicValue;" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                        </methodReturnValue>
+                        <termination name="&lt;end&gt;" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" terminationKind="NORMAL">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="!SimpleObjectQuery.INSTANCE = x" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="true" branchCondition="!SimpleObjectQuery.INSTANCE = x" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return magicValue;" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
+                        </methodReturnValue>
+                        <termination name="&lt;end&gt;" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" terminationKind="NORMAL">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </branchCondition>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

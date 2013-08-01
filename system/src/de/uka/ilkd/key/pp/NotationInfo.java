@@ -15,12 +15,14 @@
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -198,7 +200,7 @@ public final class NotationInfo {
             notationTable = defaultNotationCache;
             return;
         }
-    defaultNotationCache = new HashMap<Object,Notation>();
+    defaultNotationCache = new LinkedHashMap<Object,Notation>();
     HashMap<Object,Notation> tbl = defaultNotationCache;
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));

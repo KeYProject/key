@@ -16,6 +16,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,7 +38,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class RuleSetDispatchFeature implements Feature {
 
-    private final Map<RuleSet, Feature> rulesetToFeature = new HashMap<RuleSet, Feature> ();
+    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<RuleSet, Feature> ();
     
     private RuleSetDispatchFeature() {}
     

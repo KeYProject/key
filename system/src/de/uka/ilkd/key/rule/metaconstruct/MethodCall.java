@@ -425,7 +425,8 @@ public class MethodCall extends ProgramTransformer {
         
         TypeReference baseTyRef = arrayTy.getBaseType();
         
-        ArrayInitializer arrayInit = KeYJavaASTFactory.arrayInitializer(exps);
+	ArrayInitializer arrayInit = KeYJavaASTFactory.arrayInitializer(exps,
+		kjt);
 	NewArray newArray = KeYJavaASTFactory.newArray(baseTyRef, 1, arrayInit,
 		kjt);
         

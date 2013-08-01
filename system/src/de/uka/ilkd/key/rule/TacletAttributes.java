@@ -18,10 +18,15 @@
 package de.uka.ilkd.key.rule;
 
 
+
 public final class TacletAttributes {
    
     private String displayName;
     private String helpText;
+    
+    /** trigger related information */
+    private Trigger trigger;
+
 
 
    public TacletAttributes() {
@@ -47,4 +52,16 @@ public final class TacletAttributes {
     public void setHelpText(String s) {
        helpText = s;
     }
+
+
+    public Trigger getTrigger() {
+        return trigger;
+    }
+
+
+    public void setTrigger(Trigger trigger) {
+        this.trigger = trigger;
+    }
+
+
 }

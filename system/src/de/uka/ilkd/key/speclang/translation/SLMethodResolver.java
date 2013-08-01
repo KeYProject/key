@@ -14,6 +14,9 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,6 +25,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.speclang.HeapContext;
+
 
 /**
  * Resolver for method calls in specifications.
@@ -57,7 +62,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
         
-        ImmutableList<KeYJavaType> signature = parameters.getSignature(javaInfo.getServices());
+        ImmutableList<KeYJavaType> signature = new SLParameters(parameters.getParameters().tail()).getSignature(javaInfo.getServices());
         
         IProgramMethod pm = null;
         Term recTerm = receiver.getTerm(); 
@@ -85,26 +90,37 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
         
-        int i;
-        Term[] subs;
-        
+    	List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+    	int hc = 0;
+    	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+    		if(hc >= pm.getHeapCount(services)) {
+    			break;
+    		}
+    		heaps.add(h);
+    	}
+        ImmutableList<SLExpression> params = parameters.getParameters();
+        int i = 0;
+        Term[] subs = new Term[params.size() - pm.getHeapCount(services) + pm.getStateCount()*pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1) ];
+        for(LocationVariable heap : heaps ) {
+          if(pm.getStateCount() >= 1) {
+            subs[i++] = TB.var(heap);
+            if(pm.getStateCount() == 2) {
+              subs[i++] = params.head().getTerm();
+            }
+          }
+          params = params.tail();
+        }
+      
         if(!pm.isStatic()) {
             if (!receiver.isTerm()) {
                 throw manager.excManager.createException(
                         "non-static method (" + methodName + ") invocation" +
                         " on Type " + receiver.getType());
             }
-            subs = new Term[parameters.getParameters().size() + 2];
-            subs[0] = TB.getBaseHeap(services);
-            subs[1] = recTerm;
-            i = 2;
-        } else {
-            subs = new Term[parameters.getParameters().size() + 1];
-            subs[0] = TB.getBaseHeap(services);
-            i = 1;
+            subs[i++] = recTerm;
         }
 
-        for (SLExpression slExpression : parameters.getParameters()) {
+        for (SLExpression slExpression : params) {
             //Remember: parameters.isLisOfTerm() is true!
             subs[i++] = slExpression.getTerm();
         }

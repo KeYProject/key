@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -41,8 +42,8 @@ public class FormulaTagManager {
      * sequent
      */
     FormulaTagManager ( Goal p_goal ) {
-	tagToFormulaInfo = new HashMap<FormulaTag, FormulaInfo> ();
-	pioToTag = new HashMap<PosInOccurrence, FormulaTag> ();
+	tagToFormulaInfo = new LinkedHashMap<FormulaTag, FormulaInfo> ();
+	pioToTag = new LinkedHashMap<PosInOccurrence, FormulaTag> ();
 	createNewTags ( p_goal );
     }
 

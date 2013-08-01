@@ -15,7 +15,10 @@ package org.key_project.keyide.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotAutoModeHandlerTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEPreferencePageTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicationTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
 
 /**
  * <p>
@@ -32,7 +35,10 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTes
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   SWTBotStartProofHandlerTest.class
+   SWTBotAutoModeHandlerTest.class,
+   SWTBotKeYIDEPreferencePageTest.class,
+   SWTBotManualRuleApplicationTest.class,
+   SWTBotKeYIDEMethodStarterTest.class
 })
 public class SWTBotAllKeYIDEUITests {
 }

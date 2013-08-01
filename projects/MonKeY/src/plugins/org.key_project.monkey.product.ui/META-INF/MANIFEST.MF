@@ -5,13 +5,15 @@ Bundle-SymbolicName: org.key_project.monkey.product.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.monkey.product.ui.Activator
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.ui,
  org.eclipse.ui.ide.application;bundle-version="1.0.300",
  org.eclipse.ui.ide;bundle-version="3.7.0",
  org.eclipse.ui.intro,
  org.key_project.key4eclipse;bundle-version="1.0.0",
  org.key_project.util;bundle-version="1.0.0",
- org.key_project.key4eclipse.starter.core;bundle-version="1.0.0"
+ org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
+ org.key_project.key4eclipse.common.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project

@@ -21,7 +21,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
  * A node in the symbolic execution tree which represents a loop condition,
  * e.g. {@code x >= 0}.
  * <p>
- * A symbolic branch node is also a normal stack frame ({@link IStackFrame})
+ * A symbolic loop statement is also a normal stack frame ({@link IStackFrame})
  * for compatibility reasons with the Eclipse debug API.
  * </p>
  * <p>

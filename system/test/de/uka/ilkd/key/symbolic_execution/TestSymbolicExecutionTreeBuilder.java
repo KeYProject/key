@@ -15,9 +15,9 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
@@ -39,75 +39,612 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArrayAverage
+    */
+   public void testUseLoopInvariantArrayAverage() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArrayAverage/test/ArrayAverage.java", 
+                "ArrayAverage", 
+                "average", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArrayAverage/oracle/ArrayAverage.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor
+    */
+   public void testUseOperationContractStatementsInImpliciteConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/test/UseOperationContractStatementsInImpliciteConstructor.java", 
+                "UseOperationContractStatementsInImpliciteConstructor", 
+                "average", 
+                null,
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/oracle/UseOperationContractStatementsInImpliciteConstructor.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopSplittingCondition
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testUseLoopInvariantLoopSplittingCondition() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopSplittingCondition/test/LoopSplittingCondition.java", 
+                "LoopSplittingCondition", 
+                "main", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopSplittingCondition/oracle/LoopSplittingCondition.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantTwoLoops
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testUseLoopInvariantTwoLoops() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantTwoLoops/test/TwoLoops.java", 
+                "TwoLoops", 
+                "main", 
+                null,
+                "examples/_testcase/set/useLoopInvariantTwoLoops/oracle/TwoLoops.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testLoopInvariantMethodReturnInDifferentModalities() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/test/WhileWithMethodCallAsConditionFullImplemented.java", 
+                "WhileWithMethodCallAsConditionFullImplemented", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/oracle/WhileWithMethodCallAsConditionFullImplemented.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testLoopBodyBranchClosed() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed/test/LoopBodyBranchClosed.java", 
+                "LoopBodyBranchClosed", 
+                "deadBody", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed/oracle/LoopBodyBranchClosed.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testLoopUsageBranchClosed() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed/test/LoopUsageBranchClosed.java", 
+                "LoopUsageBranchClosed", 
+                "deadCodeAfterLoop", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopUsageBranchClosed/oracle/LoopUsageBranchClosed.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/nestedLoopsWithContinue
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testNestedLoopsWithContinue() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/nestedLoopsWithContinue/test/NestedLoopsWithContinue.java", 
+                "NestedLoopsWithContinue", 
+                "main", 
+                null,
+                "examples/_testcase/set/nestedLoopsWithContinue/oracle/NestedLoopsWithContinue.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithContinue() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue/test/ArraySumWhileWithContinue.java", 
+                "ArraySumWhileWithContinue", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue/oracle/ArraySumWhileWithContinue.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantVoidWhileWithReturn
+    * </p>
+    * <p>
+    * Tests the handling of {@code return} when a loop invariant is applied.
+    * </p>
+    */
+   public void testVoidWhileWithReturn() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantVoidWhileWithReturn/test/VoidWhileWithReturn.java", 
+                "VoidWhileWithReturn", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantVoidWhileWithReturn/oracle/VoidWhileWithReturn.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn
+    * </p>
+    * <p>
+    * Tests the handling of {@code return} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithReturn() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn/test/ArraySumWhileWithReturn.java", 
+                "ArraySumWhileWithReturn", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn/oracle/ArraySumWhileWithReturn.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak
+    * </p>
+    * <p>
+    * Tests the handling of {@code break} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithBreak() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak/test/ArraySumWhileWithBreak.java", 
+                "ArraySumWhileWithBreak", 
+                "sum", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak/oracle/ArraySumWhileWithBreak.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithException
+    * </p>
+    * <p>
+    * Tests the handling of thrown exceptions when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithException/test/ArraySumWhileWithException.java", 
+                "ArraySumWhileWithException", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumWhileWithException/oracle/ArraySumWhileWithException.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_preMethodContract.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_preExpandMethods() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_preExpandMethods.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_NoPreMethodContract() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreMethodContract.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_NoPreExpandMethods() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+                "WhileWithMethodCallAsCondition", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreExpandMethods.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySizeDoWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testUseLoopInvariantArraySizeDoWhile() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/test/ArraySizeDoWhile.java", 
+                "ArraySizeDoWhile", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/oracle/ArraySizeDoWhile.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySizeWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testUseLoopInvariantArraySizeWhile() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySizeWhile/test/ArraySizeWhile.java", 
+                "ArraySizeWhile", 
+                "size", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySizeWhile/oracle/ArraySizeWhile.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumFor
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumFor() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
-//             "ArraySumFor", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
+                "ArraySumFor", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumForEach
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumForEach() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
-//             "ArraySumForEach", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
+                "ArraySumForEach", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumWhile() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
-//             "ArraySumWhile", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
+                "ArraySumWhile", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumWhileInitiallyInvalid() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
-//             "ArraySumWhileInitiallyInvalid", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
+                "ArraySumWhileInitiallyInvalid", 
+                "sum", 
+                "array != null",
+                "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractQueryTest
+    */
+   public void testUseOperationContractQueryTest() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractQueryTest/test/UseOperationContractQueryTest.java", 
+                "UseOperationContractQueryTest", 
+                "main", 
+                "value == magicNumber()",
+                "examples/_testcase/set/useOperationContractQueryTest/oracle/UseOperationContractQueryTest.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
    }
    
    /**
@@ -122,9 +659,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractAllBranchesOpenTest/oracle/UseOperationContractAllBranchesOpenTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -142,19 +681,21 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                                "examples/_testcase/set/identicalTermsDuringProof/oracle/IdenticalTermsDuringProof.xml",
                                                                                false,
                                                                                false,
+                                                                               false,
                                                                                ALL_IN_ONE_RUN,
+                                                                               false,
                                                                                false,
                                                                                false,
                                                                                false,
                                                                                false);
       try {
          // Find both statements "mid = y;".
-         IExecutionStartNode startNode = env.getBuilder().getStartNode();
+         IExecutionStart startNode = env.getBuilder().getStartNode();
          IExecutionMethodCall methodCall = (IExecutionMethodCall)startNode.getChildren()[0];
          IExecutionStatement intMidZ = (IExecutionStatement)methodCall.getChildren()[0];
-         IExecutionBranchNode ifYZ = (IExecutionBranchNode)intMidZ.getChildren()[0];
+         IExecutionBranchStatement ifYZ = (IExecutionBranchStatement)intMidZ.getChildren()[0];
          IExecutionBranchCondition notXY = (IExecutionBranchCondition)ifYZ.getChildren()[0];
-         IExecutionBranchNode ifXZ = (IExecutionBranchNode)notXY.getChildren()[0];
+         IExecutionBranchStatement ifXZ = (IExecutionBranchStatement)notXY.getChildren()[0];
          IExecutionBranchCondition not1X = (IExecutionBranchCondition)ifXZ.getChildren()[0];
          IExecutionStatement midThenBranch = (IExecutionStatement)not1X.getChildren()[0];
          IExecutionBranchCondition not1Y = (IExecutionBranchCondition)ifYZ.getChildren()[1];
@@ -193,7 +734,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/labelTest/oracle/LabelTest_doubled.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -212,7 +755,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/labelTest/oracle/LabelTest_lost.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -231,7 +776,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/emptyBlockTest/oracle/EmptyBlockTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -250,9 +797,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractExceptionalNoPreconditionWithNullCheckTest/oracle/UseOperationContractExceptionalNoPreconditionWithNullCheckTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -269,9 +818,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractFalsePreconditionTest/oracle/UseOperationContractFalsePreconditionTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -288,9 +839,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractFixedNormalPostTest/oracle/UseOperationContractFixedNormalPostTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -307,9 +860,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractInvalidPreconditionOnObjectTest/oracle/UseOperationContractInvalidPreconditionOnObjectTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -326,9 +881,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractInvalidPreconditionTest/oracle/UseOperationContractInvalidPreconditionTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -345,9 +902,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractNoExceptionTest/oracle/UseOperationContractNoExceptionTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -364,9 +923,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractNoPreconditionTest/oracle/UseOperationContractNoPreconditionTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -383,9 +944,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractNoPreconditionWithNullCheckTest/oracle/UseOperationContractNoPreconditionWithNullCheckTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -402,9 +965,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractNormalAndExceptionalBranchTest/oracle/UseOperationContractNormalAndExceptionalBranchTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -421,9 +986,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/useOperationContractNormalAndExceptionalTogetherTest/oracle/UseOperationContractNormalAndExceptionalTogetherTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -440,7 +1007,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/complexConstructorTest/oracle/ComplexConstructorTest.xml",
                 false,
                 true,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -459,7 +1028,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/simpleConstructorTest/oracle/SimpleConstructorTest.xml",
                 false,
                 true,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -478,7 +1049,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
                           true,
                           false,
+                          false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -497,7 +1070,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/variablesParameterAttributesChange/oracle/VariablesParameterAttributesChange.xml",
                 true,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -516,8 +1091,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/elseIfTest/oracle/ElseIfTestMergedBranchConditions.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 true,
+                false,
                 false,
                 false,
                 false);
@@ -535,8 +1112,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTestMergedBranchConditions.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 true,
+                false,
                 false,
                 false,
                 false);
@@ -554,7 +1133,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -573,7 +1154,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -592,7 +1175,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_main.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -611,7 +1196,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
                           true,
                           false,
+                          false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -630,7 +1217,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
                           true,
                           false,
+                          false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -649,7 +1238,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
                           true,
                           false,
+                          false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -668,7 +1259,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
                           true,
                           false,
+                          false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -687,7 +1280,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/complexFlatSteps/oracle/ComplexFlatSteps.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -706,7 +1301,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/complexIf/oracle/ComplexIf.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -725,7 +1322,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/doWhileFalseTest/oracle/DoWhileFalseTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -744,7 +1343,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/doWhileTest/oracle/DoWhileTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -763,7 +1364,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -782,7 +1385,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/elseIfTest/oracle/ElseIfTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -801,7 +1406,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -820,7 +1427,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/forEachTest/oracle/ForEachTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -839,7 +1448,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/forFalseTest/oracle/ForFalseTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -858,7 +1469,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/forTest/oracle/ForTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -877,7 +1490,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -896,7 +1511,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/functionalForTest/oracle/FunctionalForTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -915,7 +1532,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/functionalIf/oracle/FunctionalIf.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -934,7 +1553,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/functionalWhileTest/oracle/FunctionalWhileTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -953,7 +1574,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/methodCallOnObject/oracle/MethodCallOnObject.xml",
                 false,
                 false,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -972,7 +1595,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml",
                 false,
                 false,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -991,7 +1616,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/methodCallParallelTest/oracle/MethodCallParallelTest.xml",
                 false,
                 false,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1010,7 +1637,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/methodFormatTest/oracle/MethodFormatTest.xml",
                 false,
                 false,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1029,7 +1658,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml",
                 false,
                 true,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1048,7 +1679,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml",
                 false,
                 true,
+                true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1067,7 +1700,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/nestedDoWhileTest/oracle/NestedDoWhileTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1086,7 +1721,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/nestedForTest/oracle/NestedForTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1105,7 +1742,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/nestedWhileTest/oracle/NestedWhileTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1130,7 +1769,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
                           false,
                           false,
+                          false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -1149,7 +1790,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/simpleIf/oracle/SimpleIf.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1168,7 +1811,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1187,7 +1832,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/statementKindTest/oracle/StatementKindTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1206,7 +1853,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/statements/oracle/FlatSteps.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1225,7 +1874,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/staticMethodCall/oracle/StaticMethodCall.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1244,7 +1895,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1263,7 +1916,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/throwTest/oracle/ThrowTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1282,7 +1937,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/throwVariableTest/oracle/ThrowVariableTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1301,7 +1958,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/tryCatchFinally/oracle/TryCatchFinally.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1320,7 +1979,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/whileFalseTest/oracle/WhileFalseTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1339,7 +2000,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 "examples/_testcase/set/whileTest/oracle/WhileTest.xml",
                 false,
                 false,
+                false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,

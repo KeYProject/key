@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
@@ -39,7 +40,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    /**
     * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
     */
-   private Map<Goal, NodeStartEntry> startingCallStackSizePerGoal = new HashMap<Goal, NodeStartEntry>();
+   private Map<Goal, NodeStartEntry> startingCallStackSizePerGoal = new LinkedHashMap<Goal, NodeStartEntry>();
 
    /**
     * {@inheritDoc}
@@ -73,7 +74,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
             NodeStartEntry startingCallStackSizeEntry = startingCallStackSizePerGoal.get(goal);
             if (startingCallStackSizeEntry == null) {
                Node parentSetNode = SymbolicExecutionUtil.findParentSetNode(node);
-               int startingCallStackSize = SymbolicExecutionUtil.computeStackSize(parentSetNode, parentSetNode != null ? parentSetNode.getAppliedRuleApp() : null);
+               int startingCallStackSize = SymbolicExecutionUtil.computeStackSize(parentSetNode != null ? parentSetNode.getAppliedRuleApp() : null);
                startingCallStackSizeEntry = new NodeStartEntry(node, startingCallStackSize);
                startingCallStackSizePerGoal.put(goal, startingCallStackSizeEntry);
                return true; // Initial check, no need to stop
@@ -81,11 +82,11 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
             else {
                if (node != startingCallStackSizeEntry.getNode()) {
                   // Check if current call stack size matches the end condition
-                  int currentCallStackSize = SymbolicExecutionUtil.computeStackSize(node, ruleApp);
+                  int currentCallStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                   if (isCallStackSizeReached(startingCallStackSizeEntry.getNodeCallStackSize(), currentCallStackSize)) {
                      // Get parent node to make sure that already one node was executed which does not match the end condition
                      Node parentSetNode = SymbolicExecutionUtil.findParentSetNode(node);
-                     int parentStackSize = SymbolicExecutionUtil.computeStackSize(parentSetNode, parentSetNode.getAppliedRuleApp());
+                     int parentStackSize = SymbolicExecutionUtil.computeStackSize(parentSetNode.getAppliedRuleApp());
                      if (isCallStackSizeReached(startingCallStackSizeEntry.getNodeCallStackSize(), parentStackSize)) {
                         // Parent node also don't fulfill the call stack limit, stop now
                         return false;

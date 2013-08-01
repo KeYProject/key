@@ -47,8 +47,8 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 	        + ProofSettings.DEFAULT_SETTINGS.settingsToString()
 	        + "\n----------\n";
 	message += "Settings[CurrentProof]:\n"
-	        + ((getMediator().getProof() == null) ? "No proof loaded."
-	                : getMediator().getProof().getSettings()
+	        + ((getMediator().getSelectedProof() == null) ? "No proof loaded."
+	                : getMediator().getSelectedProof().getSettings()
 	                        .settingsToString());
 
 	final JTextArea settings = new JTextArea(message, 30, 80);

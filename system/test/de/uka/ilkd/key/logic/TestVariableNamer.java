@@ -25,36 +25,32 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
+import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
 
 public class TestVariableNamer extends TestCase {
     
     private static final TermBuilder TB = TermBuilder.DF;
 
-    private final Proof proof = new Proof(new Services());
+    private final Proof proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
     private final Services services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");

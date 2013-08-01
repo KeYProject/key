@@ -17,9 +17,24 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -137,14 +152,22 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         KeYJavaASTFactory.assign(rtrn, BooleanLiteral.TRUE);
 		final StatementBlock stmnts;
                 if (returnExpr != null) {
-                    Statement assignExpr =
-                            KeYJavaASTFactory.assign(returnExpr,
-                                    x.getExpression());
+		    // Keep the PositionInfo because it is required for symbolic
+		    // execution tree extraction and this assignment is the only
+		    // unique representation of the replaced return
+		    Statement assignExpr = KeYJavaASTFactory.assign(returnExpr,
+			    x.getExpression(), x.getPositionInfo());
 		    stmnts = KeYJavaASTFactory.block(assignFlag, assignExpr,
 			    breakInnerLabel);
                 } else
-		    stmnts = KeYJavaASTFactory.block(assignFlag,
-			    breakInnerLabel);
+		    // Keep the PositionInfo because it is required for symbolic
+		    // execution tree extraction and there is no other unique
+		    // representation of the replaced return
+		    stmnts = KeYJavaASTFactory.block(
+			    assignFlag,
+			    KeYJavaASTFactory.breakStatement(
+				    breakInnerLabel.getLabel(),
+				    x.getPositionInfo()));
 		addChild(stmnts);
                 changed();
             }
@@ -162,7 +185,12 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             } else {
                 Statement assign =
                         KeYJavaASTFactory.assign(cont, BooleanLiteral.TRUE);
-		addChild(KeYJavaASTFactory.block(assign, breakInnerLabel));
+		// Keep the PositionInfo because it is required for symbolic
+		// execution tree extraction and there is no other unique
+		// representation of the replaced continue
+		addChild(KeYJavaASTFactory.block(assign, KeYJavaASTFactory
+			.breakStatement(breakInnerLabel.getLabel(),
+				x.getPositionInfo())));
                 changed();
             }
         } else {
@@ -185,10 +213,13 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         Statement assignFlag =
                                 KeYJavaASTFactory.assign(brk,
                                         BooleanLiteral.TRUE);
-                        Statement assign =
-                                KeYJavaASTFactory.assign(
-                                        b.getProgramVariable(),
-                                        BooleanLiteral.TRUE);
+			// Keep the PositionInfo because it is required for
+			// symbolic execution tree extraction and this
+			// assignment is the only unique representation of the
+			// replaced break
+			Statement assign = KeYJavaASTFactory.assign(
+				b.getProgramVariable(), BooleanLiteral.TRUE,
+				x.getPositionInfo());
                         replaced = true;
 			addChild(KeYJavaASTFactory.block(assignFlag, assign,
 				breakInnerLabel));
