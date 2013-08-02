@@ -78,9 +78,20 @@ public class SaveAsAction extends CommandAction implements IDisposable {
     */
    protected void handleFixedPartPropertyChanged(Object source, int propId) {
       if (ISaveablePart.PROP_DIRTY == propId) {
-         if (fixedPart instanceof ISaveablePart) {
-            setEnabled(((ISaveablePart) fixedPart).isSaveAsAllowed());
-         }
+         setEnabled(isSaveAsAllowed());
+      }
+   }
+   
+   /**
+    * Checks if save as is allowed or not.
+    * @return {@code true} allowed, {@code false} forbidden
+    */
+   protected boolean isSaveAsAllowed() {
+      if (fixedPart instanceof ISaveablePart) {
+         return ((ISaveablePart) fixedPart).isSaveAsAllowed();
+      }
+      else {
+         return false;
       }
    }
 
@@ -112,8 +123,7 @@ public class SaveAsAction extends CommandAction implements IDisposable {
                if (ObjectUtil.equals(fixedPart, WorkbenchUtil.getActivePart())) {
                   if (commandEvent.isHandledChanged() || commandEvent.isEnabledChanged()) {
                      if (commandEvent.getCommand().isDefined()) {
-                        // TODO: Find out why commandEvent.getCommand().isEnabled() is false after the button was clicked!
-                        setEnabled(commandEvent.getCommand().isEnabled());
+                        setEnabled(isSaveAsAllowed());
                      }
                   }
                }
