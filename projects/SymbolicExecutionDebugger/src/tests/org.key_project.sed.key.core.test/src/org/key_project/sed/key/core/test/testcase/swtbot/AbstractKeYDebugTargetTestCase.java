@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
 import java.io.File;
@@ -27,7 +40,6 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
 import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
@@ -43,7 +55,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -616,8 +628,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-            KeYUtil.clearProofList(MainWindow.getInstance());
+            Proof proof = TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, false);
+            proof.dispose();
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);

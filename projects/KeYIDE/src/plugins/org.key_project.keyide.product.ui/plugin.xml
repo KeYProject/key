@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench" 
+            name="KeYIDE">
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property
+               name="appName"
+               value="KeYIDE">
+         </property>
+         <property
+               name="welcomePerspective"
+               value="org.eclipse.jdt.ui.JavaPerspective">
+         </property>
+         <property
+               name="introTitle"
+               value="KeYIDE">
+         </property>
+         <property
+               name="introBrandingImage"
+               value="product:icons/IntroLogo.gif">
+         </property>
+         <property
+               name="introBrandingImageText"
+               value="KeY Project">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/logo16.gif,icons/logo32.gif,icons/logo48.gif,icons/logo64.gif,icons/logo128.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="KeYIDE&#x0A;&#x0A;Version: 1.0.0&#x0A;&#x0A;Developed as part of the KeY project.">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/About.gif">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="30,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="30,275,445,15">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro">
+      <introProductBinding
+            introId="org.eclipse.ui.intro.universal"
+            productId="org.key_project.sed.product.ui.product">
+      </introProductBinding>
+   </extension>
+</plugin>

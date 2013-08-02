@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.util;
 
 import java.awt.Color;
@@ -15,7 +28,7 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 
 public class GuiUtilities {
 
@@ -85,7 +98,7 @@ public class GuiUtilities {
     }
 
     // is this still needed?
-    public static void copyHighlightToClipboard(SequentView view) {
+    public static void copyHighlightToClipboard(CurrentGoalView view) {
         String s = view.getHighlightedText();
         // now CLIPBOARD
         java.awt.datatransfer.StringSelection ss = 

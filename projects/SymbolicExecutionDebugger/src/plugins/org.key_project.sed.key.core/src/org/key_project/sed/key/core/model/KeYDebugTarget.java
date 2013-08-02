@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.core.model;
 
 import java.util.HashMap;
@@ -107,7 +120,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), 
+                                                                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
    }
 
    /**
@@ -168,7 +182,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof), isLoopTreatmentInvariant(proof));
+      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
@@ -181,28 +195,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       }
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       environment.getUi().startAutoMode(proof, goals);
-   }
-   
-   /**
-    * Checks if the given {@link Proof} uses method treatment "Contract" right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} Contract, {@code false} Expand
-    */
-   protected boolean isMethodTreatmentContract(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return StrategyProperties.METHOD_CONTRACT.equals(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
-   }
-   
-   /**
-    * Checks if the given {@link Proof} uses loop treatment "Invariant" right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} Invariant, {@code false} Expand
-    */
-   protected boolean isLoopTreatmentInvariant(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return StrategyProperties.LOOP_INVARIANT.equals(sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
    }
 
    /**
@@ -212,7 +205,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public boolean canSuspend() {
       return super.canSuspend() && 
              environment.getBuilder().getMediator().autoMode() && // Only if the auto mode is in progress
-             environment.getBuilder().getMediator().getProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
+             environment.getBuilder().getMediator().getSelectedProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
    }
    
    /**
@@ -271,9 +264,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Remove proof from user interface
          environment.getUi().removeProof(environment.getProof());
          // Clear cache
-         environment.getBuilder().dispose();
+         environment.dispose();
          environment = null;
-         executionToDebugMapping.clear();
       }
       // Inform UI that the process is terminated
       super.terminate();

@@ -26,12 +26,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -49,11 +47,17 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
-    
-    private static final String EXAMPLES_PATH =  
+    /**
+     * This path is also accessed by the Eclipse integration of KeY
+     * to find the right examples.
+     */
+    public static final String EXAMPLES_PATH =  
 		    "examples" + File.separator + "firstTouch";
     private static final long serialVersionUID = -4405666868752394532L;
-    private static final String KEY_FILE_NAME = "project.key";
+    /**
+     * This constant is accessed by the eclipse based projects.
+     */
+    public static final String KEY_FILE_NAME = "project.key";
     private static final String README_NAME = "README.txt";
     
     private static ExampleChooser instance;
@@ -71,11 +75,15 @@ public final class ExampleChooser extends JDialog {
      * 
      * Used for displaying files in the examples list w/o prefix
      */
-    private static class ShortFile {
+    public static class ShortFile {
         private File file;
 
         public ShortFile(File file) {
             this.file = file;
+        }
+        
+        public File getFile() {
+           return file;
         }
 
         @Override 
@@ -100,19 +108,9 @@ public final class ExampleChooser extends JDialog {
 	
 	//create example list
 	final DefaultListModel model = new DefaultListModel();
-	File[] examples = examplesDir.listFiles();
-        Arrays.sort(examples, new Comparator<File> () {
-            public int compare(File f1, File f2) {
-                return f1.getName().compareToIgnoreCase(f2.getName());
-            }
-        });
-	for(File example : examples) {
-	    if(example.isDirectory()) {
-		final File keyfile = new File(example, KEY_FILE_NAME);
-		if(keyfile.isFile()) {
-		    model.addElement(new ShortFile(example));
-		}
-	    }
+	List<ShortFile> examples = listExamples(examplesDir);
+	for (ShortFile example : examples) {
+	   model.addElement(example);
 	}
 	exampleList = new JList();
 	exampleList.setModel(model);
@@ -203,7 +201,30 @@ public final class ExampleChooser extends JDialog {
 	setLocationRelativeTo(MainWindow.getInstance());
     }	
     
-    
+    /**
+     * Lists all examples in the given directory. 
+     * This method is also accessed by the eclipse based projects.
+     * @param examplesDir The examples directory to list examples in.
+     * @return The found examples.
+     */
+    public static List<ShortFile> listExamples(File examplesDir) {
+       File[] examples = examplesDir.listFiles();
+       Arrays.sort(examples, new Comparator<File>() {
+          public int compare(File f1, File f2) {
+             return f1.getName().compareToIgnoreCase(f2.getName());
+          }
+       });
+       List<ShortFile> result = new LinkedList<ExampleChooser.ShortFile>();
+       for (File example : examples) {
+          if (example.isDirectory()) {
+             final File keyfile = new File(example, KEY_FILE_NAME);
+             if (keyfile.isFile()) {
+                result.add(new ShortFile(example));
+             }
+          }
+       }
+       return result;
+    }
     
     //-------------------------------------------------------------------------
     //internal methods
@@ -217,29 +238,44 @@ public final class ExampleChooser extends JDialog {
     
     
     private void updateDescription() {
-	final ShortFile selectedExample = (ShortFile) exampleList.getSelectedValue();
-	final File readme = new File(selectedExample.file, README_NAME);
-	if(readme.isFile()) {
-            final BufferedReader br;
+       ShortFile selectedExample = (ShortFile) exampleList.getSelectedValue();
+       String description = readDescription(selectedExample);
+       descriptionText.setText(description);
+       descriptionText.getCaret().setDot(0);
+    }
+    
+    public static String readDescription(ShortFile example) {
+      final File readme = new File(example.file, README_NAME);
+      if (readme.isFile()) {
+         BufferedReader br = null;
+         try {
+            br = new BufferedReader(new FileReader(readme));
+            final StringBuilder sb = new StringBuilder();
+            final String ls = System.getProperty("line.separator");
+            String line;
+            while ((line = br.readLine()) != null) {
+               sb.append(line);
+               sb.append(ls);
+            }
+            return sb.toString();
+         }
+         catch (IOException e) {
+            return "Reading description from README file failed.";
+         }
+         finally {
             try {
-                br = new BufferedReader(new FileReader(readme));
-                final StringBuilder sb = new StringBuilder();
-                final String ls = System.getProperty("line.separator");
-                String line;
-                while((line = br.readLine()) != null) {
-                    sb.append(line);
-                    sb.append(ls);
-                }
-                descriptionText.setText(sb.toString());
-                descriptionText.getCaret().setDot(0);	        
-                br.close();
-            } catch(IOException e) {
-                descriptionText.setText("Reading description from "
-                        + "README file failed.");
-            } 
-	} else {
-	    descriptionText.setText("No description available.");
-	}
+               if (br != null) {
+                  br.close();
+               }
+            }
+            catch (IOException e) {
+               // Nothing to do.
+            }
+         }
+      }
+      else {
+         return "No description available.";
+      }
     }
     
     

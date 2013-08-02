@@ -1,8 +1,22 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.smt;
 
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 
 
@@ -39,7 +53,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
   
 
-        private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
+        private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
         public boolean useExplicitTypeHierarchy     = false;
         public boolean useNullInstantiation         = true;

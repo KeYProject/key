@@ -33,23 +33,32 @@ public class FieldReference extends VariableReference
     
 
     protected FieldReference() {
+        prefix = null;
     }
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
-	super(pv);
-	this.prefix = prefix;
+        super(pv);
+        initPrefix(pv, prefix);
+    }
+
+    private void initPrefix(ProgramVariable pv, ReferencePrefix prefix) {
+        if (prefix == null && !pv.isStatic() && pv.isMember()) {
+            this.prefix = new ThisReference();
+        } else {
+            this.prefix = prefix;
+        }
     }
 
     public FieldReference(ExtList children, ReferencePrefix prefix) {
-	super(children);
-	this.prefix = prefix;
+        super(children);
+        initPrefix(getProgramVariable(), prefix);
     }
 
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
         super(pv, pi);
-        this.prefix = prefix;
-        
+        initPrefix(pv, prefix);
+
     }
 
     /**

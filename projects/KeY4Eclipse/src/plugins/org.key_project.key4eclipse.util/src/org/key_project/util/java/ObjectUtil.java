@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.util.java;
 
 import java.lang.reflect.Field;
@@ -122,9 +135,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -180,9 +190,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, boolean value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -238,9 +245,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, int value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }

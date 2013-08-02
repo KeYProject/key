@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.common.ui.property;
 
 import java.io.File;
@@ -35,7 +48,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.key_project.key4eclipse.common.ui.provider.KeYClassPathEntryLabelProvider;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
@@ -53,7 +65,7 @@ import org.key_project.util.java.StringUtil;
  * settings of an {@link IProject}.
  * @author Martin Hentschel
  */
-public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
+public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
     /**
      * Radio button to use default key boot class path.
      */
@@ -643,19 +655,6 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
         }
         else {
             SWTUtil.setText(bootClassPathText, null);
-        }
-    }
-
-    /**
-     * Returns the {@link IProject} that is currently configured.
-     * @return The {@link IProject} to configure.
-     */
-    public IProject getProject() {
-        if (getElement() != null) {
-            return (IProject)getElement().getAdapter(IProject.class);
-        }
-        else {
-            return null;
         }
     }
     

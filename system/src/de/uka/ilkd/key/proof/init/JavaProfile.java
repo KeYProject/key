@@ -36,10 +36,22 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
  *
  */
 public class JavaProfile extends AbstractProfile {
+    public static final String NAME = "Java Profile";
+    
+    /**
+     * <p>
+     * The default instance of this class.
+     * </p>
+     * <p> 
+     * It is typically used in the {@link Thread} of the user interface.
+     * Other instances of this class are typically only required to 
+     * use them in different {@link Thread}s (not the UI {@link Thread}).
+     * </p>
+     */
+    public static JavaProfile defaultInstance; 
 
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
-
 
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
         super(standardRules, gcb);
@@ -112,7 +124,7 @@ public class JavaProfile extends AbstractProfile {
      * the name of the profile
      */
     public String name() {
-        return "Java Profile";
+        return NAME;
     }
 
     /**
@@ -120,5 +132,23 @@ public class JavaProfile extends AbstractProfile {
      */
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
+    }
+
+    /**
+     * <p>
+     * Returns the default instance of this class.
+     * </p>
+     * <p>
+     * It is typically used in the {@link Thread} of the user interface.
+     * Other instances of this class are typically only required to 
+     * use them in different {@link Thread}s (not the UI {@link Thread}).
+     * </p>
+     * @return The default instance for usage in the {@link Thread} of the user interface.
+     */
+    public static synchronized JavaProfile getDefaultInstance() {
+        if (defaultInstance == null) {
+            defaultInstance = new JavaProfile();
+        }
+       return defaultInstance;
     }
 }

@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.ByteArrayInputStream;
@@ -71,28 +84,28 @@ public class TestSymbolicConfigurationWriterAndReader extends TestCase {
       model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
       // state
       KeYlessState state = new KeYlessState("exampleState");
-      state.addValue(new KeYlessValue("v1", "v1", false, -1, "v1Value", "t1"));
-      state.addValue(new KeYlessValue("v2", "v2", false, -1, "v2Value", "t2"));
+      state.addValue(new KeYlessValue("v1", "v1", false, -1, "v1Value", "t1", null));
+      state.addValue(new KeYlessValue("v2", "v2", false, -1, "v2Value", "t2", "c1"));
       model.setState(state);
       // o1
       KeYlessObject o1 = new KeYlessObject("o1", "t1");
-      o1.addValue(new KeYlessValue("o1", "o1", false, -1, "o1Value", "t1"));
+      o1.addValue(new KeYlessValue("o1", "o1", false, -1, "o1Value", "t1", "c2"));
       model.addObject(o1);
       // o2
       KeYlessObject o2 = new KeYlessObject("o2", "t2");
       model.addObject(o2);
       // o3
       KeYlessObject o3 = new KeYlessObject("o3", "t3");
-      o3.addValue(new KeYlessValue("o1", "o1", false, -1, "o1Value", "t1"));
-      o3.addValue(new KeYlessValue("o2", "o2", true, 52, "o2Value", "t2"));
-      o3.addValue(new KeYlessValue("o3", "o3", false, -1, "o3Value", "t3"));
+      o3.addValue(new KeYlessValue("o1", "o1", false, -1, "o1Value", "t1", null));
+      o3.addValue(new KeYlessValue("o2", "o2", true, 52, "o2Value", "t2", "c3"));
+      o3.addValue(new KeYlessValue("o3", "o3", false, -1, "o3Value", "t3", null));
       model.addObject(o3);
       // associations
-      state.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o2));
-      o1.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o1));
-      o1.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o2));
-      o2.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o3));
-      o3.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o1));
+      state.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o2, null));
+      o1.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o1, "c4"));
+      o1.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o2, "c5"));
+      o2.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o3, null));
+      o3.addAssociation(new KeYlessAssociation("a1", "a1", false, -1, o1, "c6"));
       return model;
    }
 }

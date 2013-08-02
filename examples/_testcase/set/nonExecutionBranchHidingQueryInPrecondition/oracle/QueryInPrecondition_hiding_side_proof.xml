@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="QueryInPrecondition.main(x,y);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result = magic(x, y) catch(exc)
+pre: xPre(x) = TRUE &amp; y &lt; 0 | !(xPre(x) = TRUE &amp; y &lt; 0)
+post: (   heapAtPre[xPre(x)] = TRUE &amp; y &lt; 0
+   -&gt; result = subFirst(x, y) &amp; exc = null)
+&amp; (   !(heapAtPre[xPre(x)] = TRUE &amp; y &lt; 0)
+   -&gt; result = subSecond(x, y) &amp; exc = null)
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	42 {x &gt;= 0 &amp; y &lt;= -1}, 
+	-4711 {!(y &lt;= -1 &amp; x &gt;= 0)}
+as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="42 {x &gt;= 0 &amp; y &lt;= -1}" returnValueString="42" hasCondition="true" conditionString="x &gt;= 0 &amp; y &lt;= -1">
+                  </methodReturnValue>
+                  <methodReturnValue name="-4711 {!(y &lt;= -1 &amp; x &gt;= 0)}" returnValueString="-4711" hasCondition="true" conditionString="!(y &lt;= -1 &amp; x &gt;= 0)">
+                  </methodReturnValue>
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

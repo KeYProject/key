@@ -16,9 +16,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.Modality;
+
 
 /**
  * Returns zero iff a term contains a program or (optionally) a query expression
@@ -42,7 +43,8 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
 
     private boolean containsExec(Term t) {
         if ( t.isRigid () ) return false;
-
+        //if ( t.isContainsJavaBlockRecursive() ) return true;
+        
         final Operator op = t.op ();
         if ( op instanceof Quantifier ) return false;
 

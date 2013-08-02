@@ -14,9 +14,12 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -28,15 +31,21 @@ public interface DependencyContract extends Contract {
     /**
      * Returns the dependency set of the contract.
      */
-    public Term getDep(ProgramVariable selfVar,
+    public Term getDep(
+    		       LocationVariable heap, boolean atPre,
+                   ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
+	               Map<LocationVariable,? extends ProgramVariable> atPreVars,	               
 	               Services services);    
         
     /**
      * Returns the dependency set of the contract.
      */
-    public Term getDep(Term heapTerm,
+    public Term getDep(
+    		       LocationVariable heap, boolean atPre,
+    		       Term heapTerm,
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
+                   Map<LocationVariable, Term> atPres,           
 	               Services services);
 }

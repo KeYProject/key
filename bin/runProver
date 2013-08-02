@@ -27,6 +27,7 @@ if [ -z "$JAVA_HOME" ] ; then
 	exit 1
     fi
 else
+    echo "Using JDK installation from:      $JAVA_HOME"
     if [ "$UNAME" = "darwin" ] ; then
 	JRE=$JAVA_HOME/Home
 	JAVA=$JRE/bin/java
@@ -36,7 +37,6 @@ else
 	JAVA=$JRE/bin/java
     fi
 fi
-echo "Using JDK installation from:      $JAVA_HOME"
 
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
@@ -198,6 +198,11 @@ while [ $# -ne 0 ]; do
 	    shift
 	    continue;;
 	    
+	--splash)
+	    JAVA_OPTIONS="${JAVA_OPTIONS} -splash:$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-color.gif" 
+	    shift
+	    continue;;
+
          # key options beginning with a minus or filenames  
          *) break;;
 

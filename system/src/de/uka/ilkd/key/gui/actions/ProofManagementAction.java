@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -43,9 +56,9 @@ public final class ProofManagementAction extends MainWindowAction {
     }
 
     private boolean enabled() {
-	return getMediator().getProof() != null
-	        && getMediator().getProof().getJavaModel() != null
-	        && !getMediator().getProof().getJavaModel().isEmpty();
+	return getMediator().getSelectedProof() != null
+	        && getMediator().getSelectedProof().getJavaModel() != null
+	        && !getMediator().getSelectedProof().getJavaModel().isEmpty();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -53,12 +66,12 @@ public final class ProofManagementAction extends MainWindowAction {
     }
 
     private void showProofManagement() {
-	if (getMediator().getProof() == null) {
+	if (getMediator().getSelectedProof() == null) {
 	    mainWindow.notify(
 		    new GeneralFailureEvent("Please load a proof first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
-		    .getInitConfig());
+	    ProofManagementDialog
+                    .showInstance(getMediator().getSelectedProof().env().getInitConfig());
 	}
     }
 }

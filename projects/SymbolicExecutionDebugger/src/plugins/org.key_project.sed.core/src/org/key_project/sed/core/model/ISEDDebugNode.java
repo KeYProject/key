@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.DebugException;
@@ -13,7 +26,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugN
  * <ul>
  * <li>{@link ISEDThread} (root node)</li>
  * <li>{@link ISEDStatement} (single statement, e.g. {@code int x =  1 + 2;})</li>
- * <li>{@link ISEDBranchNode} (branch node, e.g. {@code if(x >= 0)})</li>
+ * <li>{@link ISEDBranchStatement} (branch statement, e.g. {@code if(x >= 0)})</li>
  * <li>{@link ISEDBranchCondition} (branch condition, e.g. {@code x < 0})</li>
  * <li>{@link ISEDMethodCall} (method call, e.g. {@code foo()})</li>
  * <li>{@link ISEDMethodReturn} (method return, e.g. {@code return 42})</li>

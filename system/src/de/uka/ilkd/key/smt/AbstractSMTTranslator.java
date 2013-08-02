@@ -107,7 +107,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         /** remember all function declarations */
 
-        protected class FunctionWrapper {
+        protected static class FunctionWrapper {
                 private StringBuffer name;
                 private Function function;
                 private boolean usedForUnique;
@@ -147,54 +147,54 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
         
         //key is the term to identify the bsum, value is the name used for that function.
-        private final HashMap<Term, StringBuffer> usedBsumTerms = new HashMap<Term, StringBuffer>();
+        private final HashMap<Term, StringBuffer> usedBsumTerms = new LinkedHashMap<Term, StringBuffer>();
 
         //key is the term to identify the bprod, value is the name used for that function.
-        private final HashMap<Term, StringBuffer> usedBprodTerms = new HashMap<Term, StringBuffer>();
+        private final HashMap<Term, StringBuffer> usedBprodTerms = new LinkedHashMap<Term, StringBuffer>();
         
         //key is the term to identify the function binding vars, value is the name used for the function
-        private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new LinkedHashMap<Term, StringBuffer>();
         
         //key is the term to identify the predicate binding vars, value is the name used for the predicate
-        private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new LinkedHashMap<Term, StringBuffer>();
         
-        private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
+        private HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<Operator, ArrayList<Sort>>();
 
-        private HashSet<Function> specialFunctions = new HashSet<Function>();
+        private HashSet<Function> specialFunctions = new LinkedHashSet<Function>();
 
-        private HashMap<Operator, ArrayList<Sort>> predicateDecls = new HashMap<Operator, ArrayList<Sort>>();
+        private HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<Operator, ArrayList<Sort>>();
 
-        private HashMap<Operator, StringBuffer> usedVariableNames = new HashMap<Operator, StringBuffer>();
+        private HashMap<Operator, StringBuffer> usedVariableNames = new LinkedHashMap<Operator, StringBuffer>();
 
-        private HashMap<Operator, StringBuffer> usedFunctionNames = new HashMap<Operator, StringBuffer>();
+        private HashMap<Operator, StringBuffer> usedFunctionNames = new LinkedHashMap<Operator, StringBuffer>();
 
         private Collection<FunctionWrapper> usedFunctions = new LinkedList<FunctionWrapper>();
 
-        private HashMap<Operator, StringBuffer> usedPredicateNames = new HashMap<Operator, StringBuffer>();
+        private HashMap<Operator, StringBuffer> usedPredicateNames = new LinkedHashMap<Operator, StringBuffer>();
 
-        protected HashMap<Sort, StringBuffer> usedDisplaySort = new HashMap<Sort, StringBuffer>();
+        protected HashMap<Sort, StringBuffer> usedDisplaySort = new LinkedHashMap<Sort, StringBuffer>();
 
-        protected HashMap<Sort, StringBuffer> usedRealSort = new HashMap<Sort, StringBuffer>();
+        protected HashMap<Sort, StringBuffer> usedRealSort = new LinkedHashMap<Sort, StringBuffer>();
 
-        private HashMap<Sort, StringBuffer> typePredicates = new HashMap<Sort, StringBuffer>();
+        private HashMap<Sort, StringBuffer> typePredicates = new LinkedHashMap<Sort, StringBuffer>();
 
         // used type predicates for constant values, e.g. 1, 2, ...
-        private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> constantTypePreds = new LinkedHashMap<Term, StringBuffer>();
 
         /** map used for storing predicates representing modalities or updates */
-        private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
+        private HashMap<Term, StringBuffer> modalityPredicates = new LinkedHashMap<Term, StringBuffer>();
 
         /**
          * If a integer is not supported by a solver because it is too big, the
          * integer is translated into a constant. This constants are stored at
          * this place.
          */
-        private final HashMap<Long, StringBuffer> constantsForBigIntegers = new HashMap<Long, StringBuffer>();
+        private final HashMap<Long, StringBuffer> constantsForBigIntegers = new LinkedHashMap<Long, StringBuffer>();
         /**
          * If a integer is not supported by a solver because it is too small,
          * the integer is translated into a constant.
          */
-        private final HashMap<Long, StringBuffer> constantsForSmallIntegers = new HashMap<Long, StringBuffer>();
+        private final HashMap<Long, StringBuffer> constantsForSmallIntegers = new LinkedHashMap<Long, StringBuffer>();
 
         // assumptions. they have to be added to the formula!
         private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
@@ -264,13 +264,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 new Vector<QuantifiableVariable>(), services);
 
                 // add one variable for each sort
-                for (Sort s : this.usedRealSort.keySet()) {
-                        // if(!s.equals(Sort.FORMULA)){
+                for (Sort s : this.usedRealSort.keySet()) {                 
+                   if(!s.equals(Sort.FORMULA)){
                         LogicVariable l = new LogicVariable(new Name("dummy_"
                                         + s.name().toString()), s);
                         this.addFunction(l, new ArrayList<Sort>(), s);
                         this.translateFunc(l, new ArrayList<StringBuffer>());
-                        // }
+                   }
                 }
 
                 tacletAssumptions = translateTaclets(services, settings);
@@ -484,7 +484,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 ArrayList<ContextualBlock> predicateTypes = new ArrayList<ContextualBlock>();
                 return buildCompleteText(formula, this.getAssumptions(serv,
                                 assumptionTypes, settings), assumptionTypes,
-                                this.buildTranslatedFuncDecls(),
+                                this.buildTranslatedFuncDecls(serv),
                                 this.buildTranslatedPredDecls(predicateTypes),
                                 predicateTypes, this.buildTranslatedSorts(),
                                 this.buildSortHierarchy(serv, settings),
@@ -744,14 +744,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          * 
          * @return structured List of declaration.
          */
-        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls() {
+        private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls(Services services) {
                 ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
                 // add the function declarations for each used function
                 for (Operator op : this.functionDecls.keySet()) {
                         ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
                         element.add(usedFunctionNames.get(op));
                         for (Sort s : functionDecls.get(op)) {
-                                element.add(usedDisplaySort.get(s));
+                                if (s == Sort.FORMULA) {
+                                    //This function was used with a formula as argument. Treat like a boolean sort
+                                    element.add(this.getBoolSort());
+                                } else {
+                                    element.add(usedDisplaySort.get(s));
+                                }
                         }
                         toReturn.add(element);
                 }
@@ -1044,7 +1049,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         	if(this.isMultiSorted()){
          		for(Sort sort : usedRealSort.keySet()){
          	
-             		if(!isSomeIntegerSort(sort)){
+         		//Do not add Assumptions for Boolean or integer sorts
+             		if(!isSomeIntegerSort(sort) && sort != Sort.FORMULA ){
              			Term var = createLogicalVar(services, "x", sort);
              			StringBuffer sVar = translateVariable(var.op());
             			//StringBuffer var = this.makeUnique(new StringBuffer("x"));
@@ -1162,6 +1168,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         protected abstract StringBuffer getIntegerSort();
 
+        /**
+         * The String used for boolean values.
+         * @return The string used for boolean values.
+         */
+        protected abstract StringBuffer getBoolSort();
+        
         /**
          * Build the Stringbuffer for a logical NOT.
          * 
@@ -2714,7 +2726,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                         ArrayList<Sort> sorts = new ArrayList<Sort>();
                         for (int i = 0; i < op.arity(); i++) {
+                            if (term.sub(i).sort() != Sort.FORMULA) {
                                 sorts.add(term.sub(i).sort());
+                            } else {
+                                sorts.add(Sort.FORMULA);
+                            }
                         }
                         this.addFunction(op, sorts, term.sort());
 
@@ -3019,7 +3035,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 Vector<QuantifiableVariable> vector = new Vector<QuantifiableVariable>();
                 ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
-                HashSet<Sort> tempSorts = new HashSet<Sort>();
+                HashSet<Sort> tempSorts = new LinkedHashSet<Sort>();
                 tempSorts.addAll(usedRealSort.keySet());
 
                 for (Operator op : usedFunctionNames.keySet()) {
@@ -3041,9 +3057,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 for (Sort sort : tempSorts) {
                         HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+                        //Several special sorts should not be added to the collection
                         if (ldt.getHeap().sort() != sort
                                         && ldt.getFieldSort() != sort
-                                        && services.getJavaInfo().nullSort() != sort) {
+                                        && services.getJavaInfo().nullSort() != sort                                      
+                                        && Sort.FORMULA != sort) {
                                 sorts = sorts.add(sort);
                         }
                 }

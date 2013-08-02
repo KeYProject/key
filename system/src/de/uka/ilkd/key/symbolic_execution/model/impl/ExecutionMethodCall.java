@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -5,6 +18,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -40,7 +54,7 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     */
    @Override
    public boolean isImplicitConstructor() {
-      return SymbolicExecutionUtil.isImplicitConstructor(getProgramMethod());
+      return KeYTypeUtil.isImplicitConstructor(getProgramMethod());
    }
 
    /**
@@ -64,8 +78,8 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
    @Override
    public IProgramMethod getExplicitConstructorProgramMethod() {
       IProgramMethod pm = getProgramMethod();
-      if (SymbolicExecutionUtil.isImplicitConstructor(pm)) {
-         return SymbolicExecutionUtil.findExplicitConstructor(getServices(), pm);
+      if (KeYTypeUtil.isImplicitConstructor(pm)) {
+         return KeYTypeUtil.findExplicitConstructor(getServices(), pm);
       }
       else {
          return null;

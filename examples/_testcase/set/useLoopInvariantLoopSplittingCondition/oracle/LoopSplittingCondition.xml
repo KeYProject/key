@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="LoopSplittingCondition.main(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int i = x&gt;=0 ?x :-x;" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
+modifies: {heap=false};
+variant: i" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="!i_1 &lt;= -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="!i_1 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <methodCall name="LoopSplittingCondition.goOn(x_17);" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                     <branchStatement name="if (x_17&gt;0) {return true; }else  {return false; }" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                        <statement name="return true;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_17);&gt;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_17);&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
+                              </methodReturnValue>
+                              <branchStatement name="if (i&gt;=0) {   x--; }else  {   x++; }" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                                 <statement name="x--;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                                    <statement name="i--;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                                       <termination name="&lt;loop body end&gt;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                                       </termination>
+                                    </statement>
+                                 </statement>
+                              </branchStatement>
+                           </methodReturn>
+                        </statement>
+                     </branchStatement>
+                  </methodCall>
+               </branchCondition>
+               <branchCondition name="!i_1 &lt;= -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="!i_1 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return i;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_1 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="i_1" returnValueString="i_1" hasCondition="false">
+                        </methodReturnValue>
+                        <termination name="&lt;end&gt;" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </branchCondition>
+         <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <loopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
+modifies: {heap=false};
+variant: i" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyValid="true">
+               <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <methodCall name="LoopSplittingCondition.goOn(x_7);" pathCondition="false" pathConditionChanged="false">
+                     <branchStatement name="if (x_7&gt;0) {return true; }else  {return false; }" pathCondition="false" pathConditionChanged="false">
+                        <statement name="return true;" pathCondition="false" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of LoopSplittingCondition.goOn(x_7);&gt;" pathCondition="false" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of LoopSplittingCondition.goOn(x_7);&gt;" isReturnValueComputed="true">
+                              <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
+                              </methodReturnValue>
+                              <branchStatement name="if (i&gt;=0) {   x--; }else  {   x++; }" pathCondition="false" pathConditionChanged="false">
+                                 <statement name="x--;" pathCondition="false" pathConditionChanged="false">
+                                    <statement name="i--;" pathCondition="false" pathConditionChanged="false">
+                                       <termination name="&lt;loop body end&gt;" pathCondition="false" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                                       </termination>
+                                    </statement>
+                                 </statement>
+                              </branchStatement>
+                           </methodReturn>
+                        </statement>
+                     </branchStatement>
+                  </methodCall>
+               </branchCondition>
+               <branchCondition name="!i_0 &lt;= -1" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="true" branchCondition="!i_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <statement name="return i;" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of LoopSplittingCondition.main(x);&gt;" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of LoopSplittingCondition.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturnValue name="i_0" returnValueString="i_0" hasCondition="false">
+                        </methodReturnValue>
+                        <termination name="&lt;end&gt;" pathCondition="i_0 &gt;= 0 &amp; x &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </loopInvariant>
+         </branchCondition>
+      </statement>
+   </methodCall>
+</start>

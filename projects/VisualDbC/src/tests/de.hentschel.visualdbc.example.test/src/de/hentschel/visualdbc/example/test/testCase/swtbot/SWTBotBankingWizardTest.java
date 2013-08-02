@@ -1,12 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.example.test.testCase.swtbot;
@@ -74,12 +76,12 @@ public class SWTBotBankingWizardTest extends TestCase {
       SWTBotShell shell = bot.shell("New Example");
       //  Open Banking Example wizard
       TestUtilsUtil.selectInTree(shell.bot().tree(), "Visual DbC", "Banking Example");
-      shell.bot().button("Next >").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Next >");
       // Define project name
       SWTBotText text = shell.bot().text(0);
       text.setText(project.getName());
       // Finish wizard
-      shell.bot().button("Finish").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Finish");
       shell.bot().waitUntil(Conditions.shellCloses(shell));
       // Make sure that the correct files are added to the new created project
       assertTrue(project.exists());

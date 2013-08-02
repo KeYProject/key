@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.util.install;
@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-/** 
+/**
  * This class is an abstract installer for the binary version of KeY. The
  * installer UI itself is realised in subclasses in order to support
  * a graphical and a command line interface.
@@ -33,9 +33,9 @@ public abstract class KeYInstaller {
     private static final String binaryPath = "bin";
     private static final String systemPath = "system";
     private static final String keyextjarsPath = "key-ext-jars";
-    
-    private static final String[] subdirs = { systemPath, 
-					      binaryPath,  					   
+
+    private static final String[] subdirs = { systemPath,
+					      binaryPath,
 					      keyextjarsPath };
 
 
@@ -49,23 +49,21 @@ public abstract class KeYInstaller {
 
     /** the directory where your Java interpreter is installed */
     private String JAVA_HOME = "";
-    /** the directory where together is installed */
-    private String TOGETHER_HOME = "";
     /** the directory where key has to be installed */
     private String KEY_HOME = "";
     /** the directory where the key external libraries can be found */
     private String KEY_LIB = "";
 
     /** the underlying operation system, default linux */
-    private String[] supportedOS = {"linux", "win"}; 
+    private String[] supportedOS = {"linux", "win"};
     private String os = "linux";
-    
-    private String keyJarPath = ""; 
 
-    public KeYInstaller ( String keyHome, 
-			  String keyLib, 
-			  String javaHome, 
-			  String keyJarPath,			  
+    private String keyJarPath = "";
+
+    public KeYInstaller ( String keyHome,
+			  String keyLib,
+			  String javaHome,
+			  String keyJarPath,
 			  String os ) {
 
 	keyHome ( keyHome );
@@ -73,41 +71,41 @@ public abstract class KeYInstaller {
 	javaHome ( javaHome );
 	keyJarPath ( keyJarPath );
 
-	if ( os != null && 
+	if ( os != null &&
 	     ( os.toUpperCase ().indexOf ( "WINDOWS" ) >= 0 ||
 	       os.toUpperCase ().indexOf ( "WINNT" ) >= 0 ) ) {
 	    this.os = supportedOS [1];
 	} else {
 	    this.os = supportedOS [0];
-	}		
+	}
     }
 
-    // create strings setting the environment right        
+    // create strings setting the environment right
 
-    private String replaceAll ( String text, 
-				String old, 
+    private String replaceAll ( String text,
+				String old,
 				String replacement ) {
 
 	StringBuffer result = new StringBuffer ( text );
 
 	int idx = 0;
 
-	while ( (idx = text.indexOf( old, idx ) ) != -1 ) {	    
+	while ( (idx = text.indexOf( old, idx ) ) != -1 ) {
 	    result.replace( idx, idx + 1, replacement );
-	} 
-	
+	}
+
 	return result.toString();
     }
-    
+
     /**
      *  creates a comment with the given content
      * for the installation OS
      */
     protected String comment ( String comment ) {
 	if ( "linux".equals ( os ) ) {
-            return "# " + replaceAll ( comment, "\n", "\n# " ) + "\n"; 
+            return "# " + replaceAll ( comment, "\n", "\n# " ) + "\n";
 	} else { // windows is assumed
-            return "rem " + replaceAll ( comment, "\n", "\r\nrem " ) + "\r\n"; 
+            return "rem " + replaceAll ( comment, "\n", "\r\nrem " ) + "\r\n";
 	}
     }
 
@@ -136,7 +134,7 @@ public abstract class KeYInstaller {
 	environment.append ( variable ( "JAVA_HOME", javaHome () ) );
 
 	return environment.toString();
-    }			     
+    }
 
     // selection of the correct shell-script
 
@@ -158,8 +156,8 @@ public abstract class KeYInstaller {
     }
 
     // create directories
-    
-    
+
+
     /**
      * creates directory structure as used by key
      */
@@ -170,7 +168,7 @@ public abstract class KeYInstaller {
             f.mkdirs();
         }
     }
-    
+
 
     public void copy( File file, String to ) throws KeYInstallerException {
 
@@ -187,63 +185,63 @@ public abstract class KeYInstaller {
             int i = 0;
             while((i=fis.read(buf))!=-1) fos.write(buf, 0, i);
 	} catch ( IOException ioe ) {
-	    throw new KeYInstallerException 
-		( "Error occured while copying \n" + file + "\n to \n" + 
+	    throw new KeYInstallerException
+		( "Error occured while copying \n" + file + "\n to \n" +
 		  newFile + " \n due to:\n" + ioe );
-	} finally { 
+	} finally {
 	    try {
 		if ( fis != null ) fis.close ();
 		if ( fos != null ) fos.close();
 	    } catch ( IOException ioe ) {
-		throw new KeYInstallerException 
+		throw new KeYInstallerException
 		    ( "Error occured while closing streams :" + ioe );
 	    }
-	}       	
+	}
     }
 
 
     // write shellscript
-    
+
     private void createStandAloneProverScript ( JarFile jarFile )
 	throws KeYInstallerException {
-	createFile ( environment (), 
-		     startProverScriptFilePath (), 
+	createFile ( environment (),
+		     startProverScriptFilePath (),
 		     startProverScriptPatternPath (),
 		     jarFile );
     }
-      
 
-    public void generateScripts ( JarFile jarFile ) 
+
+    public void generateScripts ( JarFile jarFile )
 	throws KeYInstallerException {
 	createStandAloneProverScript( jarFile );
     }
-    
-    private void createFile ( String preamble, 
+
+    private void createFile ( String preamble,
 			      String fileNameToWrite,
 			      String fileNameToReadFromJar,
-			      JarFile jarFile ) 
+			      JarFile jarFile )
 	throws KeYInstallerException {
 
 
-	// write preamble	
+	// write preamble
 	FileOutputStream fw = null;
 	InputStream in = null;
-	try {	     
+	try {
 	    fw = new FileOutputStream ( new File ( fileNameToWrite ) );
 	    fw.write ( preamble.getBytes () );
-	
+
 	    // rest of the start script
-	    JarEntry entry = ( JarEntry ) jarFile.getEntry ( fileNameToReadFromJar.replace 
+	    JarEntry entry = ( JarEntry ) jarFile.getEntry ( fileNameToReadFromJar.replace
 		( File.separatorChar, '/' ) );
 
 	    if ( entry == null ) {
-		throw new KeYInstallerException ( " Could not found jar file entry : " + 
+		throw new KeYInstallerException ( " Could not found jar file entry : " +
 						  fileNameToReadFromJar );
 	    }
 	    in = jarFile.getInputStream ( entry );
 
 	    if ( entry.getSize () > Integer.MAX_VALUE ) {
-		throw new KeYInstallerException 
+		throw new KeYInstallerException
 		    ( "Entry " + entry + " too big. Overflow would occur." );
 	    }
 
@@ -252,20 +250,20 @@ public abstract class KeYInstaller {
 	    long count = 0;
 	    while ( count < scriptfileContent.length &&
 		    in.available () != 0 ) {
-		int bytesRead = in.read 
-		    ( scriptfileContent, 
-		      (int) count, 
-		      (int) ( scriptfileContent.length - count ) ); 
+		int bytesRead = in.read
+		    ( scriptfileContent,
+		      (int) count,
+		      (int) ( scriptfileContent.length - count ) );
 		count += ( bytesRead >= 0 ? bytesRead : 0 );
 	    }
 
 	    if ( count < scriptfileContent.length ) {
-		throw new KeYInstallerException ( "Read " + entry + 
+		throw new KeYInstallerException ( "Read " + entry +
 						  " only partial ");
 	    }
 
 	    fw.write ( scriptfileContent );
-	    
+
 
 	} catch ( IOException io ) {
 	    throw new KeYInstallerException ( io.getLocalizedMessage () );
@@ -274,11 +272,11 @@ public abstract class KeYInstaller {
 		if ( in != null ) { in.close(); }
 		if ( fw != null ) { fw.close(); }
 	    } catch ( IOException io ) {
-		throw new KeYInstallerException ( io.getLocalizedMessage () );		
+		throw new KeYInstallerException ( io.getLocalizedMessage () );
 	    }
-	}       
+	}
     }
-    
+
     protected void extractExamples(JarFile jarFile) throws IOException {
         File targetDir = new File(keyHome(), "examples" + File.separatorChar + "firstTouch");
         Enumeration<JarEntry> en = jarFile.entries();
@@ -304,7 +302,7 @@ public abstract class KeYInstaller {
     }
 
     // jar helper methods
-    
+
     /**
      * Extracts files from the key/program jar-archive.
      * @param entrypath name of the file in the jar
@@ -320,19 +318,19 @@ public abstract class KeYInstaller {
 	    boolean dirs = (new File(writetopath)).mkdirs();
 
 	    // get JarEntry
-	    JarEntry entry = (JarEntry) jarFile.getEntry( entrypath + 
-							  '/' + 
+	    JarEntry entry = (JarEntry) jarFile.getEntry( entrypath +
+							  '/' +
 							  filename );
 	    if ( entry == null ) {
-		throw new KeYInstallerException ( " Could not find jar file entry : " + 
-						  entrypath + '/' + 
+		throw new KeYInstallerException ( " Could not find jar file entry : " +
+						  entrypath + '/' +
 						  filename );
 	    }
 
 	    InputStream in = jarFile.getInputStream(entry);
 	    //Write to file
-	    FileOutputStream out = new FileOutputStream( writetopath + 
-							 File.separatorChar + 
+	    FileOutputStream out = new FileOutputStream( writetopath +
+							 File.separatorChar +
 							 filename );
 	    int c;
 	    while ( ( c = in.read () ) != -1 ) {
@@ -346,11 +344,11 @@ public abstract class KeYInstaller {
 	}
     }
 
-    /** Checks if libraries are found in the keyLib directory 
-     * and returns a list of missing files 
+    /** Checks if libraries are found in the keyLib directory
+     * and returns a list of missing files
      */
     public String[] checkLibraries () {
-	LinkedList<String> l = new LinkedList<String> ();	
+	LinkedList<String> l = new LinkedList<String> ();
 	for ( int i = 0; i < libs ().length; i++ ) {
 	    File lib = new File ( keyLib () + File.separatorChar + libs () [i] );
 	    if ( ! lib.exists() ) {
@@ -361,7 +359,7 @@ public abstract class KeYInstaller {
     }
 
 
-    // some getters 
+    // some getters
 
     /**
      * returns the names of the required libraries
@@ -369,19 +367,12 @@ public abstract class KeYInstaller {
     public String[] libs () {
 	return libraries;
     }
-    
+
     /**
      * returns directory of JAVA_HOME
      */
     public String javaHome () {
 	return JAVA_HOME;
-    }
-
-    /**
-     * returns directory of TOGETHER_HOME
-     */
-    public String togetherHome () {
-	return TOGETHER_HOME;
     }
 
     /**
@@ -421,7 +412,7 @@ public abstract class KeYInstaller {
     }
 
     /**
-     * returns directory where to put the system 
+     * returns directory where to put the system
      * (jar file)
      */
     public String systemPath () {
@@ -429,7 +420,7 @@ public abstract class KeYInstaller {
     }
 
     /**
-     * returns directory where to put the system 
+     * returns directory where to put the system
      * libraries ( per default )
      */
     public String keyextjarsPath () {
@@ -441,7 +432,7 @@ public abstract class KeYInstaller {
      */
     public String keyJarPath () {
 	return keyJarPath;
-    }    
+    }
 
     /**
      * returns file where to find key.jar
@@ -449,7 +440,7 @@ public abstract class KeYInstaller {
     public String keyJarFile () {
 	return keyJarPath () + File.separatorChar + "key.jar";
     }
-    
+
     // some setters
 
     /**
@@ -458,7 +449,7 @@ public abstract class KeYInstaller {
     public void os ( String os ) {
 	this.os = os;
     }
- 
+
     /**
      * sets directory of JAVA_HOME
      */
@@ -470,8 +461,8 @@ public abstract class KeYInstaller {
      * remove trailing file separatorchars
      */
     private String trail ( String dir ) {
-	String result = dir; 
-	while ( result.length () > 0 && 
+	String result = dir;
+	while ( result.length () > 0 &&
 		result.charAt ( result.length () -1 ) == File.separatorChar )  {
 	    result = result.substring ( 0, result.length () - 1 );
 	}
@@ -479,13 +470,6 @@ public abstract class KeYInstaller {
 	return result;
     }
 
-    
-    /**
-     * sets directory of TOGETHER_HOME
-     */
-    public void togetherHome ( String dir ) {
-	TOGETHER_HOME = trail ( dir ) ;
-    }
 
     /**
      * sets directory of KEY_HOME
@@ -499,14 +483,14 @@ public abstract class KeYInstaller {
      */
     public void keyLib ( String dir ) {
 	KEY_LIB = trail ( dir );
-    }    
+    }
 
     /**
      * sets directory where to find key.jar
      */
     public void keyJarPath ( String dir ) {
 	keyJarPath = trail ( dir );
-    }    
+    }
 
     /**
      * entry method
@@ -514,14 +498,14 @@ public abstract class KeYInstaller {
     public abstract void start ();
 
     /*
-      Vorgehen: 
+      Vorgehen:
           1. Begruessung
-	  2. Verzeichnis, in das KeY installiert werden soll angeben lassen 
+	  2. Verzeichnis, in das KeY installiert werden soll angeben lassen
 	  3. Verzeichnis, in dem die KeY-Bibliotheken gesucht werden sollen
 	     angeben lassen
 	  4. existiert das Verzeichnis nicht, anlegen und den
 	     Benutzer auffordern die Bibliotheken dort hinein zu
-	     kopieren (mgl. das zu ueberspringen 
+	     kopieren (mgl. das zu ueberspringen
 	     nur mit ausdruecklichem "I will do it later").
 	  5. Dateien kopieren
 	  6. Fertig.

@@ -1,8 +1,23 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -42,7 +57,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
         // Describes how a schema variable is mapped to another operator, e.g.
         // logical variable.
-        private HashMap<SchemaVariable, Term> mapping = new HashMap<SchemaVariable, Term>();
+        private HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
        
         @Override
         public TacletFormula translate(Taclet taclet, Services services) {
@@ -53,7 +68,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR
                                 .translate(taclet);
                 formula = rebuild(taclet, formula, services,
-                                new HashSet<QuantifiableVariable>());
+                                new LinkedHashSet<QuantifiableVariable>());
                 result =   checkForIllegalOps(formula, taclet,false);
                 if(result != null){
                         throw new IllegalTacletException(result);

@@ -1,16 +1,21 @@
 /*******************************************************************************
- * Copyright (c) 2011 Martin Hentschel.
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Martin Hentschel - initial API and implementation
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
 package de.hentschel.visualdbc.dbcmodel.diagram.part;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -43,9 +48,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorMatchingStrategy;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.SaveAsDialog;
+import org.eclipse.ui.handlers.RadioState;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.part.FileEditorInput;
@@ -53,6 +63,7 @@ import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.part.ShowInContext;
 
 import de.hentschel.visualdbc.dbcmodel.diagram.navigator.DbCNavigatorItem;
+import de.hentschel.visualdbc.dbcmodel.diagram.util.ProofReferenceManagement;
 
 /**
  * @generated
@@ -75,6 +86,13 @@ public class DbCDiagramEditor extends DiagramDocumentEditor implements
     */
    public DbCDiagramEditor() {
       super(true);
+   }
+   
+   /**
+    * @generated NOT
+    */
+   public DbCDiagramEditor(boolean hasFlyoutPalette) {
+      super(hasFlyoutPalette);
    }
 
    /**
@@ -295,5 +313,92 @@ public class DbCDiagramEditor extends DiagramDocumentEditor implements
       getSite().registerContextMenu(ActionIds.DIAGRAM_EDITOR_CONTEXT_MENU,
             provider, getDiagramGraphicalViewer());
    }
+   
+   //###########################################################################
+   //### Begin custom code for proof reference management ######################
+   //###########################################################################
+   
+   /**
+    * @generated NOT
+    */
+   private IStateListener stateListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         updateProofReferenceManagement();
+      }
+   };
+   
+   /**
+    * @generated NOT
+    */
+   private State hideState;
+   
+   /**
+    * @generated NOT
+    */
+   private State highlightState;
+   
+   /**
+    * @generated NOT
+    */
+   @Override
+   public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+      super.init(site, input);
+      ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+      if (service != null) {
+         Command hideCmd = service.getCommand("de.hentschel.visualdbc.dbcmodel.diagram.defineProofReferencesCommand");
+         if (hideCmd != null) {
+            hideState = hideCmd.getState(RadioState.STATE_ID);
+            if (hideState != null) {
+               hideState.addListener(stateListener);
+            }
+         }
+         Command highlightCmd = service.getCommand("de.hentschel.visualdbc.dbcmodel.diagram.highlightProofReferencesCommand");
+         if (highlightCmd != null) {
+            highlightState = highlightCmd.getState(RegistryToggleState.STATE_ID);
+            if (highlightState != null) {
+               highlightState.addListener(stateListener);
+            }
+         }
+      }
+   }
 
+   /**
+    * @generated NOT
+    */
+   protected void handleSelectionChanged() {
+      super.handleSelectionChanged();
+      updateProofReferenceManagement();
+   }
+
+   /**
+    * @generated NOT
+    */
+   protected void updateProofReferenceManagement() {
+      ISelection selection = getSite().getSelectionProvider().getSelection();
+      if (highlightState != null) {
+         ProofReferenceManagement.updateHighlighting(this, selection, highlightState.getValue());
+      }
+      if (hideState != null) {
+         ProofReferenceManagement.updateHiddenElements(this, selection, hideState.getValue());
+      }
+   }
+
+   /**
+    * @generated NOT
+    */
+   @Override
+   public void dispose() {
+      if (hideState != null) {
+         hideState.removeListener(stateListener);
+      }
+      if (highlightState != null) {
+         highlightState.removeListener(stateListener);
+      }
+      super.dispose();
+   }
+   
+   //###########################################################################
+   //### End custom code for proof reference management ########################
+   //###########################################################################
 }

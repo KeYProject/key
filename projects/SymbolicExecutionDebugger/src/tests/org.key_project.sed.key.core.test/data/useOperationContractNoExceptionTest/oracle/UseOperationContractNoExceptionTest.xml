@@ -4,7 +4,7 @@
       <sedThread xml:id="_cf3ccbb0-1399-4970-87d7-a520ee0d77a7" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_60483490-0141-4ade-bdd8-f626998de6ca" name="UseOperationContractNoExceptionTest.main();" pathCondition="true" lineNumber="-1" charStart="73" charEnd="77">
             <sedStatement xml:id="_123d9b93-784b-4e65-b9b9-4a5b9ff3d4da" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="95" charEnd="124">
-               <sedUseOperationContract xml:id="_c13cd73d-6d6a-4caf-8486-5c67f00eb39d" name="result = magic(x) catch(exc)
+               <sedOperationContract xml:id="_c13cd73d-6d6a-4caf-8486-5c67f00eb39d" name="result = magic(x) catch(exc)
 pre: x &gt;= 0 | x &lt; 0
 post: (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
 &amp; (x &lt; 0 -&gt; result = javaUnaryMinusInt(1) &amp; exc = null)
@@ -18,7 +18,7 @@ termination: diamond" pathCondition="true" lineNumber="-1" charStart="475" charE
                         </sedMethodReturn>
                      </sedStatement>
                   </sedStatement>
-               </sedUseOperationContract>
+               </sedOperationContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

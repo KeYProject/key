@@ -1,6 +1,20 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
@@ -52,7 +66,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    /**
     * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
     */
-   private Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new HashMap<Goal, Integer>();
+   private Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new LinkedHashMap<Goal, Integer>();
    
    /**
     * Stores for each {@link Node} which is a symbolic execution tree node the computed result
@@ -60,7 +74,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * sure that it is only computed once and that the number of executed set statements is
     * not increased multiple times for the same {@link Node}.
     */
-   private Map<Node, Boolean> goalAllowedResultPerSetNode = new HashMap<Node, Boolean>();
+   private Map<Node, Boolean> goalAllowedResultPerSetNode = new LinkedHashMap<Node, Boolean>();
    
    /**
     * Constructor to stop after one executed symbolic execution tree node.

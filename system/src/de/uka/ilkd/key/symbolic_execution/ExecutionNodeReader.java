@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -5,7 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,19 +56,21 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
@@ -179,7 +194,7 @@ public class ExecutionNodeReader {
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
        */
-      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new HashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
       
       /**
        * {@inheritDoc}
@@ -220,6 +235,14 @@ public class ExecutionNodeReader {
             }
             callStackEntries.add(getPathInTree(attributes));
          }
+         else if (isMethodReturnValue(uri, localName, qName)) {
+            Object parentValue = parentNodeStack.peekFirst();
+            if (!(parentValue instanceof KeYlessMethodReturn)) {
+               throw new SAXException("Can't add method return value to parent.");
+            }
+            KeYlessMethodReturnValue returnValue = createMethodReturnValue(uri, localName, qName, attributes);
+            ((KeYlessMethodReturn)parentValue).addReturnValue(returnValue);
+         }
          else {
             AbstractKeYlessExecutionNode child = createExecutionNode(parent, uri, localName, qName, attributes);
             if (root == null) {
@@ -244,6 +267,9 @@ public class ExecutionNodeReader {
             parentVariableValueStack.removeFirst();
          }
          else if (isCallStackEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
+         else if (isMethodReturnValue(uri, localName, qName)) {
             // Nothing to do.
          }
          else {
@@ -278,7 +304,18 @@ public class ExecutionNodeReader {
    protected boolean isVariable(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_VARIABLE.equals(qName);
    }
-   
+
+   /**
+    * Checks if the currently parsed tag represents an {@link IExecutionMethodReturnValue}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents an {@link IExecutionMethodReturnValue}, {@code false} is something else.
+    */
+   public boolean isMethodReturnValue(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_METHOD_RETURN_VALUE.equals(qName);
+   }
+
    /**
     * Checks if the currently parsed tag represents an {@link IExecutionValue}.
     * @param uri The URI.
@@ -320,6 +357,24 @@ public class ExecutionNodeReader {
                                  getArrayIndex(attributes), 
                                  getName(attributes));
    }
+   
+   /**
+    * Creates a new {@link IExecutionMethodReturnValue} with the given content.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @param attributes The attributes.
+    * @return The created {@link IExecutionMethodReturnValue}.
+    */
+   public KeYlessMethodReturnValue createMethodReturnValue(String uri, 
+                                                           String localName,
+                                                           String qName, 
+                                                           Attributes attributes) {
+      return new KeYlessMethodReturnValue(getName(attributes), 
+                                          getReturnValueString(attributes), 
+                                          getHasCondition(attributes), 
+                                          getConditionString(attributes));
+   }
 
    /**
     * Creates a new {@link IExecutionValue} with the given content.
@@ -356,41 +411,50 @@ public class ExecutionNodeReader {
     */
    protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes));
+         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
       }
-      else if (ExecutionNodeWriter.TAG_BRANCH_NODE.equals(qName)) {
-         return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+      else if (ExecutionNodeWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
+         return new KeYlessBranchStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_CONDITION.equals(qName)) {
          return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
-      else if (ExecutionNodeWriter.TAG_LOOP_NODE.equals(qName)) {
-         return new KeYlessLoopNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+      else if (ExecutionNodeWriter.TAG_LOOP_STATEMENT.equals(qName)) {
+         return new KeYlessLoopStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_CALL.equals(qName)) {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
-         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes));
+         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), isReturnValueComputed(attributes));
       }
-      else if (ExecutionNodeWriter.TAG_START_NODE.equals(qName)) {
-         return new KeYlessStartNode(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+      else if (ExecutionNodeWriter.TAG_START.equals(qName)) {
+         return new KeYlessStart(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_STATEMENT.equals(qName)) {
          return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
-         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isExceptionalTermination(attributes));
+         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes));
       }
-      else if (ExecutionNodeWriter.TAG_USE_OPERATION_CONTRACT.equals(qName)) {
-         return new KeYlessUseOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
+      else if (ExecutionNodeWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
+         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
       }
-      else if (ExecutionNodeWriter.TAG_USE_LOOP_INVARIANT.equals(qName)) {
-         return new KeYlessUseLoopInvariant(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isInitiallyValid(attributes));
+      else if (ExecutionNodeWriter.TAG_LOOP_INVARIANT.equals(qName)) {
+         return new KeYlessLoopInvariant(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isInitiallyValid(attributes));
       }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
+   }
+
+   /**
+    * Returns the additional branch label value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getAdditionalBranchLabel(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ADDITIONAL_BRANCH_LABEL);
    }
 
    /**
@@ -421,12 +485,12 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * Returns the exceptional termination value.
+    * Returns the termination kind value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   protected boolean isExceptionalTermination(Attributes attributes) {
-      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTIONAL_TERMINATION));
+   protected TerminationKind getTerminationKind(Attributes attributes) {
+      return TerminationKind.valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TERMINATION_KIND));
    }
    
    /**
@@ -439,12 +503,30 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * Returns the has not nullc heck value.
+    * Returns the has not null check value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
    protected boolean isHasNotNullCheck(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+   
+   /**
+    * Returns the is return value computed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isReturnValueComputed(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
+   }
+
+   /**
+    * Returns the is branch condition computed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isBranchConditionComputed(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION_COMPUTED));
    }
    
    /**
@@ -499,6 +581,24 @@ public class ExecutionNodeReader {
     */
    protected String getConditionString(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONDITION_STRING);
+   }
+
+   /**
+    * Returns the is has condition value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean getHasCondition(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_CONDITION));
+   }
+
+   /**
+    * Returns the return value string value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getReturnValueString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_STRING);
    }
 
    /**
@@ -638,6 +738,14 @@ public class ExecutionNodeReader {
       public String toString() {
          return getElementType() + " " + getName();
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDisposed() {
+         return false;
+      }
    }
    
    /**
@@ -770,6 +878,16 @@ public class ExecutionNodeReader {
       private boolean mergedBranchCondition;
       
       /**
+       * Indicates if branch condition is computed or not.
+       */
+      private boolean branchConditionComputed;
+
+      /**
+       * The optional additional branch label.
+       */
+      private String additionalBranchLabel;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -777,16 +895,22 @@ public class ExecutionNodeReader {
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedBranchCondition The formated branch condition.
        * @param mergedBranchCondition Merged branch condition?
+       * @param branchConditionComputed Is branch condition computed?
+       * @param additionalBranchLabel The optional additional branch label.
        */
       public KeYlessBranchCondition(IExecutionNode parent, 
                                     String name, 
                                     String formatedPathCondition, 
                                     boolean pathConditionChanged,
                                     String formatedBranchCondition,
-                                    boolean mergedBranchCondition) {
+                                    boolean mergedBranchCondition,
+                                    boolean branchConditionComputed,
+                                    String additionalBranchLabel) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.formatedBranchCondition = formatedBranchCondition;
          this.mergedBranchCondition = mergedBranchCondition;
+         this.branchConditionComputed = branchConditionComputed;
+         this.additionalBranchLabel = additionalBranchLabel;
       }
 
       /**
@@ -836,23 +960,39 @@ public class ExecutionNodeReader {
       public Term[] getMergedBranchCondtions() throws ProofInputException {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isBranchConditionComputed() {
+         return branchConditionComputed;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getAdditionalBranchLabel() {
+         return additionalBranchLabel;
+      }
    }
 
    /**
-    * An implementation of {@link IExecutionStartNode} which is independent
+    * An implementation of {@link IExecutionStart} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessStartNode extends AbstractKeYlessExecutionNode implements IExecutionStartNode {
+   public static class KeYlessStart extends AbstractKeYlessExecutionNode implements IExecutionStart {
       /**
        * Constructor.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessStartNode(String name, 
-                              String formatedPathCondition, 
-                              boolean pathConditionChanged) {
+      public KeYlessStart(String name, 
+                          String formatedPathCondition, 
+                          boolean pathConditionChanged) {
          super(null, name, formatedPathCondition, pathConditionChanged);
       }
       
@@ -861,7 +1001,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public String getElementType() {
-         return "Start Node";
+         return "Start";
       }
    }
    
@@ -872,9 +1012,9 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessTermination extends AbstractKeYlessExecutionNode implements IExecutionTermination {
       /**
-       * Exceptional termination?
+       * The {@link TerminationKind}.
        */
-      private boolean exceptionalTermination;
+      private TerminationKind terminationKind;
       
       /**
        * Constructor.
@@ -888,9 +1028,9 @@ public class ExecutionNodeReader {
                                 String name, 
                                 String formatedPathCondition, 
                                 boolean pathConditionChanged, 
-                                boolean exceptionalTermination) {
+                                TerminationKind terminationKind) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
-         this.exceptionalTermination = exceptionalTermination;
+         this.terminationKind = terminationKind;
       }
 
       /**
@@ -908,21 +1048,25 @@ public class ExecutionNodeReader {
       public Sort getExceptionSort() {
          return null;
       }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public boolean isExceptionalTermination() {
-         return exceptionalTermination;
-      }
       
       /**
        * {@inheritDoc}
        */
       @Override
       public String getElementType() {
-         return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+         switch (getTerminationKind()) {
+            case EXCEPTIONAL : return "Exceptional Termination";
+            case LOOP_BODY : return "Loop Body Termination";
+            default : return "Termination";
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public TerminationKind getTerminationKind() {
+         return terminationKind;
       }
    }
 
@@ -1017,11 +1161,11 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * An implementation of {@link IExecutionBranchNode} which is independent
+    * An implementation of {@link IExecutionBranchStatement} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessBranchNode extends AbstractKeYlessStateNode<BranchStatement> implements IExecutionBranchNode {
+   public static class KeYlessBranchStatement extends AbstractKeYlessStateNode<BranchStatement> implements IExecutionBranchStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -1029,10 +1173,10 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessBranchNode(IExecutionNode parent, 
-                               String name, 
-                               String formatedPathCondition,
-                               boolean pathConditionChanged) {
+      public KeYlessBranchStatement(IExecutionNode parent, 
+                                    String name, 
+                                    String formatedPathCondition,
+                                    boolean pathConditionChanged) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
       }
 
@@ -1041,7 +1185,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public String getElementType() {
-         return "Branch Node";
+         return "Branch Statement";
       }
    }
    
@@ -1091,11 +1235,11 @@ public class ExecutionNodeReader {
    }
 
    /**
-    * An implementation of {@link IExecutionLoopNode} which is independent
+    * An implementation of {@link IExecutionLoopStatement} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopNode extends AbstractKeYlessStateNode<LoopStatement> implements IExecutionLoopNode {
+   public static class KeYlessLoopStatement extends AbstractKeYlessStateNode<LoopStatement> implements IExecutionLoopStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -1103,10 +1247,10 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessLoopNode(IExecutionNode parent, 
-                             String name, 
-                             String formatedPathCondition, 
-                             boolean pathConditionChanged) {
+      public KeYlessLoopStatement(IExecutionNode parent, 
+                                  String name, 
+                                  String formatedPathCondition, 
+                                  boolean pathConditionChanged) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
       }
 
@@ -1115,7 +1259,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public String getElementType() {
-         return "Loop Node";
+         return "Loop Statement";
       }
    }
 
@@ -1198,6 +1342,16 @@ public class ExecutionNodeReader {
        * The name including the return value.
        */
       private String nameIncludingReturnValue;
+      
+      /**
+       * Defines if the return value is computed or not.
+       */
+      private boolean returnValueComputed;
+
+      /**
+       * The possible return values.
+       */
+      private List<IExecutionMethodReturnValue> returnValues = new LinkedList<IExecutionMethodReturnValue>();
 
       /**
        * Constructor.
@@ -1206,14 +1360,17 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param nameIncludingReturnValue The name including the return value.
+       * @param returnValueComputed Is the return value computed?
        */
       public KeYlessMethodReturn(IExecutionNode parent, 
                                  String name, 
                                  String formatedPathCondition, 
                                  boolean pathConditionChanged,
-                                 String nameIncludingReturnValue) {
+                                 String nameIncludingReturnValue,
+                                 boolean returnValueComputed) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.nameIncludingReturnValue = nameIncludingReturnValue;
+         this.returnValueComputed = returnValueComputed;
       }
 
       /**
@@ -1231,6 +1388,85 @@ public class ExecutionNodeReader {
       public String getNameIncludingReturnValue() throws ProofInputException {
          return nameIncludingReturnValue;
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Method Return";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isReturnValuesComputed() {
+         return returnValueComputed;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
+         return returnValues.toArray(new IExecutionMethodReturnValue[returnValues.size()]);
+      }
+      
+      /**
+       * Adds the given {@link IExecutionMethodReturnValue}.
+       * @param returnValue The {@link IExecutionMethodReturnValue} to add.
+       */
+      public void addReturnValue(IExecutionMethodReturnValue returnValue) {
+         returnValues.add(returnValue);
+      }
+   }
+   
+   /**
+    * An implementation of {@link IExecutionMethodReturn} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessMethodReturnValue extends AbstractKeYlessExecutionElement implements IExecutionMethodReturnValue {
+      /**
+       * The human readable return value.
+       */
+      private String returnValueString;
+      
+      /**
+       * Is a condition available?
+       */
+      private boolean hasCondition;
+      
+      /**
+       * The optional human readable condition.
+       */
+      private String conditionString;
+
+      /**
+       * Constructor.
+       * @param name The name of this node.
+       * @param returnValueString The human readable return value.
+       * @param hasCondition Is a condition available?
+       * @param conditionString The optional human readable condition.
+       */
+      public KeYlessMethodReturnValue(String name,
+                                      String returnValueString,
+                                      boolean hasCondition,
+                                      String conditionString) {
+         super(name);
+         this.returnValueString = returnValueString;
+         this.hasCondition = hasCondition;
+         this.conditionString = conditionString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Return Value";
+      }
 
       /**
        * {@inheritDoc}
@@ -1244,16 +1480,32 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public String getFormatedReturnValue() throws ProofInputException {
-         return null;
+      public String getReturnValueString() throws ProofInputException {
+         return returnValueString;
       }
-      
+
       /**
        * {@inheritDoc}
        */
       @Override
-      public String getElementType() {
-         return "Method Return";
+      public boolean hasCondition() throws ProofInputException {
+         return hasCondition;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getCondition() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getConditionString() throws ProofInputException {
+         return conditionString;
       }
    }
 
@@ -1287,11 +1539,11 @@ public class ExecutionNodeReader {
    }
 
    /**
-    * An implementation of {@link IExecutionUseOperationContract} which is independent
+    * An implementation of {@link IExecutionOperationContract} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessUseOperationContract extends AbstractKeYlessStateNode<SourceElement> implements IExecutionUseOperationContract {
+   public static class KeYlessOperationContract extends AbstractKeYlessStateNode<SourceElement> implements IExecutionOperationContract {
       /**
        * Is precondition complied?
        */
@@ -1317,13 +1569,13 @@ public class ExecutionNodeReader {
        * @param hasNotNullCheck Has not null check?
        * @param notNullCheckComplied Is not null check complied?
        */
-      public KeYlessUseOperationContract(IExecutionNode parent, 
-                                         String name, 
-                                         String formatedPathCondition,
-                                         boolean pathConditionChanged,
-                                         boolean preconditionComplied,
-                                         boolean hasNotNullCheck,
-                                         boolean notNullCheckComplied) {
+      public KeYlessOperationContract(IExecutionNode parent, 
+                                      String name, 
+                                      String formatedPathCondition,
+                                      boolean pathConditionChanged,
+                                      boolean preconditionComplied,
+                                      boolean hasNotNullCheck,
+                                      boolean notNullCheckComplied) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.preconditionComplied = preconditionComplied;
          this.hasNotNullCheck = hasNotNullCheck;
@@ -1335,7 +1587,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public String getElementType() {
-         return "Use Operation Contract";
+         return "Operation Contract";
       }
 
       /**
@@ -1380,11 +1632,11 @@ public class ExecutionNodeReader {
    }
 
    /**
-    * An implementation of {@link IExecutionUseLoopInvariant} which is independent
+    * An implementation of {@link IExecutionLoopInvariant} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessUseLoopInvariant extends AbstractKeYlessStateNode<SourceElement> implements IExecutionUseLoopInvariant {
+   public static class KeYlessLoopInvariant extends AbstractKeYlessStateNode<SourceElement> implements IExecutionLoopInvariant {
       /**
        * Initially valid?
        */
@@ -1398,11 +1650,11 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param initiallyValid Initially valid?
        */
-      public KeYlessUseLoopInvariant(IExecutionNode parent, 
-                                     String name, 
-                                     String formatedPathCondition,
-                                     boolean pathConditionChanged,
-                                     boolean initiallyValid) {
+      public KeYlessLoopInvariant(IExecutionNode parent, 
+                                  String name, 
+                                  String formatedPathCondition,
+                                  boolean pathConditionChanged,
+                                  boolean initiallyValid) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.initiallyValid = initiallyValid;
       }
@@ -1412,7 +1664,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public String getElementType() {
-         return "Use Loop Invariant";
+         return "Loop Invariant";
       }
 
       /**

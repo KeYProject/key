@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.ui.util;
 
 import java.io.IOException;
@@ -45,14 +58,20 @@ public final class KeYSEDImages {
      * @return The {@link Image} or {@code null} if it was not possible to get it.
      */
     public static Image getImage(String key) {
-        Image image = Activator.getDefault().getImageRegistry().get(key);
-        if (image == null) {
-            image = createImage(key);
-            if (image != null) {
-                Activator.getDefault().getImageRegistry().put(key, image);
-            }
-        }
-        return image;
+       ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();  
+       Image image = imageRegistry.get(key);
+       if (image == null) {
+           synchronized (imageRegistry) { // Make sure that the image is created only once
+              image = imageRegistry.get(key); // Make sure that the image is still not available
+              if (image == null) { 
+                 image = createImage(key);
+                 if (image != null) {
+                    imageRegistry.put(key, image);
+                 }
+              }
+           }
+       }
+       return image;
     }
 
     /**

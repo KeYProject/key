@@ -102,7 +102,8 @@ public class KeYJavaType implements Type {
     
     public boolean equals (Object o){
         try {
-            return MiscTools.equalsOrNull(javaType,((KeYJavaType)o).javaType) && MiscTools.equalsOrNull(sort,((KeYJavaType)o).sort);
+            return MiscTools.equalsOrNull(javaType,((KeYJavaType)o).javaType) && 
+                    MiscTools.equalsOrNull(sort,((KeYJavaType)o).sort);
         } catch (Exception e) {
         return false;
         }

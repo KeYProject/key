@@ -1,8 +1,22 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.proof.io;
 
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -52,6 +66,12 @@ import de.uka.ilkd.key.speclang.OperationContract;
  * @author Martin Hentschel
  */
 public class DefaultProofFileParser implements IProofFileParser {
+
+    private static final String RULE = " rule: ";
+    private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof. Line ";
+    private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
+
+    private final DefaultProblemLoader loader;
    private Proof proof = null;
    private Iterator<Node> children = null;
 
@@ -67,32 +87,61 @@ public class DefaultProofFileParser implements IProofFileParser {
    private ImmutableList<PosInOccurrence> builtinIfInsts;
    private int currIfInstFormula;
    private PosInTerm currIfInstPosInTerm;
+   private String status = "";
 
 
    private KeYMediator mediator;
    
-   public DefaultProofFileParser(Proof proof, KeYMediator mediator) {
+   
+   /** a value == 1 means the current branch is ignored; a value > 1 means that the "skipBranch - 1" parent branch of the
+    *  current branch is ignored.
+    *  a value == 0 means that no branch is ignored 
+    */
+   private int skipBranch;
+
+   private List<Throwable> errors = new LinkedList<Throwable>();
+
+
+   public DefaultProofFileParser(DefaultProblemLoader loader, Proof proof, KeYMediator mediator) {
       super();
       this.proof = proof;
       this.mediator = mediator;
+      this.loader = loader;
       currNode = proof.root(); // initialize loader
       children = currNode.childrenIterator(); // --"--
+   }
+
+   public DefaultProofFileParser(Proof proof, KeYMediator mediator) {
+       this(null, proof, mediator);
+   }
+
+   /**
+    * Communicates a non-fatal condition to the caller. Empty string
+    * means everything is OK. The message will be displayed to the user
+    * in the GUI after the proof has been parsed.
+    */
+   public String getStatus() {
+       return status;
    }
 
 
 // note: Expressions without parameters only emit the endExpr signal
    @Override
-   public void beginExpr(char id, String s) {
-       //System.out.println("start "+id+"="+s);
-       
+   public void beginExpr(char id, String s) throws ProblemLoaderException {
+
        //start no new commands until the ignored branch closes
        //count sub-branches though
+       if (skipBranch > 0 && id != 'b') return;
+       
        switch (id) {
        case 'b' :
            stack.push(children);
            if (children.hasNext()) currNode = children.next();
+           if (skipBranch > 0) {
+               skipBranch ++;
+           }
            break;
-  case 'r' : 
+  case 'r' :
            if (currNode == null) currNode = children.next();
            // otherwise we already fetched the node at branch point
            currGoal      = proof.getGoal(currNode);
@@ -127,16 +176,16 @@ public class DefaultProofFileParser implements IProofFileParser {
            if (loadedInsts == null) loadedInsts = new LinkedList<String>();
            loadedInsts.add(s);
            break;
-           
+
   case 'h' :
       //             Debug.fail("Detected use of heuristics!");
       break;
-  case 'q' : // ifseqformula      
+  case 'q' : // ifseqformula
            Sequent seq = currGoal.sequent();
            ifFormulaList = ifFormulaList.append(
-                   new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
+                   new IfFormulaInstSeq(seq, Integer.parseInt(s)));
            break;
-       case 'd' : // ifdirectformula      
+       case 'd' : // ifdirectformula
            ifFormulaList = ifFormulaList.append(
                new IfFormulaInstDirect(
                    new SequentFormula(parseTerm(s, proof))));
@@ -169,7 +218,7 @@ public class DefaultProofFileParser implements IProofFileParser {
        case 'c' : //contract
            currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
            if(currContract == null) {
-               throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
+               throw new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
            }
            break;
        case 'x' : //ifInst (for built in rules)
@@ -199,12 +248,18 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    @Override
-   public void endExpr(char id, int linenr) {
+   public void endExpr(char id, int linenr) throws ProblemLoaderException {
        //System.out.println("end "+id);
+
        //read no new commands until ignored branch closes
+       if (skipBranch > 0 && id != 'b') return;
+
        switch (id) {
        case 'b' :
-           children = stack.pop();           
+           children = stack.pop();
+           if (skipBranch > 0) {
+               skipBranch--;
+           }
            break;
        case 'a' :
            if (currNode != null) {
@@ -217,8 +272,8 @@ public class DefaultProofFileParser implements IProofFileParser {
               children = currNode.childrenIterator();
               currNode = null;
            } catch(Exception e) {
-               throw new RuntimeException("Error loading proof. Line "+
-                   linenr+" rule: "+currTacletName,e);
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'n' :
@@ -226,42 +281,55 @@ public class DefaultProofFileParser implements IProofFileParser {
                IBuiltInRuleApp app = constructBuiltinApp();
               if (!app.complete()) {
                  app = app.tryToInstantiate(currGoal);
-              }                 
+              }
                currGoal.apply(app);
                children = currNode.childrenIterator();
                currNode = null;
+           } catch (SkipSMTRuleException e) {
+               // silently continue; status will be reported via polling
            } catch (BuiltInConstructionException e) {
-               throw new RuntimeException("Error loading proof. Line "+
-                   linenr+" rule: "+currTacletName,e);
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
            try {
-        final PosInOccurrence ifInst 
+        final PosInOccurrence ifInst
            = PosInOccurrence.findInSequent(currGoal.sequent(),
                                                      currIfInstFormula,
                                                      currIfInstPosInTerm);
-        builtinIfInsts = builtinIfInsts.append(ifInst);          
+        builtinIfInsts = builtinIfInsts.append(ifInst);
            } catch(RuntimeException e) {
-        System.out.println("formula: " + currIfInstFormula);
-        System.out.println("term: " + currIfInstPosInTerm);
-               throw new RuntimeException("Error loading proof. Line "+
-                   linenr +" rule: "+currTacletName,e);
+//        System.out.println("formula: " + currIfInstFormula);
+//        System.out.println("term: " + currIfInstPosInTerm);
+               skipBranch = 1;
+               reportError(ERROR_LOADING_PROOF_LINE+linenr +RULE+currTacletName+NOT_APPLICABLE,e);
            }
-           break;                        
+           break;
        }
 
    }
 
 
+   
+   private void reportError(String string, Exception e) {       
+       status = "Errors while reading the proof. Not all branches could be load successfully.";
+       errors.add(new ProblemLoaderException(loader, string, e));
+   }
 
+   /** 
+    * returns list of errors that have been reported during parsing
+    * @return list of errors
+    */
+   @Override
+   public List<Throwable> getErrors() {
+       return errors;
+   }
+   
    public void loadPreferences(String preferences) {
        final ProofSettings proofSettings = ProofSettings.DEFAULT_SETTINGS;
        proofSettings.loadSettingsFromString(preferences);
    }
-
-
-   
 
    /**
     * Constructs rule application for UpdateSimplification from
@@ -270,7 +338,14 @@ public class DefaultProofFileParser implements IProofFileParser {
     * @return current rule application for updateSimplification
     */
    private IBuiltInRuleApp constructBuiltinApp()
-                              throws BuiltInConstructionException {
+                              throws SkipSMTRuleException,
+                                     BuiltInConstructionException {
+
+        if ("SMTRule".equals(currTacletName)) {
+            status = "Your proof has been loaded, but SMT solvers have not been run";
+            throw new SkipSMTRuleException();
+        }
+
 
      IBuiltInRuleApp ourApp = null;
        PosInOccurrence pos = null;
@@ -286,11 +361,11 @@ public class DefaultProofFileParser implements IProofFileParser {
        }
 
        if (currContract != null) {
-        BuiltInRule useContractRule = 
-              currContract instanceof OperationContract 
+        BuiltInRule useContractRule =
+              currContract instanceof OperationContract
               ? UseOperationContractRule.INSTANCE
                     : UseDependencyContractRule.INSTANCE;
-           
+
 
         ourApp = ((AbstractContractRuleApp)useContractRule.
               createApp(pos)).setContract(currContract);
@@ -335,7 +410,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            ourApp = NoPosTacletApp.createNoPosTacletApp(t);
        }
        Services services = mediator.getServices();
-       
+
 
        if (currFormula != 0) { // otherwise we have no pos
            pos = PosInOccurrence.findInSequent(currGoal.sequent(),
@@ -374,10 +449,10 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    /** 2nd pass: all other SV */
-   public static TacletApp parseSV2(TacletApp app, 
+   public static TacletApp parseSV2(TacletApp app,
                    SchemaVariable sv,
-                                    String value, 
-                                    Goal targetGoal) {        
+                                    String value,
+                                    Goal targetGoal) {
        final Proof p = targetGoal.proof();
        final Services services = p.getServices();
        TacletApp result;
@@ -385,7 +460,7 @@ public class DefaultProofFileParser implements IProofFileParser {
            // ignore -- already done
            result = app;
        } else if(sv instanceof ProgramSV) {
-      final ProgramElement pe = 
+      final ProgramElement pe =
           TacletInstantiationsTableModel.getProgramElement(
          app, value, sv, services);
       result = app.addCheckedInstantiation(sv, pe, services, true);
@@ -394,9 +469,9 @@ public class DefaultProofFileParser implements IProofFileParser {
        } else {
            Namespace varNS = p.getNamespaces().variables();
       varNS = app.extendVarNamespaceForSV(varNS, sv);
-      Term instance = parseTerm(value, p, varNS, 
+      Term instance = parseTerm(value, p, varNS,
               targetGoal.getVariableNamespace(varNS));
-      result = app.addCheckedInstantiation(sv, instance, services, true); 
+      result = app.addCheckedInstantiation(sv, instance, services, true);
        }
        return result;
    }
@@ -464,7 +539,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    }
    public static Term parseTerm(String value, Services services,
            Namespace varNS, Namespace progVar_ns) {
-       try { 
+       try {
            return new DefaultTermParser().
                parse(new StringReader(value), null,
                      services,
@@ -497,20 +572,27 @@ public class DefaultProofFileParser implements IProofFileParser {
    private static class AppConstructionException extends Exception {
 
        /**
-        * 
+        *
         */
        private static final long serialVersionUID = -6534063595443883709L; }
 
    private static class BuiltInConstructionException extends Exception {
-  /**
-        * 
+       /**
+        *
         */
        private static final long serialVersionUID = -735474220502290816L;
-   BuiltInConstructionException(String s) {
-      super(s);
-  }
-  BuiltInConstructionException(Throwable cause) {
-      super(cause);
-  }  
+       BuiltInConstructionException(String s) {
+           super(s);
+       }
+       BuiltInConstructionException(Throwable cause) {
+           super(cause);
+       }
    }
+
+    private static class SkipSMTRuleException extends Exception {
+
+        private static final long serialVersionUID = -2932282883810135168L;
+
+    }
+
 }

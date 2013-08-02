@@ -18,6 +18,8 @@ package de.uka.ilkd.key.proof;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -34,6 +36,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -53,15 +56,15 @@ public final class TacletIndex  {
    
     /** contains rewrite Taclets */
     private HashMap<Object, ImmutableList<NoPosTacletApp>> rwList 
-	= new HashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
 
     /** contains antecedent Taclets */
     private HashMap<Object, ImmutableList<NoPosTacletApp>> antecList
-	= new HashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
 
     /** contains succedent Taclets */
     private HashMap<Object, ImmutableList<NoPosTacletApp>> succList
-	= new HashMap<Object, ImmutableList<NoPosTacletApp>>();
+	= new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
 
     /** contains NoFind-Taclets */
     private ImmutableList<NoPosTacletApp> noFindList
@@ -72,7 +75,7 @@ public final class TacletIndex  {
      * instantiations 
      */
     private HashSet<NoPosTacletApp> partialInstantiatedRuleApps = 
-        new HashSet<NoPosTacletApp>(); 
+        new LinkedHashSet<NoPosTacletApp>(); 
 
     // reused object to store prefix occurrences when retrieving
     // taclets with java blocks.
@@ -174,9 +177,9 @@ public final class TacletIndex  {
      * @param tacletAppList the new NoPosTacletApps for this index
      */
     public void setTaclets(ImmutableSet<NoPosTacletApp> tacletAppList) {
-	rwList    = new HashMap<Object, ImmutableList<NoPosTacletApp>>();
-	antecList = new HashMap<Object, ImmutableList<NoPosTacletApp>>();	
-	succList  = new HashMap<Object, ImmutableList<NoPosTacletApp>>();
+	rwList    = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
+	antecList = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();	
+	succList  = new LinkedHashMap<Object, ImmutableList<NoPosTacletApp>>();
 	noFindList= ImmutableSLList.<NoPosTacletApp>nil();
 	addTaclets(tacletAppList);
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="a();" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
@@ -30,12 +30,12 @@
                               <statement name="int a1 = 1;" pathCondition="true" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>
                                  <callStackEntry path="/0/0/0"/>
-                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.a();&gt;">
+                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.a();&gt;" isReturnValueComputed="true">
                                     <callStackEntry path="/0"/>
                                     <callStackEntry path="/0/0/0"/>
-                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;">
+                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;" isReturnValueComputed="true">
                                        <callStackEntry path="/0"/>
-                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                        </termination>
                                     </methodReturn>
                                  </methodReturn>
@@ -49,4 +49,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

@@ -20,6 +20,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -240,13 +242,23 @@ public abstract class AbstractFeatureStrategy implements Strategy {
 
     /**
      * Create a projection of taclet applications to the instantiation of the
+     * trigger variable of a taclet. If the trigger variable
+     * is not instantiated for a particular taclet app, an error will be raised
+     */
+    protected ProjectionToTerm instOfTriggerVariable() {
+        return new TriggerVariableInstantiationProjection();
+    }
+
+    
+    /**
+     * Create a projection of taclet applications to the instantiation of the
      * schema variables <code>schemaVar</code>. If <code>schemaVar</code>
      * is not instantiated for a particular taclet app, an error will be raised
      */
     protected ProjectionToTerm instOf(String schemaVar) {
         return SVInstantiationProjection.create ( new Name ( schemaVar ), true );
     }
-    
+
     /**
      * Create a projection of taclet applications to the instantiation of the
      * schema variables <code>schemaVar</code>. The projection will be
@@ -281,6 +293,10 @@ public abstract class AbstractFeatureStrategy implements Strategy {
 
     protected Feature isInstantiated(String schemaVar) {
         return InstantiatedSVFeature.create ( new Name ( schemaVar ) );
+    }
+
+    protected Feature isTriggerVariableInstantiated() {
+        return TriggerVarInstantiatedFeature.INSTANCE;
     }
     
     protected TermFeature op(Operator op) {
@@ -430,7 +446,14 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         else
             return longConst ( 0 );
     }
-    
+
+    protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
+        if ( instantiateActive )
+            return SVInstantiationCP.createTriggeredVarCP( value, getBtManager () );
+        else
+            return longConst ( 0 );
+    }
+
     protected Feature let(TermBuffer x, ProjectionToTerm value, Feature body) {
         return LetFeature.create ( x, value, body );
     }    
@@ -439,6 +462,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return instantiate ( new Name ( sv ), value );
     }
 
+    
     protected Feature isSubSortFeature(ProjectionToTerm s1, ProjectionToTerm s2) {        
         return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }

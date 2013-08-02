@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation;
 
 import java.io.PrintWriter;
@@ -13,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class TestTacletTranslator extends TestCase {
@@ -29,7 +43,7 @@ public class TestTacletTranslator extends TestCase {
 
     protected void setUp() throws Exception {
         nss = new NamespaceSet();
-        services = new Services();
+        services = new Services(AbstractProfile.getDefaultProfile());
 
         parseDecls("\\sorts { S; }\n" +
                 "\\functions {\n" +

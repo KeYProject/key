@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleIntQuery.mainWithUpdates(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="x=11;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
+            <operationContract name="result = magic(x) catch(exc)
+pre: true
+post: result = subMagic(x) &amp; exc = null
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+               <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of SimpleIntQuery.mainWithUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleIntQuery.mainWithUpdates(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                     </methodReturnValue>
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </operationContract>
+         </statement>
+      </statement>
+   </methodCall>
+</start>
