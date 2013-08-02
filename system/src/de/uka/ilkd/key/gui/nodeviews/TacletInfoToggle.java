@@ -27,13 +27,13 @@ import javax.swing.event.ChangeListener;
  */
 public class TacletInfoToggle extends JCheckBox {
 
-    InnerNodeView leafNodeView = null;
+    InnerNodeView innerNodeView = null;
 
     public TacletInfoToggle() {
         setText("Show taclet info (Inner Nodes only)");
         addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                leafNodeView.tacletInfo.setVisible(isSelected());
+                innerNodeView.tacletInfo.setVisible(isSelected());
             }
         });
         setVisible(false);
@@ -41,11 +41,11 @@ public class TacletInfoToggle extends JCheckBox {
 
     public void setSequentView(SequentView sequentView) {
         if (sequentView instanceof InnerNodeView) {
-            leafNodeView = (InnerNodeView) sequentView;
+            innerNodeView = (InnerNodeView) sequentView;
             setVisible(true);
-            leafNodeView.tacletInfo.setVisible(isSelected());
+            innerNodeView.tacletInfo.setVisible(isSelected());
         } else {
-            leafNodeView = null;
+            innerNodeView = null;
             setVisible(false);
         }
     }

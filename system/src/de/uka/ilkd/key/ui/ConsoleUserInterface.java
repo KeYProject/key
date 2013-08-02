@@ -73,6 +73,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     public void taskFinished(TaskFinishedInfo info) {
         progressMax = 0; // reset progress bar marker
         final int openGoals = info.getProof().openGoals().size();
+        final Object result2 = info.getResult();
         if (info.getSource() instanceof ApplyStrategy) {
             if (verbosity >= HIGH) {
                 System.out.println("]"); // end progress bar
@@ -90,13 +91,16 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                         openGoals);
                 System.out.flush();
             }
-            batchMode.finishedBatchMode ( info.getResult(), info.getProof() );
+            batchMode.finishedBatchMode ( result2, info.getProof() );
             Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
             if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
-            if (!"".equals(info.getResult())) {
-                if (verbosity > SILENT) System.out.println(info.getResult());
-                    System.exit(-1);
+            if (result2 != null) {
+                if (verbosity > SILENT) System.out.println(result2);
+                if (verbosity >= HIGH && result2 instanceof Throwable) {
+                    ((Throwable) result2).printStackTrace();
+                }
+                System.exit(-1);
             }
             if(batchMode.isLoadOnly() ||  openGoals==0) {
                 if (verbosity > SILENT)

@@ -21,21 +21,17 @@ import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.HierarchyBoundsListener;
-import java.awt.event.HierarchyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.*;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 import java.util.Vector;
@@ -56,21 +52,11 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
-    // the current line width
-    int lineWidth;
-    
-    // the used sequent
-    private Sequent seq;
-
     // the mediator
     private KeYMediator mediator;
 
     // the mouse/mouseMotion listener
     protected SequentViewListener listener;
-    
-    // a component and property change listener used to
-    // update the sequent view on font or size changes
-    private SeqViewChangeListener changeListener;
     
     // an object that detects opening and closing of an Taclet instantiation dialog
     private GUIListener guiListener;
@@ -87,7 +73,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * @param mediator the KeYMediator allowing access to the
      *  current system status
      */
-    public CurrentGoalView(KeYMediator mediator) {
+    public CurrentGoalView(KeYMediator mediator, MainWindow mainWindow) {
+        super(mainWindow);
 	setMediator(mediator);
         setBackground(Color.white);
 	// disables selection
@@ -152,11 +139,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	// add listener to KeY GUI events
         getMediator().addGUIListener(guiListener);
         
-        // add a listener to this component
-        changeListener = new SeqViewChangeListener();
-        addComponentListener(changeListener);
-        addPropertyChangeListener("font", changeListener);
-        addHierarchyBoundsListener(changeListener);
         updateHighlights = new Vector<Object>();
 
     }
@@ -167,8 +149,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void updateUpdateHighlights() {
         if (printer == null) return;
-        LogicPrinter printer = this.printer;
-
+        
         for (Object updateHighlight : updateHighlights) {
             removeHighlight(updateHighlight);
         }
@@ -190,48 +171,34 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /** sets the text being printed */
-    public synchronized void printSequent() {	
-        if ( SwingUtilities.isEventDispatchThread () ) {
-	    printSequentImmediately ();
-	} else {
-	    Runnable sequentUpdater = new Runnable() {
-		    public void run() {
-			printSequentImmediately ();
-		    }
-		};
-	    SwingUtilities.invokeLater(sequentUpdater);
-	}
+    public synchronized void printSequent() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            printSequentImmediately();
+        } else {
+            Runnable sequentUpdater = new Runnable() {
+                public void run() {
+                    printSequentImmediately();
+                }
+            };
+            SwingUtilities.invokeLater(sequentUpdater);
+        }
     }
-
-    /**
-     * computes the line width
-     */
-    private int computeLineWidth() {
-        // assumes we have a uniform font width
-        int maxChars = (int) 
-            (getVisibleRect().getWidth()/getFontMetrics(getFont()).charWidth('W'));
-        
-        if (maxChars > 1) maxChars-=1;    
-        
-        return maxChars;
-    }
-    
 
     /** sets the text being printed */
     public synchronized void printSequentImmediately() {
 	removeMouseMotionListener(listener);
 	removeMouseListener(listener);
         
-        lineWidth = computeLineWidth();
+        setLineWidth(computeLineWidth());
         
         if (printer != null) {
-            printer.update(seq, filter, lineWidth);
+            printer.update(filter, getLineWidth());
 	    boolean errorocc;
 	    do {
 	        errorocc = false;
 	        try {
 		    setText(printer.toString());
-
+			MainWindow.getInstance().sequentSearchBar.search();
 	        } catch (Error e) {
 		    System.err.println("Error occurred while printing Sequent!");
 		    errorocc = true;
@@ -264,25 +231,26 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	}
     }
     
-    /** sets the LogicPrinter to use
+    /** sets the LogicPrinter to use in case there is no proof available.
      * @param sp the LogicPrinter that is used
      */
-    public void setPrinter(LogicPrinter sp, Sequent s) {
-    	setPrinter ( sp, null, s );
+    public void setPrinterNoProof() {
+    	printer = new LogicPrinter(new ProgramPrinter(null), null, null);
     }
-
-    protected SequentPrintFilter getSequentPrintFilter() {
-    	return filter;
-    }
-
+    
     /** sets the LogicPrinter to use
      * @param sp the LogicPrinter that is used
      * @param f the SequentPrintFilter that is used
      */
-    public void setPrinter(LogicPrinter sp, SequentPrintFilter f, Sequent s) {
-        printer = sp;
-        filter  = f;
-        seq = s;
+    public void setPrinter(Goal goal) {
+        filter = new IdentitySequentPrintFilter(goal.sequent());
+        printer = new LogicPrinter(new ProgramPrinter(null),
+                getMediator().getNotationInfo(),
+                mediator.getServices());
+    }
+
+    protected SequentPrintFilter getSequentPrintFilter() {
+    	return filter;
     }
 
     /** return used LogicPrinter
@@ -368,40 +336,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public Insets getAutoscrollInsets() {      
         return autoScrollSensitiveRegion;
-    }
-    
-    private class SeqViewChangeListener implements ComponentListener,
-    PropertyChangeListener, HierarchyBoundsListener {
-        
-        
-        public void componentHidden(ComponentEvent e) {}
-        
-        public void componentMoved(ComponentEvent e) {}
-        
-        public void componentResized(ComponentEvent e) {            
-            // reprint sequent
-            int lw = computeLineWidth();
-            if (lw != lineWidth) { 
-                printSequent();
-            }
-        }
-        
-        public void componentShown(ComponentEvent e) {}
-        
-        public void propertyChange(PropertyChangeEvent evt) {
-            // reprint sequent
-            printSequent();            
-        }
-        
-        public void ancestorMoved(HierarchyEvent e) {}
-        
-        public void ancestorResized(HierarchyEvent e) {
-            //          reprint sequent            
-            int lw = computeLineWidth();
-            if (lw != lineWidth) { 
-                printSequent();
-            }
-        }
     }
 
     public String getTitle() {

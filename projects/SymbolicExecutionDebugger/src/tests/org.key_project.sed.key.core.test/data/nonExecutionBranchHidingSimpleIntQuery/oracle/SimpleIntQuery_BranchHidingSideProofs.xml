@@ -4,7 +4,7 @@
       <sedThread xml:id="_ec2a2580-f026-42f3-a11d-a1d24d2ccb8e" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_f3476d01-f02f-4475-9b54-ef4fd1235e85" name="SimpleIntQuery.main(x);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
             <sedStatement xml:id="_1376eb90-cb29-4818-b40c-658966a04603" name="int magicValue = magic(x);" pathCondition="true" lineNumber="-1" charStart="69" charEnd="95">
-               <sedUseOperationContract xml:id="_5684ade2-d0e4-4132-8167-89a8814a5139" name="result = magic(x) catch(exc)
+               <sedOperationContract xml:id="_5684ade2-d0e4-4132-8167-89a8814a5139" name="result = magic(x) catch(exc)
 pre: true
 post: result = subMagic(x) &amp; exc = null
 mod: {}
@@ -18,7 +18,7 @@ as result of SimpleIntQuery.main(x);&gt;" pathCondition="true" lineNumber="-1" c
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
-               </sedUseOperationContract>
+               </sedOperationContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>
