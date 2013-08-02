@@ -31,7 +31,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.keyide.ui.starter.KeYIDEMethodStarter;
@@ -49,8 +48,6 @@ import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class SWTBotManualRuleApplicationTest extends TestCase {
@@ -143,6 +140,8 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
                                    int y,
                                    String ruleNameToApply,
                                    boolean expectedProofClosed) throws CoreException, InterruptedException {
+      // Made sure that workspace is initialized and correct taclet options are set.
+      TestUtilsUtil.waitUntilWorkspaceInitialized();
       // Make sure that given parameters are valid.
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);
@@ -163,7 +162,6 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
-      String originalRuntimeExceptions = null;
       try {
          // Close welcome view if available
          TestUtilsUtil.closeWelcomeView(bot);
@@ -171,14 +169,6 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          IFolder src = project.getProject().getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            KeYEnvironment<?> environment = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
-            environment.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Open PayCard.java
          IEditorPart editorPart = TestUtilsUtil.openEditor(src.getFile("PayCard.java"));
          // Start proof
@@ -238,10 +228,6 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          bot.closeAllShells();
          // Close all editors
          bot.closeAllEditors();
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
       }
    }
 }
