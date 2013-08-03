@@ -62,6 +62,11 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     * ID of the used extension point.
     */
    public static final String CONTEXT_ITEM_EXTENSION_POINT = "org.key_project.sed.ui.visualization.executionTree.contextMenuEntries";
+
+   /**
+    * The contributor id used in the tab view.
+    */
+   public static final String CONTRIBUTOR_ID = "symbolicExecutionTreeDiagram.PropertyContributor";
    
    /**
     * Indicates that the diagram is read-only or editable.
@@ -289,5 +294,15 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     */
    public void setReadOnly(boolean readOnly) {
       this.readOnly = readOnly;
+   }
+
+   /**
+    * Made sure that always the correct contributor ID is returned
+    * and that it is not computed by the active diagram which fails
+    * for object diagrams opened from the symbolic execution tree view.
+    */
+   @Override
+   public String getContributorId() {
+      return CONTRIBUTOR_ID;
    }
 }
