@@ -123,7 +123,7 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
    </license>
 
    <url>
-      <update label="KeY Juno Updates" url="http://www.key-project.org/download/releases/eclipse/juno"/>
+      <update label="KeY Kepler Updates" url="http://www.key-project.org/download/releases/eclipse/kepler"/>
    </url>
 
    <includes
