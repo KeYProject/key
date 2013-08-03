@@ -89,6 +89,13 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    private boolean defaultSelectionSynchronizationEnabled = true;
    
    /**
+    * Constructor.
+    */
+   public PaletteHideableDiagramEditor() {
+      setPaletteHidden(false); // Show palette by default, required if a file is opened.
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override
