@@ -14,6 +14,7 @@
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,8 +37,8 @@ import org.eclipse.graphiti.tb.IContextButtonEntry;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
-import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.graphiti.ui.internal.platform.ExtensionManager;
+import org.eclipse.graphiti.ui.platform.IImageProvider;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
@@ -241,10 +242,15 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     */
    protected void makeSureThatImageIdExist(IConfigurationElement configElement) {
       String imageKey = configElement.getAttribute("iconId");
-      if (GraphitiUIPlugin.getDefault().getImageRegistry().getDescriptor(imageKey) == null) {
-         Bundle bundle = Platform.getBundle(configElement.getContributor().getName());
-         URL url = bundle.getResource(configElement.getAttribute("icon"));
-         GraphitiUIPlugin.getDefault().getImageRegistry().put(imageKey, ImageDescriptor.createFromURL(url));
+      Collection<IImageProvider> imageProviders = ExtensionManager.getSingleton().getImageProvidersForDiagramTypeProviderId(ExecutionTreeDiagramTypeProvider.PROVIDER_ID);
+      for (IImageProvider imageProvider : imageProviders) {
+         if (imageProvider instanceof ExecutionTreeImageProvider) {
+            Bundle bundle = Platform.getBundle(configElement.getContributor().getName());
+            URL url = bundle.getResource(configElement.getAttribute("icon"));
+            if (url != null) {
+               ((ExecutionTreeImageProvider)imageProvider).addImageFilePathLater(imageKey, url.toString());
+            }
+         }
       }
    }
 
@@ -296,6 +302,14 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       this.readOnly = readOnly;
    }
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isShowFlyoutPalette() {
+      return !isReadOnly();
+   }
+   
    /**
     * Made sure that always the correct contributor ID is returned
     * and that it is not computed by the active diagram which fails

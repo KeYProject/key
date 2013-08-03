@@ -16,9 +16,9 @@ package org.key_project.sed.ui.visualization.object_diagram.provider;
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramBehavior;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
-import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor;
+import org.key_project.sed.ui.visualization.object_diagram.editor.ObjectDiagramBehavior;
 
 /**
  * {@link IDiagramTypeProvider} specific implementation for object diagrams.
@@ -53,16 +53,17 @@ public class ObjectDiagramTypeProvider extends AbstractDiagramTypeProvider {
     * {@inheritDoc}
     */
    @Override
-   public void init(Diagram diagram, IDiagramEditor diagramEditor) {
+   public void init(Diagram diagram, IDiagramBehavior diagramBehavior) {
       // Make sure that the editor is compatible with this diagram
-      if (diagramEditor instanceof ReadonlyObjectDiagramEditor) {
-         getFeatureProvider().setReadOnly(true);
+      if (diagramBehavior instanceof ObjectDiagramBehavior) {
+         boolean readonly = ((ObjectDiagramBehavior)diagramBehavior).isReadOnly();
+         getFeatureProvider().setReadOnly(readonly);
          for (ObjectDiagramToolBehaviorProvider behaviorProvider : getAvailableToolBehaviorProviders()) {
-            behaviorProvider.setReadOnly(true);
+            behaviorProvider.setReadOnly(readonly);
          }
       }
       // Initialize type provider
-      super.init(diagram, diagramEditor);
+      super.init(diagram, diagramBehavior);
    }
 
    /**

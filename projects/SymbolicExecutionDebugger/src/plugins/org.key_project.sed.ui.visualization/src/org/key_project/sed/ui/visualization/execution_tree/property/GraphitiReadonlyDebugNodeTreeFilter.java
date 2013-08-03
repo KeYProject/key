@@ -14,8 +14,9 @@
 package org.key_project.sed.ui.visualization.execution_tree.property;
 
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
+import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramBehavior;
 
 /**
  * {@link IFilter} implementation used to define if a {@link GraphitiCallStackPropertySection}
@@ -29,8 +30,14 @@ public class GraphitiReadonlyDebugNodeTreeFilter extends GraphitiDebugNodeTreeFi
    @Override
    protected boolean accept(PictogramElement pe, AbstractGraphitiDebugNodePropertySection section) {
       if (super.accept(pe, section)) {
-         if (section.getDiagramEditor() instanceof ExecutionTreeDiagramEditor) {
-            return ((ExecutionTreeDiagramEditor)section.getDiagramEditor()).isReadOnly();
+         IDiagramContainer container = section.getDiagramContainer();
+         if (container != null) {
+            if (container.getDiagramBehavior() instanceof ExecutionTreeDiagramBehavior) {
+               return ((ExecutionTreeDiagramBehavior)container.getDiagramBehavior()).isReadOnly();
+            }
+            else {
+               return false;
+            }
          }
          else {
             return false;

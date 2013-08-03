@@ -19,11 +19,11 @@ import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSEDNodeCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.SaveAsObjectDiagramWizard;
-import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
 import org.key_project.util.java.StringUtil;
 
@@ -38,19 +38,33 @@ public class ObjectDiagramEditor extends PaletteHideableDiagramEditor {
    public static final String EDITOR_ID = "org.key_project.sed.ui.visualization.ObjectDiagramEditor";
    
    /**
+    * Indicates that this editor is read-only or editable otherwise.
+    */
+   private boolean readOnly;
+   
+   /**
     * Constructor.
     */
    public ObjectDiagramEditor() {
+      this(false);
+   }
+   
+   /**
+    * Constructor.
+    * @param readOnly Indicates that this editor is read-only or editable otherwise.
+    */
+   public ObjectDiagramEditor(boolean readOnly) {
       setGlobalEnabled(true);
       setDefaultSelectionSynchronizationEnabled(false);
+      this.readOnly = readOnly;
    }
-
+   
    /**
     * {@inheritDoc}
     */
    @Override
-   protected EmptyDiagramPersistencyBehavior createPersistencyBehavior() {
-      return new EmptyDiagramPersistencyBehavior(this);
+   protected DiagramBehavior createDiagramBehavior() {
+      return new ObjectDiagramBehavior(this, readOnly);
    }
    
    /**

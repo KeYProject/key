@@ -7,6 +7,7 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
@@ -21,19 +22,22 @@ import org.key_project.util.java.IOUtil;
  * @author Martin Hentschel
  */
 public class EmptyDiagramPersistencyBehavior extends DefaultPersistencyBehavior {
-   public static final String SCHEME = "emptyDiagram";
-   
    /**
     * This URL should be used to create an empty diagram.
     */
-   public static final URI EMPTY_DIAGRAM_URI = URI.createGenericURI(SCHEME, "newEmptyDiagram", null);
-   
+   public static final URI EMPTY_DIAGRAM_URI = URI.createGenericURI("emptyDiagram", "newEmptyDiagram", null);
+
+   /**
+    * The scheme used for empty diagram {@link URI}s.
+    */
+   public static final String SCHEME = EMPTY_DIAGRAM_URI.scheme();
+
    /**
     * Constructor.
-    * @param diagramEditor The {@link DiagramEditor} in which this {@link DefaultPersistencyBehavior} is used.
+    * @param diagramBehavior The {@link DiagramBehavior} in which this {@link DefaultPersistencyBehavior} is used.
     */
-   public EmptyDiagramPersistencyBehavior(DiagramEditor diagramEditor) {
-      super(diagramEditor);
+   public EmptyDiagramPersistencyBehavior(DiagramBehavior diagramBehavior) {
+      super(diagramBehavior);
    }
 
    /**
@@ -42,7 +46,7 @@ public class EmptyDiagramPersistencyBehavior extends DefaultPersistencyBehavior 
    @Override
    public Diagram loadDiagram(URI uri) {
       if (SCHEME.equals(uri.scheme())) {
-         TransactionalEditingDomain domain = diagramEditor.getEditingDomain();
+         TransactionalEditingDomain domain = diagramBehavior.getEditingDomain();
          if (domain != null) {
             // Create empty diagram
             final Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, 

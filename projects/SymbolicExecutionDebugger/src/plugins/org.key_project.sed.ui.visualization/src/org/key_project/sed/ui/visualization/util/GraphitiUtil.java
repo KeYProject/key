@@ -58,10 +58,11 @@ import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramBehavior;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.impl.GaServiceImpl;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 import org.eclipse.graphiti.ui.internal.services.impl.GefService;
@@ -545,9 +546,9 @@ public final class GraphitiUtil {
       if (featureProvider != null) {
          IDiagramTypeProvider typeProvider = featureProvider.getDiagramTypeProvider(); 
          if (typeProvider != null) {
-            IDiagramEditor editor = typeProvider.getDiagramEditor();
-            if (editor != null) {
-               editor.setPictogramElementForSelection(pe);
+            IDiagramBehavior behavior = typeProvider.getDiagramBehavior();
+            if (behavior instanceof DiagramBehavior) {
+               ((DiagramBehavior)behavior).setPictogramElementForSelection(pe);
             }
          }
       }

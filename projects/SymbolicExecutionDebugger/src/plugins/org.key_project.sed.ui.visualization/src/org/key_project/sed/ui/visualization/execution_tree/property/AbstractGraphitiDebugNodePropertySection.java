@@ -16,7 +16,7 @@ package org.key_project.sed.ui.visualization.execution_tree.property;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -102,17 +102,17 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
     * </p>
     */
    @Override
-   public IDiagramEditor getDiagramEditor() {
-      IDiagramEditor editor = super.getDiagramEditor();
-      if (editor == null) {
+   public IDiagramContainer getDiagramContainer() {
+      IDiagramContainer container = super.getDiagramContainer();
+      if (container == null) {
          IWorkbenchPart part = getPart();
          if (part != null) {
             IEditorPart editPart = (IEditorPart)part.getAdapter(IEditorPart.class);
-            if (editPart instanceof IDiagramEditor) {
-               editor = (IDiagramEditor)editPart;
+            if (editPart instanceof IDiagramContainer) {
+               container = (IDiagramContainer)editPart;
             }
          }
       }
-      return editor;
+      return container;
    }
 }

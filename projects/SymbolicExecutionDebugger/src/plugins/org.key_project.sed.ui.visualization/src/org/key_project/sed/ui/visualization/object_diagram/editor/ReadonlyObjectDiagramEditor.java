@@ -41,7 +41,7 @@ public class ReadonlyObjectDiagramEditor extends ObjectDiagramEditor {
     * Constructor.
     */
    public ReadonlyObjectDiagramEditor() {
-      setPaletteHidden(true);
+      super(true);
    }
 
    /**
@@ -51,14 +51,6 @@ public class ReadonlyObjectDiagramEditor extends ObjectDiagramEditor {
    protected void configureGraphicalViewer() {
       super.configureGraphicalViewer();
       setGridVisible(false);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isDirty() {
-      return false;
    }
    
    /**

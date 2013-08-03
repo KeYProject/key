@@ -13,7 +13,6 @@
 
 package org.key_project.sed.ui.visualization.util;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,17 +22,14 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.SnapToGrid;
-import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
-import org.eclipse.gef.ui.palette.FlyoutPaletteComposite;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.graphiti.ui.internal.action.AbstractPreDefinedAction;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
@@ -67,12 +63,7 @@ import org.key_project.util.java.CollectionUtil;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlobalEnablement {
-   /**
-    * Defines if the palette is hidden or not.
-    */
-   private boolean paletteHidden;
-   
+public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlobalEnablement {   
    /**
     * The global enablement state which is shared with child {@link IGlobalEnablement} ({@link #childGlobalEnablements}).
     */
@@ -92,7 +83,20 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
     * Constructor.
     */
    public PaletteHideableDiagramEditor() {
-      setPaletteHidden(false); // Show palette by default, required if a file is opened.
+      setActionRegistry(new ActionRegistry() {
+         @Override
+         public void registerAction(IAction action) {
+            if (action instanceof IGlobalEnablement) {
+               registerGlobalEnablement((IGlobalEnablement)action);
+               super.registerAction(action);
+            }
+            else {
+               GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
+               registerGlobalEnablement(wrapper);
+               super.registerAction(wrapper);
+            }
+         }
+      });
    }
    
    /**
@@ -121,9 +125,9 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
             try {
                SWTUtil.checkCanceled(monitor);
                context.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, monitor);
-               executeFeature(feature, context);
+               getDiagramBehavior().executeFeature(feature, context);
                return Status.OK_STATUS;
-            }
+            }  
             catch (OperationCanceledException e) {
                return Status.CANCEL_STATUS;
             }
@@ -186,39 +190,6 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
          return getDiagramTypeProvider().getNotificationService().calculateRelatedPictogramElements(new Object[] { bo });
       }
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected void initActionRegistry(ZoomManager zoomManager) {
-      super.initActionRegistry(zoomManager);
-      // Make sure that all action always use this editor as selection provider instead of the currently active editor because this is required if the editor is shown in a view!
-      ActionRegistry actionRegistry = getActionRegistry();
-      Iterator<?> iter = actionRegistry.getActions();
-      while (iter.hasNext()) {
-         Object next = iter.next();
-         if (next instanceof AbstractPreDefinedAction) {
-            ((AbstractPreDefinedAction)next).setSelectionProvider(getGraphicalViewer());
-         }
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected void registerAction(IAction action) {
-      if (action instanceof IGlobalEnablement) {
-         registerGlobalEnablement((IGlobalEnablement)action);
-         super.registerAction(action);
-      }
-      else {
-         GraphitiGlobalEnablementWrapperAction wrapper = new GraphitiGlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
-         registerGlobalEnablement(wrapper);
-         super.registerAction(wrapper);
-      }
-   }
    
    /**
     * Checks if the grid is visible.
@@ -254,28 +225,6 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
     */
    public void setDefaultSelectionSynchronizationEnabled(boolean defaultSelectionSynchronizationEnabled) {
       this.defaultSelectionSynchronizationEnabled = defaultSelectionSynchronizationEnabled;
-   }
-   
-   /**
-    * Checks if the palette is hidden or not.
-    * @return {@code true} palette is hidden, {@code false} palette is visible.
-    */
-   protected boolean isPaletteHidden() {
-      return paletteHidden;
-   }
-   
-   /**
-    * Defines if the palette is hidden or not.
-    * @param paletteHidden {@code true} palette is hidden, {@code false} palette is visible.
-    */
-   public void setPaletteHidden(boolean paletteHidden) {
-      this.paletteHidden = paletteHidden;
-      if (this.paletteHidden) {
-         getPalettePreferences().setPaletteState(8); // FlyoutPaletteComposite.STATE_HIDDEN
-      }
-      else {
-         getPalettePreferences().setPaletteState(FlyoutPaletteComposite.STATE_PINNED_OPEN);
-      }
    }
    
    /**

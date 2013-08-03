@@ -259,7 +259,7 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
                   ICustomContext context = new CustomContext();
                   context.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, monitor);
                   context.putProperty(GenerateObjectDiagramFromSymbolicConfigurationCustomFeature.PROPERTY_SYMBOLIC_CONFIGURATION, toShow);
-                  executeFeature(feature, context);
+                  getDiagramBehavior().executeFeature(feature, context);
                }
                return Status.OK_STATUS;
             }

@@ -143,10 +143,8 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    protected ExecutionTreeDiagramEditor createEditorPart() {
-      ExecutionTreeDiagramEditor editorPart = new ExecutionTreeDiagramEditor();
+      ExecutionTreeDiagramEditor editorPart = new ExecutionTreeDiagramEditor(true);
       editorPart.setDefaultSelectionSynchronizationEnabled(false);
-      editorPart.setReadOnly(true);
-      editorPart.setPaletteHidden(true);
       return editorPart;
    }
 

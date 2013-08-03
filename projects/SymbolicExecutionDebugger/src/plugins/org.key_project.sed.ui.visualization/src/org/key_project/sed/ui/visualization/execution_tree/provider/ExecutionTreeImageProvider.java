@@ -71,4 +71,8 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATE, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "terminate_co.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_VISUALIZE_STATE, ROOT_FOLDER_FOR_IMG + "object_diagram.gif");
    }
+   
+   public void addImageFilePathLater(String imageId, String imageFilePath) {
+      addImageFilePath(imageId, imageFilePath);
+   }
 }

@@ -61,7 +61,8 @@ public class ReadonlyObjectDiagramActionBarContributor extends ActionBarContribu
       addRetargetAction(new RetargetAction(GEFActionConstants.TOGGLE_GRID_VISIBILITY, Messages.DiagramEditorActionBarContributor_Grid, IAction.AS_CHECK_BOX));
 
       RetargetAction updateRetargetAction = new RetargetAction(UpdateAction.ACTION_ID, UpdateAction.TEXT);
-      updateRetargetAction.setImageDescriptor(GraphitiUi.getImageService().getImageDescriptorForId(IPlatformImageConstants.IMG_EDIT_REFRESH));
+      // TODO: Replace null with correct type id
+      updateRetargetAction.setImageDescriptor(GraphitiUi.getImageService().getImageDescriptorForId(null, IPlatformImageConstants.IMG_EDIT_REFRESH));
       updateRetargetAction.setActionDefinitionId(UpdateAction.ACTION_DEFINITION_ID);
       addRetargetAction(updateRetargetAction);
       RetargetAction saveImageRetargetAction = new RetargetAction(SaveImageAction.ACTION_ID, SaveImageAction.TEXT);
