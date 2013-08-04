@@ -296,12 +296,21 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	def.doAction(x);
     }
 
-    public void performActionOnStatementBlock(StatementBlock x) {
-	DefaultAction def=new DefaultAction() {
-		ProgramElement createNewElement(ExtList changeList) {
-		return KeYJavaASTFactory.block(changeList);
-		}
-	    };
+    public void performActionOnStatementBlock(final StatementBlock x) {
+        DefaultAction def=new DefaultAction() {
+            ProgramElement createNewElement(ExtList changeList) {
+		StatementBlock newBlock = KeYJavaASTFactory.block(changeList);
+                ImmutableSet<BlockContract> bcs
+                    = services.getSpecificationRepository().getBlockContracts(x);
+                if (bcs != null) {
+                    for (BlockContract bc : bcs) {
+                        bc = bc.setBlock(newBlock);
+                        services.getSpecificationRepository().addBlockContract(bc);
+                    }
+                }
+                return newBlock;
+            }
+        };
 	def.doAction(x);
     }
 
@@ -585,7 +594,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             if (changeList.getFirst() == CHANGED) {
 	    	changeList.removeFirst();
-		addChild(KeYJavaASTFactory.forLoop(changeList));
+		For newLoop = KeYJavaASTFactory.forLoop(changeList);
+	    	services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+	    	addChild(newLoop);
 	    	changed();
 	    } else {
 	    	doDefaultAction(x);
@@ -614,7 +625,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         } else {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
-		addChild(KeYJavaASTFactory.forLoop(changeList));
+		EnhancedFor newLoop = KeYJavaASTFactory
+			.enhancedForLoop(changeList);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                addChild(newLoop);
                 changed();
             } else {
                 doDefaultAction(x);
@@ -681,8 +695,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Statement body = (Statement) (changeList.isEmpty() ?
 					      null :
 					      changeList.removeFirst());
-		addChild(KeYJavaASTFactory.whileLoop(guard, body,
-			x.getPositionInfo()));
+		While newLoop = KeYJavaASTFactory.whileLoop(guard, body,
+			x.getPositionInfo());
+		services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+		addChild(newLoop);
 		changed();
 	    } else {
 		doDefaultAction(x);
@@ -710,10 +726,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 unwindedBody = body;
             }
 	    Statement resultStatement = null;
-	    StatementBlock block = KeYJavaASTFactory.block(
-		    unwindedBody,
-		    KeYJavaASTFactory.whileLoop(guard, x.getBody(),
-			    x.getPositionInfo()));
+	    While newLoop = KeYJavaASTFactory.whileLoop(guard, x.getBody(),
+		    x.getPositionInfo());
+	    services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+	    StatementBlock block = KeYJavaASTFactory.block(unwindedBody,
+		    newLoop);
 
  	    if (outerLabelNeeded() && breakOuterLabel != null) {
 		// an unlabeled break occurs in the
@@ -728,12 +745,13 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	} else {
 	    if (changeList.getFirst() == CHANGED) {
 		changeList.removeFirst();
-		Expression guard = (Expression) changeList.removeFirst();
-		Statement body = (Statement) (changeList.isEmpty() ?
-					      null :
-					      changeList.removeFirst());
-		addChild(KeYJavaASTFactory.doLoop(guard, body,
-			x.getPositionInfo()));
+		Statement body = changeList.removeFirstOccurrence(Statement.class);
+		Guard g = changeList.removeFirstOccurrence(Guard.class);
+		Expression guard = g == null ? null : g.getExpression();
+		Do newLoop = KeYJavaASTFactory.doLoop(guard, body,
+			x.getPositionInfo());
+		services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+		addChild(newLoop);
 		changed();
 	    } else {
 		doDefaultAction(x);
