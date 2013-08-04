@@ -34,6 +34,7 @@ lexer grammar KeYJMLPreLexer;
     LPARENT : '(';
     RPARENT : ')';
     EQUALITY : '=';
+    EMPTYBRACKETS : '[]';
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
     ACCESSIBLE_REDUNDANTLY      : 'accessible_redundantly';
@@ -264,8 +265,6 @@ IDENT
     	:
     	    LETTER 
     	|   DIGIT 
-    	|   '[]' 
-    	|   '.'
     )*
 ;
 
