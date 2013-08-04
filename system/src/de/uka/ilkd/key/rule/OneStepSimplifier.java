@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
+// 
 
 
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
-    public final class Protocol extends ArrayList<RuleApp> {
+    public final static class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
 
@@ -434,7 +434,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    				       Protocol protocol) {
 	//collect context formulas (potential if-insts for replace-known)
 	final Map<Term,PosInOccurrence> context
-		= new HashMap<Term,PosInOccurrence>();
+		= new LinkedHashMap<Term,PosInOccurrence>();
 	for(SequentFormula ante : seq.antecedent()) {
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
 		context.put(

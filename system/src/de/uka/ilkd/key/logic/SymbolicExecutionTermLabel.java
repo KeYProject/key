@@ -1,4 +1,19 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic;
+
+import de.uka.ilkd.key.java.Services;
 
 /**
  * Label attached to a symbolic execution thread. 
@@ -12,9 +27,10 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
    public static final Name NAME = new Name("SE");
 
    /**
-    * The ID for the first modality with this label.
+    * The name used in {@link Services#getCounter(String)} to keep track
+    * of the already used IDs.
     */
-   public static final int START_ID = 1;
+   public static final String PROOF_COUNTER_NAME = "SE_LABEL_COUNTER";
    
    /**
     * The unique ID of this term label in the {@link Sequent}.

@@ -47,6 +47,7 @@ tokens {
     ENSURES         = "ensures";
     DECLASSIFY      = "declassify";
     DEPENDS         = "depends";
+    MODEL_METHOD_AXIOM    = "model_method_axiom";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
     RESPECTS        = "respects";
@@ -159,6 +160,7 @@ UNION : "\\set_union";
 INTERSECT : "\\intersect";
 SETMINUS : "\\set_minus";
 ALLFIELDS : "\\all_fields";
+ALLOBJECTS : "\\all_objects";
 UNIONINF: "\\infinite_union";
 DISJOINT : "\\disjoint";
 SUBSET : "\\subset";

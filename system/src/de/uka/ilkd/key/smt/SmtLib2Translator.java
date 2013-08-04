@@ -129,7 +129,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     	result.append("(set-option :print-success true) \n");
     	result.append("(set-option :produce-unsat-cores true)\n");
     	result.append("(set-option :produce-models true)\n");
-    	result.append("(set-option :produce-proofs true)\n");
+    	// One cannot ask for proofs and models at one time
+    	// rather have models than proofs (MU, 2013-07-19)
+    	// result.append("(set-option :produce-proofs true)\n");
     	
     
     	createSortDeclaration(types, result);

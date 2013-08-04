@@ -36,7 +36,11 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -80,8 +84,8 @@ public class TacletForTests {
     public static void parse(File file) {
 	try {	    
 	    if (!file.equals(lastFile)) {
-		KeYFileForTests envInput = new KeYFileForTests("Test", file);	
-		ProblemInitializer pi = new ProblemInitializer(profile); 
+		KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);	
+		ProblemInitializer pi = new ProblemInitializer(envInput.getProfile()); 
 		InitConfig ic = pi.prepare(envInput);
               	nss      = ic.namespaces(); 
                 rules    = ic.createTacletIndex();

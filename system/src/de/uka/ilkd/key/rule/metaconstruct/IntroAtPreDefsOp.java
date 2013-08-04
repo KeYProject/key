@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -49,9 +49,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   SVInstantiations svInst,
                   Services services) {
         final Term target = term.sub(0);
-        final boolean transaction =
-              (target.op() != null &&
-                  (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
 
         //the target term should have a Java block
         final ProgramElement pe = target.javaBlock().program();
@@ -101,7 +98,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
-        for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
           final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
           // buf fix. see #1197
           services.getNamespaces().programVariables().addSafely(l);
@@ -132,11 +129,16 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-                for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
+                     &&
+                     inv.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
+                    continue;
+                  }
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
-                  newMods.put(heap, m);
-                  newInvariants.put(heap, i);
+                  if(m != null) { newMods.put(heap, m); }
+                  if(i != null) { newInvariants.put(heap, i); }
                 }
                 final LoopInvariant newInv
                        = new LoopInvariantImpl(loop,

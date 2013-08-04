@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.HashMap;
-
+import java.util.LinkedHashMap;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -89,7 +89,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
     private static final HashMap<Name, ProgramSVSort> name2sort =
-        new HashMap<Name, ProgramSVSort>(60);
+        new LinkedHashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
     
@@ -383,7 +383,8 @@ public abstract class ProgramSVSort extends AbstractSort {
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
 
-	    if (pe instanceof ProgramVariable       ||
+	    if (pe instanceof ProgramVariable ||
+                pe instanceof ThisReference ||
 		pe instanceof VariableSpecification) {
 		return true;
 	    }	   
@@ -397,18 +398,8 @@ public abstract class ProgramSVSort extends AbstractSort {
 		    return (rp == null ||
 			    rp instanceof ThisReference ||
 			    rp instanceof TypeReference ||
-			    canStandFor(rp, services)); 
-		} else if (rp == null || //AR was in SimpleEx
-			   rp instanceof ThisReference) {
-		    return canStandFor
-			(fr.getProgramVariable(), services);	  
-		}
-	    }
-
-	    if (pe instanceof PassiveExpression) {
-		return canStandFor
-		    (((NonTerminalProgramElement)pe).
-		     getChildAt(0), services);
+			    canStandFor(rp, services));
+                }
 	    }
 
 	    return false;
@@ -447,12 +438,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		accessedField = ((FieldReference)pe).getProgramVariable();
 	    } else if (pe instanceof ProgramVariable) {
 		accessedField = (ProgramVariable) pe;
-	    } else if (pe instanceof PassiveExpression) {
-		return super.canStandFor
-		    (((PassiveExpression)pe).getChildAt(0), 
-		     services);
 	    }
-	    
 	    
 	    if (accessedField != null &&
 		accessedField.isStatic() &&
@@ -556,13 +542,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    }
 	    if (pe instanceof Instanceof) {
 		ProgramElement v = ((Instanceof) pe).getChildAt(0);
-		return (v instanceof ThisReference) || VARIABLE.canStandFor(v, services); 
+		return VARIABLE.canStandFor(v, services); 
 	    }
 
-	    if (pe instanceof ThisReference) {
-		return true;
-	    }
-	    
 	    if(pe instanceof SetUnion 
 		|| pe instanceof Singleton		    
 		|| pe instanceof Intersect 
@@ -601,10 +583,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 				      Services services) {
 	    if (!( check instanceof Expression)
 		|| check instanceof SuperReference) {
-		return false;
-	    }
-	    if (check instanceof FieldReference && 
-		((FieldReference)check).referencesOwnInstanceField()) {
 		return false;
 	    }
 	    return !SIMPLEEXPRESSION.canStandFor(check,services);

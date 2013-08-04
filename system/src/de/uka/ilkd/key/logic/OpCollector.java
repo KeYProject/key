@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -29,7 +30,7 @@ public class OpCollector extends DefaultVisitor {
 
     /** creates the Op collector */
     public OpCollector() {
-	ops = new HashSet<Operator>();
+	ops = new LinkedHashSet<Operator>();
     }
 
     public void visit(Term t) {	

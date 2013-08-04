@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 
 import recoder.service.ConstantEvaluator;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -286,7 +287,31 @@ public final class TypeConverter {
         return result;
     }
 
-
+    public Term convertMethodReference(MethodReference mr, ExecutionContext ec) {
+        Debug.out("TypeConverter: MethodReference: ", mr);
+    	// FIXME this needs to handle two state?
+    	final ReferencePrefix prefix = mr.getReferencePrefix();
+    	Term p = convertReferencePrefix(prefix, ec);
+    	IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
+    	if(pm.isModel()) {
+    	  ImmutableArray<? extends Expression> args = mr.getArguments();
+    	  Term[] argTerms = new Term[args.size()+2]; // heap, self, 
+    	  int index = 0;
+    	  for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+    		  if(h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+    			  continue;
+    		  }
+        	  argTerms[index++] = TB.var(h);
+    	  }
+    	  argTerms[index++] = p;
+    	  for(Expression e : args) {
+    	       argTerms[index++] = convertToLogicElement(e, ec);
+    	  }
+    	  return TB.func(pm, argTerms);
+    	}
+    	throw new IllegalArgumentException ("TypeConverter could not handle this");
+    }
+ 
     public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {
 	Debug.out("TypeConverter: FieldReference: ", fr);
@@ -365,6 +390,8 @@ public final class TypeConverter {
 	    return TB.var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);
+	} else if (pe instanceof MethodReference) {
+	    return convertMethodReference((MethodReference)pe, ec);
 	} else if (pe instanceof VariableReference) {
 	    return convertVariableReference((VariableReference)pe, ec);
 	} else if (pe instanceof ArrayReference){

@@ -3,7 +3,7 @@
  */
 package java.lang;
 
-public final class String extends java.lang.Object
+public final class String extends java.lang.Object implements java.io.Serializable, java.lang.Comparable
 {
 // public final static java.util.Comparator CASE_INSENSITIVE_ORDER;
 

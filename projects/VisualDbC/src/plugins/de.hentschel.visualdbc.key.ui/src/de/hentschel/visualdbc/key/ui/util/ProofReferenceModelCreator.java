@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package de.hentschel.visualdbc.key.ui.util;
 
 import java.util.HashMap;
@@ -216,11 +229,15 @@ public class ProofReferenceModelCreator {
             Contract contract = ((ContractPO) input).getContract();
             if (contract instanceof FunctionalOperationContract) {
                DbcOperationContract dbcContract = makeSureOperationContractExist((FunctionalOperationContract)contract, services);
-               result.setTarget(dbcContract);
+               if (dbcContract != null) {
+                  result.setTarget(dbcContract);
+               }
             }
             else if (contract instanceof DependencyContract) {
                DbCAxiomContract dbcContract = makeSureAxiomContractExist((DependencyContract)contract, services);
-               result.setTarget(dbcContract);
+               if (dbcContract != null) {
+                  result.setTarget(dbcContract);
+               }
             }
             else {
                throw new DSException("Contract \"" + contract + "\" is not supported.");
@@ -229,7 +246,9 @@ public class ProofReferenceModelCreator {
          else if (input instanceof ProgramMethodPO) {
             IProgramMethod pm = ((ProgramMethodPO) input).getProgramMethod();
             AbstractDbcOperation dbcOperation = makeSureOperationExist(pm, services);
-            result.setTarget(dbcOperation);
+            if (dbcOperation != null) {
+               result.setTarget(dbcOperation);
+            }
          }
          else {
             throw new DSException("Problem \"" + input + "\" is not supported.");
@@ -252,7 +271,13 @@ public class ProofReferenceModelCreator {
       if (result == null) {
          IDbCProofReferencable dbcReferencable = null;
          if (reference.getTarget() instanceof IProgramMethod) {
-            dbcReferencable = makeSureOperationExist((IProgramMethod)reference.getTarget(), services);
+            IProgramMethod pm = (IProgramMethod)reference.getTarget();
+            if (KeYTypeUtil.isImplicitConstructor(pm)) {
+               pm = KeYTypeUtil.findExplicitConstructor(services, pm);
+            }
+            if (pm != null) {
+               dbcReferencable = makeSureOperationExist(pm, services);
+            }
          }
          else if (reference.getTarget() instanceof IProgramVariable) {
             IProgramVariable pv = (IProgramVariable)reference.getTarget();
@@ -337,14 +362,16 @@ public class ProofReferenceModelCreator {
          DbcOperationContract result = operationContractMapping.get(contract);
          if (result == null) {
             AbstractDbcOperation dbcOperation = makeSureOperationExist((IProgramMethod)contract.getTarget(), services);
-            result = DbcmodelFactory.eINSTANCE.createDbcOperationContract();
-            result.setModifies(KeyHacks.getOperationContractModifies(services, contract));
-            result.setName(contract.getName());
-            result.setPost(KeyHacks.getOperationContractPost(services, contract));
-            result.setPre(KeyHacks.getOperationContractPre(services, contract));
-            result.setTermination(ObjectUtil.toString(contract.getModality()));
-            dbcOperation.getOperationContracts().add(result);
-            operationContractMapping.put(contract, result);
+            if (dbcOperation != null) {
+               result = DbcmodelFactory.eINSTANCE.createDbcOperationContract();
+               result.setModifies(KeyHacks.getOperationContractModifies(services, contract));
+               result.setName(contract.getName());
+               result.setPost(KeyHacks.getOperationContractPost(services, contract));
+               result.setPre(KeyHacks.getOperationContractPre(services, contract));
+               result.setTermination(ObjectUtil.toString(contract.getModality()));
+               dbcOperation.getOperationContracts().add(result);
+               operationContractMapping.put(contract, result);
+            }
          }
          return result;
       }
@@ -378,13 +405,15 @@ public class ProofReferenceModelCreator {
       if (ca != null) {
          DbCAxiomContract result = axiomContractMapping.get(contract);
          if (result == null) {
-            result = DbcmodelFactory.eINSTANCE.createDbCAxiomContract();
-            result.setDep(KeyHacks.getDependencyContractDep(services, contract));
-            result.setName(contract.getName());
-            result.setPre(KeyHacks.getOperationContractPre(services, contract));
             DbcAxiom dbcAxiom = makeSureAxiomExist(ca, services);
-            dbcAxiom.getAxiomContracts().add(result);
-            axiomContractMapping.put(contract, result);
+            if (dbcAxiom != null) {
+               result = DbcmodelFactory.eINSTANCE.createDbCAxiomContract();
+               result.setDep(KeyHacks.getDependencyContractDep(services, contract));
+               result.setName(contract.getName());
+               result.setPre(KeyHacks.getOperationContractPre(services, contract));
+               dbcAxiom.getAxiomContracts().add(result);
+               axiomContractMapping.put(contract, result);
+            }
          }
          return result;
       }
@@ -405,59 +434,61 @@ public class ProofReferenceModelCreator {
          AbstractDbcOperation result = operationMapping.get(pm);
          if (result == null) {
             AbstractDbcType dbcType = makeSureTypeExist(pm.getContainerType(), services);
-            if (pm.isConstructor()) {
-               DbcConstructor constructor = DbcmodelFactory.eINSTANCE.createDbcConstructor();
-               if (dbcType instanceof DbcClass) {
-                  ((DbcClass) dbcType).getConstructors().add(constructor);
-               }
-               else if (dbcType instanceof DbcEnum) {
-                  ((DbcEnum) dbcType).getConstructors().add(constructor);
-               }
-               else {
-                  throw new IllegalStateException("Parent \"" + dbcType + "\" is not supposed to contain constructors.");
-               }
-               result = constructor;
-            }
-            else {
-               DbcMethod method = DbcmodelFactory.eINSTANCE.createDbcMethod();
-               method.setAbstract(pm.isAbstract());
-               method.setFinal(pm.isFinal());
-               if (pm.getMethodDeclaration() != null && pm.getMethodDeclaration().getTypeReference() != null) {
-                  String returnType = KeyConnection.getTypeName(pm.getMethodDeclaration().getTypeReference(), DSPackageManagement.NO_PACKAGES);
-                  method.setReturnType(returnType);
+            if (dbcType != null) {
+               if (pm.isConstructor()) {
+                  DbcConstructor constructor = DbcmodelFactory.eINSTANCE.createDbcConstructor();
+                  if (dbcType instanceof DbcClass) {
+                     ((DbcClass) dbcType).getConstructors().add(constructor);
+                  }
+                  else if (dbcType instanceof DbcEnum) {
+                     ((DbcEnum) dbcType).getConstructors().add(constructor);
+                  }
+                  else {
+                     throw new IllegalStateException("Parent \"" + dbcType + "\" is not supposed to contain constructors.");
+                  }
+                  result = constructor;
                }
                else {
-                  method.setReturnType(KeyConnection.VOID);
+                  DbcMethod method = DbcmodelFactory.eINSTANCE.createDbcMethod();
+                  method.setAbstract(pm.isAbstract());
+                  method.setFinal(pm.isFinal());
+                  if (pm.getMethodDeclaration() != null && pm.getMethodDeclaration().getTypeReference() != null) {
+                     String returnType = KeyConnection.getTypeName(pm.getMethodDeclaration().getTypeReference(), DSPackageManagement.NO_PACKAGES);
+                     method.setReturnType(returnType);
+                  }
+                  else {
+                     method.setReturnType(KeyConnection.VOID);
+                  }
+                  if (dbcType instanceof DbcClass) {
+                     ((DbcClass) dbcType).getMethods().add(method);
+                  }
+                  else if (dbcType instanceof DbcEnum) {
+                     ((DbcEnum) dbcType).getMethods().add(method);
+                  }
+                  else if (dbcType instanceof DbcInterface) {
+                     ((DbcInterface) dbcType).getMethods().add(method);
+                  }
+                  else {
+                     throw new DSException("Parent \"" + dbcType + "\" is not supposed to contain constructors.");
+                  }
+                  result = method;
                }
-               if (dbcType instanceof DbcClass) {
-                  ((DbcClass) dbcType).getMethods().add(method);
+               result.setSignature(KeyConnection.getSignature(pm));
+               result.setStatic(pm.isStatic());
+               if (pm.isPrivate()) {
+                  result.setVisibility(DbcVisibility.PRIVATE);
                }
-               else if (dbcType instanceof DbcEnum) {
-                  ((DbcEnum) dbcType).getMethods().add(method);
+               else if (pm.isProtected()) {
+                  result.setVisibility(DbcVisibility.PROTECTED);
                }
-               else if (dbcType instanceof DbcInterface) {
-                  ((DbcInterface) dbcType).getMethods().add(method);
+               else if (pm.isPublic()) {
+                  result.setVisibility(DbcVisibility.PUBLIC);
                }
                else {
-                  throw new DSException("Parent \"" + dbcType + "\" is not supposed to contain constructors.");
+                  result.setVisibility(DbcVisibility.DEFAULT);
                }
-               result = method;
+               operationMapping.put(pm, result);
             }
-            result.setSignature(KeyConnection.getSignature(pm));
-            result.setStatic(pm.isStatic());
-            if (pm.isPrivate()) {
-               result.setVisibility(DbcVisibility.PRIVATE);
-            }
-            else if (pm.isProtected()) {
-               result.setVisibility(DbcVisibility.PROTECTED);
-            }
-            else if (pm.isPublic()) {
-               result.setVisibility(DbcVisibility.PUBLIC);
-            }
-            else {
-               result.setVisibility(DbcVisibility.DEFAULT);
-            }
-            operationMapping.put(pm, result);
          }
          return result;
       }
@@ -474,44 +505,49 @@ public class ProofReferenceModelCreator {
     * @throws DSException Occurred Exception.
     */
    protected AbstractDbcType makeSureTypeExist(KeYJavaType kjt, Services services) throws DSException {
-      AbstractDbcType result = typeMapping.get(kjt);
-      if (result == null) {
-         ClassType ct = (ClassType)kjt.getJavaType();
-         if (ct.isInterface()) {
-            DbcInterface dbcInterface = DbcmodelFactory.eINSTANCE.createDbcInterface();
-            addToParentTypeOrModelOtherwise(dbcInterface, kjt, services);
-            result = dbcInterface;
+      if (!KeYTypeUtil.isLibraryClass(kjt)) {
+         AbstractDbcType result = typeMapping.get(kjt);
+         if (result == null) {
+            ClassType ct = (ClassType)kjt.getJavaType();
+            if (ct.isInterface()) {
+               DbcInterface dbcInterface = DbcmodelFactory.eINSTANCE.createDbcInterface();
+               addToParentTypeOrModelOtherwise(dbcInterface, kjt, services);
+               result = dbcInterface;
+            }
+            else if (ct instanceof EnumClassDeclaration) {
+               DbcEnum dbcEnum = DbcmodelFactory.eINSTANCE.createDbcEnum();
+               addToParentTypeOrModelOtherwise(dbcEnum, kjt, services);
+               result = dbcEnum;
+            }
+            else {
+               DbcClass dbcClass = DbcmodelFactory.eINSTANCE.createDbcClass();
+               dbcClass.setAbstract(ct.isAbstract());
+               dbcClass.setAnonymous(((ClassDeclaration)ct).isAnonymousClass());
+               dbcClass.setFinal(ct.isFinal());
+               addToParentTypeOrModelOtherwise(dbcClass, kjt, services);
+               result = dbcClass;
+            }
+            result.setName(KeyConnection.getTypeName(kjt, DSPackageManagement.NO_PACKAGES));
+            result.setStatic(ct.isStatic());
+            if (ct.isPrivate()) {
+               result.setVisibility(DbcVisibility.PRIVATE);
+            }
+            else if (ct.isProtected()) {
+               result.setVisibility(DbcVisibility.PROTECTED);
+            }
+            else if (ct.isPublic()) {
+               result.setVisibility(DbcVisibility.PUBLIC);
+            }
+            else {
+               result.setVisibility(DbcVisibility.DEFAULT);
+            }
+            typeMapping.put(kjt, result);
          }
-         else if (ct instanceof EnumClassDeclaration) {
-            DbcEnum dbcEnum = DbcmodelFactory.eINSTANCE.createDbcEnum();
-            addToParentTypeOrModelOtherwise(dbcEnum, kjt, services);
-            result = dbcEnum;
-         }
-         else {
-            DbcClass dbcClass = DbcmodelFactory.eINSTANCE.createDbcClass();
-            dbcClass.setAbstract(ct.isAbstract());
-            dbcClass.setAnonymous(((ClassDeclaration)ct).isAnonymousClass());
-            dbcClass.setFinal(ct.isFinal());
-            addToParentTypeOrModelOtherwise(dbcClass, kjt, services);
-            result = dbcClass;
-         }
-         result.setName(KeyConnection.getTypeName(kjt, DSPackageManagement.NO_PACKAGES));
-         result.setStatic(ct.isStatic());
-         if (ct.isPrivate()) {
-            result.setVisibility(DbcVisibility.PRIVATE);
-         }
-         else if (ct.isProtected()) {
-            result.setVisibility(DbcVisibility.PROTECTED);
-         }
-         else if (ct.isPublic()) {
-            result.setVisibility(DbcVisibility.PUBLIC);
-         }
-         else {
-            result.setVisibility(DbcVisibility.DEFAULT);
-         }
-         typeMapping.put(kjt, result);
+         return result;
       }
-      return result;
+      else {
+         return null;
+      }
    }
    
    /**
@@ -557,16 +593,18 @@ public class ProofReferenceModelCreator {
       }
       DbcEnumLiteral result = literalMapping.get(pv);
       if (result == null) {
-         result = DbcmodelFactory.eINSTANCE.createDbcEnumLiteral();
-         result.setName(field.getProgramName());
          AbstractDbcType dbcType = makeSureTypeExist(((ProgramVariable)pv).getContainerType(), services);
-         if (dbcType instanceof DbcEnum) {
-            ((DbcEnum) dbcType).getLiterals().add(result);
+         if (dbcType != null) {
+            result = DbcmodelFactory.eINSTANCE.createDbcEnumLiteral();
+            result.setName(field.getProgramName());
+            if (dbcType instanceof DbcEnum) {
+               ((DbcEnum) dbcType).getLiterals().add(result);
+            }
+            else {
+               throw new DSException("Parent \"" + dbcType + "\" is not supposed to contain literals.");
+            }
+            literalMapping.put(pv, result);
          }
-         else {
-            throw new DSException("Parent \"" + dbcType + "\" is not supposed to contain literals.");
-         }
-         literalMapping.put(pv, result);
       }
       return result;
    }
@@ -585,41 +623,43 @@ public class ProofReferenceModelCreator {
       if (!((ProgramVariable)pv).isImplicit()) {
          DbcAttribute result = attributeMapping.get(pv);
          if (result == null) {
-            Field field = toField((ProgramVariable)pv, services);
-            if (field == null) {
-               throw new DSException("Unable to find field of \"" + pv + "\".");
-            }
-            result = DbcmodelFactory.eINSTANCE.createDbcAttribute();
-            result.setFinal(field.isFinal());
-            result.setName(field.getProgramName());
-            result.setStatic(field.isStatic());
-            result.setType(KeyConnection.getTypeName(field.getType(), DSPackageManagement.NO_PACKAGES));
-            if (field.isPrivate()) {
-               result.setVisibility(DbcVisibility.PRIVATE);
-            }
-            else if (field.isProtected()) {
-               result.setVisibility(DbcVisibility.PROTECTED);
-            }
-            else if (field.isPublic()) {
-               result.setVisibility(DbcVisibility.PUBLIC);
-            }
-            else {
-               result.setVisibility(DbcVisibility.DEFAULT);
-            }
             AbstractDbcType dbcType = makeSureTypeExist(((ProgramVariable)pv).getContainerType(), services);
-            if (dbcType instanceof DbcClass) {
-               ((DbcClass) dbcType).getAttributes().add(result);
+            if (dbcType != null) {
+               Field field = toField((ProgramVariable)pv, services);
+               if (field == null) {
+                  throw new DSException("Unable to find field of \"" + pv + "\".");
+               }
+               result = DbcmodelFactory.eINSTANCE.createDbcAttribute();
+               result.setFinal(field.isFinal());
+               result.setName(field.getProgramName());
+               result.setStatic(field.isStatic());
+               result.setType(KeyConnection.getTypeName(field.getType(), DSPackageManagement.NO_PACKAGES));
+               if (field.isPrivate()) {
+                  result.setVisibility(DbcVisibility.PRIVATE);
+               }
+               else if (field.isProtected()) {
+                  result.setVisibility(DbcVisibility.PROTECTED);
+               }
+               else if (field.isPublic()) {
+                  result.setVisibility(DbcVisibility.PUBLIC);
+               }
+               else {
+                  result.setVisibility(DbcVisibility.DEFAULT);
+               }
+               if (dbcType instanceof DbcClass) {
+                  ((DbcClass) dbcType).getAttributes().add(result);
+               }
+               else if (dbcType instanceof DbcInterface) {
+                  ((DbcInterface) dbcType).getAttributes().add(result);
+               }
+               else if (dbcType instanceof DbcEnum) {
+                  ((DbcEnum) dbcType).getAttributes().add(result);
+               }
+               else {
+                  throw new DSException("Parent \"" + dbcType + "\" is not supposed to contain attributes.");
+               }
+               attributeMapping.put(pv, result);
             }
-            else if (dbcType instanceof DbcInterface) {
-               ((DbcInterface) dbcType).getAttributes().add(result);
-            }
-            else if (dbcType instanceof DbcEnum) {
-               ((DbcEnum) dbcType).getAttributes().add(result);
-            }
-            else {
-               throw new DSException("Parent \"" + dbcType + "\" is not supposed to contain attributes.");
-            }
-            attributeMapping.put(pv, result);
          }
          return result;
       }
@@ -656,12 +696,14 @@ public class ProofReferenceModelCreator {
       if (KeyConnection.shouldIncludeClassAxiom(services, ca.getKJT(), ca)) {
          DbcAxiom result = axiomMapping.get(ca);
          if (result == null) {
-            result = DbcmodelFactory.eINSTANCE.createDbcAxiom();
-            result.setDefinition(ObjectUtil.toString(ca));
-            result.setName(ca.getName());
             AbstractDbcType dbcType = makeSureTypeExist(ca.getKJT(), services);
-            dbcType.getAxioms().add(result);
-            axiomMapping.put(ca, result);
+            if (dbcType != null) {
+               result = DbcmodelFactory.eINSTANCE.createDbcAxiom();
+               result.setDefinition(ObjectUtil.toString(ca));
+               result.setName(ca.getName());
+               dbcType.getAxioms().add(result);
+               axiomMapping.put(ca, result);
+            }
          }
          return result;
       }
@@ -680,12 +722,14 @@ public class ProofReferenceModelCreator {
    protected DbcInvariant makeSureInvariantExist(ClassInvariant ci, Services services) throws DSException {
       DbcInvariant result = invariantMapping.get(ci);
       if (result == null) {
-         result = DbcmodelFactory.eINSTANCE.createDbcInvariant();
-         result.setCondition(KeyHacks.getClassInvariantText(services, ci));
-         result.setName(ci.getName());
          AbstractDbcType dbcType = makeSureTypeExist(ci.getKJT(), services);
-         dbcType.getInvariants().add(result);
-         invariantMapping.put(ci, result);
+         if (dbcType != null) {
+            result = DbcmodelFactory.eINSTANCE.createDbcInvariant();
+            result.setCondition(KeyHacks.getClassInvariantText(services, ci));
+            result.setName(ci.getName());
+            dbcType.getInvariants().add(result);
+            invariantMapping.put(ci, result);
+         }
       }
       return result;
    }

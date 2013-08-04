@@ -40,8 +40,8 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
                               pos.isInAntec () );
     }
 
-    private class ACPIterator implements Iterator<Term> {
-        private final Stack termStack = new Stack (); 
+    private static class ACPIterator implements Iterator<Term> {
+        private final Stack<Object> termStack = new Stack<Object> (); 
 
         public ACPIterator(Term t, boolean negated) {
             push ( t, negated );

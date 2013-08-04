@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
@@ -40,11 +41,11 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 /**
  * This class is the starting point for the extraction of a unified
  * Userinterface for a GUI refactoring.
- * 
+ *
  * It gathers all present interfaces and redirects action to the mainWindow.
- * 
+ *
  * It is subject to change a lot at the moment.
- * 
+ *
  * @author mattias ulbrich
  */
 
@@ -55,13 +56,13 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
-	
+
 	public WindowUserInterface(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 	        completions.add(new FunctionalOperationContractCompletion());
 		completions.add(new DependencyContractCompletion());
 		completions.add(new LoopInvariantRuleCompletion());
-		completions.add(new BlockContractCompletion());
+		completions.add(new BlockContractCompletion(mainWindow));
 	}
 
 	public void loadProblem(File file, List<File> classPath,
@@ -142,7 +143,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 			}
 			mainWindow.displayResults(info.toString());
 		} else if (info.getSource() instanceof ProblemLoader) {
-			if (!"".equals(info.getResult())) {
+			if (info.getResult() != null) {
 				final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
 				        .getSource()).getExceptionHandler();
 				ExceptionDialog.showDialog(
@@ -247,11 +248,10 @@ public class WindowUserInterface extends AbstractUserInterface {
 	}
 
 	@Override
-	public ProblemInitializer createProblemInitializer() {
-	    ProblemInitializer pi = new ProblemInitializer(this, 
-	            mainWindow.getMediator().getProfile(), 
-	            new Services(mainWindow.getMediator().getExceptionHandler()), 
-	            true, 
+	public ProblemInitializer createProblemInitializer(Profile profile) {
+	    ProblemInitializer pi = new ProblemInitializer(this,
+	            new Services(profile, mainWindow.getMediator().getExceptionHandler()),
+	            true,
 	            this);
 	    return pi;
 	}
@@ -263,16 +263,16 @@ public class WindowUserInterface extends AbstractUserInterface {
    public KeYMediator getMediator() {
       return mainWindow.getMediator();
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
-      return super.load(file, classPath, bootClassPath);
+      return super.load(profile, file, classPath, bootClassPath);
    }
 
    /**
@@ -302,10 +302,10 @@ public class WindowUserInterface extends AbstractUserInterface {
            }
            proof.dispose();
            mainWindow.getProofView().removeProofs(rootTaskProofs);
-           
+
            // The original code of this method. Neccessary?
            mainWindow.getProofList().removeProof(proof);
-           
+
            // Run the garbage collector.
            Runtime r = Runtime.getRuntime();
            r.gc();

@@ -44,7 +44,6 @@ import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -82,6 +81,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
    /**
     * Shown string for alias check "Never".
     */
+   public static final String NON_EXECUTION_BRANCH_HIDING_OFF = "Off";
+
+   /**
+    * Shown string for alias check "Immediately".
+    */
+   public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "Via Side Proofs";
+
+   /**
+    * Shown string for alias check "Never".
+    */
    public static final String ALIAS_CHECK_NEVER = "Never";
 
    /**
@@ -93,11 +102,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     * Control to define the method treatment.
     */
    private Combo methodTreatmentCombo;
-
+   
    /**
     * Control to define the loop treatment.
     */
    private Combo loopTreatmentCombo;
+
+   /**
+    * Control to define the execution branch hiding options.
+    */
+   private Combo nonExecutionBranchHidingCombo;
 
    /**
     * Control to define alias checks.
@@ -147,7 +161,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       methodTreatmentCombo.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            methodTreatmentChanged(e);
+            updateStrategySettings();
          }
       });
       // Loop treatment
@@ -161,7 +175,21 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            loopTreatmentChanged(e);
+            updateStrategySettings();
+         }
+      });
+      // Alias checks
+      Group nonExecutionBranchHidingGroup = new Group(parent, SWT.NONE);
+      nonExecutionBranchHidingGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      nonExecutionBranchHidingGroup.setText("Non Execution Branch Hiding");
+      nonExecutionBranchHidingGroup.setLayout(new FillLayout());
+      nonExecutionBranchHidingCombo = new Combo(nonExecutionBranchHidingGroup, SWT.READ_ONLY);
+      nonExecutionBranchHidingCombo.add(NON_EXECUTION_BRANCH_HIDING_OFF);
+      nonExecutionBranchHidingCombo.add(NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF);
+      nonExecutionBranchHidingCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateStrategySettings();
          }
       });
       // Alias checks
@@ -175,7 +203,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       aliasChecksCombo.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            aliasChecksChanged(e);
+            updateStrategySettings();
          }
       });
       // Set read-only if required
@@ -191,12 +219,14 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          showSettings(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY), 
                       sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY),
-                      sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
+                      sp.getProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY),
+                      sp.getProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
       }
       else {
          showSettings(StrategyProperties.METHOD_EXPAND, 
                       StrategyProperties.LOOP_EXPAND,
-                      SymbolicExecutionStrategy.ALIAS_CHECK_NEVER);
+                      StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
+                      StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
       }
    }
 
@@ -211,6 +241,9 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       if (loopTreatmentCombo != null) {
          loopTreatmentCombo.setEnabled(editable);
       }
+      if (nonExecutionBranchHidingCombo != null) {
+         nonExecutionBranchHidingCombo.setEnabled(editable);
+      }
       if (aliasChecksCombo != null) {
          aliasChecksCombo.setEnabled(editable);
       }
@@ -220,17 +253,21 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     * Updates the shown proof search strategy settings.
     * @param methodOptionsKey The method treatment setting to show.
     * @param loopOptionsKey The loop treatment setting to show.
+    * @param nonExecutionBranchHidingOptionsKey The non execution branch hiding setting to show.
     * @param aliasCheckOptionsKey The alias treatment setting to show.
     */
-   protected void showSettings(String methodOptionsKey, String loopOptionsKey, String aliasCheckOptionsKey) {
+   protected void showSettings(String methodOptionsKey, String loopOptionsKey, String nonExecutionBranchHidingOptionsKey, String aliasCheckOptionsKey) {
       if (methodTreatmentCombo != null) {
          methodTreatmentCombo.setText(StrategyProperties.METHOD_CONTRACT.equals(methodOptionsKey) ? METHOD_TREATMENT_CONTRACT : METHOD_TREATMENT_EXPAND);
       }
       if (loopTreatmentCombo != null) {
          loopTreatmentCombo.setText(StrategyProperties.LOOP_INVARIANT.equals(loopOptionsKey) ? LOOP_TREATMENT_INVARIANT : LOOP_TREATMENT_EXPAND);
       }
+      if (nonExecutionBranchHidingCombo != null) {
+         nonExecutionBranchHidingCombo.setText(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(nonExecutionBranchHidingOptionsKey) ? NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : NON_EXECUTION_BRANCH_HIDING_OFF);
+      }
       if (aliasChecksCombo != null) {
-         aliasChecksCombo.setText(SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(aliasCheckOptionsKey) ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
+         aliasChecksCombo.setText(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(aliasCheckOptionsKey) ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
       }
    }
 
@@ -372,28 +409,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       this.proof = proof;
       updateShownValues();
    }
-
+   
    /**
-    * When the selected method treatment has changed.
-    * @param e The event.
+    * Updates the {@link StrategyProperties} of {@link #proof} whe
+    * a value has changed in the UI.
     */
-   protected void methodTreatmentChanged(SelectionEvent e) {
-      SymbolicExecutionUtil.setUseOperationContracts(proof, METHOD_TREATMENT_CONTRACT.equals(methodTreatmentCombo.getText()));
-   }
-
-   /**
-    * When the selected loop treatment has changed.
-    * @param e The event.
-    */
-   protected void loopTreatmentChanged(SelectionEvent e) {
-      SymbolicExecutionUtil.setUseLoopInvariants(proof, LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText()));
-   }
-
-   /**
-    * When the selected alias checks has changed.
-    * @param e The event.
-    */
-   protected void aliasChecksChanged(SelectionEvent e) {
-      SymbolicExecutionUtil.setAliasChecks(proof, ALIAS_CHECK_IMMEDIATELY.equals(aliasChecksCombo.getText()));
+   protected void updateStrategySettings() {
+      boolean useOperationContracts = METHOD_TREATMENT_CONTRACT.equals(methodTreatmentCombo.getText());
+      boolean useLoopInvariants = LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText());
+      boolean aliasChecksImmediately = ALIAS_CHECK_IMMEDIATELY.equals(aliasChecksCombo.getText());
+      boolean nonExecutionBranchHidingSideProofs = NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(nonExecutionBranchHidingCombo.getText());
+      SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecksImmediately);
    }
 }

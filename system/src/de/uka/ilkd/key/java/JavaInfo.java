@@ -16,6 +16,8 @@ package de.uka.ilkd.key.java;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Member;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -38,12 +41,15 @@ import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -143,7 +149,7 @@ public final class JavaInfo {
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
-    private HashMap<KeYJavaType,IObserverFunction> staticInvs = new HashMap<KeYJavaType,IObserverFunction>();
+    private HashMap<KeYJavaType,IObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,IObserverFunction>();
 
 
     /**
@@ -257,7 +263,7 @@ public final class JavaInfo {
      */
     private void buildNameCache() {
         nameCachedSize = kpmi.rec2key().size();
-        name2KJTCache = new HashMap<String, KeYJavaType>();
+        name2KJTCache = new LinkedHashMap<String, KeYJavaType>();
         for (final Object o : kpmi.allElements()) {
             if (o != null && o instanceof KeYJavaType){
                 final KeYJavaType oKJT = (KeYJavaType)o;
@@ -360,9 +366,9 @@ public final class JavaInfo {
      * caches all known types according to their short name
      */
     private void buildShortNameCache() {
-        sName2KJTCache = new HashMap<String, Object>();
+        sName2KJTCache = new LinkedHashMap<String, Object>();
         sNameCachedSize = kpmi.rec2key().size();
-        final HashSet<String> duplicates = new HashSet<String>();
+        final HashSet<String> duplicates = new LinkedHashSet<String>();
         for (Object o : kpmi.allElements()) {
             if (o instanceof KeYJavaType){
                 KeYJavaType t = (KeYJavaType)o;
@@ -397,7 +403,7 @@ public final class JavaInfo {
      * program type model
      */
     public Set<KeYJavaType> getAllKeYJavaTypes() {
-	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
+	final Set<KeYJavaType> result  = new LinkedHashSet<KeYJavaType>();
         for (final Object o : kpmi.allElements()) {
 	    if (o instanceof KeYJavaType) {
 	        result.add((KeYJavaType)o);
@@ -475,13 +481,54 @@ public final class JavaInfo {
         return (t.getJavaType() instanceof InterfaceDeclaration);
     }
 
+
+    /**
+     * Checks whether the type is declared as final.
+     * Returns false for all primitive and array types.
+     * @param kjt
+     * @return
+     */
+    public boolean isFinal(KeYJavaType kjt) {
+        return kpmi.isFinal(kjt);
+    }
+
+    public static boolean isPrivate(KeYJavaType kjt) {
+        final Type t = kjt.getJavaType();
+        if (t instanceof ClassType) {
+            return ((ClassType)t).isPrivate();
+        } else if (t instanceof ArrayType) {
+            final ArrayType at = (ArrayType) t;
+            return isPrivate(at.getBaseType().getKeYJavaType());
+        } else // primitive type or null
+            return true;
+    }
+
+    public static boolean isVisibleTo(SpecificationElement ax, KeYJavaType visibleTo) {
+        final KeYJavaType kjt = ax.getKJT();
+        // elements of private types are not visible
+        if (isPrivate(kjt)) return kjt.equals(visibleTo);
+        //TODO: package information not yet available
+        // BUGFIX: package-private is understood as private (see bug #1268)
+        final boolean visibleToPackage = false;
+        final VisibilityModifier visibility = ax.getVisibility();
+        if (VisibilityModifier.isPublic(visibility))
+            return true;
+        if (VisibilityModifier.allowsInheritance(visibility))
+            return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
+        if (VisibilityModifier.isPackageVisible(visibility))
+            return visibleToPackage;
+        else
+            return kjt.equals(visibleTo);
+    }
+
+
     /**
      * returns a KeYJavaType having the given sort
      */
      public KeYJavaType getKeYJavaType(Sort sort) {
 	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
 	     sortCachedSize = kpmi.rec2key().size();
-	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
+	     sort2KJTCache = new LinkedHashMap<Sort, KeYJavaType>();
 	     for (final Object o : kpmi.allElements()) {
 	         if (o instanceof KeYJavaType){
 	             final KeYJavaType oKJT = (KeYJavaType)o;
@@ -511,7 +558,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getKeYJavaType(Type t) {
 	if(type2KJTCache == null) {
-	    type2KJTCache = new HashMap<Type, KeYJavaType>();
+	    type2KJTCache = new LinkedHashMap<Type, KeYJavaType>();
 	    for (final Object o : kpmi.allElements()) {
 		if (o instanceof KeYJavaType) {
 		    final KeYJavaType oKJT = (KeYJavaType)o;
@@ -612,28 +659,31 @@ public final class JavaInfo {
 				     Term[] args,
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-	Term[] subs = new Term[args.length+2];
-	subs[0] = TermBuilder.DF.getBaseHeap(services);
-	subs[1] = prefix;
-	for(int i = 2; i < subs.length; i++) {
-              Term t = args[i-2];
-              sig = sig.append(getServices().getTypeConverter()
-        	                            .getKeYJavaType(t));
-              subs[i] = t;
-	}
-	className = translateArrayType(className);
 	KeYJavaType clType = getKeYJavaTypeByClassName(className);
+	for(int i=0; i < args.length; i++) {
+        sig = sig.append(getServices().getTypeConverter()
+                .getKeYJavaType(args[i]));
+	}	
 	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
 	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" not found.");
 	}
-	if(pm.isStatic()) {
-	    Term[] newSubs = new Term[subs.length - 1];
-	    newSubs[0] = subs[0];
-	    System.arraycopy(subs, 2, newSubs, 1, newSubs.length - 1);
-	    subs=newSubs;
+	Term[] subs = new Term[pm.getHeapCount(services)*pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
+	int offset = 0;
+	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+		if(offset >= pm.getHeapCount(services)) {
+			break;
+		}
+		subs[offset++] = TermBuilder.DF.var(heap);
 	}
+	if(!pm.isStatic()) {
+	  subs[offset++] = prefix;
+	}
+	for(int i=0; offset < subs.length; i++, offset++) {
+        subs[offset] = args[i];
+	}
+	className = translateArrayType(className);
 	assert pm.getReturnType() != null;
 	if(pm.isVoid()) {
 	    throw new IllegalArgumentException("Program method "+methodName
@@ -1300,14 +1350,16 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-	if(inv == null) {
+	if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
         			       null,
         			       services.getTypeConverter().getHeapLDT().targetSort(),
         			       getJavaLangObject(),
         			       false,
-        			       new ImmutableArray<KeYJavaType>());
+        			       new ImmutableArray<KeYJavaType>(),
+        			       HeapContext.getModHeaps(services, false).size(),
+        			       1);
 	}
 	return inv;
     }
@@ -1339,7 +1391,9 @@ public final class JavaInfo {
                            services.getTypeConverter().getHeapLDT().targetSort(),
                            target,
                            true,
-                           new ImmutableArray<KeYJavaType>()));
+                           new ImmutableArray<KeYJavaType>(),
+        			       HeapContext.getModHeaps(services, false).size(),
+                           1));
         return staticInvs.get(target);
     }
 

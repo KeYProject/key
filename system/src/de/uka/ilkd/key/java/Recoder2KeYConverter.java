@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -52,6 +53,8 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
+import de.uka.ilkd.key.java.declaration.modifier.NoState;
+import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -113,6 +116,7 @@ import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
@@ -160,6 +164,7 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -239,14 +244,14 @@ public class Recoder2KeYConverter {
     /**
      * caches access to methods for reflection. It is a HashMap<Class, Method>
      */
-    private final HashMap<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>(400);
+    private final HashMap<Class<?>, Method> methodCache = new LinkedHashMap<Class<?>, Method>(400);
 
     /**
      * caches constructor access for reflection. It is a HashMap<Class,
      * Constructor>
      */
-    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
-	new HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
+    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache = 
+	new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
 
     /**
      * Hashmap from <code>recoder.java.declaration.FieldSpecification</code>
@@ -254,16 +259,16 @@ public class Recoder2KeYConverter {
      * when converting initializers. Access to this map is performed via the
      * method <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
-	new HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
+    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping = 
+	new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
 
     /**
      * methodsDeclaring contains the recoder method declarations as keys that
      * have been started to convert but are not yet finished. The mapped value
      * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
-	new HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
+	new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed
@@ -842,6 +847,11 @@ public class Recoder2KeYConverter {
 	return new AllFields(children);
     }
 
+    public AllObjects convert(de.uka.ilkd.key.java.recoderext.adt.AllObjects e) {
+        ExtList children = collectChildren(e);	
+	return new AllObjects(children);
+    }
+
     public EmptySeqLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral e) {
         return EmptySeqLiteral.INSTANCE;
     }
@@ -889,11 +899,12 @@ public class Recoder2KeYConverter {
                     + " is not a known DL function name. Line/Col:" + e.getStartPosition());
         }
 
-        Function f = (Function) named;
+	        Function f = (Function) named;
         DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
-
-        expression.check(services);
-
+        
+        expression.check(services, getKeYJavaType(getServiceConfiguration().getCrossReferenceSourceInfo()
+						  .getContainingClassType(e)));
+        
         return expression;
     }
 
@@ -1121,16 +1132,18 @@ public class Recoder2KeYConverter {
         .getCrossReferenceSourceInfo().getContainingClassType(
                 (recoder.abstraction.Member) cd);
 
-        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+        final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+        Sort heapSort = heapLDT == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+                            : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result
         	= new ProgramMethod(consDecl,
         			    containerKJT,
         			    KeYJavaType.VOID_TYPE,
         			    positionInfo(cd),
-        			    heapSort);
+        			    heapSort,
+        			    heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         insertToMap(cd, result);
         return result;
     }
@@ -1145,14 +1158,16 @@ public class Recoder2KeYConverter {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
                 dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
-        Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+        final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+        Sort heapSort = heapLDT == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+                            : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result = new ProgramMethod(consDecl,
                 containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
-                heapSort);
+                heapSort,
+                heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         insertToMap(dc, result);
         return result;
     }
@@ -1287,9 +1302,10 @@ public class Recoder2KeYConverter {
             	= getServiceConfiguration().getCrossReferenceSourceInfo()
             	                           .getContainingClassType((recoder.abstraction.Member) md);
 
-            Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
+            final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+            Sort heapSort = heapLDT == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+                            : heapLDT.targetSort();
             final KeYJavaType containerType = getKeYJavaType(cont);
             assert containerType != null;
             final Type returnType = md.getReturnType();
@@ -1298,7 +1314,8 @@ public class Recoder2KeYConverter {
             result = new ProgramMethod(methDecl,
         	    		       containerType,
                     		       returnKJT, positionInfo(md),
-                    		       heapSort);
+                    		       heapSort,
+                    		       heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
 
             insertToMap(md, result);
         }
@@ -1995,7 +2012,8 @@ public class Recoder2KeYConverter {
     }
 
     public ArrayInitializer convert(recoder.java.expression.ArrayInitializer arg) {
-        return new ArrayInitializer(collectChildrenAndComments(arg));
+        return new ArrayInitializer(collectChildrenAndComments(arg), 
+                getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
     }
 
     public Throw convert(recoder.java.statement.Throw  arg) {
@@ -2176,4 +2194,14 @@ public class Recoder2KeYConverter {
     public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {
         return new Model(collectComments(m));
     }
-}
+
+    public TwoState convert(de.uka.ilkd.key.java.recoderext.TwoState m) {
+        return new TwoState(collectComments(m));
+    }
+
+    public NoState convert(de.uka.ilkd.key.java.recoderext.NoState m) {
+        return new NoState(collectComments(m));
+    }
+
+}	
+

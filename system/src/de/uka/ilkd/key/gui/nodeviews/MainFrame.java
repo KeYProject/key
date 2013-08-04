@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -6,6 +19,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -21,20 +35,25 @@ import javax.swing.border.TitledBorder;
  *
  * @author Kai Wallisch
  */
-public class MainFrame extends JScrollPane {
+@SuppressWarnings("serial")
+public final class MainFrame extends JScrollPane {
+    
+    private final MainWindow mainWindow;
 
     public void setSequentView(SequentView sequentView) {
+        Point oldViewpointPosition = getViewport().getViewPosition();
         setViewportView(new MainFrameBody(sequentView));
+        getViewport().setViewPosition(oldViewpointPosition);
 
         // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
-        ProofTreeView ptv = MainWindow.getInstance().proofTreeView;
+        ProofTreeView ptv = mainWindow.getProofView();
         if (ptv != null) {
             ptv.tacletInfoToggle.setSequentView(sequentView);
         }
     }
 
-    public MainFrame() {
-
+    public MainFrame(final MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
         getVerticalScrollBar().setUnitIncrement(30);
         getHorizontalScrollBar().setUnitIncrement(30);
@@ -45,14 +64,14 @@ public class MainFrame extends JScrollPane {
                 "copy");
         getActionMap().put("copy", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                GuiUtilities.copyHighlightToClipboard(MainWindow.getInstance().leafNodeView);
+                GuiUtilities.copyHighlightToClipboard(mainWindow.leafNodeView);
             }
         });
 
-        setSequentView(new EmptySequent());
+        setSequentView(new EmptySequent(mainWindow));
     }
 
-    private class MainFrameBody extends JPanel {
+    private static class MainFrameBody extends JPanel {
 
         public MainFrameBody(SequentView sequentView) {
 

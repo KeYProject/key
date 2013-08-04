@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -621,10 +621,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         public Node cacheKey = null;
 
         public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>
-            antecCache = new HashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
+            antecCache = new LinkedHashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
         public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  =
-            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
-
+            new LinkedHashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
         public void reset(Node n){
             cacheKey = n;
             antecCache.clear ();

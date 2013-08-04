@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.SearchBar;
@@ -77,6 +90,7 @@ public class SequentSearchBar extends SearchBar {
 
     @Override
     public void setVisible(boolean vis) {
+        super.setVisible(vis);
         if (sequentView != null) {
             if (vis) {
                 search();
@@ -84,7 +98,6 @@ public class SequentSearchBar extends SearchBar {
                 clearSearchResults();
             }
         }
-        super.setVisible(vis);
     }
     
     /**
@@ -93,7 +106,8 @@ public class SequentSearchBar extends SearchBar {
     public boolean search(String search) {
         clearSearchResults();
 
-        if (sequentView == null || sequentView.getText() == null || search.equals("")) {
+        if (sequentView == null || sequentView.getText() == null || search.equals("")
+                || !this.isVisible()) {
             return true;
         }
         

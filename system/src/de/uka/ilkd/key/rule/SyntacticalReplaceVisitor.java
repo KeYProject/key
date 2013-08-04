@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 
 
 /**
@@ -127,10 +126,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             true);
     }
 
-    public SyntacticalReplaceVisitor(Constraint metavariableInst, TermLabelWorkerManagement labelInstantiator) { 
-       this(null, metavariableInst, labelInstantiator);
-    }
-
     private JavaProgramElement addContext(StatementBlock pe) {
 	final ContextInstantiationEntry cie =
 	    svInst.getContextInstantiation();
@@ -150,9 +145,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     private Services getServices () {
-	if ( services == null )
-	    services = new Services ();
-	return services;
+       return services;
     }
 
     private TypeConverter getTypeConverter () {
@@ -221,7 +214,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =
-                    new SyntacticalReplaceVisitor (metavariableInst, labelInstantiator);
+                    new SyntacticalReplaceVisitor (getServices(), metavariableInst, labelInstantiator);
                 t.execPostOrder ( srv );
                 return srv.getTerm ();
             }

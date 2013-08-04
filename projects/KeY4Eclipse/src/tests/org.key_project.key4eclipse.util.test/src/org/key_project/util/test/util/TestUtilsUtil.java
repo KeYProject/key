@@ -139,8 +139,13 @@ public class TestUtilsUtil {
     * Closes the welcome view if it is opened. Otherwise nothing is done.
     */
    public static void closeWelcomeView() {
-      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager(); 
-      introManager.closeIntro(introManager.getIntro());
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager();
+            introManager.closeIntro(introManager.getIntro());
+         }
+      });
    }
    
    /**
@@ -1470,5 +1475,21 @@ public class TestUtilsUtil {
             WorkbenchUtil.closeView(view);
          }
       });
+   }
+
+   /**
+    * Searches an {@link IViewPart} with the given ID in the active {@link IWorkbenchPage}.
+    * @param viewId The view ID to search.
+    * @return The found {@link IViewPart} or {@code null} if no one was found.
+    */
+   public static IViewPart findView(final String viewId) {
+      IRunnableWithResult<IViewPart> run = new AbstractRunnableWithResult<IViewPart>() {
+         @Override
+         public void run() {
+            setResult(WorkbenchUtil.findView(viewId));
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
    }
 }

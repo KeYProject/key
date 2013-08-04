@@ -23,8 +23,6 @@ import de.hentschel.visualdbc.dbcmodel.diagram.custom.test.suite.swtbot.SWTBotAl
 import de.hentschel.visualdbc.example.test.suite.swtbot.SWTBotAllExampleTests;
 import de.hentschel.visualdbc.generation.ui.test.suite.swtbot.SWTBotAllGenerationUiTests;
 import de.hentschel.visualdbc.interactive.proving.ui.test.suite.swtbot.SWTBotAllInteractiveProvingUiTests;
-import de.hentschel.visualdbc.key.ui.test.suite.swtbot.SWTBotAllKeYUiTests;
-
 /**
  * <p>
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -46,8 +44,7 @@ import de.hentschel.visualdbc.key.ui.test.suite.swtbot.SWTBotAllKeYUiTests;
    SWTBotAllDiagramCustomTests.class,
    SWTBotAllKeyDataSourceTests.class,
    SWTBotAllInteractiveProvingUiTests.class,
-   SWTBotAllExampleTests.class,
-   SWTBotAllKeYUiTests.class
+   SWTBotAllExampleTests.class
 })
 public class SWTBotAllVisualDbCTests {
 }

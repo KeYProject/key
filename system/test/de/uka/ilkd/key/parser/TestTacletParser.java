@@ -16,6 +16,7 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
 import junit.framework.TestCase;
@@ -17,16 +30,27 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
+import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
+import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
+import org.key_project.keyide.ui.starter.KeYIDEMethodStarter;
 import org.key_project.keyide.ui.test.Activator;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTest.IStartProofTestRunnable;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest.IStartProofTestRunnable;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class SWTBotManualRuleApplicationTest extends TestCase {
@@ -46,9 +70,36 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testCloseFalse_ProofClosed", 
                        starter,
-                       92,
-                       28,
-                       108,
+                       new IStopCondition() {
+                          @Override
+                          public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                              return false;
+                          }
+                        
+                          @Override
+                          public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                             return !"closeFalse".equals(MiscTools.getRuleName(ruleApp)) ||
+                                    proof.openEnabledGoals().size() >= 2; // Stop before last goal is closed with closeFalse
+                          }
+                        
+                          @Override
+                          public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                              return null;
+                          }
+                        
+                          @Override
+                          public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                              return 0;
+                          }
+                        
+                          @Override
+                          public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                             return null;
+                          }
+                       },
+                       25, // x of false in text control of editor
+                       110, // y of false in text control of editor
                        "closeFalse",
                        true);
    }
@@ -68,9 +119,9 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        starter,
-                       0,
-                       114,
-                       161,
+                       null,
+                       100, // x of assignment text control of editor
+                       160, // y of assignment text control of editor
                        "assignment",
                        false);
    }
@@ -87,7 +138,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
     */
    protected void doStartProofTest(String projectName, 
                                    IStartProofTestRunnable startProofRunnable,
-                                   int numOfRulesToApplyAutomatically,
+                                   IStopCondition stopCondition,
                                    int x,
                                    int y,
                                    String ruleNameToApply,
@@ -96,6 +147,13 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       assertNotNull(startProofRunnable);
       assertNotNull(projectName);
       assertTrue(!projectName.isEmpty());
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -105,6 +163,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      String originalRuntimeExceptions = null;
       try {
          // Close welcome view if available
          TestUtilsUtil.closeWelcomeView(bot);
@@ -112,6 +171,14 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          IFolder src = project.getProject().getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            KeYEnvironment<?> environment = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+            environment.dispose();
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Open PayCard.java
          IEditorPart editorPart = TestUtilsUtil.openEditor(src.getFile("PayCard.java"));
          // Start proof
@@ -135,9 +202,9 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          // Start auto mode if required
-         if (numOfRulesToApplyAutomatically >= 1) {
+         if (stopCondition != null) {
             StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
-            ss.setMaxSteps(numOfRulesToApplyAutomatically);
+            ss.setCustomApplyStrategyStopCondition(stopCondition);
             keyEditor.getEnvironment().getUi().startAndWaitForAutoMode(keyEditor.getCurrentProof());
          }
          // Get node to apply rule on
@@ -158,6 +225,9 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          // Restore original timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
          // Restore original switch perspective preference.
@@ -168,6 +238,10 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          bot.closeAllShells();
          // Close all editors
          bot.closeAllEditors();
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
       }
    }
 }

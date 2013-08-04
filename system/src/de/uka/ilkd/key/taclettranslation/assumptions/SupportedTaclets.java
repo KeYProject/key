@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +50,7 @@ public final class SupportedTaclets {
          * The taclets that could be used for external provers.
          */
 
-        private Map<String, TreeItem> tacletNames = new HashMap<String, TreeItem>();
+        private Map<String, TreeItem> tacletNames = new LinkedHashMap<String, TreeItem>();
 
         private SupportedTaclets() {
                 getTreeModel();
@@ -150,7 +152,7 @@ public final class SupportedTaclets {
      * 
      */
         public HashSet<String> getTacletNamesAsHash() {
-                HashSet<String> names = new HashSet<String>();
+                HashSet<String> names = new LinkedHashSet<String>();
                 names.addAll(tacletNames.keySet());
                 return names;
         }

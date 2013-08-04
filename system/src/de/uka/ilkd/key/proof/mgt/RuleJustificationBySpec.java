@@ -33,6 +33,7 @@ public class RuleJustificationBySpec implements RuleJustification {
      */
     public boolean isAxiomJustification() {
         return spec.getTarget() instanceof IProgramMethod
+               && !((IProgramMethod)spec.getTarget()).isModel()
                && ((IProgramMethod)spec.getTarget()).getBody() == null;
     }
     

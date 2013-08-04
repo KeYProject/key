@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
 import junit.framework.TestCase;
@@ -15,11 +28,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
+import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartAutoModeHandler;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
+import org.key_project.keyide.ui.starter.KeYIDEMethodStarter;
 import org.key_project.keyide.ui.test.Activator;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotStartProofHandlerTest.IStartProofTestRunnable;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest.IStartProofTestRunnable;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -59,6 +74,13 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -114,6 +136,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
@@ -137,6 +162,13 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -192,6 +224,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
@@ -216,6 +251,13 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -285,6 +327,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }
@@ -309,6 +354,13 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
             TestUtilsUtil.clickContextMenu(projectTree, "Start Proof");
          }
       };
+      // Define starter settings
+      String originalStarterId = StarterPreferenceUtil.getSelectedMethodStarterID();
+      boolean originalDontAsk = StarterPreferenceUtil.isDontAskForMethodStarter();
+      boolean originalDisabled = StarterPreferenceUtil.isMethodStarterDisabled();
+      StarterPreferenceUtil.setSelectedMethodStarterID(KeYIDEMethodStarter.STARTER_ID);
+      StarterPreferenceUtil.setDontAskForMethodStarter(true);
+      StarterPreferenceUtil.setMethodStarterDisabled(false);
       // Store original SWTBot timeout and increase it
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 5;
@@ -364,6 +416,9 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
       }
       finally {
+         StarterPreferenceUtil.setSelectedMethodStarterID(originalStarterId);
+         StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
+         StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
       }
    }

@@ -1,7 +1,29 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.proof_references;
 
+import java.util.Iterator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Provides utility methods which makes it easier to analyze the type hierarchy
@@ -94,6 +116,61 @@ public final class KeYTypeUtil {
       }
       catch (Exception e) {
          return null; // RuntimeException is thrown if type not exist.
+      }
+   }
+
+   /**
+    * Checks if the given {@link KeYJavaType} is a library class.
+    * @param kjt The {@link KeYJavaType} to check.
+    * @return {@code true} is library class, {@code false} is no library class.
+    */
+   public static boolean isLibraryClass(KeYJavaType kjt) {
+      return kjt != null && 
+             kjt.getJavaType() instanceof TypeDeclaration && 
+             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass();
+   }
+   
+   /**
+    * Checks if the given {@link IProgramMethod} is an implicit constructor.
+    * @param pm The {@link IProgramMethod} to check.
+    * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g. method or explicit construcotr).
+    */
+   public static boolean isImplicitConstructor(IProgramMethod pm) {
+      return pm != null && ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER.equals(pm.getName());
+   }
+
+   /**
+    * Returns the {@link IProgramMethod} of the explicit constructor for
+    * the given implicit constructor.
+    * @param services The {@link Services} to use.
+    * @param implicitConstructor The implicit constructor.
+    * @return The found explicit constructor or {@code null} if not available.
+    */
+   public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
+      if (services != null && implicitConstructor != null) {
+         ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
+         return JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+            @Override
+            public boolean select(IProgramMethod element) {
+               if (implicitConstructor.getParameterDeclarationCount() == element.getParameterDeclarationCount()) {
+                  Iterator<ParameterDeclaration> implicitIter = implicitConstructor.getParameters().iterator();
+                  Iterator<ParameterDeclaration> elementIter = element.getParameters().iterator();
+                  boolean sameTypes = true;
+                  while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
+                     ParameterDeclaration implicitNext = implicitIter.next();
+                     ParameterDeclaration elementNext = elementIter.next();
+                     sameTypes = implicitNext.getTypeReference().equals(elementNext.getTypeReference());
+                  }
+                  return sameTypes;
+               }
+               else {
+                  return false;
+               }
+            }
+         });
+      }
+      else {
+         return null;
       }
    }
 }

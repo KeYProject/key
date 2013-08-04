@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashSet;
@@ -32,7 +45,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
       // Compute collect terms of sequent formulas
       Sequent sequent = goal.sequent();
-      Set<Term> topTerms = new HashSet<Term>();
+      Set<Term> topTerms = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
          topTerms.add(sf.formula());
       }

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -71,12 +71,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * The {@link IProgramMethod} to execute code parts from.
     */
    private IProgramMethod pm;
-   
+
    /**
     * The precondition in JML syntax.
     */
    private String precondition;
-   
+
    /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
@@ -84,16 +84,16 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * @param pm The {@link IProgramMethod} to execute code parts from.
     * @param precondition An optional precondition to use.
     */
-   public ProgramMethodPO(InitConfig initConfig, 
-                          String name, 
-                          IProgramMethod pm, 
+   public ProgramMethodPO(InitConfig initConfig,
+                          String name,
+                          IProgramMethod pm,
                           String precondition) {
       super(initConfig, name);
       assert pm != null;
       this.pm = pm;
       this.precondition = precondition;
    }
-   
+
    /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
@@ -103,9 +103,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
     */
-   public ProgramMethodPO(InitConfig initConfig, 
-                          String name, 
-                          IProgramMethod pm, 
+   public ProgramMethodPO(InitConfig initConfig,
+                          String name,
+                          IProgramMethod pm,
                           String precondition,
                           boolean addUninterpretedPredicate,
                           boolean addSymbolicExecutionLabel) {
@@ -114,7 +114,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
       this.pm = pm;
       this.precondition = precondition;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -122,7 +122,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    public IProgramMethod getProgramMethod() {
       return pm;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -130,7 +130,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    protected boolean isTransactionApplicable() {
       return false;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -138,13 +138,13 @@ public class ProgramMethodPO extends AbstractOperationPO {
    protected KeYJavaType getCalleeKeYJavaType() {
       return pm.getContainerType();
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
-   protected StatementBlock buildOperationBlock(ImmutableList<LocationVariable> formalParVars,
-                                                ProgramVariable selfVar, 
+   protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
+                                                ProgramVariable selfVar,
                                                 ProgramVariable resultVar) {
       // Get program method to execute
       IProgramMethod pm = getProgramMethod();
@@ -152,9 +152,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
       ImmutableArray<Expression> args = new ImmutableArray<Expression>(formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
       MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
       StatementBlock result = new StatementBlock(mbs);
-      return result;
+      return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -169,20 +169,20 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term getPre(List<LocationVariable> modHeaps,
-                         ProgramVariable selfVar, 
-                         ImmutableList<ProgramVariable> paramVars, 
-                         Map<LocationVariable, LocationVariable> atPreVars, 
+                         ProgramVariable selfVar,
+                         ImmutableList<ProgramVariable> paramVars,
+                         Map<LocationVariable, LocationVariable> atPreVars,
                          Services services) {
       try {
          if (precondition != null && !precondition.isEmpty()) {
             PositionedString ps = new PositionedString(precondition);
-            KeYJMLParser parser = new KeYJMLParser(ps, 
-                                                   services, 
-                                                   getCalleeKeYJavaType(), 
-                                                   selfVar, 
-                                                   paramVars, 
-                                                   null, 
-                                                   null, 
+            KeYJMLParser parser = new KeYJMLParser(ps,
+                                                   services,
+                                                   getCalleeKeYJavaType(),
+                                                   selfVar,
+                                                   paramVars,
+                                                   null,
+                                                   null,
                                                    null);
             return parser.parseExpression();
          }
@@ -200,11 +200,11 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term getPost(List<LocationVariable> modHeaps,
-                          ProgramVariable selfVar, 
-                          ImmutableList<ProgramVariable> paramVars, 
-                          ProgramVariable resultVar, 
-                          ProgramVariable exceptionVar, 
-                          Map<LocationVariable, LocationVariable> atPreVars, 
+                          ProgramVariable selfVar,
+                          ImmutableList<ProgramVariable> paramVars,
+                          ProgramVariable resultVar,
+                          ProgramVariable exceptionVar,
+                          Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
       return TB.tt();
    }
@@ -215,7 +215,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    @Override
    protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                    Map<LocationVariable, Map<Term, Term>> heapToAtPre,
-                                   ProgramVariable selfVar, 
+                                   ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars) {
       return TB.tt();
    }
@@ -235,7 +235,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    protected boolean isMakeNamesUnique() {
       return false; // Unique names crashes precondition parsing if names are renamed.
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -251,13 +251,13 @@ public class ProgramMethodPO extends AbstractOperationPO {
    protected String buildPOName(boolean transactionFlag) {
       return name;
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
    public int hashCode() {
-      return pm.hashCode() + 
+      return pm.hashCode() +
              (precondition != null ? precondition.hashCode() : 0);
    }
 
@@ -275,7 +275,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
          return false;
       }
    }
-   
+
    /**
     * Returns the precondition in JML syntax.
     * @return The precondition in JML syntax.
@@ -295,7 +295,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
           properties.setProperty("precondition", getPrecondition());
        }
    }
-   
+
    /**
     * Returns a human readable full qualified method signature.
     * @param pm The {@link IProgramMethod} which provides the signature.
@@ -328,14 +328,14 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * @throws IOException Occurred Exception.
     */
    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
-      return new LoadedPOContainer(new ProgramMethodPO(initConfig, 
-                                                       getName(properties), 
-                                                       getProgramMethod(initConfig, properties), 
+      return new LoadedPOContainer(new ProgramMethodPO(initConfig,
+                                                       getName(properties),
+                                                       getProgramMethod(initConfig, properties),
                                                        getPrecondition(properties),
                                                        isAddUninterpretedPredicate(properties),
                                                        isAddSymbolicExecutionLabel(properties)));
    }
-   
+
    /**
     * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
     * @param initConfig The already load {@link InitConfig}.
@@ -398,4 +398,11 @@ public class ProgramMethodPO extends AbstractOperationPO {
    public static String getPrecondition(Properties properties) {
       return properties.getProperty("precondition");
    }
+
+    @Override
+    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

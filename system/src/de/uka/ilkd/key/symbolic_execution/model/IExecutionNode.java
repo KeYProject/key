@@ -21,15 +21,15 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
  * <p>
  * Provides the basic methods each node in a symbolic execution tree
  * should have and allows to access the children. A symbolic execution tree
- * always starts with an {@link IExecutionStartNode} and is created via
+ * always starts with an {@link IExecutionStart} and is created via
  * a {@link SymbolicExecutionTreeBuilder} instance.
  * </p>
  * <p>
  * The following concrete nodes are available
  * <ul>
- * <li>{@link IExecutionStartNode} (root node)</li>
+ * <li>{@link IExecutionStart} (root node)</li>
  * <li>{@link IExecutionStatement} (single statement, e.g. {@code int x =  1 + 2;})</li>
- * <li>{@link IExecutionBranchNode} (branch node, e.g. {@code if(x >= 0)})</li>
+ * <li>{@link IExecutionBranchStatement} (branch statement, e.g. {@code if(x >= 0)})</li>
  * <li>{@link IExecutionBranchCondition} (branch condition, e.g. {@code x < 0})</li>
  * <li>{@link IExecutionMethodCall} (method call, e.g. {@code foo()})</li>
  * <li>{@link IExecutionMethodReturn} (method return, e.g. {@code return 42})</li>

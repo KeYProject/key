@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -28,20 +28,23 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * <p>
  * This class provides the functionality to load something it KeY.
- * The loading process is done in the current {@link Thread} and 
+ * The loading process is done in the current {@link Thread} and
  * no user interaction is required.
  * </p>
  * <p>
@@ -58,12 +61,12 @@ public class DefaultProblemLoader {
     * The file or folder to load.
     */
    private File file;
-   
+
    /**
     * The optional class path entries to use.
     */
    private List<File> classPath;
-   
+
    /**
     * An optional boot class path.
     */
@@ -73,22 +76,27 @@ public class DefaultProblemLoader {
     * The {@link KeYMediator} to use.
     */
    private KeYMediator mediator;
-   
+
+   /**
+    * The {@link Profile} to use for new {@link Proof}s.
+    */
+   private Profile profileOfNewProofs;
+
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
     */
    private EnvInput envInput;
-   
+
    /**
     * The instantiated {@link ProblemInitializer} used during the loading process.
     */
    private ProblemInitializer problemInitializer;
-   
+
    /**
     * The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
     */
    private InitConfig initConfig;
-   
+
    /**
     * The instantiate proof or {@code null} if no proof was instantiated during loading process.
     */
@@ -99,25 +107,29 @@ public class DefaultProblemLoader {
     * @param file The file or folder to load.
     * @param classPath The optional class path entries to use.
     * @param bootClassPath An optional boot class path.
+    * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+   public DefaultProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
       this.bootClassPath = bootClassPath;
       this.mediator = mediator;
+      this.profileOfNewProofs = profileOfNewProofs;
+      if (this.profileOfNewProofs == null) {
+         this.profileOfNewProofs = AbstractProfile.getDefaultProfile();
+      }
    }
 
    /**
     * Executes the loading process and tries to instantiate a proof
-    * and to re-apply rules on it if possible. 
+    * and to re-apply rules on it if possible.
     * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
-    * @return An error message or {@code ""} (empty string) if everything is fine.
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public String load(boolean registerProof) throws ProblemLoaderException {
+   public ProblemLoaderException load(boolean registerProof) throws ProblemLoaderException {
       try {
          // Read environment
       boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
@@ -137,20 +149,20 @@ public class DefaultProblemLoader {
                replayProof(proof);
             }
             // this message is propagated to the top level in console mode
-            return ""; // Everything fine
+            return null; // Everything fine
          }
          finally {
     	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
             getMediator().resetNrGoalsClosedByHeuristics();
             if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
                ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-            }  
+            }
          }
       }
-      catch (IOException e) {
-         throw new ProblemLoaderException(this, e);
+      catch (ProblemLoaderException e) {
+          throw(e);
       }
-      catch (ProofInputException e) {
+      catch (Exception e) { // TODO give more specific exception message
          throw new ProblemLoaderException(this, e);
       }
    }
@@ -167,22 +179,22 @@ public class DefaultProblemLoader {
       if (filename.endsWith(".java")) {
          // java file, probably enriched by specifications
          if (file.getParentFile() == null) {
-            return new SLEnvInput(".", classPath, bootClassPath);
+            return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs);
          }
          else {
             return new SLEnvInput(file.getParentFile().getAbsolutePath(),
-                  classPath, bootClassPath);
+                  classPath, bootClassPath, profileOfNewProofs);
          }
       }
       else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
          // KeY problem specification or saved proof
-         return new KeYUserProblemFile(filename, file, mediator.getUI());
+         return new KeYUserProblemFile(filename, file, mediator.getUI(), profileOfNewProofs);
 
       }
       else if (file.isDirectory()) {
          // directory containing java sources, probably enriched
          // by specifications
-         return new SLEnvInput(file.getPath(), classPath, bootClassPath);
+         return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs);
       }
       else {
          if (filename.lastIndexOf('.') != -1) {
@@ -198,7 +210,7 @@ public class DefaultProblemLoader {
          }
       }
    }
-   
+
    /**
     * Instantiates the {@link ProblemInitializer} to use.
     * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
@@ -206,13 +218,12 @@ public class DefaultProblemLoader {
     */
    protected ProblemInitializer createProblemInitializer(boolean registerProof) {
       UserInterface ui = mediator.getUI();
-      return new ProblemInitializer(ui, 
-                                    mediator.getProfile(), 
-                                    new Services(mediator.getExceptionHandler()), 
-                                    registerProof, 
+      return new ProblemInitializer(ui,
+                                    new Services(envInput.getProfile(), mediator.getExceptionHandler()),
+                                    registerProof,
                                     ui);
    }
-   
+
    /**
     * Creates the {@link InitConfig}.
     * @return The created {@link InitConfig}.
@@ -221,7 +232,7 @@ public class DefaultProblemLoader {
    protected InitConfig createInitConfig() throws ProofInputException {
       return problemInitializer.prepare(envInput);
    }
-   
+
    /**
     * Creates a {@link LoadedPOContainer} if available which contains
     * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
@@ -299,7 +310,7 @@ public class DefaultProblemLoader {
     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
     * @return An error message or {@code null} if everything is fine.
     */
-   protected String selectProofObligation() {
+   protected ProblemLoaderException selectProofObligation() {
       return null; // Do nothing
    }
 
@@ -313,22 +324,34 @@ public class DefaultProblemLoader {
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
       return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
    }
-   
+
    protected void replayProof(Proof proof) throws ProofInputException {
       mediator.setProof(proof);
 
       mediator.stopInterface(true); // first stop (above) is not enough
 
       String status = "";
+      List<Throwable> errors = null;
       if (envInput instanceof KeYUserProblemFile) {
-         IProofFileParser parser = new DefaultProofFileParser(proof,
+          DefaultProofFileParser parser = new DefaultProofFileParser(this, proof,
                                                               mediator);
          problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
          status = parser.getStatus();
+         errors = parser.getErrors();
       }
 
-      if ("".equals(status)) mediator.getUI().resetStatus(this);
-         else mediator.getUI().reportStatus(this, status);
+      if ("".equals(status)) {
+          mediator.getUI().resetStatus(this);
+      } else {
+          mediator.getUI().reportStatus(this, status);
+          if (errors != null &&
+                  !errors.isEmpty()) {
+              throw new ProblemLoaderException(this,
+                      "Proof could only be loaded partially. In summary " + errors.size() +
+                      " not loadable rule application(s) have been detected." +
+                      "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
+          }
+      }
    }
 
    /**
@@ -370,7 +393,7 @@ public class DefaultProblemLoader {
    public EnvInput getEnvInput() {
       return envInput;
    }
-   
+
    /**
     * Returns the instantiated {@link ProblemInitializer} used during the loading process.
     * @return The instantiated {@link ProblemInitializer} used during the loading process.
