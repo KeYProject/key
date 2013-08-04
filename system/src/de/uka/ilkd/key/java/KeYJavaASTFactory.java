@@ -599,7 +599,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link While} loop defined by <code>condition</code> and
      *         <code>body</code>, and positioned at <code>position</code>
      */
-    public static Statement whileLoop(final Expression condition,
+    public static While whileLoop(final Expression condition,
 	    final Statement body, final PositionInfo position) {
 	final While loop = new While(condition, body, position);
 
