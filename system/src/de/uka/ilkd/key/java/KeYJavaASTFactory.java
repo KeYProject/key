@@ -60,6 +60,7 @@ import de.uka.ilkd.key.java.statement.Default;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.ForUpdates;
@@ -850,6 +851,20 @@ public abstract class KeYJavaASTFactory {
      */
     public static EmptyStatement emptyStatement() {
 	return new EmptyStatement();
+    }
+
+    /**
+     * Create an enhanced for loop.
+     * 
+     * @param parameters
+     *            the loop definition parameters (initializer, guard, body) as
+     *            {@link ExtList}
+     * @return a new {@link For} as defined by <code>parameters</code>
+     */
+    public static EnhancedFor enhancedForLoop(final ExtList parameters) {
+	final EnhancedFor loop = new EnhancedFor(parameters);
+
+	return loop;
     }
 
     /**
