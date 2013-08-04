@@ -384,3 +384,32 @@ JMLSPECIALSYMBOL
           '==>' | '<==' | '<==>' | '<=!=>' | '->' | '<-' | '..' | '{|'
         | '|}'
     ;
+
+INTEGERLITERAL
+    :
+        '0' | DECIMALINTEGERLITERAL
+    ;
+
+fragment
+DECIMALINTEGERLITERAL
+    :
+        NONZERODIGIT DIGITS? INTEGERTYPESUFFIX?
+    ;
+
+fragment
+DIGITS
+    :
+        DIGIT DIGIT*
+    ;
+
+fragment
+NONZERODIGIT
+    :
+        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+    ;
+
+fragment
+INTEGERTYPESUFFIX
+    :
+        'l' | 'L'
+    ;
