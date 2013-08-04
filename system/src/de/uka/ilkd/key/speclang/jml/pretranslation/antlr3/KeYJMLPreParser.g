@@ -1184,7 +1184,7 @@ expression returns [PositionedString result = null]
         |   { parenthesesCounter > 0 }? t=SEMICOLON
         |   t=~(LPARENT|RPARENT|SEMICOLON)
         )
-        { if (begin == null) { begin = t; } text.append(t.getText()); }
+        { if (begin == null) { begin = t; } text.append(" " + t.getText()); }
     )*
     { parenthesesCounter == 0 }? t=SEMICOLON { if (begin == null) { begin = t; } text.append(t.getText()); }
     {
