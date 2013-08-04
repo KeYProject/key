@@ -201,33 +201,6 @@ fragment ML_COMMENT
     '*/' 
 ;
 
-
-fragment PARAM_DECL
-@init {
-    paraphrase.push("a parameter declaration");
-}
-@after { paraphrase.pop(); }
-:
-    (
-    	('non_null' | 'nullable')
-    	=>
-    	{
-    	    append("/*@");
-    	}
-    	(
-		'non_null'
-    	    |   'nullable'
-    	)
-    	{
-    	    append("@*/");
-        }
-    )?
-    IDENT  { append(" "); } 
-    IDENT
-;
-
-
-
 fragment LETTER
 @init {
     paraphrase.push("a letter");
@@ -295,25 +268,6 @@ IDENT
     	|   '.'
     )*
 ;
-
-
-PARAM_LIST
-@init {
-    paraphrase.push("a parameter list");
-}
-@after { paraphrase.pop(); }
-:
-    '(' 
-    (
-        PARAM_DECL
-        (
-            ',' 
-            PARAM_DECL
-        )*
-    )? 
-    ')'
-;   
-
 
 NEST_START
 :

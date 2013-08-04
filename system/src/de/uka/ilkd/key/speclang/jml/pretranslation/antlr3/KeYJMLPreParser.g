@@ -174,7 +174,7 @@ classlevel_element[ImmutableList<String> mods]
         result=class_invariant[mods]
     |   (accessible_keyword expression) => result=depends_clause[mods]
     |   result=method_specification[mods]
-    |   (IDENT IDENT PARAM_LIST (BODY | SEMICOLON)) => result=method_declaration[mods]
+    |   (IDENT IDENT param_list (BODY | SEMICOLON)) => result=method_declaration[mods]
     |   result=field_declaration[mods]
     |   result=represents_clause[mods]
     |   result=history_constraint[mods]
@@ -895,7 +895,7 @@ method_declaration[ImmutableList<String> mods]
 :
     type=IDENT 	   	{ sb.append(type.getText() + " "); }
     name=IDENT 	   	{ sb.append(name.getText()); }
-    params=PARAM_LIST   { sb.append(params.getText()); }
+    params=param_list   { sb.append(params); }
     (
     	    body=BODY  	    { sb.append(body.getText()); }
     	|   semi=SEMICOLON  { sb.append(semi.getText()); }
@@ -908,6 +908,49 @@ method_declaration[ImmutableList<String> mods]
     }
 ;
 
+param_list returns [String s = null]
+@init {
+    final StringBuilder text = new StringBuilder();
+}
+@after {
+    s = text.toString();
+}
+    :
+        t=LPAREN { text.append(t.getText()); }
+        (
+            param=param_decl { text.append(param); }
+            (
+                t=COMMA
+                param=param_decl
+                { text.append(t.getText() + param); }
+            )*
+        )?
+        t=RPAREN { text.append(t.getText()); }
+    ;
+
+param_decl returns [String s = null]
+@init {
+    final StringBuilder text = new StringBuilder();
+}
+@after {
+    s = text.toString();
+}
+    :
+        (
+             t=(NON_NULL | NULLABLE)
+             {
+                text.append("/*@" + t.getText() + "@*/");
+             }
+        )?
+        t=IDENT
+        {
+            text.append(t.getText() + " ");
+        }
+        IDENT
+        {
+            text.append(t.getText());
+        }
+    ;
 
 
 //-----------------------------------------------------------------------------
