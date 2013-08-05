@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.util.MiscTools;
 import java.util.Iterator;
 
 
@@ -278,7 +279,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         if (t == null) {
             return null;
         }
-        String svName = schemaPrefix + t.toString();
+        String svName = MiscTools.toValidVariableName(schemaPrefix + t.toString()).toString();
         Sort sort = t.sort();
         Name name =
                 services.getVariableNamer().getTemporaryNameProposal(svName);
