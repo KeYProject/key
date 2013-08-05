@@ -44,7 +44,7 @@ public abstract class TacletLoader {
     protected KeYUserProblemFile tacletFile;
     protected final ProgressMonitor monitor;
     protected final ProblemInitializerListener listener;
-    protected final Profile    profile;
+    protected final Profile profile;
     protected ProofEnvironment envForTaclets;
 
     public TacletLoader(ProgressMonitor monitor,
@@ -191,11 +191,13 @@ public abstract class TacletLoader {
             this.envForTaclets = loader.envForTaclets;
             this.initConfig = initConfig;
         }
+        
+
 
         private void prepare() {
             KeYUserProblemFile keyFileDefs = new KeYUserProblemFile(
                     "Definitions", fileForDefinitions,
-                    monitor, initConfig.getProfile());
+                    monitor, profile);
             try {
                 initConfig = problemInitializer.prepare(keyFileDefs);
             } catch (ProofInputException e) {

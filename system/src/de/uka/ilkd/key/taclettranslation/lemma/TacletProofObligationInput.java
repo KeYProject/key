@@ -9,7 +9,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -18,12 +17,10 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * The Class TacletProofObligationInput is a special purpose proof obligations
@@ -131,14 +128,16 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
     }
 
-    @Override public String name() {
+    @Override 
+    public String name() {
         return tacletName;
     }
 
     /*
      * use the TacletLoader and TacletSoundlessPOLoader to generate the PO.
      */
-    @Override public void readProblem() throws ProofInputException {
+    @Override 
+    public void readProblem() throws ProofInputException {
         TacletLoader loader = null;
         if (tacletFile == null) {
             // prove a KeY taclet
