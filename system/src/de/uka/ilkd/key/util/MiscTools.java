@@ -330,6 +330,12 @@ public final class MiscTools {
         return s;
     }
 
+    public static Name toValidVariableName(String s) {
+        s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/|\\(|\\)", "_");
+        return new Name(s);
+    }
+
+
     /**
      * Join the string representations of a collection of objects into onw
      * string. The individual elements are separated by a delimiter.
