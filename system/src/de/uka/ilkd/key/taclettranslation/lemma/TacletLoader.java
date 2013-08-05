@@ -39,7 +39,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class TacletLoader {
-    
+
     protected KeYUserProblemFile tacletFile;
     protected final ProgressMonitor monitor;
     protected final ProblemInitializerListener listener;
@@ -115,7 +115,6 @@ public abstract class TacletLoader {
     }
 
     public ProofEnvironment getProofEnvForTaclets() {
-        // Is it wise to cache the environment? Taclets are removed from it later! (MU 5/2013)
         if(envForTaclets == null) {
             try {
                 EnvironmentCreator ec = new EnvironmentCreator();
@@ -130,7 +129,15 @@ public abstract class TacletLoader {
         return envForTaclets;
     }
 
-    /* turn an immutable set into an array list */
+
+    public void setProofEnvForTaclets(ProofEnvironment proofEnv) {
+        this.envForTaclets = proofEnv;
+    }
+
+
+    /* 
+     * turn an immutable set into an array list 
+     */
     private static <E> List<E> toList(ImmutableSet<E> set) {
         ArrayList<E> res = new ArrayList<E>();
         for (E element : set) {
@@ -146,7 +153,7 @@ public abstract class TacletLoader {
         private final Collection<File> filesForAxioms;
         private final ProblemInitializer problemInitializer;
 
-
+        public void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets) {}
 
         public TacletFromFileLoader(ProgressMonitor pm,
                 ProblemInitializerListener listener,
@@ -180,7 +187,7 @@ public abstract class TacletLoader {
         }
 
 
-        public void prepare() {
+        private void prepare() {
             KeYUserProblemFile keyFileDefs = new KeYUserProblemFile(
                     "Definitions", fileForDefinitions,
                     monitor);
@@ -213,11 +220,13 @@ public abstract class TacletLoader {
                 ImmutableSet<Taclet> taclets = load(keyFile, initConfig);
                 getProofEnvForTaclets().registerRules(taclets,
                         AxiomJustification.INSTANCE);
+                initConfig.getProofEnv().registerRules(taclets,
+                        AxiomJustification.INSTANCE);
                 axioms = axioms.union(taclets);
             }
 
             return axioms;
-        }  
+        }
 
 
         private InitConfig createInitConfig(InitConfig reference) {
@@ -249,7 +258,7 @@ public abstract class TacletLoader {
             assert name.startsWith("Taclet: ") : 
                 "This depends (unfortunately) on the name of the proof";
             TacletProofObligationInput result = 
-                    new TacletProofObligationInput(name.substring(8), profile);
+                    new TacletProofObligationInput(name.substring(8), null);
             result.setLoadInfo(fileForTaclets, fileForDefinitions, filesForAxioms);
             return result;
         }
@@ -292,7 +301,7 @@ public abstract class TacletLoader {
             String name = proof.name().toString();
             assert name.startsWith("Taclet: ") : 
                 "This depends (unfortunately) on the name of the proof";
-            return new TacletProofObligationInput(name.substring(8), profile);
+            return new TacletProofObligationInput(name.substring(8), null);
         }
 
 
@@ -300,7 +309,5 @@ public abstract class TacletLoader {
         public ImmutableSet<Taclet> getTacletsAlreadyInUse() {
             return DefaultImmutableSet.nil();
         }
-
     }
-
 }

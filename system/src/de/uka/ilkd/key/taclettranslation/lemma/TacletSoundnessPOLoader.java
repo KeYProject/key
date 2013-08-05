@@ -323,8 +323,8 @@ public class TacletSoundnessPOLoader {
         }
         
         /**
-         * @return returns <code>true</code> if and only if the taclets should be proved sound and are not added
-         * to an already existing proof obligation. 
+         * @return returns <code>true</code> if and only if the taclets should be proved sound
+         * and are not added to an already existing proof obligation. 
          */
         private boolean isUsedOnlyForProvingTaclets(){
                 return originalConfig == null;
