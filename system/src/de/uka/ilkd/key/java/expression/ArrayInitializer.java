@@ -38,7 +38,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     protected final ImmutableArray<Expression> children;
-
+    protected final KeYJavaType kjt;
 
     /**
      *  Array initializer.
@@ -47,8 +47,10 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
      * 		several of Expression (as the initializing expression)
      * 		Comments
      */
-    public ArrayInitializer(ExtList list) {
+    public ArrayInitializer(ExtList list, KeYJavaType kjt) {
 	super(list);
+	assert kjt != null;
+	this.kjt = kjt;
 	this.children = 
 	    new ImmutableArray<Expression>(list.collect(Expression.class));
     }
@@ -58,8 +60,10 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
      * create a new array initializer with the given expressions as elements.
      * @param expressions a list of all contained elements
      */
-    public ArrayInitializer(Expression[] expressions) {
+    public ArrayInitializer(Expression[] expressions, KeYJavaType kjt) {
         super();
+        assert kjt != null;
+        this.kjt = kjt;
         this.children = new ImmutableArray<Expression>(expressions);
     }
     
@@ -117,20 +121,6 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
     
     @Override    
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	Expression i = this;
-	int n = 0;
-	for(; i instanceof ArrayInitializer && ((ArrayInitializer)i).getChildCount() != 0 ;
-	    i = ((ArrayInitializer)i).getExpressionAt(0)) {
-	    n++;
-	}
-	final KeYJavaType kjt = i.getKeYJavaType(javaServ, ec);
-        final JavaInfo javaInfo = javaServ.getJavaInfo();
-	return javaInfo.getKeYJavaType(
-		ArraySort.getArraySortForDim(kjt.getSort(),
-					     kjt.getJavaType(),
-					     n, 
-				             javaInfo.objectSort(), 
-                                             javaInfo.cloneableSort(),
-                                             javaInfo.serializableSort()));
+        return kjt;
     }
 }

@@ -15,7 +15,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
-    public final class Protocol extends ArrayList<RuleApp> {
+    public final static class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
 
@@ -434,7 +434,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    				       Protocol protocol) {
 	//collect context formulas (potential if-insts for replace-known)
 	final Map<Term,PosInOccurrence> context
-		= new HashMap<Term,PosInOccurrence>();
+		= new LinkedHashMap<Term,PosInOccurrence>();
 	for(SequentFormula ante : seq.antecedent()) {
 	    if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
 		context.put(

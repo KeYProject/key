@@ -14,6 +14,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -36,6 +39,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -104,11 +108,13 @@ public final class QueryAxiom extends ClassAxiom {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	
 	//create schema variables
-	final SchemaVariable heapSV 
-		= SchemaVariableFactory.createTermSV(new Name("h"), 
-						     heapLDT.targetSort(), 
-						     false, 
-						     false);
+	final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+	for(int i=0; i<target.getHeapCount(services); i++) {
+		heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h"+i), 
+			     heapLDT.targetSort(), 
+			     false, 
+			     false));
+	}
 	final SchemaVariable selfSV
 		= target.isStatic()
 		  ? null
@@ -154,8 +160,19 @@ public final class QueryAxiom extends ClassAxiom {
 	
 	//create update and postcondition linking schema variables and 
 	//program variables
-	Term update 
-		= TB.elementary(services, heapLDT.getHeap(), TB.var(heapSV));
+	Term update = null;
+	int hc = 0;
+	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+		if(hc >= target.getHeapCount(services)) {
+			break;
+		}
+		Term u = TB.elementary(services, heap, TB.var(heapSVs.get(hc++)));
+		if(update == null) {
+			update = u;
+		}else{
+			update = TB.parallel(update, u);
+		}
+	}
 	update = target.isStatic() 
 	         ? update 
                  : TB.parallel(update, 
@@ -206,13 +223,16 @@ public final class QueryAxiom extends ClassAxiom {
 	}
 
 	//create find
-	final Term[] subs = new Term[target.arity()];	
-	subs[0] = TB.var(heapSV);
+	final Term[] subs = new Term[target.arity()];
+	int offset = 0;
+	for(SchemaVariable heapSV : heapSVs) {
+		subs[offset++] = TB.var(heapSV);
+	}
 	if(!target.isStatic()) {
-	    subs[1] = TB.var(selfSV);
+	    subs[offset++] = TB.var(selfSV);
 	}
 	for(int i = 0; i < paramSVs.length; i++) {
-	    subs[i + (target.isStatic() ? 1 : 2)] = TB.var(paramSVs[i]);	    
+	    subs[offset++] = TB.var(paramSVs[i]);	    
 	}
 	final Term find = TB.func(target, subs);
 	
@@ -231,7 +251,9 @@ public final class QueryAxiom extends ClassAxiom {
 	//build taclet
 	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
 	tacletBuilder.setFind(find);
-	tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
+	for(SchemaVariable heapSV : heapSVs) {
+  	    tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
+	}
 	if(!target.isStatic()) {
 	    tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
 	    tacletBuilder.setIfSequent(ifSeq);

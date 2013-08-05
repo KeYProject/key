@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.proof.rulefilter;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -36,7 +37,7 @@ public class IHTacletFilter extends TacletFilter {
     private final ImmutableList<RuleSet> heuristics;
 
     
-    private final HashMap<Taclet, Boolean> filterCache = new HashMap<Taclet, Boolean>(2000);
+    private final HashMap<Taclet, Boolean> filterCache = new LinkedHashMap<Taclet, Boolean>(2000);
     
     
     

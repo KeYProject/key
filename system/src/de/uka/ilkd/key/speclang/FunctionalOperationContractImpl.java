@@ -65,6 +65,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final Map<LocationVariable,Term> originalPres;
     final Term originalMby;
     final Map<LocationVariable,Term> originalPosts;
+    final Map<LocationVariable,Term> originalAxioms;
     final Map<LocationVariable,Term> originalMods;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
@@ -80,7 +81,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * anonymised.
      * @see #hasModifiesClause()
      */
-    final boolean hasRealModifiesClause;
+    final Map<LocationVariable,Boolean> hasRealModifiesClause;
     
     
     //-------------------------------------------------------------------------
@@ -96,8 +97,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Map<LocationVariable,Term> pres,
                                     Term mby,
                                     Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> axioms,
                                     Map<LocationVariable,Term> mods,
-                                    boolean hasRealMod,
+                                    Map<LocationVariable,Boolean> hasRealMod,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
@@ -120,7 +122,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         } else {
             assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
         }
-        assert excVar != null;
+        assert pm.isModel() || excVar != null;
         assert atPreVars.size() != 0;
         this.baseName               = baseName;
         this.name = name != null 
@@ -133,6 +135,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.originalPres           = pres;
         this.originalMby            = mby;
         this.originalPosts          = posts;
+        this.originalAxioms			= axioms;
         this.originalMods           = mods;
         this.hasRealModifiesClause  = hasRealMod;
         this.originalSelfVar        = selfVar;
@@ -169,8 +172,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Map<LocationVariable,Term> pres,
                                     Term mby,
                                     Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> axioms,
                                     Map<LocationVariable,Term> mods,
-                                    boolean hasMod,
+                                    Map<LocationVariable,Boolean> hasMod,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ProgramVariable resultVar,
@@ -187,6 +191,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
              pres,
              mby,
              posts,
+             axioms,
              mods,
              hasMod,
              selfVar,
@@ -285,8 +290,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     
     
     protected Map<Term, Term> getReplaceMap(
-	    		      LocationVariable baseHeap,
-	    		      Term heapTerm,
+    		          Map<LocationVariable,Term> heapTerms,
 	    		      Term selfTerm, 
 	    		      ImmutableList<Term> paramTerms, 
 	    		      Term resultTerm, 
@@ -295,13 +299,16 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	    		      Services services) {
 	final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 	
-	//heap
-	assert heapTerm != null;
-	assert heapTerm.sort().equals(services.getTypeConverter()
-		                              .getHeapLDT()
-		                              .targetSort());
-	result.put(baseHeap != null ? TB.var(baseHeap) : TB.getBaseHeap(services), heapTerm);
+	//heaps
 	
+	for(LocationVariable heap : heapTerms.keySet()) {
+		 final Term heapTerm = heapTerms.get(heap);
+  	     assert heapTerm == null || heapTerm.sort().equals(services.getTypeConverter()
+                    .getHeapLDT()
+                    .targetSort());
+	     result.put(TB.var(heap), heapTerm);
+	}
+
         //self
 	if(selfTerm != null) {
             assert selfTerm.sort().extendsTrans(originalSelfVar.sort());
@@ -432,7 +439,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm, 
+        
+    final Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+    heapTerms.put(heap, heapTerm);
+
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerms, 
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
@@ -453,6 +464,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+          if(p == null) {
+            continue;
+          }
           if(result == null) {
             result = p;
           }else{
@@ -482,21 +496,22 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     
     
     @Override
-    public Term getMby(Term heapTerm,
+    public Term getMby(Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
+                   Map<LocationVariable, Term> atPres,
                        Services services) {
-	assert heapTerm != null;		
+	assert heapTerms != null;		
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(null, heapTerm, 
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerms, 
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
 					     null, 
-                                             null,
+                                             atPres,
 					     services);
 	final OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalMby);
@@ -537,9 +552,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
          sig.setLength(sig.length() - 2);
       }
       sig.append(")");
-      sig.append(" catch(");
-      sig.append(originalExcVar);
-      sig.append(")");
+      if(!pm.isModel()) {
+        sig.append(" catch(");
+        sig.append(originalExcVar);
+        sig.append(")");
+      }
 
       final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
 
@@ -553,7 +570,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                   + (h == baseHeap ? "" : "[" + h + "]")
                   + (includeHtmlMarkup ? "</b> " : ": ")
                   + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
-            if (h == baseHeap && !hasRealModifiesClause) {
+            if (!hasRealModifiesClause.get(h)) {
                mods = mods + 
                       (includeHtmlMarkup ? "<b>" : "") +
                		 ", creates no new objects" +
@@ -577,7 +594,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
       String posts = "";
       for (LocationVariable h : heapLDT.getAllHeaps()) {
-         if (originalPres.get(h) != null) {
+         if (originalPosts.get(h) != null) {
             String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services);
             posts = posts
                   + (includeHtmlMarkup ? "<br><b>" : "\n")
@@ -588,6 +605,19 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
          }
       }
 
+      String axioms = "";
+      for(LocationVariable h : heapLDT.getAllHeaps()) {
+         if(originalAxioms.get(h) != null) {
+           String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services);
+           posts = posts
+                   + (includeHtmlMarkup ? "<br><b>" : "\n")
+                   + "axiom"
+                   + (h == baseHeap ? "" : "[" + h + "]")
+                   + (includeHtmlMarkup ? "</b> " : ": ")
+                   + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false) : printAxioms.trim());
+         }
+      }
+      
       if (includeHtmlMarkup) {
          return "<html>"
                + "<i>"
@@ -595,6 +625,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                + "</i>"
                + pres
                + posts
+               + axioms
                + mods
                + (hasMby() ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
                + "<br><b>termination</b> "
@@ -607,6 +638,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
          return sig.toString()
                + pres
                + posts
+               + axioms
                + mods
                + (hasMby() ? "\nmeasured-by: "+ mby : "")
                + "\ntermination: "
@@ -725,7 +757,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
-        assert excVar != null;
+        assert pm.isModel() || excVar != null;
         assert atPreVars.size() != 0;
         assert services != null;
 	final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar, 
@@ -772,10 +804,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert (resultTerm == null) == (originalResultVar == null);
-        assert excTerm != null;
+        assert pm.isModel() || excTerm != null;
         assert atPres.size() != 0;
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm,
+    final Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+    heapTerms.put(heap, heapTerm);
+
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerms,
 		                             selfTerm, 
                                              paramTerms, 
                                              resultTerm, 
@@ -797,6 +832,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        Term result = null;
        for(LocationVariable heap : heapContext) {
           final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
+          if(p == null) {
+            continue;
+          }
           if(result == null) {
             result = p;
           }else{
@@ -806,6 +844,32 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        return result;
     }
 
+    @Override
+    public Term getRepresentsAxiom(LocationVariable heap,
+                                   ProgramVariable selfVar,
+                                   ImmutableList<ProgramVariable> paramVars,
+                                   ProgramVariable resultVar,
+                                   Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                                   Services services) {
+            assert (selfVar == null) == (originalSelfVar == null);
+            assert paramVars != null;
+            assert paramVars.size() == originalParamVars.size();
+            assert (resultVar == null) == (originalResultVar == null);
+            assert atPreVars.size() != 0;
+            assert services != null;
+            if(originalAxioms == null) {
+              return null;
+            }
+            final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
+                                                                                   paramVars,
+                                                                                   resultVar,
+                                                                                   null,
+                                                                                   atPreVars,
+                                                                                   services);
+            final OpReplacer or = new OpReplacer(replaceMap);
+            return or.replace(originalAxioms.get(heap));
+    }
+    
     public boolean isReadOnlyContract(Services services) {
         return originalMods.get(services.getTypeConverter().getHeapLDT().getHeap()).op() == 
                 services.getTypeConverter().getLocSetLDT().getEmpty();
@@ -844,7 +908,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm,
+        
+    final Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+    heapTerms.put(heap, heapTerm);
+        
+	final Map<Term, Term> replaceMap = getReplaceMap(heapTerms,
 		                             selfTerm, 
                                              paramTerms, 
                                              null, 
@@ -856,8 +924,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
     
     @Override
-    public boolean hasModifiesClause() {
-        return this.hasRealModifiesClause;
+    public boolean hasModifiesClause(LocationVariable heap) {
+        return this.hasRealModifiesClause.get(heap);
     }
   
     @Override    
@@ -880,6 +948,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 		+ originalMods
 		+ "; hasMod: "
 		+ hasRealModifiesClause
+		+ (originalAxioms.size() > 0 ?  ("; axioms: " + originalAxioms) : "")
 		+ "; termination: "
 		+ getModality()
                 + "; transaction: "
@@ -922,6 +991,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    originalPres,
                                                    originalMby,
                                                    originalPosts,
+                                                   originalAxioms,
                                                    originalMods,
                                                    hasRealModifiesClause,
                                                    originalSelfVar,
@@ -948,6 +1018,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    originalPres,
                                                    originalMby,
                                                    originalPosts,
+                                                   originalAxioms,
                                                    originalMods,
                                                    hasRealModifiesClause,
                                                    originalSelfVar,
@@ -967,3 +1038,4 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 }
+

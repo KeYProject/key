@@ -18,6 +18,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -294,7 +295,7 @@ public class PrettyPrinter {
     private boolean isPrintingSingleLineComments = false;
 
 
-    protected HashMap<SourceElement, Position> indentMap=new HashMap<SourceElement, Position>();
+    protected HashMap<SourceElement, Position> indentMap=new LinkedHashMap<SourceElement, Position>();
 
     /**
        Set a new stream to write to. Useful to redirect the output

@@ -21,7 +21,7 @@ header {
   import java.io.*;
   import java.util.*;
   import java.math.BigInteger;
-
+  import java.util.LinkedHashMap;
   import de.uka.ilkd.key.collection.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
@@ -76,7 +76,7 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
-    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
+    static HashMap<String, Character> prooflabel2tag = new LinkedHashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -99,10 +99,10 @@ options {
    }
 
     private NamespaceSet nss;
-    private HashMap<String, String> category2Default = new HashMap<String, String>();
+    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
     private boolean onlyWith=false;
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private HashSet usedChoiceCategories = new HashSet();
+    private HashSet usedChoiceCategories = new LinkedHashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
     private KeYExceptionHandler keh = null;
@@ -149,6 +149,8 @@ options {
     private ParserConfig parserConfig;
 
     private Term quantifiedArrayGuard = null;
+    
+    private String profileName;
     
     private TokenStreamSelector selector;
 
@@ -213,7 +215,7 @@ options {
              new SchemaRecoder2KeY(services, nss),
 	     services, 
 	     nss, 
-	     new HashMap());
+	     new LinkedHashMap());
     }
 
 
@@ -224,27 +226,18 @@ options {
      * declared globally in the variable namespace.  This parser is used
      * for test cases, where you want to know in advance which objects
      * will represent bound variables.
-     */  
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
-		     JavaReader jr,
-		     NamespaceSet nss) {
-        this(lexer, null, new Services(), nss, mode);
-        this.scm = new AbbrevMap();
-        this.javaReader = jr;
-    }
-
+     */
     public KeYParser(ParserMode mode, 
                      TokenStream lexer,
 		     Services services,
 		     NamespaceSet nss) {
-	this(mode, lexer, 
-	     new Recoder2KeY(services,
-		new KeYCrossReferenceServiceConfiguration(
-		   services.getExceptionHandler()), 
-		services.getJavaInfo().rec2key(), new NamespaceSet(), 
-		services.getTypeConverter()),
-   	     nss);
+        this(lexer, null, services, nss, mode);
+        this.scm = new AbbrevMap();
+        this.javaReader = new Recoder2KeY(services,
+                new KeYCrossReferenceServiceConfiguration(
+                   services.getExceptionHandler()), 
+                services.getJavaInfo().rec2key(), new NamespaceSet(), 
+                services.getTypeConverter());
     }
 
     /**
@@ -339,6 +332,10 @@ options {
     
     public String getProofObligation() {
       return proofObligation;
+    }
+    
+    public String getProfileName() {
+      return profileName;
     }
     
     public String getFilename() {
@@ -924,7 +921,7 @@ options {
         }else 
   	  if(!isDeclParser()) {
             if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
-              return new HashSet();
+              return new LinkedHashSet();
             }   
             DeclarationProgramVariableCollector pvc
                = new DeclarationProgramVariableCollector(jb.program(), getServices());
@@ -2891,7 +2888,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 
 
 
-accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
+accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] {Term t = null;}:
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
@@ -3415,6 +3412,31 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
+triggers[TacletBuilder b]
+{
+   String id = null;
+   Term t = null;
+   Named triggerVar = null;
+   Term avoidCond = null;
+   ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
+} :
+   TRIGGER
+     LBRACE id = simple_ident 
+     	{  
+     	  triggerVar = variables().lookup(new Name(id));
+     	  if (triggerVar == null || !(triggerVar instanceof SchemaVariable)) {
+     	  	throw 
+     	  	  new KeYSemanticException("Undeclared schemavariable: " + id, 
+     	  	  getFilename(), getLine(), getColumn());
+     	  }  
+     	}   RBRACE     
+     t=term (AVOID avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);} 
+      (COMMA avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);})*)? SEMI
+   {
+     b.setTrigger(new Trigger((SchemaVariable)triggerVar, t, avoidConditions));
+   }
+;
+
 taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 { 
     Sequent ifSeq = Sequent.EMPTY_SEQUENT;
@@ -3473,6 +3495,7 @@ modifiers[TacletBuilder b]
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal
             {b.setHelpText(htext);}
+        | triggers[b]            
         ) *
     ;
 
@@ -3568,6 +3591,7 @@ varexp[TacletBuilder b]
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
+        | varcond_thisreference[b, negated]        
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
@@ -3861,6 +3885,20 @@ varcond_reference [TacletBuilder b, boolean isPrimitive]
         tr = type_resolver                           
    RPAREN 
    { b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull)); }
+;
+
+varcond_thisreference [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+  String id = null;
+  boolean nonNull = false;
+}
+:
+   ISTHISREFERENCE
+   LPAREN      
+     x = varId                           
+   RPAREN 
+   { b.addVariableCondition(new IsThisReference(x, negated)); }
 ;
 
         
@@ -4284,7 +4322,7 @@ problem returns [ Term a = null ]
     String pref = null;
 }
     :
-
+        profile     
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
@@ -4404,6 +4442,11 @@ oneJavaSource returns [String s = null]
   )+ {
     s = b.toString();
   }
+;
+
+
+profile:
+        (PROFILE profileName=string_literal SEMI)? 
 ;
 
 preferences returns [String s = null]:

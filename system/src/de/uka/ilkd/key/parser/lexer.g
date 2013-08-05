@@ -19,6 +19,7 @@ header {
     import java.io.InputStream;
     import de.uka.ilkd.key.util.*;
     import java.util.HashMap;
+    import java.util.LinkedHashMap;
     import antlr.TokenStreamSelector;
     import java.util.NoSuchElementException;
     import java.io.*;
@@ -82,6 +83,7 @@ tokens {
 	ISOBSERVER = "\\isObserver";
 	DIFFERENT = "\\different";		
 	METADISJOINT = "\\metaDisjoint";
+	ISTHISREFERENCE="\\isThisReference";	        
 	ISREFERENCE="\\isReference";	        
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISSUBTYPE = "\\sub";	
@@ -117,6 +119,7 @@ tokens {
         WITHOPTIONS="\\withOptions";
         OPTIONSDECL="\\optionsDecl";
 	KEYSETTINGS = "\\settings";
+        PROFILE = "\\profile";
 
         // Those guys can stay being keywords
 	TRUE = "true";
@@ -139,6 +142,8 @@ tokens {
 	FIND = "\\find";
 	ADD = "\\add";
 	ASSUMES = "\\assumes";
+	TRIGGER = "\\trigger";
+	AVOID = "\\avoid";
 
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";
@@ -216,8 +221,8 @@ tokens {
    private String modalityBegin = null;
    private String modalityEnd = null;
 
-   private static HashMap<String,String> modNames = new HashMap<String,String>(20);
-   private static HashMap<String,String> modPairs = new HashMap<String,String>(20);
+   private static HashMap<String,String> modNames = new LinkedHashMap<String,String>(20);
+   private static HashMap<String,String> modPairs = new LinkedHashMap<String,String>(20);
    
    static {
       modNames.put("\\<","diamond");

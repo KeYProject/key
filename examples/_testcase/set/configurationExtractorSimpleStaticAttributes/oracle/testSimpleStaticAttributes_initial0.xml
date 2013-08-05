@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <state name="One Step Simplification resulting in return instance.x+finalInstance.x+staticInt+finalStaticint;">
+   <state name="One Step Simplification resulting in return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;">
       <association name="newInstance" programVariable="newInstance" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="newInstance" type="SimpleStaticAttributes">

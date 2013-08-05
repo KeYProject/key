@@ -1,6 +1,6 @@
 
 public class UseOperationContractTest {
-	/*@
+	/*@ normal_behavior
 	  @ ensures \result == 84;
 	  @*/
 	public int main() {
@@ -8,7 +8,7 @@ public class UseOperationContractTest {
 		return magic * 2;
 	}
 	
-	/*@
+	/*@ normal_behavior
 	  @ ensures \result == 42;
 	  @*/
 	public int magic42() {

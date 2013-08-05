@@ -99,6 +99,6 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
-                              new ExpectedProofReferences(IProofReference.USE_INVARIANT, "java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c))"));
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
    }
 }

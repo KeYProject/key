@@ -22,7 +22,12 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
@@ -57,7 +62,7 @@ public class HelperClassForTests {
        
         try {	    
             KeYUserProblemFile po 
-            	= new KeYUserProblemFile("UpdatetermTest", file, null); 
+            	= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
             pi = new ProblemInitializer(profile);
            
             pi.startProver(po, po);
@@ -78,7 +83,7 @@ public class HelperClassForTests {
     
     public ProofAggregate parseThrowException(File file, Profile profile) throws ProofInputException{
 	KeYUserProblemFile po 
-		= new KeYUserProblemFile("UpdatetermTest", file, null); 
+		= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
         ProblemInitializer pi = new ProblemInitializer(profile);
         pi.startProver(po, po);
         return po.getPO();        

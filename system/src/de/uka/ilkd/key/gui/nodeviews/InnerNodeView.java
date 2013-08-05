@@ -21,11 +21,6 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -63,7 +58,6 @@ import javax.swing.text.DefaultHighlighter;
 public class InnerNodeView extends SequentView {
     
     private InitialPositionTable posTable;
-    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
     public final JTextArea tacletInfo;
     
     public InnerNodeView(Node node, KeYMediator mediator) {
@@ -83,7 +77,6 @@ public class InnerNodeView extends SequentView {
                 new EmptyBorder(new Insets(4,0,0,0))));
         
         posTable = printer.getInitialPositionTable();
-        Config.DEFAULT.addConfigChangeListener(configChangeListener);
         updateUI();
 
         RuleApp app = node.getAppliedRuleApp();
@@ -237,39 +230,7 @@ public class InnerNodeView extends SequentView {
         }
         return s;
     }
-
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        Config.DEFAULT.addConfigChangeListener(configChangeListener);
-    }
-
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-        unregisterListener();
-    }
-
-    public void unregisterListener() {
-        if (configChangeListener != null) {
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        }
-    }
-
-    @Override
-    protected void finalize() {
-        try {
-            unregisterListener();
-        } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-        } finally {
-            try {
-                super.finalize();
-            } catch (Throwable e) {
-                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-            }
-        }
-    }
+    
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
             new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER =

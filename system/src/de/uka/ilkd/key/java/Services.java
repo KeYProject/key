@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -77,7 +79,7 @@ public class Services{
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters = new HashMap<String, Counter>();
+    private HashMap<String, Counter> counters = new LinkedHashMap<String, Counter>();
 
     /**
      * specification repository
@@ -88,12 +90,15 @@ public class Services{
 
     private NameRecorder nameRecorder;
     
+    private final Profile profile;
     
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
-    public Services(KeYExceptionHandler exceptionHandler){
+    public Services(Profile profile, KeYExceptionHandler exceptionHandler){
+       assert profile != null;
+       this.profile = profile;
 	cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
 	if(exceptionHandler == null){
@@ -106,15 +111,16 @@ public class Services{
         nameRecorder = new NameRecorder();
     }
     
-    
     // ONLY for tests
-    public Services() { 
-	this((KeYExceptionHandler) null);
+    public Services(Profile profile) {
+	this(profile, (KeYExceptionHandler) null);
     }    
     
 
-    private Services(KeYCrossReferenceServiceConfiguration crsc, 
+    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, 
 		     KeYRecoderMapping rec2key) {
+   assert profile != null;
+   this.profile = profile;
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
 	//	exceptionHandler = new KeYRecoderExcHandler();
@@ -191,19 +197,27 @@ public class Services{
         return innerVarNamer;
     }
     
-
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)
      * @return the copy
      */
     public Services copy() {
+       return copy(getProfile());
+    }
+
+    /**
+     * Creates a copy of this {@link Services} in which the {@link Profile} is replaced.
+     * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
+     * @return The created copy.
+     */
+    public Services copy(Profile profile) {
 	Debug.assertTrue
 	    (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
 	       instanceof SchemaCrossReferenceServiceConfiguration),
 	     "services: tried to copy schema cross reference service config.");
 	Services s = new Services
-	    (getJavaInfo().getKeYProgModelInfo().getServConf(),
+	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
 	     getJavaInfo().getKeYProgModelInfo().rec2key().copy());
         s.specRepos = specRepos;
 	s.setTypeConverter(getTypeConverter().copy(s));
@@ -223,7 +237,7 @@ public class Services{
 	    (!(javainfo.getKeYProgModelInfo().getServConf() 
 	       instanceof SchemaCrossReferenceServiceConfiguration),
 	     "services: tried to copy schema cross reference service config.");
-	Services s = new Services(getExceptionHandler());
+	Services s = new Services(getProfile(), getExceptionHandler());
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
@@ -232,7 +246,7 @@ public class Services{
     
     
     public Services copyProofSpecific(Proof p_proof) {
-        final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
+        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
                 getJavaInfo().getKeYProgModelInfo().rec2key());
         s.proof = p_proof;
         s.specRepos = specRepos;
@@ -281,4 +295,7 @@ public class Services{
 	return proof;
     }
 
+    public Profile getProfile() {
+        return profile;
+    }
 }

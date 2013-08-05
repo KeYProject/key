@@ -121,6 +121,21 @@ public final class StrategyProperties extends Properties {
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY = "SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY";
 
+    /**
+     * Key used in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution branch in a {@link SymbolicExecutionStrategy}.
+     */
+    public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY";
+    
+    /**
+     * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to disable branch avoiding caused by modalities not part of main execution in a {@link SymbolicExecutionStrategy}.
+     */
+    public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF";
+    
+    /**
+     * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution by using site proofs in a {@link SymbolicExecutionStrategy}.
+     */
+    public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
+
     //String identities.
     private static final String[] stringPool = {
     	STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
@@ -138,7 +153,8 @@ public final class StrategyProperties extends Properties {
     	AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF, AUTO_INDUCTION_RESTRICTED, AUTO_INDUCTION_ON,  AUTO_INDUCTION_LEMMA_ON,
     	USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH, 
     	USER_TACLETS_OPTIONS_KEY(1), USER_TACLETS_OPTIONS_KEY(2), USER_TACLETS_OPTIONS_KEY(3),
-    	SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER};
+    	SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
+    	SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF};
     
    
     private static final Properties defaultMap = new Properties();
@@ -160,6 +176,7 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
         defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg        
         defaultMap.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+        defaultMap.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
     
     public StrategyProperties() {
@@ -209,6 +226,7 @@ public final class StrategyProperties extends Properties {
         sp.put(VBT_PHASE, readSingleOption(p,VBT_PHASE));
         sp.put(AUTO_INDUCTION_OPTIONS_KEY, readSingleOption(p,AUTO_INDUCTION_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, readSingleOption(p,SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
+        sp.put(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, readSingleOption(p,SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
         return sp;
     }
 
@@ -240,6 +258,10 @@ public final class StrategyProperties extends Properties {
         Object aliasCheckValue =  get(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY);
         if (aliasCheckValue != null) {
            p.put("[StrategyProperty]"+SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasCheckValue);
+        }
+        Object avoidBranchingValue =  get(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY);
+        if (avoidBranchingValue != null) {
+           p.put("[StrategyProperty]"+SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, avoidBranchingValue);
         }
     }
 

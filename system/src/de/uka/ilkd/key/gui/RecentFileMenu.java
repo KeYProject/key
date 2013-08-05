@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 
 import javax.swing.JMenu;
@@ -76,7 +77,7 @@ public class RecentFileMenu {
         this.lissy = listener;
         this.maxNumberOfEntries = maxNumberOfEntries;
 
-	this.recentFiles = new HashMap<JMenuItem, RecentFileEntry>();
+	this.recentFiles = new LinkedHashMap<JMenuItem, RecentFileEntry>();
 
         if (p != null) load(p);
 

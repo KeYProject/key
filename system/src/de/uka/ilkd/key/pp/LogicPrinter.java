@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -72,6 +74,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
@@ -319,7 +322,7 @@ public final class LogicPrinter {
     
     private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
 	
-	Set<SchemaVariable> result = new HashSet<SchemaVariable>();
+	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 	OpCollector oc = new OpCollector();
 	
 	//find, assumes
@@ -1160,23 +1163,33 @@ public final class LogicPrinter {
 	    final ObserverFunction obs = (ObserverFunction) t.op();
             startTerm(t.arity());
 
-            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
-            if (printHeap) {
-                markStartSub();
-                printTerm(t.sub(0));
-                markEndSub();
+            int numHeaps = obs.getHeapCount(services);
+            final int stateCount = obs.getStateCount();
+            final boolean printHeaps = 
+            		(stateCount == 1 && t.sub(0).op() != heapLDT.getHeap()) 
+                 || numHeaps > 1 || stateCount > 1;
+            final int totalHeaps = stateCount * numHeaps;
+            if (printHeaps) {
+            	if(totalHeaps > 1) layouter.print("{");
+                for(int i=0;i<totalHeaps;i++) {
+                  markStartSub();
+                  if(i>0) layouter.print(",");
+                  printTerm(t.sub(i));
+                  markEndSub();
+                }
+            	if(totalHeaps > 1) layouter.print("}");
                 layouter.print("[");
             } else {
                 markStartSub();
-            //heap not printed
-            markEndSub();
+                //heaps not printed
+                markEndSub();
             }
             
-            if(!obs.isStatic()) {
-        	markStartSub();
-        	printTerm(t.sub(1));
-        	markEndSub();
-        	layouter.print(".");
+            if(!obs.isStatic() ) {
+        	  markStartSub();
+        	  printTerm(t.sub(totalHeaps));
+        	  markEndSub();
+        	  layouter.print(".");
             }
             
             final String prettyFieldName 
@@ -1197,7 +1210,7 @@ public final class LogicPrinter {
         	}
         	layouter.print(")").end();
             }
-            if (printHeap) {
+            if (printHeaps) {
                 layouter.print("]");
             }
         } else {

@@ -52,7 +52,13 @@ public class SVInstantiationCP implements Feature {
                                  BackTrackingManager manager) {
         return new SVInstantiationCP ( svToInstantiate, value, manager );
     }
-        
+
+    public static Feature createTriggeredVarCP(ProjectionToTerm value,
+                                               BackTrackingManager manager) {
+        return new SVInstantiationCP ( null, value, manager );
+    }
+
+    
     private SVInstantiationCP(Name svToInstantiate,
                               ProjectionToTerm value,
                               BackTrackingManager manager) {
@@ -67,6 +73,11 @@ public class SVInstantiationCP implements Feature {
     }
 
     private SchemaVariable findSVWithName(TacletApp app) {
+        
+        if (svToInstantiate == null) {
+            return app.taclet().getTrigger().getTriggerVar();
+        }
+        
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars ();
         for (SchemaVariable var : vars) {
             final SchemaVariable svt = var;

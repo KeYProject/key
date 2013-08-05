@@ -15,22 +15,25 @@
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.TacletForTests;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.TacletForTests;
 
 
 public class TestTacletIndex extends TestCase{   
@@ -142,7 +145,7 @@ public class TestTacletIndex extends TestCase{
 
 
     public void testShownIfHeuristicFits() {
-        Services services = new Services();
+        Services services = new Services(AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 	listofHeuristic=listofHeuristic.prepend(h3).prepend(h2);
 
@@ -177,7 +180,7 @@ public class TestTacletIndex extends TestCase{
     }
 
     public void testNoMatchingFindRule() {
-        Services services = new Services();
+        Services services = new Services(AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 
 	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
@@ -204,7 +207,7 @@ public class TestTacletIndex extends TestCase{
     }
 
     public void testMatchConflictOccurs() {
-        Services services = new Services();
+        Services services = new Services(AbstractProfile.getDefaultProfile());
         TacletIndex ruleIdx=new TacletIndex();
 	ruleIdx.add(ruleRewriteNonH1H2);
 	ruleIdx.add(ruleNoFindNonH1H2H3);
@@ -263,7 +266,7 @@ public class TestTacletIndex extends TestCase{
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
         final Node node_p5 =
-            new Node (new Proof (new Services()), seq_p5);
+            new Node (new Proof (new Services(AbstractProfile.getDefaultProfile())), seq_p5);
         final BuiltInRuleAppIndex builtinIdx =
             new BuiltInRuleAppIndex (new BuiltInRuleIndex ());
         final Goal goal_p5 =

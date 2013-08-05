@@ -51,7 +51,7 @@ public class HeapContext {
     }
     return result;
   }
-
+  
   public static Map<LocationVariable,Term> getAtPres(Map<LocationVariable,LocationVariable> atPreVars, Services services) {
     final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {

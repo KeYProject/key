@@ -14,7 +14,13 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -30,6 +36,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
 
@@ -63,7 +70,7 @@ public class EqualityConstraint implements Constraint {
     
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
-	this ( new HashMap<Metavariable, Term> () );
+	this ( new LinkedHashMap<Metavariable, Term> () );
     }
 
     private EqualityConstraint( HashMap<Metavariable, Term> map ) {
@@ -155,7 +162,7 @@ public class EqualityConstraint implements Constraint {
     public synchronized Term getInstantiation (Metavariable p_mv) {
         Term t = null;
         if ( instantiationCache == null )
-            instantiationCache = new HashMap<Metavariable, Term> ();
+            instantiationCache = new LinkedHashMap<Metavariable, Term> ();
         else
             t = instantiationCache.get ( p_mv );
 
@@ -186,7 +193,9 @@ public class EqualityConstraint implements Constraint {
      */
     private Term instantiate ( Term p ) {
 	SyntacticalReplaceVisitor srVisitor =
-	    new SyntacticalReplaceVisitor(this, null);
+	    new SyntacticalReplaceVisitor(new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
+	                                  this, 
+	                                  null);
 	p.execPostOrder ( srVisitor );
 	return srVisitor.getTerm ();
     }
@@ -748,6 +757,7 @@ public class EqualityConstraint implements Constraint {
      * value according to the new constraint (the possible values of
      * other variables are not modified)
      */
+    @Override
     public Constraint removeVariables ( ImmutableSet<Metavariable> mvs ) {
 	if ( !mvs.isEmpty() && !isBottom () ) {
 	    EqualityConstraint removeConstraint = new EqualityConstraint ();
@@ -929,9 +939,9 @@ public class EqualityConstraint implements Constraint {
     private static final Object joinCacheMonitor = new Object();
     
     private static HashMap<ECPair, Constraint> joinCache = 
-        new HashMap<ECPair, Constraint> ();
+        new LinkedHashMap<ECPair, Constraint> ();
     private static HashMap<ECPair, Constraint> joinCacheOld = 
-        new HashMap<ECPair, Constraint> ();
+        new LinkedHashMap<ECPair, Constraint> ();
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );
 

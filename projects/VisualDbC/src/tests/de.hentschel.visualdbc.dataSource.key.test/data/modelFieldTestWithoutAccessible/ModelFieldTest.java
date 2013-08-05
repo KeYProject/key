@@ -4,7 +4,7 @@ public class ModelFieldTest {
 	
 	private int x = 4;
 	
-	/*@
+	/*@ normal_behavior
 	  @ ensures \result == f;
 	  @*/
 	public int doubleX() {

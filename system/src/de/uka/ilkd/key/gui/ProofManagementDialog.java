@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,6 +55,7 @@ import javax.swing.event.TreeSelectionListener;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -115,7 +117,7 @@ public final class ProofManagementDialog extends JDialog {
 	this.mediator = mediator;
 	
 	//create class tree
-	targetIcons = new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
+	targetIcons = new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
 	classTree = new ClassTree(true, true, services, targetIcons);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
@@ -425,7 +427,7 @@ public final class ProofManagementDialog extends JDialog {
     
     
     private ProofOblInput createPOForSelectedContract() {
-	final Contract contract = getActiveContractPanel().getContract();
+	final Contract contract = getActiveContractPanel().getContract();	
 	return contract == null
 	       ? null
 	       : contract.createProofObl(initConfig, contract);
@@ -457,7 +459,7 @@ public final class ProofManagementDialog extends JDialog {
         if(proof == null) {
         	UserInterface ui = mediator.getUI();
             ProblemInitializer pi = 
-            		new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
+            		new ProblemInitializer(ui, services, true, ui);
             try {
                 pi.startProver(initConfig, po, 0);
             } catch(ProofInputException exc) {
@@ -500,12 +502,18 @@ public final class ProofManagementDialog extends JDialog {
     }
         
     
+    private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
+        return p_class.getSort().isAbstract() && !obs.isStatic();
+    }
+    
     private void updateContractPanel() {
 	if(getActiveContractPanel() == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
-	    if(entry != null && entry.target != null) {
+	    if(entry != null && entry.target != null && 
+	            !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
 		final ImmutableSet<Contract> contracts 
 			= specRepos.getContracts(entry.kjt, entry.target);
+				
 		getActiveContractPanel().setContracts(contracts, "Contracts");
 	    } else {
 		getActiveContractPanel().setContracts(
@@ -536,35 +544,39 @@ public final class ProofManagementDialog extends JDialog {
 	    ImmutableSet<IObserverFunction> targets 
 	    	= specRepos.getContractTargets(kjt);
 	    for(IObserverFunction target : targets) {
-		ImmutableSet<Contract> contracts 
-			= specRepos.getContracts(kjt, target);
-		boolean startedProving = false;
-		boolean allClosed = true;		
-		boolean lemmasLeft = false;
-		for(Contract contract : contracts) {
-		    final ProofOblInput po
-		    	= contract.createProofObl(initConfig, contract);
-		    Proof proof = findPreferablyClosedProof(po);
-		    if(proof == null) {
-			allClosed = false;
-		    } else {
-			startedProving = true;
-			ProofStatus status = proof.mgt().getStatus();
-			if(status.getProofOpen()) {
-			    allClosed = false;
-			} else if(status.getProofClosedButLemmasLeft()) {
-			    lemmasLeft = true;
-			}		    
-		    }
-		}
-		targetIcons.put(new Pair<KeYJavaType,IObserverFunction>(kjt, target), 
-			        startedProving
-			        ? (allClosed
-			           ? (lemmasLeft 
-			              ? keyAlmostClosedIcon 
-			              : keyClosedIcon)
-			           : keyIcon)
-			        : null);
+	        if (!isInstanceMethodOfAbstractClass(kjt, target)) {                
+	            ImmutableSet<Contract> contracts 
+	            = specRepos.getContracts(kjt, target);
+	            boolean startedProving = false;
+	            boolean allClosed = true;		
+	            boolean lemmasLeft = false;
+	            for(Contract contract : contracts) {
+
+
+	                final ProofOblInput po
+	                = contract.createProofObl(initConfig, contract);
+	                Proof proof = findPreferablyClosedProof(po);
+	                if(proof == null) {
+	                    allClosed = false;
+	                } else {
+	                    startedProving = true;
+	                    ProofStatus status = proof.mgt().getStatus();
+	                    if(status.getProofOpen()) {
+	                        allClosed = false;
+	                    } else if(status.getProofClosedButLemmasLeft()) {
+	                        lemmasLeft = true;
+	                    }		    
+	                }
+	            }
+	            targetIcons.put(new Pair<KeYJavaType,IObserverFunction>(kjt, target), 
+	                    startedProving
+	                    ? (allClosed
+	                            ? (lemmasLeft 
+	                                    ? keyAlmostClosedIcon 
+	                                            : keyClosedIcon)
+	                                            : keyIcon)
+	                                            : null);
+	        }
 	    }
 	}
 	classTree.updateUI();

@@ -82,7 +82,6 @@ public final class ProblemInitializer {
     }    
     private static InitConfig baseConfig;
  
-    private final Profile profile;
     private final Services services;
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
@@ -93,9 +92,8 @@ public final class ProblemInitializer {
     //------------------------------------------------------------------------- 
     
     public ProblemInitializer(ProgressMonitor mon,
-	                      Profile profile, Services services, boolean registerProof,
+	                      Services services, boolean registerProof,
 	                      ProblemInitializerListener listener) {
-	this.profile = profile;
 	this.services = services;
 	this.progMon = mon;
 	this.listener = listener;
@@ -104,12 +102,11 @@ public final class ProblemInitializer {
   
     
     public ProblemInitializer(Profile profile) {
-	assert profile != null;
+        assert profile != null;
         this.progMon    = null;
         this.listener   = null;
-        this.profile    = profile;
         this.registerProof = false;
-        this.services   = new Services();
+        this.services   = new Services(profile);
     }
     
         
@@ -160,7 +157,7 @@ public final class ProblemInitializer {
 	
 	int i = 0;
         for (String name : in.getLDTIncludes()) {
-	    keyFile[i++] = new KeYFile(name, in.get(name), progMon);
+	    keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
 	}
 
         LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
@@ -170,7 +167,7 @@ public final class ProblemInitializer {
 		    listener.reportStatus(ProblemInitializer.this, status, progress);
 		}		
 	    }
-	});
+	}, initConfig.getProfile());
 	
 	//read the LDTInput
 	readEnvInput(ldtInp, initConfig);
@@ -192,7 +189,7 @@ public final class ProblemInitializer {
         
 	//read normal includes
 	for (String fileName : in.getIncludes()) {
-	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon);
+	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile());
 	    readEnvInput(keyFile, initConfig);
 	}
     }
@@ -243,7 +240,7 @@ public final class ProblemInitializer {
 	    throw new ProofInputException("You do not want to have "+
 	    "your home directory as the program model.");
 	} else { 
-	    String modelTag = "KeY_" + new Long((new java.util.Date()).getTime());
+	    String modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
 	    result = new JavaModel(javaPath, 
 		    		   modelTag,
 		    		   classPath,
@@ -273,7 +270,7 @@ public final class ProblemInitializer {
 	
 	//create Recoder2KeY, set classpath
 	final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
-                                                initConfig.namespaces());
+                                           initConfig.namespaces());
 	r2k.setClassPath(bootClassPath, classPath);
 
     	//read Java (at least the library classes)		
@@ -467,14 +464,16 @@ public final class ProblemInitializer {
 	alreadyParsed.clear();
 
         //the first time, read in standard rules
+	Profile profile = envInput.getProfile();
 	if(baseConfig == null || profile != baseConfig.getProfile()) {            
-		InitConfig newBaseConfig = new InitConfig(services, profile);
+		InitConfig newBaseConfig = new InitConfig(services);
 			RuleSource tacletBase = profile.getStandardRules().getTacletBase();
 			if(tacletBase != null) {
 				KeYFile tacletBaseFile
 				= new KeYFile("taclet base", 
 						profile.getStandardRules().getTacletBase(),
-						progMon);
+						progMon,
+						profile);
 				readEnvInput(tacletBaseFile, newBaseConfig);			
 			}
 			baseConfig = newBaseConfig;
@@ -488,6 +487,7 @@ public final class ProblemInitializer {
          InitConfig initConfig = referenceConfig.copy();
         
 	//register built in rules
+        Profile profile = envInput.getProfile();
         for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
             initConfig.getProofEnv().registerRule(r, 
                     profile.getJustification(r));

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -130,9 +131,9 @@ public abstract class TacletLoader {
     }
 
 
-    public void setProofEnvForTaclets(ProofEnvironment proofEnv) {
-        this.envForTaclets = proofEnv;
-    }
+//    public void setProofEnvForTaclets(ProofEnvironment proofEnv) {
+//        this.envForTaclets = proofEnv;
+//    }
 
 
     /* 
@@ -153,16 +154,13 @@ public abstract class TacletLoader {
         private final Collection<File> filesForAxioms;
         private final ProblemInitializer problemInitializer;
 
-        public void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets) {}
-
         public TacletFromFileLoader(ProgressMonitor pm,
                 ProblemInitializerListener listener,
                 ProblemInitializer problemInitializer,
-                Profile profile,
                 File fileForDefinitions, File fileForTaclets,
                 Collection<File> filesForAxioms,
                 ProofEnvironment env) {
-            super(pm,listener,profile);
+            super(pm,listener, env.getInitConfig().getProfile());
             this.fileForDefinitions = fileForDefinitions;
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -170,27 +168,34 @@ public abstract class TacletLoader {
             this.envForTaclets = env;
         }
 
-        public TacletFromFileLoader(TacletFromFileLoader loader,InitConfig initConfig){
-            this(loader.monitor,loader.listener,loader.problemInitializer,loader.profile,
-                    loader.fileForDefinitions,loader.fileForTaclets,loader.filesForAxioms,loader.envForTaclets,initConfig);
-        }
-
         public TacletFromFileLoader(ProgressMonitor pm,
                 ProblemInitializerListener listener,
                 ProblemInitializer problemInitializer,
                 Profile profile,
                 File fileForDefinitions, File fileForTaclets,
-                Collection<File> filesForAxioms,
-                ProofEnvironment env, InitConfig config) {
-            this(pm,listener,problemInitializer,profile,fileForDefinitions,fileForTaclets,filesForAxioms,env);
-            this.initConfig = config;
+                Collection<File> filesForAxioms) {
+            super(pm,listener,profile);
+            this.fileForDefinitions = fileForDefinitions;
+            this.fileForTaclets = fileForTaclets;
+            this.filesForAxioms = filesForAxioms;
+            this.problemInitializer = problemInitializer;
         }
 
+        public TacletFromFileLoader(TacletFromFileLoader loader, InitConfig initConfig) {
+            super(loader.monitor,loader.listener, loader.profile);
+            assert initConfig == null || loader.profile == initConfig.getProfile();
+            this.problemInitializer = loader.problemInitializer;
+            this.fileForDefinitions = loader.fileForDefinitions;
+            this.fileForTaclets = loader.fileForTaclets;
+            this.filesForAxioms = loader.filesForAxioms;
+            this.envForTaclets = loader.envForTaclets;
+            this.initConfig = initConfig;
+        }
 
         private void prepare() {
             KeYUserProblemFile keyFileDefs = new KeYUserProblemFile(
                     "Definitions", fileForDefinitions,
-                    monitor);
+                    monitor, initConfig.getProfile());
             try {
                 initConfig = problemInitializer.prepare(keyFileDefs);
             } catch (ProofInputException e) {
@@ -204,7 +209,7 @@ public abstract class TacletLoader {
                 prepare();
             }
             tacletFile = new KeYUserProblemFile(
-                    fileForTaclets.getName(), fileForTaclets, monitor);
+                    fileForTaclets.getName(), fileForTaclets, monitor, initConfig.getProfile());
             return load(tacletFile, initConfig);
 
         }
@@ -216,7 +221,7 @@ public abstract class TacletLoader {
             }
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
             for (File f : filesForAxioms) {
-                KeYUserProblemFile keyFile = new KeYUserProblemFile(f.getName(), f, monitor);
+                KeYUserProblemFile keyFile = new KeYUserProblemFile(f.getName(), f, monitor, initConfig.getProfile());
                 ImmutableSet<Taclet> taclets = load(keyFile, initConfig);
                 getProofEnvForTaclets().registerRules(taclets,
                         AxiomJustification.INSTANCE);
@@ -232,7 +237,7 @@ public abstract class TacletLoader {
         private InitConfig createInitConfig(InitConfig reference) {
             InitConfig newConfig = reference.deepCopy();
             newConfig.setTaclets(DefaultImmutableSet.<Taclet> nil());
-            newConfig.setTaclet2Builder(new HashMap<Taclet, TacletBuilder>());
+            newConfig.setTaclet2Builder(new LinkedHashMap<Taclet, TacletBuilder>());
 
             return newConfig;
         }

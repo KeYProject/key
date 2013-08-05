@@ -146,13 +146,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         } else {
 
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer(null, getProfile(), new Services(
-                            new KeYRecoderExcHandler()), false, null);
+                    new ProblemInitializer(getProfile());
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                    getProfile(), new File(definitionFile), new File(tacletFile), 
-                    fileCollection(axiomFiles), null);
-
-            loader.setProofEnvForTaclets(initConfig.getProofEnv());
+                    new File(definitionFile), new File(tacletFile), 
+                    fileCollection(axiomFiles), initConfig.getProofEnv());
         }
 
         TacletSoundnessPOLoader poloader =
