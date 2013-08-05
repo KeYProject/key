@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.AutoSpecTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -352,8 +353,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
-    throws SLTranslationException {
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+                                                                 boolean addInvariant)
+                  throws SLTranslationException {
         ImmutableSet<SpecificationElement> result
         = DefaultImmutableSet.<SpecificationElement>nil();
 
@@ -431,10 +433,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use the internal symbol
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString(invString));
+                    specCase.addRequires(new PositionedLabeledString(invString,
+                                                                     AutoSpecTermLabel.INSTANCE));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv"));
+                    specCase.addRequires(new PositionedLabeledString(""+pm.getName()+".\\inv",
+                                                                     AutoSpecTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(new PositionedString("ensures "+invString));
@@ -456,6 +460,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                 false,
                                 fileName, pm.getStartPosition(),services);
                     for (PositionedString nonNull : nonNullParams) {
+                        nonNull = nonNull.label(AutoSpecTermLabel.INSTANCE);
                         specCase.addRequires(nonNull);
                     }
                 }

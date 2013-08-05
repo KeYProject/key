@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -406,5 +408,20 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             }
          }
       });
+   }
+
+   static boolean inTransformer(PosInOccurrence pio) {
+       boolean trans = false;
+       if ( pio.posInTerm () != null ) {
+           PIOPathIterator it = pio.iterator ();
+           Operator        op;
+
+           while ( it.next () != -1 && !trans) {
+               final Term t = it.getSubTerm ();
+               op = t.op ();
+               trans = op instanceof TransformerProcedure;
+           }
+       }
+       return trans;
    }
 }

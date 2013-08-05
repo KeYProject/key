@@ -35,6 +35,4 @@ public interface BuiltInRule extends Rule {
 			 PosInOccurrence pio);
 
     IBuiltInRuleApp createApp( PosInOccurrence pos );
-    
-
 }

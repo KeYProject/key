@@ -33,7 +33,8 @@ class TermImpl implements Term {
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
     	= new ImmutableArray<QuantifiableVariable>();
 	
-    private static final ImmutableArray<ITermLabel> EMPTY_LABEL_LIST = new ImmutableArray<ITermLabel>();
+    private static final ImmutableArray<ITermLabel> EMPTY_LABEL_LIST =
+            new ImmutableArray<ITermLabel>();
     
 	private static int serialNumberCounter =0;
 

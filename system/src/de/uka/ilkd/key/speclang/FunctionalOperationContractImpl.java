@@ -111,26 +111,26 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param globalDefs definitions for the whole contract
      */
     FunctionalOperationContractImpl(String baseName,
-            String name,
-            KeYJavaType kjt,
-            IProgramMethod pm,
-            KeYJavaType specifiedIn,
-            Modality modality,
-            Map<LocationVariable,Term> pres,
-            Term mby,
-            Map<LocationVariable,Term> posts,
-            Map<LocationVariable,Term> axioms,
-            Map<LocationVariable,Term> mods,
-            Map<LocationVariable,Boolean> hasRealMod,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            Map<LocationVariable, LocationVariable> atPreVars,
-            Term globalDefs,
-            int id,
-            boolean toBeSaved,
-            boolean transaction) {
+                                    String name,
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> axioms,
+                                    Map<LocationVariable,Term> mods,
+                                    Map<LocationVariable,Boolean> hasRealMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    Term globalDefs,
+                                    int id,
+                                    boolean toBeSaved,
+                                    boolean transaction) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -185,7 +185,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                       ImmutableList<ProgramVariable> paramVars,
                                       ProgramVariable resultVar,
                                       ProgramVariable excVar,
-                                      Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                                      Map<LocationVariable, ? extends ProgramVariable> atPreVars,
                                       Services services) {
         final Map<ProgramVariable, ProgramVariable> result =
                 new LinkedHashMap<ProgramVariable, ProgramVariable>();
@@ -236,15 +236,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Deprecated
-    protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+    protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                            ImmutableList<Term> paramTerms, Services services) {
         return getReplaceMap(heap, heapTerm, selfTerm, paramTerms, null, null, null, services);
     }
 
     @Deprecated
-    protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms, Term resultTerm,
-            Term excTerm, Term atPre, Services services) {
+    protected Map<Term, Term> getReplaceMap(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                            ImmutableList<Term> paramTerms, Term resultTerm,
+                                            Term excTerm, Term atPre, Services services) {
         Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
         heapTerms.put(heap, heapTerm);
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
@@ -252,14 +252,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getReplaceMap(heapTerms, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
     }
 
-    protected Map<Term, Term> getReplaceMap(
-            Map<LocationVariable,Term> heapTerms,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Term resultTerm,
-            Term excTerm,
-            Map<LocationVariable,Term> atPres,
-            Services services) {
+    protected Map<Term, Term> getReplaceMap(Map<LocationVariable,Term> heapTerms,
+                                            Term selfTerm,
+                                            ImmutableList<Term> paramTerms,
+                                            Term resultTerm,
+                                            Term excTerm,
+                                            Map<LocationVariable, Term> atPres,
+                                            Services services) {
         final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 
         //heaps
@@ -317,8 +316,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     /** Make sure ghost parameters appear in the list of parameter variables. */
-    private ImmutableList<ProgramVariable> addGhostParams(
-            ImmutableList<ProgramVariable> paramVars) {
+    private ImmutableList<ProgramVariable> addGhostParams(ImmutableList<ProgramVariable> paramVars) {
         // make sure ghost parameters are present
         ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
         for (ProgramVariable param: originalParamVars) {
@@ -330,8 +328,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     /** Make sure ghost parameters appear in the list of parameter variables. */
-    private ImmutableList<Term> addGhostParamTerms(
-            ImmutableList<Term> paramVars) {
+    private ImmutableList<Term> addGhostParamTerms(ImmutableList<Term> paramVars) {
         // make sure ghost parameters are present
         ImmutableList<Term> ghostParams = ImmutableSLList.<Term>nil();
         for (ProgramVariable param: originalParamVars) {
@@ -378,10 +375,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPre(LocationVariable heap,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable,? extends ProgramVariable> atPreVars,
-            Services services) {
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                       Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null : "null parameters";
         assert services != null;
@@ -401,10 +398,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     public Term getPre(List<LocationVariable> heapContext,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable,? extends ProgramVariable> atPreVars,
-            Services services) {
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                       Services services) {
         Term result = null;
         for(LocationVariable heap : heapContext) {
             final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
@@ -420,11 +417,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPre(LocationVariable heap,
-            Term heapTerm,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Map<LocationVariable,Term> atPres,
-            Services services) {
+                       Term heapTerm,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable,Term> atPres,
+                       Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -448,11 +445,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     public Term getPre(List<LocationVariable> heapContext,
-            Map<LocationVariable,Term> heapTerms,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Map<LocationVariable,Term> atPres,
-            Services services) {
+                       Map<LocationVariable,Term> heapTerms,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable,Term> atPres,
+                       Services services) {
         Term result = null;
         for(LocationVariable heap : heapContext) {
             final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
@@ -489,8 +486,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getMby(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Services services) {
+                       ImmutableList<ProgramVariable> paramVars,
+                       Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         paramVars = addGhostParams(paramVars);
@@ -770,12 +767,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPost(LocationVariable heap,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            Map<LocationVariable,? extends ProgramVariable> atPreVars,
-            Services services) {
+                        ProgramVariable selfVar,
+                        ImmutableList<ProgramVariable> paramVars,
+                        ProgramVariable resultVar,
+                        ProgramVariable excVar,
+                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                        Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         paramVars = addGhostParams(paramVars);
@@ -816,13 +813,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPost(LocationVariable heap,
-            Term heapTerm,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Term resultTerm,
-            Term excTerm,
-            Map<LocationVariable,Term> atPres,
-            Services services) {
+                        Term heapTerm,
+                        Term selfTerm,
+                        ImmutableList<Term> paramTerms,
+                        Term resultTerm,
+                        Term excTerm,
+                        Map<LocationVariable, Term> atPres,
+                        Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -836,24 +833,24 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap = getReplaceMap(heapTerms,
-                selfTerm,
-                paramTerms,
-                resultTerm,
-                excTerm,
-                atPres,
-                services);
+                                                         selfTerm,
+                                                         paramTerms,
+                                                         resultTerm,
+                                                         excTerm,
+                                                         atPres,
+                                                         services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalPosts.get(heap));
     }
 
     public Term getPost(List<LocationVariable> heapContext,
-            Map<LocationVariable,Term> heapTerms,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Term resultTerm,
-            Term excTerm,
-            Map<LocationVariable,Term> atPres,
-            Services services) {
+                        Map<LocationVariable,Term> heapTerms,
+                        Term selfTerm,
+                        ImmutableList<Term> paramTerms,
+                        Term resultTerm,
+                        Term excTerm,
+                        Map<LocationVariable, Term> atPres,
+                        Services services) {
         Term result = null;
         for(LocationVariable heap : heapContext) {
             final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
@@ -871,11 +868,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getRepresentsAxiom(LocationVariable heap,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            Map<LocationVariable,? extends ProgramVariable> atPreVars,
-            Services services) {
+                                   ProgramVariable selfVar,
+                                   ImmutableList<ProgramVariable> paramVars,
+                                   ProgramVariable resultVar,
+                                   Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                                   Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -909,11 +906,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
         final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
-                paramVars,
-                null,
-                null,
-                null,
-                services);
+                                                                               paramVars,
+                                                                               null,
+                                                                               null,
+                                                                               null,
+                                                                               services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(mod);
     }
@@ -940,12 +937,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         heapTerms.put(heap, heapTerm);
 
         final Map<Term, Term> replaceMap = getReplaceMap(heapTerms,
-                selfTerm,
-                paramTerms,
-                null,
-                null,
-                null,
-                services);
+                                                         selfTerm,
+                                                         paramTerms,
+                                                         null,
+                                                         null,
+                                                         null,
+                                                         services);
         final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(mod);
     }
@@ -957,15 +954,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getMod(LocationVariable heap, Term heapTerm,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Services services) {
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Services services) {
         return getAnyMod(heap, this.originalMods.get(heap), heapTerm, selfTerm, paramTerms, services);
     }
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+                              ImmutableList<Term> paramTerms, Services services) {
         if (globalDefs==null) return null;
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
@@ -1004,8 +1001,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
-            Contract contract) {
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         return new FunctionalOperationContractPO(initConfig,
                 (FunctionalOperationContract) contract);
     }
@@ -1030,26 +1026,26 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public FunctionalOperationContract setID(int newId) {
         return new FunctionalOperationContractImpl(baseName,
-                null,
-                kjt,
-                pm,
-                specifiedIn,
-                modality,
-                originalPres,
-                originalMby,
-                originalPosts,
-                originalAxioms,
-                originalMods,
-                hasRealModifiesClause,
-                originalSelfVar,
-                originalParamVars,
-                originalResultVar,
-                originalExcVar,
-                originalAtPreVars,
-                globalDefs,
-                newId,
-                toBeSaved,
-                transaction);
+                                                   null,
+                                                   kjt,
+                                                   pm,
+                                                   specifiedIn,
+                                                   modality,
+                                                   originalPres,
+                                                   originalMby,
+                                                   originalPosts,
+                                                   originalAxioms,
+                                                   originalMods,
+                                                   hasRealModifiesClause,
+                                                   originalSelfVar,
+                                                   originalParamVars,
+                                                   originalResultVar,
+                                                   originalExcVar,
+                                                   originalAtPreVars,
+                                                   globalDefs,
+                                                   newId,
+                                                   toBeSaved,
+                                                   transaction);
     }
 
 
@@ -1058,26 +1054,26 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new FunctionalOperationContractImpl(baseName,
-                null,
-                newKJT,
-                (IProgramMethod) newPM,
-                specifiedIn,
-                modality,
-                originalPres,
-                originalMby,
-                originalPosts,
-                originalAxioms,
-                originalMods,
-                hasRealModifiesClause,
-                originalSelfVar,
-                originalParamVars,
-                originalResultVar,
-                originalExcVar,
-                originalAtPreVars,
-                globalDefs,
-                id,
-                toBeSaved && newKJT.equals(
-                        kjt), transaction);
+                                                   null,
+                                                   newKJT,
+                                                   (IProgramMethod) newPM,
+                                                   specifiedIn,
+                                                   modality,
+                                                   originalPres,
+                                                   originalMby,
+                                                   originalPosts,
+                                                   originalAxioms,
+                                                   originalMods,
+                                                   hasRealModifiesClause,
+                                                   originalSelfVar,
+                                                   originalParamVars,
+                                                   originalResultVar,
+                                                   originalExcVar,
+                                                   originalAtPreVars,
+                                                   globalDefs,
+                                                   id,
+                                                   toBeSaved && newKJT.equals(kjt),
+                                                   transaction);
     }
 
 

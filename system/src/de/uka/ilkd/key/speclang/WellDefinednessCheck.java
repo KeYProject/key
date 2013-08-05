@@ -1,13 +1,18 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.AutoSpecTermLabel;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -30,6 +35,7 @@ import de.uka.ilkd.key.util.Triple;
 public abstract class WellDefinednessCheck implements Contract {
 
     protected static final TermBuilder TB = TermBuilder.DF;
+    protected static final TermFactory TF = TermFactory.DEFAULT;
 
     public final Type type;
 
@@ -145,6 +151,23 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     public boolean toBeSaved() {
         return false;
+    }
+
+    static Term relabel(Term t) {
+        ImmutableArray<ITermLabel> ls = t.getLabels();
+        LinkedList<ITermLabel> res = new LinkedList<ITermLabel>();
+        for (ITermLabel l: ls) {
+            if(!l.equals(AutoSpecTermLabel.INSTANCE)) {
+                res.add(l);
+            }
+        }
+        if (res.isEmpty()) {
+            ls = new ImmutableArray<ITermLabel>();
+        } else {
+            ls = new ImmutableArray<ITermLabel>(res);
+        }
+        res.clear();
+        return TB.relabel(t, ls);
     }
 
     @Deprecated

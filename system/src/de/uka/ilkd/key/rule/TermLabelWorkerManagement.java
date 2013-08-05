@@ -19,6 +19,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.AutoSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
@@ -191,6 +192,9 @@ public final class TermLabelWorkerManagement {
       }
       else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
           return ShortcutEvaluationTermLabelInstantiator.INSTANCE;
+      }
+      else if (AutoSpecTermLabel.NAME.toString().equals(name)) {
+          return AutoSpecTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;

@@ -1519,6 +1519,24 @@ public class TermBuilder {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
+    public Term relabel(Term term, ImmutableArray<ITermLabel> labels) {
+        if ((labels == null || labels.isEmpty())
+                && !term.hasLabels()) {
+            return term;
+        } else {
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
+                    term.javaBlock(), labels);
+        }
+    }
+
+    public Term relabel(Term term, ITermLabel label) {
+        if (label == null && !term.hasLabels()) {
+            return term;
+        } else {
+            return label(term, new ImmutableArray<ITermLabel>(label));
+        }
+    }
+
     public Term label(Term term, ImmutableArray<ITermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;

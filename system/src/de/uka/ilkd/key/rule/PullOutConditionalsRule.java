@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -96,25 +98,30 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	if(pio == null || !pio.isTopLevel()) {
 	    return false;
 	}
-	
+
 	//node must have parent
 	final Node parent = goal.node().parent();
 	if(parent == null) {
 	    return false;
 	}
-	
+
 	//last rule app must be one step simplification
 	final RuleApp app = parent.getAppliedRuleApp();
 	if(app == null || !(app.rule() instanceof OneStepSimplifier)) {
 	    return false;
 	}
-	
+
 	//semisequent of pio must be same as in last rule app
 	final PosInOccurrence parentPio = app.posInOccurrence();
 	if(parentPio.isInAntec() != pio.isInAntec()) {
 	    return false;
 	}
-	
+
+	// abort if inside of transformer
+        if (inTransformer(pio)) {
+            return false;
+        }
+
 	//formula number must be same as in last rule app
 	final int parentNum
 		= parent.sequent()
@@ -127,13 +134,13 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	if(parentNum != num) {
 	    return false;
 	}
-	
+
 	//determine and cache equivalence classes
-	focus = pio.subTerm();	
-	equivalenceClasses.clear();		
+	focus = pio.subTerm();
+	equivalenceClasses.clear();
 	collectConditionals(focus);
-	
-	//there must be at least one equivalence class with more than one 
+
+	//there must be at least one equivalence class with more than one
 	//element
 	for(List<Term> equivalenceClass : equivalenceClasses) {
 	    if(equivalenceClass.size() > 1) {
@@ -143,6 +150,20 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	return false;
     }
 
+    static boolean inTransformer(PosInOccurrence pio) {
+        boolean trans = false;
+        if ( pio.posInTerm () != null ) {
+            PIOPathIterator it = pio.iterator ();
+            Operator        op;
+
+            while ( it.next () != -1 && !trans) {
+                final Term t = it.getSubTerm ();
+                op = t.op ();
+                trans = op instanceof TransformerProcedure;
+            }
+        }
+        return trans;
+    }
     
     @Override
     public ImmutableList<Goal> apply(Goal goal, 

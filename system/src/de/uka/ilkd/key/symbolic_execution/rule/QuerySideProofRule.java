@@ -106,6 +106,10 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
       boolean applicable = false;
       if (pio != null) {
+          // abort if inside of transformer
+          if (inTransformer(pio)) {
+              return false;
+          }
          Term term = pio.subTerm();
          if (term != null) {
             if (term.op() == Equality.EQUALS) {

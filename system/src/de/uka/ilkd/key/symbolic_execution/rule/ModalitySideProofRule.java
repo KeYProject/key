@@ -82,18 +82,23 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
       boolean applicable = false;
       if (pio != null && pio.isTopLevel()) {
-         Term term = pio.subTerm();
-         term = TermBuilder.DF.goBelowUpdates(term);
-         if (term.op() instanceof Modality && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
-            Term equalityTerm = term.sub(0);
-            if (equalityTerm.op() == Equality.EQUALS) {
-               if (equalityTerm.sub(0).op() instanceof IProgramVariable ||
-                   equalityTerm.sub(1).op() instanceof IProgramVariable) {
-                  
-                  applicable = true;
-               }
-            }
-         }
+          // abort if inside of transformer
+          if (inTransformer(pio)) {
+              return false;
+          }
+          Term term = pio.subTerm();
+          term = TermBuilder.DF.goBelowUpdates(term);
+          if (term.op() instanceof Modality
+                  && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
+              Term equalityTerm = term.sub(0);
+              if (equalityTerm.op() == Equality.EQUALS) {
+                  if (equalityTerm.sub(0).op() instanceof IProgramVariable ||
+                          equalityTerm.sub(1).op() instanceof IProgramVariable) {
+
+                      applicable = true;
+                  }
+              }
+          }
       }
       return applicable;
    }

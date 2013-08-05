@@ -24,16 +24,23 @@ import java.util.Set;
  */
 public interface ITermLabel extends Named {
 
+    /**
+     * List of all "relevant" TermLabels. This is used for TermLabelCondition
+     * (a VariableCondition). If you want any other TermLabels to be used in
+     * TermLabelCondition, please add them here.
+     */
     public static final Set<ITermLabel> labels =
             Collections.unmodifiableSet(new LinkedHashSet<ITermLabel>(Arrays.asList(
                     LoopBodyTermLabel.INSTANCE, LoopInvariantNormalBehaviorTermLabel.INSTANCE,
-                    ShortcutEvaluationTermLabel.INSTANCE)));
+                    ShortcutEvaluationTermLabel.INSTANCE, AutoSpecTermLabel.INSTANCE)));
 
     /**
      * A term label may have structure, i.e., parameterized
      * @param i the i-th parameter (from 0 to max nr of parameters)
      * @return the selected parameter
-     * @throw an {@link IndexOutOfBoundsException} if the given parameter number is negative or greater-or-equal the number of parameters returned by {@link #getChildCount()}
+     * @throw an {@link IndexOutOfBoundsException} if the given parameter
+     * number is negative or greater-or-equal the number of parameters
+     * returned by {@link #getChildCount()}
      */
     public abstract Object getChild(int i);
 

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
@@ -46,9 +47,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -198,11 +201,30 @@ public final class WhileInvariantRule implements BuiltInRule {
         return checkApplicability(goal,pio);
     }
 
+    static boolean inTransformer(PosInOccurrence pio) {
+        boolean trans = false;
+        if ( pio.posInTerm () != null ) {
+            PIOPathIterator it = pio.iterator ();
+            Operator        op;
+
+            while ( it.next () != -1 && !trans) {
+                final Term t = it.getSubTerm ();
+                op = t.op ();
+                trans = op instanceof TransformerProcedure;
+            }
+        }
+        return trans;
+    }
+
     //focus must be top level succedent
     static boolean checkApplicability (Goal g, PosInOccurrence pio){
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec())
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
-
+        }
+        // abort if inside of transformer
+        if (inTransformer(pio)) {
+            return false;
+        }
         Pair<Term, Term> up = applyUpdates(pio.subTerm());
         final Term progPost = up.second;
 

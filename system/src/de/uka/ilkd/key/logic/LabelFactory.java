@@ -39,7 +39,10 @@ public class LabelFactory {
       }
       else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
           return ShortcutEvaluationTermLabel.INSTANCE;
-       }
+      }
+      else if (AutoSpecTermLabel.NAME.toString().equals(name)) {
+          return AutoSpecTermLabel.INSTANCE;
+      }
       else {
          throw new UnknownLabelException(name);
       }

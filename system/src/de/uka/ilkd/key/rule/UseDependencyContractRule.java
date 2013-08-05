@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -389,11 +390,16 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    return false;
 	}
 
+	// abort if inside of transformer
+        if (inTransformer(pio)) {
+            return false;
+        }
+
 	//heap term of observer must be store-term (or anon, create,
 	//memset, ...)
 	final Services services = goal.proof().getServices();
 	final IObserverFunction target = (IObserverFunction) focus.op();
-    //final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+	//final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
 	boolean hasRawSteps = false;
 	for(int i = 0; i<target.getHeapCount(services) * target.getStateCount(); i++) {
 	  if(hasRawSteps(focus.sub(i), goal.sequent(), services)) {
@@ -426,6 +432,20 @@ public final class UseDependencyContractRule implements BuiltInRule {
                    .isContractApplicable(contracts.iterator().next());
     }
 
+    static boolean inTransformer(PosInOccurrence pio) {
+        boolean trans = false;
+        if ( pio.posInTerm () != null ) {
+            PIOPathIterator it = pio.iterator ();
+            Operator        op;
+
+            while ( it.next () != -1 && !trans) {
+                final Term t = it.getSubTerm ();
+                op = t.op ();
+                trans = op instanceof TransformerProcedure;
+            }
+        }
+        return trans;
+    }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal,

@@ -43,7 +43,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
 
     static Name makeLabelName(String name) {
         for (ITermLabel l: ITermLabel.labels) {
-            if(l.toString().equalsIgnoreCase(name)) {
+            if(l.toString().equals(name)) {
                 return l.name();
             }
         }

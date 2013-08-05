@@ -544,7 +544,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 			    pio.constrainedFormula());
     }
 
-    private boolean inTransformer(PosInOccurrence pio) {
+    static boolean inTransformer(PosInOccurrence pio) {
         boolean trans = false;
         if ( pio.posInTerm () != null ) {
             PIOPathIterator it = pio.iterator ();
