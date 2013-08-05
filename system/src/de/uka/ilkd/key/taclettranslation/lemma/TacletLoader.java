@@ -94,14 +94,20 @@ public abstract class TacletLoader {
      * @param initConfig the initial config from which the taclet base is taken
      */
 
-    public void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets) {
-        List<Taclet> oldTaclets = toList(initConfig.getTaclets());
-        Collections.reverse(oldTaclets);
+    public void manageAvailableTaclets(InitConfig initConfig,
+            ImmutableSet<Taclet> tacletsToAdd,
+            ImmutableSet<Taclet> tacletsToProve) {
+        List<Taclet> sysTaclets = toList(initConfig.getTaclets());
+        Collections.reverse(sysTaclets);
+        List<Taclet> addedList = toList(tacletsToAdd);
+        Collections.reverse(addedList);
+        sysTaclets.addAll(addedList);
+
         ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
         HashMap<Taclet, TacletBuilder> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
-        for (Taclet taclet : oldTaclets) {
-            if (taclets.contains(taclet)) {
+        for (Taclet taclet : sysTaclets) {
+            if (tacletsToProve.contains(taclet)) {
                 tacletfound = true;
             }
 
@@ -111,6 +117,7 @@ public abstract class TacletLoader {
                 map.remove(taclet);
             }
         }
+
         initConfig.setTaclets(newTaclets);
 
     }

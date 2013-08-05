@@ -273,8 +273,9 @@ public class TacletSoundnessPOLoader {
                 }
 
                 resultingProof = loadAsLemmata ? 
-                        createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(),
-                                axioms) : null;
+                        createProof(tacletLoader.getProofEnvForTaclets(), 
+                                getResultingTaclets(),
+                                axioms, taclets) : null;
 
         }
         
@@ -331,15 +332,17 @@ public class TacletSoundnessPOLoader {
         }
 
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
-                        ImmutableSet<Taclet> taclets,
-                        ImmutableSet<Taclet> axioms) {
-                tacletLoader.removeTaclets(proofEnvForTaclets.getInitConfig(), taclets);
+                        ImmutableSet<Taclet> tacletsToProve,
+                        ImmutableSet<Taclet> axioms, 
+                        ImmutableSet<Taclet> loadedTaclets) {
+                tacletLoader.manageAvailableTaclets(proofEnvForTaclets.getInitConfig(), 
+                        loadedTaclets, tacletsToProve);
                 ProofObligationCreator creator = new ProofObligationCreator();
-                ProofAggregate p = creator.create(taclets,
+                ProofAggregate p = creator.create(tacletsToProve,
                                 proofEnvForTaclets.getInitConfig(), axioms,
                                 listeners);
                 
-                proofEnvForTaclets.registerRules(taclets,
+                proofEnvForTaclets.registerRules(tacletsToProve,
                                 AxiomJustification.INSTANCE);
                 
                 if(isUsedOnlyForProvingTaclets()){
