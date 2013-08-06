@@ -331,7 +331,7 @@ public final class MiscTools {
     }
 
     public static Name toValidVariableName(String s) {
-        s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/|\\(|\\)", "_");
+        s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/|\\(|\\)|,", "_");
         return new Name(s);
     }
 
