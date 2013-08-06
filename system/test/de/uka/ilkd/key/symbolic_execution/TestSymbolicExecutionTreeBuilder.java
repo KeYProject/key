@@ -39,6 +39,27 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/methodCallReturnTests
+    */
+   public void testMethodCallReturnTests() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/methodCallReturnTests/test/MethodCallReturnTests.java", 
+                "MethodCallReturnTests", 
+                "main", 
+                null,
+                "examples/_testcase/set/methodCallReturnTests/oracle/MethodCallReturnTests.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/useLoopInvariantArrayAverage
     */
    public void testUseLoopInvariantArrayAverage() throws Exception {
