@@ -9,18 +9,24 @@
 //
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 
 /**
@@ -235,15 +241,29 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term
-        Term schemaContApps =
+        Term replaceWithTerm =
                 buildContractApplications(schemaDataFind,
                                           schemaDataAssumes, services);
+
+        // collect quantifaible variables of the post term and replace them
+        // by schema variables
+        QuantifiableVaribaleVisitor qvVisitor = new QuantifiableVaribaleVisitor();
+        replaceWithTerm.execPreOrder(qvVisitor);
+        LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
+        final Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+                new LinkedHashMap<QuantifiableVariable, SchemaVariable>();
+        for (QuantifiableVariable qv : quantifiableVariables) {
+            quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
+        }
+	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars);
+	replaceWithTerm = or.replace(replaceWithTerm);
+
 
         //create sequents
         Sequent assumesSeq = Sequent.createAnteSequent(
                 new Semisequent(new SequentFormula(schemaAssumes)));
-        Sequent axiomSeq = Sequent.createAnteSequent(
-                new Semisequent(new SequentFormula(schemaContApps)));
+        Sequent replaceWithSeq = Sequent.createAnteSequent(
+                new Semisequent(new SequentFormula(replaceWithTerm)));
 
         //create taclet
         InfFlowTacletBuilder tacletBuilder = new InfFlowTacletBuilder();
@@ -252,12 +272,15 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate =
-                new RewriteTacletGoalTemplate(axiomSeq,
+                new RewriteTacletGoalTemplate(replaceWithSeq,
                                               ImmutableSLList.<Taclet>nil(),
                                               schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
         tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
         tacletBuilder.setSurviveSmbExec(true);
+        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(),
+                    schemaDataFind, schemaDataAssumes);
+
         return tacletBuilder.getTaclet();
     }
 
@@ -287,6 +310,20 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
     }
 
+    SchemaVariable createVariableSV(QuantifiableVariable v,
+                                    String schemaPrefix,
+                                    Services services) {
+        if (v == null) {
+            return null;
+        }
+        String svName = MiscTools.toValidVariableName(schemaPrefix + v.name()).toString();
+        Sort sort = v.sort();
+        Name name =
+                services.getVariableNamer().getTemporaryNameProposal(svName);
+        return SchemaVariableFactory.createVariableSV(name, sort);
+
+    }
+
     static void register(ProgramVariable pv,
                          Services services) {
         Namespace progVarNames = services.getNamespaces().programVariables();
@@ -298,4 +335,63 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     abstract Term buildContractApplications(ProofObligationVars contAppData,
                                             ProofObligationVars contAppData2,
                                             Services services);
+
+
+    private void addVarconds(InfFlowTacletBuilder tacletBuilder,
+                             Iterable<SchemaVariable> quantifiableSVs,
+                             ProofObligationVars schemaDataFind,
+                             ProofObligationVars schemaDataAssumes) throws IllegalArgumentException {
+        for (SchemaVariable qv : quantifiableSVs) {
+            for (Term svTerm : schemaDataFind.pre.termList) {
+                assert svTerm.op() instanceof SchemaVariable;
+                SchemaVariable sv = svTerm.op(SchemaVariable.class);
+                tacletBuilder.addVarsNotFreeIn(qv, sv);
+            }
+            for (Term svTerm : schemaDataFind.post.termList) {
+                assert svTerm.op() instanceof SchemaVariable;
+                SchemaVariable sv = svTerm.op(SchemaVariable.class);
+                tacletBuilder.addVarsNotFreeIn(qv, sv);
+            }
+            for (Term svTerm : schemaDataAssumes.pre.termList) {
+                assert svTerm.op() instanceof SchemaVariable;
+                SchemaVariable sv = svTerm.op(SchemaVariable.class);
+                tacletBuilder.addVarsNotFreeIn(qv, sv);
+            }
+            for (Term svTerm : schemaDataAssumes.post.termList) {
+                assert svTerm.op() instanceof SchemaVariable;
+                SchemaVariable sv = svTerm.op(SchemaVariable.class);
+                tacletBuilder.addVarsNotFreeIn(qv, sv);
+            }
+        }
+    }
+
+    private class QuantifiableVaribaleVisitor implements Visitor {
+        private LinkedList<QuantifiableVariable> vars = new LinkedList();
+
+        @Override
+        public void visit(Term visited) {
+            final ImmutableArray<QuantifiableVariable> boundVars =
+                    visited.boundVars();
+            for (QuantifiableVariable var : boundVars) {
+                vars.add(var);
+            }
+        }
+
+
+        @Override
+        public void subtreeEntered(Term subtreeRoot) {
+            // nothing to do
+        }
+
+
+        @Override
+        public void subtreeLeft(Term subtreeRoot) {
+            // nothing to do
+        }
+
+        public LinkedList<QuantifiableVariable> getResult() {
+            return vars;
+        }
+
+    }
 }
