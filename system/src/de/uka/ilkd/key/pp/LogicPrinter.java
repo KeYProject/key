@@ -134,7 +134,11 @@ public final class LogicPrinter {
 
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
-    
+
+    private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
+    private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
+            QuantifiableVariablePrintMode.NORMAL;
+
     
     public static String quickPrintTerm(Term t, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -369,6 +373,7 @@ public final class LogicPrinter {
                             boolean showWholeTaclet,
                             boolean declareSchemaVars) {
 	instantiations = sv;
+        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
 	try {
 	    Debug.log4jDebug(taclet.name().toString(),
 		    	     LogicPrinter.class.getName());
@@ -408,6 +413,7 @@ public final class LogicPrinter {
 		    	    LogicPrinter.class.getName());
 	}
 	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
     }
 
     /**
@@ -1011,7 +1017,7 @@ public final class LogicPrinter {
             layouter.print(name);
             if(!t.boundVars().isEmpty()) {
         	layouter.print("{").beginC(0);
-        	printVariables(t.boundVars());
+        	printVariables(t.boundVars(), quantifiableVariablePrintMode);
         	layouter.print("}").end();
             }
             if(t.arity() > 0) {
@@ -1477,7 +1483,8 @@ public final class LogicPrinter {
     }
     
 
-    protected void printVariables (ImmutableArray<QuantifiableVariable> vars)
+    protected void printVariables (ImmutableArray<QuantifiableVariable> vars,
+                                   QuantifiableVariablePrintMode mode)
                                             throws IOException {
         int size = vars.size ();
         for(int j = 0; j != size; j++) {
@@ -1485,11 +1492,14 @@ public final class LogicPrinter {
             if(v instanceof LogicVariable) {
                 Term t =
                     TermFactory.DEFAULT.createTerm(v);
+                if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
+                    // do not print declarations in taclets...
+                    layouter.print(v.sort().name().toString() + " ");
+                }
                 if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (v.sort().name().toString() + " " +
-                                    notationInfo.getAbbrevMap().getAbbrev(t));
+                    layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
                 } else {
-                    layouter.print (v.sort().name() + " " + v.name ());
+                    layouter.print (v.name().toString());
                 }
             } else {
                 layouter.print (v.name().toString());
@@ -1511,7 +1521,7 @@ public final class LogicPrinter {
 
         if ( t.varsBoundHere ( 0 ).size () > 0 ) {
             layouter.print ( " " );
-            printVariables ( t.varsBoundHere ( 0 ) );
+            printVariables ( t.varsBoundHere ( 0 ), quantifiableVariablePrintMode );
         }
         
         layouter.print( " (" );
@@ -1562,7 +1572,8 @@ public final class LogicPrinter {
         throws IOException
     {
         layouter.beginC(2).print(l);
-        printVariables(new ImmutableArray<QuantifiableVariable>(v));
+        printVariables(new ImmutableArray<QuantifiableVariable>(v),
+                       quantifiableVariablePrintMode);
         startTerm(2);
         maybeParens(t, ass2);
         layouter.print(r).brk(0);
@@ -1595,7 +1606,7 @@ public final class LogicPrinter {
         throws IOException {
         layouter.beginC(2);
         layouter.print(name).print(" ");
-        printVariables(vars);
+        printVariables(vars, quantifiableVariablePrintMode);
         layouter.brk();
         startTerm(1);
         maybeParens(phi,ass);
