@@ -669,8 +669,10 @@ public class InfFlowProofSymbols {
         }
         buffer.append("\n}");
         String string = buffer.toString();
-        string = string.replaceAll("\\[", "");
-        string = string.replaceAll("\\]", "");
+        // bugfix (CS): the following two lines changed array types to their
+        // base type -- which is no good idea. Thus I removed the lines.
+//        string = string.replaceAll("\\[", "");
+//        string = string.replaceAll("\\]", "");
         buffer = new StringBuffer();
         buffer.append(string);
         buffer.append("\n\n");
