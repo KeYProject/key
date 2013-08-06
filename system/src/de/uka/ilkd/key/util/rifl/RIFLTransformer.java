@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ import recoder.ServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.FileCollection.Walker;
+import de.uka.ilkd.key.util.JavaFileFilter;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
@@ -62,14 +66,12 @@ public class RIFLTransformer {
         return "file:" + path;
     }
 
-    private static final String testPath = "/home/daniel/rifl-test/";
-
     /**
      * Entry point for the stand-alone RIFL to JML* tool.
      */
     public static void main(String[] args) {
-        final String riflFilename = testPath+"test.xml";
-        final String javaFilename = testPath+"Test.java";
+        final String riflFilename = args[0];
+        final String javaFilename = args[1];
         RIFLTransformer.transform(riflFilename, javaFilename);
     }
 
@@ -131,26 +133,36 @@ public class RIFLTransformer {
      * @return path to the transformed directory
      */
     public static String getDefaultSavePath (String origSourcePath) {
-        if (origSourcePath.endsWith("java")) {
-            // select containing directory
-            final String absPath = new File(origSourcePath).getAbsolutePath();
-            origSourcePath = absPath.substring(0, absPath.lastIndexOf(File.separator));
-        }
+        origSourcePath = getBaseDirPath(origSourcePath);
         final String[] path = origSourcePath.split(File.separator);
         final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
         final String result = TMP_PATH + File.separator + dirName + ".rifl";
         return result;
     }
 
+    private static String getBaseDirPath(String origSourcePath) {
+        if (origSourcePath.endsWith("java")) {
+            // select containing directory
+            final String absPath = new File(origSourcePath).getAbsolutePath();
+            origSourcePath = absPath.substring(0, absPath.lastIndexOf(File.separator));
+        }
+        return origSourcePath;
+    }
+
     private void readJava(String source) throws IOException, ParserException {
-        // TODO: collect all Java files from directory
-        final Collection<String> javaFiles = new ArrayList<String>();
-        javaFiles.add(source);
+
+        final File root = new File(source);
+        assert root.exists(): "source dir must exist";
+        assert root.isDirectory(): "source must be directory";
+        final DirectoryFileCollection files = new DirectoryFileCollection(root);
+        final Walker walker = files.createWalker(".java");
 
         final ServiceConfiguration serviceConfiguration = JPF.getServiceConfiguration();
 
         // parse
-        for (final String javaFile : javaFiles) {
+        while (walker.step()) {
+            final String javaFile = walker.getCurrentName();
+            System.out.println("[RIFL] read file: "+ javaFile); // XXX
             final CompilationUnit cu;
             final Reader fr = new BufferedReader(new FileReader(javaFile));
             cu = JPF.parseCompilationUnit(fr);
@@ -166,14 +178,15 @@ public class RIFLTransformer {
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    private void transform(String riflFilename, String javaSource,
+    private void transform(String riflFilename, String source,
             String savePath) throws IOException, SAXException, ParserException {
 
         // step 1: parse RIFL file
         final SpecificationContainer sc = readRIFL(riflFilename);
 
         // step 2: parse Java source
-        readJava(javaSource);
+        final String javaRoot = getBaseDirPath(source);
+        readJava(javaRoot);
 
         // step 3: inject specifications
         for (final CompilationUnit cu : javaCUs) {
@@ -183,7 +196,8 @@ public class RIFLTransformer {
 
         // step 4: write modified Java files
         ensureTargetDirExists(savePath);
-        writeJavaFile(savePath, javaSource, javaCUs.get(0));
+//        writeJavaFile(savePath, javaRoot, javaCUs.get(0));
+        // TODO this only writes one file
     }
 
     private void ensureTargetDirExists(String target) throws IOException {
