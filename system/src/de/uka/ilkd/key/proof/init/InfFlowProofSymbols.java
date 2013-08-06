@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.StringBackend;
+import java.util.Iterator;
 
 public class InfFlowProofSymbols {
 
@@ -488,6 +490,17 @@ public class InfFlowProofSymbols {
         return sorts;
     }
 
+    private LinkedList<Sort> removeArraySorts(LinkedList<Sort> sorts){
+        Iterator<Sort> it = sorts.iterator();
+        while (it.hasNext()) {
+            Sort s = it.next();
+            if (s instanceof ArraySort) {
+                it.remove();
+            }
+        }
+        return sorts;
+    }
+
     private ImmutableSet<Function> getPredicates() {
         ImmutableSet<Function> predicates = DefaultImmutableSet.<Function>nil();
         for (Pair<Function, Boolean> p: this.predicates) {
@@ -541,8 +554,11 @@ public class InfFlowProofSymbols {
 
         StringBuffer result = new StringBuffer();
         result.append("\\sorts{\n");
-        final LinkedList<Sort> sorts = ensureRightOrderOfSorts(getSorts());
-        for (final Sort sort: sorts) {
+        LinkedList<Sort> sortsList = ensureRightOrderOfSorts(getSorts());
+        // bugfix (CS): array types need not to be added as sorts
+        // (and they cannot be parsed...)
+        sortsList = removeArraySorts(sortsList);
+        for (final Sort sort: sortsList) {
             result.append(sort.name());
             if (!sort.extendsSorts().isEmpty()) {
                 String res = "\\extends ";
