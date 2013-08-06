@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -30,7 +29,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Term when;
     Term workingSpace;
     Term duration;
-    Term ensures = TB.tt();
     Term signalsOnly;
     Term signals = TB.ff();
 
@@ -83,10 +81,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public Term getDuration() {
         return this.duration;
-    }
-
-    public Term getEnsures() {
-        return this.ensures;
     }
 
     public Term getSignalsOnly() {

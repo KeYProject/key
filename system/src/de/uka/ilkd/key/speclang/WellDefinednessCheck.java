@@ -47,8 +47,10 @@ public abstract class WellDefinednessCheck implements Contract {
 
     Term assignable;
 
+    Term ensures;
+
     public static enum Type {
-        CLASS_INVARIANT, METHOD_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
+        CLASS_INVARIANT, CLASS_AXIOM, METHOD_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
     }
 
     Type type() {
@@ -73,6 +75,10 @@ public abstract class WellDefinednessCheck implements Contract {
     public Term getAssignable() {
         assert this.assignable != null;
         return this.assignable;
+    }
+
+    public Term getEnsures() {
+        return this.ensures;
     }
 
     public Term getRequires(LocationVariable heap) {

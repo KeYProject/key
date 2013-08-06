@@ -9,16 +9,17 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.util.Triple;
 
-public final class ClassWellDefinedness extends WellDefinednessCheck {
+public final class ClassInvWellDefinedness extends WellDefinednessCheck {
 
     final ClassInvariant inv;
 
-    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, Services services) {
+    public ClassInvWellDefinedness(ClassInvariant inv, IObserverFunction target, Services services) {
         super(target, Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
-        this.requires = inv.getOriginalInv();
+        this.requires = TB.tt();
         this.assignable = TB.func(services.getTypeConverter().getLocSetLDT().getAllLocs());
+        this.ensures = inv.getOriginalInv();
     }
 
     @Override
@@ -33,13 +34,11 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public boolean transactionApplicableContract() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public String proofToString(Services services) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -50,7 +49,6 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public String getTypeName() {
-        // TODO Auto-generated method stub
         return "Well-Definedness of " + inv.getDisplayName();
     }
 

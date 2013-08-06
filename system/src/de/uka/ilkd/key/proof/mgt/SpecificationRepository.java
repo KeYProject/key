@@ -60,7 +60,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
+import de.uka.ilkd.key.speclang.ClassInvWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -1213,6 +1213,31 @@ public final class SpecificationRepository {
                         : result;
     }
 
+    public ImmutableSet<MethodWellDefinedness> getWdMethodContracts(KeYJavaType kjt,
+                                                                    IObserverFunction target) {
+        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
+        ImmutableSet<MethodWellDefinedness> methods =
+                DefaultImmutableSet.<MethodWellDefinedness>nil();
+        for(WellDefinednessCheck check: checks) {
+            if (check instanceof MethodWellDefinedness) {
+                methods = methods.add((MethodWellDefinedness)check);
+            }
+        }
+        return methods;
+    }
+
+    public ImmutableSet<ClassInvWellDefinedness> getWdClassInvariants(KeYJavaType kjt,
+                                                                   IObserverFunction target) {
+        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
+        ImmutableSet<ClassInvWellDefinedness> invs =
+                DefaultImmutableSet.<ClassInvWellDefinedness>nil();
+        for(WellDefinednessCheck check: checks) {
+            if (check instanceof ClassInvWellDefinedness) {
+                invs = invs.add((ClassInvWellDefinedness)check);
+            }
+        }
+        return invs;
+    }
 
     public ImmutableSet<Contract> getWdContracts(KeYJavaType kjt,
                                                  IObserverFunction target) {
@@ -1246,13 +1271,19 @@ public final class SpecificationRepository {
     public void addWellDefinednessCheck(ClassInvariant ci) {
         // Class Invariant
         final KeYJavaType kjt = ci.getKJT();
+        // FIXME TODO: Implement also stuff below?
+        // in any case, create axiom with non-static target
+        // addClassAxiom(new PartialInvAxiom(inv, false, services));
+        // for a static invariant, create also an axiom with a static target
+        // if (inv.isStatic())
+        // addClassAxiom(new PartialInvAxiom(inv, true, services));
         final IObserverFunction target = ci.isStatic() ?
                 services.getJavaInfo().getStaticInv(ci.getKJT()) :
                     services.getJavaInfo().getInv();
         final Pair<KeYJavaType,IObserverFunction> pair =
                 new Pair<KeYJavaType,IObserverFunction>(kjt,target);
         wdChecks.put(pair, getWdChecks(pair.first, pair.second)
-                .add(new ClassWellDefinedness(ci, target, services)));
+                .add(new ClassInvWellDefinedness(ci, target, services)));
 
         // inherit non-private, non-static invariants
         if(!ci.isStatic() && VisibilityModifier.allowsInheritance(ci.getVisibility())) {
@@ -1262,9 +1293,51 @@ public final class SpecificationRepository {
                 final Pair<KeYJavaType,IObserverFunction> sPair =
                         new Pair<KeYJavaType,IObserverFunction>(sub,target);
                 wdChecks.put(sPair, getWdChecks(sPair.first, sPair.second)
-                        .add(new ClassWellDefinedness(subCi, target, services)));
+                        .add(new ClassInvWellDefinedness(subCi, target, services)));
             }
         }
+    }
+
+
+    /**
+     * Registers the passed class axiom.
+     */
+    public void addWellDefinednessCheck(ClassAxiom ax) {
+        // Class Axiom FIXME FIXME TODO TODO TODO TODO TODO TODO
+        /*KeYJavaType kjt = ax.getKJT();
+        ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
+        if(currentAxioms == null) {
+            currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
+        }
+        if (ax instanceof RepresentsAxiom) {
+            // there may only be one conjoined represents axiom per model field
+            RepresentsAxiom  oldRep = getRepresentsAxiom(kjt, ax);
+            if (oldRep != null) {
+                final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom)ax);
+                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
+            } else {
+                axioms.put(kjt, currentAxioms.add(ax));
+            }
+            // inherit represents clauses to subclasses and conjoin together
+            if (VisibilityModifier.allowsInheritance(ax.getVisibility())){
+                final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                for (KeYJavaType sub: subs){
+                    RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
+                    currentAxioms = axioms.get(sub);
+                    if(currentAxioms == null) {
+                        currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
+                    }
+                    oldRep = getRepresentsAxiom(sub, subAx);
+                    if (oldRep == null)
+                        axioms.put(sub, currentAxioms.add(subAx));
+                    else {
+                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx);
+                        axioms.put(sub, currentAxioms.remove(oldRep).add(newSubRep));
+                    }
+                }}
+        } else {
+            axioms.put(kjt, currentAxioms.add(ax));
+        }*/
     }
 
 
