@@ -46,7 +46,8 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  */
 public class RIFLTransformer {
 
-    private static final JavaProgramFactory jpf = de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory
+    private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
+    private static final JavaProgramFactory JPF = de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory
             .getInstance();
 
     private static String convertToFileURL(String filename) {
@@ -69,13 +70,23 @@ public class RIFLTransformer {
     public static void main(String[] args) {
         final String riflFilename = testPath+"test.xml";
         final String javaFilename = testPath+"Test.java";
-        final String targetFilename = testPath+"TestNew.java";
-        RIFLTransformer.transform(riflFilename, javaFilename, targetFilename,
-                SimpleRIFLExceptionHandler.INSTANCE);
+        RIFLTransformer.transform(riflFilename, javaFilename);
     }
 
+    /**
+     * Transforms plain Java files + RIFL specification to Java+JML* specifications.
+     * @param riflFilename path to a RIFL file
+     * @param javaSource path to Java sources (should be a directory)
+     * @param savePath custom save path
+     * @param kexh
+     */
     public static void transform(String riflFilename, String javaSource,
             String savePath, KeYExceptionHandler kexh) {
+        assert riflFilename != null;
+        assert javaSource != null;
+        assert savePath != null;
+        assert kexh != null;
+
         RIFLTransformer rt = null;
         try {
             rt = new RIFLTransformer();
@@ -92,6 +103,14 @@ public class RIFLTransformer {
         }
     }
 
+    public static void transform(String riflFilename, String javaSource, KeYExceptionHandler kexh) {
+        transform(riflFilename, javaSource, getDefaultSavePath(javaSource), kexh);
+    }
+
+    public static void transform(String riflFilename, String javaSource) {
+        transform(riflFilename, javaSource, SimpleRIFLExceptionHandler.INSTANCE);
+    }
+
     private final XMLReader xmlReader;
     private final List<CompilationUnit> javaCUs = new ArrayList<CompilationUnit>();
 
@@ -102,8 +121,25 @@ public class RIFLTransformer {
         xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new RIFLHandler());
         xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
-        jpf.initialize(new CrossReferenceServiceConfiguration());
-        assert jpf.getServiceConfiguration() != null;
+        JPF.initialize(new CrossReferenceServiceConfiguration());
+        assert JPF.getServiceConfiguration() != null;
+    }
+
+    /**
+     * Returns the default save path for transformed Java files.
+     * @param origSourcePath path to a directory or single Java file
+     * @return path to the transformed directory
+     */
+    public static String getDefaultSavePath (String origSourcePath) {
+        if (origSourcePath.endsWith("java")) {
+            // select containing directory
+            final String absPath = new File(origSourcePath).getAbsolutePath();
+            origSourcePath = absPath.substring(0, absPath.lastIndexOf(File.separator));
+        }
+        final String[] path = origSourcePath.split(File.separator);
+        final String dirName = "".equals(path[path.length-1])? path[path.length-2]: path[path.length-1];
+        final String result = TMP_PATH + File.separator + dirName + ".rifl";
+        return result;
     }
 
     private void readJava(String source) throws IOException, ParserException {
@@ -111,13 +147,13 @@ public class RIFLTransformer {
         final Collection<String> javaFiles = new ArrayList<String>();
         javaFiles.add(source);
 
-        final ServiceConfiguration serviceConfiguration = jpf.getServiceConfiguration();
+        final ServiceConfiguration serviceConfiguration = JPF.getServiceConfiguration();
 
         // parse
         for (final String javaFile : javaFiles) {
             final CompilationUnit cu;
             final Reader fr = new BufferedReader(new FileReader(javaFile));
-            cu = jpf.parseCompilationUnit(fr);
+            cu = JPF.parseCompilationUnit(fr);
             javaCUs.add(cu);
             serviceConfiguration.getChangeHistory().updateModel();
         }
@@ -141,27 +177,43 @@ public class RIFLTransformer {
 
         // step 3: inject specifications
         for (final CompilationUnit cu : javaCUs) {
-            final SpecificationInjector si = new SpecificationInjector(sc,jpf.getServiceConfiguration().getSourceInfo());
+            final SpecificationInjector si = new SpecificationInjector(sc,JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
         }
 
         // step 4: write modified Java files
-        writeJavaFile(savePath, javaCUs.get(0));
+        ensureTargetDirExists(savePath);
+        writeJavaFile(savePath, javaSource, javaCUs.get(0));
+    }
+
+    private void ensureTargetDirExists(String target) throws IOException {
+        final File file = new File(target);
+        if (file.exists()) {
+            if (file.isDirectory() && file.canWrite()) {
+                return; // nothing to do
+            } else {
+                // bad
+                throw new IOException("target directory "+target+" not writable");
+            }
+        } else { // create directory
+            file.mkdir();
+        }
     }
 
     /** Writes a single Java file. */
-    private void writeJavaFile(String target, CompilationUnit cu)
+    private void writeJavaFile(String target, String fileName, CompilationUnit cu)
             throws IOException {
         FileWriter writer = null;
+        final String filePath = target + File.separator + fileName;
         try {
-            writer = new FileWriter(target);
+            writer = new FileWriter(filePath);
             final String source = cu.toSource();
             System.out.println(source);
             writer.append(source);
         } catch (final IOException e) {
             throw e;
         } finally {
-            writer.close();
+            if (writer != null) writer.close();
         }
     }
 

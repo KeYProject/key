@@ -33,8 +33,10 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.UnicodeHelper;
+import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 /**
  * The main entry point for KeY
@@ -60,6 +62,7 @@ public final class Main {
     private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String TIMEOUT ="--timeout";
     private static final String EXAMPLES = "--examples";
+    private static final String RIFL = "--rifl";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
     public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
@@ -143,6 +146,11 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    /**
+     * Path to a RIFL specification file.
+     */
+    private static String riflFileName = null;
+
 
     /**
      * <p>
@@ -173,6 +181,7 @@ public final class Main {
             cl.parse(args);
             evaluateOptions(cl);
             UserInterface userInterface = createUserInterface();
+            preProcessInput(userInterface);
             loadCommandLineFile(userInterface);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
@@ -185,6 +194,8 @@ public final class Main {
     }
 
     public static void loadCommandLineFile(UserInterface ui) {
+        if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
+            System.out.println("Loading: "+fileNameOnStartUp);
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
 
@@ -215,6 +226,7 @@ public final class Main {
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+        cl.addOption(RIFL, "<filename>", "load RIFL specifications from file");
         cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
         cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
@@ -334,6 +346,13 @@ public final class Main {
             deactivateExperimentalFeatures();
         }
 
+        if (cl.isSet(RIFL)) {
+            riflFileName = cl.getString(RIFL, null);
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("Loading RIFL specification from "+riflFileName+ " ...");
+            }
+        }
+
         if(cl.isSet(LAST)){
             loadRecentFile=true;
         }
@@ -418,8 +437,6 @@ public final class Main {
             }
 
             ui = mainWindow.getUserInterface();
-	    if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
-	        System.out.println("Loading: "+fileNameOnStartUp);
         }
 
         return ui;
@@ -464,6 +481,21 @@ public final class Main {
             cl.printUsage(ps);
         }
         System.exit(exitValue);
+    }
+
+    /**
+     * Perform necessary actions before loading any problem files.
+     * Currently only performs RIFL to JML transformation.
+     */
+    private static void preProcessInput (UserInterface ui) {
+        // RIFL to JML transformation
+        if (riflFileName != null) {
+            final KeYExceptionHandler kexh = ui.getMediator().getExceptionHandler();
+            RIFLTransformer.transform(riflFileName, fileNameOnStartUp, kexh);
+            fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
+            if (verbosity > Verbosity.SILENT)
+                System.out.println("Writing RIFL to JML transformed files to "+fileNameOnStartUp+" ...");
+        }
     }
 
     public static String getExamplesDir() {
