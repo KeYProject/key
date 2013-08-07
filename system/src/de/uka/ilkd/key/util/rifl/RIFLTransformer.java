@@ -162,10 +162,19 @@ public class RIFLTransformer {
             final String javaFile = walker.getCurrentName();
             System.out.println("[RIFL] read file: "+ javaFile); // XXX
             final CompilationUnit cu;
-            final Reader fr = new BufferedReader(new FileReader(javaFile));
-            cu = JPF.parseCompilationUnit(fr);
-            javaCUs.put(cu,javaFile); // TODO: put absolute or relative path?
-            serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
+            Reader fr = null;
+            try {
+                fr = new BufferedReader(new FileReader(javaFile));
+                cu = JPF.parseCompilationUnit(fr);
+                javaCUs.put(cu,javaFile); // TODO: put absolute or relative path?
+                serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
+            } catch (IOException e) {
+                throw e;
+            } catch (ParserException e) {
+                throw e;
+            } finally {
+                if (fr != null) fr.close();
+            }
         }
     }
 
