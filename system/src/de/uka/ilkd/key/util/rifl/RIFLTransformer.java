@@ -17,12 +17,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import javax.xml.parsers.*;
 
@@ -36,8 +32,9 @@ import recoder.java.JavaProgramFactory;
 
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.JavaFileFilter;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Facet class for interpreting RIFL specifications. The Requirements for
@@ -114,7 +111,8 @@ public class RIFLTransformer {
     }
 
     private final XMLReader xmlReader;
-    private final List<CompilationUnit> javaCUs = new ArrayList<CompilationUnit>();
+    private final LinkedHashMap<CompilationUnit,String> javaCUs
+            = new LinkedHashMap<CompilationUnit,String>();
 
     private RIFLTransformer() throws ParserConfigurationException, SAXException {
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -166,8 +164,8 @@ public class RIFLTransformer {
             final CompilationUnit cu;
             final Reader fr = new BufferedReader(new FileReader(javaFile));
             cu = JPF.parseCompilationUnit(fr);
-            javaCUs.add(cu);
-            serviceConfiguration.getChangeHistory().updateModel();
+            javaCUs.put(cu,javaFile); // TODO: put absolute or relative path?
+            serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
         }
     }
 
@@ -181,6 +179,7 @@ public class RIFLTransformer {
     private void transform(String riflFilename, String source,
             String savePath) throws IOException, SAXException, ParserException {
 
+        // TODO : execute steps 1 and 2 in parallel
         // step 1: parse RIFL file
         final SpecificationContainer sc = readRIFL(riflFilename);
 
@@ -189,15 +188,18 @@ public class RIFLTransformer {
         readJava(javaRoot);
 
         // step 3: inject specifications
-        for (final CompilationUnit cu : javaCUs) {
+        for (final CompilationUnit cu : javaCUs.keySet()) {
             final SpecificationInjector si = new SpecificationInjector(sc,JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
         }
 
         // step 4: write modified Java files
         ensureTargetDirExists(savePath);
-//        writeJavaFile(savePath, javaRoot, javaCUs.get(0));
-        // TODO this only writes one file
+        for (final Pair<CompilationUnit,String> javaUnit: javaCUs) {
+            // TODO: javaCus contains absolute path, strip it
+            final String onlyFilename = javaUnit.second.substring(javaUnit.second.lastIndexOf(File.separator)+1);
+            writeJavaFile(savePath, onlyFilename, javaUnit.first);
+        }
     }
 
     private void ensureTargetDirExists(String target) throws IOException {
@@ -220,8 +222,10 @@ public class RIFLTransformer {
         FileWriter writer = null;
         final String filePath = target + File.separator + fileName;
         try {
+            System.out.println("[RIFL] Trying to write file "+filePath); // XXX
             writer = new FileWriter(filePath);
             final String source = cu.toSource();
+            System.out.println("[RIFL] write the following contents to file:"); // XXX
             System.out.println(source);
             writer.append(source);
         } catch (final IOException e) {

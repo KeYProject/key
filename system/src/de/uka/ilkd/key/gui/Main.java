@@ -349,7 +349,7 @@ public final class Main {
         if (cl.isSet(RIFL)) {
             riflFileName = cl.getString(RIFL, null);
             if (verbosity > Verbosity.SILENT) {
-                System.out.println("Loading RIFL specification from "+riflFileName+ " ...");
+                System.out.println("[RIFL] Loading RIFL specification from "+riflFileName+ " ...");
             }
         }
 
@@ -494,7 +494,7 @@ public final class Main {
             RIFLTransformer.transform(riflFileName, fileNameOnStartUp, kexh);
             fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
             if (verbosity > Verbosity.SILENT)
-                System.out.println("Writing RIFL to JML transformed files to "+fileNameOnStartUp+" ...");
+                System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
         }
     }
 
