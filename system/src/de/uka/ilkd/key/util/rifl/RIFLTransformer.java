@@ -89,7 +89,7 @@ public class RIFLTransformer {
         RIFLTransformer rt = null;
         try {
             rt = new RIFLTransformer();
-            rt.transform(riflFilename, javaSource, savePath);
+            rt.doTransform(riflFilename, javaSource, savePath);
         } catch (final ParserConfigurationException e) {
             kexh.reportException(e);
         } catch (final SAXException e) {
@@ -185,16 +185,56 @@ public class RIFLTransformer {
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    private void transform(String riflFilename, String source,
-            String savePath) throws IOException, SAXException, ParserException {
+    private SpecificationContainer sc = null;
+    private Exception threadExc = null;
 
-        // TODO : execute steps 1 and 2 in parallel
+    private void doTransform(final String riflFilename, String source, String savePath)
+            throws IOException, SAXException, ParserException {
+
         // step 1: parse RIFL file
-        final SpecificationContainer sc = readRIFL(riflFilename);
+        final Runnable r = new Runnable () {
+             public void run() {
+                 System.out.println("[RIFL] start RIFL reader"); // XXX
+                 try {
+                     sc = readRIFL(riflFilename);
+                 } catch (IOException e) {
+                     threadExc = e;
+                 } catch (SAXException e) {
+                     threadExc = e;
+                 } finally {
+                     System.out.println("[RIFL] finished RIFL reader"); // XXX
+                 }
+             }
+        };
+        final Thread riflReader = new Thread(r,"RIFLReader");
+        riflReader.run();
 
         // step 2: parse Java source
         final String javaRoot = getBaseDirPath(source);
-        readJava(javaRoot);
+        final Runnable t = new Runnable() {
+            public void run() {
+                System.out.println("[RIFL] start Java reader"); // XXX
+                try {
+                    readJava(javaRoot);
+                } catch (IOException e) {
+                    threadExc = e;
+                } catch (ParserException e) {
+                    threadExc = e;
+                } finally {
+                    System.out.println("[RIFL] finished Java reader"); // XXX
+                }
+            }
+        };
+        final Thread javaReader = new Thread(t,"JavaReader");
+        javaReader.run();
+
+        // synchronize
+        while (riflReader.isAlive() || javaReader.isAlive()) {}
+        // promote exceptions
+        if (threadExc instanceof IOException) throw (IOException) threadExc;
+        if (threadExc instanceof ParserException) throw (ParserException) threadExc;
+        if (threadExc instanceof SAXException) throw (SAXException) threadExc;
+
 
         // step 3: inject specifications
         for (final CompilationUnit cu : javaCUs.keySet()) {
