@@ -6,16 +6,19 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.AutoSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.TransformerProcedure;
@@ -24,6 +27,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -205,6 +209,50 @@ public abstract class WellDefinednessCheck implements Contract {
 
     static TransformerProcedure wdAny(Services services) {
         return getTransformer("wd", Sort.ANY, services);
+    }
+
+    static Term order(Term spec) {
+        Pair<ImmutableList<Term>, ImmutableList<Term>> p = suborder(spec);
+        ImmutableList<Term> start = p.first;
+        ImmutableList<Term> end   = p.second;
+        Term s = TB.and(start);
+        Term e = TB.and(end);
+        if(start.size() > 0 && end.size() > 0) {
+            return TB.label(TB.and(s, e), ShortcutEvaluationTermLabel.INSTANCE);
+        } else {
+            return TB.and(s, e);
+        }
+    }
+
+    static Pair<ImmutableList<Term>, ImmutableList<Term>> suborder(Term spec) {
+        assert spec != null;
+        ImmutableList<Term> start = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> end = ImmutableSLList.<Term>nil();
+        if(spec.arity() > 0
+                && spec.op().equals(Junctor.AND)) {
+            for (Term sub: spec.subs()) {
+                if(sub.hasLabels()
+                        && sub.getLabels().contains(AutoSpecTermLabel.INSTANCE)) {
+                    sub = relabel(sub);
+                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = suborder(sub);
+                    start = start.append(p.first).append(p.second);
+                } else {
+                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = suborder(sub);
+                    start = start.append(p.first);
+                    end = end.append(p.second);
+                }
+            }
+            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
+        } else {
+            for (Term sub: spec.subs()) {
+                if(sub.hasLabels()
+                        && sub.getLabels().contains(AutoSpecTermLabel.INSTANCE)) {
+                    sub = relabel(sub);
+                }
+            }
+            end = end.append(spec);
+            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
+        }
     }
 
     @Deprecated
