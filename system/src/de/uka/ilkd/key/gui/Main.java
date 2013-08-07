@@ -198,7 +198,6 @@ public final class Main {
             System.out.println("Loading: "+fileNameOnStartUp);
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
-
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -226,7 +225,7 @@ public final class Main {
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
-        cl.addOption(RIFL, "<filename>", "load RIFL specifications from file");
+        cl.addOption(RIFL, "<filename>", "load RIFL specifications from file (requires GUI and startup file)");
         cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
         cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
@@ -490,6 +489,10 @@ public final class Main {
     private static void preProcessInput (UserInterface ui) {
         // RIFL to JML transformation
         if (riflFileName != null) {
+            if (fileNameOnStartUp == null) {
+                System.out.println("[RIFL] No Java file to load from.");
+                System.exit (-130826);
+            }
             final KeYExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             RIFLTransformer.transform(riflFileName, fileNameOnStartUp, kexh);
             fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
