@@ -635,9 +635,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "hide_auxiliary_eq",
                       // hide auxiliary equation after the skolem constatns have
                       // been replaced by it's computed value
-                      add( applyTF("sk", IsSelectSkolemConstantTermFeature.INSTANCE),
-                           applyTF( "t", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
-                                                     not( ff.ifThenElse ) ) ) ),
+                      add( applyTF("auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                           applyTF( "leftHandSide", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
+                                                                     not( ff.ifThenElse ) ) ) ),
                            longConst(-5400) ) );
     }
 
