@@ -152,7 +152,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         ImmutableList<Term> end   = p.second;
         Term s = TB.and(start);
         Term e = TB.and(end);
-        return TB.label(TB.and(s, e), ShortcutEvaluationTermLabel.INSTANCE);
+        if(start.size() > 0 && end.size() > 0) {
+            return TB.label(TB.and(s, e), ShortcutEvaluationTermLabel.INSTANCE);
+        } else {
+            return TB.and(s, e);
+        }
     }
 
     private static Pair<ImmutableList<Term>, ImmutableList<Term>> suborder(Term spec) {

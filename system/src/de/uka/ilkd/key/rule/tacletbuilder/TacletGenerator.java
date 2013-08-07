@@ -32,7 +32,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -55,7 +54,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -186,7 +184,6 @@ public class TacletGenerator {
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
 
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaAxiom = createSchemaTerm(originalAxiom, pvs, svs);
 
         // create goal template
@@ -276,7 +273,6 @@ public class TacletGenerator {
         }
         pvs = pvs.append(self).append(paramVars);
         svs = svs.append(selfSV).append(paramSVs);
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaRepresents =
                 createSchemaTerm(originalRepresentsTerm, pvs, svs);
         assert schemaRepresents.term.op() instanceof Equality;
@@ -580,7 +576,6 @@ public class TacletGenerator {
         }
         //create taclet
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        final RewriteTacletBuilder newTB = new RewriteTacletBuilder();
         final Term invTerm = isStatic ?
                 TB.staticInv(services,hs,kjt) :
                     TB.inv(services,
@@ -590,13 +585,8 @@ public class TacletGenerator {
                                     : TB.var(selfSV));
                 Term find = WellDefinednessCheck.wd(invTerm, services);
                 tb.setFind(find);
-                newTB.setFind(find);
                 tb.setName(name);
-                newTB.setName(new Name(name.toString()+"_to_true"));
                 tb.addRuleSet(new RuleSet(new Name("simplify")));
-                newTB.addRuleSet(new RuleSet(new Name("simplify")));
-                tb.addGoalTerm(requires);
-                newTB.addGoalTerm(requires);
                 Term addedTerm = TB.and((isStatic ?
                                             TB.tt() :
                                                 TB.not(TB.equals(TB.var(selfSV),
@@ -614,15 +604,12 @@ public class TacletGenerator {
                 for (VariableSV boundSV : schemaAxiom.boundVars) {
                     for(SchemaVariable heapSV : heapSVs) {
                         tb.addVarsNotFreeIn(boundSV, heapSV);
-                        newTB.addVarsNotFreeIn(boundSV, heapSV);
                     }
                     if (selfSV != null) {
                         tb.addVarsNotFreeIn(boundSV, selfSV);
-                        newTB.addVarsNotFreeIn(boundSV, selfSV);
                     }
                     if (eqSV != null && eqVersion) {
                         tb.addVarsNotFreeIn(boundSV, eqSV);
-                        newTB.addVarsNotFreeIn(boundSV, eqSV);
                     }
                 }
 
@@ -635,15 +622,10 @@ public class TacletGenerator {
                             ifCf).semisequent();
                     final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
                     tb.setIfSequent(ifSeq);
-                    newTB.setIfSequent(ifSeq);
                 }
-                ImmutableList<Taclet> newTaclets =
-                        ImmutableSLList.<Taclet>nil().append(newTB.getTaclet());
-                ImmutableList<TacletGoalTemplate> temps =
-                        ImmutableSLList.<TacletGoalTemplate>nil().append(
-                                new TacletGoalTemplate(addedSeq, newTaclets));
-                tb.setTacletGoalTemplates(temps);
-
+                tb.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
+                                                                       ImmutableSLList.<Taclet>nil(),
+                                                                       requires));
                 result = result.add(tb.getTaclet());
                 return result;
     }
