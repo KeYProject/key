@@ -1227,7 +1227,7 @@ public final class SpecificationRepository {
     }
 
     public ImmutableSet<ClassInvWellDefinedness> getWdClassInvariants(KeYJavaType kjt,
-                                                                   IObserverFunction target) {
+                                                                      IObserverFunction target) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
         ImmutableSet<ClassInvWellDefinedness> invs =
                 DefaultImmutableSet.<ClassInvWellDefinedness>nil();
@@ -1271,17 +1271,11 @@ public final class SpecificationRepository {
     public void addWellDefinednessCheck(ClassInvariant ci) {
         // Class Invariant
         final KeYJavaType kjt = ci.getKJT();
-        // FIXME TODO: Implement also stuff below?
-        // in any case, create axiom with non-static target
-        // addClassAxiom(new PartialInvAxiom(inv, false, services));
-        // for a static invariant, create also an axiom with a static target
-        // if (inv.isStatic())
-        // addClassAxiom(new PartialInvAxiom(inv, true, services));
         final IObserverFunction target = ci.isStatic() ?
                 services.getJavaInfo().getStaticInv(ci.getKJT()) :
                     services.getJavaInfo().getInv();
         final Pair<KeYJavaType,IObserverFunction> pair =
-                new Pair<KeYJavaType,IObserverFunction>(kjt,target);
+                new Pair<KeYJavaType,IObserverFunction> (kjt, target);
         wdChecks.put(pair, getWdChecks(pair.first, pair.second)
                 .add(new ClassInvWellDefinedness(ci, target, services)));
 

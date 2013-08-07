@@ -32,6 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -54,10 +55,12 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -543,6 +546,106 @@ public class TacletGenerator {
 
         result = result.add(tacletBuilder.getTaclet());
         return result;
+    }
+
+
+    public ImmutableSet<Taclet> generateWdInvTaclet(Name name,
+                                                    List<SchemaVariable> heapSVs,
+                                                    SchemaVariable selfSV,
+                                                    SchemaVariable eqSV,
+                                                    Term term,
+                                                    Term requires,
+                                                    Term ensures,
+                                                    KeYJavaType kjt,
+                                                    boolean isStatic,
+                                                    boolean eqVersion,
+                                                    Services services) {
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        Map<Term, Term> replace = new LinkedHashMap<Term, Term>();
+        int i = 0;
+        for(ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
+            replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
+        }
+        final OpReplacer replacer = new OpReplacer(replace);
+        // TB.getBaseHeap(services),  TB.var(heapSV)
+        //instantiate axiom with schema variables
+        final Term rawAxiom = replacer.replace(term);
+        final TermAndBoundVarPair schemaAxiom =
+                replaceBoundLogicVars(rawAxiom);
+
+        final Term[] hs = new Term[heapSVs.size()];
+        i = 0;
+        for(SchemaVariable heapSV : heapSVs) {
+            hs[i++] = TB.var(heapSV);
+        }
+        //create taclet
+        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        final RewriteTacletBuilder newTB = new RewriteTacletBuilder();
+        final Term invTerm = isStatic ?
+                TB.staticInv(services,hs,kjt) :
+                    TB.inv(services,
+                            hs,
+                            eqVersion ?
+                                    TB.var(eqSV)
+                                    : TB.var(selfSV));
+                Term find = WellDefinednessCheck.wd(invTerm, services);
+                tb.setFind(find);
+                newTB.setFind(find);
+                tb.setName(name);
+                newTB.setName(new Name(name.toString()+"_to_true"));
+                tb.addRuleSet(new RuleSet(new Name("simplify")));
+                newTB.addRuleSet(new RuleSet(new Name("simplify")));
+                tb.addGoalTerm(requires);
+                newTB.addGoalTerm(requires);
+                Term addedTerm = TB.and((isStatic ?
+                                            TB.tt() :
+                                                TB.not(TB.equals(TB.var(selfSV),
+                                                                 TB.NULL(services)))),
+                                        ensures,
+                                        (isStatic ?
+                                                TB.tt() :
+                                                    TB.created(services, TB.var(selfSV))),
+                                        invTerm);
+                final SequentFormula addedSeqForm = new SequentFormula(addedTerm);
+                final Semisequent addedSemiSeq =
+                        Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedSeqForm).semisequent();
+                final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+
+                for (VariableSV boundSV : schemaAxiom.boundVars) {
+                    for(SchemaVariable heapSV : heapSVs) {
+                        tb.addVarsNotFreeIn(boundSV, heapSV);
+                        newTB.addVarsNotFreeIn(boundSV, heapSV);
+                    }
+                    if (selfSV != null) {
+                        tb.addVarsNotFreeIn(boundSV, selfSV);
+                        newTB.addVarsNotFreeIn(boundSV, selfSV);
+                    }
+                    if (eqSV != null && eqVersion) {
+                        tb.addVarsNotFreeIn(boundSV, eqSV);
+                        newTB.addVarsNotFreeIn(boundSV, eqSV);
+                    }
+                }
+
+                //\assumes(self = EQ ==>)
+                if (eqVersion) {
+                    assert !isStatic;
+                    final Term ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
+                    final SequentFormula ifCf = new SequentFormula(ifFormula);
+                    final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                            ifCf).semisequent();
+                    final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+                    tb.setIfSequent(ifSeq);
+                    newTB.setIfSequent(ifSeq);
+                }
+                ImmutableList<Taclet> newTaclets =
+                        ImmutableSLList.<Taclet>nil().append(newTB.getTaclet());
+                ImmutableList<TacletGoalTemplate> temps =
+                        ImmutableSLList.<TacletGoalTemplate>nil().append(
+                                new TacletGoalTemplate(addedSeq, newTaclets));
+                tb.setTacletGoalTemplates(temps);
+
+                result = result.add(tb.getTaclet());
+                return result;
     }
 
 

@@ -10,12 +10,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.AutoSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -36,6 +40,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
+
 
     public final Type type;
 
@@ -174,6 +179,32 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         res.clear();
         return TB.relabel(t, ls);
+    }
+
+    public static Term wd(Term t, Services services) {
+        if (new Name("Formula").equals(t.sort().name())) {
+            return TB.func(wdFormula(services), t);
+        } else {
+            return TB.func(wdAny(services), t);
+        }
+    }
+
+    static TransformerProcedure getTransformer(String nameString, Sort argSort, Services services) {
+        Name name = new Name(nameString);
+        Named f = services.getNamespaces().functions().lookup(name);
+        if (f != null && f instanceof TransformerProcedure) {
+            return (TransformerProcedure) f;
+        } else {
+            return new TransformerProcedure(name, Sort.FORMULA, argSort);
+        }
+    }
+
+    static TransformerProcedure wdFormula(Services services) {
+        return getTransformer("WD", Sort.FORMULA, services);
+    }
+
+    static TransformerProcedure wdAny(Services services) {
+        return getTransformer("wd", Sort.ANY, services);
     }
 
     @Deprecated

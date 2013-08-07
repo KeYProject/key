@@ -102,16 +102,18 @@ public class TacletPrefixBuilder {
 	}
 	if (t.hasLabels()) {
 	    for (ITermLabel l: t.getLabels()) {
-	        SchemaVariable sv = (SchemaVariable)l;
-	        ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
-	        TacletPrefix prefix = prefixMap.get(sv);
-	        if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
-	            setPrefixOfOccurrence(sv, relevantBoundVars);
-	        } else {
-	            throw new InvalidPrefixException(tacletBuilder.getName().toString(),
-	                                             sv,
-	                                             prefix,
-	                                             relevantBoundVars);
+	        if (l instanceof SchemaVariable) {
+	            SchemaVariable sv = (SchemaVariable)l;
+	            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+	            TacletPrefix prefix = prefixMap.get(sv);
+	            if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+	                setPrefixOfOccurrence(sv, relevantBoundVars);
+	            } else {
+	                throw new InvalidPrefixException(tacletBuilder.getName().toString(),
+	                        sv,
+	                        prefix,
+	                        relevantBoundVars);
+	            }
 	        }
 	    }
 	}
