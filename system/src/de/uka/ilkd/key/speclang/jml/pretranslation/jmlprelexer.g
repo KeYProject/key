@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 header {
@@ -147,7 +147,7 @@ tokens {
     WHEN 			= "when";
     WHEN_RED 			= "when_redundantly";
     WORKING_SPACE 		= "working_space";
-    WORKING_SPACE_RED 		= "working_space_redundantly";   
+    WORKING_SPACE_RED 		= "working_space_redundantly";
     WORKING_SPACE_SINGLE_ITERATION	= "working_space_single_iteration";
     WORKING_SPACE_SINGLE_ITERATION_PARAM	= "working_space_single_iteration_param";
     WORKING_SPACE_SINGLE_ITERATION_LOCAL	= "working_space_single_iteration_local";
@@ -157,13 +157,13 @@ tokens {
     WORKING_SPACE_LOCAL 		= "working_space_local";
     WORKING_SPACE_CALLER 		= "working_space_caller";
     WORKING_SPACE_REENTRANT 		= "working_space_reentrant";
-    WRITABLE			= "writable";   
+    WRITABLE			= "writable";
 }
 
 
 {
     private boolean expressionMode = false;
-    
+
     public void setExpressionMode(boolean b) {
     	expressionMode = b;
     }
@@ -180,12 +180,12 @@ options {
     	(~('@'|'\n'))
     	=>
         ~('@'|'\n')
-        (  
+        (
             options { greedy = true; }
             :
             ~'\n'
         )*
-    )? 
+    )?
 ;
 
 
@@ -201,14 +201,14 @@ options {
         (	'\n'         { newline(); }
             | 	~'@'
         )
-    	( 
-    	    options { greedy = false; } 
-            : 
+    	(
+    	    options { greedy = false; }
+            :
             	'\n'     { newline(); }
-            |	~'\n' 
+            |	~'\n'
     	)*
-    )? 
-    "*/" 
+    )?
+    "*/"
 ;
 
 
@@ -232,7 +232,7 @@ options {
     	    $append("@*/");
         }
     )?
-    IDENT  { $append(" "); } 
+    IDENT  { $append(" "); }
     IDENT
 ;
 
@@ -255,7 +255,7 @@ protected DIGIT
 options {
     paraphrase = "a digit";
 }
-:	
+:
     '0'..'9'
 ;
 
@@ -269,7 +269,7 @@ options {
 }
 :
     {!expressionMode}?
-    ( 
+    (
     	    ' '
     	|   '\t'
     	|   '\n'  { newline(); acceptAt = true; }
@@ -282,8 +282,8 @@ options {
     	|   SL_COMMENT
     	|   ML_COMMENT
     )+
-    { 
-    	$setType(Token.SKIP); 
+    {
+    	$setType(Token.SKIP);
     }
 ;
 
@@ -296,12 +296,12 @@ options {
 }
 :
     {!expressionMode}?
-    LETTER 
+    LETTER
     (	options { greedy = true; }
     	:
-    	    LETTER 
-    	|   DIGIT 
-    	|   "[]" 
+    	    LETTER
+    	|   DIGIT
+    	|   "[]"
     	|   '.'
     )*
 ;
@@ -314,16 +314,16 @@ options {
 }
 :
     {!expressionMode}?
-    '(' 
+    '('
     (
         PARAM_DECL
         (
-            ',' 
+            ','
             PARAM_DECL
         )*
-    )? 
+    )?
     ')'
-;   
+;
 
 
 NEST_START
@@ -353,7 +353,7 @@ options {
     (
 	   '{'                      { braceCounter++; ignoreAt = false; }
     	|  {braceCounter > 0}? '}'  { braceCounter--; ignoreAt = false; }
-    	|  '\n'                     { newline(); ignoreAt = true; } 
+    	|  '\n'                     { newline(); ignoreAt = true; }
     	|  ' '
     	|  '\u000C'
     	|  '\t'
@@ -361,7 +361,7 @@ options {
     	|  {!ignoreAt}? '@'
     	|  {ignoreAt}? '@'!	    { ignoreAt = false; }
     	|  ~'}'			    { ignoreAt = false; }
-    )* 
+    )*
     {braceCounter == 0}? '}'
 ;
 
@@ -395,7 +395,7 @@ STRING_LITERAL
 options {
   paraphrase = "a string in double quotes";
 }
-    : '"'! ( ESC | ~('"'|'\\') )* '"'! 
+    : '"'! ( ESC | ~('"'|'\\') )* '"'!
     ;
 
 protected
@@ -427,17 +427,17 @@ EXPRESSION
         |   {parenthesesCounter > 0}? ';'
         |   '\n'  { newline(); }
         |    ~';'
-    )* 
+    )*
     {parenthesesCounter == 0}? ';'
 ;
-    
+
 
     AXIOM_NAME_BEGIN
     options {
       paraphrase = "`['";
     }
         :
-        '[' 
+        '['
         ;
 
     AXIOM_NAME_END
@@ -445,6 +445,6 @@ EXPRESSION
       paraphrase = "`]'";
     }
         :
-        ']' 
+        ']'
         ;
-  
+

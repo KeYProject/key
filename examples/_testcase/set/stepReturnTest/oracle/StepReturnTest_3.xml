@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
       <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
       </statement>
    </methodCall>
-</startNode>
+</start>

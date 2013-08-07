@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="InstanceCreationTest.classWrapper=new InstanceCreationTestWrapper (1);" pathCondition="true" pathConditionChanged="false">
          <methodCall name="InstanceCreationTestWrapper(var);" pathCondition="true" pathConditionChanged="false">
@@ -9,7 +9,7 @@
                      <methodCall name="InstanceCreationTestWrapper(var_1);" pathCondition="true" pathConditionChanged="false">
                         <statement name="this.value=var_1;" pathCondition="true" pathConditionChanged="false">
                            <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                              <branchNode name="if (this.next!=null) {   this.next.instanceWrapper=new InstanceCreationTestWrapper (3);InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);return    InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+                              <branchStatement name="if (this.next!=null) {   this.next.instanceWrapper=new InstanceCreationTestWrapper (3);InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);return    InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
                                  <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="this.next.instanceWrapper=new InstanceCreationTestWrapper (3);" pathCondition="!self.next = null" pathConditionChanged="false">
                                        <methodCall name="InstanceCreationTestWrapper(var_2);" pathCondition="!self.next = null" pathConditionChanged="false">
@@ -42,7 +42,7 @@
                                        </methodReturn>
                                     </statement>
                                  </branchCondition>
-                              </branchNode>
+                              </branchStatement>
                            </methodReturn>
                         </statement>
                      </methodCall>
@@ -52,4 +52,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

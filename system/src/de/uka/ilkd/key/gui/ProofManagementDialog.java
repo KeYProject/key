@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 // 
 package de.uka.ilkd.key.gui;
@@ -360,40 +360,62 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Shows the dialog and selects the passed proof.
      */
-    public static void showInstance(InitConfig initConfig,
-            Proof selectedProof) {
-        showInstance(initConfig);
-        ProofManagementDialog instance = MainWindow.getInstance().getProofManagementDialog();
-        if (selectedProof != null) {
-            instance.select(selectedProof);
-        }
+    public static void showInstance(InitConfig initConfig, Proof selectedProof) {
+       showInstance(initConfig, null, null, selectedProof);
+    }
+
+    /**
+     * <p>
+     * Shows the dialog and selects the passed {@link KeYJavaType} and its {@link IObserverFunction}.
+     * </p>
+     * <p>
+     * <b>This method is required, because the Eclipse integration of KeY
+     * needs this functionality to start a new proof for a selected method.</b>
+     * </p>
+     */
+    public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT, IObserverFunction selectedTarget) {
+       showInstance(initConfig, selectedKJT, selectedTarget, null);
     }
 
     /**
      * Shows the dialog.
      */
     public static void showInstance(InitConfig initConfig) {
-
-        MainWindow mainWindow = MainWindow.getInstance();
-        ProofManagementDialog instance = mainWindow.getProofManagementDialog();
-
-        if (instance == null || instance.initConfig != initConfig) {
-
-            // initConfig has changed --> create new instance
-            if (instance != null) {
-                instance.dispose();
-            }
-            instance = new ProofManagementDialog(mainWindow, initConfig);
-            mainWindow.setProofManagementDialog(instance);
-
-            //determine own defaults if not given
-            instance.selectKJTandTarget();
-        }
-
-        startedProof = false;
-        instance.updateGlobalStatus();
-        instance.setVisible(true);
+       showInstance(initConfig, null, null, null);
     }
+    
+    private static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT, IObserverFunction selectedTarget, Proof selectedProof) {
+
+       MainWindow mainWindow = MainWindow.getInstance();
+       ProofManagementDialog instance = mainWindow.getProofManagementDialog();
+
+       if (instance == null || instance.initConfig != initConfig) {
+
+           // initConfig has changed --> create new instance
+           if (instance != null) {
+               instance.dispose();
+           }
+           instance = new ProofManagementDialog(mainWindow, initConfig);
+           mainWindow.setProofManagementDialog(instance);
+
+           //determine own defaults if not given
+           instance.selectKJTandTarget();
+       }
+
+       startedProof = false;
+       instance.updateGlobalStatus();
+       
+       // The selected elements have to be select before the dialog is made visible!
+       if (selectedKJT != null && selectedTarget != null) {
+          instance.select(selectedKJT, selectedTarget);
+       }
+       
+       if (selectedProof != null) {
+          instance.select(selectedProof);
+       }
+       
+       instance.setVisible(true);
+   }
 
     private ContractSelectionPanel getActiveContractPanel() {
         return tabbedPane.getSelectedIndex() == 0

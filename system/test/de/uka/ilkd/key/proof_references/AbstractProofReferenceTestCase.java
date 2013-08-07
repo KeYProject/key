@@ -440,6 +440,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
       proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      proof.getSettings().getStrategySettings().setMaxSteps(1000);
       environment.getUi().startAndWaitForAutoMode(proof);
       // Do test
       tester.doTest(environment, proof);

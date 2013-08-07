@@ -5,7 +5,7 @@
          <sedMethodCall xml:id="_a7400ea6-dcaf-4ef0-8321-3f8c5d786329" name="ArraySumWhile.sum(array);" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
             <sedStatement xml:id="_178fc681-d46c-4b5b-8a4f-d36f1ce4704d" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203">
                <sedStatement xml:id="_d592804c-c12f-4c68-a956-71d1c2590b72" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217">
-                  <sedUseLoopInvariant xml:id="_22c463cb-38de-4422-8622-845338a4ee4c" name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
+                  <sedLoopInvariant xml:id="_22c463cb-38de-4422-8622-845338a4ee4c" name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" initiallyValid="true">
                      <sedBranchCondition xml:id="_671cb78a-0c80-4ab0-b42d-1b2d1b14b592" name="Body Preserves Invariant: !(    i_0 &gt;= 1
@@ -115,7 +115,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" lineNumber="-1" charS
                            </sedMethodReturn>
                         </sedStatement>
                      </sedBranchCondition>
-                  </sedUseLoopInvariant>
+                  </sedLoopInvariant>
                </sedStatement>
             </sedStatement>
          </sedMethodCall>

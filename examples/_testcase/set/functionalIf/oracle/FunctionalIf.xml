@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.min(i,j);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
-         <branchNode name="if (invert(i)&lt;invert(j)) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (invert(i)&lt;invert(j)) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" pathConditionChanged="false">
             <methodCall name="self.invert(a);" pathCondition="true" pathConditionChanged="false">
                <statement name="return a*-1;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.invert(a);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
@@ -35,7 +35,7 @@
                   </methodReturn>
                </statement>
             </methodCall>
-         </branchNode>
+         </branchStatement>
       </statement>
    </methodCall>
-</startNode>
+</start>

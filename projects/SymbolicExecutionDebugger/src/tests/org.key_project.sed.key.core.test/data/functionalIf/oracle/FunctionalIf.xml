@@ -4,7 +4,7 @@
       <sedThread xml:id="_eb2d1498-062e-48f7-80c1-04c6c69e4cf3" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_6a50c8c2-833a-4b2f-a327-8afe4818b818" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="661" charEnd="664">
             <sedStatement xml:id="_44cebd84-e104-47ba-8931-d107ff3dfbee" name="int result;" pathCondition="true" lineNumber="-1" charStart="684" charEnd="695">
-               <sedBranchNode xml:id="_50e97169-afb2-42f8-9453-6c1d8683ee7e" name="if (invert(i)&lt;invert(j)) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="699" charEnd="779">
+               <sedBranchStatement xml:id="_50e97169-afb2-42f8-9453-6c1d8683ee7e" name="if (invert(i)&lt;invert(j)) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="699" charEnd="779">
                   <sedMethodCall xml:id="_2267f57d-d94e-486a-8cda-8f5d9a83b4e8" name="self.invert(a);" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824">
                      <sedStatement xml:id="_ae4753db-bd1c-4290-bd75-880c21ea5590" name="return a*-1;" pathCondition="true" lineNumber="-1" charStart="837" charEnd="851">
                         <sedMethodReturn xml:id="_7b71361b-7006-4389-b107-26d7402cb81e" name="&lt;return i * -1 as result of self.invert(a);&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824">
@@ -37,7 +37,7 @@
                         </sedMethodReturn>
                      </sedStatement>
                   </sedMethodCall>
-               </sedBranchNode>
+               </sedBranchStatement>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

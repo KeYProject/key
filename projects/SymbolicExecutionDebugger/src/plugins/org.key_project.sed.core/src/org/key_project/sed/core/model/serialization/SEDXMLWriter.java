@@ -100,7 +100,7 @@ public class SEDXMLWriter {
    /**
     * Tag name to store {@link ISEDBranchStatement}s.
     */
-   public static final String TAG_BRANCH_STATEMENT = "sedBranchNode";
+   public static final String TAG_BRANCH_STATEMENT = "sedBranchStatement";
 
    /**
     * Tag name to store {@link ISEDExceptionalTermination}s.
@@ -120,7 +120,7 @@ public class SEDXMLWriter {
    /**
     * Tag name to store {@link ISEDLoopStatement}s.
     */
-   public static final String TAG_LOOP_STATEMENT = "sedLoopNode";
+   public static final String TAG_LOOP_STATEMENT = "sedLoopStatement";
 
    /**
     * Tag name to store {@link ISEDMethodCall}s.
@@ -165,12 +165,12 @@ public class SEDXMLWriter {
    /**
     * Tag name to store {@link ISEDOperationContract}s.
     */
-   public static final String TAG_OPERATION_CONTRACT = "sedUseOperationContract";
+   public static final String TAG_OPERATION_CONTRACT = "sedOperationContract";
 
    /**
     * Tag name to store {@link ISEDLoopInvariant}s.
     */
-   public static final String TAG_LOOP_INVARIANT = "sedUseLoopInvariant";
+   public static final String TAG_LOOP_INVARIANT = "sedLoopInvariant";
 
    /**
     * Attribute name to store encodings.

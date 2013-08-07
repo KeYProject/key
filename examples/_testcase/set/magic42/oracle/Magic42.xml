@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="Magic42.compute(xValue);" pathCondition="true" pathConditionChanged="false">
       <statement name="int y = computeHelp(xValue);" pathCondition="true" pathConditionChanged="false">
          <methodCall name="Magic42.computeHelp(x_1);" pathCondition="true" pathConditionChanged="false">
@@ -8,23 +8,23 @@
                   <statement name="return 320*y_1+7;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                      <methodReturn name="&lt;return of Magic42.computeHelp(x_1);&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 + quotient_1 * 320 as result of Magic42.computeHelp(x_1);&gt;" isReturnValueComputed="true">
                         <statement name="int res = 0;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                           <loopNode name="while ( y%2!=0 ) {if (res_1%2==0) {     res_1=2*res_1+(y%2);     y=y/2;   }else  {     res_1=2*res_1;   } }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
+                           <loopStatement name="while ( y%2!=0 ) {if (res_1%2==0) {     res_1=2*res_1+(y%2);     y=y/2;   }else  {     res_1=2*res_1;   } }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                               <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                 <branchNode name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
+                                 <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                     <statement name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                        <statement name="y=y/2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                           <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                             <branchNode name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
+                                             <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                 <statement name="res_1=2*res_1;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                    <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                      <branchNode name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
+                                                      <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                          <statement name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                             <statement name="y=y/2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                  <branchNode name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
+                                                                  <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                      <statement name="res_1=2*res_1;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                         <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                           <branchNode name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
+                                                                           <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                               <statement name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                                  <statement name="y=y/2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
                                                                                     <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
@@ -37,23 +37,23 @@
                                                                                     </loopCondition>
                                                                                  </statement>
                                                                               </statement>
-                                                                           </branchNode>
+                                                                           </branchStatement>
                                                                         </loopCondition>
                                                                      </statement>
-                                                                  </branchNode>
+                                                                  </branchStatement>
                                                                </loopCondition>
                                                             </statement>
                                                          </statement>
-                                                      </branchNode>
+                                                      </branchStatement>
                                                    </loopCondition>
                                                 </statement>
-                                             </branchNode>
+                                             </branchStatement>
                                           </loopCondition>
                                        </statement>
                                     </statement>
-                                 </branchNode>
+                                 </branchStatement>
                               </loopCondition>
-                           </loopNode>
+                           </loopStatement>
                         </statement>
                      </methodReturn>
                   </statement>
@@ -62,23 +62,23 @@
                   <statement name="return 320*y_1+7;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of Magic42.computeHelp(x_1);&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 + quotient_0 * 320 as result of Magic42.computeHelp(x_1);&gt;" isReturnValueComputed="true">
                         <statement name="int res = 0;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                           <loopNode name="while ( y%2!=0 ) {if (res%2==0) {     res=2*res+(y%2);     y=y/2;   }else  {     res=2*res;   } }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
+                           <loopStatement name="while ( y%2!=0 ) {if (res%2==0) {     res=2*res+(y%2);     y=y/2;   }else  {     res=2*res;   } }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                               <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                 <branchNode name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
+                                 <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                     <statement name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                        <statement name="y=y/2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                           <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                             <branchNode name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
+                                             <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                 <statement name="res=2*res;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                    <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                      <branchNode name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
+                                                      <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                          <statement name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                             <statement name="y=y/2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                  <branchNode name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
+                                                                  <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                      <statement name="res=2*res;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                         <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                           <branchNode name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
+                                                                           <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                               <statement name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                                  <statement name="y=y/2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
                                                                                     <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
@@ -91,23 +91,23 @@
                                                                                     </loopCondition>
                                                                                  </statement>
                                                                               </statement>
-                                                                           </branchNode>
+                                                                           </branchStatement>
                                                                         </loopCondition>
                                                                      </statement>
-                                                                  </branchNode>
+                                                                  </branchStatement>
                                                                </loopCondition>
                                                             </statement>
                                                          </statement>
-                                                      </branchNode>
+                                                      </branchStatement>
                                                    </loopCondition>
                                                 </statement>
-                                             </branchNode>
+                                             </branchStatement>
                                           </loopCondition>
                                        </statement>
                                     </statement>
-                                 </branchNode>
+                                 </branchStatement>
                               </loopCondition>
-                           </loopNode>
+                           </loopStatement>
                         </statement>
                      </methodReturn>
                   </statement>
@@ -116,4 +116,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

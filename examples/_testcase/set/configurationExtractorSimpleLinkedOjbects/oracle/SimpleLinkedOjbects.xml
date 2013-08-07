@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleLinkedOjbects.compute(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="x.value=1;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -32,4 +32,4 @@
          </branchCondition>
       </statement>
    </methodCall>
-</startNode>
+</start>

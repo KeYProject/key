@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
-         <loopNode name="for ( int i = 0; invert(i)&gt;-3; i++ ) {   result_1++; }" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="for ( int i = 0; invert(i)&gt;-3; i++ ) {   result_1++; }" pathCondition="true" pathConditionChanged="false">
             <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
                <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="self.invert(i_1);" pathCondition="true" pathConditionChanged="false">
@@ -55,7 +55,7 @@
                   </methodCall>
                </loopCondition>
             </statement>
-         </loopNode>
+         </loopStatement>
       </statement>
    </methodCall>
-</startNode>
+</start>

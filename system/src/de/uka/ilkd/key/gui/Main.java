@@ -396,7 +396,7 @@ public final class Main {
                         System.out.println("Auto mode was terminated by an exception:");
                         if (Debug.ENABLE_DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
-                        if (msg!=null) System.err.println(msg);
+                        if (msg!=null) System.out.println(msg);
                     }
                     System.exit(-1);
                 }
@@ -406,8 +406,8 @@ public final class Main {
             ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
-            MainWindow mainWindow = new MainWindow();
-            
+            MainWindow mainWindow = MainWindow.getInstance();
+
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
                         mainWindow.getRecentFiles().getMostRecent();

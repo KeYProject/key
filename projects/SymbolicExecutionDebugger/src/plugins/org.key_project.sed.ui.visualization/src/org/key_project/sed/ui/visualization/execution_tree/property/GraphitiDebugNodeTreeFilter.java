@@ -40,7 +40,7 @@ public class GraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilter {
                return null; // Is never used.
             }
          };
-         section.setInput(WorkbenchUtil.getActivePart(), null);
+         section.setInput(part, null);
          return accept(pe, section);
       }
       else {

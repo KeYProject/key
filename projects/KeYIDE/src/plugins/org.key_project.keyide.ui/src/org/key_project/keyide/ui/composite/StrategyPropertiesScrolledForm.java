@@ -19,6 +19,8 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -28,6 +30,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.key_project.keyide.ui.util.LogUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -82,6 +86,137 @@ public class StrategyPropertiesScrolledForm extends ScrolledForm {
    private Button userSpecificTacletsThreeLowPrior;
    private Button userSpecificTacletsThreeHighPrior;
 
+
+
+   private SelectionListener listener = new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+          if(e.getSource().equals(stopAtDefault)&&stopAtDefault.getSelection()){
+             props.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+          }
+          else if(e.getSource().equals(stopAtUnclosable)&&stopAtUnclosable.getSelection()){
+             props.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
+          }
+          else if(e.getSource().equals(treatmentOfNewUnclosableGoalsNone)&&treatmentOfNewUnclosableGoalsNone.getSelection()){
+             props.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
+          }
+          else if(e.getSource().equals(treatmentOfNewUnclosableGoalsAutoPrune)&&treatmentOfNewUnclosableGoalsAutoPrune.getSelection()){
+             props.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_RETREAT);
+          }
+          else if(e.getSource().equals(logicalSplittingDelayed)&&logicalSplittingDelayed.getSelection()){
+             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
+          }
+          else if(e.getSource().equals(logicalSplittingFree)&&logicalSplittingFree.getSelection()){
+             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
+          }
+          else if(e.getSource().equals(logicalSplittingOff)&&logicalSplittingOff.getSelection()){
+             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
+          }
+          else if(e.getSource().equals(loopTreatmentInvariant)&&loopTreatmentInvariant.getSelection()){
+             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT);
+          }
+          else if(e.getSource().equals(loopTreatmentExpand)&&loopTreatmentExpand.getSelection()){
+             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
+          }
+          else if(e.getSource().equals(loopTreatmentNone)&&loopTreatmentNone.getSelection()){
+             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
+          }
+          else if(e.getSource().equals(blockTreatmentContract)&&blockTreatmentContract.getSelection()){
+             props.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_CONTRACT);
+          }
+          else if(e.getSource().equals(blockTreatmentExpand)&&blockTreatmentExpand.getSelection()){
+             props.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+          }
+          else if(e.getSource().equals(methodTreatmentContract)&&methodTreatmentContract.getSelection()){
+             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT);
+          }
+          else if(e.getSource().equals(methodTreatmentExpand)&&methodTreatmentExpand.getSelection()){
+             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
+          }
+          else if(e.getSource().equals(methodTreatmentNone)&&methodTreatmentNone.getSelection()){
+             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE);
+          }
+          else if(e.getSource().equals(dependencyContratcsOn)&&dependencyContratcsOn.getSelection()){
+             props.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON);
+          }
+          else if(e.getSource().equals(dependencyContratcsOff)&&dependencyContratcsOff.getSelection()){
+             props.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+          }
+          else if(e.getSource().equals(queryTreatmentOn)&&queryTreatmentOn.getSelection()){
+             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
+          }
+          else if(e.getSource().equals(queryTreatmentRestricted)&&queryTreatmentRestricted.getSelection()){
+             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
+          }
+          else if(e.getSource().equals(queryTreatmentOff)&&queryTreatmentOff.getSelection()){
+             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
+          }
+          else if(e.getSource().equals(expandLocalQueriesOn)&&expandLocalQueriesOn.getSelection()){
+             props.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
+          }
+          else if(e.getSource().equals(expandLocalQueriesOff)&&expandLocalQueriesOff.getSelection()){
+             props.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
+          }
+          else if(e.getSource().equals(arithmeticTreatmentBasic)&&arithmeticTreatmentBasic.getSelection()){
+             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_NONE);
+          }
+          else if(e.getSource().equals(arithmeticTreatmentDefOps)&&arithmeticTreatmentDefOps.getSelection()){
+             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+          }
+          else if(e.getSource().equals(arithmeticTreatmentModelSearch)&&arithmeticTreatmentModelSearch.getSelection()){
+             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_COMPLETION);
+          }
+          else if(e.getSource().equals(quantifierTreatmentNone)&&quantifierTreatmentNone.getSelection()){
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE);
+          }
+          else if(e.getSource().equals(quantifierTreatmentNoSplits)&&quantifierTreatmentNoSplits.getSelection()){
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
+          }
+          else if(e.getSource().equals(quantifierTreatmentNoSplitsWithProgs)&&quantifierTreatmentNoSplitsWithProgs.getSelection()){
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+          }
+          else if(e.getSource().equals(quantifierTreatmentFree)&&quantifierTreatmentFree.getSelection()){
+             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
+          }
+          else if(e.getSource().equals(autoInductionOn)&&autoInductionOn.getSelection()){
+             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_ON);
+          }
+          else if(e.getSource().equals(autoInductionRestricted)&&autoInductionRestricted.getSelection()){
+             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_RESTRICTED);
+          }
+          else if(e.getSource().equals(autoInductionOff)&&autoInductionOff.getSelection()){
+             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+          }
+          else if(e.getSource().equals(userSpecificTacletsOneOff)&&userSpecificTacletsOneOff.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_OFF);
+          }
+          else if(e.getSource().equals(userSpecificTacletsOneLowPrior)&&userSpecificTacletsOneLowPrior.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_LOW);
+          }
+          else if(e.getSource().equals(userSpecificTacletsOneHighPrior)&&userSpecificTacletsOneHighPrior.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_HIGH);
+          }
+          else if(e.getSource().equals(userSpecificTacletsTwoOff)&&userSpecificTacletsTwoOff.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_OFF);
+          }
+          else if(e.getSource().equals(userSpecificTacletsTwoLowPrior)&&userSpecificTacletsTwoLowPrior.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_LOW);
+          }
+          else if(e.getSource().equals(userSpecificTacletsTwoHighPrior)&&userSpecificTacletsTwoHighPrior.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_HIGH);
+          }
+          else if(e.getSource().equals(userSpecificTacletsThreeOff)&&userSpecificTacletsThreeOff.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_OFF);
+          }
+          else if(e.getSource().equals(userSpecificTacletsThreeLowPrior)&&userSpecificTacletsThreeLowPrior.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_LOW);
+          }
+          else if(e.getSource().equals(userSpecificTacletsThreeHighPrior)&&userSpecificTacletsThreeHighPrior.getSelection()){
+             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_HIGH);
+          }
+          SymbolicExecutionUtil.updateStrategySettings(proof, props);
+      }
+   };
+   
    public StrategyPropertiesScrolledForm(Composite parent) {
       super(parent, SWT.V_SCROLL);
       initializeContent(parent);
@@ -96,7 +231,38 @@ public class StrategyPropertiesScrolledForm extends ScrolledForm {
       maxStepLabel.setText("&Maximum number of steps:");
       maxStepText = new Text(getBody(), SWT.BORDER);
       maxStepText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      maxStepText.addModifyListener(maxStepListener);
+      maxStepText.addVerifyListener(new VerifyListener() {
+         @Override
+         public void verifyText(VerifyEvent e) {
+            if (!StringUtil.isTrimmedEmpty(e.text)) {
+               try {
+                  int steps = Integer.valueOf(e.text);
+                  e.doit = steps >= 0;
+               }
+               catch (Exception exc) {
+                  e.doit = false;
+               }
+            }
+            else {
+              e.doit = true; // Allow empty text which will be treated as zero
+            }
+         }
+      });
+      maxStepText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(ModifyEvent e) {
+            try {
+               String text = maxStepText.getText();
+               int steps = !StringUtil.isTrimmedEmpty(text) ? 
+                           Integer.valueOf(text) : 
+                           0;
+               proof.getSettings().getStrategySettings().setMaxSteps(steps);
+            }
+            catch (Exception exc) {
+               LogUtil.getLogger().openErrorDialog(getShell(), exc);
+            }
+         }
+      });
       maxStepText.setTextLimit(7);
       
       Group javaDLOptionsGroup = new Group(getBody(), SWT.SHADOW_IN);
@@ -330,179 +496,4 @@ public class StrategyPropertiesScrolledForm extends ScrolledForm {
       userSpecificTacletsThreeHighPrior.setSelection(props.getProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3)).equals(StrategyProperties.USER_TACLETS_HIGH));
       
    }
-
-   SelectionListener listener = new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-          if(e.getSource().equals(stopAtDefault)&&stopAtDefault.getSelection()){
-             props.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
-          }
-          else if(e.getSource().equals(stopAtUnclosable)&&stopAtUnclosable.getSelection()){
-             props.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
-          }
-          else if(e.getSource().equals(treatmentOfNewUnclosableGoalsNone)&&treatmentOfNewUnclosableGoalsNone.getSelection()){
-             props.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_NONE);
-          }
-          else if(e.getSource().equals(treatmentOfNewUnclosableGoalsAutoPrune)&&treatmentOfNewUnclosableGoalsAutoPrune.getSelection()){
-             props.setProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY, StrategyProperties.RETREAT_MODE_RETREAT);
-          }
-          else if(e.getSource().equals(logicalSplittingDelayed)&&logicalSplittingDelayed.getSelection()){
-             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
-          }
-          else if(e.getSource().equals(logicalSplittingFree)&&logicalSplittingFree.getSelection()){
-             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_NORMAL);
-          }
-          else if(e.getSource().equals(logicalSplittingOff)&&logicalSplittingOff.getSelection()){
-             props.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
-          }
-          else if(e.getSource().equals(loopTreatmentInvariant)&&loopTreatmentInvariant.getSelection()){
-             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT);
-          }
-          else if(e.getSource().equals(loopTreatmentExpand)&&loopTreatmentExpand.getSelection()){
-             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
-          }
-          else if(e.getSource().equals(loopTreatmentNone)&&loopTreatmentNone.getSelection()){
-             props.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
-          }
-          else if(e.getSource().equals(blockTreatmentContract)&&blockTreatmentContract.getSelection()){
-             props.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_CONTRACT);
-          }
-          else if(e.getSource().equals(blockTreatmentExpand)&&blockTreatmentExpand.getSelection()){
-             props.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
-          }
-          else if(e.getSource().equals(methodTreatmentContract)&&methodTreatmentContract.getSelection()){
-             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT);
-          }
-          else if(e.getSource().equals(methodTreatmentExpand)&&methodTreatmentExpand.getSelection()){
-             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
-          }
-          else if(e.getSource().equals(methodTreatmentNone)&&methodTreatmentNone.getSelection()){
-             props.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE);
-          }
-          else if(e.getSource().equals(dependencyContratcsOn)&&dependencyContratcsOn.getSelection()){
-             props.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON);
-          }
-          else if(e.getSource().equals(dependencyContratcsOff)&&dependencyContratcsOff.getSelection()){
-             props.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-          }
-          else if(e.getSource().equals(queryTreatmentOn)&&queryTreatmentOn.getSelection()){
-             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
-          }
-          else if(e.getSource().equals(queryTreatmentRestricted)&&queryTreatmentRestricted.getSelection()){
-             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
-          }
-          else if(e.getSource().equals(queryTreatmentOff)&&queryTreatmentOff.getSelection()){
-             props.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
-          }
-          else if(e.getSource().equals(expandLocalQueriesOn)&&expandLocalQueriesOn.getSelection()){
-             props.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
-          }
-          else if(e.getSource().equals(expandLocalQueriesOff)&&expandLocalQueriesOff.getSelection()){
-             props.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_OFF);
-          }
-          else if(e.getSource().equals(arithmeticTreatmentBasic)&&arithmeticTreatmentBasic.getSelection()){
-             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_NONE);
-          }
-          else if(e.getSource().equals(arithmeticTreatmentDefOps)&&arithmeticTreatmentDefOps.getSelection()){
-             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-          }
-          else if(e.getSource().equals(arithmeticTreatmentModelSearch)&&arithmeticTreatmentModelSearch.getSelection()){
-             props.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_COMPLETION);
-          }
-          else if(e.getSource().equals(quantifierTreatmentNone)&&quantifierTreatmentNone.getSelection()){
-             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE);
-          }
-          else if(e.getSource().equals(quantifierTreatmentNoSplits)&&quantifierTreatmentNoSplits.getSelection()){
-             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
-          }
-          else if(e.getSource().equals(quantifierTreatmentNoSplitsWithProgs)&&quantifierTreatmentNoSplitsWithProgs.getSelection()){
-             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-          }
-          else if(e.getSource().equals(quantifierTreatmentFree)&&quantifierTreatmentFree.getSelection()){
-             props.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_INSTANTIATE);
-          }
-          else if(e.getSource().equals(autoInductionOn)&&autoInductionOn.getSelection()){
-             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_ON);
-          }
-          else if(e.getSource().equals(autoInductionRestricted)&&autoInductionRestricted.getSelection()){
-             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_RESTRICTED);
-          }
-          else if(e.getSource().equals(autoInductionOff)&&autoInductionOff.getSelection()){
-             props.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
-          }
-          else if(e.getSource().equals(userSpecificTacletsOneOff)&&userSpecificTacletsOneOff.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_OFF);
-          }
-          else if(e.getSource().equals(userSpecificTacletsOneLowPrior)&&userSpecificTacletsOneLowPrior.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_LOW);
-          }
-          else if(e.getSource().equals(userSpecificTacletsOneHighPrior)&&userSpecificTacletsOneHighPrior.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(1), StrategyProperties.USER_TACLETS_HIGH);
-          }
-          else if(e.getSource().equals(userSpecificTacletsTwoOff)&&userSpecificTacletsTwoOff.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_OFF);
-          }
-          else if(e.getSource().equals(userSpecificTacletsTwoLowPrior)&&userSpecificTacletsTwoLowPrior.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_LOW);
-          }
-          else if(e.getSource().equals(userSpecificTacletsTwoHighPrior)&&userSpecificTacletsTwoHighPrior.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(2), StrategyProperties.USER_TACLETS_HIGH);
-          }
-          else if(e.getSource().equals(userSpecificTacletsThreeOff)&&userSpecificTacletsThreeOff.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_OFF);
-          }
-          else if(e.getSource().equals(userSpecificTacletsThreeLowPrior)&&userSpecificTacletsThreeLowPrior.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_LOW);
-          }
-          else if(e.getSource().equals(userSpecificTacletsThreeHighPrior)&&userSpecificTacletsThreeHighPrior.getSelection()){
-             props.setProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(3), StrategyProperties.USER_TACLETS_HIGH);
-          }
-          SymbolicExecutionUtil.updateStrategySettings(proof, props);
-      }
-   };
-   
-   ModifyListener maxStepListener = new ModifyListener(){
-      @Override
-      public void modifyText(ModifyEvent e) {
-         if(e.getSource() instanceof Text){
-            boolean firstValueZero = true;
-            Text text = (Text)e.getSource();
-            String string = text.getText();
-            char [] chars = new char [string.length ()];
-            string.getChars (0, chars.length, chars, 0);
-            if(text.getText()==""){
-               return;
-            }
-            for (int i=0; i<chars.length; i++) {
-               if (!('0' <= chars [i] && chars [i] <= '9')) {
-                  text.setText("");
-                  return;
-               } 
-            }
-            
-            int steps = Integer.parseInt(string);
-            if(steps<1){
-               steps=1;
-               text.setText(String.valueOf(steps));
-               return;
-            }
-            if(steps>1000000){
-               steps=1000000;
-               text.setText(String.valueOf(steps));
-               return;
-            }
-            for (int i=0; i<chars.length; i++) {
-               if( chars[i] == '0' && firstValueZero){
-                  text.setText(String.valueOf(chars, i+1,  chars.length-i-1));
-                  return;
-               }else{
-                  firstValueZero = false;
-               }
-            }
-            proof.getSettings().getStrategySettings().setMaxSteps(steps);
-         }
-      }
-      
-   };
-   
-   
 }

@@ -83,7 +83,7 @@ public abstract class AbstractGraphitiDebugNodePropertySection extends GFPropert
          if (diagramProvider != null) {
             IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
             if (featureProvider != null) {
-               Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+               Object bo = featureProvider.getBusinessObjectForPictogramElement(pe);
                if (bo instanceof ISEDDebugNode) {
                   node = (ISEDDebugNode)bo;
                }

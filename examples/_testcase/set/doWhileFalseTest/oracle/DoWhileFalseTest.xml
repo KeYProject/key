@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
-         <loopNode name="do {result_1++;}while ( false );" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="do {result_1++;}while ( false );" pathCondition="true" pathConditionChanged="false">
             <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                <loopCondition name="false" pathCondition="true" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
@@ -13,7 +13,7 @@
                   </statement>
                </loopCondition>
             </statement>
-         </loopNode>
+         </loopStatement>
       </statement>
    </methodCall>
-</startNode>
+</start>

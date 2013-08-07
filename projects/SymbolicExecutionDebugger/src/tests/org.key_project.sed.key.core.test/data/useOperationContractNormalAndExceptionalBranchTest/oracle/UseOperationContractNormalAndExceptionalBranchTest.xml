@@ -4,7 +4,7 @@
       <sedThread xml:id="_863ce224-201b-4b0f-b5a4-7fcf37230b49" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_5471389e-bb27-4c71-ad76-c6dd4ab150a1" name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" lineNumber="-1" charStart="88" charEnd="92">
             <sedStatement xml:id="_05bdce59-2d47-4c0e-8a5f-a890b5d9185e" name="int magicNumber = magic(value);" pathCondition="true" lineNumber="-1" charStart="119" charEnd="150">
-               <sedUseOperationContract xml:id="_d3958b14-edda-4b55-a88b-6faa9a731f3d" name="result = magic(x) catch(exc)
+               <sedOperationContract xml:id="_d3958b14-edda-4b55-a88b-6faa9a731f3d" name="result = magic(x) catch(exc)
 pre: x &lt; 0 &amp; x &gt;= javaUnaryMinusInt(10)
 | x &lt; javaUnaryMinusInt(10)
 | x &gt;= 0
@@ -42,7 +42,7 @@ termination: diamond" pathCondition="true" lineNumber="-1" charStart="755" charE
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-               </sedUseOperationContract>
+               </sedOperationContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>
