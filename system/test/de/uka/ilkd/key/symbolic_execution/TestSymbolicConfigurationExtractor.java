@@ -829,7 +829,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
-         assertEquals(expected.getValueString(), current.getValueString());
+         assertTrue("\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"", JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertEquals(expected.getConditionString(), current.getConditionString());
       }
