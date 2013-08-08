@@ -546,4 +546,16 @@ public final class DependencyContractImpl implements DependencyContract {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
                 specifiedIn);
     }
+
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        Map<LocationVariable, ProgramVariable> atPreVars =
+                new LinkedHashMap<LocationVariable, ProgramVariable>();
+        for (LocationVariable h: originalAtPreVars.keySet()) {
+            atPreVars.put(h, originalAtPreVars.get(h));
+        }
+        return new OriginalVariables(originalSelfVar, null, null,
+                                     atPreVars, originalParamVars);
+    }
 }

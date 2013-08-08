@@ -123,7 +123,8 @@ public class OpReplacer {
             result = TF.createTerm(newOp,
                                    newSubTerms,
                                    newBoundVars,
-                                   term.javaBlock());
+                                   term.javaBlock(),
+                                   term.getLabels());
         } else {
             result = term;
         }

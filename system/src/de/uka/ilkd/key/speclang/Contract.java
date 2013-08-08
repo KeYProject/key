@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -51,6 +52,12 @@ public interface Contract extends SpecificationElement {
      * Tells whether the contract contains a measured_by clause.
      */
     public boolean hasMby();
+
+    /**
+     * Returns the original ProgramVariables to replace them easier.
+     * The second list consists of the parameters.
+     */
+    public OriginalVariables getOrigVars();
 
     /**
      * Returns the precondition of the contract.
@@ -156,4 +163,29 @@ public interface Contract extends SpecificationElement {
      * Returns technical name for the contract type.
      */
     public String getTypeName();
+
+    final public class OriginalVariables {
+
+        public final ProgramVariable self;
+        public final ProgramVariable result;
+        public final ProgramVariable exception;
+        public final Map<LocationVariable, ProgramVariable> atPres;
+        public final ImmutableList<ProgramVariable> params;
+
+        public OriginalVariables(ProgramVariable selfVar,
+                                 ProgramVariable resVar,
+                                 ProgramVariable excVar,
+                                 Map<LocationVariable, ProgramVariable> atPreVars,
+                                 ImmutableList<ProgramVariable> paramVars) {
+            this.self = selfVar;
+            this.result = resVar;
+            this.exception = excVar;
+            this.atPres = atPreVars;
+            if (paramVars == null) {
+                this.params = ImmutableSLList.<ProgramVariable>nil();
+            } else {
+                this.params = paramVars;
+            }
+        }
+    }
 }

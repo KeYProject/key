@@ -32,7 +32,7 @@ public interface ITermLabel extends Named {
     public static final Set<ITermLabel> labels =
             Collections.unmodifiableSet(new LinkedHashSet<ITermLabel>(Arrays.asList(
                     LoopBodyTermLabel.INSTANCE, LoopInvariantNormalBehaviorTermLabel.INSTANCE,
-                    ShortcutEvaluationTermLabel.INSTANCE, AutoSpecTermLabel.INSTANCE)));
+                    ShortcutEvaluationTermLabel.INSTANCE, ImplicitTermLabel.INSTANCE)));
 
     /**
      * A term label may have structure, i.e., parameterized

@@ -672,6 +672,9 @@ public class TermBuilder {
         }
     }
 
+    public Term andSC(Term t1, Term t2) {
+        return shortcut(and(t1, t2));
+    }
 
     public Term and(Term ... subTerms) {
         Term result = tt();
@@ -681,6 +684,13 @@ public class TermBuilder {
         return result;
     }
 
+    public Term andSC(Term ... subTerms) {
+        Term result = tt();
+        for(Term sub : subTerms) {
+            result = andSC(result, sub);
+        }
+        return result;
+    }
 
     public Term and(Iterable<Term> subTerms) {
         Term result = tt();
@@ -690,6 +700,13 @@ public class TermBuilder {
         return result;
     }
 
+    public Term andSC(Iterable<Term> subTerms) {
+        Term result = tt();
+        for(Term sub : subTerms) {
+            result = andSC(result, sub);
+        }
+        return result;
+    }
 
     public Term or(Term t1, Term t2) {
         if(t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
@@ -703,6 +720,9 @@ public class TermBuilder {
         }
     }
 
+    public Term orSC(Term t1, Term t2) {
+        return shortcut(or(t1, t2));
+    }
 
     public Term or(Term... subTerms) {
         Term result = ff();
@@ -712,6 +732,13 @@ public class TermBuilder {
         return result;
     }
 
+    public Term orSC(Term... subTerms) {
+        Term result = ff();
+        for(Term sub : subTerms) {
+            result = orSC(result, sub);
+        }
+        return result;
+    }
 
     public Term or(Iterable<Term> subTerms) {
         Term result = ff();
@@ -721,6 +748,13 @@ public class TermBuilder {
         return result;
     }
 
+    public Term orSC(Iterable<Term> subTerms) {
+        Term result = ff();
+        for(Term sub : subTerms) {
+            result = orSC(result, sub);
+        }
+        return result;
+    }
 
     public Term imp(Term t1, Term t2) {
         return imp(t1, t2, null);
@@ -1551,6 +1585,15 @@ public class TermBuilder {
             return term;
         } else {
             return label(term, new ImmutableArray<ITermLabel>(label));
+        }
+    }
+
+    public Term shortcut(Term term) {
+        if (term.op().equals(Junctor.AND)
+                        || term.op().equals(Junctor.OR)) {
+            return label(term, ShortcutEvaluationTermLabel.INSTANCE);
+        } else {
+            return term;
         }
     }
 

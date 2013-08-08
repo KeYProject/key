@@ -358,7 +358,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param selfVar The self variable.
     * @return The term representing the general assumption.
     */
-   protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm, ProgramVariable selfVar) {
+   protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
+                                      ProgramVariable selfVar) {
 	  if(selfVar == null || pm.isConstructor()) {
 		  return TB.tt();
 	  }
@@ -443,7 +444,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    Map<LocationVariable, LocationVariable> atPreVars,
                                    Services services);
 
-   protected abstract Term getGlobalDefs (LocationVariable heap, Term heapTerm, Term selfTerm, ImmutableList<Term> paramTerms, Services services);
+   protected abstract Term getGlobalDefs (LocationVariable heap, Term heapTerm, Term selfTerm,
+                                          ImmutableList<Term> paramTerms, Services services);
 
    /**
     * Checks if an uninterpreted predicate is added to the postcondition or not.

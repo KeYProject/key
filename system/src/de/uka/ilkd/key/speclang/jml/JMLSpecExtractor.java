@@ -37,7 +37,7 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.AutoSpecTermLabel;
+import de.uka.ilkd.key.logic.ImplicitTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -179,29 +179,31 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param pos the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
      */
-    public static ImmutableSet<PositionedString> createNonNullPositionedString(String varName, KeYJavaType kjt,
-	    boolean isImplicitVar, String fileName, Position pos, Services services) {
-	ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
-	final Type varType  = kjt.getJavaType();
+    public static ImmutableSet<PositionedString>
+                        createNonNullPositionedString(String varName,KeYJavaType kjt,
+                                                      boolean isImplicitVar, String fileName,
+                                                      Position pos, Services services) {
+        ImmutableSet<PositionedString> result = DefaultImmutableSet.<PositionedString>nil();
+        final Type varType  = kjt.getJavaType();
 
-	final TypeConverter typeConverter = services.getTypeConverter();
-    if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
+        final TypeConverter typeConverter = services.getTypeConverter();
+        if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
 
-	    PositionedString ps
-	    = new PositionedString(varName + " != null", fileName, pos);
-	    result = result.add(ps);
-	    if (varType instanceof ArrayType &&
-		    typeConverter.
-		    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
-		final PositionedString arrayElementsNonNull
-		= new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
-			+ varName + "[i]" + " != null)",
-			fileName,
-			pos);
-		result = result.add(arrayElementsNonNull);
-	    }
-	}
-	return result;
+            PositionedString ps
+            = new PositionedString(varName + " != null", fileName, pos);
+            result = result.add(ps);
+            if (varType instanceof ArrayType &&
+                    typeConverter.
+                    isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
+                final PositionedString arrayElementsNonNull
+                = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
+                        + varName + "[i]" + " != null)",
+                        fileName,
+                        pos);
+                result = result.add(arrayElementsNonNull);
+            }
+        }
+        return result;
     }
 
 
@@ -258,9 +260,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 		    field instanceof ImplicitFieldSpecification,
                 		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
-                	    result = result.add(jsf.createJMLClassInvariant(kjt,
-                		    					    visibility, isStatic,
-                		            				    classInv));
+                            result = result.add(
+                                    jsf.createJMLClassInvariant(kjt, visibility, isStatic,
+                                            classInv.label(ImplicitTermLabel.INSTANCE)));
                 	}
                     }
                 }
@@ -434,11 +436,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
                     specCase.addRequires(new PositionedLabeledString(invString,
-                                                                     AutoSpecTermLabel.INSTANCE));
+                                                                     ImplicitTermLabel.INSTANCE));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addRequires(new PositionedLabeledString(""+pm.getName()+".\\inv",
-                                                                     AutoSpecTermLabel.INSTANCE));
+                                                                     ImplicitTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(new PositionedString("ensures "+invString));
@@ -460,8 +462,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                 false,
                                 fileName, pm.getStartPosition(),services);
                     for (PositionedString nonNull : nonNullParams) {
-                        nonNull = nonNull.label(AutoSpecTermLabel.INSTANCE);
-                        specCase.addRequires(nonNull);
+                        specCase.addRequires(nonNull.label(ImplicitTermLabel.INSTANCE));
                     }
                 }
             }

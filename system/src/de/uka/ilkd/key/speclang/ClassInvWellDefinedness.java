@@ -14,6 +14,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
@@ -23,15 +24,19 @@ import de.uka.ilkd.key.util.Triple;
 
 public final class ClassInvWellDefinedness extends WellDefinednessCheck {
 
-    final ClassInvariant inv;
+    private final ClassInvariant inv;
 
     public ClassInvWellDefinedness(ClassInvariant inv, IObserverFunction target, Services services) {
         super(target, Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
-        this.requires = TB.tt();
-        this.assignable = TB.func(services.getTypeConverter().getLocSetLDT().getAllLocs());
-        this.ensures = inv.getOriginalInv();
+        this.setRequires(TB.tt());
+        this.setAssignable(TB.func(services.getTypeConverter().getLocSetLDT().getAllLocs()));
+        this.setEnsures(inv.getOriginalInv());
+    }
+
+    public ClassInvariant getInvariant() {
+        return this.inv;
     }
 
     @Override
@@ -81,62 +86,53 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public Triple<Term, ImmutableList<Term>, Term> createPOTerm() {
-        Term inv = this.getRequires();
+        Term pre = this.getRequires();
         ImmutableList<Term> c = ImmutableSLList.<Term>nil();
         c = c.append(this.getAssignable());
-        return new Triple<Term, ImmutableList<Term>, Term>(inv, c, inv);
+        Term inv = this.getEnsures();
+        return new Triple<Term, ImmutableList<Term>, Term>(pre, c, inv);
     }
 
     public ImmutableSet<Taclet> getTaclets(Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        IObserverFunction target = getTarget();
+        boolean isStatic = target.isStatic();
+        KeYJavaType kjt = inv.getKJT();
+        TacletGenerator TG = TacletGenerator.getInstance();
 
-        for (int i = 0; i < 2; i++) {
-            TacletGenerator TG = TacletGenerator.getInstance();
-            Name name = MiscTools.toValidTacletName("wd invariant "
-                                                    + (getTarget().isStatic()? "static ": "")
-                                                    + getTarget().name().toString()
-                                                    + (i == 0 ? "" : " EQ"));
+        Name name = MiscTools.toValidTacletName("wd invariant "
+                                                + (isStatic ? "static ": "")
+                                                + target.name().toString());
 
-            //create schema variables
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
-            for(int j=0; j<HeapContext.getModHeaps(services, false).size(); j++) {
-                heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h"+j),
-                                                       heapLDT.targetSort(),
-                                                       false,
-                                                       false));
-            }
-            final SchemaVariable selfSV =
-                    getTarget().isStatic() ? null
-                            : SchemaVariableFactory.createTermSV(new Name("self"),
-                                                         inv.getKJT().getSort());
-            final SchemaVariable eqSV = getTarget().isStatic()
-                                        ? null
-                                        : SchemaVariableFactory.createTermSV(
-                    new Name("EQ"),
-                    services.getJavaInfo().objectSort());
-
-            ImmutableSet<Taclet> taclets =
-                    TG.generateWdInvTaclet(name,
-                                           heapSVs,
-                                           selfSV,
-                                           eqSV,
-                                           inv.getInv(selfSV, services),
-                                           getRequires(),
-                                           getEnsures(),
-                                           inv.getKJT(),
-                                           getTarget().isStatic(),
-                                           i == 1,
-                                           services);
-            result = result.union(taclets);
-
-            //EQ taclet only for non-static invariants
-            if (getTarget().isStatic()) {
-                break;
-            }
+        //create schema variables
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
+        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        for(int j = 0; j< heaps.size(); j++) {
+            heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h"+j),
+                                                           heapLDT.targetSort(),
+                                                           false,
+                                                           false));
         }
-
+        final SchemaVariable selfSV =
+                isStatic ? null
+                        : SchemaVariableFactory.createTermSV(new Name("self"),
+                                                             kjt.getSort());
+        final Taclet taclet = TG.generateWdInvTaclet(name,
+                                                     heapSVs,
+                                                     selfSV,
+                                                     inv.getInv(selfSV, services),
+                                                     getRequires(),
+                                                     kjt,
+                                                     isStatic,
+                                                     services);
         //return
-        return result;
+        return result.add(taclet);
+    }
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        assert getInvariant() != null;
+        return getInvariant().getOrigVars();
     }
 }

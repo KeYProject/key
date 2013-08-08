@@ -224,51 +224,51 @@ public final class RewriteTaclet extends FindTaclet {
     /**
      * does the work for applyReplacewith (wraps recursion) 
      */
-    private Term replace(Term term, 
+    private Term replace(Term term,
                          Term with,
                          PosInOccurrence posOfFind,
                          IntIterator it,
-                         Services services, 
-                         MatchConditions mc, 
+                         Services services,
+                         MatchConditions mc,
                          Sort maxSort) {
-	if (it.hasNext()) {	    
+	if (it.hasNext()) {
 	    int sub = it.next();
-	    
+
 	    final Term[] subs = new Term[term.arity()];
-	    
+
 	    for (int i=0, arity = term.arity(); i<arity; i++) {
-		
+
                 if (i!=sub) {
 		    subs[i] = term.sub(i);
-		} else {                    
+		} else {
                     final Sort newMaxSort = TermHelper.getMaxSort(term, i, services);
-		    subs[i] = replace(term.sub(i), 
-			    	      with, 
+		    subs[i] = replace(term.sub(i),
+				      with,
 			    	      posOfFind,
-			    	      it, 
-			    	      services, 
-			    	      mc, 
+				      it,
+				      services,
+				      mc,
 			    	      newMaxSort);
 		}
-	    }	    	    	    	    	    
- 	    
-	    return TermFactory.DEFAULT.createTerm(term.op(), 
-	            				  subs, 
-	            				  term.boundVars(), 
-	            				  term.javaBlock(),
-	            				  term.getLabels());
-	} 
-                                      
-	with = syntacticalReplace(with, services, mc, posOfFind);   
+	    }
 
-               
+	    return TermFactory.DEFAULT.createTerm(term.op(),
+                                                  subs,
+                                                  term.boundVars(),
+                                                  term.javaBlock(),
+	            				  term.getLabels());
+	}
+
+	with = syntacticalReplace(with, services, mc, posOfFind);
+
+
 	if(!with.sort().extendsTrans(maxSort)) {
 	    with = TermBuilder.DF.cast(services, maxSort, with);
 	}
-        
+
 	return with;
     }
-    
+
 
     private SequentFormula applyReplacewithHelper(
 	    				RewriteTacletGoalTemplate gt, 

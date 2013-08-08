@@ -17,7 +17,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * choice-statement, continues-clause, diverges-clause, duration-clause, if-statement,
      * measured-clause, returns-clause, when-clause, working-space-clause, requires-clause,
      * initially-clause, constraint, ensures-clause, signals-clause */
-    final Contract contract;
+    private final FunctionalOperationContract contract;
 
     Term forall;
     Term old;
@@ -32,10 +32,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         super(contract.getTarget(), Type.METHOD_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
+        LocationVariable h = getHeap();
 
-        this.requires = order(contract.getRequires(heap));
-        this.assignable = contract.getAssignable(heap);
-        this.ensures = contract.getEnsures(heap);
+        this.setRequires(contract.getRequires(h));
+        this.setAssignable(contract.getAssignable(h));
+        this.setEnsures(contract.getEnsures(h));
 
         this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
         this.old = TB.tt(); // TODO: Where do we get the old-clause from?
@@ -47,12 +48,16 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
     }
 
+    public FunctionalOperationContract getContract() {
+        return this.contract;
+    }
+
     // TODO: Not used atm, do we even need this method here? Better alternatives?
     public Term getPre(ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
                        Services services) {
-        return contract.getPre(heap, selfVar, paramVars, atPreVars, services);
+        return contract.getPre(getHeap(), selfVar, paramVars, atPreVars, services);
     }
 
     public Term getForall() {
@@ -140,5 +145,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         c = c.append(this.getAssignable());
         Term post = this.getEnsures();
         return new Triple<Term, ImmutableList<Term>, Term>(pre, c, post);
+    }
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        assert getContract() != null;
+        return getContract().getOrigVars();
     }
 }

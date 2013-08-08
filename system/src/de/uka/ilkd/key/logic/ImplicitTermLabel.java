@@ -1,20 +1,23 @@
 package de.uka.ilkd.key.logic;
 
-public class AutoSpecTermLabel implements ITermLabel {
+/**
+ * Label attached to a term which is specified implicitly (by the JML specification). 
+ */
+public class ImplicitTermLabel implements ITermLabel {
     /**
      * The unique name of this label.
      */
-    public static final Name NAME = new Name("AutoSpec");
+    public static final Name NAME = new Name("ImplicitSpec");
 
     /**
      * The only instance of this class.
      */
-    public static AutoSpecTermLabel INSTANCE = new AutoSpecTermLabel();
+    public static ImplicitTermLabel INSTANCE = new ImplicitTermLabel();
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private AutoSpecTermLabel() {
+    private ImplicitTermLabel() {
     }
 
     @Override

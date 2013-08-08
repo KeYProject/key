@@ -131,10 +131,10 @@ public final class TermFactory {
 
     
     public Term createTerm(Operator op,
-    		Term[] subs, 
-    		ImmutableArray<QuantifiableVariable> boundVars,
-    		JavaBlock javaBlock,
-    		ImmutableArray<ITermLabel> labels) {
+                           Term[] subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ImmutableArray<ITermLabel> labels) {
     	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock, labels);
     }
 

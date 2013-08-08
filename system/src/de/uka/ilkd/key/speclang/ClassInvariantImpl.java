@@ -23,7 +23,9 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
 
 /**
@@ -163,5 +165,16 @@ public final class ClassInvariantImpl implements ClassInvariant {
     @Override
     public String toString() {
         return originalInv.toString();
+    }
+
+    @Override
+    public OriginalVariables getOrigVars() {
+        final ProgramVariable self;
+        if (this.originalSelfVar instanceof ProgramVariable) {
+            self = (ProgramVariable)this.originalSelfVar;
+        } else {
+            self = null;
+        }
+        return new OriginalVariables(self, null, null, null, null);
     }
 }

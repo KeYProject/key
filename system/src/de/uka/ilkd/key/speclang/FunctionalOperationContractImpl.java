@@ -1082,5 +1082,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
     }
 
-}
 
+    @Override
+    public OriginalVariables getOrigVars() {
+        Map<LocationVariable, ProgramVariable> atPreVars =
+                new LinkedHashMap<LocationVariable, ProgramVariable>();
+        for (LocationVariable h: originalAtPreVars.keySet()) {
+            atPreVars.put(h, originalAtPreVars.get(h));
+        }
+        return new OriginalVariables(originalSelfVar, originalResultVar,
+                                     originalExcVar, atPreVars, originalParamVars);
+    }
+}
