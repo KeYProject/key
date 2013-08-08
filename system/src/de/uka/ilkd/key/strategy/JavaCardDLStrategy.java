@@ -607,7 +607,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                   AnonHeapTermFeature.INSTANCE ) ) ),
                            ifZero( applyTF(FocusFormulaProjection.INSTANCE, ff.update),
                                    longConst(-4200),
-                                   longConst(-1900) ) ) );
+                                   longConst(-1900) ), NonDuplicateAppModPositionFeature.INSTANCE ) );
         bindRuleSet ( d, "apply_select_eq",
                       // replace non-simplified select by the skolem constant
                       // of the corresponding pull out; at least one select
