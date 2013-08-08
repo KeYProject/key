@@ -19,8 +19,6 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
-import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
@@ -190,12 +188,6 @@ public final class TermLabelWorkerManagement {
       else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE;
       }
-      else if(SelectSkolemConstantTermLabel.NAME.toString().equals(name)) {
-         return SelectSkolemConstantTermLabelInstantiator.INSTANCE;
-      }
-      else if(AnonHeapTermLabel.NAME.toString().equals(name)) {
-         return AnonHeapTermLabelInstantiator.INSTANCE;
-      }
       else {
          return null;
       }
@@ -273,15 +265,17 @@ public final class TermLabelWorkerManagement {
                                                           Goal goal,
                                                           Term term,
                                                           ImmutableList<ITermLabelWorker> labelInstantiators) {
-      List<ITermLabel> updatedLabels = new LinkedList<ITermLabel>();
+      // Create list with all old labels
+      List<ITermLabel> newLabels = new LinkedList<ITermLabel>();
+      for (ITermLabel oldLabel : term.getLabels()) {
+         newLabels.add(oldLabel);
+      }
+      // Give all ITermLabelWorker instances the chance to remove or to add labels from/to the list 
       if (labelInstantiators != null) {
          for (ITermLabelWorker instantiator : labelInstantiators) {
-            List<ITermLabel> labels = instantiator.updateLabels(tacletTerm, applicationPosInOccurrence, term, rule, goal);
-            if (labels != null) {
-               updatedLabels.addAll(labels);
-            }
+            instantiator.updateLabels(tacletTerm, applicationPosInOccurrence, term, rule, goal, newLabels);
          }
       }
-      return new ImmutableArray<ITermLabel>(updatedLabels);
+      return new ImmutableArray<ITermLabel>(newLabels);
    }
 }

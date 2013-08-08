@@ -18,7 +18,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -39,9 +38,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.AnonHeapTermLabelInstantiator;
-import de.uka.ilkd.key.rule.SelectSkolemConstantTermLabelInstantiator;
-import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -286,17 +282,6 @@ public abstract class AbstractPO implements IPersistablePO {
                                 initConfig.getSettings() != null
                                 ? initConfig.getSettings()
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
-
-        // Make sure that required label works are present
-        ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
-        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
-        }
-        if (!labelInstantiators.contains(AnonHeapTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(AnonHeapTermLabelInstantiator.INSTANCE);
-        }
-        proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
-
         return proof;
     }
 
