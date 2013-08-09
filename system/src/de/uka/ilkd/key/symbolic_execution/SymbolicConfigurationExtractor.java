@@ -828,7 +828,9 @@ public class SymbolicConfigurationExtractor {
             // Static fields have a null term as select argument.
          }
          else {
-            throw new ProofInputException("Unsupported operator in select argument of heap update \"" + selectArgument.op() + "\".");
+            for (int i = 0; i < selectArgument.arity(); i++) {
+               collectLocationsFromHeapUpdate(selectArgument.sub(i), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
+            }
          }
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
@@ -871,7 +873,9 @@ public class SymbolicConfigurationExtractor {
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
       else {
-         throw new ProofInputException("Unsupported operator in heap update \"" + term.op() + "\".");
+         for (int i = 0; i < term.arity(); i++) {
+            collectLocationsFromHeapUpdate(term.sub(i), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
+         }
       }
    }
 
