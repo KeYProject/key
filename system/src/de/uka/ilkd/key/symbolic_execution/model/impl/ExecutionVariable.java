@@ -246,6 +246,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          // Extract value
          Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
          assert value != null;
+         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value);
          // Compute unknown flag if required
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {

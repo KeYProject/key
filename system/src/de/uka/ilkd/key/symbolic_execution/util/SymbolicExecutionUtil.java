@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -2129,11 +2130,10 @@ public final class SymbolicExecutionUtil {
       else {
          newSuccedentToProve = newSuccedent;
       }
-      // Collect terms with skolem label
-      List<Term> skolemTerms = collectSkolemConstants(newSuccedentToProve);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
+      Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
       if (additionalAntecedent != null) {
@@ -2144,12 +2144,38 @@ public final class SymbolicExecutionUtil {
 
    /**
     * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)} as well as the skolem constants
+    * used in the find once recursive.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param term The {@link Term} to start collection in.
+    * @return The found skolem {@link Term}s.
+    */
+   private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
+      // Collect skolem constants in term
+      Set<Term> result = collectSkolemConstantsNonRecursive(term);
+      // Collect all skolem constants used in skolem constants
+      List<Term> toCheck = new LinkedList<Term>(result);
+      while (!toCheck.isEmpty()) {
+         Term skolemConstant = toCheck.remove(0);
+         Term replacement = findSkolemReplacement(sequent, skolemConstant);
+         Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+         for (Term checkConstant : checkResult) {
+            if (result.add(checkConstant)) {
+               toCheck.add(checkConstant);
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Collects all contained skolem {@link Term}s which fulfill
     * {@link #isSkolemConstant(Term)}.
     * @param term The {@link Term} to collect in.
     * @return The found skolem {@link Term}s.
     */
-   private static List<Term> collectSkolemConstants(Term term) {
-      final List<Term> result = new LinkedList<Term>();
+   private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
+      final Set<Term> result = new HashSet<Term>();
       term.execPreOrder(new DefaultVisitor() {
          @Override
          public void visit(Term visited) {
@@ -2247,25 +2273,27 @@ public final class SymbolicExecutionUtil {
     * @return The skolem constant free {@link Term}.
     */
    public static Term replaceSkolemConstants(Sequent sequent, Term term) {
-      List<Term> newChildren = new LinkedList<Term>();
-      boolean changed = false;
-      for (int i = 0; i < term.arity(); i++) {
-         Term oldChild = term.sub(i);
-         if (isSkolemConstant(oldChild)) {
-            oldChild = findSkolemReplacement(sequent, oldChild);
-            if (!changed) {
+      if (isSkolemConstant(term)) {
+         return findSkolemReplacement(sequent, term);
+      }
+      else {
+         List<Term> newChildren = new LinkedList<Term>();
+         boolean changed = false;
+         for (int i = 0; i < term.arity(); i++) {
+            Term oldChild = term.sub(i);
+            Term newChild = replaceSkolemConstants(sequent, oldChild);
+            if (newChild != oldChild) {
                changed = true;
             }
+            newChildren.add(newChild);
          }
-         Term newChild = replaceSkolemConstants(sequent, oldChild);
-         newChildren.add(newChild);
+         return changed ? TermFactory.DEFAULT.createTerm(term.op(), 
+                                                         new ImmutableArray<Term>(newChildren), 
+                                                         term.boundVars(), 
+                                                         term.javaBlock(), 
+                                                         term.getLabels()) : 
+                          term;
       }
-      return changed ? TermFactory.DEFAULT.createTerm(term.op(), 
-                                                      new ImmutableArray<Term>(newChildren), 
-                                                      term.boundVars(), 
-                                                      term.javaBlock(), 
-                                                      term.getLabels()) : 
-                       term;
    }
 
    /**
