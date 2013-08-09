@@ -443,10 +443,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                                                      ImplicitTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(new PositionedString("ensures "+invString));
+                    specCase.addEnsures(new PositionedLabeledString("ensures "+invString,
+                                                                    ImplicitTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString));
+                    specCase.addSignals(new PositionedLabeledString("signals (Exception e) "+invString,
+                                                                    ImplicitTermLabel.INSTANCE));
                 }
             }
 
@@ -477,7 +479,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     createNonNullPositionedString("\\result", resultType, false,
                             fileName, pm.getStartPosition(),services);
                 for (PositionedString nonNull : resultNonNull) {
-                    specCase.addEnsures(nonNull.prepend("ensures "));
+                    specCase.addEnsures(
+                            nonNull.prepend("ensures ").label(ImplicitTermLabel.INSTANCE));
                 }
             }
 
@@ -485,8 +488,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if(specCase.getSignalsOnly().isEmpty()
                     && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
                     && !pm.isModel()) {
-                specCase.addSignalsOnly(
-                        new PositionedString(getDefaultSignalsOnly(pm)));
+                specCase.addSignalsOnly(new PositionedString(getDefaultSignalsOnly(pm)));
             }
 
             //translate contract

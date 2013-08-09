@@ -463,7 +463,7 @@ final class JMLTranslator {
             public Term combineQuantifiedTerms(Term t1,
                                                Term t2)
                     throws SLTranslationException {
-                return TB.and(t1, t2);
+                return TB.andSC(t1, t2);
             }
 
 

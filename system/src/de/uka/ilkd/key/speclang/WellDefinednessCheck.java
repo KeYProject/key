@@ -12,7 +12,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ImplicitTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
@@ -115,7 +114,8 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     void setEnsures(Term ens) {
-        this.ensures = ens;
+        Pair<Term, Term> ensures = sortAndShortcut(ens);
+        this.ensures = TB.andSC(ensures.first, ensures.second);
     }
 
     public Term getEnsures() {
