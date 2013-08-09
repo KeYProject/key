@@ -31,6 +31,8 @@ import de.uka.ilkd.key.proof.Goal;
  */
 public class SuccTaclet extends FindTaclet{
 
+    private final boolean ignoreTopLevelUpdates;
+
      /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters that works on the succedent.  
@@ -50,9 +52,11 @@ public class SuccTaclet extends FindTaclet{
 		    ImmutableList<RuleSet> heuristics,
 		    TacletAttributes attrs,
 		    Term find,
-		    ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,ImmutableSet<Choice> choices){
+                     boolean ignoreTopLevelUpdates,
+		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, heuristics, attrs,
 	      find, prefixMap, choices);
+        this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
 	cacheMatchInfo();
     }	
 
@@ -61,8 +65,9 @@ public class SuccTaclet extends FindTaclet{
      * SuccTaclet but not for a RewriteTaclet
      * @return true if top level updates shall be ignored 
      */
+    @Override
     protected boolean ignoreTopLevelUpdates() {
-	return true;
+	return ignoreTopLevelUpdates;
     }
 
     /** CONSTRAINT NOT USED 
