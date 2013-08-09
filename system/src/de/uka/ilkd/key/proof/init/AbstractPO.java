@@ -38,7 +38,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -282,6 +284,14 @@ public abstract class AbstractPO implements IPersistablePO {
                                 initConfig.getSettings() != null
                                 ? initConfig.getSettings()
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+
+        // Make sure that required label works are present
+        ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
+        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
+           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+        }
+        proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
+
         return proof;
     }
 

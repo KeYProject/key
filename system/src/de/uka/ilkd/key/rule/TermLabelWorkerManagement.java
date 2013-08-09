@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -187,6 +188,9 @@ public final class TermLabelWorkerManagement {
       }
       else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE;
+      }
+      else if(SelectSkolemConstantTermLabel.NAME.toString().equals(name)) {
+         return SelectSkolemConstantTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;
