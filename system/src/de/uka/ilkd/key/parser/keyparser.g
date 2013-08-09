@@ -1204,14 +1204,12 @@ options {
     private TacletBuilder createTacletBuilderFor
         (Object find, int applicationRestriction) 
         throws InvalidFindException {
-        if ( applicationRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
+        if ( applicationRestriction != RewriteTaclet.NONE &&
+             applicationRestriction != RewriteTaclet.IN_SEQUENT_STATE &&
+             !( find instanceof Term ) ) {
             String mod = "";
             if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
                 mod = "\"\\sameUpdateLevel\"";
-            }
-            if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
-                if (mod != "") mod += " and ";
-                mod += "\"\\inSequentState\""; 
             }
             if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
                 if (mod != "") mod += " and ";
@@ -1241,11 +1239,17 @@ options {
             } else if (   findSeq.antecedent().size() == 1
                           && findSeq.succedent().size() == 0 ) {
                 Term findFma = findSeq.antecedent().get(0).formula();
-                return new AntecTacletBuilder().setFind(findFma);
+                AntecTacletBuilder b = new AntecTacletBuilder();
+                b.setFind(findFma);
+                b.setIgnoreTopLevelUpdates((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
+                return b;
             } else if (   findSeq.antecedent().size() == 0
                           && findSeq.succedent().size() == 1 ) {
                 Term findFma = findSeq.succedent().get(0).formula();
-                return new SuccTacletBuilder().setFind(findFma);
+                SuccTacletBuilder b = new SuccTacletBuilder();
+                b.setFind(findFma);
+                b.setIgnoreTopLevelUpdates((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
+                return b;
             } else {
                 throw new InvalidFindException
                     ("Unknown find-sequent (perhaps null?):"+findSeq,
