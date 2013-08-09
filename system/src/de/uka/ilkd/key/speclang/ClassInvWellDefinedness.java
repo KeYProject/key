@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class ClassInvWellDefinedness extends WellDefinednessCheck {
@@ -85,12 +86,12 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Triple<Term, ImmutableList<Term>, Term> createPOTerm() {
-        Term pre = this.getRequires();
+    public Triple<Pair<Term, Term>, ImmutableList<Term>, Term> createPOTerm() {
+        Pair<Term, Term> pre = this.getRequires();
         ImmutableList<Term> c = ImmutableSLList.<Term>nil();
         c = c.append(this.getAssignable());
         Term inv = this.getEnsures();
-        return new Triple<Term, ImmutableList<Term>, Term>(pre, c, inv);
+        return new Triple<Pair<Term, Term>, ImmutableList<Term>, Term>(pre, c, inv);
     }
 
     public ImmutableSet<Taclet> getTaclets(Services services) {
@@ -122,7 +123,7 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
                                                      heapSVs,
                                                      selfSV,
                                                      inv.getInv(selfSV, services),
-                                                     getRequires(),
+                                                     getRequires(null),
                                                      kjt,
                                                      isStatic,
                                                      services);

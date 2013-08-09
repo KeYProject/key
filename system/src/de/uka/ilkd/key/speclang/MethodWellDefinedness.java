@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
@@ -139,12 +140,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Triple<Term, ImmutableList<Term>, Term> createPOTerm() {
-        Term pre = this.getRequires();
+    public Triple<Pair<Term, Term>, ImmutableList<Term>, Term> createPOTerm() {
+        Pair<Term, Term> pre = this.getRequires();
         ImmutableList<Term> c = ImmutableSLList.<Term>nil();
         c = c.append(this.getAssignable());
         Term post = this.getEnsures();
-        return new Triple<Term, ImmutableList<Term>, Term>(pre, c, post);
+        return new Triple<Pair<Term, Term>, ImmutableList<Term>, Term>(pre, c, post);
     }
 
     @Override

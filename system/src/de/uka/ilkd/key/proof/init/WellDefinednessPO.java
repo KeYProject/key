@@ -11,7 +11,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -21,8 +20,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -34,6 +31,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
@@ -59,7 +57,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
-        final Triple<Term, ImmutableList<Term>, Term> po = check.createPOTerm();
+        final Triple<Pair<Term, Term>, ImmutableList<Term>, Term> po = check.createPOTerm();
         ImmutableList<Term> c = ImmutableSLList.<Term>nil();
         for (Term t: po.second) {
             c = c.append(wd(replace(t)));
@@ -88,8 +86,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return check;
     }
 
-    private Term getPre(final Term pre) {
-        final ImmutableList<Term> res = buildFreePre().append(replace(pre));
+    private Term getPre(final Pair<Term, Term> pre) {
+        final ImmutableList<Term> res =
+                buildImplicitAndFreePre(replace(pre.first)).append(replace(pre.second));
         return TB.andSC(res);
     }
 
@@ -218,28 +217,19 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return WellDefinednessCheck.wd(t, services);
     }
 
-    TransformerProcedure getTransformer(String nameString, Sort argSort) {
-        Name name = new Name(nameString);
-        Named f = services.getNamespaces().functions().lookup(name);
-        if (f != null && f instanceof TransformerProcedure) {
-            return (TransformerProcedure) f;
-        } else {
-            return new TransformerProcedure(name, Sort.FORMULA, argSort);
-        }
-    }
-
     @Override
     protected void collectClassAxioms(KeYJavaType selfKJT) {
+        IObserverFunction target = getTarget();
         ImmutableSet<ClassInvWellDefinedness> invs =
-                specRepos.getWdClassInvariants(selfKJT, getTarget());
+                specRepos.getWdClassInvariants(selfKJT, target);
         if(invs.isEmpty()) {
             Term inv = TB.tt();
-            final SchemaVariable selfSV = getTarget().isStatic() ?
+            final SchemaVariable selfSV = target.isStatic() ?
                     null : SchemaVariableFactory.createTermSV(new Name("self"),
                                                               getCalleeKeYJavaType().getSort());
             ClassInvariant ci = new ClassInvariantImpl(name, check.getDisplayName(), selfKJT,
                                                        new Public(), inv, selfSV);
-            invs = invs.add(new ClassInvWellDefinedness(ci, getTarget(), services));
+            invs = invs.add(new ClassInvWellDefinedness(ci, target, services));
         }
 
         for (ClassInvWellDefinedness inv : invs) {
@@ -254,14 +244,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     /**
-     * Builds the "general assumption".
-     * @param selfVar The self variable.
-     * @param selfKJT The {@link KeYJavaType} of the self variable.
-     * @param paramVars The parameters {@link ProgramVariable}s.
-     * @param heaps The heaps.
+     * Builds the "general assumption" using the self variable (selfVar),
+     * the {@link KeYJavaType} of the self variable (selfKJT),
+     * the parameters {@link ProgramVariable}s (paramVars), the heaps (heaps), and
+     * @param the implicit precondition
      * @return The {@link Term} containing the general assumptions.
      */
-    protected ImmutableList<Term> buildFreePre() {
+    protected ImmutableList<Term> buildImplicitAndFreePre(Term implicitPre) {
         ProgramVariable selfVar = vars.self;
         ImmutableList<ProgramVariable> paramVars = vars.params;
         KeYJavaType selfKJT = getCalleeKeYJavaType();
@@ -269,13 +258,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
 
        // "self != null"
-       final Term selfNotNull = generateSelfNotNull(getTarget(), selfVar);
+       final Term selfNotNull = generateSelfNotNull(selfVar);
 
        // "self.<created> = TRUE"
-       final Term selfCreated = generateSelfCreated(heaps, getTarget(), selfVar);
+       final Term selfCreated = generateSelfCreated(heaps, selfVar);
 
        // "MyClass::exactInstance(self) = TRUE"
-       final Term selfExactType = generateSelfExactType(getTarget(), selfVar, selfKJT);
+       final Term selfExactType = generateSelfExactType(selfVar, selfKJT);
 
        // conjunction of...
        // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
@@ -296,7 +285,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
        }
 
        Term[] resultTerm = new Term[] { wellFormed != null ? wellFormed : TB.tt(), selfNotNull,
-               selfCreated, selfExactType, paramsOK, mbyAtPreDef };
+               selfCreated, selfExactType, implicitPre, paramsOK, mbyAtPreDef };
        for (Term t: resultTerm) {
            res = res.append(t);
        }
@@ -309,8 +298,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfNotNull(IObserverFunction target, ProgramVariable selfVar) {
-       return selfVar == null || isConstructor(target) ?
+    protected Term generateSelfNotNull(ProgramVariable selfVar) {
+       return selfVar == null || isConstructor() ?
               TB.tt() :
               TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
     }
@@ -321,9 +310,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfCreated(List<LocationVariable> heaps, IObserverFunction target,
+    protected Term generateSelfCreated(List<LocationVariable> heaps,
                                        ProgramVariable selfVar) {
-           if(selfVar == null || isConstructor(target)) {
+           if(selfVar == null || isConstructor()) {
                    return TB.tt();
            }
            Term created = null;
@@ -348,10 +337,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfExactType(IObserverFunction target,
-                                         ProgramVariable selfVar,
+    protected Term generateSelfExactType(ProgramVariable selfVar,
                                          KeYJavaType selfKJT) {
-       final Term selfExactType = selfVar == null || isConstructor(target) ?
+       final Term selfExactType = selfVar == null || isConstructor() ?
              TB.tt() :
              TB.exactInstance(services, selfKJT.getSort(), TB.var(selfVar));
        return selfExactType;
@@ -391,7 +379,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return mbyAtPreDef;
     }
 
-    private boolean isConstructor(IObserverFunction obs) {
+    private boolean isConstructor() {
+        IObserverFunction obs = getTarget();
         return obs instanceof IProgramMethod &&
                 ((IProgramMethod)obs).isConstructor();
     }
@@ -413,7 +402,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private Term replace(Term t) {
         assert this.check != null;
-        return check.replace(t, vars.self, vars.result, vars.exception, vars.atPres, vars.params);
+        return check.replace(t, vars.self, vars.result, vars.exception,
+                             vars.atPres, vars.params);
     }
 
     private class Variables {
