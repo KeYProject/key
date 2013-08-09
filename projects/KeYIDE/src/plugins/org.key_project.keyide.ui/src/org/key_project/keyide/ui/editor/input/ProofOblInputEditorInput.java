@@ -19,8 +19,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -60,11 +58,6 @@ public class ProofOblInputEditorInput extends PlatformObject implements IStorage
     * on the selected {@link Node} itself.
     */
    private IStorage storage;
-   
-   /**
-    * Indicates that this {@link IEditorInput} is already in use by an {@link IEditorPart}.
-    */
-   private boolean inUse;
 
    /**
     * Constructor.
@@ -73,8 +66,8 @@ public class ProofOblInputEditorInput extends PlatformObject implements IStorage
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     */
    public ProofOblInputEditorInput(ProofOblInput problem, 
-                           KeYEnvironment<CustomConsoleUserInterface> environment, 
-                           IMethod method) {
+                                   KeYEnvironment<CustomConsoleUserInterface> environment, 
+                                   IMethod method) {
       Assert.isNotNull(problem);
       Assert.isNotNull(environment);
       this.problem = problem;
@@ -153,21 +146,5 @@ public class ProofOblInputEditorInput extends PlatformObject implements IStorage
     */
    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
       return environment;
-   }
-
-   /**
-    * Checks if this {@link IEditorInput} is already in use by an {@link IEditorPart}.
-    * @return {@code true} in use, {@code false} not in use.
-    */
-   public boolean isInUse() {
-      return inUse;
-   }
-
-   /**
-    * Defines if this {@link IEditorInput} is already in use by an {@link IEditorPart}.
-    * @param inUse {@code true} in use, {@code false} not in use.
-    */
-   public void setInUse(boolean inUse) {
-      this.inUse = inUse;
    }
 }
