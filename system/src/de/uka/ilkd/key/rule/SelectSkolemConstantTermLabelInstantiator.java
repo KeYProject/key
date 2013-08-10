@@ -12,17 +12,18 @@
 //
 package de.uka.ilkd.key.rule;
 
+import java.util.Collections;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -53,7 +54,9 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
         return SelectSkolemConstantTermLabel.NAME.toString();
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ITermLabel> instantiateLabels(Term tacletTerm,
                                               PosInOccurrence applicationPosInOccurrence,
@@ -68,15 +71,13 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
             tacletTerm.arity() == 0 && // check for performance reasons
             tacletTerm.containsLabel(SelectSkolemConstantTermLabel.INSTANCE)) {
             // keep SelectSkolemConstantTermLabel
-            LinkedList<ITermLabel> result = new LinkedList<ITermLabel>();
-            result.add(SelectSkolemConstantTermLabel.INSTANCE);
-            return result;
+            return Collections.<ITermLabel>singletonList(SelectSkolemConstantTermLabel.INSTANCE);
 
         } else {
             // in all other cases the tacletTerm cannot contain the
             // SelectSkolemConstantTermLabel, because it is attached only
             // to constants on which no rules are applicable
-            return new LinkedList<ITermLabel>();
+            return null;
         }
     }
 
