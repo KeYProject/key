@@ -2572,10 +2572,16 @@ public final class SymbolicExecutionUtil {
     */
    public static void configureProof(Proof proof) {
       if (proof != null) {
-         ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
-         labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
+         if (!labelInstantiators.contains(SymbolicExecutionTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         }
+         if (!labelInstantiators.contains(LoopBodyTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
+         }
+         if (!labelInstantiators.contains(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         }
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
