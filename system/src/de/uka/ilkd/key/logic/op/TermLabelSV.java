@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
@@ -43,7 +44,17 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, ITe
         final TermLabelInstantiationEntry inst =
                 (TermLabelInstantiationEntry) svInsts.getInstantiation(this);
         if (inst != null) {
-            if (t.getLabels().equals(inst.getInstantiation())) {
+            boolean matched = false;
+            assert inst.getInstantiation() instanceof ImmutableArray<?>;
+            for (Object o: (ImmutableArray<?>)inst.getInstantiation()) {
+                assert o instanceof ITermLabel;
+                if (t.containsLabel((ITermLabel)o)) {
+                    matched = true;
+                } else {
+                    matched = false;
+                }
+            }
+            if (matched) {
                 return mc;
             }
             return null;

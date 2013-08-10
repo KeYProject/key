@@ -543,57 +543,57 @@ public abstract class Taclet implements Rule, Named {
 	final Operator sourceOp   =     term.op ();
 	final Operator templateOp = template.op ();
                 
-    if (template.hasLabels()) {
-        final ImmutableArray<ITermLabel> labels = template.getLabels();
-        if (labels.size() > 1 || !(labels.get(0) instanceof SchemaVariable)) {
-            Debug.out("FAILED 3x.");
-            return null; ///FAILED
-        } else {
-            final MatchConditions cond =
-                    ((SchemaVariable)labels.get(0)).match(term, matchCond, services);
-            if (cond == null) {
-                return null;
-            }
-            matchCond = cond;
-        }
-    }
-    
-	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
+	if (template.hasLabels()) {
+	    final ImmutableArray<ITermLabel> labels = template.getLabels();
+	    if (!(labels.get(0) instanceof SchemaVariable)) {
+	        Debug.out("FAILED 3x.");
+	        return null; ///FAILED
+	    } else {
+	        for (ITermLabel l: labels) {
+	            final MatchConditions cond =
+	                    ((SchemaVariable)l).match(term, matchCond, services);
+	            if (cond == null) {
+	                return null;
+	            }
+	            matchCond = cond;
+	        }
+	    }
+	}
+
+	if (templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
 	    return templateOp.match(term, matchCond, services);
 	}
-    
+
 	matchCond = templateOp.match (sourceOp, matchCond, services);
 	if(matchCond == null) {
 	    Debug.out("FAILED 3x.");
 	    return null; ///FAILED
-	} 
-	
+	}
+
 	//match java blocks:
 	matchCond = matchJavaBlock(term, template, matchCond, services);
-	if (matchCond == null) { 
+	if (matchCond == null) {
 	    Debug.out("FAILED. 9: Java Blocks not matching");
 	    return null;  //FAILED
 	}
-	
+
 	//match bound variables:
-	matchCond = matchBoundVariables(term, template, matchCond, 
-					services);
-	if (matchCond == null) { 
+	matchCond = matchBoundVariables(term, template, matchCond, services);
+	if (matchCond == null) {
 	    Debug.out("FAILED. 10: Bound Vars");
 	    return null;  //FAILED
 	}
-	
-	    
+
 	for (int i = 0, arity = term.arity(); i < arity; i++) {
-	    matchCond = matchHelp(term.sub(i), 
-		    		  template.sub(i), 
-				  matchCond, 
-				  services);
-	    if (matchCond == null) {		      
+	    matchCond = matchHelp(term.sub(i),
+	                          template.sub(i),
+	                          matchCond,
+	                          services);
+	    if (matchCond == null) {
 	        return null; //FAILED
-	    } 
-	}	
-                
+	    }
+	}
+
         return matchCond.shrinkRenameTable();
     }
 
