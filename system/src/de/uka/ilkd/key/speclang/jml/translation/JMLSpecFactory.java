@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -676,7 +677,8 @@ public class JMLSpecFactory {
         }else{
           for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             if(clauses.ensures.get(heap) != null) {
-              Term excNull = TB.equals(TB.var(progVars.excVar), TB.NULL(services));
+              Term excNull = TB.label(TB.equals(TB.var(progVars.excVar), TB.NULL(services)),
+                                      ImplicitSpecTermLabel.INSTANCE);
               Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                         ? TB.convertToFormula(clauses.ensures.get(heap),services)
                         : TB.imp(excNull, TB.convertToFormula(clauses.ensures.get(heap),services)));

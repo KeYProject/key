@@ -19,7 +19,7 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ImplicitTermLabel;
+import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
@@ -193,8 +193,8 @@ public final class TermLabelWorkerManagement {
       else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
           return ShortcutEvaluationTermLabelInstantiator.INSTANCE;
       }
-      else if (ImplicitTermLabel.NAME.toString().equals(name)) {
-          return ImplicitTermLabelInstantiator.INSTANCE;
+      else if (ImplicitSpecTermLabel.NAME.toString().equals(name)) {
+          return ImplicitSpecTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;

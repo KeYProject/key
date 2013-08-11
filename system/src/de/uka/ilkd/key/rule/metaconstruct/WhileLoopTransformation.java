@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.Break;
@@ -258,9 +257,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (buffer instanceof ProgramElement) {
                 walk((ProgramElement)buffer);                
             } else {
-                final ImmutableArray<Statement> aope = (ImmutableArray<Statement>)buffer;
+                final ImmutableArray<?> aope = (ImmutableArray<?>)buffer;
                 for (int iterate=0; iterate<aope.size();iterate++){
-                    ProgramElement pe = aope.get(iterate);
+                    ProgramElement pe = (Statement)aope.get(iterate);
 	            if (pe != null) {
                         walk(pe);
                     }

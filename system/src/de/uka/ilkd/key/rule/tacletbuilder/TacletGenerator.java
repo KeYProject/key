@@ -467,7 +467,9 @@ public class TacletGenerator {
                                                          SchemaVariable eqSV,
                                                          Term term,
                                                          KeYJavaType kjt,
-                                                         ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+                                                         ImmutableSet<Pair<Sort,
+                                                                           IObserverFunction>>
+                                                                  toLimit,
                                                          boolean isStatic,
                                                          boolean eqVersion,
                                                          Services services) {
@@ -553,20 +555,19 @@ public class TacletGenerator {
                                       KeYJavaType kjt,
                                       boolean isStatic,
                                       Services services) {
-        Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+        /*Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         int i = 0;
         for(ProgramVariable heap : heaps) {
             map.put(TB.var(heap), TB.var(heapSVs.get(i++)));
-        }
-        final OpReplacer replacer = new OpReplacer(map);
+        }*/
+        //final OpReplacer replacer = new OpReplacer(map);
 
         //instantiate axiom with schema variables
-        final TermAndBoundVarPair schemaAxiom =
-                replaceBoundLogicVars(replacer.replace(term));
+        //final TermAndBoundVarPair schemaAxiom = replaceBoundLogicVars(replacer.replace(term));
 
         final Term[] hs = new Term[heapSVs.size()];
-        i = 0;
+        int i = 0;
         for(SchemaVariable heapSV : heapSVs) {
             hs[i++] = TB.var(heapSV);
         }
@@ -585,16 +586,15 @@ public class TacletGenerator {
         tb.setFind(WellDefinednessCheck.wd(invTerm, services));
         tb.setName(name);
         tb.addRuleSet(new RuleSet(new Name("simplify")));
-        for (VariableSV boundSV : schemaAxiom.boundVars) {
+        /*for (VariableSV boundSV : schemaAxiom.boundVars) {
             for(SchemaVariable heapSV : heapSVs) {
                 tb.addVarsNotFreeIn(boundSV, heapSV);
             }
             if (selfSV != null) {
                 tb.addVarsNotFreeIn(boundSV, selfSV);
             }
-        }
+        }*/
         tb.addGoalTerm(TB.andSC(notNull, wdSelf, created, req));
-
         return tb.getTaclet();
     }
 
@@ -780,15 +780,16 @@ public class TacletGenerator {
 
 
     private Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t,
-                                                      ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+                                                      ImmutableSet<Pair<Sort,
+                                                                        IObserverFunction>>
+                                                               toLimit,
                                                       Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
 
         //recurse to subterms
         Term[] subs = new Term[t.arity()];
         for (int i = 0; i < subs.length; i++) {
-            Pair<Term, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit,
-                                                              services);
+            Pair<Term, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit, services);
             subs[i] = pair.first;
             taclets = taclets.union(pair.second);
         }
@@ -801,8 +802,8 @@ public class TacletGenerator {
                 if (pair.second.equals(t.op())
                     && (obs.isStatic()
                         || t.sub(1).sort().extendsTrans(pair.first))) {
-                    Pair<IObserverFunction, ImmutableSet<Taclet>> limited = services.getSpecificationRepository().limitObs(
-                            obs);
+                    Pair<IObserverFunction, ImmutableSet<Taclet>> limited =
+                            services.getSpecificationRepository().limitObs(obs);
                     newOp = limited.first;
                     taclets = taclets.union(limited.second);
                 }
@@ -810,8 +811,7 @@ public class TacletGenerator {
         }
 
         //reassemble, return
-        final Term term = TB.tf().createTerm(newOp, subs, t.boundVars(),
-                                             t.javaBlock());
+        final Term term = TB.tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
         return new Pair<Term, ImmutableSet<Taclet>>(term, taclets);
     }
 
@@ -908,7 +908,7 @@ public class TacletGenerator {
         final boolean finalClass =
                 kjt.getJavaType() instanceof ClassDeclaration
                 && ((ClassDeclaration) kjt.getJavaType()).isFinal();
-        // TODO: exact instance neccessary?
+        // TODO: exact instance necessary?
         // or better: instance(finalClass, selfSV, services)?
         final Term exactInstance =
                 target.isStatic() || finalClass ? TB.tt()

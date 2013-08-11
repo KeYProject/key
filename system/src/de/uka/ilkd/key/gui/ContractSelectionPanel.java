@@ -44,7 +44,7 @@ class ContractSelectionPanel extends JPanel {
      */
     private static final long serialVersionUID = 1681223715264203991L;
     private final Services services;
-    private final JList contractList;
+    private final JList<Contract> contractList;
     private final TitledBorder border;
     
     
@@ -70,7 +70,7 @@ class ContractSelectionPanel extends JPanel {
         add(scrollPane);
         
         //create contract list
-        contractList = new JList();
+        contractList = new JList<Contract>();
         contractList.setSelectionMode(
                 multipleSelection 
                 ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION 
@@ -90,8 +90,8 @@ class ContractSelectionPanel extends JPanel {
             private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
             
-	    public Component getListCellRendererComponent(
-                                		    JList list,
+            public Component getListCellRendererComponent(
+                                                    JList<?> list,
                                 		    Object value,
                                 		    int index,
                                 		    boolean isSelected,
@@ -163,7 +163,9 @@ class ContractSelectionPanel extends JPanel {
         //sort contracts by id (for the user's convenience)
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
-                return c1.id() - c2.id();
+                final int res = c1.id() - c2.id();
+                final int altRes = c1.getName().hashCode() - c2.getName().hashCode();
+                return (res != 0) ? res : altRes;
             }
         });
         

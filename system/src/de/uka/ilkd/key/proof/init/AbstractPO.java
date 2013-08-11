@@ -102,8 +102,8 @@ public abstract class AbstractPO implements IPersistablePO {
                           ImmutableSet<ClassAxiom> axioms) {
         ImmutableSet<Pair<Sort, IObserverFunction>> reached =
                 DefaultImmutableSet.nil();
-        ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached = DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(
-                from);
+        ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached =
+                DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(from);
 
         while (!newlyReached.isEmpty()) {
             for (Pair<Sort, IObserverFunction> node : newlyReached) {
@@ -112,8 +112,8 @@ public abstract class AbstractPO implements IPersistablePO {
                 final ImmutableSet<ClassAxiom> nodeAxioms = getAxiomsForObserver(
                         node, axioms);
                 for (ClassAxiom nodeAxiom : nodeAxioms) {
-                    final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes = nodeAxiom.getUsedObservers(
-                            services);
+                    final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes =
+                            nodeAxiom.getUsedObservers(services);
                     for (Pair<Sort, IObserverFunction> nextNode : nextNodes) {
                         if (nextNode.equals(to)) {
                             return true;
@@ -130,7 +130,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     private ImmutableSet<Pair<Sort, IObserverFunction>> getSCC(ClassAxiom startAxiom,
-                                                              ImmutableSet<ClassAxiom> axioms) {
+                                                               ImmutableSet<ClassAxiom> axioms) {
         //TODO: make more efficient
         final Pair<Sort, IObserverFunction> start =
                 new Pair<Sort, IObserverFunction>(startAxiom.getKJT().getSort(),
@@ -149,10 +149,12 @@ public abstract class AbstractPO implements IPersistablePO {
         return result;
     }
 
+    protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
+        return specRepos.getClassAxioms(selfKJT);
+    }
 
     protected void collectClassAxioms(KeYJavaType selfKJT) {
-        final ImmutableSet<ClassAxiom> axioms =
-                specRepos.getClassAxioms(selfKJT);
+        final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
 
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
@@ -171,7 +173,7 @@ public abstract class AbstractPO implements IPersistablePO {
             }
         }
     }
-    
+
     /** Check whether a taclet conforms with the currently active choices.
      * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
      */

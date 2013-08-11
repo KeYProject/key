@@ -37,7 +37,7 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.ImplicitTermLabel;
+import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -190,16 +190,18 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
 
             PositionedString ps
-            = new PositionedString(varName + " != null", fileName, pos);
+            = new PositionedLabeledString(varName + " != null", fileName, pos,
+                                          ImplicitSpecTermLabel.INSTANCE);
             result = result.add(ps);
             if (varType instanceof ArrayType &&
                     typeConverter.
                     isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
                 final PositionedString arrayElementsNonNull
-                = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
-                        + varName + "[i]" + " != null)",
-                        fileName,
-                        pos);
+                = new PositionedLabeledString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
+                                              + varName + "[i]" + " != null)",
+                                              fileName,
+                                              pos,
+                                              ImplicitSpecTermLabel.INSTANCE);
                 result = result.add(arrayElementsNonNull);
             }
         }
@@ -261,8 +263,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
                             result = result.add(
-                                    jsf.createJMLClassInvariant(kjt, visibility, isStatic,
-                                            classInv.label(ImplicitTermLabel.INSTANCE)));
+                                    jsf.createJMLClassInvariant(kjt, visibility,
+                                                                isStatic, classInv));
                 	}
                     }
                 }
@@ -436,19 +438,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
                     specCase.addRequires(new PositionedLabeledString(invString,
-                                                                     ImplicitTermLabel.INSTANCE));
+                                                                     ImplicitSpecTermLabel.INSTANCE));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addRequires(new PositionedLabeledString(""+pm.getName()+".\\inv",
-                                                                     ImplicitTermLabel.INSTANCE));
+                                                                     ImplicitSpecTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(new PositionedLabeledString("ensures "+invString,
-                                                                    ImplicitTermLabel.INSTANCE));
+                                                                    ImplicitSpecTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
                     specCase.addSignals(new PositionedLabeledString("signals (Exception e) "+invString,
-                                                                    ImplicitTermLabel.INSTANCE));
+                                                                    ImplicitSpecTermLabel.INSTANCE));
                 }
             }
 
@@ -464,7 +466,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                 false,
                                 fileName, pm.getStartPosition(),services);
                     for (PositionedString nonNull : nonNullParams) {
-                        specCase.addRequires(nonNull.label(ImplicitTermLabel.INSTANCE));
+                        specCase.addRequires(nonNull.label(ImplicitSpecTermLabel.INSTANCE));
                     }
                 }
             }
@@ -480,7 +482,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                             fileName, pm.getStartPosition(),services);
                 for (PositionedString nonNull : resultNonNull) {
                     specCase.addEnsures(
-                            nonNull.prepend("ensures ").label(ImplicitTermLabel.INSTANCE));
+                            nonNull.prepend("ensures ").label(ImplicitSpecTermLabel.INSTANCE));
                 }
             }
 

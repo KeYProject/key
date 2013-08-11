@@ -2,32 +2,32 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.ImplicitTermLabel;
+import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 
-public class ImplicitTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+public class ImplicitSpecTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
     /**
      * The only instance of this class.
      */
-    public static final ImplicitTermLabelInstantiator INSTANCE = new ImplicitTermLabelInstantiator();
+    public static final ImplicitSpecTermLabelInstantiator INSTANCE = new ImplicitSpecTermLabelInstantiator();
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private ImplicitTermLabelInstantiator() {
+    private ImplicitSpecTermLabelInstantiator() {
     }
 
     @Override
     public String getName() {
-        return ImplicitTermLabel.NAME.toString();
+        return ImplicitSpecTermLabel.NAME.toString();
     }
 
     @Override
     protected ITermLabel getTermLabel(Term applicationTerm) {
-        return ImplicitTermLabel.INSTANCE;
+        return ImplicitSpecTermLabel.INSTANCE;
     }
 
     @Override

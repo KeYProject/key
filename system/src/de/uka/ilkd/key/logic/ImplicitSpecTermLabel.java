@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.logic;
 
 /**
- * Label attached to a term which is specified implicitly (by the JML specification). 
+ * Label attached to a term which is specified implicitly (by the JML specification).
  */
-public class ImplicitTermLabel implements ITermLabel {
+public class ImplicitSpecTermLabel implements ITermLabel {
     /**
      * The unique name of this label.
      */
@@ -12,12 +12,12 @@ public class ImplicitTermLabel implements ITermLabel {
     /**
      * The only instance of this class.
      */
-    public static ImplicitTermLabel INSTANCE = new ImplicitTermLabel();
+    public static ImplicitSpecTermLabel INSTANCE = new ImplicitSpecTermLabel();
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private ImplicitTermLabel() {
+    private ImplicitSpecTermLabel() {
     }
 
     @Override

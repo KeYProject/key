@@ -40,8 +40,8 @@ public class LabelFactory {
       else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
           return ShortcutEvaluationTermLabel.INSTANCE;
       }
-      else if (ImplicitTermLabel.NAME.toString().equals(name)) {
-          return ImplicitTermLabel.INSTANCE;
+      else if (ImplicitSpecTermLabel.NAME.toString().equals(name)) {
+          return ImplicitSpecTermLabel.INSTANCE;
       }
       else {
          throw new UnknownLabelException(name);

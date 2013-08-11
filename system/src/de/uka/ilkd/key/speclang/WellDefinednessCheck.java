@@ -12,7 +12,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ImplicitTermLabel;
+import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -37,8 +37,8 @@ import de.uka.ilkd.key.util.Triple;
 /**
  * A contract for checking the well-definedness of a specification element
  * (i.e. a class invariant, a method contract, a loop invariant or a block contract),
- * consisting of invariant/precondition (depending on which kind of contract it is)
- * and assignable-clause.
+ * consisting of precondition, assignable-clause and postcondition/invariant
+ * (depending on which kind of contract it is).
  */
 /**
  * @author kirsten
@@ -48,9 +48,13 @@ public abstract class WellDefinednessCheck implements Contract {
 
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
+    private static int i = 0;
 
+    private final String name;
 
-    public final Type type;
+    private final int id;
+
+    private final Type type;
 
     private IObserverFunction target;
 
@@ -86,16 +90,50 @@ public abstract class WellDefinednessCheck implements Contract {
         return type().toString().toLowerCase();
     }
 
-    WellDefinednessCheck(IObserverFunction target, Type type, Services services) {
+    WellDefinednessCheck(String name, IObserverFunction target, Type type, Services services) {
+        this.id = i++;
+        this.name = name +" (wd)." + id;
         this.type = type;
         this.target = target;
         this.heap = services.getTypeConverter().getHeapLDT().getHeap();
+    }
+
+    WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
+                         LocationVariable heap, Term implicitRequires,
+                         Term requires, Term assignable, Term ensures) {
+        this.name = name;
+        this.id = id;
+        this.type = type;
+        this.target = target;
+        this.heap = heap;
+        this.implicitRequires = implicitRequires;
+        this.requires = requires;
+        this.assignable = assignable;
+        this.ensures = ensures;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int id() {
+        return id;
     }
 
     void setRequires(Term req) {
         Pair<Term, Term> requires = sortAndShortcut(req);
         this.implicitRequires = requires.first;
         this.requires = requires.second;
+    }
+
+    Term implicitRequires() {
+        return this.implicitRequires;
+    }
+
+    Term requires() {
+        return this.requires;
     }
 
     public Pair<Term, Term> getRequires() {
@@ -238,6 +276,12 @@ public abstract class WellDefinednessCheck implements Contract {
      }
 
     @Override
+    public String proofToString(Services services) {
+        assert false;
+        return null;
+    }
+
+    @Override
     public IObserverFunction getTarget() {
         return target;
     }
@@ -254,7 +298,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public String getDisplayName() {
-        return "Well-Definedness of JML " + typeString();
+        return "Well-Definedness of JML " + typeString() + " " + id;
     }
 
     @Override
@@ -266,7 +310,7 @@ public abstract class WellDefinednessCheck implements Contract {
         ImmutableArray<ITermLabel> ls = t.getLabels();
         LinkedList<ITermLabel> res = new LinkedList<ITermLabel>();
         for (ITermLabel l: ls) {
-            if(!l.equals(ImplicitTermLabel.INSTANCE)) {
+            if(!l.equals(ImplicitSpecTermLabel.INSTANCE)) {
                 res.add(l);
             }
         }
@@ -322,7 +366,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 && spec.op().equals(Junctor.AND)) {
             for (Term sub: spec.subs()) {
                 if(sub.hasLabels()
-                        && sub.getLabels().contains(ImplicitTermLabel.INSTANCE)) {
+                        && sub.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
                     sub = relabel(sub);
                     Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                     start = start.append(p.first).append(p.second);
@@ -336,9 +380,13 @@ public abstract class WellDefinednessCheck implements Contract {
         } else {
             for (Term sub: spec.subs()) {
                 if(sub.hasLabels()
-                        && sub.getLabels().contains(ImplicitTermLabel.INSTANCE)) {
+                        && sub.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
                     sub = relabel(sub);
                 }
+            }
+            if(spec.hasLabels()
+                    && spec.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
+                spec = relabel(spec);
             }
             end = end.append(spec);
             return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);

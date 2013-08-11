@@ -102,7 +102,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
-import de.uka.ilkd.key.rule.ImplicitTermLabelInstantiator;
+import de.uka.ilkd.key.rule.ImplicitSpecTermLabelInstantiator;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.ITermLabelWorker;
@@ -2397,7 +2397,7 @@ public final class SymbolicExecutionUtil {
          labelInstantiators = labelInstantiators.append(
                  ShortcutEvaluationTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(
-                 ImplicitTermLabelInstantiator.INSTANCE);
+                 ImplicitSpecTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }

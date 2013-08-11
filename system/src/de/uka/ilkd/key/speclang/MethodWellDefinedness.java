@@ -1,15 +1,13 @@
 package de.uka.ilkd.key.speclang;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -30,7 +28,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Term signals = TB.ff();
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
-        super(contract.getTarget(), Type.METHOD_CONTRACT, services);
+        super(contract.getTypeName(), contract.getTarget(), Type.METHOD_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         LocationVariable h = getHeap();
@@ -49,16 +47,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
     }
 
-    public FunctionalOperationContract getContract() {
-        return this.contract;
+    private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
+                                  LocationVariable heap, Term implicitRequires,
+                                  Term requires, Term assignable, Term ensures,
+                                  FunctionalOperationContract contract, Term forall,
+                                  Term old, Term diverges, Term when, Term workingSpace,
+                                  Term duration, Term signalsOnly, Term signals) {
+        super(name, id, type, target, heap, implicitRequires, requires, assignable, ensures);
+        this.contract = contract;
+        this.forall = forall;
+        this.old = old;
+        this.diverges = diverges;
+        this.when = when;
+        this.workingSpace = workingSpace;
+        this.duration = duration;
+        this.signalsOnly = signalsOnly;
+        this.signals = signals;
     }
 
-    // TODO: Not used atm, do we even need this method here? Better alternatives?
-    public Term getPre(ProgramVariable selfVar,
-                       ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-                       Services services) {
-        return contract.getPre(getHeap(), selfVar, paramVars, atPreVars, services);
+    public FunctionalOperationContract getContract() {
+        return this.contract;
     }
 
     public Term getForall() {
@@ -94,39 +102,35 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Type type() {
-        return Type.METHOD_CONTRACT;
-    }
-
-    @Override
-    public int id() {
-        return contract.id();
-    }
-
-    @Override
     public boolean transactionApplicableContract() {
         return contract.transactionApplicableContract();
     }
 
     @Override
-    public String proofToString(Services services) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Contract setID(int newId) {
-        return this;
+        return new MethodWellDefinedness(getName(),
+                                         newId,
+                                         type(),
+                                         getTarget(),
+                                         getHeap(),
+                                         implicitRequires(),
+                                         requires(),
+                                         getAssignable(),
+                                         getEnsures(),
+                                         contract,
+                                         forall,
+                                         old,
+                                         diverges,
+                                         when,
+                                         workingSpace,
+                                         duration,
+                                         signalsOnly,
+                                         signals);
     }    
 
     @Override
     public String getTypeName() {
         return "Well-Definedness of " + contract.getTypeName();
-    }
-
-    @Override
-    public String getName() {
-        return "Well-Definedness of " + contract.getName();
     }
 
     @Override

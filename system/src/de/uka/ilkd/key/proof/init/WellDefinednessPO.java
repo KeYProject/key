@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvWellDefinedness;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
@@ -30,6 +32,7 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -68,7 +71,19 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         assignPOTerms(poTerms);
 
         // add axioms
+        collectWdClassInvariants();
         collectClassAxioms(getCalleeKeYJavaType());
+    }
+
+    @Override
+    protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
+        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
+        for(ClassAxiom axiom: specRepos.getClassAxioms(kjt)) {
+            if(axiom instanceof PartialInvAxiom) {
+                result = result.add(axiom);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -217,9 +232,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return WellDefinednessCheck.wd(t, services);
     }
 
-    @Override
-    protected void collectClassAxioms(KeYJavaType selfKJT) {
+    private void collectWdClassInvariants() {
         IObserverFunction target = getTarget();
+        KeYJavaType selfKJT = getCalleeKeYJavaType();
         ImmutableSet<ClassInvWellDefinedness> invs =
                 specRepos.getWdClassInvariants(selfKJT, target);
         if(invs.isEmpty()) {
@@ -233,13 +248,12 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
 
         for (ClassInvWellDefinedness inv : invs) {
-            for (Taclet invTaclet : inv.getTaclets(services)) {
+            final Taclet invTaclet = inv.getTaclet(services);
                 assert invTaclet != null : "class invariant (wd) returned null taclet: "
-                        + inv.getName();
+                                           + inv.getName();
                 taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(invTaclet));
                 initConfig.getProofEnv().registerRule(invTaclet,
                                                       AxiomJustification.INSTANCE);
-            }
         }
     }
 

@@ -3,10 +3,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -28,7 +26,7 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
     private final ClassInvariant inv;
 
     public ClassInvWellDefinedness(ClassInvariant inv, IObserverFunction target, Services services) {
-        super(target, Type.CLASS_INVARIANT, services);
+        super(inv.getName(), target, Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
         this.setRequires(TB.tt());
@@ -36,18 +34,16 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
         this.setEnsures(inv.getOriginalInv());
     }
 
+    private ClassInvWellDefinedness(String name, int id, Type type, IObserverFunction target,
+                                    LocationVariable heap, Term implicitRequires,
+                                    Term requires, Term assignable, Term ensures,
+                                    ClassInvariant inv) {
+        super(name, id, type, target, heap, implicitRequires, requires, assignable, ensures);
+        this.inv = inv;
+    }
+
     public ClassInvariant getInvariant() {
         return this.inv;
-    }
-
-    @Override
-    public Type type() {
-        return Type.CLASS_INVARIANT;
-    }
-
-    @Override
-    public int id() {
-        return inv.hashCode();
     }
 
     @Override
@@ -56,23 +52,22 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public String proofToString(Services services) {
-        return null;
-    }
-
-    @Override
     public Contract setID(int newId) {
-        return this;
+        return new ClassInvWellDefinedness(getName(),
+                                           newId,
+                                           type(),
+                                           getTarget(),
+                                           getHeap(),
+                                           implicitRequires(),
+                                           requires(),
+                                           getAssignable(),
+                                           getEnsures(),
+                                           inv);
     }
 
     @Override
     public String getTypeName() {
         return "Well-Definedness of " + inv.getDisplayName();
-    }
-
-    @Override
-    public String getName() {
-        return inv.getName();
     }
 
     @Override
@@ -94,8 +89,7 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
         return new Triple<Pair<Term, Term>, ImmutableList<Term>, Term>(pre, c, inv);
     }
 
-    public ImmutableSet<Taclet> getTaclets(Services services) {
-        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+    public Taclet getTaclet(Services services) {
         IObserverFunction target = getTarget();
         boolean isStatic = target.isStatic();
         KeYJavaType kjt = inv.getKJT();
@@ -115,10 +109,8 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
                                                            false,
                                                            false));
         }
-        final SchemaVariable selfSV =
-                isStatic ? null
-                        : SchemaVariableFactory.createTermSV(new Name("self"),
-                                                             kjt.getSort());
+        final SchemaVariable selfSV = isStatic ?
+                null : SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort());
         final Taclet taclet = TG.generateWdInvTaclet(name,
                                                      heapSVs,
                                                      selfSV,
@@ -127,8 +119,7 @@ public final class ClassInvWellDefinedness extends WellDefinednessCheck {
                                                      kjt,
                                                      isStatic,
                                                      services);
-        //return
-        return result.add(taclet);
+        return taclet;
     }
 
     @Override

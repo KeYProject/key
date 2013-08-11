@@ -36,7 +36,7 @@ class BlockContractSelectionPanel extends JPanel {
     private static final long serialVersionUID = 1681443715264203991L;
 
     private final Services services;
-    private final JList contractList;
+    private final JList<BlockContract> contractList;
     private final TitledBorder border;
 
     public BlockContractSelectionPanel(final Services services, final boolean multipleSelection)
@@ -54,7 +54,7 @@ class BlockContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         //create contract list
-        contractList = new JList();
+        contractList = new JList<BlockContract>();
         contractList.setSelectionMode(
                 multipleSelection
                         ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
@@ -72,7 +72,7 @@ class BlockContractSelectionPanel extends JPanel {
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
             public Component getListCellRendererComponent(
-                    JList list,
+                    JList<?> list,
                     Object value,
                     int index,
                     boolean isSelected,
