@@ -555,17 +555,6 @@ public class TacletGenerator {
                                       KeYJavaType kjt,
                                       boolean isStatic,
                                       Services services) {
-        /*Map<Term, Term> map = new LinkedHashMap<Term, Term>();
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        int i = 0;
-        for(ProgramVariable heap : heaps) {
-            map.put(TB.var(heap), TB.var(heapSVs.get(i++)));
-        }*/
-        //final OpReplacer replacer = new OpReplacer(map);
-
-        //instantiate axiom with schema variables
-        //final TermAndBoundVarPair schemaAxiom = replaceBoundLogicVars(replacer.replace(term));
-
         final Term[] hs = new Term[heapSVs.size()];
         int i = 0;
         for(SchemaVariable heapSV : heapSVs) {
@@ -586,14 +575,6 @@ public class TacletGenerator {
         tb.setFind(WellDefinednessCheck.wd(invTerm, services));
         tb.setName(name);
         tb.addRuleSet(new RuleSet(new Name("simplify")));
-        /*for (VariableSV boundSV : schemaAxiom.boundVars) {
-            for(SchemaVariable heapSV : heapSVs) {
-                tb.addVarsNotFreeIn(boundSV, heapSV);
-            }
-            if (selfSV != null) {
-                tb.addVarsNotFreeIn(boundSV, selfSV);
-            }
-        }*/
         tb.addGoalTerm(TB.andSC(notNull, wdSelf, created, req));
         return tb.getTaclet();
     }

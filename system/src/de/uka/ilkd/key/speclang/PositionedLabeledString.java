@@ -45,7 +45,7 @@ public class PositionedLabeledString extends PositionedString {
     }
 
     /**
-     * returns the labels attached to this term
+     * returns the labels attached to this positioned string
      */
     @Override
     public ImmutableArray<ITermLabel> getLabels() {
@@ -55,7 +55,7 @@ public class PositionedLabeledString extends PositionedString {
     /**
      * returns true if the given label is attached
      * @param label the ITermLabel for which to look (must not be null)
-     * @return true iff. the label is attached to this term
+     * @return true iff. the label is attached to this positioned string
      */
     @Override
     public boolean containsLabel(ITermLabel label) {

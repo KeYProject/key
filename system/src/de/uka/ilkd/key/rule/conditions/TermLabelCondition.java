@@ -18,7 +18,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
 
     public TermLabelCondition(TermLabelSV l, String t, boolean negated) {
         this.l = l;
-        this.ln = makeLabelName(t);
+        this.ln = new Name(t);
         this.negated = negated;
     }
 
@@ -27,8 +27,8 @@ public class TermLabelCondition extends VariableConditionAdapter {
                          SVInstantiations instMap, Services services) {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
-        boolean isLabel = hasLabel(tInsts, ln);
-        return negated ? !isLabel : isLabel;
+        boolean hasLabel = hasLabel(tInsts, ln);
+        return negated ? !hasLabel : hasLabel;
     }
 
     static boolean hasLabel(ImmutableArray<?> labels, Name name) {
@@ -41,18 +41,8 @@ public class TermLabelCondition extends VariableConditionAdapter {
         return found;
     }
 
-    static Name makeLabelName(String name) {
-        for (ITermLabel l: ITermLabel.labels) {
-            if(l.toString().equals(name)) {
-                return l.name();
-            }
-        }
-        assert false : "Unknown Term Label!";
-        return null;
-    }
-
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\isLabel (" + l + ", " + ln + ")";
+        return (negated ? "\\not":"") + "\\hasLabel (" + l + ", " + ln + ")";
     }
 }

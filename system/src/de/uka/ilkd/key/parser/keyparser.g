@@ -4174,7 +4174,7 @@ varcond_label [TacletBuilder b, boolean negated]
   String name = null;
 }
 :
-   ISLABEL
+   HASLABEL
         LPAREN label=varId COMMA name=simple_ident RPAREN {
            b.addVariableCondition(new TermLabelCondition((TermLabelSV) label, name, negated ));
         }

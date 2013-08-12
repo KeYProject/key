@@ -74,13 +74,13 @@ tokens {
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";
 	FIELDTYPE = "\\fieldType";
-	ELEMSORT = "\\elemSort";        
+	ELEMSORT = "\\elemSort";
+	HASLABEL="\\hasLabel";
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";
 	ISATOMIC="\\isAtomic";
         ISENUMTYPE="\\isEnumType";
 	ISINDUCTVAR="\\isInductVar";
-	ISLABEL="\\isLabel";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	ISOBSERVER = "\\isObserver";
 	DIFFERENT = "\\different";		

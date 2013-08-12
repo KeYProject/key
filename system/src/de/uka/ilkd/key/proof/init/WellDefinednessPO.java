@@ -92,8 +92,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             return false;
         }
         WellDefinednessPO wPO = (WellDefinednessPO) po;
-        return specRepos.getWdChecks(wPO.check.getKJT(), wPO.check.getTarget())
-                .subset(specRepos.getWdChecks(check.getKJT(), check.getTarget()));
+        return check.equals(wPO.check);
     }
 
     @Override
@@ -122,15 +121,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return result;
     }
 
-    private LocationVariable getSelf() {
+    private ProgramVariable getSelf() {
         IObserverFunction obs = getTarget();
         final LocationVariable self;
-        if (obs instanceof IProgramMethod) {
-            self = TB.selfVar(services, (IProgramMethod)obs, getCalleeKeYJavaType(), true);
-            register(self);
-        } else {
-            self = null;
-        }
+        self = TB.selfVar(services, obs, getCalleeKeYJavaType(), true);
+        register(self);
         return self;
     }
 
@@ -269,41 +264,41 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         ImmutableList<ProgramVariable> paramVars = vars.params;
         KeYJavaType selfKJT = getCalleeKeYJavaType();
         List<LocationVariable> heaps = getHeaps();
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resList = ImmutableSLList.<Term>nil();
 
-       // "self != null"
-       final Term selfNotNull = generateSelfNotNull(selfVar);
+        // "self != null"
+        final Term selfNotNull = generateSelfNotNull(selfVar);
 
-       // "self.<created> = TRUE"
-       final Term selfCreated = generateSelfCreated(heaps, selfVar);
+        // "self.<created> = TRUE"
+        final Term selfCreated = generateSelfCreated(heaps, selfVar);
 
-       // "MyClass::exactInstance(self) = TRUE"
-       final Term selfExactType = generateSelfExactType(selfVar, selfKJT);
+        // "MyClass::exactInstance(self) = TRUE"
+        final Term selfExactType = generateSelfExactType(selfVar, selfKJT);
 
-       // conjunction of...
-       // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
-       // - "inBounds(p_i)" for integer parameters
-       Term paramsOK = generateParamsOK(paramVars);
+        // conjunction of...
+        // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
+        // - "inBounds(p_i)" for integer parameters
+        Term paramsOK = generateParamsOK(paramVars);
 
-       // initial value of measured_by clause
-       final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
-       Term wellFormed = null;
-       for (LocationVariable heap : heaps) {
-          final Term wf = TB.wellFormed(TB.var(heap), services);
-          if (wellFormed == null) {
-             wellFormed = wf;
-          }
-          else {
-             wellFormed = TB.and(wellFormed, wf);
-          }
-       }
-
-       Term[] resultTerm = new Term[] { wellFormed != null ? wellFormed : TB.tt(), selfNotNull,
-               selfCreated, selfExactType, implicitPre, paramsOK, mbyAtPreDef };
-       for (Term t: resultTerm) {
-           res = res.append(t);
-       }
-       return res;
+        // initial value of measured_by clause
+        final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
+        Term wellFormed = null;
+        for (LocationVariable heap : heaps) {
+            final Term wf = TB.wellFormed(TB.var(heap), services);
+            if (wellFormed == null) {
+                wellFormed = wf;
+            }
+            else {
+                wellFormed = TB.and(wellFormed, wf);
+            }
+        }
+        final Term[] result = new Term[]
+                { wellFormed != null ? wellFormed : TB.tt(), selfNotNull, selfCreated,
+                        selfExactType, implicitPre, paramsOK, mbyAtPreDef };
+        for (Term t: result) {
+            resList = resList.append(t);
+        }
+        return resList;
     }
 
     /**
@@ -313,9 +308,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @return The term representing the general assumption.
      */
     protected Term generateSelfNotNull(ProgramVariable selfVar) {
-       return selfVar == null || isConstructor() ?
-              TB.tt() :
-              TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+        return selfVar == null || isConstructor() ?
+                TB.tt() : TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
     }
 
     /**

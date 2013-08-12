@@ -205,7 +205,7 @@ public class TermBuilder {
      * in the namespaces!
      */
     public LocationVariable selfVar(Services services,
-                                    IProgramMethod pm,
+                                    IObserverFunction pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
         if(pm.isStatic()) {

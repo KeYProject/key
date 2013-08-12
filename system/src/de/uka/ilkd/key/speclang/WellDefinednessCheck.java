@@ -76,6 +76,20 @@ public abstract class WellDefinednessCheck implements Contract {
         return type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof WellDefinednessCheck)) {
+            return false;
+        }
+        WellDefinednessCheck wd = (WellDefinednessCheck)o;
+        return wd.getName().equals(name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public LocationVariable getHeap() {
         return this.heap;
     }

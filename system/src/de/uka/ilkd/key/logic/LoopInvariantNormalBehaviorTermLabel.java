@@ -28,7 +28,8 @@ public class LoopInvariantNormalBehaviorTermLabel implements ITermLabel {
    /**
     * The only instance of this class.
     */
-   public static LoopInvariantNormalBehaviorTermLabel INSTANCE = new LoopInvariantNormalBehaviorTermLabel();
+   public static LoopInvariantNormalBehaviorTermLabel INSTANCE =
+           new LoopInvariantNormalBehaviorTermLabel();
 
    /**
     * Constructor to forbid multiple instances.

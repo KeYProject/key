@@ -166,7 +166,7 @@ class ContractSelectionPanel extends JPanel {
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
                 final int res = c1.id() - c2.id();
-                final int altRes = c1.getName().hashCode() - c2.getName().hashCode();
+                final int altRes = c1.hashCode() - c2.hashCode();
                 return (res != 0) ? res : altRes;
             }
         });

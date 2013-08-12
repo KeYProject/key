@@ -13,26 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 /**
  * The interface for term labels. Term labels are annotations that can be attached
  * to {@link Term}s and carry additional information. They must not be soundness relevant.
  */
 public interface ITermLabel extends Named {
-
-    /**
-     * List of all "relevant" TermLabels. This is used for TermLabelCondition
-     * (a VariableCondition). If you want any other TermLabels to be used in
-     * TermLabelCondition, please add them here.
-     */
-    public static final Set<ITermLabel> labels =
-            Collections.unmodifiableSet(new LinkedHashSet<ITermLabel>(Arrays.asList(
-                    LoopBodyTermLabel.INSTANCE, LoopInvariantNormalBehaviorTermLabel.INSTANCE,
-                    ShortcutEvaluationTermLabel.INSTANCE, ImplicitSpecTermLabel.INSTANCE)));
 
     /**
      * A term label may have structure, i.e., parameterized
