@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 lexer grammar KeYJMLPreLexer;
 
@@ -75,6 +75,8 @@ lexer grammar KeYJMLPreLexer;
     ENSURES_RED 		: 'ensures_redundantly';
     EXCEPTIONAL_BEHAVIOR 	: 'exceptional_behavior';
     EXCEPTIONAL_BEHAVIOUR 	: 'exceptional_behaviour';
+    EXSURES                     : 'exsures';
+    EXSURES_RED                 : 'exsures_redundantly';
     EXTRACT                     : 'extract';
     FINAL 			: 'final';
     FOR_EXAMPLE			: 'for_example';
@@ -97,6 +99,8 @@ lexer grammar KeYJMLPreLexer;
     MEASURED_BY                 : 'measured_by';
     MEASURED_BY_REDUNDANTLY     : 'measured_by_redundantly';
     MODEL 			: 'model';
+    MODEL_BEHAVIOR 		: 'model_behavior' ;
+    MODEL_BEHAVIOUR 		: 'model_behaviour' ;
     MODIFIABLE			: 'modifiable';
     MODIFIABLE_RED		: 'modifiable_redundantly';
     MODIFIES			: 'modifies';
@@ -107,6 +111,7 @@ lexer grammar KeYJMLPreLexer;
     NON_NULL 			: 'non_null';
     NORMAL_BEHAVIOR 		: 'normal_behavior';
     NORMAL_BEHAVIOUR 		: 'normal_behaviour';
+    NO_STATE			: 'no_state' ;
     NOWARN			: 'nowarn';
     NULLABLE 			: 'nullable';
     NULLABLE_BY_DEFAULT 	: 'nullable_by_default';
@@ -142,12 +147,13 @@ lexer grammar KeYJMLPreLexer;
     STRICTFP 			: 'strictfp';
     SYNCHRONIZED 		: 'synchronized';
     TRANSIENT 			: 'transient';
+    TWO_STATE			: 'two_state' ;
     UNINITIALIZED 		: 'uninitialized';
     VOLATILE 			: 'volatile';
     WHEN 			: 'when';
     WHEN_RED 			: 'when_redundantly';
     WORKING_SPACE 		: 'working_space';
-    WORKING_SPACE_RED 		: 'working_space_redundantly';   
+    WORKING_SPACE_RED 		: 'working_space_redundantly';
     WORKING_SPACE_SINGLE_ITERATION	: 'working_space_single_iteration';
     WORKING_SPACE_SINGLE_ITERATION_PARAM	: 'working_space_single_iteration_param';
     WORKING_SPACE_SINGLE_ITERATION_LOCAL	: 'working_space_single_iteration_local';
@@ -157,7 +163,7 @@ lexer grammar KeYJMLPreLexer;
     WORKING_SPACE_LOCAL 		: 'working_space_local';
     WORKING_SPACE_CALLER 		: 'working_space_caller';
     WORKING_SPACE_REENTRANT 		: 'working_space_reentrant';
-    WRITABLE			: 'writable';   
+    WRITABLE			: 'writable';
 
 fragment SL_COMMENT
 @init {
@@ -170,12 +176,12 @@ fragment SL_COMMENT
     	(~('@'|'\n'))
     	=>
         ~('@'|'\n')
-        (  
+        (
             options { greedy = true; }
             :
             ~'\n'
         )*
-    )? 
+    )?
 ;
 
 
@@ -192,14 +198,14 @@ fragment ML_COMMENT
         (	'\n'         { newline(); }
             | 	~'@'
         )
-    	( 
-    	    options { greedy = false; } 
-            : 
+    	(
+    	    options { greedy = false; }
+            :
             	'\n'     { newline(); }
-            |	~'\n' 
+            |	~'\n'
     	)*
-    )? 
-    '*/' 
+    )?
+    '*/'
 ;
 
 fragment LETTER
@@ -221,7 +227,7 @@ fragment DIGIT
     paraphrase.push("a digit");
 }
 @after { paraphrase.pop(); }
-:	
+:
     '0'..'9'
 ;
 
@@ -233,7 +239,7 @@ WS
 }
 @after { paraphrase.pop(); }
 :
-    ( 
+    (
     	    ' '
     	|   '\t'
     	|   '\n'  { newline(); acceptAt = true; }
@@ -246,8 +252,8 @@ WS
     	|   SL_COMMENT
     	|   ML_COMMENT
     )+
-    { 
-    	$channel = HIDDEN; 
+    {
+    	$channel = HIDDEN;
     }
 ;
 
@@ -260,11 +266,11 @@ IDENT
 }
 @after { paraphrase.pop(); }
 :
-    LETTER 
+    LETTER
     (	options { greedy = true; }
     	:
-    	    LETTER 
-    	|   DIGIT 
+    	    LETTER
+    	|   DIGIT
     )*
 ;
 
@@ -292,7 +298,7 @@ BODY
     (
 	   '{'                      { braceCounter++; ignoreAt = false; }
     	|  {braceCounter > 0}? '}'  { braceCounter--; ignoreAt = false; }
-    	|  '\n'                     { newline(); ignoreAt = true; } 
+    	|  '\n'                     { newline(); ignoreAt = true; }
     	|  ' '
     	|  '\u000C'
     	|  '\t'
@@ -300,7 +306,7 @@ BODY
     	|  {!ignoreAt}? '@'
     	|  {ignoreAt}? { s = getText(); } '@'	    { setText(s); ignoreAt = false; }
     	|  ~'}'			    { ignoreAt = false; }
-    )* 
+    )*
     {braceCounter == 0}? '}'
 ;
 
@@ -352,7 +358,7 @@ ESC
     }
     @after { paraphrase.pop(); }
         :
-        '[' 
+        '['
         ;
 
     AXIOM_NAME_END
@@ -361,9 +367,9 @@ ESC
     }
     @after { paraphrase.pop(); }
         :
-        ']' 
+        ']'
         ;
-  
+
 // http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC31, 2013-06-22
 JAVASEPARATOR
     :
