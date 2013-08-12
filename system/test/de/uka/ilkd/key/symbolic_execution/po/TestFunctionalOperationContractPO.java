@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -50,17 +50,11 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
                          String baseContractName,
                          String oraclePathInBaseDirFile,
                          String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      String originalRuntimeExceptions = null;
+      HashMap<String, String> originalTacletOptions = null;
       SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
       try {
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false);
-            env.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Make sure that the correct taclet options are defined.
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName);
          // Create proof environment for symbolic execution
          env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false);
          // Extract and test try content
@@ -72,10 +66,8 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
          assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
+         // Restore taclet options
+         restoreTacletOptions(originalTacletOptions);
          if (env != null) {
             env.dispose();
          }
