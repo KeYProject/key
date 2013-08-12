@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -64,7 +65,11 @@ public final class MainFrame extends JScrollPane {
                 "copy");
         getActionMap().put("copy", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                GuiUtilities.copyHighlightToClipboard(mainWindow.leafNodeView);
+                // FIXME: Can this ever be reached ?!?! (MU 2013)
+                PosInSequent pos = mainWindow.leafNodeView.getMousePosInSequent();
+                if(pos != null) {
+                    GuiUtilities.copyHighlightToClipboard(mainWindow.leafNodeView, pos);
+                }
             }
         });
 

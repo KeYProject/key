@@ -22,28 +22,29 @@ import java.util.List;
  * label factory in package rule.label
  */
 public class LabelFactory {
-   public static ITermLabel createLabel(String name, List<String> parameters) throws UnknownLabelException {
+   public static ITermLabel createLabel(String name, List<String> parameters)
+           throws UnknownLabelException {
       if (SymbolicExecutionTermLabel.NAME.toString().equals(name)) {
          if (parameters != null && parameters.size() == 1) {
             return new SymbolicExecutionTermLabel(Integer.valueOf(parameters.get(0)));
+         } else {
+            throw new IllegalArgumentException(
+                    "Label " + SymbolicExecutionTermLabel.NAME
+                    + " requires exactly one Integer-Parameter with its ID.");
          }
-         else {
-            throw new IllegalArgumentException("Label " + SymbolicExecutionTermLabel.NAME + " requires exactly one Integer-Parameter with its ID.");
-         }
-      }
-      else if (LoopBodyTermLabel.NAME.toString().equals(name)) {
+      } else if (LoopBodyTermLabel.NAME.toString().equals(name)) {
          return LoopBodyTermLabel.INSTANCE;
-      }
-      else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
+      } else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
          return LoopInvariantNormalBehaviorTermLabel.INSTANCE;
-      }
-      else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
+      } else if (SelectSkolemConstantTermLabel.NAME.toString().equals(name)) {
+          return SelectSkolemConstantTermLabel.INSTANCE;
+      } else if (AnonHeapTermLabel.NAME.toString().equals(name)) {
+          return AnonHeapTermLabel.INSTANCE;
+      } else if (ShortcutEvaluationTermLabel.NAME.toString().equals(name)) {
           return ShortcutEvaluationTermLabel.INSTANCE;
-      }
-      else if (ImplicitSpecTermLabel.NAME.toString().equals(name)) {
+      } else if (ImplicitSpecTermLabel.NAME.toString().equals(name)) {
           return ImplicitSpecTermLabel.INSTANCE;
-      }
-      else {
+      } else {
          throw new UnknownLabelException(name);
       }
    }

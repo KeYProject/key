@@ -410,8 +410,7 @@ public class KeYFile implements EnvInput {
      * modifying the set of rules 
      * of the initial configuration 
      */
-    public void readRulesAndProblem() 
-            throws ProofInputException {
+    public void readRulesAndProblem() throws ProofInputException {
         final ParserConfig schemaConfig = 
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         final ParserConfig normalConfig = 
@@ -430,7 +429,7 @@ public class KeYFile implements EnvInput {
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),
-                                initConfig.getTaclets());                             
+                                initConfig.getTaclets());
                 problemParser.parseTacletsAndProblem();
                 initConfig.setTaclets(problemParser.getTaclets());
             } finally {

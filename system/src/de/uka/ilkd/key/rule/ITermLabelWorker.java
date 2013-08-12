@@ -80,13 +80,14 @@ public interface ITermLabelWorker {
     * @param termToUpdate The {@link Term} to update its labels.
     * @param rule The {@link Rule} which is applied. 
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
-    * @return The {@link ITermLabel}s to add to the updated {@link Term}.
+    * @param newLabels This {@link List} defines the new {@link ITermLabel} and can be modified by this method.
     */
-   public List<ITermLabel> updateLabels(Term tacletTerm, 
-                                        PosInOccurrence applicationPosInOccurrence,
-                                        Term termToUpdate,
-                                        Rule rule,
-                                        Goal goal);
+   public void updateLabels(Term tacletTerm,
+                            PosInOccurrence applicationPosInOccurrence,
+                            Term termToUpdate,
+                            Rule rule,
+                            Goal goal,
+                            List<ITermLabel> newLabels);
 
    /**
     * Returns the unique name of this {@link ITermLabelWorker} which should

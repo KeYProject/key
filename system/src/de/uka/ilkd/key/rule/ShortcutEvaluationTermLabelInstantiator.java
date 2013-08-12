@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.rule;
-import java.util.List;
 
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
-import de.uka.ilkd.key.rule.Rule;
 
 
 public class ShortcutEvaluationTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
@@ -31,14 +27,5 @@ public class ShortcutEvaluationTermLabelInstantiator extends AbstractSymbolicExe
     @Override
     protected ITermLabel getTermLabel(Term applicationTerm) {
         return ShortcutEvaluationTermLabel.INSTANCE;
-    }
-
-    @Override
-    public List<ITermLabel> updateLabels(Term tacletTerm,
-                                         PosInOccurrence applicationPosInOccurrence,
-                                         Term termToUpdate,
-                                         Rule rule,
-                                         Goal goal) {
-        return keepLabels(termToUpdate);
     }
 }

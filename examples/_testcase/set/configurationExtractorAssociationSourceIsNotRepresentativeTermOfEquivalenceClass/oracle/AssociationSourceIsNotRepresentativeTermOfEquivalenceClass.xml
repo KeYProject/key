@@ -25,55 +25,48 @@
 = null" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="true" branchCondition="  \if (current.right.left = current)
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="true" branchCondition="  \if (current.right.left = current)
       \then (current.right.left)
       \else (current.parent)
 = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <statement name="this.root=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="false">
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false">
                                                 <statement name="newParent.parent=null;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="false">
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false">
                                                    <statement name="current.parent=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="false">
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false">
                                                       <statement name="return current;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="false">
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false">
                                                          <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="false" isReturnValueComputed="false">
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false" isReturnValueComputed="false">
                                                             <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp;   \if (current.right.left = current)
-        \then (current.right.left)
-        \else (current.parent)
-  = null" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; (current = null | !current.right.left = current)
+&amp; (current.parent = null | current.right.left = null)
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false" terminationKind="NORMAL">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>
@@ -87,55 +80,55 @@
  = null" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="true" branchCondition="!  \if (current.right.left = current)
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="true" branchCondition="!  \if (current.right.left = current)
        \then (current.right.left)
        \else (current.parent)
  = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <statement name="current.parent.right=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="false">
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="false">
                                                 <statement name="newParent.parent=current.parent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="false">
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="false">
                                                    <statement name="current.parent=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="false">
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="false">
                                                       <statement name="return current;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="false">
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="false">
                                                          <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="false" isReturnValueComputed="false">
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="false" isReturnValueComputed="false">
                                                             <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
-&amp; !  \if (current.right.left = current)
-         \then (current.right.left)
-         \else (current.parent)
-   = null" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; !(  (current = null | current.parent = null)
+    &amp; (current = null | !current.right.left = current)
+    &amp; (  current.parent = null
+       | current.right.left = null))" pathConditionChanged="false" terminationKind="NORMAL">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>

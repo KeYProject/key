@@ -328,26 +328,26 @@ public final class ProblemInitializer {
     }
     
     
-    public final void readEnvInput(EnvInput envInput, 
-			      InitConfig initConfig) 
+    public final void readEnvInput(EnvInput envInput,
+			      InitConfig initConfig)
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
 	    //read includes
 	    if(!(envInput instanceof LDTInput)) {
 		readIncludes(envInput, initConfig);
 	    }
-	    
+
 	    //sanity check
 	    assert initConfig.varNS().allElements().size() == 0;
 	    for(Named n : initConfig.sortNS().allElements()) {
 		assert n instanceof Sort && !(n instanceof GenericSort);
-	    }	    
-	    
+	    }
+
 	    //read envInput itself
-	    reportStatus("Reading "+envInput.name(), 
+	    reportStatus("Reading "+envInput.name(),
 		    	 envInput.getNumberOfChars());
-	    envInput.setInitConfig(initConfig);	    
-	    envInput.read();	    
+	    envInput.setInitConfig(initConfig);
+	    envInput.read();
 
 	    //clean namespaces
 	    cleanupNamespaces(initConfig);	    	    
@@ -474,7 +474,7 @@ public final class ProblemInitializer {
 						profile.getStandardRules().getTacletBase(),
 						progMon,
 						profile);
-				readEnvInput(tacletBaseFile, newBaseConfig);			
+				readEnvInput(tacletBaseFile, newBaseConfig);
 			}
 			baseConfig = newBaseConfig;
 	}

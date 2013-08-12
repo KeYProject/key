@@ -492,7 +492,7 @@ public class BlockContractRule implements BuiltInRule {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
                 if (!modifiesClause.equals(strictlyNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, func(anonymisationHeap.getValue()));
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, TB.label(TB.func(anonymisationHeap.getValue()), AnonHeapTermLabel.INSTANCE));
                 }
                 result = parallel(result, anonymisationUpdate);
             }
@@ -640,7 +640,7 @@ public class BlockContractRule implements BuiltInRule {
         {
             Term result = tt();
             for (Function anonymisationFunction : anonymisationHeaps.values()) {
-                result = and(result, wellFormed(func(anonymisationFunction)));
+                result = and(result, wellFormed(TB.label(TB.func(anonymisationFunction), AnonHeapTermLabel.INSTANCE)));
             }
             return result;
         }

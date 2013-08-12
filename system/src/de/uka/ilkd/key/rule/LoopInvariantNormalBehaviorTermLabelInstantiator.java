@@ -24,11 +24,13 @@ import de.uka.ilkd.key.logic.op.Operator;
  * {@link LoopInvariantNormalBehaviorTermLabel} is maintained.
  * @author Martin Hentschel
  */
-public final class LoopInvariantNormalBehaviorTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+public final class LoopInvariantNormalBehaviorTermLabelInstantiator
+                            extends AbstractSymbolicExecutionInstantiator {
    /**
     * The only instance of this class.
     */
-   public static final LoopInvariantNormalBehaviorTermLabelInstantiator INSTANCE = new LoopInvariantNormalBehaviorTermLabelInstantiator();
+   public static final LoopInvariantNormalBehaviorTermLabelInstantiator INSTANCE =
+           new LoopInvariantNormalBehaviorTermLabelInstantiator();
 
    /**
     * Constructor to forbid multiple instances.

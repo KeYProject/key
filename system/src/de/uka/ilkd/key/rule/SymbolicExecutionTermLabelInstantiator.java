@@ -23,11 +23,13 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * {@link SymbolicExecutionTermLabel} is maintained.
  * @author Martin Hentschel
  */
-public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+public final class SymbolicExecutionTermLabelInstantiator
+                            extends AbstractSymbolicExecutionInstantiator {
    /**
     * The only instance of this class.
     */
-   public static final SymbolicExecutionTermLabelInstantiator INSTANCE = new SymbolicExecutionTermLabelInstantiator();
+   public static final SymbolicExecutionTermLabelInstantiator INSTANCE =
+           new SymbolicExecutionTermLabelInstantiator();
 
    /**
     * Constructor to forbid multiple instances.
