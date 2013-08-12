@@ -190,8 +190,10 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
             ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), input.getSequentToProve(), StrategyProperties.SPLITTING_NORMAL);
             try {
                if (info.getProof().openGoals().size() == 1) {
-                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(info.getProof().openGoals().head(), input.getOperator());
+                  Goal goal = info.getProof().openGoals().head();
+                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
                   assert returnValue != null;
+                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue);
                   return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getMediator(), getProofNode(), returnValue, null)};
                }
                else {
@@ -200,6 +202,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                   for (Goal goal : info.getProof().openGoals()) {
                      Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
+                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue);
                      List<Node> nodeList = valueNodeMap.get(returnValue);
                      if (nodeList == null) {
                         nodeList = new LinkedList<Node>();

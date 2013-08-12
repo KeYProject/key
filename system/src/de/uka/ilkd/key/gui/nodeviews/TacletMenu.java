@@ -501,7 +501,7 @@ class TacletMenu extends JMenu {
 	    } else {
 		if (((JMenuItem)e.getSource()).getText()
 		    .startsWith("copy to clipboard")){
-                    GuiUtilities.copyHighlightToClipboard(sequentView);
+                    GuiUtilities.copyHighlightToClipboard(sequentView, pos);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith("Pop method frame")){
 		    //                        mediator.popMethodFrame();

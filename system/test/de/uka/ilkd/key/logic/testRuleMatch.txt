@@ -177,5 +177,18 @@
 	               \replacewith (\<{..  ...}\>post)
  };
 
+testInsequentState {
+      \schemaVar \term int i;
+      \find (i = 0 ==>)
+      \inSequentState
+      \replacewith (0 = i ==>)
+};
+
+testInsequentState_2 {
+      \schemaVar \term int i;
+      \find (i = 0 ==>)
+      \replacewith (0 = i ==>)
+};
+ 
 }
 

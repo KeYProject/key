@@ -22,17 +22,14 @@ import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -44,17 +41,10 @@ import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -272,16 +262,15 @@ public class MethodCall extends ProgramTransformer {
 	    Debug.out("method-call: invocation of static method detected");
             newContext = null;
 	    IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
-            result = new MethodBodyStatement(staticMethod, newContext,
-					     pvar, arguments); 
+	    result = KeYJavaASTFactory.methodBody(pvar, newContext,
+		    staticMethod, arguments);
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
 	    IProgramMethod superMethod = getSuperMethod(execContext,
 						       methRef, services);
-	    result = new MethodBodyStatement
-		(superMethod, execContext.getRuntimeInstance(), pvar,
-		 arguments);
+	    result = KeYJavaASTFactory.methodBody(pvar,
+		    execContext.getRuntimeInstance(), superMethod, arguments);
 	} else {    // Instance invocation mode
 	    if (pm.isPrivate() || (methRef.implicit() && 
 				methRef.getName().
@@ -315,8 +304,8 @@ public class MethodCall extends ProgramTransformer {
 		}
 	    }
 	}
-	return KeYJavaASTFactory.
-	    insertStatementInBlock(paramDecl, new StatementBlock(result));
+	return KeYJavaASTFactory.insertStatementInBlock(paramDecl,
+		KeYJavaASTFactory.block(result));
     }
 
 
@@ -325,14 +314,13 @@ public class MethodCall extends ProgramTransformer {
 
     private Statement makeMbs(KeYJavaType t, Services services) {
 	IProgramMethod meth = getMethod(t, methRef, services);
-	return new MethodBodyStatement(meth, newContext,
-				       pvar, arguments);
+	return KeYJavaASTFactory.methodBody(pvar, newContext, meth, arguments);
     }
 
     public Expression makeIOf(Type t) {
 	Debug.assertTrue(newContext!=null);
-	return new Instanceof((Expression) newContext, 
-			      new TypeRef((KeYJavaType)t));
+	return KeYJavaASTFactory.instanceOf((Expression) newContext,
+		(KeYJavaType) t);
     }
 
 
@@ -340,9 +328,10 @@ public class MethodCall extends ProgramTransformer {
         KeYJavaType currType = imps.head();
         if (imps.size()==1) 
            return makeMbs(currType, services);
-        else return new If(makeIOf(currType),
-                           new Then(makeMbs(currType, services)),
-                           new Else(makeIfCascade(imps.tail(), services)));
+	else
+	    return KeYJavaASTFactory.ifElse(makeIOf(currType),
+		    makeMbs(currType, services),
+		    makeIfCascade(imps.tail(), services));
     }
 
 
@@ -359,14 +348,9 @@ public class MethodCall extends ProgramTransformer {
 	    final ProgramVariable originalParamVar =
 	        (ProgramVariable)originalSpec.getProgramVariable ();
 
-            VariableNamer varNamer = services.getVariableNamer();
-	    ProgramElementName newName 
-	    	= varNamer.getTemporaryNameProposal(originalParamVar
-					  .getProgramElementName().toString());
-
-	    final IProgramVariable paramVar
-	    	= new LocationVariable(newName,
-	    			      originalParamVar.getKeYJavaType());
+	    final IProgramVariable paramVar = KeYJavaASTFactory.localVariable(
+		    services, originalParamVar.getProgramElementName()
+			    .toString(), originalParamVar.getKeYJavaType());
 
 	    // this condition checks whether this is the last formal parameter and is used
 	    // in the context of a method with a variable number of args.
@@ -375,15 +359,14 @@ public class MethodCall extends ProgramTransformer {
 	            (   methRef.getArguments().size() != params 
 	             || !assignmentCompatible(methRef.getArgumentAt(i), originalSpec.getType(), services))) {
 	        // variable argument
-	        varSpecs[i] = new VariableSpecification(paramVar, 1, makeVariableArgument(originalSpec), originalSpec.getType());
+		varSpecs[i] = KeYJavaASTFactory.variableSpecification(paramVar,
+			1, makeVariableArgument(originalSpec),
+			originalSpec.getType());
 	    } else {
 	        // normal argument
-	        varSpecs[i] =
-	            new VariableSpecification
-	                    (paramVar, 
-	                    originalSpec.getDimensions(), 
-	                    methRef.getArgumentAt(i),
-	                    originalSpec.getType());
+		varSpecs[i] = KeYJavaASTFactory.variableSpecification(paramVar,
+			originalSpec.getDimensions(), methRef.getArgumentAt(i),
+			originalSpec.getType());
 	    }
 	} 
 	return varSpecs;
@@ -442,9 +425,10 @@ public class MethodCall extends ProgramTransformer {
         
         TypeReference baseTyRef = arrayTy.getBaseType();
         
-        ArrayInitializer arrayInit = new ArrayInitializer(exps, kjt);
-        Expression[] emptyArgs = new Expression[0];
-        NewArray newArray = new NewArray(emptyArgs, baseTyRef, kjt, arrayInit, 1);
+	ArrayInitializer arrayInit = KeYJavaASTFactory.arrayInitializer(exps,
+		kjt);
+	NewArray newArray = KeYJavaASTFactory.newArray(baseTyRef, 1, arrayInit,
+		kjt);
         
         return newArray;
     }
@@ -456,8 +440,8 @@ public class MethodCall extends ProgramTransformer {
 	for (int i=0; i<specs.length; i++) {
 	    ParameterDeclaration parDecl = 
 		methDecl.getParameterDeclarationAt(i);
-	    paramDecl[i] = new LocalVariableDeclaration
-		(parDecl.getModifiers(), parDecl.getTypeReference(), specs[i]);
+	    paramDecl[i] = KeYJavaASTFactory.declare(parDecl.getModifiers(),
+		    parDecl.getTypeReference(), specs[i]);
 	}
 	return paramDecl;
     }

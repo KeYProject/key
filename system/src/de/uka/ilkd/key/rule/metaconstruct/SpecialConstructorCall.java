@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.*;
@@ -53,13 +54,15 @@ public class SpecialConstructorCall extends ProgramTransformer {
 	SpecialConstructorReference constructorReference = 
 	    (SpecialConstructorReference) pe;
 
-	return new MethodReference
-	    (constructorReference.getArguments(), 
-             NORMALFORM_IDENTIFIER, 
-	     constructorReference instanceof ThisConstructorReference ?
-                 new ThisReference() :
-                 new SuperReference());
+	ReferencePrefix prefix;
+	if (constructorReference instanceof ThisConstructorReference) {
+	    prefix = KeYJavaASTFactory.thisReference();
+	} else {
+	    prefix = KeYJavaASTFactory.superReference();
+	}
 
+	return KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
+		constructorReference.getArguments());
     }
 
 }

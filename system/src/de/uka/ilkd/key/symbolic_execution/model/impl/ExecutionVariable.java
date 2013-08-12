@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -247,6 +246,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          // Extract value
          Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
          assert value != null;
+         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value);
          // Compute unknown flag if required
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {

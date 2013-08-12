@@ -24,6 +24,8 @@ import de.uka.ilkd.key.rule.TacletApplPart;
 /** class builds SuccTaclet objects.*/
 public class SuccTacletBuilder extends FindTacletBuilder {
 
+    private boolean ignoreTopLevelUpdates = true;
+
     /** sets the <I>find</I> of the Taclet that is to build to the given
      * term, if the sort of the given term is of Sort.FORMULA otherwise
      * nothing happens.
@@ -84,6 +86,7 @@ public class SuccTacletBuilder extends FindTacletBuilder {
 			      goals, ruleSets,
 			      attrs,
 			      find,
+                              ignoreTopLevelUpdates,
 			      prefixBuilder.getPrefixMap(),
 			      choices);
     }
@@ -103,5 +106,7 @@ public class SuccTacletBuilder extends FindTacletBuilder {
     }
 
 
-
+    public void setIgnoreTopLevelUpdates(boolean ignore) {
+        ignoreTopLevelUpdates = ignore;
+    }
 }
