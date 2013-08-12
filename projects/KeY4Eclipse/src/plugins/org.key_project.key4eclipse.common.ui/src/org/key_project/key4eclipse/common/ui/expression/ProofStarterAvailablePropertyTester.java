@@ -11,21 +11,23 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.common.ui.test.suite;
+package org.key_project.key4eclipse.common.ui.expression;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.key_project.key4eclipse.common.ui.test.testcase.ImmutableCollectionContentProviderTest;
-import org.key_project.key4eclipse.common.ui.test.testcase.StarterUtilTest;
+import org.eclipse.core.expressions.PropertyTester;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
+import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 
 /**
- * Run all contained JUnit 4 test cases.
+ * A {@link PropertyTester} which checks if the proof start functionality
+ * via {@link IProofStarter}s is available or not.
  * @author Martin Hentschel
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ImmutableCollectionContentProviderTest.class,
-    StarterUtilTest.class
-})
-public class AllCommonUiTests {
+public class ProofStarterAvailablePropertyTester extends PropertyTester {
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+      return StarterUtil.areProofStartersAvailable();
+   }
 }

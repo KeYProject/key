@@ -13,51 +13,56 @@
 
 package org.key_project.key4eclipse.common.ui.test.starter;
 
-import org.eclipse.core.resources.IProject;
-import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
+import org.eclipse.jdt.core.IMethod;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * {@link IProjectStarter} which logs the calls of {@link #open(IProject)}.
+ * {@link IProofStarter} which logs the calls of {@link #open(Proof, KeYEnvironment, IMethod)}.
  * @author Martin Hentschel
  */
-public class FirstLoggingProjectStarter implements IProjectStarter, ITestedStarter {
+public class FirstLoggingProofStarter implements IProofStarter, ITestedStarter {
    /**
     * The unique ID of this starter.
     */
-   public static final String ID = "org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProjectStarterID";
+   public static final String ID = "org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProofStarterID";
 
    /**
     * The unique Name of this starter.
     */
-   public static final String NAME = "First Project Starter";
+   public static final String NAME = "First Proof Starter";
 
    /**
     * The description of this starter.
     */
-   public static final String DESCRIPTION = "Description of First Project Starter";
+   public static final String DESCRIPTION = "Description of First Proof Starter";
 
    /**
     * The logged calls.
     */
-   private ImmutableList<IProject> log = ImmutableSLList.nil();
+   private ImmutableList<Proof> log = ImmutableSLList.nil();
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void open(IProject project) throws Exception {
-      log = log.append(project);
+   public void open(Proof proof, 
+                    KeYEnvironment<CustomConsoleUserInterface> environment, 
+                    IMethod method) throws Exception {
+      log = log.append(proof);
    }
    
    /**
     * Returns the logged calls and clears it.
     * @return The logged calls.
     */
-   public ImmutableList<IProject> getAndResetLog() {
-      ImmutableList<IProject> result = log;
+   public ImmutableList<Proof> getAndResetLog() {
+      ImmutableList<Proof> result = log;
       log = ImmutableSLList.nil();
       return result;
    }

@@ -15,42 +15,63 @@ package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.ui.IEditorInput;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * This class is used to define an input to display in the editor
- * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * This {@link IEditorInput} is used to open an existing {@link Proof}.
+ * @author Martin Hentschel
  */
-public class ProofOblInputEditorInput extends AbstractProofEditorInput {
+public class ProofEditorInput extends AbstractProofEditorInput {
    /**
-    * The {@link ProofOblInput} to prove.
+    * The {@link Proof}.
     */
-   private ProofOblInput problem;
+   private Proof proof;
 
    /**
     * Constructor.
-    * @param problem The {@link ProofOblInput} to prove.
+    * @param proof The {@link Proof}.
     * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     */
-   public ProofOblInputEditorInput(ProofOblInput problem, 
-                                   KeYEnvironment<CustomConsoleUserInterface> environment, 
-                                   IMethod method) {
-      super(environment, method, problem.name());
-      Assert.isNotNull(problem);
-      this.problem = problem;
+   public ProofEditorInput(Proof proof, 
+                           KeYEnvironment<CustomConsoleUserInterface> environment, 
+                           IMethod method) {
+      super(environment, method, proof.name().toString());
+      Assert.isNotNull(proof);
+      this.proof = proof;
    }
    
    /**
-    * Gives the {@link ProofOblInput} of this {@link ProofOblInputEditorInput}.
-    * @return The {@link ProofOblInput} of this {@link ProofOblInputEditorInput}.
+    * Returns the {@link Proof}.
+    * @return The {@link Proof}.
     */
-   public ProofOblInput getProblem() {
-      return problem;
-   }   
+   public Proof getProof() {
+      return proof;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int hashCode() {
+      return ObjectUtil.hashCode(getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean equals(Object obj) {
+      if (obj instanceof ProofEditorInput) {
+         return ObjectUtil.equals(getProof(), ((ProofEditorInput)obj).getProof());
+      }
+      else {
+         return false;
+      }
+   }
 }

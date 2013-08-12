@@ -11,46 +11,28 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.keyide.ui.editor.input;
+package org.key_project.key4eclipse.common.ui.starter;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IMethod;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
- * This class is used to define an input to display in the editor
- * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * Instances of this class are used to start an application
+ * and to load the given existing {@link Proof} in it.
+ * @author Martin Hentschel
  */
-public class ProofOblInputEditorInput extends AbstractProofEditorInput {
+public interface IProofStarter {
    /**
-    * The {@link ProofOblInput} to prove.
-    */
-   private ProofOblInput problem;
-
-   /**
-    * Constructor.
-    * @param problem The {@link ProofOblInput} to prove.
+    * Open the application.
+    * @param proof The {@link Proof} to load.
     * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
+    * @throws Exception Occurred Exception.
     */
-   public ProofOblInputEditorInput(ProofOblInput problem, 
-                                   KeYEnvironment<CustomConsoleUserInterface> environment, 
-                                   IMethod method) {
-      super(environment, method, problem.name());
-      Assert.isNotNull(problem);
-      this.problem = problem;
-   }
-   
-   /**
-    * Gives the {@link ProofOblInput} of this {@link ProofOblInputEditorInput}.
-    * @return The {@link ProofOblInput} of this {@link ProofOblInputEditorInput}.
-    */
-   public ProofOblInput getProblem() {
-      return problem;
-   }   
+   public void open(Proof proof, 
+                    KeYEnvironment<CustomConsoleUserInterface> environment, 
+                    IMethod method) throws Exception;
 }

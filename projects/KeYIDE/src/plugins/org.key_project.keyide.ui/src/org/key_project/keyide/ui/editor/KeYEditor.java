@@ -41,11 +41,12 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
-import org.key_project.key4eclipse.common.ui.util.ProofUserManager;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -213,7 +214,15 @@ public class KeYEditor extends TextEditor implements IProofProvider {
                ProofOblInputEditorInput in = (ProofOblInputEditorInput) input;
                this.environment = in.getEnvironment();
                this.proof = environment.createProof(in.getProblem());
-               ProofUserManager.getInstance().addUser(proof, this);
+               ProofUserManager.getInstance().addUser(proof, environment, this);
+               this.environment.getMediator().setProof(proof);
+               this.environment.getMediator().setStupidMode(true);
+            }
+            else if (input instanceof ProofEditorInput) {
+               ProofEditorInput in = (ProofEditorInput) input;
+               this.environment = in.getEnvironment();
+               this.proof = in.getProof();
+               ProofUserManager.getInstance().addUser(proof, environment, this);
                this.environment.getMediator().setProof(proof);
                this.environment.getMediator().setStupidMode(true);
             }
@@ -225,7 +234,7 @@ public class KeYEditor extends TextEditor implements IProofProvider {
                this.environment.getMediator().setStupidMode(true);
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.proof = getEnvironment().getLoadedProof();
-               ProofUserManager.getInstance().addUser(proof, this);
+               ProofUserManager.getInstance().addUser(proof, environment, this);
             }
          }
          else {
@@ -289,9 +298,6 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       }
       if (proof != null) {
          ProofUserManager.getInstance().removeUserAndDispose(proof, this);
-      }
-      if (environment != null) {
-         environment.dispose();
       }
       super.dispose();
    }
