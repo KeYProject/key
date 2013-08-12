@@ -992,7 +992,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 + originalMods
                 + "; hasMod: "
                 + hasRealModifiesClause
-                + (originalAxioms.size() > 0 ?  ("; axioms: " + originalAxioms) : "")
+                + (originalAxioms != null && originalAxioms.size() > 0 ?  ("; axioms: " + originalAxioms) : "")
                 + "; termination: "
                 + getModality()
                 + "; transaction: "

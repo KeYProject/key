@@ -2864,4 +2864,25 @@ public final class SymbolicExecutionUtil {
       return booleanLDT.getFalseConst() == op ||
              booleanLDT.getTrueConst() == op;
    }
+
+   /**
+    * Returns the default taclet options for symbolic execution.
+    * @return The default taclet options for symbolic execution.
+    */
+   public static HashMap<String, String> getDefaultTacletOptions() {
+      HashMap<String, String> result = new HashMap<String, String>();
+      result.put("Strings", "Strings:on");
+      result.put("reach", "reach:on");
+      result.put("JavaCard", "JavaCard:on");
+      result.put("assertions", "assertions:on");
+      result.put("bigint", "bigint:on");
+      result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
+      result.put("programRules", "programRules:Java");
+      result.put("modelFields", "modelFields:showSatisfiability");
+      result.put("initialisation", "initialisation:disableStaticInitialisation");
+      result.put("sequences", "sequences:on");
+      result.put("runtimeExceptions", "runtimeExceptions:allow");
+      result.put("integerSimplificationRules", "integerSimplificationRules:full");
+      return result;
+   }
 }
