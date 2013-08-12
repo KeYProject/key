@@ -102,6 +102,10 @@ public class KeYParserF {
 	return this.keYParser.getTaclets();
     }
 
+    public String getProfileName() {
+	return this.keYParser.getProfileName();
+    }
+
     public String getProofObligation() {
 	return this.keYParser.getProofObligation();
     }
@@ -129,6 +133,14 @@ public class KeYParserF {
     public Term problem() throws ANTLRException {
 	try {
 	    return this.keYParser.problem();
+	} catch (RecognitionException e) {
+	    throw new ANTLRException(e.getMessage());
+	}
+    }
+
+    public void profile() throws ANTLRException {
+	try {
+	    this.keYParser.profile();
 	} catch (RecognitionException e) {
 	    throw new ANTLRException(e.getMessage());
 	}

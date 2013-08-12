@@ -248,7 +248,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     * @throws Exception Occurred Exception.
     */
    protected Profile readProfileFromFile() throws Exception {
-      KeYParser problemParser = new KeYParser(ParserMode.GLOBALDECL, new KeYLexer(getNewStream(), null), file.toString());
+      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), null), file.toString());
       problemParser.profile();
       String profileName = problemParser.getProfileName();
       if (profileName != null && !profileName.isEmpty()) {

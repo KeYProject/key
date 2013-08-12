@@ -50,6 +50,8 @@ options {
   import java.io.*;
   import java.util.HashSet;
   import java.util.Iterator;
+  import java.util.LinkedHashMap;
+  import java.util.LinkedHashSet;
   import java.util.LinkedList;
   import java.util.Set;
   import java.util.Vector;
@@ -99,7 +101,7 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
-    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
+    static HashMap<String, Character> prooflabel2tag = new LinkedHashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -122,10 +124,10 @@ options {
    }
 
     private NamespaceSet nss;
-    private HashMap<String, String> category2Default = new HashMap<String, String>();
+    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
     private boolean onlyWith=false;
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
-    private HashSet usedChoiceCategories = new HashSet();
+    private HashSet usedChoiceCategories = new LinkedHashSet();
     private HashMap taclet2Builder;
     private AbbrevMap scm;
     private KeYExceptionHandler keh = null;
@@ -172,6 +174,8 @@ options {
     private ParserConfig parserConfig;
 
     private Term quantifiedArrayGuard = null;
+    
+    private String profileName;
     
     private TokenStream lexer;
 
@@ -235,7 +239,7 @@ options {
              new SchemaRecoder2KeY(services, nss),
 	     services, 
 	     nss, 
-	     new HashMap());
+	     new LinkedHashMap());
     }
 
 
@@ -246,27 +250,18 @@ options {
      * declared globally in the variable namespace.  This parser is used
      * for test cases, where you want to know in advance which objects
      * will represent bound variables.
-     */  
-    public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
-		     JavaReader jr,
-		     NamespaceSet nss) {
-        this(lexer, null, new Services(), nss, mode);
-        this.scm = new AbbrevMap();
-        this.javaReader = jr;
-    }
-
+     */
     public KeYParser(ParserMode mode, 
                      TokenStream lexer,
 		     Services services,
 		     NamespaceSet nss) {
-	this(mode, lexer, 
-	     new Recoder2KeY(services,
-		new KeYCrossReferenceServiceConfiguration(
-		   services.getExceptionHandler()), 
-		services.getJavaInfo().rec2key(), new NamespaceSet(), 
-		services.getTypeConverter()),
-   	     nss);
+        this(lexer, null, services, nss, mode);
+        this.scm = new AbbrevMap();
+        this.javaReader = new Recoder2KeY(services,
+                new KeYCrossReferenceServiceConfiguration(
+                   services.getExceptionHandler()), 
+                services.getJavaInfo().rec2key(), new NamespaceSet(), 
+                services.getTypeConverter());
     }
 
     /**
@@ -366,7 +361,11 @@ options {
     public String getProofObligation() {
       return proofObligation;
     }
- 
+    
+    public String getProfileName() {
+      return profileName;
+    }
+    
     private boolean isDeclParser() {
 	return parserMode == ParserMode.DECLARATION;
     }
@@ -930,7 +929,7 @@ options {
         }else 
   	  if(!isDeclParser()) {
             if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
-              return new HashSet();
+              return new LinkedHashSet();
             }   
             DeclarationProgramVariableCollector pvc
                = new DeclarationProgramVariableCollector(jb.program(), getServices());
@@ -2830,14 +2829,14 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
 
 
 
-accesstermlist returns [HashSet accessTerms = new HashSet()] :
+accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] :
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
 atom returns [Term _atom = null]
 @after { _atom = a; }
     :
-        {isTermTransformer()}? a = specialTerm
+(        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
@@ -2848,8 +2847,40 @@ atom returns [Term _atom = null]
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }   
+    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } RGUILLEMETS)?
     ;
         catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
+        }
+
+label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+@init {
+  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
+}
+:
+   l=single_label {labelList.add(l);} (COMMA l=single_label {labelList.add(l);})*
+   {
+   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   }
+;
+
+single_label returns [ITermLabel label=null]
+@init {
+  String labelName = "";
+  ITermLabel left = null;
+  ITermLabel right = null;
+  List<String> parameters = new LinkedList<String>();
+}
+:
+  (name=IDENT {labelName=name.getText();} | star=STAR {labelName=star.getText();} ) (LPAREN param1=STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2=STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
+  {
+  	label = LabelFactory.createLabel(labelName, parameters);
+  }
+ 
+;
+        catch [UnknownLabelException ex] {
               keh.reportException
 		(new KeYSemanticException
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
@@ -3304,6 +3335,29 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
+triggers[TacletBuilder b]
+@init {
+   id = null;
+   t = null;
+   Named triggerVar = null;
+   avoidCond = null;
+   ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
+} :
+   TRIGGER
+     LBRACE id = simple_ident 
+     	{  
+     	  triggerVar = variables().lookup(new Name(id));
+     	  if (triggerVar == null || !(triggerVar instanceof SchemaVariable)) {
+     	  	semanticError("Undeclared schemavariable: " + id);
+     	  }  
+     	}   RBRACE     
+     t=term (AVOID avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);} 
+      (COMMA avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);})*)? SEMI
+   {
+     b.setTrigger(new Trigger((SchemaVariable)triggerVar, t, avoidConditions));
+   }
+;
+
 taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 @init{ 
     ifSeq = Sequent.EMPTY_SEQUENT;
@@ -3319,7 +3373,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN
+        ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
@@ -3332,7 +3386,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
             b.setIfSequent(ifSeq);
         }
         ( VARCOND LPAREN varexplist[b] RPAREN ) ?
-        goalspecs[b]
+        goalspecs[b, find != null]
         modifiers[b]
         RBRACE
         { 
@@ -3356,11 +3410,12 @@ modifiers[TacletBuilder b]
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal
             {b.setHelpText(htext);}
+        | triggers[b]            
         ) *
     ;
 
 seq returns [Sequent s] : 
-        ant=semisequent SEQARROW suc=semisequent 
+        ant=semisequent SEQARROW suc=semisequent
         { s = Sequent.createSequent(ant, suc); }
     ;
      catch [RuntimeException ex] {
@@ -3374,7 +3429,7 @@ seq returns [Sequent s] :
 termorseq returns [Object o]
     :
         head=term ( COMMA s=seq | SEQARROW ss=semisequent ) ?
-        {
+        {        
             if ( s == null ) {
                 if ( ss == null ) {
                     // Just a term
@@ -3409,7 +3464,9 @@ semisequent returns [Semisequent _semi_sequent]
     :
         /* empty */ | 
         head=term ( COMMA ss=semisequent) ? 
-        { ss = ss.insertFirst(new SequentFormula(head)).semisequent(); }
+        { 
+          ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
+        }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -3442,6 +3499,7 @@ varexp[TacletBuilder b]
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
+        | varcond_thisreference[b, negated]        
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
@@ -3685,6 +3743,20 @@ varcond_reference [TacletBuilder b, boolean isPrimitive]
    { b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull)); }
 ;
 
+varcond_thisreference [TacletBuilder b, boolean negated]
+@init {
+  x = null;
+  String id = null;
+  boolean nonNull = false;
+}
+:
+   ISTHISREFERENCE
+   LPAREN      
+     x = varId                           
+   RPAREN 
+   { b.addVariableCondition(new IsThisReference(x, negated)); }
+;
+
         
 varcond_staticmethod [TacletBuilder b, boolean negated]
 :
@@ -3798,8 +3870,8 @@ varcond_freeLabelIn [TacletBuilder b, boolean negated]
 :
 
  FREELABELIN 
-    LPAREN label=varId COMMA statement=varId RPAREN {
-    	b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) label, 
+    LPAREN l=varId COMMA statement=varId RPAREN {
+    	b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l, 
     	(SchemaVariable) statement, negated ));
     }
 ;
@@ -3813,20 +3885,20 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
 ;
 
 
-goalspecs[TacletBuilder b] :
+goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
-    | goalspecwithoption[b] ( SEMI goalspecwithoption[b] )* ;
+    | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
 
-goalspecwithoption[TacletBuilder b]
+goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
 @init{
     soc = DefaultImmutableSet.<Choice>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
-                goalspec[b,soc] 
+                goalspec[b,soc,ruleWithFind] 
                 RBRACE)
         |  
-            goalspec[b,null] 
+            goalspec[b,null,ruleWithFind] 
         )
     ;
 
@@ -3850,7 +3922,7 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, ImmutableSet<Choice> soc] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 @init{
     addSeq = Sequent.EMPTY_SEQUENT;
     addRList = ImmutableSLList.<Taclet>nil();
@@ -4047,7 +4119,7 @@ problem returns [ Term _problem = null ]
 }
 @after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
     :
-
+     profile     
 	{ if (capturer != null) capturer.begin(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.begin(); }
@@ -4168,6 +4240,11 @@ oneJavaSource returns [String s = null]
   )+ {
     s = b.toString();
   }
+;
+
+
+profile:
+        (PROFILE profileName=string_literal SEMI)? 
 ;
 
 preferences returns [String _preferences = null]
