@@ -2952,10 +2952,10 @@ single_label returns [ITermLabel label=null]
 :
   (name:IDENT {labelName=name.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
-	if (inSchemaMode()) {
-		label = (ITermLabel) variables().lookup(new Name(labelName));
-	}
-	if (label == null) {
+        Named var = variables().lookup(new Name(labelName));
+	if (var instanceof ITermLabel) {
+		label = (ITermLabel) var;
+	} else {
 		label = LabelFactory.createLabel(labelName, parameters);
 	}
   }
