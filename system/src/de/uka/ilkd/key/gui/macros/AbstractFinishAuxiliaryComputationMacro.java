@@ -189,7 +189,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             } else {
                 services.getNamespaces().programVariables().addSafely(renamedPv);
             }
-            final Term pvTerm = TermFactory.DEFAULT.createTerm(renamedPv);
+            final Term pvTerm = TB.label(TermFactory.DEFAULT.createTerm(renamedPv),
+                                         term.getLabels());
             replaceMap.put(term, pvTerm);
             return pvTerm;
 
@@ -203,7 +204,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             final Function renamedF = f.rename(newName);
             services.getNamespaces().functions().addSafely(renamedF);
             final Term fTerm =
-                    TermFactory.DEFAULT.createTerm(renamedF);
+                    TB.label(TermFactory.DEFAULT.createTerm(renamedF),
+                             term.getLabels());
             replaceMap.put(term, fTerm);
             return fTerm;
         } else if (term.op() instanceof ElementaryUpdate) {
@@ -218,7 +220,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                     renameSubs(term, replaceMap, notReplaceMap, postfix, initGoal);
             final ElementaryUpdate renamedU =
                     ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
-            final Term uTerm = TermFactory.DEFAULT.createTerm(renamedU, renamedSubs);
+            final Term uTerm = TB.label(TermFactory.DEFAULT.createTerm(renamedU, renamedSubs),
+                                        term.getLabels());
             replaceMap.put(term, uTerm);
             return uTerm;
         } else {
@@ -228,7 +231,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
                                                    term.boundVars(),
-                                                   term.javaBlock());
+                                                   term.javaBlock(),
+                                                   term.getLabels());
             replaceMap.put(term, renamedTerm);
             return renamedTerm;
         }
@@ -319,7 +323,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), appliedSubs,
                                                    term.boundVars(),
-                                                   renamedJavaBlock);
+                                                   renamedJavaBlock,
+                                                   term.getLabels());
             return renamedTerm;
         } else {
             return null;
