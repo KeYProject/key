@@ -164,7 +164,7 @@ public class StateVars {
                      Services services) {
         this(copyVariable(orig.self, postfix, services),
              copyVariable(orig.guard, postfix, services),
-             copyLocationVariable(orig.localVars, postfix, services),
+             copyVariables(orig.localVars, postfix, services),
              copyVariable(orig.result, postfix, services),
              copyVariable(orig.exception, postfix, services),
              copyHeapFunction(orig.heap, postfix, services),
@@ -246,9 +246,9 @@ public class StateVars {
     }
 
 
-    private static ImmutableList<Term> copyLocationVariable(ImmutableList<Term> ts,
-                                                            String postfix,
-                                                            Services services) {
+    private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts,
+                                                     String postfix,
+                                                     Services services) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term t : ts) {
             result = result.append(copyVariable(t, postfix, services));
