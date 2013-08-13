@@ -13,6 +13,7 @@
 
 package org.key_project.keyide.ui.perspectives;
 
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -50,10 +51,9 @@ public class KeYPerspective implements IPerspectiveFactory {
       IFolderLayout rightFolder = layout.createFolder("right", IPageLayout.RIGHT, 0.8f, editorArea);
       rightFolder.addView(IPageLayout.ID_OUTLINE);
       // Perspective Shortcuts
-      layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
-      layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaHierarchyPerspective");
-      layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaBrowsingPerspective");
-      layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
+      layout.addPerspectiveShortcut(JavaUI.ID_PERSPECTIVE);
+      layout.addPerspectiveShortcut(JavaUI.ID_HIERARCHYPERSPECTIVE);
+      layout.addPerspectiveShortcut(JavaUI.ID_BROWSING_PERSPECTIVE);
       // View Shortcuts
       layout.addShowViewShortcut(StrategyPropertiesView.VIEW_ID);
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
