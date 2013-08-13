@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -17,6 +18,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
+/**
+ * Defines the basic functionality for {@link IEditorInput}s used for the {@link KeYEditor}.
+ * @author Martin Hentschel
+ */
 public abstract class AbstractProofEditorInput extends PlatformObject implements IStorageEditorInput {
    /**
     * The {@link KeYEnvironment} in which the {@link Proof} lives.
