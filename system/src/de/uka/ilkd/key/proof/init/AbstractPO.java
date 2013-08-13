@@ -40,7 +40,9 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -276,22 +278,30 @@ public abstract class AbstractPO implements IPersistablePO {
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath());
-        Proof p = new Proof(proofName,
-                         poTerm,
-                         header,
-                         initConfig.createTacletIndex(),
-                         initConfig.createBuiltInRuleIndex(),
-                         initConfig.getServices(),
-                         initConfig.getSettings() != null
-                         ? initConfig.getSettings()
-                         : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
-        assert p.openGoals().size() == 1 : "expected one first open goal";
+        Proof proof = new Proof(proofName,
+                                poTerm,
+                                header,
+                                initConfig.createTacletIndex(),
+                                initConfig.createBuiltInRuleIndex(),
+                                initConfig.getServices(),
+                                initConfig.getSettings() != null
+                                ? initConfig.getSettings()
+                                : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+
+        // Make sure that required label works are present
+        ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
+        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
+           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+        }
+        proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
+
+        assert proof.openGoals().size() == 1 : "expected one first open goal";
         final boolean isInfFlowProof =
                 (this instanceof InfFlowRelatedPO) ||
                 // this is a hack and has to be changed by time
-                p.getSettings().getStrategySettings().getActiveStrategyProperties()
-                               .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
-                               .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                                   .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+                                   .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
         if (isInfFlowProof) {
             StrategyInfoUndoMethod undo =
                     new StrategyInfoUndoMethod() {
@@ -301,9 +311,9 @@ public abstract class AbstractPO implements IPersistablePO {
                     strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
                 }
             };
-            p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
+            proof.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
         }
-        return p;
+        return proof;
     }
 
 

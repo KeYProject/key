@@ -340,5 +340,6 @@ public final class StarterUtil {
                                           "org.key_project.key4eclipse.common.ui.methodStarterAvailable",
                                           "org.key_project.key4eclipse.common.ui.fileStarterAvailable",
                                           "org.key_project.key4eclipse.common.ui.projectStarterAvailable");
+      WorkbenchUtil.updateToolBars();
    }
 }

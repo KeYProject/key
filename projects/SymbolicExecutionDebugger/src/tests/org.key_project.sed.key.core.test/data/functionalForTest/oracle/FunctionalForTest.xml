@@ -4,7 +4,7 @@
       <sedThread xml:id="_2970f144-105a-41c4-bbd8-f3e7745994ae" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_4a9183b3-7eaf-48be-800d-6c6464bd6cef" name="self.main();" pathCondition="true" lineNumber="-1" charStart="97" charEnd="101">
             <sedStatement xml:id="_e67e7ea3-77af-4ae7-841a-87dfe33ba5f0" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="109" charEnd="124">
-               <sedLoopNode xml:id="_4cad7992-c522-4c25-b881-e890420de6db" name="for ( int i = 0; invert(i)&gt;-3; i++ ) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="128" charEnd="186">
+               <sedLoopStatement xml:id="_4cad7992-c522-4c25-b881-e890420de6db" name="for ( int i = 0; invert(i)&gt;-3; i++ ) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="128" charEnd="186">
                   <sedStatement xml:id="_08786dcf-def4-4f04-b12d-49ec4b0d9c6f" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="133" charEnd="142">
                      <sedLoopCondition xml:id="_6e0d5dfa-0ec7-42d1-a067-a56bc7c0cdcc" name="invert(i)&gt;-3" pathCondition="true" lineNumber="-1" charStart="144" charEnd="158">
                         <sedMethodCall xml:id="_7e688c80-bcbd-4d79-92f2-b5f1b8b98f47" name="self.invert(i_1);" pathCondition="true" lineNumber="-1" charStart="224" charEnd="230">
@@ -57,7 +57,7 @@
                         </sedMethodCall>
                      </sedLoopCondition>
                   </sedStatement>
-               </sedLoopNode>
+               </sedLoopStatement>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

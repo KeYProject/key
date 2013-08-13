@@ -193,7 +193,7 @@ public class ProofSourceViewerDecorator {
                                     SequentPrintFilter filter, 
                                     LogicPrinter printer) {
       
-        printer.printSequent (null, filter);
+        printer.printSequent (filter);
         String s = printer.toString();
              printer=null;
         RuleApp app = node.getAppliedRuleApp();

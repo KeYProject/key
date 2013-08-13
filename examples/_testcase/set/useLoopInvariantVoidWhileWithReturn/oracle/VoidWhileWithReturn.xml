@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="VoidWhileWithReturn.sum(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j))))))};
+            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j))))))};
 modifies: {heap=false};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchNode name="if (array==null) { {     rtrn=true;break inner_label;   } }else if (i==array.length) { {       rtrn=true;break inner_label;     }   }" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (array==null) { {     rtrn=true;break inner_label;   } }else if (i==array.length) { {       rtrn=true;break inner_label;     }   }" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0"/>
@@ -21,7 +21,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                   </branchCondition>
                   <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0"/>
-                     <branchNode name="if (i==array.length) { {     rtrn=true;break inner_label;   } }" pathCondition="!array = null" pathConditionChanged="false">
+                     <branchStatement name="if (i==array.length) { {     rtrn=true;break inner_label;   } }" pathCondition="!array = null" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="array.length &gt;= 0 -&gt; array.length = i_0" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = i_0" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
@@ -46,11 +46,11 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                               </statement>
                            </statement>
                         </branchCondition>
-                     </branchNode>
+                     </branchStatement>
                   </branchCondition>
-               </branchNode>
-            </useLoopInvariant>
+               </branchStatement>
+            </loopInvariant>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

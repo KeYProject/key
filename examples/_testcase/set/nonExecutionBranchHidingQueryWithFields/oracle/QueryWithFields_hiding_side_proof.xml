@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
-         <useOperationContract name="result = self.magic(x) catch(exc)
+         <operationContract name="result = self.magic(x) catch(exc)
 pre: self.&lt;inv&gt;
 post: result = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	42 {  result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11
+	42 {    result_0 = 42
+  &amp; x &gt;= 0
+  &amp; QueryWithFields.classField = 66
 | result_0 = 42
 &amp; x &gt;= 0
-&amp; !self.instanceField = 11}, 
+&amp; !QueryWithFields.classField = 66}, 
 	421166 {!result_0 = 42 &amp; x &gt;= 0}, 
 	-4711 {!x &gt;= 0}
 as result of self.main(x);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="42 {  result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11
+                  <methodReturnValue name="42 {    result_0 = 42
+  &amp; x &gt;= 0
+  &amp; QueryWithFields.classField = 66
 | result_0 = 42
 &amp; x &gt;= 0
-&amp; !self.instanceField = 11}" returnValueString="42" hasCondition="true" conditionString="  result_0 = 42 &amp; x &gt;= 0 &amp; self.instanceField = 11
+&amp; !QueryWithFields.classField = 66}" returnValueString="42" hasCondition="true" conditionString="    result_0 = 42
+  &amp; x &gt;= 0
+  &amp; QueryWithFields.classField = 66
 | result_0 = 42
 &amp; x &gt;= 0
-&amp; !self.instanceField = 11">
+&amp; !QueryWithFields.classField = 66">
                   </methodReturnValue>
                   <methodReturnValue name="421166 {!result_0 = 42 &amp; x &gt;= 0}" returnValueString="421166" hasCondition="true" conditionString="!result_0 = 42 &amp; x &gt;= 0">
                   </methodReturnValue>
@@ -32,7 +38,7 @@ as result of self.main(x);&gt;" isReturnValueComputed="true">
                   </termination>
                </methodReturn>
             </statement>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

@@ -5,16 +5,16 @@
          <sedMethodCall xml:id="_72f4acaf-67ef-46fa-8d3c-1f38d4951b80" name="FixedRecursiveMethodCallTest.decreaseValue();" pathCondition="true" lineNumber="-1" charStart="66" charEnd="79">
             <sedStatement xml:id="_0d9de80b-a4c8-41df-a1e3-b3724aa3677f" name="return decrease(3);" pathCondition="true" lineNumber="-1" charStart="87" charEnd="106">
                <sedMethodCall xml:id="_80433816-bfaa-4914-843c-3feeccdb628e" name="FixedRecursiveMethodCallTest.decrease(n);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                  <sedBranchNode xml:id="_452a82af-02f6-4419-a5a1-6dab33bb97ee" name="if (n&gt;=1) {return decrease(n-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
+                  <sedBranchStatement xml:id="_452a82af-02f6-4419-a5a1-6dab33bb97ee" name="if (n&gt;=1) {return decrease(n-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
                      <sedStatement xml:id="_b8a0ee49-4fac-483a-a5d8-7ae68d50aa37" name="return decrease(n-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196">
                         <sedMethodCall xml:id="_8e5546fb-459d-4934-862f-c8f2a2a06177" name="FixedRecursiveMethodCallTest.decrease(n_1);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                           <sedBranchNode xml:id="_861ff361-1db5-4d64-8ec5-82da30398167" name="if (n_1&gt;=1) {return decrease(n_1-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
+                           <sedBranchStatement xml:id="_861ff361-1db5-4d64-8ec5-82da30398167" name="if (n_1&gt;=1) {return decrease(n_1-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
                               <sedStatement xml:id="_85a3ec0f-24b8-4a09-9991-d24a42c19b74" name="return decrease(n_1-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196">
                                  <sedMethodCall xml:id="_9f3943a7-9ee8-4cbe-98ca-3edf62090002" name="FixedRecursiveMethodCallTest.decrease(n_2);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                    <sedBranchNode xml:id="_83009bda-36e1-495b-9b45-8ac23def910c" name="if (n_2&gt;=1) {return decrease(n_2-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
+                                    <sedBranchStatement xml:id="_83009bda-36e1-495b-9b45-8ac23def910c" name="if (n_2&gt;=1) {return decrease(n_2-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
                                        <sedStatement xml:id="_bf9c9f9a-138a-4387-87ec-65a6296d5a1f" name="return decrease(n_2-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196">
                                           <sedMethodCall xml:id="_27a0f125-8bde-4575-8be5-17e4d62537d0" name="FixedRecursiveMethodCallTest.decrease(n_3);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                             <sedBranchNode xml:id="_c6ebf356-1b1e-46b2-9803-1ac555cd3413" name="if (n_3&gt;=1) {return decrease(n_3-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
+                                             <sedBranchStatement xml:id="_c6ebf356-1b1e-46b2-9803-1ac555cd3413" name="if (n_3&gt;=1) {return decrease(n_3-1); }" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
                                                 <sedStatement xml:id="_54d88fd1-1922-4311-8099-7286b8142fd4" name="return n_3;" pathCondition="true" lineNumber="-1" charStart="205" charEnd="214">
                                                    <sedMethodReturn xml:id="_08252cee-a61f-4902-be12-93f8f8ee4780" name="&lt;return 0 as result of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
                                                       <sedMethodReturn xml:id="_6267dced-7e70-4d3b-b6a8-d923c7d37628" name="&lt;return 0 as result of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
@@ -29,16 +29,16 @@
                                                       </sedMethodReturn>
                                                    </sedMethodReturn>
                                                 </sedStatement>
-                                             </sedBranchNode>
+                                             </sedBranchStatement>
                                           </sedMethodCall>
                                        </sedStatement>
-                                    </sedBranchNode>
+                                    </sedBranchStatement>
                                  </sedMethodCall>
                               </sedStatement>
-                           </sedBranchNode>
+                           </sedBranchStatement>
                         </sedMethodCall>
                      </sedStatement>
-                  </sedBranchNode>
+                  </sedBranchStatement>
                </sedMethodCall>
             </sedStatement>
          </sedMethodCall>

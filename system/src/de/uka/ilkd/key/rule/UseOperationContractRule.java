@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.rule;
@@ -47,6 +47,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -82,43 +83,43 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
  * Implements the rule which inserts operation contracts for a method call.
  */
 public final class UseOperationContractRule implements BuiltInRule {
-    
-    public static final UseOperationContractRule INSTANCE 
-                                            = new UseOperationContractRule();    
+
+    public static final UseOperationContractRule INSTANCE
+                                            = new UseOperationContractRule();
 
     private static final Name NAME = new Name("Use Operation Contract");
     private static final TermBuilder TB = TermBuilder.DF;
-    
+
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
-    
+
 
     //-------------------------------------------------------------------------
     //constructors
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
     private UseOperationContractRule() {
     }
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
+
     private static Pair<Expression,MethodOrConstructorReference> getMethodCall(
 	    						JavaBlock jb,
 	    				                Services services) {
 	final Expression actualResult;
         final MethodOrConstructorReference mr;
-        
+
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         //active statement must be method reference or assignment with
         //method reference
         if(activeStatement instanceof MethodReference) {
             actualResult = null;
             mr = (MethodReference) activeStatement;
-        } else if(activeStatement instanceof New 
+        } else if(activeStatement instanceof New
         	  && ((New)activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
@@ -126,10 +127,10 @@ public final class UseOperationContractRule implements BuiltInRule {
             final CopyAssignment ca = (CopyAssignment) activeStatement;
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
-            if((rhs instanceof MethodReference 
-        	|| rhs instanceof New 
+            if((rhs instanceof MethodReference
+        	|| rhs instanceof New
         	   && ((New)rhs).getTypeDeclarationCount() == 0)
-               && (lhs instanceof LocationVariable 
+               && (lhs instanceof LocationVariable
                    || lhs instanceof FieldReference)) {
         	actualResult = lhs;
         	mr = (MethodOrConstructorReference) rhs;
@@ -139,10 +140,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else {
             return null;
         }
-        
+
         //constructor may not refer to anonymous class
-        if(mr instanceof New 
-           && ((New)mr).getTypeReference().getKeYJavaType().getJavaType() 
+        if(mr instanceof New
+           && ((New)mr).getTypeReference().getKeYJavaType().getJavaType()
                        instanceof ClassDeclaration
            && ((ClassDeclaration)((New)mr).getTypeReference()
         	                          .getKeYJavaType()
@@ -152,7 +153,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //receiver must be simple
         final ReferencePrefix rp = mr.getReferencePrefix();
-        if(rp != null 
+        if(rp != null
            && !ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp, null, services)
            && !(rp instanceof ThisReference)
            && !(rp instanceof SuperReference)
@@ -160,32 +161,32 @@ public final class UseOperationContractRule implements BuiltInRule {
             return null;
         } else {
             return new Pair<Expression,MethodOrConstructorReference>(
-        	    				actualResult, 
+        	    				actualResult,
         	    				mr);
         }
     }
-    
-    
+
+
     private static KeYJavaType getStaticPrefixType(
 	    				MethodOrConstructorReference mr,
 	                                Services services,
 	                                ExecutionContext ec) {
-	if(mr instanceof MethodReference) { 
-	    return ((MethodReference)mr).determineStaticPrefixType(services, 
+	if(mr instanceof MethodReference) {
+	    return ((MethodReference)mr).determineStaticPrefixType(services,
 		                         ec);
 	} else {
 	    New n = (New) mr;
 	    return n.getKeYJavaType(services, ec);
 	}
     }
-    
-    
+
+
     private static IProgramMethod getProgramMethod(
             MethodOrConstructorReference mr,
-            KeYJavaType staticType, 
+            KeYJavaType staticType,
             ExecutionContext ec,
             Services services) {
-        IProgramMethod result;	
+        IProgramMethod result;
         if(mr instanceof MethodReference) { //from MethodCall.java
             MethodReference methRef = (MethodReference) mr;
             if(ec != null) {
@@ -194,15 +195,15 @@ public final class UseOperationContractRule implements BuiltInRule {
                     // if a method is declared protected and prefix and
                     // execContext are in different packages we have to
                     // simulate visibility rules like being in prefixType
-                    result = methRef.method(services, 
-                            staticType, 
-                            methRef.getMethodSignature(services, ec), 
+                    result = methRef.method(services,
+                            staticType,
+                            methRef.getMethodSignature(services, ec),
                             staticType);
                 }
             } else {
-                result = methRef.method(services, 
-                        staticType, 
-                        methRef.getMethodSignature(services, ec), 
+                result = methRef.method(services,
+                        staticType,
+                        methRef.getMethodSignature(services, ec),
                         staticType);
             }
         } else {
@@ -216,23 +217,23 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         return result;
     }
-    
-    
+
+
     private static Term getActualSelf(MethodOrConstructorReference mr,
 	    		              IProgramMethod pm,
-	    		              ExecutionContext ec, 
+	    		              ExecutionContext ec,
 	    		              Services services) {
 	final TypeConverter tc = services.getTypeConverter();
 	final ReferencePrefix rp = mr.getReferencePrefix();
 	if(pm.isStatic() || pm.isConstructor()) {
 	    return null;
-	} else if(rp == null 
-		  || rp instanceof ThisReference 
+	} else if(rp == null
+		  || rp instanceof ThisReference
 		  || rp instanceof SuperReference) {
 	    return tc.findThisForSort(pm.getContainerType().getSort(), ec);
 	} else if(rp instanceof FieldReference
 		  && ((FieldReference) rp).referencesOwnInstanceField()) {
-	    final ReferencePrefix rp2 
+	    final ReferencePrefix rp2
 	    	= ((FieldReference)rp).setReferencePrefix(
 	    					ec.getRuntimeInstance());
 	    return tc.convertToLogicElement(rp2);
@@ -240,25 +241,25 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    return tc.convertToLogicElement(rp, ec);
 	}
     }
-    
-    
+
+
     private static ImmutableList<Term> getActualParams(
 	    					MethodOrConstructorReference mr,
 	    					ExecutionContext ec,
-	    					Services services) {        
+	    					Services services) {
 	ImmutableList<Term> result = ImmutableSLList.<Term>nil();
 	for(Expression expr : mr.getArguments()) {
-	    Term actualParam 
+	    Term actualParam
 	    	= services.getTypeConverter().convertToLogicElement(expr, ec);
 	    result = result.append(actualParam);
 	}
 	return result;
     }
-    
-    
+
+
 	public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
             Instantiation inst, Services services) {
-    	
+
 		if(inst == null) {
     		return DefaultImmutableSet.
     				<FunctionalOperationContract>nil();
@@ -268,29 +269,29 @@ public final class UseOperationContractRule implements BuiltInRule {
     	return getApplicableContracts(services, inst.pm, inst.staticType, inst.mod);
 
     }
-       
+
     /**
-     * Returns the operation contracts which are applicable for the passed 
+     * Returns the operation contracts which are applicable for the passed
      * operation and the passed modality
      */
     private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-	    						  						  Services services, 
-                                                          IProgramMethod pm, 
+	    						  						  Services services,
+                                                          IProgramMethod pm,
                                                           KeYJavaType kjt,
                                                           Modality modality) {
-        ImmutableSet<FunctionalOperationContract> result 
+        ImmutableSet<FunctionalOperationContract> result
                 = services.getSpecificationRepository()
                           .getOperationContracts(kjt, pm, modality);
-        
+
         //in box modalities, diamond contracts may be applied as well
         if(modality == Modality.BOX) {
             result = result.union(services.getSpecificationRepository()
-                                          .getOperationContracts(kjt, 
+                                          .getOperationContracts(kjt,
                                         	  		 pm,
                                         	  		 Modality.DIA));
         }else if(modality == Modality.BOX_TRANSACTION) {
             result = result.union(services.getSpecificationRepository()
-                                          .getOperationContracts(kjt, 
+                                          .getOperationContracts(kjt,
                                         	  		 pm,
                                         	  		 Modality.DIA_TRANSACTION));
         }
@@ -298,8 +299,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    
-    
+
+
     /**
      * @return (assumption, anon update, anon heap)
      */
@@ -318,17 +319,17 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.func(anonHeapFunc);	
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
 	final Term assumption =
 	        TB.equals(TB.anon(services, TB.var(heap), mod, anonHeap),
                           methodHeap); 
 	final Term anonUpdate = TB.elementary(services, heap, methodHeap);
-	
+
 	return new AnonUpdateData(assumption, anonUpdate, methodHeap,
 	                          TB.getBaseHeap(services), anonHeap);
-    } 
-    
-    
+    }
+
+
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
@@ -344,8 +345,8 @@ public final class UseOperationContractRule implements BuiltInRule {
             	if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
             		continue;
             	}
-            	final Term cr = TB.and(OpReplacer.replace(TB.var(heap), 
-	                  	 heapAtPres.get(heap), 
+            	final Term cr = TB.and(OpReplacer.replace(TB.var(heap),
+	                  	 heapAtPres.get(heap),
 	                   	 TB.not(TB.created(services, TB.var(heap),
 	                   	                   selfTerm))),
                          TB.created(services, TB.var(heap), selfTerm));
@@ -358,40 +359,40 @@ public final class UseOperationContractRule implements BuiltInRule {
             result = TB.and(new Term[]{
         	      TB.not(TB.equals(selfTerm, TB.NULL(services))),
                       createdForm,
-                      TB.exactInstance(services, kjt.getSort(), selfTerm)});            
+                      TB.exactInstance(services, kjt.getSort(), selfTerm)});
         } else if(resultTerm != null) {
-            result = TB.reachableValue(services, 
-        	                       resultTerm, 
+            result = TB.reachableValue(services,
+        	                       resultTerm,
         	                       pm.getReturnType());
         } else {
             result = TB.tt();
         }
         return result;
     }
-    
-    
+
+
     private static PosInProgram getPosInProgram(JavaBlock jb) {
-        ProgramElement pe = jb.program();        
-   
+        ProgramElement pe = jb.program();
+
         PosInProgram result = PosInProgram.TOP;
-        
+
         if (pe instanceof ProgramPrefix) {
             ProgramPrefix curPrefix = (ProgramPrefix)pe;
-       
-            final ImmutableArray<ProgramPrefix> prefix 
+
+            final ImmutableArray<ProgramPrefix> prefix
             	= curPrefix.getPrefixElements();
             final int length = prefix.size();
-                
-            //fail fast check      
-            curPrefix = prefix.get(length-1);//length -1 >= 0 as prefix array 
+
+            //fail fast check
+            curPrefix = prefix.get(length-1);//length -1 >= 0 as prefix array
                                              //contains curPrefix as first element
 
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
 
-            assert pe instanceof CopyAssignment 
+            assert pe instanceof CopyAssignment
                    || pe instanceof MethodReference
                    || pe instanceof New;
-        
+
             int i = length - 1;
             do {
                 result = curPrefix.getFirstActiveChildPos().append(result);
@@ -399,34 +400,34 @@ public final class UseOperationContractRule implements BuiltInRule {
                 if (i >= 0) {
                     curPrefix = prefix.get(i);
                 }
-            } while(i >= 0);       
+            } while(i >= 0);
 
         } else {
-            assert pe instanceof CopyAssignment 
+            assert pe instanceof CopyAssignment
                    || pe instanceof MethodReference
                    || pe instanceof New;
         }
         return result;
     }
-    
-    
-    private static StatementBlock replaceStatement(JavaBlock jb, 
+
+
+    private static StatementBlock replaceStatement(JavaBlock jb,
                                                    StatementBlock replacement) {
         PosInProgram pos = getPosInProgram(jb);
         int lastPos = pos.last();
-        ContextStatementBlockInstantiation csbi = 
-            new ContextStatementBlockInstantiation(pos, 
-                                                   pos.up().down(lastPos+1), 
-                                                   null, 
+        ContextStatementBlockInstantiation csbi =
+            new ContextStatementBlockInstantiation(pos,
+                                                   pos.up().down(lastPos+1),
+                                                   null,
                                                    jb.program());
-        final NonTerminalProgramElement result = 
+        final NonTerminalProgramElement result =
             ProgramContextAdder.INSTANCE.start(
-                        (JavaNonTerminalProgramElement)jb.program(), 
-                        replacement, 
+                        (JavaNonTerminalProgramElement)jb.program(),
+                        replacement,
                         csbi);
         return (StatementBlock) result;
     }
-        
+
 
     private static Instantiation instantiate(Term focusTerm, Services services) {
 	//result cached?
@@ -436,11 +437,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 	//compute
 	final Instantiation result = computeInstantiation(focusTerm, services);
-	
+
 	//cache and return
 	lastFocusTerm = focusTerm;
 	lastInstantiation = result;
-	return result;	
+	return result;
     }
 
 
@@ -525,11 +526,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     //-------------------------------------------------------------------------
     //public interface
-    //------------------------------------------------------------------------- 
-    
+    //-------------------------------------------------------------------------
+
     /**
      * Computes instantiation for contract rule on passed focus term.
-     * Internally only serves as helper for instantiate(). 
+     * Internally only serves as helper for instantiate().
      */
     public static Instantiation computeInstantiation(Term focusTerm, Services services) {
 	//leading update?
@@ -542,9 +543,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    u = TB.skip();
 	    progPost = focusTerm;
 	}
-	
+
 	//focus (below update) must be modality term
-	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA && 
+	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA &&
            progPost.op() != Modality.BOX_TRANSACTION && progPost.op() != Modality.DIA_TRANSACTION) {
 	    return null;
 	}
@@ -556,13 +557,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 	if(methodCall == null) {
 	    return null;
 	}
-	final Expression actualResult = methodCall.first;        
-	final MethodOrConstructorReference mr = methodCall.second;        
+	final Expression actualResult = methodCall.first;
+	final MethodOrConstructorReference mr = methodCall.second;
     assert mr != null;
 	//arguments of method call must be simple expressions
-	final ExecutionContext ec 
-	= JavaTools.getInnermostExecutionContext(progPost.javaBlock(), 
-	        services); 	        
+	final ExecutionContext ec
+	= JavaTools.getInnermostExecutionContext(progPost.javaBlock(),
+	        services);
 	for(Expression arg : mr.getArguments()) {
 	    if(!ProgramSVSort.SIMPLEEXPRESSION
 	            .canStandFor(arg, ec, services)) {
@@ -573,9 +574,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 	//collect further information
 	final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
 	assert staticType != null;
-	final IProgramMethod pm = getProgramMethod(mr, 
+	final IProgramMethod pm = getProgramMethod(mr,
 	        staticType,
-	        ec, 
+	        ec,
 	        services);
 	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+
 	                    staticType+", execution context: "+ec;
@@ -583,8 +584,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
 	//cache and return result
-	final Instantiation result = new Instantiation(u, 
-	        progPost, 
+	final Instantiation result = new Instantiation(u,
+	        progPost,
 	        mod,
 	        actualResult,
 	        actualSelf,
@@ -594,34 +595,34 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        actualParams);
 	return result;
     }
-    
-    
+
+
     @Override
-    public boolean isApplicable(Goal goal, 
-                                PosInOccurrence pio) {        
+    public boolean isApplicable(Goal goal,
+                                PosInOccurrence pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
 	    return false;
 	}
 
 	//instantiation must succeed
-	final Instantiation inst = instantiate(pio.subTerm(), 
+	final Instantiation inst = instantiate(pio.subTerm(),
 		                               goal.proof().getServices());
 	if(inst == null) {
 	    return false;
 	}
 
         //there must be applicable contracts for the operation
-        final ImmutableSet<FunctionalOperationContract> contracts 
-                = getApplicableContracts(goal.proof().getServices(), 
-                	                 inst.pm, 
-                	                 inst.staticType, 
+        final ImmutableSet<FunctionalOperationContract> contracts
+                = getApplicableContracts(goal.proof().getServices(),
+                	                 inst.pm,
+                	                 inst.staticType,
                 	                 inst.mod);
         if(contracts.isEmpty()) {
             return false;
         }
 
-        //applying a contract here must not create circular dependencies 
+        //applying a contract here must not create circular dependencies
         //between proofs
         for(FunctionalOperationContract contract : contracts) {
             if(goal.proof().mgt().isContractApplicable(contract)) {
@@ -631,24 +632,24 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-    
-    @Override    
-    public ImmutableList<Goal> apply(Goal goal, 
-	    			     Services services, 
+
+    @Override
+    public ImmutableList<Goal> apply(Goal goal,
+	    			     Services services,
 	    			     RuleApp ruleApp) {
 	//get instantiation
-	final Instantiation inst 
+	final Instantiation inst
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();
-        
+
         //configure contract
-        final FunctionalOperationContract contract = 
+        final FunctionalOperationContract contract =
         		(FunctionalOperationContract)((AbstractContractRuleApp) ruleApp)
-                .getInstantiation(); 
+                .getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
         Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
-        boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
+        boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION);
         final List<LocationVariable> heapContext =
                 HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
@@ -664,53 +665,57 @@ public final class UseOperationContractRule implements BuiltInRule {
         Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         //create variables for result and exception
-        final ProgramVariable resultVar 
+        final ProgramVariable resultVar
         	= inst.pm.isConstructor()
         	  ? TB.selfVar(services, inst.staticType, true)
                   : TB.resultVar(services, inst.pm, true);
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
-        assert inst.pm.isConstructor() 
+        assert inst.pm.isConstructor()
                || !(inst.actualResult != null && resultVar == null);
         final ProgramVariable excVar = TB.excVar(services, inst.pm, true);
         assert excVar != null;
         goal.addProgramVariable(excVar);
-        
+
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         //translate the contract
-        final Term contractSelf 
-        	= OpReplacer.replace(TB.getBaseHeap(services), 
+        final Term baseHeapTerm = TB.getBaseHeap(services);
+        final Term contractSelf
+        	= OpReplacer.replace(baseHeapTerm,
         		             atPres.get(baseHeap),
-        		             inst.pm.isConstructor() 
-        		               ? TB.var(resultVar) 
+        		             inst.pm.isConstructor()
+        		               ? TB.var(resultVar)
         		               : inst.actualSelf);
         final ImmutableList<Term> contractParams
-        	= OpReplacer.replace(TB.getBaseHeap(services), 
-        			    atPres.get(baseHeap), 
+        	= OpReplacer.replace(baseHeapTerm,
+        			    atPres.get(baseHeap),
         			    inst.actualParams);
         final Term contractResult
-        	= inst.pm.isConstructor() || resultVar == null 
-        	  ? null 
+        	= inst.pm.isConstructor() || resultVar == null
+        	  ? null
                   : TB.var(resultVar);
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : heapContext) {
            heapTerms.put(h, TB.var(h));
         }
-        final Term pre  = contract.getPre(heapContext,
-                                          heapTerms, 
-        				  contractSelf, 
+        final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
+        final Term originalPre  = contract.getPre(heapContext,
+                                          heapTerms,
+        				  contractSelf,
         				  contractParams,
                                           atPres,
         				  services);
-        final Term post = contract.getPost(heapContext,
+        final Term pre = globalDefs==null? originalPre: TB.apply(globalDefs, originalPre);
+        final Term originalPost = contract.getPost(heapContext,
                                            heapTerms,
-        	                               contractSelf, 
-        				                   contractParams, 
-                                           contractResult, 
-                                           TB.var(excVar), 
+        	                               contractSelf,
+        				                   contractParams,
+                                           contractResult,
+                                           TB.var(excVar),
                                            atPres,
                                            services);
+        final Term post = globalDefs==null? originalPost: TB.apply(globalDefs, originalPost);
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
         for(LocationVariable heap : heapContext) {
@@ -719,20 +724,20 @@ public final class UseOperationContractRule implements BuiltInRule {
            mods.put(heap, m);
         }
 
-        final Term mby = contract.hasMby() 
-                         ? contract.getMby(heapTerms, 
-                        	 	   contractSelf, 
-                        	 	   contractParams, 
+        final Term mby = contract.hasMby()
+                         ? contract.getMby(heapTerms,
+                        	 	   contractSelf,
+                        	 	   contractParams,
                         	 	   atPres,
-                        	 	   services) 
+                        	 	   services)
                          : null;
-        
+
         //split goal into three/four branches
         final ImmutableList<Goal> result;
         final Goal preGoal, postGoal, excPostGoal, nullGoal;
         final ReferencePrefix rp = inst.mr.getReferencePrefix();
-        if(rp != null 
-           && !(rp instanceof ThisReference) 
+        if(rp != null
+           && !(rp instanceof ThisReference)
            && !(rp instanceof SuperReference)
            && !(rp instanceof TypeReference)
            && !(inst.pm.isStatic())) {
@@ -741,8 +746,8 @@ public final class UseOperationContractRule implements BuiltInRule {
             excPostGoal = result.tail().tail().head();
             preGoal = result.tail().head();
             nullGoal = result.head();
-            nullGoal.setBranchLabel("Null reference (" 
-        	                    + inst.actualSelf 
+            nullGoal.setBranchLabel("Null reference ("
+        	                    + inst.actualSelf
         	                    + " = null)");
         } else {
             result = goal.split(3);
@@ -754,7 +759,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         preGoal.setBranchLabel("Pre"+ " ("+contract.getTarget().getName()+")");
         postGoal.setBranchLabel("Post"+ " ("+contract.getTarget().getName()+")");
         excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
-        
+
         //prepare common stuff for the three branches
         Term anonAssumption = null;
         Term anonUpdate = null;
@@ -808,24 +813,24 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    		     		  contractResult,
 	    		     		  contractSelf,
 	    		     		  atPres,
-	    		     		  services);  
-        final Term freeExcPost = inst.pm.isConstructor() 
-                                 ? freePost 
-                                 : TB.tt();        
-        final Term postAssumption 
-        	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
+	    		     		  services);
+        final Term freeExcPost = inst.pm.isConstructor()
+                                 ? freePost
+                                 : TB.tt();
+        final Term postAssumption
+        	= TB.applySequential(new Term[]{inst.u, atPreUpdates},
         		   	     TB.and(anonAssumption,
-        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull, 
-                          freePost, 
+        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull,
+                          freePost,
                           post}), null)));
-        final Term excPostAssumption 
-        	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
+        final Term excPostAssumption
+        	= TB.applySequential(new Term[]{inst.u, atPreUpdates},
         		   TB.and(anonAssumption,
                                   TB.apply(anonUpdate, TB.and(new Term[]{TB.not(excNull),
-                                  excCreated, 
-                                  freeExcPost, 
+                                  excCreated,
+                                  freeExcPost,
                                   post}), null)));
-       
+
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -833,12 +838,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = TB.and(reachableState,
 		                    TB.reachableValue(services, arg, argKJT));
 	}
-	final ContractPO po 
+	final ContractPO po
 		= services.getSpecificationRepository()
 		          .getPOForProof(goal.proof());
-	final Term mbyOk;	
+	final Term mbyOk;
 	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
+    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
     			       TB.lt(mby, po.getMbyAtPre(), services));
 	} else {
 	    mbyOk = TB.tt();
@@ -853,104 +858,99 @@ public final class UseOperationContractRule implements BuiltInRule {
         if (TermLabelWorkerManagement.hasInstantiators(services)) {
            TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
         }
-       
+
         //create "Post" branch
 	final StatementBlock resultAssign;
 	if(inst.actualResult == null) {
 	    resultAssign = new StatementBlock();
 	} else {
-	    final CopyAssignment ca 
+	    final CopyAssignment ca
 	    	= new CopyAssignment(inst.actualResult, resultVar);
 	    resultAssign = new StatementBlock(ca);
-	}        
-        final StatementBlock postSB 
+	}
+        final StatementBlock postSB
         	= replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final Term normalPost =
-                TB.apply(anonUpdate,
-                         TB.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
-                                 TermLabelWorkerManagement
-                                     .instantiateLabels(services, ruleApp.posInOccurrence(),
-                                                        this, postGoal, null, inst.mod,
-                                                        new ImmutableArray<Term>(inst.progPost.sub(0)),
-                                                        null, postJavaBlock)),
-                         null);
-        postGoal.addFormula(new SequentFormula(wellFormedAnon), 
-        	            true, 
+        final Term normalPost = TB.apply(anonUpdate,
+                                         TB.prog(inst.mod,
+                                                 postJavaBlock,
+                                                 inst.progPost.sub(0),
+                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
+                                         null);
+        postGoal.addFormula(new SequentFormula(wellFormedAnon),
+        	            true,
         	            false);
         postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, normalPost, null)),
         	               ruleApp.posInOccurrence());
-        postGoal.addFormula(new SequentFormula(postAssumption), 
-        	            true, 
+        postGoal.addFormula(new SequentFormula(postAssumption),
+        	            true,
         	            false);
 
         applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
                      TB.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
         //create "Exceptional Post" branch
-        final StatementBlock excPostSB 
+        final StatementBlock excPostSB
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term excPost =
-                TB.apply(anonUpdate,
-                         TB.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
-                                 TermLabelWorkerManagement
-                                     .instantiateLabels(services, ruleApp.posInOccurrence(),
-                                                        this, excPostGoal, null, inst.mod,
-                                                        new ImmutableArray<Term>(inst.progPost.sub(0)),
-                                                        null, excJavaBlock)),
-                         null);
-        excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
-                	       true, 
-                	       false);        
+        final Term originalExcPost = TB.apply(anonUpdate,
+                                      TB.prog(inst.mod,
+                                              excJavaBlock,
+                                              inst.progPost.sub(0),
+                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
+                                      null);
+        final Term excPost = globalDefs==null? originalExcPost: TB.apply(globalDefs, originalExcPost);
+        excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
+                	       true,
+                	       false);
         excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
         						          excPost)),
-        	                  ruleApp.posInOccurrence());        
-        excPostGoal.addFormula(new SequentFormula(excPostAssumption), 
-        	               true, 
+        	                  ruleApp.posInOccurrence());
+        excPostGoal.addFormula(new SequentFormula(excPostAssumption),
+        	               true,
         	               false);
-        
-        
+
+
         //create "Null Reference" branch
         if(nullGoal != null) {
-            final Term actualSelfNotNull 
+            final Term actualSelfNotNull
             	= TB.not(TB.equals(inst.actualSelf, TB.NULL(services)));
             nullGoal.changeFormula(new SequentFormula(TB.apply(
         	    				inst.u, 
         					actualSelfNotNull)),
-        	                   ruleApp.posInOccurrence());                    
+        	                   ruleApp.posInOccurrence());
         }
-        
+
         //create justification
-        final RuleJustificationBySpec just 
+        final RuleJustificationBySpec just
         	= new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust 
+        final ComplexRuleJustificationBySpec cjust
             	= (ComplexRuleJustificationBySpec)
             	    goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
         return result;
     }
-    
-    
-    @Override    
+
+
+    @Override
     public Name name() {
         return NAME;
     }
 
 
-    @Override    
-    public String displayName() { 
+    @Override
+    public String displayName() {
         return NAME.toString();
     }
-    
+
 
     @Override
     public String toString() {
         return displayName();
     }
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //inner classes
     //-------------------------------------------------------------------------
@@ -960,14 +960,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 	public final Term progPost;
 	public final Modality mod;
 	public final Expression actualResult;
-	public final Term actualSelf;	
-	public final KeYJavaType staticType;	
+	public final Term actualSelf;
+	public final KeYJavaType staticType;
 	public final MethodOrConstructorReference mr;
 	public final IProgramMethod pm;
 	public final ImmutableList<Term> actualParams;
-	
-	public Instantiation(Term u, 
-			     Term progPost, 
+
+	public Instantiation(Term u,
+			     Term progPost,
 			     Modality mod,
 			     Expression actualResult,
 			     Term actualSelf,

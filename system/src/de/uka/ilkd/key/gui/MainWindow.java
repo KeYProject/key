@@ -88,6 +88,8 @@ import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
 import de.uka.ilkd.key.gui.actions.PruneProofAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
@@ -121,10 +123,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -140,12 +138,18 @@ import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
+@SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 8858832805409618171L;
+    private static MainWindow instance = null;
+
+    private ProofManagementDialog proofManagementDialog = null;
+    public ProofManagementDialog getProofManagementDialog() {
+        return proofManagementDialog;
+    }
+    public void setProofManagementDialog(ProofManagementDialog proofManagementDialog) {
+        this.proofManagementDialog = proofManagementDialog;
+    }
 
     // Search bar for Sequent Views.
     public SequentSearchBar sequentSearchBar;
@@ -232,6 +236,9 @@ public final class MainWindow extends JFrame  {
     /** action for saving a proof (attempt) */
     private SaveFileAction saveFileAction;
 
+    private QuickSaveAction quickSaveAction;
+    private QuickLoadAction quickLoadAction;
+
     /** action for opening the proof management dialog */
     private ProofManagementAction proofManagementAction;
 
@@ -241,8 +248,6 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
-
-
     private OneStepSimplificationToggleAction oneStepSimplAction =
         new OneStepSimplificationToggleAction(this);
 
@@ -251,15 +256,10 @@ public final class MainWindow extends JFrame  {
     /** Determines if the KeY prover is started in visible mode*/
     public static boolean visible = true;
 
-
-
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
 
-    private static MainWindow instance = null;
-
     private NotificationManager notificationManager;
-
     private PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
@@ -269,43 +269,57 @@ public final class MainWindow extends JFrame  {
     public final JMenu smtOptions = new JMenu("SMT Solvers...");
 
     private ExitMainAction exitMainAction;
-
     private ShowActiveSettingsAction showActiveSettingsAction;
-
     private UnicodeToggleAction unicodeToggleAction;
 
-    /**
-     * creates prover -- private, use {@link #createInstance(String)}
-     *
+    /*
+     * This class should only be instantiated once!
      */
     private MainWindow() {
-    }
 
-    /**
-     * initialize the singleton object of this class.
-     */
-    private void initialize() {
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        proofListener = new MainProofListener();
+        proofListener = new MainProofListener(this);
         guiListener = new MainGUIListener();
-
         userInterface = new WindowUserInterface(this);
-
         setMediator(new KeYMediator(userInterface));
-
         initNotification();
         layoutMain();
-
         SwingUtilities.updateComponentTreeUI(this);
         ToolTipManager.sharedInstance().setDismissDelay(30000);
-
         addWindowListener(exitMainAction.windowListener);
-
+        setVisible(true);
     }
 
+
+    public static MainWindow getInstance() {
+        if (GraphicsEnvironment.isHeadless()) {
+            System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
+            System.err.println("Please use the --auto option to start KeY in batch mode.");
+            System.err.println("Use the --help option for more command line options.");
+            System.exit(-1);
+        }
+        if (instance == null) {
+            instance = new MainWindow();
+        }
+        return instance;
+    }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * <b>This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a {@link MainWindow} instance exists.</b>
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
+    }
 
     /**
      * Tries to set the system look and feel if this option is activated.
@@ -313,7 +327,6 @@ public final class MainWindow extends JFrame  {
     private void setLaF() {
         try{
         	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
-//            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -332,7 +345,6 @@ public final class MainWindow extends JFrame  {
     private void initNotification() {
     	notificationManager = new NotificationManager(mediator, this);
     }
-
 
     /**
      * sets the mediator to correspond with other gui elements
@@ -365,6 +377,7 @@ public final class MainWindow extends JFrame  {
         return mediator;
     }
 
+    @Override
     public void setVisible(boolean v){
         super.setVisible(v && visible);
     }
@@ -401,6 +414,8 @@ public final class MainWindow extends JFrame  {
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
+        quickSaveAction           = new QuickSaveAction(this);
+        quickLoadAction           = new QuickLoadAction(this);
         proofManagementAction     = new ProofManagementAction(this);
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
@@ -529,7 +544,7 @@ public final class MainWindow extends JFrame  {
     }
 
     private void createViews() {
-	goalView = new MainFrame();
+	goalView = new MainFrame(this);
 
 	openGoalsView = new JScrollPane();
 	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
@@ -547,7 +562,7 @@ public final class MainWindow extends JFrame  {
 	}
 
         Config.DEFAULT.setDefaultFonts();
-        leafNodeView = new CurrentGoalView(mediator);
+        leafNodeView = new CurrentGoalView(mediator, this);
     }
 
     private ComplexButton createSMTComponent() {
@@ -732,6 +747,8 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
+        fileMenu.add(quickSaveAction);
+        fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
 
@@ -1114,30 +1131,22 @@ public final class MainWindow extends JFrame  {
         if (getMediator() == null
                 || getMediator().getSelectedProof() == null) {
             //There is no proof. Either not loaded yet or it is abandoned
-            final LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(null), null, null);
-            leafNodeView.setPrinter(printer, null);
+            leafNodeView.setPrinterNoProof();
             return;
         }
 
         Goal goal = getMediator().getSelectedGoal();
         final SequentView sequentViewLocal;
         if (goal != null && !goal.node().isClosed()) {
-            SequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
-            final LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
-                    getMediator().getNotationInfo(),
-                    mediator.getServices());
-
-            leafNodeView.setPrinter(printer, filter, null);
+            leafNodeView.setPrinter(goal);
             leafNodeView.printSequent();
             sequentViewLocal = leafNodeView;
         } else {
             InnerNodeView innerNodeView =
                     new InnerNodeView(getMediator().getSelectedNode(),
-                    getMediator());
+                    getMediator(), this);
             sequentViewLocal = innerNodeView;
         }
-        sequentSearchBar.setSequentView(sequentViewLocal);
 
         if (SwingUtilities.isEventDispatchThread()) {
             goalView.setSequentView(sequentViewLocal);
@@ -1150,12 +1159,19 @@ public final class MainWindow extends JFrame  {
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
+        sequentSearchBar.setSequentView(sequentViewLocal);
+
     }
 
     class MainProofListener implements AutoModeListener, KeYSelectionListener,
     	SettingsListener {
 
+        MainProofListener(MainWindow mainWindow){
+            this.mainWindow = mainWindow;
+        }
+
         Proof proof = null;
+        private final MainWindow mainWindow;
 
         /** focused node has changed */
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
@@ -1178,7 +1194,7 @@ public final class MainWindow extends JFrame  {
             }
 
             disableCurrentGoalView = false;
-            goalView.setSequentView(new EmptySequent());
+            goalView.setSequentView(new EmptySequent(mainWindow));
 
             updateSequentView();
 
@@ -1279,6 +1295,7 @@ public final class MainWindow extends JFrame  {
             this.contentPane   = contentPane;
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             redispatchMouseEvent(e);
         }
@@ -1289,26 +1306,32 @@ public final class MainWindow extends JFrame  {
          * it keeps its dark gray background or whatever its L&F uses to indicate that the button is
          * currently being pressed.
          */
+        @Override
         public void mouseDragged(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             redispatchMouseEvent(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             redispatchMouseEvent(e);
             currentComponent = null;
@@ -1411,6 +1434,7 @@ public final class MainWindow extends JFrame  {
 	    }
 	}
 
+        @Override
 	public boolean isEnabled() {
 	    boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION &&
 	      mediator != null && mediator.getSelectedProof() != null &&
@@ -1439,11 +1463,12 @@ public final class MainWindow extends JFrame  {
 			            proof.getServices());
 
 	        }
-	    });
+	    },"SMTRunner");
 	    thread.start();
 
 	}
 
+        @Override
 	public String toString(){
 	    return solverUnion.toString();
 	}
@@ -1475,52 +1500,6 @@ public final class MainWindow extends JFrame  {
             notificationManager.notify(event);
         }
     }
-
-    /**
-     * returns an instance of Main and creates one if necessary
-     * <strong>Do not use</strong> this method to access the mediator as long as
-     * you do not attempt create a GUI element. In particular be aware that the
-     * pattern <tt>getInstance().mediator().getProof()</tt> breaks GUI and prover
-     * separation and will not work if an alternative GUI is used (e.g. soon for
-     * the visual debugger).
-     *
-     * Further the above pattern is very fragile as the mediator may have changed
-     * the selected proof. Usually if you want to have access to a proof e.g. in
-     * the strategy hand the proof object over at the creation time of the component.
-     *
-     * @return the instance of Main
-     * @throws IllegalStateException
-     */
-    public static MainWindow getInstance() throws IllegalStateException {
-        if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Error: KeY started in graphical mode, " +
-                               "but no graphical environment present.");
-            System.err.println("Please use the --auto option to start KeY in batch mode.");
-            System.err.println("Use the --help option for more command line options.");
-            System.exit(-1);
-        }
-        if (instance == null) {
-            instance = new MainWindow();
-            instance.initialize();
-        }
-
-        return instance;
-    }
-
-    /**
-     * <p>
-     * Checks if an instance of the main window is already created or not.
-     * </p>
-     * <p>
-     * This method is required, because the Eclipse integration of KeY has
-     * to do some cleanup only if a main window exists.
-     * </p>
-     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
-     */
-    public static boolean hasInstance() {
-       return instance != null;
-    }
-
 
     public void popupInformationMessage(Object message, String title) {
         JOptionPane.showMessageDialog

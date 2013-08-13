@@ -15,13 +15,10 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
-import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -58,9 +55,7 @@ public class CreateObject extends ProgramTransformer {
   	    return pe;
   	}	
  	
-        return new MethodReference(new ImmutableArray<Expression>(), 
-				   new ProgramElementName
-                                   (CreateObjectBuilder.IMPLICIT_OBJECT_CREATE), 
-				   classReference);					   
+	return KeYJavaASTFactory.methodCall(
+		classReference, CreateObjectBuilder.IMPLICIT_OBJECT_CREATE);
     }
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="WhileWithMethodCallAsCondition.size(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
+            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
@@ -41,7 +41,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)" pathConditionChanged="true" branchCondition="i_0 &gt;= 0 &amp; !array = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
-                     <useOperationContract name="result = goOnNice(array, i) catch(exc)
+                     <operationContract name="result = goOnNice(array, i) catch(exc)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc = null
@@ -153,7 +153,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
    &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                            </termination>
                         </branchCondition>
-                     </useOperationContract>
+                     </operationContract>
                   </branchCondition>
                   <branchCondition name="!i_0 &gt;= 0" pathCondition="   array.length &gt;= 0
 -&gt;   !(    !i_0 = 0
@@ -162,7 +162,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; i_0 &lt;= -1" pathConditionChanged="true" branchCondition="!i_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
-                     <useOperationContract name="result = goOnNice(array, i) catch(exc)
+                     <operationContract name="result = goOnNice(array, i) catch(exc)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
    -&gt;   !exc = null
@@ -279,7 +279,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
    &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                            </termination>
                         </branchCondition>
-                     </useOperationContract>
+                     </operationContract>
                   </branchCondition>
                </branchCondition>
                <branchCondition name="!(    i_0 &gt;= 1
@@ -341,8 +341,8 @@ termination: diamond" pathCondition="   array.length &gt;= 0
                      </branchCondition>
                   </statement>
                </branchCondition>
-            </useLoopInvariant>
+            </loopInvariant>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

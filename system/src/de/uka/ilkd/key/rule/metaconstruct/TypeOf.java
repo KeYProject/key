@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -58,13 +59,13 @@ public class TypeOf extends ProgramTransformer {
 
 		if (!(kjt.getJavaType() instanceof PrimitiveType)) {
 			if (kjt.getJavaType() instanceof ArrayType) {
-				return new TypeRef(kjt, ((ArrayType)kjt.
-						getJavaType()).getDimension());
+		return KeYJavaASTFactory.typeRef(kjt,
+			((ArrayType) kjt.getJavaType()).getDimension());
 			}
 		}
 
 
 
-		return new TypeRef(kjt);
+	return KeYJavaASTFactory.typeRef(kjt);
 	}
 }

@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 
 package de.uka.ilkd.key.speclang;
@@ -57,13 +57,13 @@ public interface Contract extends SpecificationElement {
      * Returns the precondition of the contract.
      */
     public Term getPre(LocationVariable heap,
-                       ProgramVariable selfVar, 
+                       ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
 
     public Term getPre(List<LocationVariable> heapContext,
-                       ProgramVariable selfVar, 
+                       ProgramVariable selfVar,
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
@@ -73,25 +73,28 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(LocationVariable heap,
                        Term heapTerm,
-	               Term selfTerm, 
+	               Term selfTerm,
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services);    
+	    	       Services services);
 
     public Term getPre(List<LocationVariable> heapContext,
                        Map<LocationVariable,Term> heapTerms,
-	               Term selfTerm, 
+	               Term selfTerm,
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
-	    	       Services services);    
+	    	       Services services);
 
+
+    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+            ImmutableList<Term> paramTerms, Services services);
 
     /**
      * Returns the measured_by clause of the contract.
      */
     public Term getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
-	               Services services);    
+	               Services services);
 
     /**
      * Returns the measured_by clause of the contract.
@@ -111,7 +114,7 @@ public interface Contract extends SpecificationElement {
      * Returns the contract in pretty plain text format.
      */
     public String getPlainText(Services services);
-    
+
     /**
      * Tells whether, on saving a proof where this contract is available, the
      * contract should be saved too. (this is currently true for contracts
@@ -122,7 +125,7 @@ public interface Contract extends SpecificationElement {
     public boolean transactionApplicableContract();
 
     /**
-     * Returns a parseable String representation of the contract. 
+     * Returns a parseable String representation of the contract.
      * Precondition: toBeSaved() must be true.
      */
     public String proofToString(Services services);
@@ -154,7 +157,7 @@ public interface Contract extends SpecificationElement {
      */
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
-   
+
     /**
      * Returns technical name for the contract type.
      */

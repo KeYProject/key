@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="EmptyBlockTest.emptyBlocks();" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (true) {}" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (true) {}" pathCondition="true" pathConditionChanged="false">
          <statement name="break label1;" pathCondition="true" pathConditionChanged="false">
             <statement name="break label2;" pathCondition="true" pathConditionChanged="false">
                <statement name="return 0;" pathCondition="true" pathConditionChanged="false">
@@ -12,6 +12,6 @@
                </statement>
             </statement>
          </statement>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="LoopInvariantWithSplittingQuery.main(x);" pathCondition="true" pathConditionChanged="false">
-      <useLoopInvariant name="invariants: {heap=geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#)))};
+      <loopInvariant name="invariants: {heap=geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#)))};
 modifies: {heap=false};
 variant: LoopInvariantWithSplittingQuery::magic(heap,x)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
          <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
             <branchCondition name="!x_0 &lt;= -1" pathCondition="!x_0 &lt;= -1" pathConditionChanged="true" branchCondition="!x_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
                <methodCall name="LoopInvariantWithSplittingQuery.magic(x_50);" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
-                  <branchNode name="if (x_50==0) {return 0; }else if (x_50&gt;=0) {return x_50;   }else  {return      -x_50;   }" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
-                     <branchNode name="if (x_50&gt;=0) {return x_50; }else  {return    -x_50; }" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
+                  <branchStatement name="if (x_50==0) {return 0; }else if (x_50&gt;=0) {return x_50;   }else  {return      -x_50;   }" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
+                     <branchStatement name="if (x_50&gt;=0) {return x_50; }else  {return    -x_50; }" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
                         <statement name="return x_50;" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_50);&gt;" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_50);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
@@ -19,14 +19,14 @@ variant: LoopInvariantWithSplittingQuery::magic(heap,x)" pathCondition="true" pa
                               </statement>
                            </methodReturn>
                         </statement>
-                     </branchNode>
-                  </branchNode>
+                     </branchStatement>
+                  </branchStatement>
                </methodCall>
             </branchCondition>
             <branchCondition name="!x_0 &gt;= 0" pathCondition="!x_0 &gt;= 0" pathConditionChanged="true" branchCondition="!x_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                <methodCall name="LoopInvariantWithSplittingQuery.magic(x_38);" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
-                  <branchNode name="if (x_38==0) {return 0; }else if (x_38&gt;=0) {return x_38;   }else  {return      -x_38;   }" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
-                     <branchNode name="if (x_38&gt;=0) {return x_38; }else  {return    -x_38; }" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
+                  <branchStatement name="if (x_38==0) {return 0; }else if (x_38&gt;=0) {return x_38;   }else  {return      -x_38;   }" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
+                     <branchStatement name="if (x_38&gt;=0) {return x_38; }else  {return    -x_38; }" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
                         <statement name="return -x_38;" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false">
                            <methodReturn name="&lt;return of LoopInvariantWithSplittingQuery.magic(x_38);&gt;" pathCondition="!x_0 &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return magic_sk_1 as result of LoopInvariantWithSplittingQuery.magic(x_38);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="magic_sk_1" returnValueString="magic_sk_1" hasCondition="false">
@@ -37,8 +37,8 @@ variant: LoopInvariantWithSplittingQuery::magic(heap,x)" pathCondition="true" pa
                               </statement>
                            </methodReturn>
                         </statement>
-                     </branchNode>
-                  </branchNode>
+                     </branchStatement>
+                  </branchStatement>
                </methodCall>
             </branchCondition>
          </branchCondition>
@@ -52,6 +52,6 @@ variant: LoopInvariantWithSplittingQuery::magic(heap,x)" pathCondition="true" pa
                </methodReturn>
             </statement>
          </branchCondition>
-      </useLoopInvariant>
+      </loopInvariant>
    </methodCall>
-</startNode>
+</start>

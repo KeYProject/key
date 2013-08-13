@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="OneAssignmentTestValueWrapper tempX = x;" pathCondition="true" pathConditionChanged="false">
          <statement name="OneAssignmentTestValueWrapper tempY = this.y;" pathCondition="true" pathConditionChanged="false">
@@ -28,4 +28,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

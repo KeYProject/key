@@ -398,4 +398,11 @@ public class ProgramMethodPO extends AbstractOperationPO {
    public static String getPrecondition(Properties properties) {
       return properties.getProperty("precondition");
    }
+
+    @Override
+    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm,
+            Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

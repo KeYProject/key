@@ -22,18 +22,18 @@ import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 
 /**
  * Implementation of {@link ISEDThread} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IExecutionStartNode> {
+public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IExecutionStart> {
    /**
-    * The {@link IExecutionStartNode} to represent by this debug node.
+    * The {@link IExecutionStart} to represent by this debug node.
     */
-   private IExecutionStartNode executionNode;
+   private IExecutionStart executionNode;
 
    /**
     * The contained children.
@@ -48,9 +48,9 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
-    * @param executionNode The {@link IExecutionStartNode} to represent by this debug node.
+    * @param executionNode The {@link IExecutionStart} to represent by this debug node.
     */
-   public KeYThread(KeYDebugTarget target, IExecutionStartNode executionNode) {
+   public KeYThread(KeYDebugTarget target, IExecutionStart executionNode) {
       super(target);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
@@ -93,7 +93,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * {@inheritDoc}
     */
    @Override
-   public IExecutionStartNode getExecutionNode() {
+   public IExecutionStart getExecutionNode() {
       return executionNode;
    }
 

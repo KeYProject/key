@@ -33,7 +33,7 @@ public class KeYGraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilte
       IWorkbenchPart part = WorkbenchUtil.getActivePart();
       if (part != null) {
          KeYGraphitiDebugNodePropertySection section = new KeYGraphitiDebugNodePropertySection();
-         section.setInput(WorkbenchUtil.getActivePart(), null);
+         section.setInput(part, null);
          return section.getDebugNode(pe) != null;
       }
       else {

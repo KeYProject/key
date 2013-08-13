@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ArraySizeDoWhile.size(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopNode name="do {result_1++;i++;}while ( i&lt;array.length );" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="do {result_1++;i++;}while ( i&lt;array.length );" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>
                <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
+                     <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                         <callStackEntry path="/0"/>
@@ -85,11 +85,11 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                               </methodReturn>
                            </statement>
                         </branchCondition>
-                     </useLoopInvariant>
+                     </loopInvariant>
                   </statement>
                </statement>
-            </loopNode>
+            </loopStatement>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

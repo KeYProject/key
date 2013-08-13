@@ -27,17 +27,17 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchNode;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopNode;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodCall;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodReturnValue;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStartNode;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessTermination;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessValue;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -151,7 +151,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
     * @return The root of the example symbolic execution tree.
     */
    protected IExecutionNode createModel() {
-      KeYlessStartNode root = new KeYlessStartNode("start", "pc1", true);
+      KeYlessStart root = new KeYlessStart("start", "pc1", true);
       root.addCallStackEntry(root);
       KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true, true, "myCustomBC");
       bc.addCallStackEntry(root);
@@ -163,7 +163,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       root.addChild(tExceptional);
       KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY);
       root.addChild(tloop);
-      KeYlessBranchNode bn = new KeYlessBranchNode(root, "bn", "pc5", true);
+      KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true);
       bn.addCallStackEntry(root);
       bn.addCallStackEntry(bc);
       root.addChild(bn);
@@ -177,7 +177,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bn.addVariable(bnVar2);
       KeYlessValue bnVar2Value = new KeYlessValue(bnVar2, "myTypeAgain", "myValueAgain", "value of bnVar2", false, true, "c3");
       bnVar2.addValue(bnVar2Value);
-      KeYlessLoopNode ln = new KeYlessLoopNode(root, "ln", "pc6", true);
+      KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true);
       root.addChild(ln);
       KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false);
       ln.addChild(lc);
@@ -189,10 +189,10 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mr.addReturnValue(new KeYlessMethodReturnValue("rv2", "rv2String", true, "c2String"));
       mc.addCallStackEntry(mc);
       mc.addChild(mr);
-      KeYlessUseOperationContract useContract = new KeYlessUseOperationContract(root, "useOperationContract", "pcUse", true, false, true, false);
-      root.addChild(useContract);
-      KeYlessUseLoopInvariant useInvariant = new KeYlessUseLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
-      root.addChild(useInvariant);
+      KeYlessOperationContract contract = new KeYlessOperationContract(root, "useOperationContract", "pcUse", true, false, true, false);
+      root.addChild(contract);
+      KeYlessLoopInvariant invariant = new KeYlessLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
+      root.addChild(invariant);
       KeYlessStatement s = new KeYlessStatement(root, "s", "pc10", true);
       root.addChild(s);
       KeYlessVariable sVar1 = new KeYlessVariable(null, true, 2, "sVar1");

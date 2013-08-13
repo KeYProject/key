@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="IsNullTest.compute(obj);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (obj==null) {return 1; }else  {return 0; }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (obj==null) {return 1; }else  {return 0; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="obj = null" pathCondition="obj = null" pathConditionChanged="true" branchCondition="obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="obj = null" pathConditionChanged="false">
                <methodReturn name="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="obj = null" pathConditionChanged="false" isReturnValueComputed="false">
@@ -18,6 +18,6 @@
                </methodReturn>
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

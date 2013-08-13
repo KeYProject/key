@@ -23,20 +23,20 @@ import java.util.Map;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -135,12 +135,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_IS_VALUE_UNKNOWN = "isValueUnknown";
 
    /**
-    * Attribute name to store {@link IExecutionUseOperationContract#isPreconditionComplied()}.
+    * Attribute name to store {@link IExecutionOperationContract#isPreconditionComplied()}.
     */
    public static final String ATTRIBUTE_PRECONDITION_COMPLIED = "preconditionComplied";
 
    /**
-    * Attribute name to store {@link IExecutionUseOperationContract#hasNotNullCheck()}.
+    * Attribute name to store {@link IExecutionOperationContract#hasNotNullCheck()}.
     */
    public static final String ATTRIBUTE_HAS_NOT_NULL_CHECK = "hasNotNullCheck";
 
@@ -155,12 +155,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_BRANCH_CONDITION_COMPUTED = "isBranchConditionComputed";
    
    /**
-    * Attribute name to store {@link IExecutionUseOperationContract#isNotNullCheckComplied()}.
+    * Attribute name to store {@link IExecutionOperationContract#isNotNullCheckComplied()}.
     */
    public static final String ATTRIBUTE_NOT_NULL_CHECK_COMPLIED = "notNullCheckComplied";
 
    /**
-    * Attribute name to store {@link IExecutionUseLoopInvariant#isInitiallyValid()}.
+    * Attribute name to store {@link IExecutionLoopInvariant#isInitiallyValid()}.
     */
    public static final String ATTRIBUTE_INITIALLY_VALID = "initiallyValid";
 
@@ -175,14 +175,14 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_BRANCH_CONDITION = "branchCondition";
 
    /**
-    * Tag name to store {@link IExecutionStartNode}s.
+    * Tag name to store {@link IExecutionStart}s.
     */
-   public static final String TAG_START_NODE = "startNode";
+   public static final String TAG_START = "start";
 
    /**
-    * Tag name to store {@link IExecutionBranchNode}s.
+    * Tag name to store {@link IExecutionBranchStatement}s.
     */
-   public static final String TAG_BRANCH_NODE = "branchNode";
+   public static final String TAG_BRANCH_STATEMENT = "branchStatement";
 
    /**
     * Tag name to store {@link IExecutionLoopCondition}s.
@@ -190,9 +190,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_LOOP_CONDITION = "loopCondition";
 
    /**
-    * Tag name to store {@link IExecutionLoopNode}s.
+    * Tag name to store {@link IExecutionLoopStatement}s.
     */
-   public static final String TAG_LOOP_NODE = "loopNode";
+   public static final String TAG_LOOP_STATEMENT = "loopStatement";
 
    /**
     * Tag name to store {@link IExecutionMethodCall}s.
@@ -220,14 +220,14 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_TERMINATION = "termination";
 
    /**
-    * Tag name to store {@link IExecutionUseOperationContract}s.
+    * Tag name to store {@link IExecutionOperationContract}s.
     */
-   public static final String TAG_USE_OPERATION_CONTRACT = "useOperationContract";
+   public static final String TAG_OPERATION_CONTRACT = "operationContract";
 
    /**
-    * Tag name to store {@link IExecutionUseLoopInvariant}s.
+    * Tag name to store {@link IExecutionLoopInvariant}s.
     */
-   public static final String TAG_USE_LOOP_INVARIANT = "useLoopInvariant";
+   public static final String TAG_LOOP_INVARIANT = "loopInvariant";
 
    /**
     * Tag name to store {@link IExecutionVariable}s.
@@ -338,17 +338,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
       if (node instanceof IExecutionBranchCondition) {
          appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
-      else if (node instanceof IExecutionStartNode) {
-         appendExecutionStartNode(level, (IExecutionStartNode)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      else if (node instanceof IExecutionStart) {
+         appendExecutionStart(level, (IExecutionStart)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
-      else if (node instanceof IExecutionBranchNode) {
-         appendExecutionBranchNode(level, (IExecutionBranchNode)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      else if (node instanceof IExecutionBranchStatement) {
+         appendExecutionBranchStatement(level, (IExecutionBranchStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionLoopCondition) {
          appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
-      else if (node instanceof IExecutionLoopNode) {
-         appendExecutionLoopNode(level, (IExecutionLoopNode)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      else if (node instanceof IExecutionLoopStatement) {
+         appendExecutionLoopStatement(level, (IExecutionLoopStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionMethodCall) {
          appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, saveCallStack, saveReturnValues, sb);
@@ -362,11 +362,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
       else if (node instanceof IExecutionTermination) {
          appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
-      else if (node instanceof IExecutionUseOperationContract) {
-         appendExecutionUseOperationContract(level, (IExecutionUseOperationContract)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      else if (node instanceof IExecutionOperationContract) {
+         appendExecutionOperationContract(level, (IExecutionOperationContract)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
-      else if (node instanceof IExecutionUseLoopInvariant) {
-         appendExecutionUseLoopInvariant(level, (IExecutionUseLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      else if (node instanceof IExecutionLoopInvariant) {
+         appendExecutionLoopInvariant(level, (IExecutionLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -404,17 +404,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
    }
 
    /**
-    * Converts the given {@link IExecutionStartNode} into XML and appends it to the {@link StringBuffer}.
+    * Converts the given {@link IExecutionStart} into XML and appends it to the {@link StringBuffer}.
     * @param level The current child level.
-    * @param node The {@link IExecutionStartNode} to convert.
+    * @param node The {@link IExecutionStart} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionStartNode(int level, 
-                                           IExecutionStartNode node, 
+   protected void appendExecutionStart(int level, 
+                                           IExecutionStart node, 
                                            boolean saveVariables, 
                                            boolean saveCallStack,
                                            boolean saveReturnValues,
@@ -423,10 +423,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
-      appendStartTag(level, TAG_START_NODE, attributeValues, sb);
+      appendStartTag(level, TAG_START, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
-      appendEndTag(level, TAG_START_NODE, sb);
+      appendEndTag(level, TAG_START, sb);
    }
 
    /**
@@ -439,21 +439,21 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionBranchNode(int level, 
-                                            IExecutionBranchNode node, 
-                                            boolean saveVariables, 
-                                            boolean saveCallStack, 
-                                            boolean saveReturnValues,
-                                            StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionBranchStatement(int level, 
+                                                 IExecutionBranchStatement node, 
+                                                 boolean saveVariables, 
+                                                 boolean saveCallStack, 
+                                                 boolean saveReturnValues,
+                                                 StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
-      appendStartTag(level, TAG_BRANCH_NODE, attributeValues, sb);
+      appendStartTag(level, TAG_BRANCH_STATEMENT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
-      appendEndTag(level, TAG_BRANCH_NODE, sb);
+      appendEndTag(level, TAG_BRANCH_STATEMENT, sb);
    }
 
    /**
@@ -484,30 +484,30 @@ public class ExecutionNodeWriter extends AbstractWriter {
    }
 
    /**
-    * Converts the given {@link IExecutionLoopNode} into XML and appends it to the {@link StringBuffer}.
+    * Converts the given {@link IExecutionLoopStatement} into XML and appends it to the {@link StringBuffer}.
     * @param level The current child level.
-    * @param node The {@link IExecutionLoopNode} to convert.
+    * @param node The {@link IExecutionLoopStatement} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionLoopNode(int level, 
-                                          IExecutionLoopNode node, 
-                                          boolean saveVariables, 
-                                          boolean saveCallStack,
-                                          boolean saveReturnValues,
-                                          StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionLoopStatement(int level, 
+                                               IExecutionLoopStatement node, 
+                                               boolean saveVariables, 
+                                               boolean saveCallStack,
+                                               boolean saveReturnValues,
+                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
-      appendStartTag(level, TAG_LOOP_NODE, attributeValues, sb);
+      appendStartTag(level, TAG_LOOP_STATEMENT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
-      appendEndTag(level, TAG_LOOP_NODE, sb);
+      appendEndTag(level, TAG_LOOP_STATEMENT, sb);
    }
 
    /**
@@ -621,21 +621,21 @@ public class ExecutionNodeWriter extends AbstractWriter {
    }
 
    /**
-    * Converts the given {@link IExecutionUseOperationContract} into XML and appends it to the {@link StringBuffer}.
+    * Converts the given {@link IExecutionOperationContract} into XML and appends it to the {@link StringBuffer}.
     * @param level The current child level.
-    * @param node The {@link IExecutionUseOperationContract} to convert.
+    * @param node The {@link IExecutionOperationContract} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionUseOperationContract(int level, 
-                                                     IExecutionUseOperationContract node, 
-                                                     boolean saveVariables, 
-                                                     boolean saveCallStack, 
-                                                     boolean saveReturnValues,
-                                                     StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionOperationContract(int level, 
+                                                   IExecutionOperationContract node, 
+                                                   boolean saveVariables, 
+                                                   boolean saveCallStack, 
+                                                   boolean saveReturnValues,
+                                                   StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -645,29 +645,29 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, node.hasNotNullCheck() + "");
       attributeValues.put(ATTRIBUTE_NOT_NULL_CHECK_COMPLIED, node.isNotNullCheckComplied() + "");
       
-      appendStartTag(level, TAG_USE_OPERATION_CONTRACT, attributeValues, sb);
+      appendStartTag(level, TAG_OPERATION_CONTRACT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
-      appendEndTag(level, TAG_USE_OPERATION_CONTRACT, sb);
+      appendEndTag(level, TAG_OPERATION_CONTRACT, sb);
    }
 
    /**
-    * Converts the given {@link IExecutionUseLoopInvariant} into XML and appends it to the {@link StringBuffer}.
+    * Converts the given {@link IExecutionLoopInvariant} into XML and appends it to the {@link StringBuffer}.
     * @param level The current child level.
-    * @param node The {@link IExecutionUseLoopInvariant} to convert.
+    * @param node The {@link IExecutionLoopInvariant} to convert.
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionUseLoopInvariant(int level, 
-                                         IExecutionUseLoopInvariant node, 
-                                         boolean saveVariables, 
-                                         boolean saveCallStack, 
-                                         boolean saveReturnValues,
-                                         StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionLoopInvariant(int level, 
+                                              IExecutionLoopInvariant node, 
+                                              boolean saveVariables, 
+                                              boolean saveCallStack, 
+                                              boolean saveReturnValues,
+                                              StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -675,11 +675,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
 
       attributeValues.put(ATTRIBUTE_INITIALLY_VALID, node.isInitiallyValid() + "");
 
-      appendStartTag(level, TAG_USE_LOOP_INVARIANT, attributeValues, sb);
+      appendStartTag(level, TAG_LOOP_INVARIANT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
-      appendEndTag(level, TAG_USE_LOOP_INVARIANT, sb);
+      appendEndTag(level, TAG_LOOP_INVARIANT, sb);
    }
 
    /**

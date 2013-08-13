@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
@@ -20,13 +20,14 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.Triple;
 
 /**
- * A JML specification case (i.e., more or less an operation contract) in 
+ * A JML specification case (i.e., more or less an operation contract) in
  * textual form. Is also used for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
-   
+
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> measuredBy =
@@ -45,6 +46,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
+
+    private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
+            ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
 
     private ImmutableList<PositionedString> infFlowSpecs =
             ImmutableSLList.<PositionedString>nil();
@@ -78,7 +82,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
-    
+
     static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
         final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
         res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
@@ -175,7 +179,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         depends = depends.append(ps);
     }
 
-    
+
     public void addBreaks(PositionedString ps) {
         breaks = breaks.append(ps);
     }
@@ -205,10 +209,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         returns = returns.append(l);
     }
 
+    public void addAbbreviation(PositionedString[] pss) {
+        assert pss.length == 3;
+        final Triple<PositionedString, PositionedString, PositionedString> abbr = new Triple<PositionedString, PositionedString, PositionedString>(pss[0],pss[1],pss[2]);
+        abbreviations = abbreviations.append(abbr);
+    }
+
     public void addAxioms(PositionedString ps) {
         addGeneric(axioms, ps);
     }
-    	
+
     public void addAxioms(ImmutableList<PositionedString> l) {
         for(PositionedString ps : l) {
 	           addAxioms(ps);
@@ -270,7 +280,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getAxioms() {
       return axioms.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
-    
+
     public ImmutableList<PositionedString> getAxioms(String hName) {
       return axioms.get(hName);
     }
@@ -319,6 +329,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return returns;
     }
 
+    public ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> getAbbreviations() {
+        return abbreviations;
+    }
+
 
     public ImmutableList<PositionedString> getInfFlowSpecs() {
         return infFlowSpecs;
@@ -331,6 +345,17 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         Iterator<PositionedString> it;
 
         sb.append(behavior).append("\n");
+
+        for (Triple<PositionedString, PositionedString, PositionedString> t: abbreviations) {
+            sb.append("old: ");
+            sb.append(t.first.toString());
+            sb.append(" ");
+            sb.append(t.second.toString());
+            sb.append(" = ");
+            sb.append(t.third.toString());
+            sb.append("\n");
+        }
+
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
           it = requires.get(h.toString()).iterator();
           while(it.hasNext()) {
@@ -409,6 +434,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         TextualJMLSpecCase sc = (TextualJMLSpecCase) o;
         return mods.equals(sc.mods)
                && behavior.equals(sc.behavior)
+               && abbreviations.equals(sc.abbreviations)
                && requires.equals(sc.requires)
                && assignables.equals(sc.assignables)
                && accessibles.equals(sc.accessibles)
@@ -429,6 +455,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public int hashCode() {
         return mods.hashCode()
                + behavior.hashCode()
+               + abbreviations.hashCode()
                + requires.hashCode()
                + assignables.hashCode()
                + accessibles.hashCode()

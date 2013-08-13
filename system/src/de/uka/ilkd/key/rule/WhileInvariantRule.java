@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -183,7 +184,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_LOOP"));
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.func(anonHeapFunc);
+        final Term anonHeapTerm = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
 
 	// check for strictly pure loops
 	final Term anonUpdate;

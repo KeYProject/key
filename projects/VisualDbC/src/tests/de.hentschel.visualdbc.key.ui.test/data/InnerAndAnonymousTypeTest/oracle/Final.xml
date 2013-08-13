@@ -45,11 +45,11 @@
     <types xsi:type="dbcmodel:DbcInterface" name="Main.IGetter">
       <methods signature="getValue()" returnType="int" abstract="true"/>
     </types>
-    <types xsi:type="dbcmodel:DbcClass" name="Main.33187268.4843653" visibility="default" anonymous="true">
+    <types xsi:type="dbcmodel:DbcClass" name="Main.58668191.502238060" visibility="default" anonymous="true">
       <methods signature="getValue()" returnType="int"/>
     </types>
     <methods signature="main()" returnType="int">
-      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> self.&lt;inv>) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="Main[Main::main()].JML operation contract.0" pre="self.&lt;inv>" post="(exc = null -> self.&lt;inv>)&#xA;&amp; (   !exc = null&#xA;   ->   (   java.lang.Exception::instance(exc) = TRUE&#xA;         -> self.&lt;inv>)&#xA;      &amp;   java.lang.RuntimeException::instance(exc)&#xA;        = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
   </types>
 </dbcmodel:DbcModel>
