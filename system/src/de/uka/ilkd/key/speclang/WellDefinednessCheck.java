@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -48,6 +47,9 @@ public abstract class WellDefinednessCheck implements Contract {
 
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
+    public static Name WD_FORMULA = new Name("WD");
+    public static Name WD_ANY = new Name("wd");
+
     private static int i = 0;
 
     private final String name;
@@ -345,24 +347,12 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    private static TransformerProcedure getTransformer(String nameString,
-                                                       Sort argSort,
-                                                       Services services) {
-        Name name = new Name(nameString);
-        Named f = services.getNamespaces().functions().lookup(name);
-        if (f != null && f instanceof TransformerProcedure) {
-            return (TransformerProcedure) f;
-        } else {
-            return new TransformerProcedure(name, Sort.FORMULA, argSort);
-        }
-    }
-
     private static TransformerProcedure wdFormula(Services services) {
-        return getTransformer("WD", Sort.FORMULA, services);
+        return TransformerProcedure.getTransformer(WD_FORMULA, Sort.FORMULA, services);
     }
 
     private static TransformerProcedure wdAny(Services services) {
-        return getTransformer("wd", Sort.ANY, services);
+        return TransformerProcedure.getTransformer(WD_ANY, Sort.ANY, services);
     }
 
     private static Pair<Term, Term> sortAndShortcut(Term spec) {

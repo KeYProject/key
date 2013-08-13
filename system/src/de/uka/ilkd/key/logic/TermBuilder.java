@@ -807,19 +807,19 @@ public class TermBuilder {
                       QuantifiableVariable substVar,
                       Term substTerm,
                       Term origTerm) {
-    return tf.createTerm(op,
-                         new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
-                         new ImmutableArray<QuantifiableVariable>(substVar),
-                         null);
+        return tf.createTerm(op,
+                             new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
+                             new ImmutableArray<QuantifiableVariable>(substVar),
+                             null);
     }
 
     public Term subst(QuantifiableVariable substVar,
                   Term substTerm,
                   Term origTerm) {
-        return tf.createTerm(WarySubstOp.SUBST,
-                             new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
-                             new ImmutableArray<QuantifiableVariable>(substVar),
-                             null);
+        return subst(WarySubstOp.SUBST,
+                     substVar,
+                     substTerm,
+                     origTerm);
     }
 
 

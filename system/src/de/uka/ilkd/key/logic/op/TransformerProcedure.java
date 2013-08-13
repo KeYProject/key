@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -11,7 +13,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class TransformerProcedure extends Function {
 
     public TransformerProcedure(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
-        super(name, sort, argSorts);
+        super(name, sort, argSorts, false);
     }
 
     public TransformerProcedure(Name name, Sort sort, Sort[] argSorts) {
@@ -20,5 +22,28 @@ public class TransformerProcedure extends Function {
 
     public TransformerProcedure(Name name, Sort sort, Sort argSort) {
         this(name, sort, new ImmutableArray<Sort>(argSort));
+    }
+
+    public static TransformerProcedure getTransformer(Name name,
+                                                      Sort sort,
+                                                      ImmutableArray<Sort> argSorts,
+                                                      Services services) {
+        final Named f = services.getNamespaces().functions().lookup(name);
+        if (f != null && f instanceof TransformerProcedure) {
+            TransformerProcedure t = (TransformerProcedure)f;
+            assert t.sort() == sort;
+            assert t.argSorts().size() == argSorts.size();
+            return t;
+        }
+        return new TransformerProcedure(name, sort, argSorts);
+    }
+
+    public static TransformerProcedure getTransformer(Name name,
+                                                      Sort argSort,
+                                                      Services services) {
+        return getTransformer(name,
+                              Sort.FORMULA,
+                              new ImmutableArray<Sort>(argSort),
+                              services);
     }
 }

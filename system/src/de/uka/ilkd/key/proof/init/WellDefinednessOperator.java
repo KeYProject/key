@@ -19,7 +19,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
-public class WellDefinednessOperator {
+@Deprecated
+public class WellDefinednessOperator { // TODO: Obsolete, to be removed!
 
     public static final TermBuilder TB = TermBuilder.DF;
 
