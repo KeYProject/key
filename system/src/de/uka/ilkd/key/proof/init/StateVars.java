@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -174,7 +175,10 @@ public class StateVars {
                                              String postfix,
                                              Services services) {
         if (t != null) {
-            return newLocationVariable(t, t.toString() + postfix, services);
+            Term tWithoutLables = TB.unlabel(t);
+            Term result =
+                   newLocationVariable(tWithoutLables, tWithoutLables.toString() + postfix, services);
+            return TB.label(result, t.getLabels());
         } else {
             return null;
         }
@@ -380,7 +384,7 @@ public class StateVars {
             Term heapVar =
                     TB.var(TB.heapAtPreVar(services, "heap" + postfix, true));
             register(heapVar.op(LocationVariable.class), services);
-            return heapVar;
+            return TB.label(heapVar, AnonHeapTermLabel.INSTANCE);
         }
     }
 
