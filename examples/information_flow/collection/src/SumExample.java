@@ -17,15 +17,10 @@ class SumExample {
     }
 
 
-//    /*@ normal_behavior
-//      @     ensures     \result == (\bsum int i; 0; values.length; values[i]);
-//      @     accessible  values, values[*];
-//      @     modifies    \less_than_nothing;
-//      @     declassify  (\bsum int i; 0; values.length; values[i])
-//      @                 \to \seq(\result);
-//      @     respects    anyUser;
-//      @     respects    \result;
-//      @*/
+    /*@ normal_behavior
+      @     respects    anyUser, \result
+      @                 \declassifies  (\bsum int i; 0; values.length; values[i]);
+      @*/
     public int getSum() {
         int sum = 0;
         /*@ loop_invariant
