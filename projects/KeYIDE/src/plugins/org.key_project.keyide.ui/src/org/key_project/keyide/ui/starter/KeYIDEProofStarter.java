@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.starter;
 
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.ui.IEditorInput;
 import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
@@ -40,8 +41,13 @@ public class KeYIDEProofStarter implements IProofStarter {
    @Override
    public void open(Proof proof, 
                     KeYEnvironment<CustomConsoleUserInterface> environment, 
-                    IMethod method) throws Exception {
-      WorkbenchUtil.getActivePage().openEditor(new ProofEditorInput(proof, environment, method), KeYEditor.EDITOR_ID);
+                    IMethod method,
+                    boolean canStartAutomode,
+                    boolean canApplyRules,
+                    boolean canPruneProof,
+                    boolean canStartSMTSolver) throws Exception {
+      IEditorInput input = new ProofEditorInput(proof, environment, method, canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver);
+      WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);
       KeYIDEUtil.switchPerspective();
    }
 }

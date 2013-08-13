@@ -94,11 +94,23 @@
          <enabledWhen>
             <with
                   variable="activeEditor">
-               <test
-                     forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.AutoModeTester.start"
-                     value="true">
-               </test>
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.proofIsNotClosed"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canStartAutomode"
+                        value="true">
+                  </test>
+               </and>
             </with>
          </enabledWhen>
       </handler>
@@ -110,7 +122,7 @@
                   variable="activeEditor">
                <test
                      forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.AutoModeTester.stop"
+                     property="org.key_project.keyide.ui.isAutoMode"
                      value="true">
                </test>
             </with>
@@ -120,18 +132,40 @@
             class="org.key_project.keyide.ui.handlers.PruneProofHandler"
             commandId="org.key_project.keyide.ui.commands.pruneProof">
          <enabledWhen>
+            <and>
             <with
                   variable="activeMenuSelection">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.nodeSupportsPruning">
+                  </test>
+               </and>
+            </with>
+            <with
+                  variable="activeEditor">
                <test
                      forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.PruneProofTester.isClosed">
+                     property="org.key_project.keyide.ui.canPruneProof"
+                     value="true">
                </test>
             </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
             commandId="org.key_project.keyide.ui.commands.applyrule">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.canApplyRules"
+                     value="true">
+               </test>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -289,18 +323,32 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.key_project.keyide.ui.tester.AutoModeTester"
+            class="org.key_project.keyide.ui.propertyTester.AutoModePropertyTester"
             id="org.key_project.keyide.ui.AutoModeTester"
-            namespace="org.key_project.keyide.ui.AutoModeTester"
-            properties="start, stop"
+            namespace="org.key_project.keyide.ui"
+            properties="isAutoMode, isNotAutoMode"
             type="org.eclipse.ui.IEditorPart">
       </propertyTester>
       <propertyTester
-            class="org.key_project.keyide.ui.tester.PruneProofTester"
+            class="org.key_project.keyide.ui.propertyTester.PruneProofPropertyTester"
             id="org.key_project.keyide.ui.PruneProofTester"
-            namespace="org.key_project.keyide.ui.PruneProofTester"
-            properties="isClosed"
-            type="org.eclipse.jface.viewers.StructuredSelection">
+            namespace="org.key_project.keyide.ui"
+            properties="nodeSupportsPruning"
+            type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.CanFunctionPropertyTester"
+            id="org.key_project.keyide.ui.CanFunctionPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver"
+            type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.ProofPropertyTester"
+            id="org.key_project.keyide.ui.ProofPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="proofIsNotClosed"
+            type="org.eclipse.ui.IEditorPart">
       </propertyTester>
    </extension>
 

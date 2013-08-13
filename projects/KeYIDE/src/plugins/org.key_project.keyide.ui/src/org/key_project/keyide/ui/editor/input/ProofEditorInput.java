@@ -33,14 +33,42 @@ public class ProofEditorInput extends AbstractProofEditorInput {
    private Proof proof;
 
    /**
+    * {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    */
+   private boolean canStartAutomode;
+
+   /**
+    * {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    */
+   private boolean canApplyRules;
+
+   /**
+    * {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    */
+   private boolean canPruneProof;
+
+   /**
+    * {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    */
+   private boolean canStartSMTSolver;
+   
+   /**
     * Constructor.
     * @param proof The {@link Proof}.
     * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
+    * @param canStartAutomode {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    * @param canApplyRules {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    * @param canPruneProof {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    * @param canStartSMTSolver {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
     */
    public ProofEditorInput(Proof proof, 
                            KeYEnvironment<CustomConsoleUserInterface> environment, 
-                           IMethod method) {
+                           IMethod method,
+                           boolean canStartAutomode,
+                           boolean canApplyRules,
+                           boolean canPruneProof,
+                           boolean canStartSMTSolver) {
       super(environment, method, proof.name().toString());
       Assert.isNotNull(proof);
       this.proof = proof;
@@ -52,6 +80,38 @@ public class ProofEditorInput extends AbstractProofEditorInput {
     */
    public Proof getProof() {
       return proof;
+   }
+
+   /**
+    * Checks if it is allowed to start the auto mode.
+    * @return {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    */
+   public boolean isCanStartAutomode() {
+      return canStartAutomode;
+   }
+
+   /**
+    * Checks if it is allowed to apply rules.
+    * @return {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    */
+   public boolean isCanApplyRules() {
+      return canApplyRules;
+   }
+
+   /**
+    * Checks if it is allowed to prune proof.
+    * @return {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    */
+   public boolean isCanPruneProof() {
+      return canPruneProof;
+   }
+
+   /**
+    * Checks if it is allowed to start SMT solver.
+    * @return {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    */
+   public boolean isCanStartSMTSolver() {
+      return canStartSMTSolver;
    }
 
    /**

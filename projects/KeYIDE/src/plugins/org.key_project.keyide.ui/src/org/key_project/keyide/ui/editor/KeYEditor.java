@@ -48,7 +48,8 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
-import org.key_project.keyide.ui.tester.AutoModeTester;
+import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
+import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -71,7 +72,30 @@ import de.uka.ilkd.key.ui.UserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class KeYEditor extends TextEditor implements IProofProvider {
+   /**
+    * The unique ID of this editor.
+    */
    public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
+   
+   /**
+    * {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    */
+   private boolean canStartAutomode = true;
+
+   /**
+    * {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    */
+   private boolean canApplyRules = true;
+
+   /**
+    * {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    */
+   private boolean canPruneProof = true;
+
+   /**
+    * {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    */
+   private boolean canStartSMTSolver = true;
    
    private boolean dirtyFlag = false;
       
@@ -97,7 +121,7 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() { // TODO: Move to the top of the class, order is attributes, constructors, methods like in UML
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-         AutoModeTester.updateProperties();
+         AutoModePropertyTester.updateProperties();
       }
    };
    
@@ -220,6 +244,10 @@ public class KeYEditor extends TextEditor implements IProofProvider {
             }
             else if (input instanceof ProofEditorInput) {
                ProofEditorInput in = (ProofEditorInput) input;
+               this.canStartAutomode = in.isCanStartAutomode();
+               this.canApplyRules = in.isCanApplyRules();
+               this.canPruneProof = in.isCanPruneProof();
+               this.canStartSMTSolver = in.isCanStartSMTSolver();
                this.environment = in.getEnvironment();
                this.proof = in.getProof();
                ProofUserManager.getInstance().addUser(proof, environment, this);
@@ -389,7 +417,7 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     * @param e The {@link ProofTreeEvent}.
     */
    protected void handleProofClosed(ProofTreeEvent e) {
-      AutoModeTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
+      ProofPropertyTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
    }
 
    protected void handleProofChanged(ProofTreeEvent e) {
@@ -421,6 +449,38 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    
    public ProofSourceViewerDecorator getTextViewer() {
       return textViewer;
+   }
+
+   /**
+    * Checks if it is allowed to start the auto mode.
+    * @return {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    */
+   public boolean isCanStartAutomode() {
+      return canStartAutomode;
+   }
+
+   /**
+    * Checks if it is allowed to apply rules.
+    * @return {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    */
+   public boolean isCanApplyRules() {
+      return canApplyRules;
+   }
+
+   /**
+    * Checks if it is allowed to prune proof.
+    * @return {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    */
+   public boolean isCanPruneProof() {
+      return canPruneProof;
+   }
+
+   /**
+    * Checks if it is allowed to start SMT solver.
+    * @return {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    */
+   public boolean isCanStartSMTSolver() {
+      return canStartSMTSolver;
    }
    
    /**

@@ -59,7 +59,11 @@ public class OpenProofHandler extends AbstractHandler {
                      StarterUtil.openProofStarter(HandlerUtil.getActiveShell(event), 
                                                   keyTarget.getProof(), 
                                                   (SymbolicExecutionEnvironment<CustomConsoleUserInterface>)keyTarget.getEnvironment(), 
-                                                  keyTarget.getMethod());
+                                                  keyTarget.getMethod(),
+                                                  false,
+                                                  false,
+                                                  false,
+                                                  false);
                   }
                }
             }

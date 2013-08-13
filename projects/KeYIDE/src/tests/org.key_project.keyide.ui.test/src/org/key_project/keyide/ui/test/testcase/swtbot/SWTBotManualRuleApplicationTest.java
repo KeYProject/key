@@ -96,7 +96,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
                           }
                        },
                        25, // x of false in text control of editor
-                       110, // y of false in text control of editor
+                       7, // y of false in text control of editor
                        "closeFalse",
                        true);
    }
@@ -162,6 +162,8 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
       IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      IEditorPart javaEditorPart = null;
+      SWTBotEditor editor = null;
       try {
          // Close welcome view if available
          TestUtilsUtil.closeWelcomeView(bot);
@@ -170,9 +172,9 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          IFolder src = project.getProject().getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/paycard", src);
          // Open PayCard.java
-         IEditorPart editorPart = TestUtilsUtil.openEditor(src.getFile("PayCard.java"));
+         javaEditorPart = TestUtilsUtil.openEditor(src.getFile("PayCard.java"));
          // Start proof
-         startProofRunnable.startProof(projectName, bot, editorPart);
+         startProofRunnable.startProof(projectName, bot, javaEditorPart);
          // Switch to KeY perspective
          SWTBotShell switchShell = bot.shell("Confirm Perspective Switch");
          switchShell.bot().button("Yes").click();
@@ -182,7 +184,7 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          contractShell.bot().table().select(0);
          contractShell.bot().button("OK").click();
          // Test if the correct editor is opened
-         SWTBotEditor editor = bot.activeEditor();
+         editor = bot.activeEditor();
          assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
          // Get editor and test initial proof
          SWTBot editorBot = editor.bot();
@@ -224,10 +226,13 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          KeYIDEPreferences.setSwitchToKeyPerspective(originalSwitchPerspectivePreference);
          // Restore original perspective
          TestUtilsUtil.openPerspective(originalPerspective);
-         // close all shells
-         bot.closeAllShells();
-         // Close all editors
-         bot.closeAllEditors();
+         // close all editors
+         if (editor != null) {
+            editor.close();
+         }
+         if (javaEditorPart != null) {
+            TestUtilsUtil.closeEditor(javaEditorPart, false);
+         }
       }
    }
 }

@@ -53,7 +53,11 @@ public class SecondLoggingProofStarter implements IProofStarter, ITestedStarter 
    @Override
    public void open(Proof proof, 
                     KeYEnvironment<CustomConsoleUserInterface> environment, 
-                    IMethod method) throws Exception {
+                    IMethod method,
+                    boolean canStartAutomode,
+                    boolean canApplyRules,
+                    boolean canPruneProof,
+                    boolean canStartSMTSolver) throws Exception {
       log = log.append(proof);
    }
    

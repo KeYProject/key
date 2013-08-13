@@ -371,12 +371,20 @@ public final class StarterUtil {
     * @param proof The {@link Proof} to load.
     * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
+    * @param canStartAutomode {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    * @param canApplyRules {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    * @param canPruneProof {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    * @param canStartSMTSolver {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
     * @throws Exception Occurred Exception.
     */
    public static void openProofStarter(Shell parentShell, 
                                        Proof proof, 
                                        KeYEnvironment<CustomConsoleUserInterface> environment, 
-                                       IMethod method) throws Exception {
+                                       IMethod method,
+                                       boolean canStartAutomode,
+                                       boolean canApplyRules,
+                                       boolean canPruneProof,
+                                       boolean canStartSMTSolver) throws Exception {
       ImmutableList<StarterDescription<IProofStarter>> starterDescriptions = getProofStarters();
       StarterDescription<IProofStarter> starter = StarterWizard.openWizard(parentShell, 
                                                                            "Open Proof", 
@@ -387,7 +395,7 @@ public final class StarterUtil {
                                                                            StarterPreferenceUtil.DONT_ASK_FOR_PROOF_STARTER, 
                                                                            StarterPreferenceUtil.PROOF_STARTER_DISABLED);
       if (starter != null && starter.getInstance() != null) {
-         starter.getInstance().open(proof, environment, method);
+         starter.getInstance().open(proof, environment, method, canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver);
       }
    }
 

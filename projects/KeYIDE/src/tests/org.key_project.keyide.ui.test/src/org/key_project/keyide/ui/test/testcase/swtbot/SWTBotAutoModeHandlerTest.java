@@ -39,6 +39,11 @@ import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -116,18 +121,22 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
          assertNotNull(keyEditor.getCurrentProof());
          assertFalse(keyEditor.getCurrentProof().closed());
+         SuspendingStopCondition sleepCondition = new SuspendingStopCondition();
+         keyEditor.getCurrentProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sleepCondition);
          
          //check that the auto mode is available
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is disabled
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
+         sleepCondition.setSleep(true);
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
          TestUtilsUtil.waitUntilAutoMode(bot, keyEditor.getEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
          assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         sleepCondition.setSleep(false);
          // Make sure that the proof is not closed
          TestUtilsUtil.waitWhileAutoMode(bot, keyEditor.getEnvironment().getUi());
          assertFalse(keyEditor.getCurrentProof().closed());
@@ -204,12 +213,15 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
          assertNotNull(keyEditor.getCurrentProof());
          assertFalse(keyEditor.getCurrentProof().closed());
+         SuspendingStopCondition sleepCondition = new SuspendingStopCondition();
+         keyEditor.getCurrentProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sleepCondition);
          
          //check that the auto mode is available
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is disabled
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
+         sleepCondition.setSleep(true);
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
          TestUtilsUtil.waitUntilAutoMode(bot, keyEditor.getEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
@@ -217,6 +229,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          //stop auto mode is enabled
          assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          // Make sure that the proof is closed
+         sleepCondition.setSleep(false);
          TestUtilsUtil.waitWhileAutoMode(bot, keyEditor.getEnvironment().getUi());
          assertTrue(keyEditor.getCurrentProof().closed());
          // Make sure that start/stop are both disabled
@@ -291,11 +304,15 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
          assertTrue(editor.getReference().getEditor(true) instanceof KeYEditor);
          KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
+         SuspendingStopCondition sleepCondition = new SuspendingStopCondition();
+         keyEditor.getCurrentProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sleepCondition);
          //check that the auto mode is available
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is disabled
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
+         sleepCondition.setMaxRules(10);
+         sleepCondition.setSleep(true);
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
          TestUtilsUtil.waitUntilAutoMode(bot, keyEditor.getEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
@@ -305,6 +322,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
               
          //stop auto mode and wait until it has stopped
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Stop Auto Mode"));
+         sleepCondition.setSleep(false);
          TestUtilsUtil.waitWhileAutoMode(bot, keyEditor.getEnvironment().getUi());
          //check that auto mode is available again
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
@@ -313,12 +331,15 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          // Make sure that the proof is still open (not closed)
          assertFalse(keyEditor.getCurrentProof().closed());
          //restart auto mode
+         sleepCondition.setMaxRules(Integer.MAX_VALUE);
+         sleepCondition.setSleep(true);
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
          TestUtilsUtil.waitUntilAutoMode(bot, keyEditor.getEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
          assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is enabled
          assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
+         sleepCondition.setSleep(false);
          TestUtilsUtil.waitWhileAutoMode(bot, keyEditor.getEnvironment().getUi());
          //make sure proof is closed
          assertTrue(keyEditor.getCurrentProof().closed());
@@ -331,6 +352,84 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          StarterPreferenceUtil.setDontAskForMethodStarter(originalDontAsk);
          StarterPreferenceUtil.setMethodStarterDisabled(originalDisabled);
          doFinally(originalTimeout, originalSwitchPerspectivePreference, originalPerspective, bot);
+      }
+   }
+   
+   /**
+    * This {@link IStopCondition} can be used to block the the auto mode temporary.
+    * @author Martin Hentschel
+    */
+   private static class SuspendingStopCondition implements IStopCondition {
+      /**
+       * {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
+       */
+      private boolean sleep;
+      
+      /**
+       * The maximal number of allowed rules.
+       */
+      private int maxRules = Integer.MAX_VALUE;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+         return 0;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+         if (sleep) {
+            TestUtilsUtil.sleep(100);
+         }
+         return countApplied <= this.maxRules;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+         if (sleep) {
+            TestUtilsUtil.sleep(100);
+         }
+         return countApplied > this.maxRules;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+         return null;
+      }
+
+      /**
+       * Defines if the current {@link Thread} should be blocked or not.
+       * @param sleep {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
+       */
+      public void setSleep(boolean sleep) {
+         this.sleep = sleep;
+      }
+
+      /**
+       * Sets the maximal number of allowed rules.
+       * @param maxRules The maximal number of allowed rules.
+       */
+      public void setMaxRules(int maxRules) {
+         this.maxRules = maxRules;
       }
    }
 
@@ -393,11 +492,14 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
          final SWTBotEditor editor = bot.activeEditor();
          assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
          KeYEditor keyEditor = (KeYEditor)editor.getReference().getEditor(true);
+         SuspendingStopCondition sleepCondition = new SuspendingStopCondition();
+         keyEditor.getCurrentProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sleepCondition);
          //check that the auto mode is available
          assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
          //stop auto mode is disabled
          assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          //start auto mode
+         sleepCondition.setSleep(true);
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
          TestUtilsUtil.waitUntilAutoMode(bot, keyEditor.getEnvironment().getUi());
          //check that auto mode is not available while auto mode is running
@@ -407,6 +509,7 @@ public class SWTBotAutoModeHandlerTest extends TestCase {
                   
          //stop auto mode and wait until it has stopped
          TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Stop Auto Mode"));
+         sleepCondition.setSleep(false);
          TestUtilsUtil.waitWhileAutoMode(bot, keyEditor.getEnvironment().getUi());
          //make sure proof is still open
          assertFalse(keyEditor.getCurrentProof().closed());
