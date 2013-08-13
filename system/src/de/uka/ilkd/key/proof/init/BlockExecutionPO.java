@@ -289,4 +289,15 @@ public class BlockExecutionPO extends AbstractOperationPO
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }
+
+
+    @Override
+    @Deprecated
+    protected Term getGlobalDefs(LocationVariable heap,
+                                 Term heapTerm,
+                                 Term selfTerm,
+                                 ImmutableList<Term> paramTerms,
+                                 Services services) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

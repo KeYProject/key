@@ -112,7 +112,6 @@ public final class ProofManagementDialog extends JDialog {
         proofList = new JList();
         proofList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
-        @Override
             public Component getListCellRendererComponent(JList list,
                     Object value, int index,
                     boolean isSelected, boolean cellHasFocus) {

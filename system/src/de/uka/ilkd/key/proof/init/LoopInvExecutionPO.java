@@ -262,4 +262,15 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                 "Please use the POSnippetFactory instead.");
     }
 
+
+    @Override
+    @Deprecated
+    protected Term getGlobalDefs(LocationVariable heap,
+                                 Term heapTerm,
+                                 Term selfTerm,
+                                 ImmutableList<Term> paramTerms,
+                                 Services services) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

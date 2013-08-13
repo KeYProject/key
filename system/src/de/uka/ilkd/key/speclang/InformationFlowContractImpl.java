@@ -677,4 +677,15 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 + "Please use the POSnippetFactory instead.");
     }
 
+
+    @Override
+    @Deprecated
+    public Term getGlobalDefs(LocationVariable heap,
+                              Term heapTerm,
+                              Term selfTerm,
+                              ImmutableList<Term> paramTerms,
+                              Services services) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

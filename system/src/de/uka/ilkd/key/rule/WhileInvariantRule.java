@@ -191,10 +191,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	if(TB.strictlyNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
-	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeap);
+	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeapTerm);
 	}
 
-	return new AnonUpdateData(anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
+	return new AnonUpdateData(anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeapTerm);
     }
 
     private static boolean checkFocus(final Term progPost) {
