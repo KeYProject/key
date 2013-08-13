@@ -4,12 +4,14 @@
  */
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -47,13 +49,6 @@ public class StateVars {
     public final Term heap;
 
     public final Term mbyAtPre;
-
-
-    StateVars(IProgramMethod pm,
-              KeYJavaType kjt,
-              Services services) {
-        this(pm, kjt, "", services);
-    }
 
 
     public StateVars(Term self,
@@ -271,27 +266,16 @@ public class StateVars {
     }
 
 
-    StateVars(IProgramMethod pm,
-              KeYJavaType kjt,
-              String postfix,
-              Services services) {
-        this(buildSelfVar(services, pm, kjt, postfix),
-             buildParamVars(services, postfix, pm),
-             buildResultVar(pm, services, postfix),
-             buildExceptionVar(services, postfix, pm),
-             buildHeapFunc(postfix, services),
-             buildMbyVar(postfix, services));
-    }
-
-
     public static StateVars buildMethodContractPreVars(IProgramMethod pm,
                                                        KeYJavaType kjt,
                                                        Services services) {
+        ImmutableArray<ITermLabel> heapLabels =
+                new ImmutableArray<ITermLabel>(AnonHeapTermLabel.INSTANCE);
         return new StateVars(buildSelfVar(services, pm, kjt, ""),
                              buildParamVars(services, "", pm),
                              buildResultVar(pm, services, ""),
                              buildExceptionVar(services, "", pm),
-                             buildHeapFunc("AtPre", services),
+                             buildHeapFunc("AtPre", heapLabels, services),
                              buildMbyVar("", services));
     }
 
@@ -305,7 +289,9 @@ public class StateVars {
                              preVars.localVars, // no local out variables
                              buildResultVar(pm, services, postfix),
                              buildExceptionVar(services, postfix, pm),
-                             buildHeapFunc(postfix, services),
+                             buildHeapFunc(postfix,
+                                           new ImmutableArray<ITermLabel>(),
+                                           services),
                              preVars.mbyAtPre);
     }
 
@@ -401,6 +387,7 @@ public class StateVars {
 
 
     private static Term buildHeapFunc(String postfix,
+                                      ImmutableArray<ITermLabel> labels,
                                       Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         if ("".equals(postfix)) {
@@ -411,7 +398,7 @@ public class StateVars {
                      new Function(heapName, heapLDT.getHeap().sort());
             Term heapFunc = TB.func(heap);
             register(heap, services);
-            return TB.label(heapFunc, AnonHeapTermLabel.INSTANCE);
+            return TB.label(heapFunc, labels);
         }
     }
 
