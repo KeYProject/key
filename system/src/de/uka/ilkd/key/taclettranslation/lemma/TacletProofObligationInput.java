@@ -73,7 +73,6 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
         @Override 
         public void stopped(ProofAggregate p, ImmutableSet<Taclet> taclets, boolean addAsAxioms) {
-            System.out.println(p);
             proofObligation = p;
         }
 
@@ -157,6 +156,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
                 new TacletSoundnessPOLoader(listener, filter, true, loader);
 
         poloader.startSynchronously();
+        if(proofObligation == null) {
+            throw new ProofInputException("Cannot instantiate the proof obligation for taclet '" + 
+                    tacletName + "'. Is it defined (in the specified tacletFile?)");
+            }
     }
 
     public Profile getProfile() {
