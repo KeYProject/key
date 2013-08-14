@@ -155,9 +155,9 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public void readProblem() throws ProofInputException {
-	IObserverFunction target = contract.getTarget();
-	if(target instanceof IProgramMethod) {
-	    target = javaInfo.getToplevelPM(contract.getKJT(), 
+        IObserverFunction target = contract.getTarget();
+        if(target instanceof IProgramMethod) {
+            target = javaInfo.getToplevelPM(contract.getKJT(),
 		    			    (IProgramMethod)target);
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
@@ -173,27 +173,29 @@ public final class DependencyContractPO extends AbstractPO
 	final boolean twoState = (contract.getTarget().getStateCount() == 2);
 	final int heapCount = contract.getTarget().getHeapCount(services);
 	
-	final Map<LocationVariable,LocationVariable> preHeapVars = new LinkedHashMap<LocationVariable, LocationVariable>();
-	final Map<LocationVariable,LocationVariable> preHeapVarsReverse = new LinkedHashMap<LocationVariable, LocationVariable>();
-    List<LocationVariable> heaps = new LinkedList<LocationVariable>();
-    int hc = 0;
+	final Map<LocationVariable,LocationVariable> preHeapVars =
+	        new LinkedHashMap<LocationVariable, LocationVariable>();
+	final Map<LocationVariable,LocationVariable> preHeapVarsReverse =
+	        new LinkedHashMap<LocationVariable, LocationVariable>();
+	List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+	int hc = 0;
 	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
-		  if(hc >= heapCount) {
-			  break;
-		  }
-		  heaps.add(h);
-	      LocationVariable preVar = twoState ?
-	        TB.heapAtPreVar(services, h.name()+"AtPre", h.sort(), true)
-	        : null ;
-	      if(preVar != null) { register(preVar); }
-	      preHeapVars.put(h, preVar);
-	      if(preVar != null) {
-	    	  preHeapVarsReverse.put(preVar, h);
-	      }
+	    if(hc >= heapCount) {
+	        break;
+	    }
+	    heaps.add(h);
+	    LocationVariable preVar = twoState ?
+	            TB.heapAtPreVar(services, h.name()+"AtPre", h.sort(), true)
+	            : null ;
+	    if(preVar != null) { register(preVar); }
+	    preHeapVars.put(h, preVar);
+	    if(preVar != null) {
+	        preHeapVarsReverse.put(preVar, h);
+	    }
 	}
-    if(twoState) {
-    	heaps.addAll(preHeapVars.values());
-    }
+	if(twoState) {
+	    heaps.addAll(preHeapVars.values());
+	}
 
         //register the variables and anon heap so they are declared in proof 
 	//header if the proof is saved to a file
@@ -201,37 +203,40 @@ public final class DependencyContractPO extends AbstractPO
         register(paramVars);
 
 
-    Term wellFormedHeaps = null;
-    Term update = null;
-    for(LocationVariable h : heaps) {
-        final Term wellFormedHeap = TB.wellFormed(h, services);
-        if(wellFormedHeaps == null) {
-            wellFormedHeaps = wellFormedHeap;
-        }else{
-            wellFormedHeaps = TB.and(wellFormedHeaps, wellFormedHeap);
+        Term wellFormedHeaps = null;
+        Term update = null;
+        for(LocationVariable h : heaps) {
+            final Term wellFormedHeap = TB.wellFormed(h, services);
+            if(wellFormedHeaps == null) {
+                wellFormedHeaps = wellFormedHeap;
+            } else {
+                wellFormedHeaps = TB.and(wellFormedHeaps, wellFormedHeap);
+            }
+            //prepare anon heap
+            final Name anonHeapName = new Name(TB.newName(services, "anon_"+h.toString()));
+            final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
+            register(anonHeapFunc);
+            final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
+            final Term wellFormedAnonHeap = TB.wellFormed(anonHeap, services);
+            if(wellFormedHeaps == null) {
+                wellFormedHeaps = wellFormedAnonHeap;
+            } else {
+                wellFormedHeaps = TB.and(wellFormedHeaps,wellFormedAnonHeap);
+            }
+            //prepare update
+            final boolean atPre = preHeapVars.values().contains(h);
+            final Term dep = getContract().getDep(atPre ?
+                    preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, services);
+            final Term changedHeap =
+                    TB.anon(services, TB.var(h),
+                            TB.setMinus(services, TB.allLocs(services), dep), anonHeap);
+            final Term u = TB.elementary(services, h, changedHeap);
+            if (update == null) {
+                update = u;
+            } else {
+                update = TB.parallel(update, u);
+            }
         }
-     	//prepare anon heap
-     	final Name anonHeapName = new Name(TB.newName(services, "anon_"+h.toString()));
-	    final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
-        register(anonHeapFunc);	
-	    final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
-	    final Term wellFormedAnonHeap = TB.wellFormed(anonHeap, services);
-	    if(wellFormedHeaps == null) {
-	        wellFormedHeaps = wellFormedAnonHeap;
-	    }else{
-	        wellFormedHeaps = TB.and(wellFormedHeaps,wellFormedAnonHeap);
-	    }
-		//prepare update
-	    final boolean atPre = preHeapVars.values().contains(h);
-		final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, services);	    
-		final Term changedHeap = TB.anon(services, TB.var(h), TB.setMinus(services, TB.allLocs(services), dep), anonHeap);
-		final Term u = TB.elementary(services, h, changedHeap);
-		if(update == null) {
-		    update = u;
-		}else{
-		    update = TB.parallel(update, u);
-		}
-    }
 	
 	//translate contract
 	final Term pre = TB.and(
@@ -246,7 +251,7 @@ public final class DependencyContractPO extends AbstractPO
 	int offset = 0;
 	for(LocationVariable heap : heaps) {
 	    subs[offset++] = TB.var(heap);
-    }
+	}
 	if(!target.isStatic()) {
 	    subs[offset++] = TB.var(selfVar);
 	}
@@ -321,7 +326,8 @@ public final class DependencyContractPO extends AbstractPO
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+            throws IOException {
        String contractName = properties.getProperty("contract");
        int proofNum = 0;
        String baseContractName = null;
@@ -340,7 +346,8 @@ public final class DependencyContractPO extends AbstractPO
        else {
           baseContractName = contractName.substring(0, ind);
        }
-       final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+       final Contract contract = initConfig.getServices()
+               .getSpecificationRepository().getContractByName(baseContractName);
        if (contract == null) {
           throw new RuntimeException("Contract not found: " + baseContractName);
        }

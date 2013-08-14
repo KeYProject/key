@@ -31,7 +31,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * A contract for checking the well-definedness of a specification element
@@ -62,9 +61,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     private final LocationVariable heap;
 
-    private Term implicitRequires;
-
-    private Term requires;
+    private Precondition requires;
 
     private Term assignable;
 
@@ -115,14 +112,13 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
-                         LocationVariable heap, Term implicitRequires,
-                         Term requires, Term assignable, Term ensures) {
+                         LocationVariable heap, Precondition requires,
+                         Term assignable, Term ensures) {
         this.name = name;
         this.id = id;
         this.type = type;
         this.target = target;
         this.heap = heap;
-        this.implicitRequires = implicitRequires;
         this.requires = requires;
         this.assignable = assignable;
         this.ensures = ensures;
@@ -140,22 +136,12 @@ public abstract class WellDefinednessCheck implements Contract {
 
     void setRequires(Term req) {
         Pair<Term, Term> requires = sortAndShortcut(req);
-        this.implicitRequires = requires.first;
-        this.requires = requires.second;
+        this.requires = new Precondition(requires.first, requires.second);
     }
 
-    Term implicitRequires() {
-        return this.implicitRequires;
-    }
-
-    Term requires() {
-        return this.requires;
-    }
-
-    public Pair<Term, Term> getRequires() {
-        assert this.implicitRequires != null;
+    public Precondition getRequires() {
         assert this.requires != null;
-        return new Pair<Term, Term> (this.implicitRequires, this.requires);
+        return this.requires;
     }
 
     void setAssignable(Term ass) {
@@ -178,7 +164,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public Term getRequires(LocationVariable heap) {
-        return TB.andSC(getRequires().first, getRequires().second);
+        return TB.andSC(getRequires().implicit, getRequires().explicit);
     }
 
     public Term getAssignable(LocationVariable heap) {
@@ -308,9 +294,10 @@ public abstract class WellDefinednessCheck implements Contract {
         return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
     }
 
-    /** collects terms for precondition, other specification elements and
-     * postcondition & signals-clause */
-    abstract public Triple<Pair<Term, Term>, ImmutableList<Term>, Term> createPOTerm();
+    /** collects terms for precondition,
+     * assignable clause and other specification elements,
+     * and postcondition & signals-clause */
+    abstract public POTerms createPOTerms();
 
     @Override
     public String getDisplayName() {
@@ -538,5 +525,33 @@ public abstract class WellDefinednessCheck implements Contract {
                        ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
                        Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
+    }
+
+    public final class POTerms {
+        public final Precondition pre;
+        public final Term mod;
+        public final ImmutableList<Term> rest;
+        public final Term post;
+
+        public POTerms(Precondition pre,
+                       Term mod,
+                       ImmutableList<Term> rest,
+                       Term post) {
+            this.pre = pre;
+            this.mod = mod;
+            this.rest = rest;
+            this.post = post;
+        }
+    }
+
+    public final class Precondition {
+        public final Term implicit;
+        public final Term explicit;
+
+        public Precondition(Term implicit,
+                            Term explicit) {
+            this.implicit = implicit;
+            this.explicit = explicit;
+        }
     }
 }

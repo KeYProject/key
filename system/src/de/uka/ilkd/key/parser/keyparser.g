@@ -3681,6 +3681,7 @@ varexp[TacletBuilder b]
         | varcond_induction_variable[b, negated]
         | varcond_atomic[b, negated]
         | varcond_label[b, negated]
+        | varcond_static_field[b, negated]
       )
   )
 ;
@@ -4177,6 +4178,17 @@ varcond_label [TacletBuilder b, boolean negated]
    HASLABEL
         LPAREN label=varId COMMA name=simple_ident RPAREN {
            b.addVariableCondition(new TermLabelCondition((TermLabelSV) label, name, negated ));
+        }
+;
+
+varcond_static_field [TacletBuilder b, boolean negated]
+{
+  ParsableVariable field = null;
+}
+:
+   ISSTATICFIELD
+        LPAREN field=varId RPAREN {
+           b.addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated ));
         }
 ;
 

@@ -8,8 +8,6 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
     /* accessible-clause, assignable-clause, breaks-clause, callable-clause, captures-clause,
@@ -48,12 +46,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                  LocationVariable heap, Term implicitRequires,
-                                  Term requires, Term assignable, Term ensures,
+                                  LocationVariable heap, Precondition requires,
+                                  Term assignable, Term ensures,
                                   FunctionalOperationContract contract, Term forall,
                                   Term old, Term diverges, Term when, Term workingSpace,
                                   Term duration, Term signalsOnly, Term signals) {
-        super(name, id, type, target, heap, implicitRequires, requires, assignable, ensures);
+        super(name, id, type, target, heap, requires, assignable, ensures);
         this.contract = contract;
         this.forall = forall;
         this.old = old;
@@ -113,8 +111,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          type(),
                                          getTarget(),
                                          getHeap(),
-                                         implicitRequires(),
-                                         requires(),
+                                         getRequires(),
                                          getAssignable(),
                                          getEnsures(),
                                          contract,
@@ -144,12 +141,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Triple<Pair<Term, Term>, ImmutableList<Term>, Term> createPOTerm() {
-        Pair<Term, Term> pre = this.getRequires();
-        ImmutableList<Term> c = ImmutableSLList.<Term>nil();
-        c = c.append(this.getAssignable());
-        Term post = this.getEnsures();
-        return new Triple<Pair<Term, Term>, ImmutableList<Term>, Term>(pre, c, post);
+    public POTerms createPOTerms() {
+        final Precondition pre = this.getRequires();
+        final Term mod = this.getAssignable();
+        final ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
+        final Term post = this.getEnsures();
+        return new POTerms(pre, mod, rest, post);
     }
 
     @Override

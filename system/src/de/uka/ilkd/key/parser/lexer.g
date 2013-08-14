@@ -68,9 +68,9 @@ tokens {
         DEPENDINGON = "\\dependingOn";
 	DISJOINTMODULONULL  = "\\disjointModuloNull";
 	DROP_EFFECTLESS_ELEMENTARIES = "\\dropEffectlessElementaries";
-	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";	
+	DROP_EFFECTLESS_STORES = "\\dropEffectlessStores";
 	SIMPLIFY_IF_THEN_ELSE_UPDATE = "\\simplifyIfThenElseUpdate";
-	ENUM_CONST = "\\enumConstant";	
+	ENUM_CONST = "\\enumConstant";
         FREELABELIN = "\\freeLabelIn";
 	HASSORT = "\\hasSort";
 	FIELDTYPE = "\\fieldType";
@@ -83,12 +83,13 @@ tokens {
 	ISINDUCTVAR="\\isInductVar";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	ISOBSERVER = "\\isObserver";
-	DIFFERENT = "\\different";		
+	DIFFERENT = "\\different";
 	METADISJOINT = "\\metaDisjoint";
-	ISTHISREFERENCE="\\isThisReference";	        
-	ISREFERENCE="\\isReference";	        
+	ISTHISREFERENCE="\\isThisReference";
+	ISREFERENCE="\\isReference";
 	ISREFERENCEARRAY="\\isReferenceArray";
-	ISSUBTYPE = "\\sub";	
+	ISSTATICFIELD = "\\isStaticField";
+	ISSUBTYPE = "\\sub";
 	EQUAL_UNIQUE = "\\equalUnique";
         NEW = "\\new";
         NEWLABEL = "\\newLabel";
@@ -96,8 +97,8 @@ tokens {
         NOTFREEIN = "\\notFreeIn";
 	SAME = "\\same";
 	STATIC = "\\static";
-        STATICMETHODREFERENCE = "\\staticMethodReference";	
-	STRICT    = "\\strict";	
+        STATICMETHODREFERENCE = "\\staticMethodReference";
+	STRICT    = "\\strict";
 	TYPEOF = "\\typeof";
 	INSTANTIATE_GENERIC = "\\instantiateGeneric";
 
@@ -110,7 +111,7 @@ tokens {
 	THEN = "\\then";
 	ELSE = "\\else";
 
-        // inclusion and stuff, things that (usually) come at the beginnig 
+        // inclusion and stuff, things that (usually) come at the beginning
 	// of the file
 	INCLUDE="\\include";
 	INCLUDELDTS="\\includeLDTs";
