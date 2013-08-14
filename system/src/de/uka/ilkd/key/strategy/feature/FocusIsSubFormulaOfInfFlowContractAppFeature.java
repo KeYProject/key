@@ -22,12 +22,12 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 
-public class InfFlowImpFeature implements Feature {
+public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
-    public static final Feature INSTANCE = new InfFlowImpFeature();
+    public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
 
 
-    protected InfFlowImpFeature() {
+    protected FocusIsSubFormulaOfInfFlowContractAppFeature() {
     }
 
 

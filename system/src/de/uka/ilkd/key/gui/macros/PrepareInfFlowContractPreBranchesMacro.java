@@ -9,7 +9,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.strategy.feature.InfFlowImpFeature;
+import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 
 
 /**
@@ -88,7 +88,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                 return LongRuleAppCost.create(1);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost impLeftCost =
-                        InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                        FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.compute(ruleApp, pio, goal);
                 return impLeftCost.add(LongRuleAppCost.create(1));
             } else {
                 return TopRuleAppCost.INSTANCE;

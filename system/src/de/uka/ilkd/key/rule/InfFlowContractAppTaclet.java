@@ -23,16 +23,28 @@ import de.uka.ilkd.key.util.properties.Properties;
 
 
 /**
- *
+ * A normal RewriteTaclet except that the formula which is added by this taclet
+ * is also added to the list of formulas contained in the
+ * INF_FLOW_CONTRACT_APPL_PROPERTY. The INF_FLOW_CONTRACT_APPL_PROPERTY is used
+ * by the macros UseInformationFlowContractMacro and
+ * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the formulas
+ * resulting from information flow contract applications.
+ * 
  * @author christoph
  */
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
+    /**
+     * Strategy property which saves the list of formulas which where added
+     * by information flow contract applications. This list is used by the
+     * macros UseInformationFlowContractMacro and
+     * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the
+     * formulas resulting from information flow contract applications.
+     */
     public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
             new Properties.Property<ImmutableList<Term>>(
                     (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
-                     "information flow contract " +
-                             "applicaton property");
+                     "information flow contract applicaton property");
 
 
     public InfFlowContractAppTaclet(Name name,
@@ -77,7 +89,14 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
     }
 
 
-    public void updateStrategyInfo(Goal goal,
+    /**
+     * Add the contract application formula to the list of the
+     * INF_FLOW_CONTRACT_APPL_PROPERTY.
+     * @param goal          the current goal
+     * @param applFormula   the information contract application formula added
+     *                      by this taclet
+     */
+    private void updateStrategyInfo(Goal goal,
                                    final Term applFormula) {
         ImmutableList<Term> applFormulas =
                 goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);

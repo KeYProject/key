@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
-import de.uka.ilkd.key.strategy.feature.InfFlowImpFeature;
+import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -183,11 +183,11 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
                         ruleApp, pio, goal);
             } else if (name.equals(DOUBLE_IMP_LEFT_RULENAME)) {
                 RuleAppCost impLeftCost =
-                        InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                        FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.compute(ruleApp, pio, goal);
                 return impLeftCost.add(LongRuleAppCost.create(-10010));
             } else if (name.equals(IMP_LEFT_RULENAME)) {
                 RuleAppCost impLeftCost =
-                        InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                        FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.compute(ruleApp, pio, goal);
                 return impLeftCost.add(LongRuleAppCost.create(-10000));
             } else if (admittedRuleNames.contains(name) &&
                        ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
