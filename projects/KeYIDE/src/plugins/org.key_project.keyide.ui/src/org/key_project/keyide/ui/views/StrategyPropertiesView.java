@@ -23,7 +23,6 @@ import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 
 import de.uka.ilkd.key.proof.Proof;
 
-// TODO: Document class StrategyPropertiesView
 public class StrategyPropertiesView extends AbstractViewBasedView {
    public static final String VIEW_ID = "org.key_project.keyide.ui.view.StrategyProperties";
 
@@ -68,29 +67,17 @@ public class StrategyPropertiesView extends AbstractViewBasedView {
       // Nothing to do
    }
 
-   // TODO: Content of handlePartOpened and handlePartActivated is the same, refactor in one method which is called by both
    @Override
    protected void handlePartOpened(IWorkbenchPart part) {
-      super.handlePartActivated(part);
-      if (part instanceof IEditorPart) {
-         if(part instanceof KeYEditor){
-            form.setEnabled(true);
-            Object obj = part.getAdapter(Proof.class);
-            if(obj instanceof Proof){
-               proof = (Proof) obj;
-               form.setProof((Proof)obj);
-               form.setContent();
-            }
-         }
-         else{
-            form.setEnabled(false);
-         }
-      }
+      updateContent(part);
    }
 
    @Override
    protected void handlePartActivated(IWorkbenchPart part) {
-      super.handlePartActivated(part);
+      updateContent(part);
+   }
+   
+   protected void updateContent(IWorkbenchPart part) {
       if (part instanceof IEditorPart) {
          if(part instanceof KeYEditor){
             form.setEnabled(true);

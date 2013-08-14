@@ -51,6 +51,31 @@ public class ResourceUtil {
    }
    
    /**
+    * Ensures that the segment is a valid workspace path segment meaning
+    * that it is a valid file/folder name. Each invalid sign will be replaced
+    * by {@code '_'}.
+    * @param segment The segment to validate.
+    * @return The validated workspace path segment in which each invalid sign is replaced.
+    */
+   public static String validateWorkspaceFileName(String name) {
+      if (name != null) {
+         for (int i = 1; i <= name.length(); i++) {
+            String tmp = name.substring(0, i);
+            IStatus status = ResourcesPlugin.getWorkspace().validateName(tmp, IResource.FILE);
+            if (!status.isOK()) {
+               StringBuilder strbuilder = new StringBuilder(name);
+               strbuilder.setCharAt(i - 1, '_');
+               name = strbuilder.toString();
+            }
+         }
+         return name;
+      }
+      else {
+         return name;
+      }
+   }
+
+   /**
     * Returns the file name without file extension for the given {@link IFile}.
     * @param file The {@link IFile} for that the file name without extension is needed.
     * @return The file name without extension or {@code null} if it was not possible to compute it.

@@ -56,8 +56,17 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-// TODO: Document class KeYIDEUtil
-public class KeYIDEUtil {
+/**
+ * Provides utility method for the KeYIDE.
+ * @author Martin Hentschel
+ */
+public final class KeYIDEUtil {
+   /**
+    * Forbid instances.
+    */
+   private KeYIDEUtil() {
+   }
+   
    /**
     * Opens a dialog to select a contract for the specified method, furthermore creates the proof for that method
     * @param method The method to create the proof for.

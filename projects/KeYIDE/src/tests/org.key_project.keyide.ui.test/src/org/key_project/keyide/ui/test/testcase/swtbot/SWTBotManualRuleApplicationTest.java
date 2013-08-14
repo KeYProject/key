@@ -197,10 +197,10 @@ public class SWTBotManualRuleApplicationTest extends TestCase {
          if (stopCondition != null) {
             StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
             ss.setCustomApplyStrategyStopCondition(stopCondition);
-            keyEditor.getEnvironment().getUi().startAndWaitForAutoMode(keyEditor.getCurrentProof());
+            keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
          }
          // Get node to apply rule on
-         Node node = keyEditor.getShowNode();
+         Node node = keyEditor.getCurrentNode();
          assertFalse(node.isClosed());
          assertEquals(0, node.childrenCount());
          // Apply rule "assignment" interactively

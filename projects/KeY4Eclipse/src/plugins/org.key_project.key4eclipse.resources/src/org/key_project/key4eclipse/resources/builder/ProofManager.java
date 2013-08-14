@@ -31,7 +31,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -441,36 +440,17 @@ public class ProofManager {
     * @param path - the {@link IPath} for the {@link IFile} 
     * @return - the {@link IFile} for the Proof
     */
-   private IFile getProofFile(String name, IPath path){
-      if(path != null && name != null){
-         name = makePathValid(name);
-         name = name + ".proof";
+   private IFile getProofFile(String name, IPath path) {
+      if (path != null && name != null) {
+         name = ResourceUtil.validateWorkspaceFileName(name);
+         name = name + "." + KeYUtil.PROOF_FILE_EXTENSION;
          path = path.append(name);
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
          return file;
       }
       else return null;
    }
-   
-   
-   /**
-    * Replaces invalid characters in the given {@link String} with '_' and returns a valid {@link String}.
-    * @param str - the {@link String} to be made valid.
-    * @return the valid {@link String}
-    */
-   private String makePathValid(String str){
-      String tmp;
-      for(int i = 1; i<=str.length();i++){
-         tmp = str.substring(0, i);
-         IStatus status = ResourcesPlugin.getWorkspace().validateName(tmp, IResource.FILE);
-         if(!status.isOK()){
-            StringBuilder strbuilder = new StringBuilder(str);
-            strbuilder.setCharAt(i-1, '_');
-            str = strbuilder.toString();
-         }
-      }
-      return str;
-   }
+
    
    
    /**
