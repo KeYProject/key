@@ -124,7 +124,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return check.getHeap();
     }
 
-    private Term getAnon(ProgramVariable heap) {
+    private Term buildAnonHeap(ProgramVariable heap) {
         final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.toString()));
         final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
         register(anonHeapFunc);
@@ -212,8 +212,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Map<LocationVariable, ProgramVariable> atPres;
         final ImmutableList<ProgramVariable> params;
         final LocationVariable heap = getHeap();
-        final ProgramVariable heapAtPre;
-        final Term anonHeap;
 
         if (vars.self != null) {
             self = getSelf();
@@ -240,17 +238,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         } else {
             params = null;
         }
-        if (heap != null) {
-            anonHeap = getAnon(heap);
-        } else {
-            anonHeap = null;
-        }
-        if (heap != null && atPres != null) {
-            heapAtPre = atPres.get(heap);
-        } else {
-            heapAtPre = null;
-        }
-        return new Variables(self, result, exception, atPres, params, heap, heapAtPre, anonHeap);
+
+        return new Variables(self, result, exception, atPres, params, heap);
     }
 
     public Term wd(Term t) {
@@ -314,7 +303,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term selfExactType = generateSelfExactType(selfVar, selfKJT);
 
         // conjunction of...
-        // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
+        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
 
@@ -489,18 +478,16 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                   final ProgramVariable exception,
                   final Map<LocationVariable, ProgramVariable> atPres,
                   final ImmutableList<ProgramVariable> params,
-                  final LocationVariable heap,
-                  final ProgramVariable heapAtPre,
-                  final Term anonHeap) {
+                  final LocationVariable heap) {
             this.self = self;
             this.result = result;
             this.exception = exception;
             this.atPres = atPres;
             this.params = params;
             this.heap = TB.var(heap);
-            this.heapAtPre = heapAtPre == null ?
-                    this.heap : TB.var(heapAtPre);
-            this.anonHeap = anonHeap;
+            this.heapAtPre = (atPres == null || atPres.get(heap) == null) ?
+                    this.heap : TB.var(atPres.get(heap));
+            this.anonHeap = buildAnonHeap(heap);
         }
     }
 }

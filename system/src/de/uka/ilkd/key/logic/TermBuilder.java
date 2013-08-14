@@ -1733,15 +1733,15 @@ public class TermBuilder {
 
 
     public Term reachableValue(Services services,
-                       Term h,
-                       Term t,
-                       KeYJavaType kjt) {
+                               Term h,
+                               Term t,
+                               KeYJavaType kjt) {
         assert t.sort().extendsTrans(kjt.getSort()) || t.sort() instanceof ProgramSVSort;
         final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         if(s.extendsTrans(services.getJavaInfo().objectSort())) {
-            return or(created(services, h, t), equals(t, NULL(services)));
+            return orSC(equals(t, NULL(services)), created(services, h, t));
         } else if(s.equals(setLDT.targetSort())) {
             return createdInHeap(services, t, h);
         } else if(s.equals(intLDT.targetSort()) && kjt.getJavaType() != PrimitiveType.JAVA_BIGINT) {

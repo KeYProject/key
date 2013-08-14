@@ -437,7 +437,8 @@ public class TacletGenerator {
             Term targetSVReachable = null;
             for(SchemaVariable heapSV : heapSVs) {
                  tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
-                 final Term tReach = TB.reachableValue(services, TB.var(heapSV), TB.var(targetSV), target.getType());
+                 final Term tReach = TB.reachableValue(services, TB.var(heapSV),
+                                                       TB.var(targetSV), target.getType());
                  if(targetSVReachable == null) {
                 	 targetSVReachable = tReach;
                  }else{

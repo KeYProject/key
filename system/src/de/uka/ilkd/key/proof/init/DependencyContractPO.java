@@ -116,7 +116,7 @@ public final class DependencyContractPO extends AbstractPO
              
 	
         //conjunction of... 
-        //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
+        //- "p_i = null | p_i.<created> = TRUE" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
         Term paramsOK = TB.tt();
         for(ProgramVariable paramVar : paramVars) {

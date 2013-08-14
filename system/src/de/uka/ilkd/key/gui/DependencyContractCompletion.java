@@ -68,7 +68,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
 
-        if (steps.size() == 0) {
+        if (steps.size() == 0 || !(steps.get(0).subTerm() instanceof IObserverFunction)) {
             return null;
         }
 
