@@ -41,6 +41,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     private String definitionFile;
     private String tacletFile;
     private String[] axiomFiles;
+    private String baseDir;
 
     /**
      * This filter is used to filter out precisely that taclet which has the
@@ -92,6 +93,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         public void progressStarted(Object sender) {
         }
     };
+ 
 
     /**
      * Instantiates a new taclet proof obligation input object.
@@ -143,11 +145,11 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             // prove a KeY taclet
             loader = new TacletLoader.KeYsTacletsLoader(null, null, getProfile());
         } else {
-
             final ProblemInitializer problemInitializer =
                     new ProblemInitializer(getProfile());
+            // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                    new File(definitionFile), new File(tacletFile), 
+                    new File(baseDir, definitionFile), new File(baseDir, tacletFile), 
                     fileCollection(axiomFiles), initConfig.getProofEnv());
         }
 
@@ -161,10 +163,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         return initConfig.getProfile();
     }
 
-    private static Collection<File> fileCollection(String[] strings) {
+    private Collection<File> fileCollection(String[] strings) {
         ArrayList<File> result = new ArrayList<File>();
         for (int i = 0; i < strings.length; i++) {
-            result.add(new File(strings[i]));
+            result.add(new File(baseDir, strings[i]));
         }
         return result;
     }
@@ -179,7 +181,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         return proofObligation;
     }
 
-    @Override public boolean implies(ProofOblInput po) {
+    @Override
+    public boolean implies(ProofOblInput po) {
         return this == po;
     }
 
@@ -192,6 +195,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     }
 
     private void setLoadInfo(Properties properties) {
+        this.baseDir = new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
         this.tacletFile = properties.getProperty("tacletFile");
         this.definitionFile = properties.getProperty("definitionFile");
         List<String> axioms = new ArrayList<String>();
