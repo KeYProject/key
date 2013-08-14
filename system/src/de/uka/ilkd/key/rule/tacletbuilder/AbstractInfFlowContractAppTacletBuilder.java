@@ -398,6 +398,16 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends TermBuilder.Servi
 
     }
 
+    /**
+     * A Normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is
+     * returned instead of a normal RewriteTaclet.  InfFlowContractAppTaclet's
+     * are normal RewriteTaclet's except that the formula which is added by the
+     * taclets are also added to the list of formulas contained in the
+     * INF_FLOW_CONTRACT_APPL_PROPERTY. The INF_FLOW_CONTRACT_APPL_PROPERTY is
+     * used by the macros UseInformationFlowContractMacro and
+     * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the
+     * formulas resulting from information flow contract applications.
+     */
     private class InfFlowContractAppRewriteTacletBuilder extends RewriteTacletBuilder {
 
         InfFlowContractAppRewriteTacletBuilder() {
