@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import recoder.java.SourceElement.Position;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -639,7 +638,15 @@ final class JMLTranslator {
                             "sequence definition must declare exactly one variable");
                 }
                 LogicVariable qv = (LogicVariable) declVars.head();
-                Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                Term tt = t.getTerm();
+                if (tt.sort() == Sort.FORMULA) {
+                    // bugfix (CS): t.getTerm() delivers a formula instead of a
+                    // boolean term; obviously the original boolean terms are
+                    // converted to formulas somewhere else; however, we need
+                    // boolean terms instead of formulas here
+                    tt = TB.convertToBoolean(t.getTerm(), services);
+                }
+                Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), tt, services);
                 final KeYJavaType seqtype =
                         services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(resultTerm, seqtype);
