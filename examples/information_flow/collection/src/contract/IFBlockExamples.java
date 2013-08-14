@@ -31,7 +31,7 @@ public class IFBlockExamples {
 
             //@ normal_behavior
             //@ assignable \nothing;
-            //@ respects l1;
+            //@ respects l1, l2;
             {   l1 += l2;
             }
 
