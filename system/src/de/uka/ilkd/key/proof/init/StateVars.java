@@ -162,8 +162,19 @@ public class StateVars {
              copyVariables(orig.localVars, postfix, services),
              copyVariable(orig.result, postfix, services),
              copyVariable(orig.exception, postfix, services),
-             copyHeapFunction(orig.heap, postfix, services),
+             copyHeapSymbol(orig.heap, postfix, services),
              newFunction(orig.mbyAtPre, postfix, services));
+    }
+
+
+    private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts,
+                                                     String postfix,
+                                                     Services services) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term t : ts) {
+            result = result.append(copyVariable(t, postfix, services));
+        }
+        return result;
     }
 
 
@@ -202,13 +213,13 @@ public class StateVars {
     }
 
 
-    private static Term copyHeapFunction(Term t,
-                                         String postfix,
-                                         Services services) {
+    private static Term copyHeapSymbol(Term t,
+                                       String postfix,
+                                       Services services) {
         if (t != null) {
             Term tWithoutLables = TB.unlabel(t);
             Term result =
-                   newHeapFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
+                   newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return TB.label(result, t.getLabels());
         } else {
             return null;
@@ -216,39 +227,23 @@ public class StateVars {
     }
 
 
-    private static Term newHeapFunction(Term t,
-                                        String name,
-                                        Services services) {
+    private static Term newHeapSymbol(Term t,
+                                      String name,
+                                      Services services) {
         if (t == null) {
             return null;
         }
-
-        assert t.op() instanceof Function : "Expected a function " +
-                                            "of sort Heap.";
-
-        LocationVariable heapVar =
-                services.getTypeConverter().getHeapLDT().getHeap();
-        Function f = (Function) t.op();
-
-        assert f.sort() == heapVar.sort() : "Expected a function " +
-                                            "of sort Heap.";
-
-        String newNameString = TB.newName(services, name);
-        Name newName = new Name(newNameString);
-        Function newFunc = new Function(newName, heapVar.sort());
-        register(newFunc, services);
-        return TB.func(newFunc);
-    }
-
-
-    private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts,
-                                                     String postfix,
-                                                     Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Term t : ts) {
-            result = result.append(copyVariable(t, postfix, services));
+        if (!(t.op() instanceof Function)) {
+            // Sometimes the heap term operator is a location variable (for
+            // instance if it is the base heap). Create a location variable
+            // in this case.
+            return newVariable(t, name, services);
+        } else {
+            // Otherwise (this is the normal case), the heap term operator is
+            // a function (for instance if it is a anon heap). Create a function
+            // in this case.
+            return newFunction(t, name, services);
         }
-        return result;
     }
 
 
@@ -259,8 +254,7 @@ public class StateVars {
             return null;
         }
         String newName = TB.newName(services, t.toString() + postfix);
-        final Function newFunc =
-                new Function(new Name(newName), t.sort());
+        final Function newFunc = new Function(new Name(newName), t.sort());
         register(newFunc, services);
         return TB.func(newFunc);
     }
@@ -324,7 +318,7 @@ public class StateVars {
                     copyVariable(origPostVars.exception, postfix, services);
         Term heap = (origPreVars.heap == origPostVars.heap) ?
                     preVars.heap :
-                    copyHeapFunction(origPostVars.heap, postfix, services);
+                    copyHeapSymbol(origPostVars.heap, postfix, services);
         Term mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ?
                     preVars.mbyAtPre :
                     copyVariable(origPostVars.mbyAtPre, postfix, services);
