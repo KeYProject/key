@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * Implements the rule which inserts operation contracts for a method call.
  */
 public final class InfFlowBlockContractTacletBuilder
-        extends AbstractInfFlowContractTacletBuilder {
+        extends AbstractInfFlowContractAppTacletBuilder {
 
     private BlockContract blockContract;
 

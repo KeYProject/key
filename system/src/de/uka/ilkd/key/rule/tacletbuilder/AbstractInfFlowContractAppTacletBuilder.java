@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -19,8 +19,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.InfFlowContractAppTaclet;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApplPart;
 import de.uka.ilkd.key.util.MiscTools;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -31,7 +34,7 @@ import java.util.Map;
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
-abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced {
+abstract class AbstractInfFlowContractAppTacletBuilder extends TermBuilder.Serviced {
 
     private Term[] contextUpdates;
     private Term contractSelfAtPre;
@@ -49,7 +52,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private Term mbyAtPre;
 
 
-    public AbstractInfFlowContractTacletBuilder(final Services services) {
+    public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
     }
 
@@ -265,7 +268,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                 new Semisequent(new SequentFormula(replaceWithTerm)));
 
         //create taclet
-        InfFlowTacletBuilder tacletBuilder = new InfFlowTacletBuilder();
+        InfFlowContractAppRewriteTacletBuilder tacletBuilder = new InfFlowContractAppRewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
@@ -337,7 +340,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                             Services services);
 
 
-    private void addVarconds(InfFlowTacletBuilder tacletBuilder,
+    private void addVarconds(InfFlowContractAppRewriteTacletBuilder tacletBuilder,
                              Iterable<SchemaVariable> quantifiableSVs,
                              ProofObligationVars schemaDataFind,
                              ProofObligationVars schemaDataAssumes) throws IllegalArgumentException {
@@ -393,5 +396,37 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
             return vars;
         }
 
+    }
+
+    private class InfFlowContractAppRewriteTacletBuilder extends RewriteTacletBuilder {
+
+        InfFlowContractAppRewriteTacletBuilder() {
+        }
+
+
+        @Override
+        public RewriteTaclet getRewriteTaclet() {
+            if (find == null) {
+                throw new TacletBuilder.TacletBuilderException(this, "No find part specified");
+
+            }
+            checkBoundInIfAndFind();
+            TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
+            prefixBuilder.build();
+            return new InfFlowContractAppTaclet(name,
+                                     new TacletApplPart(ifseq,
+                                                        varsNew,
+                                                        varsNotFreeIn,
+                                                        varsNewDependingOn,
+                                                        variableConditions),
+                                     goals, ruleSets,
+                                     attrs,
+                                     find,
+                                     prefixBuilder.getPrefixMap(),
+                                     applicationRestriction,
+                                     choices,
+                                     surviveSmbExec);
+
+        }
     }
 }

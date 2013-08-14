@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;

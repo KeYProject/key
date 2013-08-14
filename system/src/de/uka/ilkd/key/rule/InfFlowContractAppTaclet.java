@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.properties.Properties;
  *
  * @author christoph
  */
-public class InfFlowTaclet extends RewriteTaclet {
+public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
             new Properties.Property<ImmutableList<Term>>(
@@ -35,7 +35,7 @@ public class InfFlowTaclet extends RewriteTaclet {
                              "applicaton property");
 
 
-    public InfFlowTaclet(Name name,
+    public InfFlowContractAppTaclet(Name name,
                          TacletApplPart applPart,
                          ImmutableList<TacletGoalTemplate> goalTemplates,
                          ImmutableList<RuleSet> ruleSets,
@@ -48,7 +48,7 @@ public class InfFlowTaclet extends RewriteTaclet {
     }
 
 
-    public InfFlowTaclet(Name name,
+    public InfFlowContractAppTaclet(Name name,
                          TacletApplPart applPart,
                          ImmutableList<TacletGoalTemplate> goalTemplates,
                          ImmutableList<RuleSet> ruleSets,

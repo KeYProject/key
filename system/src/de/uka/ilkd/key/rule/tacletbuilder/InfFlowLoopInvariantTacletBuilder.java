@@ -8,8 +8,9 @@
 //
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.rule.tacletbuilder.AbstractInfFlowContractAppTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * Implements the rule which inserts loop invariants for a method call.
  */
 public final class InfFlowLoopInvariantTacletBuilder
-        extends AbstractInfFlowContractTacletBuilder {
+        extends AbstractInfFlowContractAppTacletBuilder {
     
     private LoopInvariant loopinvariant;    
 

@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.InfFlowTaclet;
+import de.uka.ilkd.key.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
@@ -46,7 +46,7 @@ public class InfFlowImpFeature implements Feature {
 
         final Term focusFor = pos.constrainedFormula().formula();
         ImmutableList<Term> contractAppls =
-                goal.getStrategyInfo(InfFlowTaclet.INF_FLOW_CONTRACT_APPL_PROPERTY);
+                goal.getStrategyInfo(InfFlowContractAppTaclet.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {
             return TopRuleAppCost.INSTANCE;
         }
