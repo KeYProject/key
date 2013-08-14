@@ -25,11 +25,13 @@ public class IFMethodContract {
         n2();
     }
     
+    //@ normal_behavior
     //@ respects low;
     void n1() {
         low = 27;
     }
     
+    //@ normal_behavior
     //@ respects low;
     void n2() {
         low = low + 13;
@@ -60,14 +62,16 @@ public class IFMethodContract {
         n4();
     }
     
-    /*@ ensures high > 0;
+    /*@ normal_behavior
+      @ ensures high > 0;
       @ respects low;
       @*/
     void n3() {
         high = 8;
     }
     
-    /*@ requires high > 0;
+    /*@ normal_behavior
+      @ requires high > 0;
       @ respects low;
       @*/
     void n4() {
@@ -113,6 +117,7 @@ public class IFMethodContract {
         n1();
     }
     
+    //@ normal_behavior
     //@ respects low, \result;
     int n5(int x) {
         high = 2 * x;
@@ -181,7 +186,8 @@ public class IFMethodContract {
         n6();
     }
  
-    /*@ requires high != 0;
+    /*@ normal_behavior
+      @ requires high != 0;
       @ respects low;
       @*/
     void n6() {
@@ -224,7 +230,8 @@ public class IFMethodContract {
 //-------- Recursion
     
     
-    /*@ requires    x >= 0;
+    /*@ normal_behavior
+      @ requires    x >= 0;
       @ measured_by x;
       @ respects    low, x;
       @*/
@@ -236,10 +243,11 @@ public class IFMethodContract {
     }
     
     
-    /*@ requires    x >= 0;
+    /*@ normal_behavior
+      @ requires    x >= 0;
       @ measured_by x;
       @ respects    low, x, (\seq_def int i; 0; a.length; a[i]);
-      @ assignable  \nothing;
+      @ assignable  low;
       @*/
     void secure_recursion_2(int[] a, int x) {
         if (x > 0 && x < a.length) {
@@ -262,6 +270,7 @@ public class IFMethodContract {
           @*/
         while (x > 0) {
             low = low + 1;
+            x = x -1;
         }
     }
     
