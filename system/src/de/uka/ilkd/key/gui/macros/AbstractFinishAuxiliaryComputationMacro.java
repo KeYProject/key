@@ -448,7 +448,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         return result;
     }
 
-    protected static final Term calculateResultingSVTerm(Proof proof,
+    protected static Term calculateResultingSVTerm(Proof proof,
                                                          IFProofObligationVars origVars,
                                                          IFProofObligationVars schemaVars,
                                                          Goal initGoal) {
@@ -456,21 +456,21 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         return replace(term, origVars, schemaVars);
     }
 
-    private static final Term replace(Term term,
+    private static Term replace(Term term,
                                       IFProofObligationVars origVars,
                                       IFProofObligationVars schemaVars) {
         Term intermediateResult = replace(term, origVars.c1, schemaVars.c1);
         return replace(intermediateResult, origVars.c2, schemaVars.c2);
     }
 
-    private static final Term replace(Term term,
+    private static Term replace(Term term,
                                       ProofObligationVars origVars,
                                       ProofObligationVars schemaVars) {
         Term intermediateResult = replace(term, origVars.pre, schemaVars.pre);
         return replace(intermediateResult, origVars.post, schemaVars.post);
     }
 
-    private static final Term replace(Term term,
+    private static Term replace(Term term,
                                       StateVars origVars,
                                       StateVars schemaVars) {
         de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
