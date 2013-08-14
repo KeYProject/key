@@ -40,6 +40,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.AnonHeapTermLabelInstantiator;
 import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.SelectSkolemConstantTermLabelInstantiator;
@@ -292,6 +293,9 @@ public abstract class AbstractPO implements IPersistablePO {
         ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
         if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
            labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+        }
+        if (!labelInstantiators.contains(AnonHeapTermLabelInstantiator.INSTANCE)) {
+           labelInstantiators = labelInstantiators.append(AnonHeapTermLabelInstantiator.INSTANCE);
         }
         proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
 

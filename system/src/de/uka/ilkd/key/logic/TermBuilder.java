@@ -1584,6 +1584,11 @@ public class TermBuilder {
         }
     }
 
+    public Term unlabel(Term term) {
+        return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
+                                              term.javaBlock());
+    }
+
     public Term dotArr(Services services, Term ref, Term idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
