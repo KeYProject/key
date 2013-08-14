@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import static de.uka.ilkd.key.proof.init.AbstractPO.TB;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -229,6 +230,16 @@ public class InfFlowContractPO extends AbstractOperationPO
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
+    @Override
+    protected Term getGlobalDefs(LocationVariable heap,
+                                 Term heapTerm,
+                                 Term selfTerm,
+                                 ImmutableList<Term> paramTerms,
+                                 Services services) {
+        // information flow contracts do not have global defs
+        return null;
+    }
+
     // the following code is legacy code
     @Override
     @Deprecated
@@ -295,16 +306,5 @@ public class InfFlowContractPO extends AbstractOperationPO
                                        ImmutableList<ProgramVariable> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
-    }
-
-
-    @Override
-    @Deprecated
-    protected Term getGlobalDefs(LocationVariable heap,
-                                 Term heapTerm,
-                                 Term selfTerm,
-                                 ImmutableList<Term> paramTerms,
-                                 Services services) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

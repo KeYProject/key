@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import static de.uka.ilkd.key.proof.init.AbstractPO.TB;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.speclang.ContractFactory;
@@ -208,6 +209,17 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     }
 
     @Override
+    protected Term getGlobalDefs(LocationVariable heap,
+                                 Term heapTerm,
+                                 Term selfTerm,
+                                 ImmutableList<Term> paramTerms,
+                                 Services services) {
+        // information flow contracts do not have global defs
+        return null;
+    }
+
+    // the following code is legacy code
+    @Override
     @Deprecated
     protected StatementBlock buildOperationBlock(
             ImmutableList<LocationVariable> formalParVars,
@@ -261,16 +273,4 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         throw new UnsupportedOperationException("Not supported any more. " +
                 "Please use the POSnippetFactory instead.");
     }
-
-
-    @Override
-    @Deprecated
-    protected Term getGlobalDefs(LocationVariable heap,
-                                 Term heapTerm,
-                                 Term selfTerm,
-                                 ImmutableList<Term> paramTerms,
-                                 Services services) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

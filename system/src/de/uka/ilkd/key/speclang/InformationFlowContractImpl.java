@@ -603,6 +603,16 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
+    @Override
+    public Term getGlobalDefs(LocationVariable heap,
+                              Term heapTerm,
+                              Term selfTerm,
+                              ImmutableList<Term> paramTerms,
+                              Services services) {
+        // information flow contracts do not have global defs (yet?)
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 
     // the following code is legacy code
     
@@ -676,16 +686,4 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         throw new UnsupportedOperationException("Not supported any more. "
                 + "Please use the POSnippetFactory instead.");
     }
-
-
-    @Override
-    @Deprecated
-    public Term getGlobalDefs(LocationVariable heap,
-                              Term heapTerm,
-                              Term selfTerm,
-                              ImmutableList<Term> paramTerms,
-                              Services services) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

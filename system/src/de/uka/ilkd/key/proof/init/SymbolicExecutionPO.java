@@ -210,6 +210,16 @@ public class SymbolicExecutionPO extends AbstractOperationPO
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
+    @Override
+    protected Term getGlobalDefs(LocationVariable heap,
+                                 Term heapTerm,
+                                 Term selfTerm,
+                                 ImmutableList<Term> paramTerms,
+                                 Services services) {
+        // information flow contracts do not have global defs
+        return null;
+    }
+
     // the following code is legacy code
     @Override
     @Deprecated
@@ -276,16 +286,5 @@ public class SymbolicExecutionPO extends AbstractOperationPO
                                        ImmutableList<ProgramVariable> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
                  "Please use the POSnippetFactory instead.");
-    }
-
-
-    @Override
-    @Deprecated
-    protected Term getGlobalDefs(LocationVariable heap,
-                                 Term heapTerm,
-                                 Term selfTerm,
-                                 ImmutableList<Term> paramTerms,
-                                 Services services) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
