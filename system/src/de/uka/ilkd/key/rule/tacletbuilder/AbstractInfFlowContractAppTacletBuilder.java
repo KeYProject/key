@@ -32,7 +32,9 @@ import java.util.Map;
 
 
 /**
- * Implements the rule which inserts operation contracts for a method call.
+ * Builds the rule which inserts information flow contract applications.
+ *
+ * @author christoph
  */
 abstract class AbstractInfFlowContractAppTacletBuilder extends TermBuilder.Serviced {
 
