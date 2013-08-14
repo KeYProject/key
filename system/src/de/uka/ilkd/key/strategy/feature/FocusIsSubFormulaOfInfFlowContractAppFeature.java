@@ -22,6 +22,14 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 
+/**
+ * Checks whether the focus of the ruleApp is contained in one of the formulas
+ * added by information flow contract applications. The list of formulas
+ * added by information flow contract applications is retrieved form the
+ * the strategy property INF_FLOW_CONTRACT_APPL_PROPERTY.
+ *
+ * @author christoph
+ */
 public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
     public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
