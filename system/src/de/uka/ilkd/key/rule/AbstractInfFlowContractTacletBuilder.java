@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -302,13 +301,14 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         if (t == null) {
             return null;
         }
+        t = TermBuilder.DF.unlabel(t);
         String svName = MiscTools.toValidVariableName(schemaPrefix + t.toString()).toString();
         Sort sort = t.sort();
         Name name =
                 services.getVariableNamer().getTemporaryNameProposal(svName);
         return var(SchemaVariableFactory.createTermSV(name, sort));
-
     }
+
 
     SchemaVariable createVariableSV(QuantifiableVariable v,
                                     String schemaPrefix,
