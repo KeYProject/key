@@ -21,7 +21,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.ExtensionContributionFactory;
 import org.eclipse.ui.menus.IContributionRoot;
 import org.eclipse.ui.services.IServiceLocator;
-import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -47,9 +47,8 @@ public class TacletContextMenu extends ExtensionContributionFactory {
          KeYEditor keyEditor = (KeYEditor)activeEditor;
          KeYMediator mediator = keyEditor.getMediator();
          if (mediator != null && mediator.getSelectedNode().getAppliedRuleApp() == null) {
-            ProofSourceViewerDecorator textViewer = keyEditor.getTextViewer();
-            PosInSequent pos = textViewer.getPosInSequent();
-            ImmutableList<TacletApp> appList = textViewer.findRules(mediator, pos);
+            PosInSequent pos = keyEditor.getSelectedPosInSequent();
+            ImmutableList<TacletApp> appList = KeYIDEUtil.findRules(mediator, pos);
             // TODO: What about build in rules, are they not supported?
             if (appList != null) {
                Iterator<TacletApp> it = appList.iterator();

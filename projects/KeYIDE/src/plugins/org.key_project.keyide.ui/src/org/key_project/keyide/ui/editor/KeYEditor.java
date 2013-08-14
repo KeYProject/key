@@ -28,8 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -56,7 +54,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
@@ -117,7 +115,7 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     */
    private Node currentNode; 
    
-   private ProofSourceViewerDecorator textViewer; // TODO: Rename, into proofDecorator. And also its getter
+   private ProofSourceViewerDecorator viewerDecorator;
 
    /**
     * The provided {@link ProofTreeContentOutlinePage}.
@@ -128,16 +126,6 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     * Contains the registered {@link IProofProviderListener}.
     */
    private List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
-
-   /**
-    * Listens for mouse move events on {@link #getTextViewer()}.
-    */
-   private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
-      @Override
-      public void mouseMove(MouseEvent e) {
-         handleMouseMoved(e);
-      }
-   };
    
    /**
     * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
@@ -229,6 +217,9 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     */
    @Override
    public void dispose() {
+      if (viewerDecorator != null) {
+         viewerDecorator.dispose();
+      }
       if (getUI() != null) {
          getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       }
@@ -315,10 +306,9 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       getMediator().addKeYSelectionListener(keySelectionListener);
       getUI().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       ISourceViewer sourceViewer = getSourceViewer();
-      textViewer = new ProofSourceViewerDecorator(sourceViewer);
+      viewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
       getCurrentProof().addProofTreeListener(proofTreeListener);
       sourceViewer.setEditable(false);
-      sourceViewer.getTextWidget().addMouseMoveListener(mouseMoveListener);
       if (this.getCurrentNode() != null) {
          setCurrentNode(currentProof.root());
       }
@@ -416,16 +406,6 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    }
 
    /**
-    * Handles a mouse move event on {@link #getTextViewer()}.
-    * @param e The event.
-    */
-   protected void handleMouseMoved(MouseEvent e) {
-      if (currentNode.getAppliedRuleApp() == null){
-         textViewer.setBackgroundColorForHover();
-      }
-   }
-
-   /**
     * This method is called when the {@link Proof} is closed.
     * @param e The {@link ProofTreeEvent}.
     */
@@ -502,15 +482,15 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
       getMediator().setStupidMode(true);
-      textViewer.setDocumentForNode(currentNode, getMediator());
-      if (currentNode.getAppliedRuleApp() != null) {
-         PosInOccurrence posInOcc = currentNode.getAppliedRuleApp().posInOccurrence();
-         textViewer.setGreenBackground(posInOcc);
-      }
+      viewerDecorator.showNode(currentNode, getMediator());
    }
    
-   public ProofSourceViewerDecorator getTextViewer() {
-      return textViewer;
+   /**
+    * Returns the selected {@link PosInSequent}.
+    * @return The selected {@link PosInSequent}.
+    */
+   public PosInSequent getSelectedPosInSequent() {
+      return viewerDecorator.getSelectedPosInSequent();
    }
 
    /**
