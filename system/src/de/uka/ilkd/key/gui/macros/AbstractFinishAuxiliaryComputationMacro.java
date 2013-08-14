@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashMap;
@@ -429,9 +430,11 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
         if (t == null) {
             return null;
         }
-        String svName = schemaPrefix + t.toString();
-        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
+        t = TermBuilder.DF.unlabel(t);
+        String svName = MiscTools.toValidVariableName(schemaPrefix + t.toString()).toString();
         Sort sort = t.sort();
+        Name name =
+                services.getVariableNamer().getTemporaryNameProposal(svName);
         return TB.var(SchemaVariableFactory.createTermSV(name, sort));
     }
 
