@@ -141,7 +141,8 @@ public class IFMethodContract {
     }
     
     
-    /*@ ensures     low == high;
+    /*@ normal_behavior
+      @ ensures     low == high;
       @ modifies    low;
       @*/
     void n9() {
@@ -152,16 +153,19 @@ public class IFMethodContract {
 //--------
 
 
-    //@ requires a.length > 0;
-    //@ requires 0 <= pos && pos < a.length;
-    //@ respects (\forall int i; 0 <= i && i < a.length; a[i] == 0);
+    /*@ requires a.length > 0;
+      @ requires 0 <= pos && pos < a.length;
+      @ respects pos, (\seq_def int i; 0; a.length; a[i] == 0);
+      @*/
     void secure_array_param(int[] a, int pos) {
         a[pos] = secure_array_param_helper();
     }
 
 
-    //@ ensures \result == 0;
-    //@ pure
+    /*@ normal_behavior
+      @ ensures \result == 0;
+      @ pure
+      @*/
     int secure_array_param_helper() {
         return 0;
     }
