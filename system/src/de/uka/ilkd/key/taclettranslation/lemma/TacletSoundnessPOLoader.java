@@ -255,7 +255,7 @@ public class TacletSoundnessPOLoader {
 
 
         private void doWork() throws ProofInputException {
- 
+            
                 // Axioms can only be loaded when the taclets are loaded as lemmata.
                 ImmutableSet<Taclet> axioms = tacletLoader.loadAxioms();
     

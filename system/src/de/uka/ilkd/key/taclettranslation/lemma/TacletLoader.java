@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
@@ -173,6 +174,7 @@ public abstract class TacletLoader {
             this.filesForAxioms = filesForAxioms;
             this.problemInitializer = problemInitializer;
             this.envForTaclets = env;
+            this.initConfig = env.getInitConfig();
         }
 
         public TacletFromFileLoader(ProgressMonitor pm,
@@ -201,12 +203,16 @@ public abstract class TacletLoader {
         
 
 
-        private void prepare() {
-            KeYUserProblemFile keyFileDefs = new KeYUserProblemFile(
+        private void prepareInitConfig() {
+            KeYFile keyFileDefs = new KeYFile(
                     "Definitions", fileForDefinitions,
                     monitor, profile);
             try {
-                initConfig = problemInitializer.prepare(keyFileDefs);
+                if(initConfig != null) {
+                    problemInitializer.readEnvInput(keyFileDefs, initConfig);
+                } else {
+                    initConfig = problemInitializer.prepare(keyFileDefs);
+                }
             } catch (ProofInputException e) {
                 throw new RuntimeException(e);
             }
@@ -214,9 +220,7 @@ public abstract class TacletLoader {
 
         @Override
         public ImmutableSet<Taclet> loadTaclets() {
-            if(initConfig == null){
-                prepare();
-            }
+            assert initConfig != null;
             tacletFile = new KeYUserProblemFile(
                     fileForTaclets.getName(), fileForTaclets, monitor, initConfig.getProfile());
             return load(tacletFile, initConfig);
@@ -225,9 +229,7 @@ public abstract class TacletLoader {
 
         @Override
         public ImmutableSet<Taclet> loadAxioms() {
-            if(initConfig == null) {
-                prepare();
-            }
+            prepareInitConfig();
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
             for (File f : filesForAxioms) {
                 KeYUserProblemFile keyFile = new KeYUserProblemFile(f.getName(), f, monitor, initConfig.getProfile());
