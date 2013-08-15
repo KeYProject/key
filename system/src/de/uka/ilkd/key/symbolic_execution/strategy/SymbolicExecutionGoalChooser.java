@@ -42,7 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * managed by this {@link IGoalChooser}. The idea is that on each {@link Goal}
  * a new symbolic execution tree node is created before on one {@link Goal}
  * a second one will be created. This has the affect that for instance on all 
- * branches of a branch node the next statement is evaluated before the first  
+ * branches of a branch statement the next statement is evaluated before the first  
  * branch executes the second statement.
  * </p>
  * <p>

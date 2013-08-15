@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleObjectQuery.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
-         <useOperationContract name="result = magic(x) catch(exc)
+         <operationContract name="result = magic(x) catch(exc)
 pre: &lt;$inv&gt; &amp; !x = null
 post: result = subMagic(x) &amp; &lt;$inv&gt; &amp; exc = null
 mod: {}
@@ -25,7 +25,7 @@ as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
                   </methodReturn>
                </statement>
             </branchCondition>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

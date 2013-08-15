@@ -18,10 +18,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -113,8 +112,7 @@ public class ConstructorCall extends ProgramTransformer {
 	final List<Statement> stmnts = constructorCallSequence(constructorReference,
                 classType, svInst, services);
 
-	return new StatementBlock(stmnts.toArray(new Statement[stmnts.size()]));
-
+	return KeYJavaASTFactory.block(stmnts);
     }
 
     /**
@@ -161,16 +159,11 @@ public class ConstructorCall extends ProgramTransformer {
 	//get init method
 	//(deliberately using classType itself as the "context type", in order
 	//to allow public calls to private init methods)
-	final IProgramMethod method
-		= services.getJavaInfo().getProgramMethod(classType,
-							  NORMALFORM_IDENTIFIER,
-							  argumentVariables,
-							  classType);
+	final MethodBodyStatement mbs = KeYJavaASTFactory.methodBody(
+		services.getJavaInfo(), null, newObject, classType,
+		NORMALFORM_IDENTIFIER, argumentVariables);
 
-	Debug.assertTrue(method != null, "Call to non-existent constructor.");
-
-	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null,
-               new ImmutableArray<Expression>(argumentVariables));
+	Debug.assertTrue(mbs != null, "Call to non-existent constructor.");
 
         //   the assignment statements + the method body statement + <allocateArea> for memory areas
 	final ArrayList<Statement> stmnts = new ArrayList<Statement>();

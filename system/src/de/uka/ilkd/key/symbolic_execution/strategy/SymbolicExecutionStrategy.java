@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
+import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -113,15 +114,31 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
        }), longConst(-3000)));
        // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break. 
        globalF = add(globalF, ifZero(new ContainsLabelFeature(LoopBodyTermLabel.INSTANCE), longConst(-2000)));       
-       globalF = add(globalF, querySiteProofFeature());       
+       globalF = add(globalF, querySideProofFeature());       
+       globalF = add(globalF, modalitySideProofFeature());       
        return globalF;
+   }
+   
+   /**
+    * Computes the cost {@link Feature} for the {@link ModalitySideProofRule}.
+    * @return The cost {@link Feature} for the {@link ModalitySideProofRule}.
+    */
+   protected Feature modalitySideProofFeature() {
+      SetRuleFilter filter = new SetRuleFilter();
+      filter.addRuleToSet(ModalitySideProofRule.INSTANCE);
+      if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(strategyProperties.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
+         return ConditionalFeature.createConditional(filter, longConst(-3050));
+      }
+      else {
+         return ConditionalFeature.createConditional(filter, inftyConst());
+      }
    }
    
    /**
     * Computes the cost {@link Feature} for the {@link QuerySideProofRule}.
     * @return The cost {@link Feature} for the {@link QuerySideProofRule}.
     */
-   protected Feature querySiteProofFeature() {
+   protected Feature querySideProofFeature() {
       SetRuleFilter filter = new SetRuleFilter();
       filter.addRuleToSet(QuerySideProofRule.INSTANCE);
       if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(strategyProperties.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {

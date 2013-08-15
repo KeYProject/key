@@ -4,7 +4,7 @@
       <sedThread xml:id="_9db15397-d160-45ab-9751-7e06d94a7131" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_f719fd6d-ce5d-4ff3-9653-df4ee26adb24" name="self.doSomething(asdf,a,b);" pathCondition="true" lineNumber="-1" charStart="248" charEnd="259">
             <sedStatement xml:id="_7eac80f6-dc6d-436b-a9fb-f3e5d796a41e" name="int x = 0;" pathCondition="true" lineNumber="-1" charStart="296" charEnd="306">
-               <sedBranchNode xml:id="_07dfffad-04af-4173-b5c9-60d880b2b86b" name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" lineNumber="-1" charStart="310" charEnd="400">
+               <sedBranchStatement xml:id="_07dfffad-04af-4173-b5c9-60d880b2b86b" name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" lineNumber="-1" charStart="310" charEnd="400">
                   <sedBranchCondition xml:id="_668c03d7-36fe-45ab-beae-437574427d6e" name="!asdf &gt;= 0" pathCondition="!asdf &gt;= 0">
                      <sedStatement xml:id="_6a0b8664-6d45-407a-b218-539bd6afb06a" name="x=x*-1;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="330" charEnd="341">
                         <sedStatement xml:id="_7db25366-f3fa-4bd1-8c98-f41750e7d6a9" name="x+=2;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="346" charEnd="353">
@@ -45,7 +45,7 @@
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-               </sedBranchNode>
+               </sedBranchStatement>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

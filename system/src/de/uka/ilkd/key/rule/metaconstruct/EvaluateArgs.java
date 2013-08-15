@@ -23,12 +23,11 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -51,13 +50,12 @@ public class EvaluateArgs extends ProgramTransformer{
 
 	final VariableNamer varNamer = services.getVariableNamer();
 	final KeYJavaType t = e.getKeYJavaType(services, ec);
-	final ProgramVariable pv = 
-	    new LocationVariable(VariableNamer.parseName
-				(varNamer.
-				 getSuggestiveNameProposalForSchemaVariable(e)), t);
-	
-	l.add(new LocalVariableDeclaration(new TypeRef(t), 
-					   new VariableSpecification(pv, e, t)));
+	final ProgramElementName name = VariableNamer.parseName(varNamer
+		.getSuggestiveNameProposalForSchemaVariable(e));
+	final ProgramVariable pv = KeYJavaASTFactory.localVariable(name, t);
+
+	l.add(KeYJavaASTFactory.declare(pv, e, t));
+
 	return pv;
     }
 
@@ -101,30 +99,29 @@ public class EvaluateArgs extends ProgramTransformer{
 
 	final MethodOrConstructorReference resMR;
 	if(mr instanceof MethodReference) {
-	    resMR = new MethodReference(new ImmutableArray<Expression>(newArgs),
-		    		        ((MethodReference)mr).getMethodName(), 
-		    		        newCalled);
+	    resMR = KeYJavaASTFactory.methodCall(newCalled,
+		    ((MethodReference) mr).getMethodName(), newArgs);
 	} else if(mr instanceof New) {
-	    resMR = new New(newArgs, 
-		    	    ((New)mr).getTypeReference(), 
-		    	    mr.getReferencePrefix());
+	    resMR = KeYJavaASTFactory.newOperator(mr.getReferencePrefix(),
+		    ((New) mr).getTypeReference(), newArgs);
 	} else if(mr instanceof SuperConstructorReference) {
-	    resMR = new SuperConstructorReference(mr.getReferencePrefix(), 
-		    			          newArgs);
+	    resMR = KeYJavaASTFactory.superConstructor(mr.getReferencePrefix(),
+		    newArgs);
 	} else if(mr instanceof ThisConstructorReference) {
-	    resMR = new ThisConstructorReference(newArgs);
+	    resMR = KeYJavaASTFactory.thisConstructor(newArgs);
 	} else {	    
 	    assert false : "unexpected subclass of MethodOrConstructorReference";
 	    resMR = null;	
 	}
 
 	if(pe instanceof CopyAssignment) {
-	    res[res.length-1] = new CopyAssignment
-		(((CopyAssignment)pe).getExpressionAt(0), (Expression)resMR);
+	    res[res.length - 1] = KeYJavaASTFactory.assign(
+		    ((CopyAssignment) pe).getExpressionAt(0),
+		    (Expression) resMR);
 	} else {
 	    res[res.length-1] = resMR;
 	}
 
-	return new StatementBlock(res);
+	return KeYJavaASTFactory.block(res);
     }
 }

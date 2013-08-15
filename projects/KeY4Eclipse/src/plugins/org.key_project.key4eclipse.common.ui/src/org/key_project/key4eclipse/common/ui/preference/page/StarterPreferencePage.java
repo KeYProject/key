@@ -215,6 +215,25 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean performOk() {
+      boolean done = super.performOk();
+      StarterUtil.updatePropertyTester();
+      return done;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void performApply() {
+      super.performApply();
+      StarterUtil.updatePropertyTester();
+   }
+
+   /**
     * Opens the {@link PreferencePage} and shows this {@link PreferencePage}.
     * @param parentShell The parent {@link Shell}.
     * @return The dialog result.

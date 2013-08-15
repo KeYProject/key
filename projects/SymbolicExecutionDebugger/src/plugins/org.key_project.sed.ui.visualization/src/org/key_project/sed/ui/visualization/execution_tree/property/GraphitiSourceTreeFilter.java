@@ -33,7 +33,7 @@ public class GraphitiSourceTreeFilter extends AbstractPropertySectionFilter {
       IWorkbenchPart part = WorkbenchUtil.getActivePart();
       if (part != null) {
          GraphitiSourcePropertySection section = new GraphitiSourcePropertySection();
-         section.setInput(WorkbenchUtil.getActivePart(), null);
+         section.setInput(part, null);
          return section.getStackFrame(pe) != null;
       }
       else {

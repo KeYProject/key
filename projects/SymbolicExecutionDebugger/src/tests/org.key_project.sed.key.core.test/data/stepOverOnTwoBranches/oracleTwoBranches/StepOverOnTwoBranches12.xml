@@ -3,7 +3,7 @@
    <sedTarget xml:id="_4660d55a-e6bc-4d1f-87a3-b347e49c8cd2" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
       <sedThread xml:id="_1d0dbb26-904e-48e9-b010-721f1b4019fa" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_aeab11f5-b399-463e-8505-6227c7b9477b" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
-            <sedBranchNode xml:id="_9d8b3ba1-6c1d-4309-8675-9c8f1cc99a4b" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
+            <sedBranchStatement xml:id="_9d8b3ba1-6c1d-4309-8675-9c8f1cc99a4b" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
                <sedBranchCondition xml:id="_f8d4f542-8da8-4770-a513-5a10a9d006e4" name="a = 0" pathCondition="a = 0">
                   <sedStatement xml:id="_65a0ed4d-d699-42a3-91c1-547b259763b1" name="int i = 2;" pathCondition="a = 0" lineNumber="-1" charStart="87" charEnd="97">
                      <sedStatement xml:id="_155d6879-b745-4d2f-a31c-2c60d4ad7c48" name="int j = 3;" pathCondition="a = 0" lineNumber="-1" charStart="102" charEnd="112">
@@ -156,7 +156,7 @@
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>
-            </sedBranchNode>
+            </sedBranchStatement>
          </sedMethodCall>
       </sedThread>
    </sedTarget>

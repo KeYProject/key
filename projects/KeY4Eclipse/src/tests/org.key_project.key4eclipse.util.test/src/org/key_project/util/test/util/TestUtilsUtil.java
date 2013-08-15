@@ -108,6 +108,7 @@ import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -1454,13 +1455,49 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Blocks the current thread until a auto mode is started.
+    * Blocks the current thread until the auto mode has started.
     * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static void waitUntilAutoMode(UserInterface ui) {
-      while (!ui.getMediator().autoMode()) {
-         sleep(10);
-      }
+   public static void waitUntilAutoMode(SWTBot bot, UserInterface ui) {
+      final KeYMediator mediator = ui.getMediator(); 
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return mediator.autoMode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Mediator \"" + mediator + "\" is not in automode.";
+         }
+      });
+   }
+
+   /**
+    * Blocks the current thread while the auto mode is running.
+    * @param ui The {@link UserInterface} to wait for its auto mode.
+    */
+   public static void waitWhileAutoMode(SWTBot bot, UserInterface ui) {
+      final KeYMediator mediator = ui.getMediator(); 
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return !mediator.autoMode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Mediator \"" + mediator + "\" is still in automode.";
+         }
+      });
    }
 
    /**

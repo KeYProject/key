@@ -54,27 +54,27 @@ import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchNode;
+import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopNode;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDUseLoopInvariant;
-import org.key_project.sed.core.model.ISEDUseOperationContract;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
+import org.key_project.sed.core.model.ISEDOperationContract;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.BranchNodeAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.BranchNodeCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.BranchNodeLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.BranchNodeUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStatementAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStatementCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStatementLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStatementUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationCreateFeature;
@@ -90,10 +90,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.LoopCondition
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopNodeAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopNodeCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopNodeLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopNodeUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallLayoutFeature;
@@ -114,14 +114,14 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeat
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.OperationContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 
 /**
@@ -158,18 +158,18 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
    public ICreateFeature[] getCreateFeatures() {
       if (!isReadOnly()) {
          return new ICreateFeature[] {new BranchConditionCreateFeature(this),
-                                      new BranchNodeCreateFeature(this),
+                                      new BranchStatementCreateFeature(this),
                                       new ExceptionalTerminationCreateFeature(this),
                                       new LoopBodyTerminationCreateFeature(this),
                                       new LoopConditionCreateFeature(this),
-                                      new LoopNodeCreateFeature(this),
+                                      new LoopStatementCreateFeature(this),
                                       new MethodCallCreateFeature(this),
                                       new MethodReturnCreateFeature(this),
                                       new StatementCreateFeature(this),
                                       new TerminationCreateFeature(this),
                                       new ThreadCreateFeature(this),
-                                      new UseLoopInvariantCreateFeature(this),
-                                      new UseOperationContractCreateFeature(this)};
+                                      new LoopInvariantCreateFeature(this),
+                                      new OperationContractCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];
@@ -184,8 +184,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       if (context.getNewObject() instanceof ISEDBranchCondition) {
          return new BranchConditionAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDBranchNode) {
-         return new BranchNodeAddFeature(this);
+      else if (context.getNewObject() instanceof ISEDBranchStatement) {
+         return new BranchStatementAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationAddFeature(this);
@@ -196,8 +196,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (context.getNewObject() instanceof ISEDLoopCondition) {
          return new LoopConditionAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDLoopNode) {
-         return new LoopNodeAddFeature(this);
+      else if (context.getNewObject() instanceof ISEDLoopStatement) {
+         return new LoopStatementAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDMethodCall) {
          return new MethodCallAddFeature(this);
@@ -214,11 +214,11 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (context.getNewObject() instanceof ISEDThread) {
          return new ThreadAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDUseOperationContract) {
-         return new UseOperationContractAddFeature(this);
+      else if (context.getNewObject() instanceof ISEDOperationContract) {
+         return new OperationContractAddFeature(this);
       }
-      else if (context.getNewObject() instanceof ISEDUseLoopInvariant) {
-         return new UseLoopInvariantAddFeature(this);
+      else if (context.getNewObject() instanceof ISEDLoopInvariant) {
+         return new LoopInvariantAddFeature(this);
       }
       else {
          return super.getAddFeature(context);
@@ -237,8 +237,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDBranchCondition) {
          return new BranchConditionUpdateFeature(this);
       }
-      else if (bo instanceof ISEDBranchNode) {
-         return new BranchNodeUpdateFeature(this);
+      else if (bo instanceof ISEDBranchStatement) {
+         return new BranchStatementUpdateFeature(this);
       }
       else if (bo instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationUpdateFeature(this);
@@ -249,8 +249,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDLoopCondition) {
          return new LoopConditionUpdateFeature(this);
       }
-      else if (bo instanceof ISEDLoopNode) {
-         return new LoopNodeUpdateFeature(this);
+      else if (bo instanceof ISEDLoopStatement) {
+         return new LoopStatementUpdateFeature(this);
       }
       else if (bo instanceof ISEDMethodCall) {
          return new MethodCallUpdateFeature(this);
@@ -267,11 +267,11 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDThread) {
          return new ThreadUpdateFeature(this);
       }
-      else if (bo instanceof ISEDUseOperationContract) {
-         return new UseOperationContractUpdateFeature(this);
+      else if (bo instanceof ISEDOperationContract) {
+         return new OperationContractUpdateFeature(this);
       }
-      else if (bo instanceof ISEDUseLoopInvariant) {
-         return new UseLoopInvariantUpdateFeature(this);
+      else if (bo instanceof ISEDLoopInvariant) {
+         return new LoopInvariantUpdateFeature(this);
       }
       else {
          return super.getUpdateFeature(context);
@@ -288,8 +288,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       if (bo instanceof ISEDBranchCondition) {
           return new BranchConditionLayoutFeature(this);
       }
-      else if (bo instanceof ISEDBranchNode) {
-         return new BranchNodeLayoutFeature(this);
+      else if (bo instanceof ISEDBranchStatement) {
+         return new BranchStatementLayoutFeature(this);
       }
       else if (bo instanceof ISEDExceptionalTermination) {
          return new ExceptionalTerminationLayoutFeature(this);
@@ -300,8 +300,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDLoopBodyTermination) {
          return new LoopBodyTerminationLayoutFeature(this);
       }
-      else if (bo instanceof ISEDLoopNode) {
-         return new LoopNodeLayoutFeature(this);
+      else if (bo instanceof ISEDLoopStatement) {
+         return new LoopStatementLayoutFeature(this);
       }
       else if (bo instanceof ISEDMethodCall) {
          return new MethodCallLayoutFeature(this);
@@ -318,11 +318,11 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDThread) {
          return new ThreadLayoutFeature(this);
       }
-      else if (bo instanceof ISEDUseOperationContract) {
-         return new UseOperationContractLayoutFeature(this);
+      else if (bo instanceof ISEDOperationContract) {
+         return new OperationContractLayoutFeature(this);
       }
-      else if (bo instanceof ISEDUseLoopInvariant) {
-         return new UseLoopInvariantLayoutFeature(this);
+      else if (bo instanceof ISEDLoopInvariant) {
+         return new LoopInvariantLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

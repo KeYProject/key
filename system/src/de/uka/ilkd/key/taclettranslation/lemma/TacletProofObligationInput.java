@@ -115,6 +115,9 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
         properties.setProperty(IPersistablePO.PROPERTY_NAME, name());
 
+        // TODO MU ----- make the file names relative
+        // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
+
         if (tacletFile != null) {
             properties.setProperty("tacletFile", tacletFile);
         }

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.array(w,array);" pathCondition="true" pathConditionChanged="false">
       <statement name="w.value=1;" pathCondition="true" pathConditionChanged="false">
          <statement name="array[0].value=2;" pathCondition="true" pathConditionChanged="false">
             <statement name="array[1].value=3;" pathCondition="true" pathConditionChanged="false">
                <statement name="return w.value+array[0].value+array[1].value;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	9 {array[0] = w &amp; array[1] = w}, 
-	7 {  array[0] = w &amp; !array[1] = w
-| !array[0] = w
-&amp; array[1] = array[0]}, 
+	9 {array[0] = w &amp; array[1] = array[0]}, 
+	7 {  !array[0] = w &amp; array[1] = array[0]
+| array[0] = w
+&amp; !array[1] = array[0]}, 
 	8 {!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]}, 
 	6 {!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]}
 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
-                     <methodReturnValue name="9 {array[0] = w &amp; array[1] = w}" returnValueString="9" hasCondition="true" conditionString="array[0] = w &amp; array[1] = w">
+                     <methodReturnValue name="9 {array[0] = w &amp; array[1] = array[0]}" returnValueString="9" hasCondition="true" conditionString="array[0] = w &amp; array[1] = array[0]">
                      </methodReturnValue>
-                     <methodReturnValue name="7 {  array[0] = w &amp; !array[1] = w
-| !array[0] = w
-&amp; array[1] = array[0]}" returnValueString="7" hasCondition="true" conditionString="  array[0] = w &amp; !array[1] = w
-| !array[0] = w
-&amp; array[1] = array[0]">
+                     <methodReturnValue name="7 {  !array[0] = w &amp; array[1] = array[0]
+| array[0] = w
+&amp; !array[1] = array[0]}" returnValueString="7" hasCondition="true" conditionString="  !array[0] = w &amp; array[1] = array[0]
+| array[0] = w
+&amp; !array[1] = array[0]">
                      </methodReturnValue>
                      <methodReturnValue name="8 {!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]}" returnValueString="8" hasCondition="true" conditionString="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]">
                      </methodReturnValue>
@@ -33,4 +33,4 @@ as result of self.array(w,array);&gt;" isReturnValueComputed="true">
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

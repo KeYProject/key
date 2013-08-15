@@ -214,8 +214,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars);
 
          final Term post = TB.and(postTerm, frameTerm);
+         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+         final Term selfVarTerm = selfVar==null? null: TB.var(selfVar);
+         final Term globalUpdate = getGlobalDefs(baseHeap, TB.getBaseHeap(services), selfVarTerm, TB.var(paramVars), services);
+
          final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar, exceptionVar, atPreVars, post, sb);
-         termPOs.add(TB.imp(pre, progPost));
+         final Term preImpliesProgPost = TB.imp(pre, progPost);
+         final Term applyGlobalUpdate = globalUpdate==null? preImpliesProgPost: TB.apply(globalUpdate, preImpliesProgPost);
+         termPOs.add(applyGlobalUpdate);
          if (poNames != null) {
             poNames[nameIndex++] = buildPOName(transactionFlag);
          }
@@ -422,6 +428,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    Map<LocationVariable, LocationVariable> atPreVars,
                                    Services services);
 
+   protected abstract Term getGlobalDefs (LocationVariable heap, Term heapTerm, Term selfTerm, ImmutableList<Term> paramTerms, Services services);
+
    /**
     * Checks if an uninterpreted predicate is added to the postcondition or not.
     * @return {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
@@ -528,7 +536,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // label modality if required
       if (addSymbolicExecutionLabel) {
-         programTerm = TB.label(programTerm, new SymbolicExecutionTermLabel(SymbolicExecutionTermLabel.START_ID));
+         int labelID = services.getCounter(SymbolicExecutionTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+         programTerm = TB.label(programTerm, new SymbolicExecutionTermLabel(labelID));
       }
 
       // create update

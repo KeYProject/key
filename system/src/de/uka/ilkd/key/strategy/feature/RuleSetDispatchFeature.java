@@ -73,7 +73,7 @@ public class RuleSetDispatchFeature implements Feature {
         if ( combinedF == null )
             combinedF = f;
         else
-            combinedF = BinarySumFeature.createSum ( combinedF, f );
+            combinedF = SumFeature.createSum ( combinedF, f );
 
         rulesetToFeature.put ( ruleSet, combinedF );
     }

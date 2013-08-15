@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ArraySumWhileWithException.sum(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
+            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
@@ -35,7 +35,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
    &amp; array.length &gt;= i_0
    &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <branchNode name="if (array.length==3) {throw new RuntimeException (); }" pathCondition="   array.length &gt;= 0
+                        <branchStatement name="if (array.length==3) {throw new RuntimeException (); }" pathCondition="   array.length &gt;= 0
 -&gt;   i_0 &gt;= 0
    &amp; array.length &gt;= 1 + i
    &amp; array.length &gt;= i_0
@@ -79,7 +79,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
    &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" terminationKind="LOOP_BODY">
                               </termination>
                            </branchCondition>
-                        </branchNode>
+                        </branchStatement>
                      </statement>
                   </statement>
                </branchCondition>
@@ -118,8 +118,8 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </useLoopInvariant>
+            </loopInvariant>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

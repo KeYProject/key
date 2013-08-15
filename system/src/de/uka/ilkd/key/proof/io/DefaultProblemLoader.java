@@ -76,7 +76,7 @@ public class DefaultProblemLoader {
     * The {@link KeYMediator} to use.
     */
    private KeYMediator mediator;
-   
+
    /**
     * The {@link Profile} to use for new {@link Proof}s.
     */
@@ -126,11 +126,10 @@ public class DefaultProblemLoader {
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible.
     * @param registerProof Register loaded {@link Proof} in {@link GlobalProofMgt}?
-    * @return An error message or {@code ""} (empty string) if everything is fine.
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public String load(boolean registerProof) throws ProblemLoaderException {
+   public ProblemLoaderException load(boolean registerProof) throws ProblemLoaderException {
       try {
          // Read environment
       boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
@@ -150,7 +149,7 @@ public class DefaultProblemLoader {
                replayProof(proof);
             }
             // this message is propagated to the top level in console mode
-            return ""; // Everything fine
+            return null; // Everything fine
          }
          finally {
     	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
@@ -312,7 +311,7 @@ public class DefaultProblemLoader {
     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
     * @return An error message or {@code null} if everything is fine.
     */
-   protected String selectProofObligation() {
+   protected ProblemLoaderException selectProofObligation() {
       return null; // Do nothing
    }
 
@@ -342,15 +341,15 @@ public class DefaultProblemLoader {
          errors = parser.getErrors();
       }
 
-      if ("".equals(status)) { 
+      if ("".equals(status)) {
           mediator.getUI().resetStatus(this);
       } else {
-          mediator.getUI().reportStatus(this, status);         
+          mediator.getUI().reportStatus(this, status);
           if (errors != null &&
-                  !errors.isEmpty()) { 
-              throw new ProblemLoaderException(this, 
-                      "Proof could only be loaded partially. In summary " + errors.size() + 
-                      " not loadable rule application(s) have been detected." + 
+                  !errors.isEmpty()) {
+              throw new ProblemLoaderException(this,
+                      "Proof could only be loaded partially. In summary " + errors.size() +
+                      " not loadable rule application(s) have been detected." +
                       "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
           }
       }

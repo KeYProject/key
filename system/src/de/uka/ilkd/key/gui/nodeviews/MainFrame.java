@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -36,7 +37,9 @@ import javax.swing.border.TitledBorder;
  * @author Kai Wallisch
  */
 @SuppressWarnings("serial")
-public class MainFrame extends JScrollPane {
+public final class MainFrame extends JScrollPane {
+    
+    private final MainWindow mainWindow;
 
     public void setSequentView(SequentView sequentView) {
         Point oldViewpointPosition = getViewport().getViewPosition();
@@ -44,14 +47,14 @@ public class MainFrame extends JScrollPane {
         getViewport().setViewPosition(oldViewpointPosition);
 
         // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
-        ProofTreeView ptv = MainWindow.getInstance().getProofView();
+        ProofTreeView ptv = mainWindow.getProofView();
         if (ptv != null) {
             ptv.tacletInfoToggle.setSequentView(sequentView);
         }
     }
 
-    public MainFrame() {
-
+    public MainFrame(final MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
         setBorder(new EmptyBorder(0, 0, 0, 0));
         getVerticalScrollBar().setUnitIncrement(30);
         getHorizontalScrollBar().setUnitIncrement(30);
@@ -62,11 +65,15 @@ public class MainFrame extends JScrollPane {
                 "copy");
         getActionMap().put("copy", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                GuiUtilities.copyHighlightToClipboard(MainWindow.getInstance().leafNodeView);
+                // FIXME: Can this ever be reached ?!?! (MU 2013)
+                PosInSequent pos = mainWindow.leafNodeView.getMousePosInSequent();
+                if(pos != null) {
+                    GuiUtilities.copyHighlightToClipboard(mainWindow.leafNodeView, pos);
+                }
             }
         });
 
-        setSequentView(new EmptySequent());
+        setSequentView(new EmptySequent(mainWindow));
     }
 
     private static class MainFrameBody extends JPanel {
