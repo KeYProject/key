@@ -17,15 +17,12 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.junit.Test;
+import org.key_project.key4eclipse.test.util.SuspendingStopCondition;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartAutoModeHandler;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -250,83 +247,5 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
                    5,
                    false, 
                    steps);
-   }
-   
-   /**
-    * This {@link IStopCondition} can be used to block the the auto mode temporary.
-    * @author Martin Hentschel
-    */
-   private static class SuspendingStopCondition implements IStopCondition {
-      /**
-       * {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
-       */
-      private boolean sleep;
-      
-      /**
-       * The maximal number of allowed rules.
-       */
-      private int maxRules = 1000;
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
-         return 0;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-         if (sleep) {
-            TestUtilsUtil.sleep(100);
-         }
-         return countApplied <= this.maxRules;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
-         if (sleep) {
-            TestUtilsUtil.sleep(100);
-         }
-         return countApplied > this.maxRules;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
-         return null;
-      }
-
-      /**
-       * Defines if the current {@link Thread} should be blocked or not.
-       * @param sleep {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
-       */
-      public void setSleep(boolean sleep) {
-         this.sleep = sleep;
-      }
-
-      /**
-       * Sets the maximal number of allowed rules.
-       * @param maxRules The maximal number of allowed rules.
-       */
-      public void setMaxRules(int maxRules) {
-         this.maxRules = maxRules;
-      }
    }
 }

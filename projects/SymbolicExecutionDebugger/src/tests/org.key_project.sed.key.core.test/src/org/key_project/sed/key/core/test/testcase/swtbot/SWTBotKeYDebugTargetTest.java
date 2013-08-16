@@ -33,6 +33,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.test.util.SuspendingStopCondition;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
@@ -1123,6 +1124,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Resume launch
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             item.contextMenu("Resume").click();
+            SuspendingStopCondition sc = new SuspendingStopCondition(true, 1, 1000);
+            ((KeYDebugTarget)target).getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sc);
             TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
