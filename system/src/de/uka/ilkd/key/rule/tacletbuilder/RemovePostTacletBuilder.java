@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -26,19 +28,26 @@ import de.uka.ilkd.key.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /**
  *
  * @author christoph
  */
-public class RemovePostTacletBuilder {
+public class RemovePostTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     public static final Name REMOVE_POST_RULENAME = new Name("Remove_post");
 
     static final TermBuilder TB = TermBuilder.DF;
 
     private static final String SCHEMA_PREFIX = "sv_";
+
+
+    public RemovePostTacletBuilder(Services services) {
+        super(services);
+    }
+
 
     public ArrayList<Taclet> generateTaclets(Term post,
                                              IFProofObligationVars ifVars,
@@ -53,6 +62,14 @@ public class RemovePostTacletBuilder {
         ArrayList<Taclet> removePostTaclets = new ArrayList<Taclet>();
         int i = 0;
         for (Term postPart : postParts) {
+            // collect quantifaible variables of the postPart and replace them
+            // by schema variables
+            Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+                    collectQuantifiableVariables(postPart, services);
+            final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars);
+            postPart = or.replace(postPart);
+
+
             RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
             tacletBuilder.setName(new Name(REMOVE_POST_RULENAME + "_" + i));
             tacletBuilder.setFind(postPart);
@@ -62,6 +79,9 @@ public class RemovePostTacletBuilder {
                     new RewriteTacletGoalTemplate(TermBuilder.DF.ff());
             tacletBuilder.addTacletGoalTemplate(goal);
             tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
+            addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(), ifSchemaVars.c1);
+            addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(), ifSchemaVars.c2);
+
             removePostTaclets.add(tacletBuilder.getTaclet());
         }
         return removePostTaclets;
@@ -89,7 +109,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static final Term replace(Term term,
+    private final Term replace(Term term,
                                       IFProofObligationVars origVars,
                                       IFProofObligationVars schemaVars) {
         Term intermediateResult = replace(term, origVars.c1, schemaVars.c1);
@@ -97,7 +117,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static final Term replace(Term term,
+    private final Term replace(Term term,
                                       ProofObligationVars origVars,
                                       ProofObligationVars schemaVars) {
         Term intermediateResult = replace(term, origVars.pre, schemaVars.pre);
@@ -105,7 +125,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static final Term replace(Term term,
+    private final Term replace(Term term,
                                       StateVars origVars,
                                       StateVars schemaVars) {
         de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
@@ -137,7 +157,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static Pair<StateVars, StateVars> filter(StateVars origVars,
+    private Pair<StateVars, StateVars> filter(StateVars origVars,
                                                      StateVars schemaVars) {
         schemaVars = filterSchemaVars(origVars, schemaVars);
         origVars = filterSchemaVars(schemaVars, origVars);
@@ -145,7 +165,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static StateVars filterSchemaVars(StateVars origVars,
+    private StateVars filterSchemaVars(StateVars origVars,
                                               StateVars schemaVars) {
         if (origVars.termList.size() == schemaVars.termList.size()) {
             return schemaVars;
@@ -184,7 +204,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static IFProofObligationVars generateApplicationDataSVs(IFProofObligationVars ifVars,
+    private IFProofObligationVars generateApplicationDataSVs(IFProofObligationVars ifVars,
                                                                     Services services) {
         return new IFProofObligationVars(
                 generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c1, services),
@@ -193,7 +213,7 @@ public class RemovePostTacletBuilder {
     }
 
 
-    private static ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
+    private ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
                                                                   ProofObligationVars appData,
                                                                   Services services) {
         // generate a new schema variable for any pre variable
@@ -257,29 +277,5 @@ public class RemovePostTacletBuilder {
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post);
-    }
-
-
-    private static Term createTermSV(Term t,
-                                     String schemaPrefix,
-                                     Services services) {
-        if (t == null) {
-            return null;
-        }
-        String svName = schemaPrefix + t.toString();
-        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
-        Sort sort = t.sort();
-        return TB.var(SchemaVariableFactory.createTermSV(name, sort));
-    }
-
-
-    private static ImmutableList<Term> createTermSV(ImmutableList<Term> ts,
-                                                    String schemaPrefix,
-                                                    Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Term t : ts) {
-            result = result.append(createTermSV(t, schemaPrefix, services));
-        }
-        return result;
     }
 }
