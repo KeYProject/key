@@ -72,6 +72,10 @@ public class ProofEditorInput extends AbstractProofEditorInput {
       super(environment, method, proof.name().toString());
       Assert.isNotNull(proof);
       this.proof = proof;
+      this.canStartAutomode = canStartAutomode;
+      this.canApplyRules = canApplyRules;
+      this.canPruneProof = canPruneProof;
+      this.canStartSMTSolver = canStartSMTSolver;
    }
    
    /**

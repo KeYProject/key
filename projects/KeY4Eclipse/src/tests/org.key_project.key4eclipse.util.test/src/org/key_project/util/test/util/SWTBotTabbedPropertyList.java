@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.sed.ui.test.util;
+package org.key_project.util.test.util;
 
 import java.util.LinkedList;
 import java.util.List;

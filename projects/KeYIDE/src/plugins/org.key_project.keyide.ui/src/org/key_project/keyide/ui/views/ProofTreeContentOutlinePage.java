@@ -25,6 +25,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -45,7 +47,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class ProofTreeContentOutlinePage extends ContentOutlinePage {
+public class ProofTreeContentOutlinePage extends ContentOutlinePage implements ITabbedPropertySheetPageContributor {
    private Proof proof;
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
@@ -258,5 +260,13 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getContributorId() {
+      return KeYEditor.CONTRIBUTOR_ID;
    }
 }

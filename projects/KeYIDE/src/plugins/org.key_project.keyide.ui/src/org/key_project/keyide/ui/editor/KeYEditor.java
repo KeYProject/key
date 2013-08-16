@@ -15,6 +15,7 @@ package org.key_project.keyide.ui.editor;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,9 @@ import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -49,7 +53,9 @@ import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
+import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
@@ -69,12 +75,22 @@ import de.uka.ilkd.key.ui.UserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class KeYEditor extends TextEditor implements IProofProvider {
+public class KeYEditor extends TextEditor implements IProofProvider, ITabbedPropertySheetPageContributor, IBean {
    /**
     * The unique ID of this editor.
     */
    public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
+
+   /**
+    * The ID of this {@link ITabbedPropertySheetPageContributor}.
+    */
+   public static final String CONTRIBUTOR_ID = "org.key_project.keyide.ui.KeYPropertyContributor";
    
+   /**
+    * Property {@link #getSelectedPosInSequent()}.
+    */
+   public static final String PROP_SELECTED_POS_IN_SEQUENT = "selectedPosInSequent";
+
    /**
     * {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
     */
@@ -115,12 +131,15 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     */
    private Node currentNode; 
    
+   /**
+    * The used {@link ProofSourceViewerDecorator}.
+    */
    private ProofSourceViewerDecorator viewerDecorator;
 
    /**
     * The provided {@link ProofTreeContentOutlinePage}.
     */
-   private ProofTreeContentOutlinePage outline;
+   private ProofTreeContentOutlinePage outlinePage;
    
    /**
     * Contains the registered {@link IProofProviderListener}.
@@ -205,6 +224,11 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    };
    
    /**
+    * The used {@link PropertyChangeSupport}.
+    */
+   private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+   
+   /**
     * Constructor to initialize the ContextMenu IDs
     */
    public KeYEditor() {
@@ -229,8 +253,8 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       if (currentProof != null) {
          currentProof.removeProofTreeListener(proofTreeListener);
       }
-      if (outline != null) {
-         outline.dispose();         
+      if (outlinePage != null) {
+         outlinePage.dispose();         
       }
       if (currentProof != null) {
          ProofUserManager.getInstance().removeUserAndDispose(currentProof, this);
@@ -307,6 +331,12 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       getUI().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       ISourceViewer sourceViewer = getSourceViewer();
       viewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
+      viewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
+         @Override
+         public void propertyChange(PropertyChangeEvent evt) {
+            handleViewerDecoratorSelectedPosInSequentChanged(evt);
+         }
+      });
       getCurrentProof().addProofTreeListener(proofTreeListener);
       sourceViewer.setEditable(false);
       if (this.getCurrentNode() != null) {
@@ -318,6 +348,14 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       }
    }
    
+   /**
+    * When the selected {@link PosInSequent} in {@link #viewerDecorator} has changed.
+    * @param evt The event.
+    */
+   protected void handleViewerDecoratorSelectedPosInSequentChanged(PropertyChangeEvent evt) {
+      firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, evt.getOldValue(), evt.getNewValue());
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -532,11 +570,14 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
       if (IContentOutlinePage.class.equals(adapter)) {
          synchronized (this) {
-            if (outline == null) {
-               outline = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment());
+            if (outlinePage == null) {
+               outlinePage = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment());
             }
          }
-         return outline;
+         return outlinePage;
+      }
+      else if (IPropertySheetPage.class.equals(adapter)) {
+         return new TabbedPropertySheetPage(this);
       }
       else if (Proof.class.equals(adapter)) {
          return getCurrentProof();
@@ -624,5 +665,173 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       for (IProofProviderListener l : toInform) {
          l.currentProofsChanged(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    * @return
+    */
+   @Override
+   public String getContributorId() {
+      return CONTRIBUTOR_ID;
+   }
+
+   /**
+    * Returns the used {@link PropertyChangeSupport}.
+    * @return the used {@link PropertyChangeSupport}.
+    */
+   protected PropertyChangeSupport getPcs() {
+       return pcs;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addPropertyChangeListener(PropertyChangeListener listener) {
+       pcs.addPropertyChangeListener(listener);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+       pcs.addPropertyChangeListener(propertyName, listener);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removePropertyChangeListener(PropertyChangeListener listener) {
+       pcs.removePropertyChangeListener(listener);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+       pcs.removePropertyChangeListener(propertyName, listener);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PropertyChangeListener[] getPropertyChangeListeners() {
+       return pcs.getPropertyChangeListeners();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+       return pcs.getPropertyChangeListeners(propertyName);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListeners() {
+       return getPropertyChangeListeners().length >= 1;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListeners(String propertyName) {
+       return pcs.hasListeners(propertyName);
+   }
+   
+   /**
+    * Fires the event to all available listeners.
+    * @param propertyName The property name.
+    * @param index The changed index.
+    * @param oldValue The old value.
+    * @param newValue The new value.
+    */
+   protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
+       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+   }
+   
+   /**
+    * Fires the event to all available listeners.
+    * @param propertyName The property name.
+    * @param index The changed index.
+    * @param oldValue The old value.
+    * @param newValue The new value.
+    */
+   protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
+       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+   }
+   
+   /**
+    * Fires the event to all available listeners.
+    * @param propertyName The property name.
+    * @param index The changed index.
+    * @param oldValue The old value.
+    * @param newValue The new value.
+    */    
+   protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
+       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+   }
+   
+   /**
+    * Fires the event to all listeners.
+    * @param evt The event to fire.
+    */
+   protected void firePropertyChange(PropertyChangeEvent evt) {
+       pcs.firePropertyChange(evt);
+   }
+   
+   /**
+    * Fires the event to all listeners.
+    * @param propertyName The changed property.
+    * @param oldValue The old value.
+    * @param newValue The new value.
+    */
+   protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+       pcs.firePropertyChange(propertyName, oldValue, newValue);
+   }
+   
+   /**
+    * Fires the event to all listeners.
+    * @param propertyName The changed property.
+    * @param oldValue The old value.
+    * @param newValue The new value.
+    */
+   protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
+       pcs.firePropertyChange(propertyName, oldValue, newValue);
+   }
+   
+   /**
+    * Fires the event to all listeners.
+    * @param propertyName The changed property.
+    * @param oldValue The old value.
+    * @param newValue The new value.
+    */
+   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+       pcs.firePropertyChange(propertyName, oldValue, newValue);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListener(PropertyChangeListener listener) {
+       return ArrayUtil.contains(getPropertyChangeListeners(), listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasListener(String propertyName, PropertyChangeListener listener) {
+       return ArrayUtil.contains(getPropertyChangeListeners(propertyName), listener);
    }
 }

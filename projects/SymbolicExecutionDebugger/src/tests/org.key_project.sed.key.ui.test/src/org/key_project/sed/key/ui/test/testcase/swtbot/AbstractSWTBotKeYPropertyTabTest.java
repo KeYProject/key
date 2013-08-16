@@ -27,7 +27,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.ui.test.Activator;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**

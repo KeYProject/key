@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -172,35 +173,40 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
              printer=null;
         RuleApp app = node.getAppliedRuleApp();
              s += "\nNode Nr "+node.serialNr()+"\n";
-             
-        if ( app != null ) {
-            s = s + "\n \nUpcoming rule application: \n";
-            if (app.rule() instanceof Taclet) {
-           LogicPrinter tacPrinter = new LogicPrinter 
-               (new ProgramPrinter(null),                        
-                mediator.getNotationInfo(),
-                mediator.getServices(),
-                true);  
-           tacPrinter.printTaclet((Taclet)(app.rule()));    
-           s += tacPrinter;
-            } else {
-              s = s + app.rule();
-            }
+             s += ruleToString(mediator, app, true);
 
-            if ( app instanceof TacletApp ) {
-           TacletApp tapp = (TacletApp)app;
-           if ( tapp.instantiations ().getGenericSortInstantiations () !=
-                GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
-               s = s + "\n\nWith sorts:\n";
-               s = s +
-              tapp.instantiations ().getGenericSortInstantiations ();
-           }
-
-           StringBuffer sb = new StringBuffer("\n\n");
-           s = s + sb;
-            }        
-        }
         return s;
+   }
+   
+   public static String ruleToString(KeYMediator mediator, RuleApp app, boolean withHeadder) {
+      String s = StringUtil.EMPTY_STRING;
+      if ( app != null ) {
+         if (withHeadder) {
+            s = s + "\n \nUpcoming rule application: \n";
+         }
+         if (app.rule() instanceof Taclet) {
+        LogicPrinter tacPrinter = new LogicPrinter 
+            (new ProgramPrinter(null),                        
+             mediator.getNotationInfo(),
+             mediator.getServices(),
+             true);  
+        tacPrinter.printTaclet((Taclet)(app.rule()));    
+        s += tacPrinter;
+         } else {
+           s = s + app.rule();
+         }
+
+         if ( app instanceof TacletApp ) {
+        TacletApp tapp = (TacletApp)app;
+        if ( tapp.instantiations ().getGenericSortInstantiations () !=
+             GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
+            s = s + "\n\nWith sorts:\n";
+            s = s +
+           tapp.instantiations ().getGenericSortInstantiations ();
+        }
+         }        
+     }
+      return s;
    }
    
    protected void setGreenBackground(PosInOccurrence pos){

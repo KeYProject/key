@@ -122,19 +122,7 @@ public class ProofTreeLabelProvider extends LabelProvider {
    public String getText(Object element){
       if(element instanceof Node) {
          Node node = (Node)element;
-         // Return text to show
-         if(node.childrenCount() == 1) {
-            Node child = node.child(0);
-            if (child.getNodeInfo().getBranchLabel() != null) {
-               return node.serialNr() + ":" + node.name() + ": " + child.getNodeInfo().getBranchLabel();
-            }
-            else {
-               return node.serialNr() + ":" + node.name();
-            }
-         }
-         else {
-            return node.serialNr() + ":" + node.name();
-         }
+         return getNodeText(node);
       }
       else if(element instanceof BranchFolder){
          BranchFolder folder = (BranchFolder)element;
@@ -143,6 +131,21 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
       else {
          return ObjectUtil.toString(element);
+      }
+   }
+   
+   public static String getNodeText(Node node) {
+      if(node.childrenCount() == 1) {
+         Node child = node.child(0);
+         if (child.getNodeInfo().getBranchLabel() != null) {
+            return node.serialNr() + ":" + node.name() + ": " + child.getNodeInfo().getBranchLabel();
+         }
+         else {
+            return node.serialNr() + ":" + node.name();
+         }
+      }
+      else {
+         return node.serialNr() + ":" + node.name();
       }
    }
    
