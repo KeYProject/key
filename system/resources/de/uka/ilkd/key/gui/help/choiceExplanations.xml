@@ -123,20 +123,9 @@ Not to be confused with intRules, which controls the semantics of the Java type 
 <entry key="optimisedSelectRules">
 The optimised select rules can be turned off by setting this option to off.
 
-The non-optimised rules use inplace rewriting for the evaluation of
-select-terms. This may lead to heap-terms growing exponentielly in
-the number of anons/stores to be evaluated. However, in some rar
-cases the usage of the non-optimised rules may lead more
-human-readable sequents.
+The non-optimised rules use in-place rewriting for the evaluation of select terms. This may lead to heap terms growing exponentially in the number of anons/stores to be evaluated. However, in some rare cases the usage of the non-optimised rules may lead to more human-readable sequents.
 
-The optimised rules pullout select-terms before they evaluate them.
-Because other occurences of the same select-term are replaced by the
-skolem constant introduced by the pullout-rule (application of
-equalities), each select-term has to be evaluated only once.
-Intelligent hiding of no longer needed auxiliary equations holds the
-sequent human-readable and increases performance. The result of the
-evaluation of a select-term is stored such that it can be reapplied
-immediately if the same select-term occurs again.
+The optimised rules pull out select-terms before they evaluate them. Because other occurences of the same select-term are replaced by the skolem constant introduced by the pullout-rule (application of equalities), each select term has to be evaluated only once. Intelligent hiding of no longer needed auxiliary equations holds the sequent human-readable and increases performance. The result of the evaluation of a select term is stored such that it can be reapplied immediately if the same select term occurs again.
 </entry>
 
 </properties>
