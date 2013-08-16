@@ -357,7 +357,7 @@ public class BlockContractRule implements BuiltInRule {
             // and associated taclet
             final Term contractApplTerm =
                     ifContractBuilder.buildContractApplPredTerm();
-            Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
+            Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
             // generate proof obligation variables
             final StateVars instantiationPreVars =

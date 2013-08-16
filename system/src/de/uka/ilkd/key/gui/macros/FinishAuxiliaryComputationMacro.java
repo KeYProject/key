@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfouldTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -66,13 +67,16 @@ public class FinishAuxiliaryComputationMacro
                 (InfFlowContractPO) services.getSpecificationRepository()
                                          .getPOForProof(initiatingProof);
         final IFProofObligationVars ifVars = ifPO.getIFVars();
-        final IFProofObligationVars ifSchemaVars =
-                generateApplicationDataSVs(ifPO.getIFVars(), proof.getServices());
         final InformationFlowContract ifContract = ifPO.getContract();
 
         // create and register resulting taclets
-        final Term result = calculateResultingSVTerm(proof, ifVars, ifSchemaVars, initiatingGoal);
-        final Taclet rwTaclet = generateRewriteTaclet(result, ifContract, ifSchemaVars, services);
+        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final MethodInfFlowUnfouldTacletBuilder tacletBuilder =
+                new MethodInfFlowUnfouldTacletBuilder(services);
+        tacletBuilder.setContract(ifContract);
+        tacletBuilder.setInfFlowVars(ifVars);
+        tacletBuilder.setReplacewith(result);
+        final Taclet rwTaclet = tacletBuilder.buildTaclet();
         initiatingGoal.proof().addLabeledTotalTerm(result);
         initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
@@ -91,37 +95,5 @@ public class FinishAuxiliaryComputationMacro
                 mediator.stopInterface(true);
             }
         });        
-    }
-
-
-    private Taclet generateRewriteTaclet(Term replacewith,
-                                         InformationFlowContract contract,
-                                         IFProofObligationVars ifVars,
-                                         Services services) {
-        final Name tacletName =
-                MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
-                                            contract.getTarget().getFullName());
-        i++;
-
-        // create find term
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract,
-                                                   ifVars.c1, ifVars.c2,
-                                                   services);
-        final Term find =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-
-        //create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(tacletName);
-        tacletBuilder.setFind(find);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
-        final RewriteTacletGoalTemplate goal =
-                new RewriteTacletGoalTemplate(replacewith);
-        tacletBuilder.addTacletGoalTemplate(goal);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));
-        tacletBuilder.setSurviveSmbExec(true);
-
-        return tacletBuilder.getTaclet();
     }
 }

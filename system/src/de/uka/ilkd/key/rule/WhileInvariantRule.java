@@ -488,7 +488,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();
         final Taclet informationFlowInvariantApp =
-                ifInvariantBuilder.buildContractApplTaclet();
+                ifInvariantBuilder.buildTaclet();
 
         // generate proof obligation variables
         final StateVars instantiationPreVars =

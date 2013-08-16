@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.LoopInfFlowUnfouldTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -64,12 +65,15 @@ public class FinishAuxiliaryLoopComputationMacro extends
         LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
-        final IFProofObligationVars ifSchemaVars =
-                generateApplicationDataSVs(ifVars, proof.getServices());
 
         // create and register resulting taclets
-        final Term result = calculateResultingSVTerm(proof, ifVars, ifSchemaVars, initiatingGoal);
-        final Taclet rwTaclet = generateRewriteTaclet(result, loopInv, ifSchemaVars, services);
+        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final LoopInfFlowUnfouldTacletBuilder tacletBuilder =
+                new LoopInfFlowUnfouldTacletBuilder(services);
+        tacletBuilder.setLoopInv(loopInv);
+        tacletBuilder.setInfFlowVars(ifVars);
+        tacletBuilder.setReplacewith(result);
+        final Taclet rwTaclet = tacletBuilder.buildTaclet();
         initiatingGoal.proof().addLabeledTotalTerm(result);
         initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);

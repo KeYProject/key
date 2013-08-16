@@ -506,7 +506,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         // generate information flow contract application predicate
         // and associated taclet
         Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
-        Taclet informationFlowContractApp = ifContractBuilder.buildContractApplTaclet();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
 
         // add term and taclet to post goal
         goal.addFormula(new SequentFormula(contractApplPredTerm),
