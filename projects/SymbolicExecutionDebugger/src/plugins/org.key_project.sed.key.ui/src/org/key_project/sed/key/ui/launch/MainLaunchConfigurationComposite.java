@@ -596,9 +596,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
            if (method != null && method.exists()) {
                IProject project = method.getResource().getProject();
                // Get source paths from class path
-               List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-               Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
-               final File location = sourcePaths.get(0);
+               final File location = KeYUtil.getSourceLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                // Load location

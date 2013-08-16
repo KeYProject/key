@@ -82,7 +82,7 @@ public class ProofManager {
       mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append("Proofs"));
       this.project = project;
       try {
-         File location = ResourceUtil.getLocation(project);
+         File location = KeYUtil.getSourceLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
          List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
          environment = KeYEnvironment.load(location, classPaths, bootClassPath);

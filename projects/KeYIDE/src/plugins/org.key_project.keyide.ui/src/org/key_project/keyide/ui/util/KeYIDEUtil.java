@@ -40,7 +40,6 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -86,7 +85,7 @@ public final class KeYIDEUtil {
            if (method != null && method.exists()) {
                // Load location
                final IProject project = method.getResource().getProject();
-               final File location = ResourceUtil.getLocation(project);
+               final File location = KeYUtil.getSourceLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                  
