@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -107,7 +108,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
       boolean applicable = false;
       if (pio != null) {
           // abort if inside of transformer
-          if (inTransformer(pio)) {
+          if (TransformerProcedure.inTransformer(pio)) {
               return false;
           }
          Term term = pio.subTerm();

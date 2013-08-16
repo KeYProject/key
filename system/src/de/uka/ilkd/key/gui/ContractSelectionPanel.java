@@ -32,6 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 
 /**
@@ -165,9 +166,15 @@ class ContractSelectionPanel extends JPanel {
         //sort contracts by id (for the user's convenience)
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
-                final int res = c1.id() - c2.id();
-                final int altRes = c1.hashCode() - c2.hashCode();
-                return (res != 0) ? res : altRes;
+                int res = c1.id() - c2.id();
+                if (res == 0) {
+                    if (c1 instanceof WellDefinednessCheck) {
+                        return 1;
+                    } else if (c2 instanceof WellDefinednessCheck) {
+                        return -1;
+                    }
+                }
+                return res;
             }
         });
 

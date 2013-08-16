@@ -23,15 +23,14 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
                          SVInstantiations instMap, Services services) {
-        Object o = instMap.getInstantiation(field);
-        assert o instanceof Term;
-        Term f = (Term)o;
-        Operator op = f.op();
+        final Object o = instMap.getInstantiation(field);
+        if (o == null || !(o instanceof Term)) {
+            return false;
+        }
+        final Term f = (Term)o;
+        final Operator op = f.op();
         if (op instanceof Function) {
-            String name = ((Function) op).name().toString();
-
-            String className;
-            String attributeName;
+            final String name = ((Function) op).name().toString();
 
             // check for normal attribute
             int endOfClassName = name.indexOf("::$");
@@ -49,10 +48,10 @@ public class StaticFieldCondition extends VariableConditionAdapter {
                 return false;
             }
 
-            className     = name.substring(0, endOfClassName);
-            attributeName = name.substring(startAttributeName);
+            final String className     = name.substring(0, endOfClassName);
+            final String attributeName = name.substring(startAttributeName);
 
-            ProgramVariable attribute =
+            final ProgramVariable attribute =
                     services.getJavaInfo().getAttribute(attributeName, className);
 
             if (attribute == null) {

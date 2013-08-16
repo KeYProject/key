@@ -4,6 +4,9 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -45,5 +48,20 @@ public class TransformerProcedure extends Function {
                               Sort.FORMULA,
                               new ImmutableArray<Sort>(argSort),
                               services);
+    }
+
+    public static boolean inTransformer(PosInOccurrence pio) {
+        boolean trans = false;
+        if ( pio.posInTerm () != null ) {
+            PIOPathIterator it = pio.iterator ();
+            Operator        op;
+
+            while ( it.next () != -1 && !trans) {
+                final Term t = it.getSubTerm ();
+                op = t.op ();
+                trans = op instanceof TransformerProcedure;
+            }
+        }
+        return trans;
     }
 }

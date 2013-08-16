@@ -58,7 +58,6 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -545,39 +544,6 @@ public class TacletGenerator {
 
         result = result.add(tacletBuilder.getTaclet());
         return result;
-    }
-
-
-    public Taclet generateWdInvTaclet(Name name,
-                                      List<SchemaVariable> heapSVs,
-                                      SchemaVariable selfSV,
-                                      Term term,
-                                      Term req,
-                                      KeYJavaType kjt,
-                                      boolean isStatic,
-                                      Services services) {
-        final Term[] hs = new Term[heapSVs.size()];
-        int i = 0;
-        for(SchemaVariable heapSV : heapSVs) {
-            hs[i++] = TB.var(heapSV);
-        }
-        //create taclet
-        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        final Term self = isStatic ? null : TB.var(selfSV);
-        final Term invTerm = isStatic ?
-                TB.staticInv(services, hs, kjt) : TB.inv(services, hs, self);
-        final Term wdSelf = isStatic ?
-                TB.tt() : WellDefinednessCheck.wd(self, services);
-        final Term notNull = isStatic ?
-                TB.tt() : TB.not(TB.equals(TB.var(selfSV), TB.NULL(services)));
-        final Term created = isStatic ?
-                TB.tt() : TB.created(services, TB.var(selfSV));
-
-        tb.setFind(WellDefinednessCheck.wd(invTerm, services));
-        tb.setName(name);
-        tb.addRuleSet(new RuleSet(new Name("simplify")));
-        tb.addGoalTerm(TB.andSC(notNull, wdSelf, created, req));
-        return tb.getTaclet();
     }
 
 

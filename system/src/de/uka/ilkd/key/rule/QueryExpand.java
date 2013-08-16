@@ -624,7 +624,7 @@ public class QueryExpand implements BuiltInRule {
               return false;
             }
             // abort if inside of transformer
-            if (inTransformer(pio)) {
+            if (TransformerProcedure.inTransformer(pio)) {
                 return false;
             }
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
@@ -643,24 +643,6 @@ public class QueryExpand implements BuiltInRule {
             }
         }
         return false;
-    }
-
-    static boolean inTransformer(PosInOccurrence pio) {
-        boolean trans = false;
-        if (pio == null) {
-            return trans;
-        }
-        if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
-            Operator        op;
-
-            while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
-                op = t.op ();
-                trans = op instanceof TransformerProcedure;
-            }
-        }
-        return trans;
     }
 
     private void storeTimeOfQuery(Term query, Goal goal){

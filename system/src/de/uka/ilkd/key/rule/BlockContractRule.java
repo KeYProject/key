@@ -130,7 +130,7 @@ public class BlockContractRule implements BuiltInRule {
             return false;
         }
         // abort if inside of transformer
-        if (inTransformer(occurrence)) {
+        if (TransformerProcedure.inTransformer(occurrence)) {
             return false;
         }
         final Instantiation instantiation =
@@ -141,24 +141,6 @@ public class BlockContractRule implements BuiltInRule {
         final ImmutableSet<BlockContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
         return !contracts.isEmpty();
-    }
-
-    static boolean inTransformer(PosInOccurrence pio) {
-        boolean trans = false;
-        if (pio == null) {
-            return trans;
-        }
-        if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
-            Operator        op;
-
-            while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
-                op = t.op ();
-                trans = op instanceof TransformerProcedure;
-            }
-        }
-        return trans;
     }
 
     private boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence)

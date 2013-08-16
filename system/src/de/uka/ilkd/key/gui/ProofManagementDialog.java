@@ -521,9 +521,8 @@ public final class ProofManagementDialog extends JDialog {
 	if (pan == contractPanelByMethod) {
 	    final ClassTree.Entry entry = classTree.getSelectedEntry();
 	    if(entry != null && entry.target != null) {
-		final ImmutableSet<Contract> contracts 
-			= specRepos.getContracts(entry.kjt, entry.target)
-			.union(specRepos.getWdContracts(entry.kjt, entry.target));
+		final ImmutableSet<Contract> contracts
+			= specRepos.getContracts(entry.kjt, entry.target);
 		pan.setContracts(contracts, "Contracts");
 	    } else {
 		pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");

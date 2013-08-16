@@ -266,7 +266,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         // (then there starts the wd check stuff probably)
 
         //read DL library specs before any other specs
-        createDLLibrarySpecs();        
+        createDLLibrarySpecs();
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();

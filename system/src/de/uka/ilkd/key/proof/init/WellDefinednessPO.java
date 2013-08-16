@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.proof.init;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -10,7 +8,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -19,24 +16,25 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvWellDefinedness;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.Precondition;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
@@ -61,19 +59,22 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
+        final KeYJavaType kjt = getCalleeKeYJavaType();
         final POTerms po = replace(check.createPOTerms());
-        final Term pre = getPre(po.pre);
+        final Term pre = getPre(po.pre, getTarget());
+
+        final Term post = getPost(po.post);
         final Term[] updates = getUpdates(po.mod);
         final Term poTerms = TB.and(wd(pre),
                                     TB.imp(pre,
                                            TB.and(wd(po.mod),
                                                   TB.and(wd(po.rest)),
-                                           TB.applySequential(updates, wd(po.post)))));
+                                           TB.applySequential(updates, wd(post)))));
+        generateTaclets();
         assignPOTerms(poTerms);
 
         // add axioms
-        collectWdClassInvariants();
-        collectClassAxioms(getCalleeKeYJavaType());
+        collectClassAxioms(kjt);
     }
 
     @Override
@@ -109,19 +110,41 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return new Term[] {oldUpd, havocUpd};
     }
 
-    private Term getPre(final Precondition pre) {
+    private Term getPre(final Precondition pre, IObserverFunction target) {
         final ImmutableList<Term> preTerms =
                 buildImplicitAndFreePre(pre.implicit).append(pre.explicit);
-        return TB.andSC(preTerms);
+        Term res = TB.andSC(preTerms);
+        if (target instanceof IProgramMethod &&
+                ((IProgramMethod)target).isConstructor()) {
+            return appendFreePreForConstructor(res);
+        } else {
+            return res;
+        }
     }
 
-    /**
-     * Returns the base heap.
-     * @return The {@link LocationVariable} which contains the base heap.
-     */
-    private LocationVariable getHeap() {
-        assert this.check != null;
-        return check.getHeap();
+    private Term appendFreePreForConstructor(Term pre) {
+        assert isConstructor();
+        if (JMLInfoExtractor.isHelper((IProgramMethod)getTarget())) {
+            return pre;
+        }
+        final Term self = TB.var(vars.self);
+        final KeYJavaType selfKJT = getCalleeKeYJavaType();
+        final Term notNull = getTarget().isStatic() ?
+                TB.tt() : TB.not(TB.equals(self, TB.NULL(services)));
+        final Term created = TB.created(services, vars.heap, self);
+        final Term selfExactType =
+                TB.exactInstance(services, selfKJT.getSort(), self);
+        return TB.andSC(pre, notNull, created, selfExactType);
+    }
+
+    private Term getPost(Term post) {
+        final Term implicit;
+        if (vars.result != null) {
+            implicit = TB.reachableValue(services, vars.result);
+        } else {
+            implicit = TB.tt();
+        }
+        return TB.andSC(implicit, post);
     }
 
     private Term buildAnonHeap(ProgramVariable heap) {
@@ -130,12 +153,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(anonHeapFunc);
         final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
         return anonHeap;
-    }
-
-    private List<LocationVariable> getHeaps() {
-        List<LocationVariable> result = new ArrayList<LocationVariable>(1);
-        result.add(getHeap());
-        return result;
     }
 
     private ProgramVariable getSelf() {
@@ -147,13 +164,12 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private Map<LocationVariable, ProgramVariable> getAtPres() {
-        Map<LocationVariable, ProgramVariable> res =
+        final Map<LocationVariable, ProgramVariable> res =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
-        Map<LocationVariable, LocationVariable> atPres =
-                HeapContext.getBeforeAtPreVars(getHeaps(), services, "AtPre");
-        for (LocationVariable h: atPres.keySet()) {
-            res.put(h, atPres.get(h));
-        }
+        final LocationVariable heap = check.getHeap();
+        final ProgramVariable atPre =
+                TB.heapAtPreVar(services, heap.name()+"AtPre", heap.sort(), true);
+        res.put(heap, atPre);
         return res;
     }
 
@@ -211,7 +227,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final ProgramVariable exception;
         final Map<LocationVariable, ProgramVariable> atPres;
         final ImmutableList<ProgramVariable> params;
-        final LocationVariable heap = getHeap();
 
         if (vars.self != null) {
             self = getSelf();
@@ -239,14 +254,14 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             params = null;
         }
 
-        return new Variables(self, result, exception, atPres, params, heap);
+        return new Variables(self, result, exception, atPres, params, check.getHeap());
     }
 
     public Term wd(Term t) {
         return WellDefinednessCheck.wd(t, services);
     }
 
-    public Term wd(ImmutableList<Term> l) {
+    public Term wd(Iterable<Term> l) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         for (Term t: l) {
             res = res.append(wd(t));
@@ -254,29 +269,122 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return TB.and(res);
     }
 
-    private void collectWdClassInvariants() {
-        IObserverFunction target = getTarget();
-        KeYJavaType selfKJT = getCalleeKeYJavaType();
-        ImmutableSet<ClassInvWellDefinedness> invs =
-                specRepos.getWdClassInvariants(selfKJT, target);
-        if(invs.isEmpty()) {
-            Term inv = TB.tt();
-            final SchemaVariable selfSV = target.isStatic() ?
-                    null : SchemaVariableFactory.createTermSV(new Name("self"),
-                                                              getCalleeKeYJavaType().getSort());
-            ClassInvariant ci = new ClassInvariantImpl(name, check.getDisplayName(), selfKJT,
-                                                       new Public(), inv, selfSV);
-            invs = invs.add(new ClassInvWellDefinedness(ci, target, services));
+    private Term[] wd(Term[] l) {
+        Term[] res = new Term[l.length];
+        for(int i = 0; i < l.length; i++) {
+            res[i] = wd(l[i]);
+        }
+        return res;
+    }
+
+    private void generateTaclets() {
+        final ImmutableSet<WellDefinednessCheck> methods =
+                specRepos.getAllWdChecks();
+
+        // WD(self.<inv>)
+        buildWdInvariantTaclet(vars.self, getTarget(), getCalleeKeYJavaType());
+        for (WellDefinednessCheck ch: methods) {
+            buildWdMethodInvocationTaclet(vars.self, ch);
         }
 
-        for (ClassInvWellDefinedness inv : invs) {
-            final Taclet invTaclet = inv.getTaclet(services);
-                assert invTaclet != null : "class invariant (wd) returned null taclet: "
-                                           + inv.getName();
-                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(invTaclet));
-                initConfig.getProofEnv().registerRule(invTaclet,
-                                                      AxiomJustification.INSTANCE);
+        if (vars.result != null) {
+            final KeYJavaType kjt = vars.result.getKeYJavaType();
+            for (IObserverFunction t: specRepos.getContractTargets(kjt)) {
+                // WD(result.<inv>)
+                buildWdInvariantTaclet(vars.result, t, kjt);
+            }
+            for (WellDefinednessCheck ch: methods) {
+                buildWdMethodInvocationTaclet(vars.result, ch);
+            }
         }
+        for (ProgramVariable pv: vars.params) {
+            final KeYJavaType kjt = pv.getKeYJavaType();
+            for (IObserverFunction t: specRepos.getContractTargets(kjt)) {
+                // for the other program variables pv: WD(pv.<inv>)
+                buildWdInvariantTaclet(pv, t, kjt);
+            }
+            for (WellDefinednessCheck ch: methods) {
+                buildWdMethodInvocationTaclet(pv, ch);
+            }
+        }
+    }
+
+    private void buildWdInvariantTaclet(ProgramVariable pv,
+                                        IObserverFunction target,
+                                        KeYJavaType kjt) {
+        final String prefix = "wd Invariant ";
+        boolean isStatic = target.isStatic();
+        final Term[] heaps = new Term[] {vars.heap};
+        final SchemaVariable sv = target.isStatic() ?
+                SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort()) :
+                    SchemaVariableFactory.createTermSV(pv.name(), kjt.getSort());
+        final Term var = TB.var(sv);
+        final Term invTerm = isStatic ?
+                TB.staticInv(services, heaps, kjt) :
+                    TB.inv(services, heaps, var);
+        buildTaclet(prefix, var, invTerm, target, TB.tt());
+    }
+
+    private void buildWdMethodInvocationTaclet(ProgramVariable pv,
+                                               WellDefinednessCheck method) {
+        final String prefix = "wd Method Invocation ";
+        final IObserverFunction target = method.getTarget();
+        if (target.toString().startsWith("java.lang.")) {
+            return;
+        }
+        final boolean isStatic = target.isStatic();
+        final KeYJavaType kjt = method.getKJT();
+        if (pv == null) {
+            if (!isStatic) {
+                return;
+            }
+        } else if (!pv.getKeYJavaType().equals(kjt)) {
+            return;
+        }
+        final Term pre = getPre(replace(method.getRequires()), target);
+        final Term[] args = replace(getArgs(pv, vars.heap, isStatic,
+                                            method.getOrigVars().params));
+        final Term wdArgs = TB.and(wd(args));
+        buildTaclet(prefix, args[1], TB.func(target, args), target, TB.and(wdArgs, pre));
+    }
+
+    private void buildTaclet(String prefix,
+                             Term calleeVar,
+                             Term callTerm,
+                             IObserverFunction target,
+                             Term pre) {
+        final String baseName = getBaseName((ParsableVariable)calleeVar.op());
+        final boolean isStatic = target.isStatic();
+        if (!isStatic) {
+            final String s = MiscTools.toValidTacletName(prefix) + baseName;
+            for (NoPosTacletApp t: taclets) {
+                if (t.taclet().name().toString().startsWith(s)) {
+                    return;
+                }
+            }
+        }
+        final Name name =
+                MiscTools.toValidTacletName(prefix
+                                            + (isStatic ? "Static " : baseName + " ")
+                                            + target.name().toString());
+        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        final Term callee = calleeVar != null ?
+                calleeVar :
+                    TB.var(SchemaVariableFactory.createTermSV(target.name(), target.sort()));
+        final Term wdCallee = isStatic ?
+                TB.tt() : wd(callee);
+        final Term notNull = isStatic ?
+                TB.tt() : TB.not(TB.equals(callee, TB.NULL(services)));
+        final Term created = isStatic ?
+                TB.tt() : TB.created(services, callee);
+
+        tb.setFind(wd(callTerm));
+        tb.setName(name);
+        tb.addRuleSet(new RuleSet(new Name("simplify")));
+        tb.addGoalTerm(TB.andSC(notNull, wdCallee, created, pre));
+        Taclet callTaclet = tb.getTaclet();
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(callTaclet));
+        initConfig.getProofEnv().registerRule(callTaclet, AxiomJustification.INSTANCE);
     }
 
     /**
@@ -290,14 +398,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         ProgramVariable selfVar = vars.self;
         ImmutableList<ProgramVariable> paramVars = vars.params;
         KeYJavaType selfKJT = getCalleeKeYJavaType();
-        List<LocationVariable> heaps = getHeaps();
         ImmutableList<Term> resList = ImmutableSLList.<Term>nil();
 
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(selfVar);
 
         // "self.<created> = TRUE"
-        final Term selfCreated = generateSelfCreated(heaps, selfVar);
+        final Term selfCreated = generateSelfCreated(selfVar);
 
         // "MyClass::exactInstance(self) = TRUE"
         final Term selfExactType = generateSelfExactType(selfVar, selfKJT);
@@ -309,19 +416,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
         // initial value of measured_by clause
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
-        Term wellFormed = null;
-        for (LocationVariable heap : heaps) {
-            final Term wf = TB.wellFormed(TB.var(heap), services);
-            if (wellFormed == null) {
-                wellFormed = wf;
-            }
-            else {
-                wellFormed = TB.and(wellFormed, wf);
-            }
-        }
+        final Term wellFormed = TB.wellFormed(vars.heap, services);
         final Term[] result = new Term[]
-                { wellFormed != null ? wellFormed : TB.tt(), selfNotNull, selfCreated,
-                        selfExactType, implicitPre, paramsOK, mbyAtPreDef };
+                { wellFormed, selfNotNull, selfCreated, selfExactType,
+                  implicitPre, paramsOK, mbyAtPreDef };
         for (Term t: result) {
             resList = resList.append(t);
         }
@@ -345,23 +443,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfCreated(List<LocationVariable> heaps,
-                                       ProgramVariable selfVar) {
+    protected Term generateSelfCreated(ProgramVariable selfVar) {
            if(selfVar == null || isConstructor()) {
                    return TB.tt();
            }
-           Term created = null;
-           for(LocationVariable heap : heaps) {
-                   if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap())
-                           continue;
-                   final Term cr = TB.created(services, TB.var(heap), TB.var(selfVar));
-                   if(created == null) {
-                           created = cr;
-                   }else{
-                           created = TB.and(created, cr);
-                   }
-           }
-           return created;
+           return TB.created(services, vars.heap, TB.var(selfVar));
     }
 
 
@@ -424,7 +510,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         assert this.check != null;
         if (this.check instanceof MethodWellDefinedness) {
             MethodWellDefinedness mCheck = (MethodWellDefinedness)check;
-            return mCheck.getContract();
+            return mCheck.getOperationContract();
         } else {
             return null;
         }
@@ -455,12 +541,63 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                              vars.atPres, vars.params);
     }
 
-    private ImmutableList<Term> replace(ImmutableList<Term> l) {
+    private ImmutableList<Term> replace(Iterable<Term> l) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         for (Term t: l) {
             res = res.append(replace(t));
         }
         return res;
+    }
+
+    private Term[] replace(Term[] l) {
+        Term[] res = new Term[l.length];
+        for(int i = 0; i < l.length; i++) {
+            res[i] = replace(l[i]);
+        }
+        return res;
+    }
+
+    private static Term[] getArgs(ParsableVariable pv,
+                                  Term heap, boolean isStatic,
+                                  ImmutableList<ProgramVariable> params) {
+        Term[] args = new Term[params.size() + (isStatic ? 1 : 2)];
+        SchemaVariable sv;
+        int i = 0;
+        args[i++] = heap;
+        if (!isStatic) {
+            sv = SchemaVariableFactory.createTermSV(
+                    new Name("callee"),
+                    ((ProgramVariable)pv).getKeYJavaType().getSort());
+            args[i++] = TB.var(sv);
+        }
+        for (ProgramVariable arg : params) {
+            sv = SchemaVariableFactory.createTermSV(
+                    arg.name(), arg.getKeYJavaType().getSort());
+            args[i++] = TB.var(sv);
+        }
+        return args;
+    }
+
+    private static String getBaseName(ParsableVariable pv) {
+        if (pv == null) {
+            return "NULL";
+        }
+        final String name = pv.toString();
+        String baseName = name.replace("1", "")
+                              .replace("2", "")
+                              .replace("3", "")
+                              .replace("4", "")
+                              .replace("5", "")
+                              .replace("6", "")
+                              .replace("7", "")
+                              .replace("8", "")
+                              .replace("9", "")
+                              .replace("0", "");
+        if (baseName.endsWith("_")
+                && baseName.lastIndexOf("_", 1) > 0) {
+            baseName = baseName.substring(0, baseName.lastIndexOf("_", 1));
+        }
+        return baseName;
     }
 
     private class Variables {

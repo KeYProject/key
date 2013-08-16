@@ -60,7 +60,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvWellDefinedness;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -98,6 +98,8 @@ public final class SpecificationRepository {
                            ImmutableSet<WellDefinednessCheck>> wdChecks
                 = new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,
                                     ImmutableSet<WellDefinednessCheck>>();
+    private final Map<KeYJavaType, Integer> invCounter
+                = new LinkedHashMap<KeYJavaType, Integer>();
     private final Map<String,Contract> contractsByName
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<IObserverFunction>> contractTargets
@@ -441,10 +443,18 @@ public final class SpecificationRepository {
                   getContracts(targetKJT, targetMethod).add(contract));
 
         if(contract instanceof FunctionalOperationContract) {
-        operationContracts.put(new Pair<KeYJavaType,IProgramMethod>(targetKJT, (IProgramMethod)targetMethod),
-                           getOperationContracts(targetKJT,
-                                             (IProgramMethod)targetMethod)
-                                      .add((FunctionalOperationContract)contract));
+            operationContracts.put(
+                    new Pair<KeYJavaType,IProgramMethod>(targetKJT, (IProgramMethod)targetMethod),
+                    getOperationContracts(targetKJT, (IProgramMethod)targetMethod)
+                                    .add((FunctionalOperationContract)contract));
+            registerContract(
+                    new MethodWellDefinedness((FunctionalOperationContract)contract,
+                                              services));
+        }
+        if (contract instanceof WellDefinednessCheck) {
+            wdChecks.put(
+                    new Pair<KeYJavaType,IObserverFunction>(targetKJT, targetMethod),
+                    getWdChecks(targetKJT, targetMethod).add((WellDefinednessCheck)contract));
         }
         contractsByName.put(contract.getName(), contract);
         final ImmutableSet<IObserverFunction> oldTargets = getContractTargets(targetKJT);
@@ -462,7 +472,13 @@ public final class SpecificationRepository {
                 new Pair<KeYJavaType, IProgramMethod>(kjt, (IProgramMethod) contract.getTarget());
         contracts.put(tp, contracts.get(tp).remove(contract));
         if (contract instanceof FunctionalOperationContract){
-            operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
+            operationContracts.put(
+                    tp2,
+                    operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
+        }
+        if (contract instanceof WellDefinednessCheck) {
+            wdChecks.put(tp,
+                         wdChecks.get(tp).remove((WellDefinednessCheck)contract));
         }
         contractsByName.remove(contract.getName());
     }
@@ -664,7 +680,8 @@ public final class SpecificationRepository {
         		        		              contract.getTarget()));
 
         registerContract(contract, impls);
-        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
+        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) :
+            "target "+contract.getTarget()+" missing for contract "+contract;
     }
 
 
@@ -729,6 +746,17 @@ public final class SpecificationRepository {
         return result;
     }
 
+    public int getInvCount(KeYJavaType target) {
+        final int count;
+        if (invCounter.get(target) == null) {
+            count = 0;
+            invCounter.put(target, count);
+        } else {
+            count = invCounter.get(target) + 1;
+            invCounter.put(target, count);
+        }
+        return count;
+    }
 
     /**
      * Registers the passed class invariant, and inherits it to all
@@ -737,6 +765,10 @@ public final class SpecificationRepository {
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
+        final IObserverFunction target =
+                inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt) :
+                    services.getJavaInfo().getInv();
+        registerContract(new ClassWellDefinedness(inv, target, services));
 
         // in any case, create axiom with non-static target
         addClassAxiom(new PartialInvAxiom(inv, false, services));
@@ -750,6 +782,10 @@ public final class SpecificationRepository {
             for(KeYJavaType sub : subs) {
         	ClassInvariant subInv = inv.setKJT(sub);
         	invs.put(sub, getClassInvariants(sub).add(subInv));
+                final IObserverFunction subTarget =
+                    subInv.isStatic() ? services.getJavaInfo().getStaticInv(sub) :
+                        services.getJavaInfo().getInv();
+                registerContract(new ClassWellDefinedness(subInv, subTarget, services));
             }
         }
     }
@@ -1168,11 +1204,9 @@ public final class SpecificationRepository {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
                 addContract((Contract)spec);
-                addWellDefinednessCheck((Contract)spec);
             }
             else if (spec instanceof ClassInvariant) {
                 addClassInvariant((ClassInvariant)spec);
-                addWellDefinednessCheck((ClassInvariant)spec);
             }
             else if (spec instanceof InitiallyClause) {
                 addInitiallyClause((InitiallyClause)spec);
@@ -1198,6 +1232,20 @@ public final class SpecificationRepository {
 
 
     /**
+     * Returns all registered well-definedness checks.
+     */
+    public ImmutableSet<WellDefinednessCheck> getAllWdChecks() {
+        ImmutableSet<WellDefinednessCheck> result =
+                DefaultImmutableSet.<WellDefinednessCheck>nil();
+        for(Contract s : getAllContracts()) {
+            if (s instanceof WellDefinednessCheck) {
+                result = result.add((WellDefinednessCheck)s);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Returns all registered (atomic) well-definedness checks for the passed target.
      */
     public ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt,
@@ -1213,8 +1261,22 @@ public final class SpecificationRepository {
                         : result;
     }
 
-    public ImmutableSet<MethodWellDefinedness> getWdMethodContracts(KeYJavaType kjt,
-                                                                    IObserverFunction target) {
+    /**
+     * Returns all registered well-definedness checks for method contracts.
+     */
+    public ImmutableSet<MethodWellDefinedness> getAllWdMethodChecks() {
+        ImmutableSet<MethodWellDefinedness> result =
+                DefaultImmutableSet.<MethodWellDefinedness>nil();
+        for(Contract s : getAllWdChecks()) {
+            if (s instanceof MethodWellDefinedness) {
+                result = result.add((MethodWellDefinedness)s);
+            }
+        }
+        return result;
+    }
+
+    public ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt,
+                                                                 IObserverFunction target) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
         ImmutableSet<MethodWellDefinedness> methods =
                 DefaultImmutableSet.<MethodWellDefinedness>nil();
@@ -1226,14 +1288,14 @@ public final class SpecificationRepository {
         return methods;
     }
 
-    public ImmutableSet<ClassInvWellDefinedness> getWdClassInvariants(KeYJavaType kjt,
-                                                                      IObserverFunction target) {
+    public ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt,
+                                                               IObserverFunction target) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
-        ImmutableSet<ClassInvWellDefinedness> invs =
-                DefaultImmutableSet.<ClassInvWellDefinedness>nil();
+        ImmutableSet<ClassWellDefinedness> invs =
+                DefaultImmutableSet.<ClassWellDefinedness>nil();
         for(WellDefinednessCheck check: checks) {
-            if (check instanceof ClassInvWellDefinedness) {
-                invs = invs.add((ClassInvWellDefinedness)check);
+            if (check instanceof ClassWellDefinedness) {
+                invs = invs.add((ClassWellDefinedness)check);
             }
         }
         return invs;
@@ -1247,91 +1309,6 @@ public final class SpecificationRepository {
             result = result.add((Contract)check);
         }
         return result;
-    }
-
-
-    public void addWellDefinednessCheck(Contract mc) {
-        // Method Contract
-        final ImmutableSet<Pair<KeYJavaType,IObserverFunction>> impls =
-                getOverridingTargets(mc.getKJT(), mc.getTarget())
-                .add(new Pair<KeYJavaType,IObserverFunction>(mc.getKJT(),
-                                                             mc.getTarget()));
-        for (Pair<KeYJavaType,IObserverFunction> pair: impls) {
-            if (mc instanceof FunctionalOperationContract) {
-                wdChecks.put(pair, getWdChecks(pair.first, pair.second)
-                        .add(new MethodWellDefinedness(
-                                (FunctionalOperationContract)mc, services)));
-            } else {
-                // TODO
-            }
-        }
-    }
-
-
-    public void addWellDefinednessCheck(ClassInvariant ci) {
-        // Class Invariant
-        final KeYJavaType kjt = ci.getKJT();
-        final IObserverFunction target = ci.isStatic() ?
-                services.getJavaInfo().getStaticInv(ci.getKJT()) :
-                    services.getJavaInfo().getInv();
-        final Pair<KeYJavaType,IObserverFunction> pair =
-                new Pair<KeYJavaType,IObserverFunction> (kjt, target);
-        wdChecks.put(pair, getWdChecks(pair.first, pair.second)
-                .add(new ClassInvWellDefinedness(ci, target, services)));
-
-        // inherit non-private, non-static invariants
-        if(!ci.isStatic() && VisibilityModifier.allowsInheritance(ci.getVisibility())) {
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for(KeYJavaType sub : subs) {
-                ClassInvariant subCi = ci.setKJT(sub);
-                final Pair<KeYJavaType,IObserverFunction> sPair =
-                        new Pair<KeYJavaType,IObserverFunction>(sub,target);
-                wdChecks.put(sPair, getWdChecks(sPair.first, sPair.second)
-                        .add(new ClassInvWellDefinedness(subCi, target, services)));
-            }
-        }
-    }
-
-
-    /**
-     * Registers the passed class axiom.
-     */
-    public void addWellDefinednessCheck(ClassAxiom ax) {
-        // Class Axiom FIXME FIXME TODO TODO TODO TODO TODO TODO
-        /*KeYJavaType kjt = ax.getKJT();
-        ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
-        if(currentAxioms == null) {
-            currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
-        }
-        if (ax instanceof RepresentsAxiom) {
-            // there may only be one conjoined represents axiom per model field
-            RepresentsAxiom  oldRep = getRepresentsAxiom(kjt, ax);
-            if (oldRep != null) {
-                final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom)ax);
-                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
-            } else {
-                axioms.put(kjt, currentAxioms.add(ax));
-            }
-            // inherit represents clauses to subclasses and conjoin together
-            if (VisibilityModifier.allowsInheritance(ax.getVisibility())){
-                final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-                for (KeYJavaType sub: subs){
-                    RepresentsAxiom subAx =  ((RepresentsAxiom)ax).setKJT(sub);
-                    currentAxioms = axioms.get(sub);
-                    if(currentAxioms == null) {
-                        currentAxioms = DefaultImmutableSet.<ClassAxiom>nil();
-                    }
-                    oldRep = getRepresentsAxiom(sub, subAx);
-                    if (oldRep == null)
-                        axioms.put(sub, currentAxioms.add(subAx));
-                    else {
-                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx);
-                        axioms.put(sub, currentAxioms.remove(oldRep).add(newSubRep));
-                    }
-                }}
-        } else {
-            axioms.put(kjt, currentAxioms.add(ax));
-        }*/
     }
 
 

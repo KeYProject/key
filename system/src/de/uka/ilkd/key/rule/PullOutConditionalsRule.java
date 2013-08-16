@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -118,7 +117,7 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	}
 
 	// abort if inside of transformer
-        if (inTransformer(pio)) {
+        if (TransformerProcedure.inTransformer(pio)) {
             return false;
         }
 
@@ -150,21 +149,6 @@ public final class PullOutConditionalsRule implements BuiltInRule {
 	return false;
     }
 
-    static boolean inTransformer(PosInOccurrence pio) {
-        boolean trans = false;
-        if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
-            Operator        op;
-
-            while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
-                op = t.op ();
-                trans = op instanceof TransformerProcedure;
-            }
-        }
-        return trans;
-    }
-    
     @Override
     public ImmutableList<Goal> apply(Goal goal, 
 	    			     Services services, 

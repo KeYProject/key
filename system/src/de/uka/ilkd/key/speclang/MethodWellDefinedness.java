@@ -26,7 +26,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Term signals = TB.ff();
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
-        super(contract.getTypeName(), contract.getTarget(), Type.METHOD_CONTRACT, services);
+        super(contract.getTypeName(), contract.id(), contract.getTarget(),
+              Type.METHOD_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         LocationVariable h = getHeap();
@@ -63,7 +64,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.signals = signals;
     }
 
-    public FunctionalOperationContract getContract() {
+    public FunctionalOperationContract getOperationContract() {
         return this.contract;
     }
 
@@ -123,7 +124,29 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          duration,
                                          signalsOnly,
                                          signals);
-    }    
+    }
+
+    @Override
+    public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
+        return new MethodWellDefinedness(getName(),
+                                         id(),
+                                         type(),
+                                         newPM,
+                                         getHeap(),
+                                         getRequires(),
+                                         getAssignable(),
+                                         getEnsures(),
+                                         (FunctionalOperationContract)
+                                             contract.setTarget(newKJT, newPM),
+                                         forall,
+                                         old,
+                                         diverges,
+                                         when,
+                                         workingSpace,
+                                         duration,
+                                         signalsOnly,
+                                         signals);
+    }
 
     @Override
     public String getTypeName() {
@@ -151,7 +174,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public OriginalVariables getOrigVars() {
-        assert getContract() != null;
-        return getContract().getOrigVars();
+        assert getOperationContract() != null;
+        return getOperationContract().getOrigVars();
     }
 }

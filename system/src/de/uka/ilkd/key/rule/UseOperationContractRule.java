@@ -50,7 +50,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -61,7 +60,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -533,7 +531,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}
 
 	// abort if inside of transformer
-        if (inTransformer(pio)) {
+        if (TransformerProcedure.inTransformer(pio)) {
             return false;
         }
 
@@ -557,20 +555,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-    static boolean inTransformer(PosInOccurrence pio) {
-        boolean trans = false;
-        if ( pio.posInTerm () != null ) {
-            PIOPathIterator it = pio.iterator ();
-            Operator        op;
-
-            while ( it.next () != -1 && !trans) {
-                final Term t = it.getSubTerm ();
-                op = t.op ();
-                trans = op instanceof TransformerProcedure;
-            }
-        }
-        return trans;
-    }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal,

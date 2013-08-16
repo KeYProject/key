@@ -11,7 +11,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
@@ -48,8 +47,6 @@ public abstract class WellDefinednessCheck implements Contract {
     protected static final TermFactory TF = TermFactory.DEFAULT;
     public static Name WD_FORMULA = new Name("WD");
     public static Name WD_ANY = new Name("wd");
-
-    private static int i = 0;
 
     private final String name;
 
@@ -103,8 +100,18 @@ public abstract class WellDefinednessCheck implements Contract {
         return type().toString().toLowerCase();
     }
 
-    WellDefinednessCheck(String name, IObserverFunction target, Type type, Services services) {
-        this.id = i++;
+    public Name name() {
+        return new Name(getName());
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    WellDefinednessCheck(String name, int id, IObserverFunction target,
+                         Type type, Services services) {
+        this.id = id;
         this.name = name +" (wd)." + id;
         this.type = type;
         this.target = target;
@@ -126,7 +133,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -258,7 +265,7 @@ public abstract class WellDefinednessCheck implements Contract {
                     + mods
                     + (this instanceof MethodWellDefinedness ?
                             "<br><b>termination</b> " +
-                            ((MethodWellDefinedness)this).getContract().getModality()
+                            ((MethodWellDefinedness)this).getOperationContract().getModality()
                             : "")
                     + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") +
                     "</html>";
@@ -271,7 +278,7 @@ public abstract class WellDefinednessCheck implements Contract {
                     + mods
                     + (this instanceof MethodWellDefinedness ?
                             "\ntermination: " +
-                            ((MethodWellDefinedness)this).getContract().getModality()
+                            ((MethodWellDefinedness)this).getOperationContract().getModality()
                             : "")
                     + (transactionApplicableContract() ? "\ntransaction applicable:" : "");
         }
@@ -323,6 +330,14 @@ public abstract class WellDefinednessCheck implements Contract {
             ls = new ImmutableArray<ITermLabel>(res);
         }
         res.clear();
+        if (t.arity() > 0) {
+            Term[] subs = new Term[t.arity()];
+            int i = 0;
+            for(Term sub: t.subs()) {
+                subs[i++] = relabel(sub);
+            }
+            t = TF.createTerm(t.op(), subs, t.getLabels());
+        }
         return TB.relabel(t, ls);
     }
 
@@ -369,12 +384,6 @@ public abstract class WellDefinednessCheck implements Contract {
             }
             return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
         } else {
-            for (Term sub: spec.subs()) {
-                if(sub.hasLabels()
-                        && sub.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
-                    sub = relabel(sub);
-                }
-            }
             if(spec.hasLabels()
                     && spec.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
                 spec = relabel(spec);
@@ -467,12 +476,6 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Deprecated
     public boolean hasMby() {
-        return false;
-    }
-
-    @Deprecated
-    public Contract setTarget(KeYJavaType newKJT,
-                              IObserverFunction newPM) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
