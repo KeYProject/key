@@ -67,8 +67,8 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
                                               ImmutableArray<Term> newTermSubs,
                                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                               JavaBlock newTermJavaBlock) {
-        if (rule.name().toString().equals("pullOutSelect") &&
-            tacletTerm.arity() == 0 && // check for performance reasons
+        if (tacletTerm != null &&
+            tacletTerm.arity() == 0 && // tacletTerm is a constant
             tacletTerm.containsLabel(SelectSkolemConstantTermLabel.INSTANCE)) {
             // keep SelectSkolemConstantTermLabel
             return Collections.<ITermLabel>singletonList(SelectSkolemConstantTermLabel.INSTANCE);
@@ -76,7 +76,7 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
         } else {
             // in all other cases the tacletTerm cannot contain the
             // SelectSkolemConstantTermLabel, because it is attached only
-            // to constants on which no rules are applicable
+            // to constants
             return null;
         }
     }
