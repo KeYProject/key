@@ -15,6 +15,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class TransformerProcedure extends Function {
 
+    public static final TransformerProcedure WD_ANY =
+            new TransformerProcedure(new Name("wd"), Sort.ANY);
+
+    public static final TransformerProcedure WD_FORMULA =
+            new TransformerProcedure(new Name("WD"), Sort.FORMULA);
+
     public TransformerProcedure(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts, false);
     }
@@ -25,6 +31,10 @@ public class TransformerProcedure extends Function {
 
     public TransformerProcedure(Name name, Sort sort, Sort argSort) {
         this(name, sort, new ImmutableArray<Sort>(argSort));
+    }
+
+    public TransformerProcedure(Name name, Sort argSort) {
+        this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
     }
 
     public static TransformerProcedure getTransformer(Name name,
@@ -39,6 +49,19 @@ public class TransformerProcedure extends Function {
             return t;
         }
         return new TransformerProcedure(name, sort, argSorts);
+    }
+
+    public static TransformerProcedure wdFormula(Services services) {
+        return getTransformer(WD_FORMULA, services);
+    }
+
+    public static TransformerProcedure wdAny(Services services) {
+        return getTransformer(WD_ANY, services);
+    }
+
+    public static TransformerProcedure getTransformer(TransformerProcedure t,
+                                                      Services services) {
+        return getTransformer(t.name(), t.sort(), t.argSorts(), services);
     }
 
     public static TransformerProcedure getTransformer(Name name,

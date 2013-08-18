@@ -17,10 +17,12 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -172,9 +174,14 @@ public final class ClassInvariantImpl implements ClassInvariant {
         final ProgramVariable self;
         if (this.originalSelfVar instanceof ProgramVariable) {
             self = (ProgramVariable)this.originalSelfVar;
+        } else if(this.originalSelfVar != null) {
+            self = new LocationVariable(
+                    new ProgramElementName(originalSelfVar.toString()), kjt);
         } else {
             self = null;
         }
-        return new OriginalVariables(self, null, null, null, null);
+        return new OriginalVariables(self, null, null,
+                new LinkedHashMap<LocationVariable, ProgramVariable>(),
+                ImmutableSLList.<ProgramVariable>nil());
     }
 }

@@ -50,6 +50,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.TransformerProcedure;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
@@ -205,7 +206,7 @@ public class TermBuilder {
      * in the namespaces!
      */
     public LocationVariable selfVar(Services services,
-                                    IObserverFunction pm,
+                                    IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
         if(pm.isStatic()) {
@@ -1456,6 +1457,29 @@ public class TermBuilder {
                         freshLocs(services, getBaseHeap(services)));
     }
 
+    public Term wd(Term t, Services services) {
+        if (t.sort().equals(Sort.FORMULA)) {
+            return func(TransformerProcedure.wdFormula(services), t);
+        } else {
+            return func(TransformerProcedure.wdAny(services), t);
+        }
+    }
+
+    public Iterable<Term> wd(Iterable<Term> l, Services services) {
+        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        for (Term t: l) {
+            res = res.append(wd(t, services));
+        }
+        return res;
+    }
+
+    public Term[] wd(Term[] l, Services services) {
+        Term[] res = new Term[l.length];
+        for(int i = 0; i < l.length; i++) {
+            res[i] = wd(l[i], services);
+        }
+        return res;
+    }
 
 
     //-------------------------------------------------------------------------
@@ -2112,6 +2136,5 @@ public class TermBuilder {
         {
             return union(services, firstLocationSet, secondLocationSet);
         }
-
     }
 }

@@ -27,7 +27,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
         super(contract.getTypeName(), contract.id(), contract.getTarget(),
-              Type.METHOD_CONTRACT, services);
+              Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         LocationVariable h = getHeap();
