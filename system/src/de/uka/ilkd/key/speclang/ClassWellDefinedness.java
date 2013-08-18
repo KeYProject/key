@@ -13,6 +13,13 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private final ClassInvariant inv;
 
+    private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
+                                 LocationVariable heap, Precondition requires,
+                                 Term assignable, Term ensures, ClassInvariant inv) {
+        super(name, id, type, target, heap, requires, assignable, ensures);
+        this.inv = inv;
+    }
+
     public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, Services services) {
         super(inv.getName(), services.getSpecificationRepository().getInvCount(inv.getKJT()),
               target, Type.CLASS_INVARIANT, services);
@@ -21,13 +28,6 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         this.setRequires(TB.tt());
         this.setAssignable(TB.func(services.getTypeConverter().getLocSetLDT().getAllLocs()));
         this.setEnsures(inv.getOriginalInv());
-    }
-
-    private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                    LocationVariable heap, Precondition requires,
-                                    Term assignable, Term ensures, ClassInvariant inv) {
-        super(name, id, type, target, heap, requires, assignable, ensures);
-        this.inv = inv;
     }
 
     public ClassInvariant getInvariant() {

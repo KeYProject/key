@@ -31,9 +31,11 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
+    protected static final String JAVA_LANG_OBJ = "java.lang.Object";
+
     private final WellDefinednessCheck check;
     private final Variables vars;
-    protected Term mbyAtPre;
+    private Term mbyAtPre;
 
     /**
      * Constructor
@@ -49,6 +51,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     //-------------------------------------------------------------------------
     // Internal Methods
     //-------------------------------------------------------------------------
+
+    private static boolean isJavaLangObj(WellDefinednessCheck ch) {
+        return ch.getTarget().toString().startsWith(JAVA_LANG_OBJ);
+    }
 
     private static Function createAnonHeap(LocationVariable heap,
                                            Services services) {
@@ -119,15 +125,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return addGhostParams(params, origParams);
     }
 
-    private void register(Variables vars) {
-        register((Function)vars.anonHeap.op());
-        register(vars.self);
-        register(vars.result);
-        register(vars.exception);
-        register(vars.atPres.get(vars.heap));
-        register(vars.params);
-    }
-
     /**
      * This should only be executed once per proof.
      * @return new variables
@@ -175,6 +172,69 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return new Variables(self, result, exception, atPres, params, heap, anonHeap);
     }
 
+    private void register(Variables vars) {
+        register((Function)vars.anonHeap.op());
+        register(vars.self);
+        register(vars.result);
+        register(vars.exception);
+        register(vars.atPres.get(vars.heap));
+        register(vars.params);
+    }
+
+    private void register(ImmutableSet<Taclet> ts) {
+        for (Taclet t: ts) {
+            assert t != null;
+            taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+        }
+    }
+
+    private Term[] getUpdates(Term mod) {
+        assert mod != null;
+        final Term havocUpd = TB.elementary(services, vars.heap,
+                TB.anon(services, TB.var(vars.heap), mod, vars.anonHeap));
+        final Term oldUpd = TB.elementary(services, TB.var(vars.heapAtPre), TB.var(vars.heap));
+        return new Term[] {oldUpd, havocUpd};
+    }
+
+    private Term getPost(Term post) {
+        final Term implicit;
+        if (vars.result != null) {
+            implicit = TB.reachableValue(services, vars.result);
+        } else {
+            implicit = TB.tt();
+        }
+        return TB.andSC(implicit, post);
+    }
+
+    private ImmutableSet<Taclet> generateTaclets() {
+        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+        for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
+            if (!isJavaLangObj(ch)) {
+                // WD(pv.<inv>)
+                res = res.add(ch.createInvTaclet(services));
+                if (ch instanceof MethodWellDefinedness) {
+                    MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
+                    // WD(pv.m(...))
+                    res = res.add(mwd.createOperationTaclet(services));
+                }
+            }
+        }
+        register(res); // register taclets: Important!
+        return res;
+    }
+
+    @Override
+    protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
+        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
+        for(ClassAxiom axiom: specRepos.getClassAxioms(kjt)) {
+            if(axiom instanceof PartialInvAxiom) {
+                result = result.add(axiom);
+            }
+        }
+        return result;
+    }
+
     //-------------------------------------------------------------------------
     // Public Interface
     //-------------------------------------------------------------------------
@@ -191,11 +251,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public void readProblem() throws ProofInputException {
         register(this.vars);
         final POTerms po = check.replace(check.createPOTerms(), vars);
-        final TermAndFunc pre = check.getPre(po.pre, vars, services);
+        final TermAndFunc pre = check.getPre(po.pre, vars.self, vars.heap, vars.params, services);
         register(pre.func);
         mbyAtPre = pre.func != null ? TB.func(pre.func) : TB.tt();
-        final Term post = check.getPost(po.post, vars.result, services);
-        final Term[] updates = check.getUpdates(po.mod, vars, services);
+        final Term post = getPost(po.post);
+        final Term[] updates = getUpdates(po.mod);
 
         final Term poTerms = TB.and(TB.wd(pre.term, services),
                                     TB.imp(pre.term,
@@ -207,53 +267,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
         // add axioms
         collectClassAxioms(getKJT());
-    }
-
-    private ImmutableSet<Taclet> generateTacletsForPV(ProgramVariable pv,
-                                                      KeYJavaType kjt) {
-        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-        for (IObserverFunction t: specRepos.getContractTargets(kjt)) {
-            for (WellDefinednessCheck ch: specRepos.getWdChecks(kjt, t)) {
-                if (!isJavaLangObj(ch) && ch instanceof MethodWellDefinedness) {
-                    // WD(pv.m(...))
-                    res = res.add(ch.createOperationTaclet(pv, vars, services));
-                }
-                if (!isJavaLangObj(ch)) {
-                    // WD(pv.<inv>)
-                    res = res.add(ch.createInvTaclet(pv, vars.heap, services));
-                }
-            }
-        }
-        register(res); // register taclets: Important!
-        return res;
-    }
-
-    private ImmutableSet<Taclet> generateTaclets() {
-        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-
-        // self variable
-        res = res.union(generateTacletsForPV(vars.self, getKJT()));
-        // result variable
-        if (vars.result != null) {
-            res = res.union(generateTacletsForPV(vars.result,
-                                                 vars.result.getKeYJavaType()));
-        }
-        // program variables
-        for (ProgramVariable pv: vars.params) {
-            res = res.union(generateTacletsForPV(pv, pv.getKeYJavaType()));
-        }
-        return res;
-    }
-
-    @Override
-    protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
-        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
-        for(ClassAxiom axiom: specRepos.getClassAxioms(kjt)) {
-            if(axiom instanceof PartialInvAxiom) {
-                result = result.add(axiom);
-            }
-        }
-        return result;
     }
 
     @Override
@@ -271,42 +284,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return check;
     }
 
-    private void register(ImmutableSet<Taclet> ts) {
-        for (Taclet t: ts) {
-            assert t != null;
-            taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
-            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-        }
-    }
-
-    /*private static String getBaseName(ParsableVariable pv) {
-        if (pv == null) {
-            return "NULL";
-        }
-        final String name = pv.toString();
-        String baseName = name.replace("1", "")
-                              .replace("2", "")
-                              .replace("3", "")
-                              .replace("4", "")
-                              .replace("5", "")
-                              .replace("6", "")
-                              .replace("7", "")
-                              .replace("8", "")
-                              .replace("9", "")
-                              .replace("0", "");
-        if (baseName.endsWith("_")
-                && baseName.lastIndexOf("_", 1) > 0) {
-            baseName = baseName.substring(0, baseName.lastIndexOf("_", 1));
-        }
-        return baseName;
-    }*/
-
     public Term getMbyAtPre() {
         return this.mbyAtPre;
-    }
-
-    private static boolean isJavaLangObj(WellDefinednessCheck ch) {
-        return ch.getTarget().toString().startsWith("java.lang.Object");
     }
 
     public static class Variables {
@@ -315,17 +294,17 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         public final ProgramVariable exception;
         public final Map<LocationVariable, ProgramVariable> atPres;
         public final ImmutableList<ProgramVariable> params;
-        public final LocationVariable heap;
-        public final ProgramVariable heapAtPre;
-        public final Term anonHeap;
+        final LocationVariable heap;
+        final ProgramVariable heapAtPre;
+        final Term anonHeap;
 
-        Variables(final ProgramVariable self,
-                  final ProgramVariable result,
-                  final ProgramVariable exception,
-                  final Map<LocationVariable, ProgramVariable> atPres,
-                  final ImmutableList<ProgramVariable> params,
-                  final LocationVariable heap,
-                  final Function anonHeap) {
+        private Variables(final ProgramVariable self,
+                          final ProgramVariable result,
+                          final ProgramVariable exception,
+                          final Map<LocationVariable, ProgramVariable> atPres,
+                          final ImmutableList<ProgramVariable> params,
+                          final LocationVariable heap,
+                          final Function anonHeap) {
             this.self = self;
             this.result = result;
             this.exception = exception;

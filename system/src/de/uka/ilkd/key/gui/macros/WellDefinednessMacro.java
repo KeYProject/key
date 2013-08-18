@@ -16,6 +16,8 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public class WellDefinednessMacro extends StrategyProofMacro {
 
+    public static final String WD_PREFIX = "wd_";
+
     @Override
     public String getName() {
         return "Well-Definedness Rules";
@@ -58,7 +60,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(name.startsWith("wd_")) {
+            if(name.startsWith(WD_PREFIX)) {
                 return LongRuleAppCost.ZERO_COST;
             } else {
                 return TopRuleAppCost.INSTANCE;

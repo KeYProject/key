@@ -5,9 +5,15 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.rule.Taclet;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
     /* accessible-clause, assignable-clause, breaks-clause, callable-clause, captures-clause,
@@ -16,14 +22,32 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * initially-clause, constraint, ensures-clause, signals-clause */
     private final FunctionalOperationContract contract;
 
-    Term forall;
-    Term old;
-    Term diverges = TB.ff();
-    Term when;
-    Term workingSpace;
-    Term duration;
-    Term signalsOnly;
-    Term signals = TB.ff();
+    private Term forall;
+    private Term old;
+    private Term diverges = TB.ff();
+    private Term when;
+    private Term workingSpace;
+    private Term duration;
+    private Term signalsOnly;
+    private Term signals = TB.ff();
+
+    private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
+                                  LocationVariable heap, Precondition requires,
+                                  Term assignable, Term ensures,
+                                  FunctionalOperationContract contract, Term forall,
+                                  Term old, Term diverges, Term when, Term workingSpace,
+                                  Term duration, Term signalsOnly, Term signals) {
+        super(name, id, type, target, heap, requires, assignable, ensures);
+        this.contract = contract;
+        this.forall = forall;
+        this.old = old;
+        this.diverges = diverges;
+        this.when = when;
+        this.workingSpace = workingSpace;
+        this.duration = duration;
+        this.signalsOnly = signalsOnly;
+        this.signals = signals;
+    }
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
         super(contract.getTypeName(), contract.id(), contract.getTarget(),
@@ -46,23 +70,38 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
     }
 
-    private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                  LocationVariable heap, Precondition requires,
-                                  Term assignable, Term ensures,
-                                  FunctionalOperationContract contract, Term forall,
-                                  Term old, Term diverges, Term when, Term workingSpace,
-                                  Term duration, Term signalsOnly, Term signals) {
-        super(name, id, type, target, heap, requires, assignable, ensures);
-        this.contract = contract;
-        this.forall = forall;
-        this.old = old;
-        this.diverges = diverges;
-        this.when = when;
-        this.workingSpace = workingSpace;
-        this.duration = duration;
-        this.signalsOnly = signalsOnly;
-        this.signals = signals;
+    //-------------------------------------------------------------------------
+    // Internal Methods
+    //-------------------------------------------------------------------------
+
+    private static Term[] getArgs(SchemaVariable sv, LocationVariable heap, boolean isStatic,
+                                  ImmutableList<ParsableVariable> params) {
+        Term[] args = new Term[params.size() + (isStatic ? 1 : 2)];
+        int i = 0;
+        args[i++] = TB.var(heap);
+        if (!isStatic) {
+            args[i++] = TB.var(sv);
+        }
+        for (ParsableVariable arg : params) {
+            assert arg instanceof SchemaVariable;
+            args[i++] = TB.var(arg);
+        }
+        return args;
     }
+
+    private ImmutableList<ParsableVariable> paramsSV() {
+        ImmutableList<ParsableVariable> paramsSV =
+                ImmutableSLList.<ParsableVariable>nil();
+        for (ProgramVariable pv: getOrigVars().params) {
+            paramsSV = paramsSV.append(SchemaVariableFactory.createTermSV(
+                    pv.name(), pv.getKeYJavaType().getSort()));
+        }
+        return paramsSV;
+    }
+
+    //-------------------------------------------------------------------------
+    // Public Interface
+    //-------------------------------------------------------------------------
 
     public FunctionalOperationContract getOperationContract() {
         return this.contract;
@@ -98,6 +137,20 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public Term getSignals() {
         return this.signals;
+    }
+
+    public Taclet createOperationTaclet(Services services) {
+        final boolean isStatic = getTarget().isStatic();
+        final LocationVariable heap = getHeap();
+        final SchemaVariable sv =
+                SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
+        final ImmutableList<ParsableVariable> paramsSV = paramsSV();
+        final Term pre = getPre(replaceSV(getRequires(), sv, paramsSV),
+                                sv, heap, paramsSV, services).term;
+        final Term[] args = getArgs(sv, heap, isStatic, paramsSV);
+        final Term wdArgs = TB.and(TB.wd(args, services));
+        return createTaclet(OP_PREFIX, TB.var(sv), heap, TB.func(getTarget(), args),
+                            TB.and(wdArgs, pre), services);
     }
 
     @Override
