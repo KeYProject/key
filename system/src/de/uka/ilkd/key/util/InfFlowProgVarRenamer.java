@@ -46,7 +46,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
 
 
     public InfFlowProgVarRenamer(Term[] terms,
-                                 Map<Term, Term> replaceMap,
+                                 Map<Term, Term> preInitialisedReplaceMap,
                                  String postfix,
                                  Goal goalForVariableRegistration,
                                  Services services) {
@@ -54,10 +54,10 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         this.terms = terms;
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
-        if (replaceMap == null) {
+        if (preInitialisedReplaceMap == null) {
             this.replaceMap = new HashMap<Term, Term>();
         } else {
-            this.replaceMap = replaceMap;
+            this.replaceMap = preInitialisedReplaceMap;
         }
 
         // the built-in heap symbol has to be handled with care; it is saver
@@ -66,6 +66,14 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
     }
     
 
+    public InfFlowProgVarRenamer(Term[] terms,
+                                 String postfix,
+                                 Goal goalForVariableRegistration,
+                                 Services services) {
+        this(terms, null, postfix, goalForVariableRegistration, services);
+    }
+
+    
     public Term[] renameVariablesAndSkolemConstants() {
         Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
@@ -97,56 +105,75 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
 
     private void renameAndAddToReplaceMap(Term term) {
         if (term.op() instanceof ProgramVariable) {
-            assert term.subs().isEmpty();
-            final ProgramVariable pv = (ProgramVariable) term.op();
-            final Name newName =
-                    VariableNameProposer.DEFAULT.getNewName(services,
-                                                            new Name(pv.name() +
-                                                                     postfix));
-            final Operator renamedPv = pv.rename(newName);
-
-            // for the taclet application dialog (which gets the declared
-            // program variables in a strange way and not directly from the
-            // namespace); adds the renamedPv also to the namespace
-            goalForVariableRegistration.addProgramVariable((ProgramVariable)renamedPv);
-
-            final Term pvTerm = label(TermFactory.DEFAULT.createTerm(renamedPv),
-                                      term.getLabels());
-            replaceMap.put(term, pvTerm);
-
+            renameProgramVariable(term);
         } else if (term.op() instanceof Function &&
                    ((Function) term.op()).isSkolemConstant()) {
-            final Function f = (Function) term.op();
-            final Name newName =
-                    VariableNameProposer.DEFAULT.getNewName(services,
-                                                            new Name(f.name() +
-                                                                     postfix));
-            final Function renamedF = f.rename(newName);
-            services.getNamespaces().functions().addSafely(renamedF);
-            final Term fTerm =
-                    label(TermFactory.DEFAULT.createTerm(renamedF),
-                          term.getLabels());
-            replaceMap.put(term, fTerm);
+            renameSkolemConstant(term);
         } else if (term.op() instanceof ElementaryUpdate) {
-            final ElementaryUpdate u = (ElementaryUpdate) term.op();
-            final Term lhsTerm = var(u.lhs());
-            final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
-            final Term[] renamedSubs = renameSubs(term);
-            final ElementaryUpdate renamedU =
-                    ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
-            final Term uTerm =
-                    label(TermFactory.DEFAULT.createTerm(renamedU, renamedSubs),
-                          term.getLabels());
-            replaceMap.put(term, uTerm);
+            applyRenamingsOnUpade(term);
         } else {
-            final Term[] renamedSubs = renameSubs(term);
-            final Term renamedTerm =
-                    TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
-                                                   term.boundVars(),
-                                                   term.javaBlock(),
-                                                   term.getLabels());
-            replaceMap.put(term, renamedTerm);
+            applyRenamingsOnSubterms(term);
         }
+    }
+
+
+    private void renameProgramVariable(Term term) {
+        assert term.subs().isEmpty();
+        final ProgramVariable pv = (ProgramVariable) term.op();
+        final Name newName =
+                VariableNameProposer.DEFAULT.getNewName(services,
+                                                        new Name(pv.name() +
+                                                                 postfix));
+        final Operator renamedPv = pv.rename(newName);
+
+        // for the taclet application dialog (which gets the declared
+        // program variables in a strange way and not directly from the
+        // namespace); adds the renamedPv also to the namespace
+        goalForVariableRegistration.addProgramVariable((ProgramVariable)renamedPv);
+
+        final Term pvTerm = label(TermFactory.DEFAULT.createTerm(renamedPv),
+                                  term.getLabels());
+        replaceMap.put(term, pvTerm);
+    }
+
+
+    private void renameSkolemConstant(Term term) {
+        final Function f = (Function) term.op();
+        final Name newName =
+                VariableNameProposer.DEFAULT.getNewName(services,
+                                                        new Name(f.name() +
+                                                                 postfix));
+        final Function renamedF = f.rename(newName);
+        services.getNamespaces().functions().addSafely(renamedF);
+        final Term fTerm =
+                label(TermFactory.DEFAULT.createTerm(renamedF),
+                      term.getLabels());
+        replaceMap.put(term, fTerm);
+    }
+
+
+    private void applyRenamingsOnUpade(Term term) {
+        final ElementaryUpdate u = (ElementaryUpdate) term.op();
+        final Term lhsTerm = var(u.lhs());
+        final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
+        final Term[] renamedSubs = renameSubs(term);
+        final ElementaryUpdate renamedU =
+                ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
+        final Term uTerm =
+                label(TermFactory.DEFAULT.createTerm(renamedU, renamedSubs),
+                      term.getLabels());
+        replaceMap.put(term, uTerm);
+    }
+
+
+    private void applyRenamingsOnSubterms(Term term) {
+        final Term[] renamedSubs = renameSubs(term);
+        final Term renamedTerm =
+                TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
+                                               term.boundVars(),
+                                               term.javaBlock(),
+                                               term.getLabels());
+        replaceMap.put(term, renamedTerm);
     }
 
 
