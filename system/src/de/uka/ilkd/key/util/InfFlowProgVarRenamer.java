@@ -29,20 +29,20 @@ import java.util.Map;
  */
 public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
     /** The set of terms on which the renaming should be applied. */
-    private Term[] terms;
+    private final Term[] terms;
 
     /** Link between program variables / skolem constants and their renamed
      *  counterparts. This map may be pre-initialised.
      */
-    private Map<Term, Term> replaceMap;
+    private final Map<Term, Term> replaceMap;
 
     /** The postfix used for renaming, if a program variable / skolem constant
      *  is found which is not yet in the replaceMap.
      */
-    private String postfix;
+    private final String postfix;
 
     /** Goal on which newly created program variables are registered in. */
-    private Goal goalForVariableRegistration;
+    private final Goal goalForVariableRegistration;
 
 
     public InfFlowProgVarRenamer(Term[] terms,
@@ -52,9 +52,13 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
                                  Services services) {
         super(services);
         this.terms = terms;
-        this.replaceMap = replaceMap;
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
+        if (replaceMap == null) {
+            this.replaceMap = new HashMap<Term, Term>();
+        } else {
+            this.replaceMap = replaceMap;
+        }
 
         // the built-in heap symbol has to be handled with care; it is saver
         // not to replace it
@@ -72,25 +76,21 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
 
 
     private Term renameVariablesAndSkolemConstants(Term term) {
-        final Term temp = renameFormulasWithoutPrograms(term, replaceMap,
-                                                        postfix);
+        final Term temp = renameFormulasWithoutPrograms(term);
         final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-                extractProgramVarReplaceMap(replaceMap);
-        return applyRenamingsToPrograms(temp, progVarReplaceMap, postfix,
-                                        services);
+                restrictToProgramVarariables(replaceMap);
+        return applyRenamingsToPrograms(temp, progVarReplaceMap);
     }
 
 
     private Term applyRenamingsToPrograms(Term term,
-                                          Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
-                                          String postfix,
-                                          Services services) {
+                                          Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
+
         if (term != null) {
             final JavaBlock renamedJavaBlock =
                     renameJavaBlock(progVarReplaceMap, term, services);
             final Term[] appliedSubs =
-                    applyProgramRenamingsToSubs(term, progVarReplaceMap, postfix,
-                                                services);
+                    applyProgramRenamingsToSubs(term, progVarReplaceMap);
 
             final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), appliedSubs,
@@ -104,33 +104,25 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
     }
 
 
-    private Term[] renameSubs(Term term,
-                              Map<Term, Term> replaceMap,
-                              String postfix) {
+    private Term[] renameSubs(Term term) {
         Term[] renamedSubs = null;
         if (term.subs() != null) {
             renamedSubs = new Term[term.subs().size()];
             for (int i = 0; i < renamedSubs.length; i++) {
-                renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i),
-                                                               replaceMap,
-                                                               postfix);
+                renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
             }
         }
         return renamedSubs;
     }
 
     private Term[] applyProgramRenamingsToSubs(Term term,
-                                               Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
-                                               String postfix,
-                                               Services services) {
+                                               Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
         Term[] appliedSubs = null;
         if (term.subs() != null) {
             appliedSubs = new Term[term.subs().size()];
             for (int i = 0; i < appliedSubs.length; i++) {
                 appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
-                                                          progVarReplaceMap,
-                                                          postfix,
-                                                          services);
+                                                          progVarReplaceMap);
             }
         }
         return appliedSubs;
@@ -138,7 +130,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
 
 
     private Map<ProgramVariable, ProgramVariable>
-                        extractProgramVarReplaceMap(Map<Term, Term> replaceMap) {
+                        restrictToProgramVarariables(Map<Term, Term> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 new HashMap<ProgramVariable, ProgramVariable>();
         for (final Term t : replaceMap.keySet()) {
@@ -151,15 +143,9 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
     }
 
 
-    private Term renameFormulasWithoutPrograms(Term term,
-                                               Map<Term, Term> replaceMap,
-                                               String postfix) {
+    private Term renameFormulasWithoutPrograms(Term term) {
         if (term == null) {
             return null;
-        }
-
-        if (replaceMap == null) {
-            replaceMap = new HashMap<Term, Term>();
         }
 
         if (replaceMap.containsKey(term)) {
@@ -200,11 +186,9 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         } else if (term.op() instanceof ElementaryUpdate) {
             final ElementaryUpdate u = (ElementaryUpdate) term.op();
             final Term lhsTerm = var(u.lhs());
-            final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm,
-                                                                  replaceMap,
-                                                                  postfix);
+            final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
             final Term[] renamedSubs =
-                    renameSubs(term, replaceMap, postfix);
+                    renameSubs(term);
             final ElementaryUpdate renamedU =
                     ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
             final Term uTerm =
@@ -214,7 +198,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
             return uTerm;
         } else {
             final Term[] renamedSubs =
-                    renameSubs(term, replaceMap, postfix);
+                    renameSubs(term);
             final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
                                                    term.boundVars(),
