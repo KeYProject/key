@@ -309,10 +309,10 @@ private SelectionListener enableMultiThreadingButtonSelectionListener = new Sele
    @Override
    protected void performDefaults() {
       enableBuildProofsButton.setSelection(true);
-      enableBuildProofsEfficentButton.setSelection(false);
-      enableMultiThreadingButton.setSelection(false);
-      setNumberOfThreadsSpinner.setSelection(1);
-      autoDeleteProofFilesButton.setSelection(false);
+      enableBuildProofsEfficentButton.setSelection(true);
+      enableMultiThreadingButton.setSelection(true);
+      setNumberOfThreadsSpinner.setSelection(2);
+      autoDeleteProofFilesButton.setSelection(true);
       hideMefaFiles.setSelection(false);
       super.performDefaults();
    }
