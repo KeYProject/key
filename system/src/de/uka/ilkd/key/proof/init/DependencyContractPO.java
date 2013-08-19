@@ -162,7 +162,7 @@ public final class DependencyContractPO extends AbstractPO
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
 	}
-	
+
 	//prepare variables
 	final ProgramVariable selfVar
                 = !contract.getTarget().isStatic() 
@@ -202,7 +202,6 @@ public final class DependencyContractPO extends AbstractPO
         register(selfVar);	
         register(paramVars);
 
-
         Term wellFormedHeaps = null;
         Term update = null;
         for(LocationVariable h : heaps) {
@@ -237,13 +236,14 @@ public final class DependencyContractPO extends AbstractPO
                 update = TB.parallel(update, u);
             }
         }
-	
+
 	//translate contract
 	final Term pre = TB.and(
-	   buildFreePre(heaps, twoState ? preHeapVars.values() : null, selfVar, 
-		            contract.getKJT(), paramVars, wellFormedHeaps),
-       contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
-	
+	   buildFreePre(heaps, twoState ? preHeapVars.values() : null, selfVar,
+	                contract.getKJT(), paramVars, wellFormedHeaps),
+	                contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
+	                                null, services));
+
 	assert heaps.size() == heapCount;
 	//prepare target term
 	final Term[] subs
