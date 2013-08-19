@@ -8,26 +8,35 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private final ClassInvariant inv;
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                 LocationVariable heap, Precondition requires,
-                                 Term assignable, Term ensures, ClassInvariant inv) {
-        super(name, id, type, target, heap, requires, assignable, ensures);
+                                 LocationVariable heap, OriginalVariables origVars,
+                                 Precondition requires, Term assignable, Term ensures,
+                                 ClassInvariant inv) {
+        super(name, id, type, target, heap, origVars, requires, assignable, ensures);
         this.inv = inv;
     }
 
     public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, Services services) {
         super(inv.getName(), services.getSpecificationRepository().getInvCount(inv.getKJT()),
-              target, Type.CLASS_INVARIANT, services);
+              target, inv.getOrigVars(), Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
         this.setRequires(TB.tt());
         this.setAssignable(TB.func(services.getTypeConverter().getLocSetLDT().getAllLocs()));
         this.setEnsures(inv.getOriginalInv());
+    }
+
+    @Override
+    TermAndFunc generateMbyAtPreDef(ParsableVariable self,
+                                    ImmutableList<ParsableVariable> params,
+                                    Services services) {
+        return new TermAndFunc(TB.tt(), null);
     }
 
     public ClassInvariant getInvariant() {
@@ -46,6 +55,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
                                         type(),
                                         getTarget(),
                                         getHeap(),
+                                        getOrigVars(),
                                         getRequires(),
                                         getAssignable(),
                                         getEnsures(),
@@ -59,6 +69,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
                                         type(),
                                         newPM,
                                         getHeap(),
+                                        getOrigVars(),
                                         getRequires(),
                                         getAssignable(),
                                         getEnsures(),
@@ -87,11 +98,5 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
         Term post = this.getEnsures();
         return new POTerms(pre, mod, rest, post);
-    }
-
-    @Override
-    public OriginalVariables getOrigVars() {
-        assert getInvariant() != null;
-        return getInvariant().getOrigVars();
     }
 }

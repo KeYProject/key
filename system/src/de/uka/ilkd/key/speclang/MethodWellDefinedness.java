@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -32,12 +33,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     private Term signals = TB.ff();
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                  LocationVariable heap, Precondition requires,
-                                  Term assignable, Term ensures,
+                                  LocationVariable heap, OriginalVariables origVars,
+                                  Precondition requires, Term assignable, Term ensures,
                                   FunctionalOperationContract contract, Term forall,
                                   Term old, Term diverges, Term when, Term workingSpace,
                                   Term duration, Term signalsOnly, Term signals) {
-        super(name, id, type, target, heap, requires, assignable, ensures);
+        super(name, id, type, target, heap, origVars, requires, assignable, ensures);
         this.contract = contract;
         this.forall = forall;
         this.old = old;
@@ -51,7 +52,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
         super(contract.getTypeName(), contract.id(), contract.getTarget(),
-              Type.OPERATION_CONTRACT, services);
+              contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         LocationVariable h = getHeap();
@@ -97,6 +98,36 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                     pv.name(), pv.getKeYJavaType().getSort()));
         }
         return paramsSV;
+    }
+
+    @Override
+    TermAndFunc generateMbyAtPreDef(ParsableVariable self,
+                                    ImmutableList<ParsableVariable> params,
+                                    Services services) {
+        if (contract.hasMby()) {
+            final Function mbyAtPreFunc =
+                    new Function(new Name(TB.newName(services, "mbyAtPre")),
+                                 services.getTypeConverter().getIntegerLDT().targetSort());
+            OriginalVariables origVars = getOrigVars();
+            final Term mbyAtPre = TB.func(mbyAtPreFunc);
+            final Term mby;
+            if ( params != null && self != null && !params.isEmpty()
+                    && (params.iterator().next() instanceof ProgramVariable)
+                    && (self instanceof ProgramVariable)) {
+                ImmutableList<ProgramVariable> parameters =
+                        ImmutableSLList.<ProgramVariable>nil();
+                for (ParsableVariable pv: params) {
+                    parameters = parameters.append((ProgramVariable)pv);
+                }
+                mby = contract.getMby((ProgramVariable)self, parameters, services);
+            } else {
+                mby = contract.getMby(origVars.self, origVars.params, services);
+            }
+            final Term mbyAtPreDef = TB.equals(mbyAtPre, mby);
+            return new TermAndFunc(mbyAtPreDef, mbyAtPreFunc);
+        } else {
+            return new TermAndFunc(TB.tt(), null);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -165,6 +196,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          type(),
                                          getTarget(),
                                          getHeap(),
+                                         getOrigVars(),
                                          getRequires(),
                                          getAssignable(),
                                          getEnsures(),
@@ -186,6 +218,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          type(),
                                          newPM,
                                          getHeap(),
+                                         getOrigVars(),
                                          getRequires(),
                                          getAssignable(),
                                          getEnsures(),
@@ -223,11 +256,5 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
         final Term post = this.getEnsures();
         return new POTerms(pre, mod, rest, post);
-    }
-
-    @Override
-    public OriginalVariables getOrigVars() {
-        assert getOperationContract() != null;
-        return getOperationContract().getOrigVars();
     }
 }

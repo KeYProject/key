@@ -15,10 +15,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class TransformerProcedure extends Function {
 
-    public static final TransformerProcedure WD_ANY =
+    private static final TransformerProcedure WD_ANY =
             new TransformerProcedure(new Name("wd"), Sort.ANY);
 
-    public static final TransformerProcedure WD_FORMULA =
+    private static final TransformerProcedure WD_FORMULA =
             new TransformerProcedure(new Name("WD"), Sort.FORMULA);
 
     public TransformerProcedure(Name name, Sort sort, ImmutableArray<Sort> argSorts) {

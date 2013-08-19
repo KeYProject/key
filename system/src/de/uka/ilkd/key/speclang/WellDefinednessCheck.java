@@ -68,27 +68,30 @@ public abstract class WellDefinednessCheck implements Contract {
     private final Type type;
     private IObserverFunction target;
     private final LocationVariable heap;
+    private final OriginalVariables origVars;
     private Precondition requires;
     private Term assignable;
     private Term ensures;
 
     WellDefinednessCheck(String name, int id, IObserverFunction target,
-                         Type type, Services services) {
+                         OriginalVariables origVars, Type type, Services services) {
         this.id = id;
         this.name = name +" (wd)." + id;
         this.type = type;
         this.target = target;
         this.heap = services.getTypeConverter().getHeapLDT().getHeap();
+        this.origVars = origVars;
     }
 
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
-                         LocationVariable heap, Precondition requires,
-                         Term assignable, Term ensures) {
+                         LocationVariable heap, OriginalVariables origVars,
+                         Precondition requires, Term assignable, Term ensures) {
         this.name = name;
         this.id = id;
         this.type = type;
         this.target = target;
         this.heap = heap;
+        this.origVars = origVars;
         this.requires = requires;
         this.assignable = assignable;
         this.ensures = ensures;
@@ -506,43 +509,6 @@ public abstract class WellDefinednessCheck implements Contract {
         return paramsOK;
     }
 
-    private Function generateMbyAtPre(Services services) {
-        final FunctionalOperationContract foc;
-        if (this instanceof MethodWellDefinedness) {
-            foc = ((MethodWellDefinedness)this).getOperationContract();
-        } else {
-            foc = null;
-        }
-        if (foc != null && foc.hasMby()) {
-            final Function mbyAtPreFunc =
-                    new Function(new Name(TB.newName(services, "mbyAtPre")),
-                            services.getTypeConverter().getIntegerLDT().targetSort());
-            return mbyAtPreFunc;
-        } else {
-            return null;
-        }
-    }
-
-    private Term generateMbyAtPre(Function mbyAtPreFunc, Services services) {
-        if (mbyAtPreFunc != null) {
-            assert this instanceof MethodWellDefinedness;
-            FunctionalOperationContract foc =
-                    ((MethodWellDefinedness)this).getOperationContract();
-            OriginalVariables origVars = getOrigVars();
-            final Term mbyAtPre = TB.func(mbyAtPreFunc);
-            final Term mby = foc.getMby(origVars.self, origVars.params, services);
-            return TB.equals(mbyAtPre, mby);
-        } else {
-            return TB.tt();
-        }
-    }
-
-    private TermAndFunc generateMbyAtPreDef(Services services) {
-        final Function mbyAtPreFunc = generateMbyAtPre(services);
-        final Term mbyAtPre = generateMbyAtPre(mbyAtPreFunc, services);
-        return new TermAndFunc(mbyAtPre, mbyAtPreFunc);
-    }
-
     /**
      * Builds the "general assumption" using the self variable (selfVar),
      * the {@link KeYJavaType} of the self variable (selfKJT),
@@ -571,7 +537,7 @@ public abstract class WellDefinednessCheck implements Contract {
         Term paramsOK = generateParamsOK(params, services);
 
         // initial value of measured_by clause
-        final TermAndFunc mbyAtPreDef = generateMbyAtPreDef(services);
+        final TermAndFunc mbyAtPreDef = generateMbyAtPreDef(self, params, services);
         final Term wellFormed = TB.wellFormed(heap, services);
         final Term[] result = new Term[]
                 { wellFormed, selfNotNull, selfCreated, selfExactType,
@@ -581,6 +547,10 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         return new TermListAndFunc(resList, mbyAtPreDef.func);
     }
+
+    abstract TermAndFunc generateMbyAtPreDef(ParsableVariable self,
+                                             ImmutableList<ParsableVariable> params,
+                                             Services services);
 
     Precondition replaceSV(Precondition pre, SchemaVariable self,
                            ImmutableList<ParsableVariable> params) {
@@ -787,6 +757,11 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
+    public OriginalVariables getOrigVars() {
+        return this.origVars;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof WellDefinednessCheck)) {
             return false;
@@ -880,7 +855,7 @@ public abstract class WellDefinednessCheck implements Contract {
         public final Term term;
         public final Function func;
 
-        private TermAndFunc(Term t, Function f) {
+        TermAndFunc(Term t, Function f) {
             this.term = t;
             this.func = f;
         }
