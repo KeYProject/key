@@ -79,8 +79,7 @@ public class RemovePostTacletBuilder extends AbstractInfFlowTacletBuilder {
                     new RewriteTacletGoalTemplate(TermBuilder.DF.ff());
             tacletBuilder.addTacletGoalTemplate(goal);
             tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
-            addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(), ifSchemaVars.c1);
-            addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(), ifSchemaVars.c2);
+            addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values());
 
             removePostTaclets.add(tacletBuilder.getTaclet());
         }

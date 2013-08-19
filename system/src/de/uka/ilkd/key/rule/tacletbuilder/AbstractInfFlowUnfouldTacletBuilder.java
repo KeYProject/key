@@ -89,10 +89,7 @@ abstract class AbstractInfFlowUnfouldTacletBuilder extends AbstractInfFlowTaclet
         tacletBuilder.addTacletGoalTemplate(goal);
         tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));
         tacletBuilder.setSurviveSmbExec(true);
-        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(),
-                    schemaVars.c1);
-        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(),
-                    schemaVars.c2);
+        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values());
 
         return tacletBuilder.getTaclet();
     }

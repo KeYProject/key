@@ -17,10 +17,13 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -79,22 +82,17 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder.Serviced {
 
 
     void addVarconds(RewriteTacletBuilder tacletBuilder,
-                     Iterable<SchemaVariable> quantifiableSVs,
-                     ProofObligationVars poVars) throws IllegalArgumentException {
-        for (SchemaVariable qv : quantifiableSVs) {
-            addVarconds(tacletBuilder, poVars.pre.termList, qv);
-            addVarconds(tacletBuilder, poVars.post.termList, qv);
-        }
-    }
-
-
-    private void addVarconds(RewriteTacletBuilder tacletBuilder,
-                             ImmutableList<Term> termList,
-                             SchemaVariable qv) throws IllegalArgumentException {
-        for (Term svTerm : termList) {
-            assert svTerm.op() instanceof SchemaVariable;
-            SchemaVariable sv = svTerm.op(SchemaVariable.class);
-            tacletBuilder.addVarsNotFreeIn(qv, sv);
+                     Iterable<SchemaVariable> quantifiableSVs)
+            throws IllegalArgumentException {
+        RewriteTacletBuilderSchemaVarCollector svCollector =
+                new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
+        Set<SchemaVariable> schemaVars = svCollector.collectSchemaVariables();
+        for (SchemaVariable sv : schemaVars) {
+            if (sv instanceof TermSV) {
+                for (SchemaVariable qv : quantifiableSVs) {
+                    tacletBuilder.addVarsNotFreeIn(qv, sv);
+                }
+            }
         }
     }
 

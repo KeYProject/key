@@ -273,10 +273,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
         tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
         tacletBuilder.setSurviveSmbExec(true);
-        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(),
-                    schemaDataFind);
-        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values(),
-                    schemaDataAssumes);
+        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values());
 
         return tacletBuilder.getTaclet();
     }
