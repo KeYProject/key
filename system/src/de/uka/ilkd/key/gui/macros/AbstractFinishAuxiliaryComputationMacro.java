@@ -81,8 +81,6 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                          Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
-        // the built-in heap symbol has to be handled with care
-        vsMap.put(TB.getBaseHeap(services), TB.getBaseHeap(services));
         final InfFlowProgVarRenamer renamer =
                         new InfFlowProgVarRenamer(goalFormulas, vsMap,
                                                   c.postfix, initGoal, services);

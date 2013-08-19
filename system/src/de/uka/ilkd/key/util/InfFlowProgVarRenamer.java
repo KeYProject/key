@@ -47,6 +47,10 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         this.replaceMap = replaceMap;
         this.postfix = postfix;
         this.initGoal = initGoal;
+
+        // the built-in heap symbol has to be handled with care; it is saver
+        // not to replace it
+        this.replaceMap.put(getBaseHeap(services), getBaseHeap(services));
     }
     
 
