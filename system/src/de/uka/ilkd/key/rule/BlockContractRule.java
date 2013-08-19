@@ -296,7 +296,7 @@ public class BlockContractRule implements BuiltInRule {
 
     
     private InfFlowValidityData
-                buildInfFlowValidityGoal(final Goal infFlowGoal,
+                setUpInfFlowValidityGoal(final Goal infFlowGoal,
                                          final BlockContract contract,
                                          final Map<LocationVariable, Function> anonymisationHeaps,
                                          final Services services,
@@ -526,22 +526,18 @@ public class BlockContractRule implements BuiltInRule {
             validityGoal.node().setSequent(Sequent.EMPTY_SEQUENT);
             validityGoal.clearAndDetachRuleAppIndex();
 
-            // set up information flow goal
-            InfFlowValidityData infFlowValitidyData =
-                buildInfFlowValidityGoal(validityGoal, contract,
+            // set up information flow validity goal
+            InfFlowValidityData infFlowValidityData =
+                setUpInfFlowValidityGoal(validityGoal, contract,
                                          anonymisationHeaps, services,
                                          variables, heaps, localInVariables,
                                          localOutVariables, application,
                                          instantiation);
 
-            // do additional preparations on the useage goal
-            usageGoal.addTaclet(infFlowValitidyData.taclet,
-                                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            final Term uAssumptions =
-                        TB.applySequential(new Term[] {contextUpdate, remembranceUpdate},
-                                        TB.and(infFlowValitidyData.preAssumption,
-                                               TB.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
-            usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
+            // do additional inf flow preparations on the usage goal
+            setUpInfFlowPartOfUsageGoal(usageGoal, infFlowValidityData,
+                                        contextUpdate, remembranceUpdate,
+                                        anonymisationUpdate);
 
         } else {
             configurator.setUpValidityGoal(
@@ -606,6 +602,21 @@ public class BlockContractRule implements BuiltInRule {
         proof.addLabeledIFSymbol(selfComposedExec);
 
         return new Pair<SequentFormula, Term> (new SequentFormula(finalTerm), post);
+    }
+
+
+    private void setUpInfFlowPartOfUsageGoal(final Goal usageGoal,
+                                             InfFlowValidityData infFlowValitidyData,
+                                             final Term contextUpdate,
+                                             final Term remembranceUpdate,
+                                             final Term anonymisationUpdate) {
+        usageGoal.addTaclet(infFlowValitidyData.taclet,
+                            SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        final Term uAssumptions =
+                    TB.applySequential(new Term[] {contextUpdate, remembranceUpdate},
+                                    TB.and(infFlowValitidyData.preAssumption,
+                                           TB.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
+        usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
     }
 
 
