@@ -83,66 +83,6 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
     }
 
 
-    private Term applyRenamingsToPrograms(Term term,
-                                          Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
-
-        if (term != null) {
-            final JavaBlock renamedJavaBlock =
-                    renameJavaBlock(progVarReplaceMap, term, services);
-            final Term[] appliedSubs =
-                    applyProgramRenamingsToSubs(term, progVarReplaceMap);
-
-            final Term renamedTerm =
-                    TermFactory.DEFAULT.createTerm(term.op(), appliedSubs,
-                                                   term.boundVars(),
-                                                   renamedJavaBlock,
-                                                   term.getLabels());
-            return renamedTerm;
-        } else {
-            return null;
-        }
-    }
-
-
-    private Term[] renameSubs(Term term) {
-        Term[] renamedSubs = null;
-        if (term.subs() != null) {
-            renamedSubs = new Term[term.subs().size()];
-            for (int i = 0; i < renamedSubs.length; i++) {
-                renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
-            }
-        }
-        return renamedSubs;
-    }
-
-    private Term[] applyProgramRenamingsToSubs(Term term,
-                                               Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
-        Term[] appliedSubs = null;
-        if (term.subs() != null) {
-            appliedSubs = new Term[term.subs().size()];
-            for (int i = 0; i < appliedSubs.length; i++) {
-                appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
-                                                          progVarReplaceMap);
-            }
-        }
-        return appliedSubs;
-    }
-
-
-    private Map<ProgramVariable, ProgramVariable>
-                        restrictToProgramVarariables(Map<Term, Term> replaceMap) {
-        Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-                new HashMap<ProgramVariable, ProgramVariable>();
-        for (final Term t : replaceMap.keySet()) {
-            if (t.op() instanceof ProgramVariable) {
-                progVarReplaceMap.put((ProgramVariable) t.op(),
-                                      (ProgramVariable) replaceMap.get(t).op());
-            }
-        }
-        return progVarReplaceMap;
-    }
-
-
     private Term renameFormulasWithoutPrograms(Term term) {
         if (term == null) {
             return null;
@@ -187,8 +127,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
             final ElementaryUpdate u = (ElementaryUpdate) term.op();
             final Term lhsTerm = var(u.lhs());
             final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
-            final Term[] renamedSubs =
-                    renameSubs(term);
+            final Term[] renamedSubs = renameSubs(term);
             final ElementaryUpdate renamedU =
                     ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
             final Term uTerm =
@@ -197,8 +136,7 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
             replaceMap.put(term, uTerm);
             return uTerm;
         } else {
-            final Term[] renamedSubs =
-                    renameSubs(term);
+            final Term[] renamedSubs = renameSubs(term);
             final Term renamedTerm =
                     TermFactory.DEFAULT.createTerm(term.op(), renamedSubs,
                                                    term.boundVars(),
@@ -207,6 +145,53 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
             replaceMap.put(term, renamedTerm);
             return renamedTerm;
         }
+    }
+
+
+    private Term[] renameSubs(Term term) {
+        Term[] renamedSubs = null;
+        if (term.subs() != null) {
+            renamedSubs = new Term[term.subs().size()];
+            for (int i = 0; i < renamedSubs.length; i++) {
+                renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
+            }
+        }
+        return renamedSubs;
+    }
+
+
+    private Term applyRenamingsToPrograms(Term term,
+                                          Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
+
+        if (term != null) {
+            final JavaBlock renamedJavaBlock =
+                    renameJavaBlock(progVarReplaceMap, term, services);
+            final Term[] appliedSubs =
+                    applyProgramRenamingsToSubs(term, progVarReplaceMap);
+
+            final Term renamedTerm =
+                    TermFactory.DEFAULT.createTerm(term.op(), appliedSubs,
+                                                   term.boundVars(),
+                                                   renamedJavaBlock,
+                                                   term.getLabels());
+            return renamedTerm;
+        } else {
+            return null;
+        }
+    }
+
+
+    private Term[] applyProgramRenamingsToSubs(Term term,
+                                               Map<ProgramVariable, ProgramVariable> progVarReplaceMap) {
+        Term[] appliedSubs = null;
+        if (term.subs() != null) {
+            appliedSubs = new Term[term.subs().size()];
+            for (int i = 0; i < appliedSubs.length; i++) {
+                appliedSubs[i] = applyRenamingsToPrograms(term.sub(i),
+                                                          progVarReplaceMap);
+            }
+        }
+        return appliedSubs;
     }
 
 
@@ -220,4 +205,17 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
         return renamedJavaBlock;
     }
 
+
+    private Map<ProgramVariable, ProgramVariable>
+                        restrictToProgramVarariables(Map<Term, Term> replaceMap) {
+        Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
+                new HashMap<ProgramVariable, ProgramVariable>();
+        for (final Term t : replaceMap.keySet()) {
+            if (t.op() instanceof ProgramVariable) {
+                progVarReplaceMap.put((ProgramVariable) t.op(),
+                                      (ProgramVariable) replaceMap.get(t).op());
+            }
+        }
+        return progVarReplaceMap;
+    }
 }
