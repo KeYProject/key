@@ -110,7 +110,7 @@ public class ProofManager {
     */
    public ProofManager(IProject project) throws CoreException, ProblemLoaderException{
       markerManager = new MarkerManager();
-      mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append("Proofs"));
+      mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append("proofs"));
       this.project = project;
       try {
          File location = ResourceUtil.getLocation(project);

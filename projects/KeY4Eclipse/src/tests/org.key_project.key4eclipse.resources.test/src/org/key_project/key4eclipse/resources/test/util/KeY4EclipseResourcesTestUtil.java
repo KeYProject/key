@@ -162,7 +162,7 @@ public class KeY4EclipseResourcesTestUtil {
     */
    public static IFolder getProofFolder(IProject project){
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append("Proofs");
+      IPath proofFolderPath = project.getFullPath().append("proofs");
       return root.getFolder(proofFolderPath);
    }
    

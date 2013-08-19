@@ -75,7 +75,7 @@ public class ProofMetaFileContentExceptionTests extends TestCase{
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("File.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("Proofs").append("File.java").append("File[File__add(int,int)]_JML_operation_contract_0.proof"));
+            project.getFullPath().append("proofs").append("File.java").append("File[File__add(int,int)]_JML_operation_contract_0.proof"));
       IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
       
       assertTrue(!javaFile.exists());

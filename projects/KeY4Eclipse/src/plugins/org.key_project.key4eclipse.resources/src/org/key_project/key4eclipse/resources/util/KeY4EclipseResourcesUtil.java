@@ -194,7 +194,7 @@ public class KeY4EclipseResourcesUtil {
    public static void hideMetaFiles(IProject project) throws CoreException{
       boolean hide = KeYProjectProperties.isHideMetaFiles(project);
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append("Proofs");
+      IPath proofFolderPath = project.getFullPath().append("proofs");
       IFolder proofFolder = root.getFolder(proofFolderPath);
       if(proofFolder.exists()){
          LinkedList<IFile> metaFiles = collectAllMetaFiles(proofFolder);

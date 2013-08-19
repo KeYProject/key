@@ -35,9 +35,9 @@ public class HideMetaFilesTests extends TestCase{
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("hideMetaFiles").append("HideMeta.java"));
       IFile proofFile0 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("Proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__add(int,int)]_JML_operation_contract_0.proof"));
+            project.getFullPath().append("proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("Proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__sub(int,int)]_JML_operation_contract_0.proof"));
+            project.getFullPath().append("proofs").append("hideMetaFiles").append("HideMeta.java").append("hideMetaFiles_HideMeta[hideMetaFiles_HideMeta__sub(int,int)]_JML_operation_contract_0.proof"));
       IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
    
@@ -69,9 +69,9 @@ public class HideMetaFilesTests extends TestCase{
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("showMetaFiles").append("ShowMeta.java"));
       IFile proofFile0 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("Proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__add(int,int)]_JML_operation_contract_0.proof"));
+            project.getFullPath().append("proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("Proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__sub(int,int)]_JML_operation_contract_0.proof"));
+            project.getFullPath().append("proofs").append("showMetaFiles").append("ShowMeta.java").append("showMetaFiles_ShowMeta[showMetaFiles_ShowMeta__sub(int,int)]_JML_operation_contract_0.proof"));
       IFile metaFile0 = KeY4EclipseResourcesTestUtil.getFile(proofFile0.getFullPath().addFileExtension("meta"));
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().addFileExtension("meta"));
    
