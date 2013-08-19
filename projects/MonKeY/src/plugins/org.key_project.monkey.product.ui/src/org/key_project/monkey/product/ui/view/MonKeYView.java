@@ -33,7 +33,7 @@ import org.key_project.monkey.product.ui.composite.MonKeYComposite;
  * @author Martin Hentschel
  */
 public class MonKeYView extends ViewPart {
-    /**
+   /**
      * The ID of this view.
      */
     public static final String ID = "org.key_project.monkey.product.ui.view.MonKeYView";
@@ -47,7 +47,18 @@ public class MonKeYView extends ViewPart {
      * The {@link IMemento} to load the last state from.
      */
     private IMemento mementoToLoadFrom;
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+        if (composite != null) {
+            composite.dispose();
+        }
+        super.dispose();
+    }
+
     /**
      * {@inheritDoc}
      */
