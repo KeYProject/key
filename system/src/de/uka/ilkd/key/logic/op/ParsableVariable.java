@@ -15,8 +15,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-
 
 /** 
  * This interface represents the variables that can be recognized 
