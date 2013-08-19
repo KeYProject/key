@@ -20,12 +20,16 @@ import java.util.logging.Logger;
  */
 class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
 
-    /**
-     * Collection of data important for the production of snippets.
-     */
+    /** Collection of data important for the production of snippets. */
     final BasicSnippetData data;
+
+    /** The first copy of the proof obligation variables. */
     final ProofObligationVars poVars1;
+
+    /** The second copy of the proof obligation variables. */
     final ProofObligationVars poVars2;
+
+
     /**
      * Registered snippet factory methods.
      */
