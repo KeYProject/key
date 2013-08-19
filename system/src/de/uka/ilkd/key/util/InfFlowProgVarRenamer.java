@@ -88,9 +88,15 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
             return null;
         }
 
-        if (replaceMap.containsKey(term)) {
-            return replaceMap.get(term);
-        } else if (term.op() instanceof ProgramVariable) {
+        if (!replaceMap.containsKey(term)) {
+            renameAndAddToReplaceMap(term);
+        }
+        return replaceMap.get(term);
+    }
+
+
+    private void renameAndAddToReplaceMap(Term term) {
+        if (term.op() instanceof ProgramVariable) {
             assert term.subs().isEmpty();
             final ProgramVariable pv = (ProgramVariable) term.op();
             final Name newName =
@@ -107,7 +113,6 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
             final Term pvTerm = label(TermFactory.DEFAULT.createTerm(renamedPv),
                                       term.getLabels());
             replaceMap.put(term, pvTerm);
-            return pvTerm;
 
         } else if (term.op() instanceof Function &&
                    ((Function) term.op()).isSkolemConstant()) {
@@ -122,7 +127,6 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
                     label(TermFactory.DEFAULT.createTerm(renamedF),
                           term.getLabels());
             replaceMap.put(term, fTerm);
-            return fTerm;
         } else if (term.op() instanceof ElementaryUpdate) {
             final ElementaryUpdate u = (ElementaryUpdate) term.op();
             final Term lhsTerm = var(u.lhs());
@@ -134,7 +138,6 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
                     label(TermFactory.DEFAULT.createTerm(renamedU, renamedSubs),
                           term.getLabels());
             replaceMap.put(term, uTerm);
-            return uTerm;
         } else {
             final Term[] renamedSubs = renameSubs(term);
             final Term renamedTerm =
@@ -143,7 +146,6 @@ public class InfFlowProgVarRenamer extends TermBuilder.Serviced {
                                                    term.javaBlock(),
                                                    term.getLabels());
             replaceMap.put(term, renamedTerm);
-            return renamedTerm;
         }
     }
 
