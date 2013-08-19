@@ -99,7 +99,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
     private Pair<JavaBlock, JavaBlock> buildJavaBlock(BasicSnippetData d) {
         ExecutionContext context =
-                (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);        
+                (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);        
 
         //create loop call
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);

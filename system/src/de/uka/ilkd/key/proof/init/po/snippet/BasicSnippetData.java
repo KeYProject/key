@@ -96,7 +96,7 @@ class BasicSnippetData {
          */
         BLOCK_VARS(Variables.class),
         LABELS(Label[].class),
-        CONTEXT(ExecutionContext.class); // this does not fit well here
+        EXECUTION_CONTEXT(ExecutionContext.class); // this does not fit well here
 
         private final Class<?> type;
 
@@ -137,7 +137,7 @@ class BasicSnippetData {
         this.tb = new TermBuilder.Serviced(services);
 
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
-        contractContents.put(Key.CONTEXT, invariant.getExecutionContext());
+        contractContents.put(Key.EXECUTION_CONTEXT, invariant.getExecutionContext());
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
@@ -170,7 +170,7 @@ class BasicSnippetData {
                      ExecutionContext context,
                      Services services) {
         this(invariant, services);
-        contractContents.put(Key.CONTEXT, context);
+        contractContents.put(Key.EXECUTION_CONTEXT, context);
     }
 
 
@@ -234,7 +234,7 @@ class BasicSnippetData {
                      ExecutionContext context,
                      Services services) {
         this(contract, services);
-        contractContents.put(Key.CONTEXT, context);
+        contractContents.put(Key.EXECUTION_CONTEXT, context);
     }
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {

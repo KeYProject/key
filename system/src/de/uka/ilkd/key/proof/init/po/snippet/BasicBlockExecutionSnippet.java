@@ -92,7 +92,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
     private JavaBlock buildJavaBlock(BasicSnippetData d) {
         Services services = d.tb.getServices();
         ExecutionContext context =
-                (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);
+                (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
 
         //create block call
         Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
