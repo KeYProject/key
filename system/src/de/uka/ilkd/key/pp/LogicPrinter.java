@@ -315,45 +315,6 @@ public final class LogicPrinter {
     }
     
     
-    private static void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-	for(SequentFormula cf : s) {
-	    cf.formula().execPostOrder(oc);
-	}
-    }
-    
-    
-    private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
-	
-	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
-	OpCollector oc = new OpCollector();
-	
-	//find, assumes
-	for(SchemaVariable sv: t.getIfFindVariables()) {
-	    result.add(sv);
-	}
-		
-	//add, replacewith
-	for(TacletGoalTemplate tgt : t.goalTemplates()) {
-	    collectSchemaVarsHelper(tgt.sequent(), oc);
-	    if(tgt instanceof AntecSuccTacletGoalTemplate) {
-		collectSchemaVarsHelper(
-			((AntecSuccTacletGoalTemplate)tgt).replaceWith(), oc);
-	    } else if(tgt instanceof RewriteTacletGoalTemplate) {
-		((RewriteTacletGoalTemplate)tgt).replaceWith()
-					        .execPostOrder(oc);
-	    }
-	}
-	
-	for(Operator op : oc.ops()) {
-	    if(op instanceof SchemaVariable) {
-		result.add((SchemaVariable)op);
-	    }
-	}
-	
-	return result;
-    }
-    
-
     /**
      * Pretty-print a taclet. Line-breaks are taken care of.
      *
@@ -381,7 +342,7 @@ public final class LogicPrinter {
 		layouter.beginC();
 	    }
 	    if (declareSchemaVars) {
-		Set<SchemaVariable> schemaVars = collectSchemaVars(taclet);
+		Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
 		layouter.brk();
 		for(SchemaVariable schemaVar : schemaVars) {
                     layouter.print(schemaVar.proofToString() + "  ");

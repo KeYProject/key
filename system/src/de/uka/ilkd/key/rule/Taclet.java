@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
@@ -55,9 +56,13 @@ import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 /** 
@@ -1461,5 +1466,42 @@ public abstract class Taclet implements Rule, Named {
     
     public boolean getSurviveSymbExec() {
         return surviveSymbExec;
+    }
+
+    public Set<SchemaVariable> collectSchemaVars() {
+
+	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+	OpCollector oc = new OpCollector();
+
+	//find, assumes
+	for(SchemaVariable sv: this.getIfFindVariables()) {
+	    result.add(sv);
+	}
+
+	//add, replacewith
+	for(TacletGoalTemplate tgt : this.goalTemplates()) {
+	    collectSchemaVarsHelper(tgt.sequent(), oc);
+	    if(tgt instanceof AntecSuccTacletGoalTemplate) {
+		collectSchemaVarsHelper(
+			((AntecSuccTacletGoalTemplate)tgt).replaceWith(), oc);
+	    } else if(tgt instanceof RewriteTacletGoalTemplate) {
+		((RewriteTacletGoalTemplate)tgt).replaceWith()
+					        .execPostOrder(oc);
+	    }
+	}
+
+	for(Operator op : oc.ops()) {
+	    if(op instanceof SchemaVariable) {
+		result.add((SchemaVariable)op);
+	    }
+	}
+
+	return result;
+    }
+
+    private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
+	for(SequentFormula cf : s) {
+	    cf.formula().execPostOrder(oc);
+	}
     }
 }
