@@ -48,6 +48,6 @@ public class LoopInfFlowUnfouldTacletBuilder extends AbstractInfFlowUnfouldTacle
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1, ifVars.c2,
                                                    services);
-        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
     }
 }

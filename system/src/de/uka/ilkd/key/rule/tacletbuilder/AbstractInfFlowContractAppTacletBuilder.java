@@ -260,7 +260,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                 new Semisequent(new SequentFormula(replaceWithTerm)));
 
         //create taclet
-        InfFlowContractAppRewriteTacletBuilder tacletBuilder = new InfFlowContractAppRewriteTacletBuilder();
+        InfFlowContractAppRewriteTacletBuilder tacletBuilder =
+                new InfFlowContractAppRewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
