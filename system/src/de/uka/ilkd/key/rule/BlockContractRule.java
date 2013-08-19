@@ -516,36 +516,38 @@ public class BlockContractRule implements BuiltInRule {
             new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition,
                         atMostOneFlagSetCondition}
         );
-        if (isInfFlow(goal) &&
-            contract.hasModifiesClause(heaps.get(0)) &&
-            contract.hasInfFlowSpecs()) {
-
-            validityGoal.setBranchLabel("Information Flow Validity");
-
-            // clear goal
-            validityGoal.node().setSequent(Sequent.EMPTY_SEQUENT);
-            validityGoal.clearAndDetachRuleAppIndex();
-
-            // set up information flow validity goal
-            InfFlowValidityData infFlowValidityData =
-                setUpInfFlowValidityGoal(validityGoal, contract,
-                                         anonymisationHeaps, services,
-                                         variables, heaps, localInVariables,
-                                         localOutVariables, application,
-                                         instantiation);
-
-            // do additional inf flow preparations on the usage goal
-            setUpInfFlowPartOfUsageGoal(usageGoal, infFlowValidityData,
-                                        contextUpdate, remembranceUpdate,
-                                        anonymisationUpdate);
-
-        } else {
+        if (! isInfFlow(goal)) {
             configurator.setUpValidityGoal(
                 validityGoal,
                 new Term[] {contextUpdate, remembranceUpdate},
                 new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition},
                 new Term[] {postcondition, frameCondition/*, atMostOneFlagSetCondition*/}
             );
+        } else {
+            validityGoal.setBranchLabel("Information Flow Validity");
+
+            // clear goal
+            validityGoal.node().setSequent(Sequent.EMPTY_SEQUENT);
+            validityGoal.clearAndDetachRuleAppIndex();
+
+            if (contract.hasModifiesClause(heaps.get(0)) &&
+                contract.hasInfFlowSpecs() ) {
+                // set up information flow validity goal
+                InfFlowValidityData infFlowValidityData =
+                    setUpInfFlowValidityGoal(validityGoal, contract,
+                                             anonymisationHeaps, services,
+                                             variables, heaps, localInVariables,
+                                             localOutVariables, application,
+                                             instantiation);
+
+                // do additional inf flow preparations on the usage goal
+                setUpInfFlowPartOfUsageGoal(usageGoal, infFlowValidityData,
+                                            contextUpdate, remembranceUpdate,
+                                            anonymisationUpdate);
+            } else {
+                // nothing to prove -> set up trivial goal
+                validityGoal.addFormula(new SequentFormula(TB.tt()), false, true);
+            }
         }
 
         return result;
