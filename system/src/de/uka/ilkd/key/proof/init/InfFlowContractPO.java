@@ -96,7 +96,8 @@ public class InfFlowContractPO extends AbstractOperationPO
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
             addLabeledIFSymbol(t);
         }
-        final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
+        final RemovePostTacletBuilder removePostTB =
+                new RemovePostTacletBuilder(services);
         final ArrayList<Taclet> removePostTaclets =
                 removePostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : removePostTaclets) {

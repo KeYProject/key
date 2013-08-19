@@ -103,10 +103,4 @@ public final class ModalOperatorSV extends AbstractSV  {
 	result.append("} ").append(name()).append(";\n");
 	return result.toString();
     }
-
-
-    @Override
-    public Operator rename(Name name) {
-        return new ModalOperatorSV(name, modalities);
-    }
 }

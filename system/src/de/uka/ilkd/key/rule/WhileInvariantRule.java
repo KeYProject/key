@@ -338,7 +338,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
             goal.proof().addLabeledIFSymbol(t);
         }
-        final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
+        final RemovePostTacletBuilder removePostTB =
+                new RemovePostTacletBuilder(services);
         final ArrayList<Taclet> removePostTaclets =
                 removePostTB.generateTaclets(post, ifVars, services);
         for (final Taclet t : removePostTaclets) {

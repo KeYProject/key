@@ -652,10 +652,4 @@ public final class ProgramSV extends AbstractSV
    public ReferencePrefix getRuntimeInstance() {
       return null;
    }
-
-
-    @Override
-    public UpdateableOperator rename(Name name) {
-        return new ProgramSV(name, (ProgramSVSort) sort(), isListSV);
-    }
 }

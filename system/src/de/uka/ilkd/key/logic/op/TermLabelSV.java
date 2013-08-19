@@ -113,9 +113,4 @@ public class TermLabelSV implements SchemaVariable, ITermLabel {
     public int getChildCount() {
         return 0;
     }
-
-    @Override
-    public Operator rename(Name name) {
-        return new TermLabelSV(name);
-    }
 }

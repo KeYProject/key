@@ -96,9 +96,4 @@ public final class Metavariable extends AbstractSortedOperator
     public boolean isTemporaryVariable () {
         return isTemporaryVariable;
     }
-
-    @Override
-    public Operator rename(Name name) {
-        return new Metavariable(name, sort(), isTemporaryVariable);
-    }
 }

@@ -79,10 +79,4 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
 	       + name() 
 	       + ";\n";
     }    
-
-
-    @Override
-    public Operator rename(Name name) {
-        return new VariableSV(name, sort());
-    }
 }

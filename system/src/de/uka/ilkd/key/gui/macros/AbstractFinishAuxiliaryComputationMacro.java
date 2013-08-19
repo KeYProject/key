@@ -163,22 +163,20 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
             return term;
         } else if (replaceMap.containsKey(term)) {
             return replaceMap.get(term);
-        } else if (term.op() instanceof ParsableVariable) {
+        } else if (term.op() instanceof ProgramVariable) {
             assert term.subs().isEmpty();
-            final ParsableVariable pv = (ParsableVariable) term.op();
+            final ProgramVariable pv = (ProgramVariable) term.op();
             final Name newName =
                     VariableNameProposer.DEFAULT.getNewName(services,
                                                             new Name(pv.name() +
                                                                      postfix));
             final Operator renamedPv = pv.rename(newName);
-            if (renamedPv instanceof ProgramVariable) {
-                // for the taclet application dialog (which gets the declared
-                // program variables in a strange way and not directly from the
-                // namespace); adds it also to the namespace
-                initGoal.addProgramVariable((ProgramVariable)renamedPv);
-            } else {
-                services.getNamespaces().programVariables().addSafely(renamedPv);
-            }
+
+            // for the taclet application dialog (which gets the declared
+            // program variables in a strange way and not directly from the
+            // namespace); adds the renamedPv also to the namespace
+            initGoal.addProgramVariable((ProgramVariable)renamedPv);
+
             final Term pvTerm = TB.label(TermFactory.DEFAULT.createTerm(renamedPv),
                                          term.getLabels());
             replaceMap.put(term, pvTerm);

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -299,4 +300,12 @@ public abstract class ProgramVariable extends AbstractSortedOperator
             return null;
         }     
     }
+
+    /**
+     * Returns an equivalent variable with the new name.
+     * @param name  the new name
+     * @return      equivalent operator with the new name
+     */
+    abstract public Operator rename(Name name);
+
 }

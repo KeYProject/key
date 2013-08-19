@@ -23,10 +23,4 @@ import de.uka.ilkd.key.logic.Name;
  * by one of the parsers. 
  */
 public interface ParsableVariable extends SortedOperator {
-    /**
-     * Returns an equivalent variable with the new name.
-     * @param name  the new name
-     * @return      equivalent operator with the new name
-     */
-    public Operator rename(Name name);
 }
