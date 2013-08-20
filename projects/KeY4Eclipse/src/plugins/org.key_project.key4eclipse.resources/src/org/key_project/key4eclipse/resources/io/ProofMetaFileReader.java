@@ -21,7 +21,7 @@ public class ProofMetaFileReader {
    
    private Element rootElement;
    private String proofFileMD5;
-   LinkedList<ProofMetaFileTypeElement> typeElemens;
+   LinkedList<ProofMetaFileTypeElement> typeElemens; // TODO: Make private
    
    
    /**
@@ -29,12 +29,12 @@ public class ProofMetaFileReader {
     * @param metaIFile
     * @throws Exception
     */
-   public ProofMetaFileReader(IFile metaIFile) throws Exception{
+   public ProofMetaFileReader(IFile metaIFile) throws Exception{ // Change Exception to ProofMetaFileContentException. Other exceptions are never thrown. It is legal for me to throw SAXException 
       File metaFile = metaIFile.getLocation().toFile();
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
       try{
-         Document doc = dBuilder.parse(metaFile);
+         Document doc = dBuilder.parse(metaFile); // TODO: Use metaIFIle.getContents() instead
          this.rootElement = doc.getDocumentElement();
          this.proofFileMD5 = readMD5();
          this.typeElemens = readAllTypeElements();

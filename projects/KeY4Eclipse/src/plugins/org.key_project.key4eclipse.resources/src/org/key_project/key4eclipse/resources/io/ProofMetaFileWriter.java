@@ -71,6 +71,7 @@ public class ProofMetaFileWriter {
          transformer.transform(source, result);
          metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
          metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+         // TODO: Make meta file read-only so that the user sees that he should not modify it.
       } catch (Exception e) {
          LogUtil.getLogger().createErrorStatus(e);
       }
@@ -99,12 +100,13 @@ public class ProofMetaFileWriter {
       createTypeElement(getKeYJavaTypeFromEnv(pe.getContract().getKJT(), pe.getKeYEnvironment()));
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
-         if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){   
+         if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){ // TODO: Method calls are not enough, you have to treat all possible reference kinds. For instance is a proof also invalid if a contract is changed    
             KeYJavaType kjt = getKeYJavaType(proofRef);
             if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
                createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
             }
          }
+         // TODO: In case of an unknown reference kind throw an exception that the developer sees that something is wrong!
       }
       return doc;
    }
