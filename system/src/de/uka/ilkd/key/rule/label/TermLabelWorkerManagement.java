@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.PostConditionTermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -198,6 +199,9 @@ public final class TermLabelWorkerManagement {
       }
       else if(AnonHeapTermLabel.NAME.toString().equals(name)) {
          return AnonHeapTermLabelInstantiator.INSTANCE;
+      }
+      else if(PostConditionTermLabel.NAME.toString().equals(name)) {
+         return PostConditionTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;

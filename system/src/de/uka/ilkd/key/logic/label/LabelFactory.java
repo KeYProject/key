@@ -45,6 +45,9 @@ public class LabelFactory {
       else if (AnonHeapTermLabel.NAME.toString().equals(name)) {
           return AnonHeapTermLabel.INSTANCE;
       }
+      else if (PostConditionTermLabel.NAME.toString().equals(name)) {
+          return PostConditionTermLabel.INSTANCE;
+      }
       else {
          throw new UnknownLabelException(name);
       }

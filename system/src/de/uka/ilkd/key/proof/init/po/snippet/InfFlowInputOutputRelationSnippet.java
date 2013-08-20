@@ -10,6 +10,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.label.PostConditionTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -74,7 +75,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                 buildOutputRelation(d, vs1, vs2, infFlowSpecAtPost1,
                                     infFlowSpecAtPost2);
 
-        return d.tb.imp(inputRelation, outputRelation);
+        return d.tb.imp(inputRelation,
+                        d.tb.label(outputRelation,
+                                   PostConditionTermLabel.INSTANCE));
     }
 
 
