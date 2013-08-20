@@ -943,7 +943,7 @@ public class ProofManager {
                            processProof(pe);
                         }
                      } catch (Exception e) {
-                        LogUtil.getLogger().createErrorStatus(e);
+                        LogUtil.getLogger().createErrorStatus(e); // TODO: You did nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
                         processProof(pe);
                      }
                   }
