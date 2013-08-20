@@ -2510,7 +2510,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
 
-    public static class Factory extends StrategyFactory {
+    public static class Factory implements StrategyFactory {
        /**
         * The unique {@link Name} of this {@link StrategyFactory}.
         */

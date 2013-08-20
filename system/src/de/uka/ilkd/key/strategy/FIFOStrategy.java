@@ -69,7 +69,7 @@ public class FIFOStrategy implements Strategy {
     
     public static Strategy INSTANCE = new FIFOStrategy ();
     
-    public static class Factory extends StrategyFactory {
+    public static class Factory implements StrategyFactory {
         public Name name () {
             return NAME;
         }

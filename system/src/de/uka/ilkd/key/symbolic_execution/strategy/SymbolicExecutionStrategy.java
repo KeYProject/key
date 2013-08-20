@@ -198,7 +198,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * The {@link StrategyFactory} to create instances of {@link SymbolicExecutionStrategy}.
     * @author Martin Hentschel
     */
-   public static class Factory extends StrategyFactory {
+   public static class Factory implements StrategyFactory {
       /**
        * Shown string for method treatment "Expand".
        */
