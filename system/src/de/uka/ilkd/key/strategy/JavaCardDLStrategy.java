@@ -2511,6 +2511,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
     public static class Factory extends StrategyFactory {
+       /**
+        * The unique {@link Name} of this {@link StrategyFactory}.
+        */
+       public static final Name NAME = new Name(JavaCardDLStrategy);
+       
+       
        public static final String TOOL_TIP_STOP_AT_DEFAULT = "<html>Stop when (i) the maximum number of rule<br>" +
              "applications is reached or (ii) no more rules are<br>"+
 "applicable on the proof tree.</html>";
@@ -2711,7 +2717,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              + "\" are applied automatically with low priority";};
        public static String TOOL_TIP_USER_HIGH(int i) {return "Taclets of the rule set \"userTaclets" + i 
              + "\" are applied automatically with high priority";};
-
        
         public Factory () {
         }
@@ -2722,7 +2727,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         public Name name () {
-            return new Name(JavaCardDLStrategy);
+            return NAME;
         }
 
         @Override
