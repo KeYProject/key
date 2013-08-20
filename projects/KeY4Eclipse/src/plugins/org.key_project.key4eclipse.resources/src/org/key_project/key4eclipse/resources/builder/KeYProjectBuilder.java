@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -61,7 +62,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             }
          }
          catch (Exception e){
-           LogUtil.getLogger().createErrorStatus(e);
+           LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing, you should throw a CoreException: throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
          }
          finally {
             if (proofManager != null) {
@@ -86,7 +87,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          super.clean(monitor);
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing, you should throw a CoreException: throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
       finally {
          if (proofManager != null) {
@@ -111,6 +112,8 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       LinkedList<IResourceDelta> deltaList = deltaVisitor.getDeltaList();
       for(IResourceDelta aDelta : deltaList){
          try{
+            // TODO: What happens if a proof file has changed? Marker and meta file should be updated based on the new proof result.
+            // TODO: What happens if a meta file is modified by a user?  
             switch(aDelta.getKind()){
             case IResourceDelta.ADDED:
                file = getFile(aDelta.getResource());
@@ -125,8 +128,9 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
                }
                break;
             }
+            // TODO: Why not when a resource is deleted?
          } catch (Exception e) {
-            LogUtil.getLogger().createErrorStatus(e);
+            LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing. What happens if a single file can't be processed? Continue build or throw exception? It might be bedder to throw an exception!?
          }
       }
       return deltasFiles;
@@ -139,7 +143,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * @return the {@link IFile}
     * @throws Exception
     */
-   private IFile getFile(IResource res) throws Exception{
+   private IFile getFile(IResource res) throws Exception{ // TODO: This implementation does not work in general. What if the project has no src folder or if it is named different? Use JDT functionality instead like in KeYUtil#updateToMethodNameLocation(...).  
       if(res.exists()){
          IPath resourcePath = res.getFullPath();
          IPath sourceFolderPath = res.getProject().getFullPath().append("src");

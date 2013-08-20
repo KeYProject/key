@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 
@@ -107,7 +108,7 @@ public class MarkerManager {
       StringBuffer sb = new StringBuffer();
       sb.append("Cycle detected:");
       for(ProofElement pe : cycle){
-         sb.append("\n");
+         sb.append(StringUtil.NEW_LINE);
          sb.append(pe.getProofFile().getFullPath());
       }
       return sb.toString();

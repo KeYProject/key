@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -47,6 +48,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * @author Stefan Käsdorf
@@ -103,11 +106,18 @@ public class KeY4EclipseResourcesUtil {
     */
    private static LinkedList<IFile> collectAllMetaFiles(IFolder folder) throws CoreException{
       LinkedList<IFile> metaFileList = new LinkedList<IFile>();
+//      folder.accept(new IResourceVisitor() {
+//         @Override
+//         public boolean visit(IResource resource) throws CoreException {
+//            return false;
+//         }
+//      }, IResource.DEPTH_INFINITE, true); // TODO: It is not efficient to iterate recursive over IResources. Use the visitor pattern instead as in this uncommented code.
+      
       IResource[] members = folder.members(IContainer.INCLUDE_HIDDEN);
       for(IResource member : members){
          if(member.getType() == IResource.FILE){
             IFile file = (IFile) member;
-            if(file.getFileExtension().equalsIgnoreCase("meta")){
+            if("meta".equalsIgnoreCase(file.getFileExtension())){ //TODO: Create constant for file extension meta and use it everywhere
                metaFileList.add(file);
             }
          }
@@ -125,12 +135,12 @@ public class KeY4EclipseResourcesUtil {
     * @param iFile - the {@link IFile} to use
     * @return the MD5 Sum as {@link String}
     */
-   public static String computeContentMD5(IFile iFile){
-      File file = iFile.getLocation().toFile();
+   public static String computeContentMD5(IFile iFile){ // TODO: Move to ResourceUtil.computeMD5(IFile)
+      File file = iFile.getLocation().toFile(); // TODO: Never work with File instead of IFile because in general an IFile can be everywhere and not only on hard disk. Ensure that this is never done. Only KeY has to do it because it can not handle IFiles... 
       String md5 = null;
          try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
-            InputStream is = new FileInputStream(file);           
+            InputStream is = new FileInputStream(file); // TODO: Use iFile iFile.getContents() instead. Here and everwhere in your code!
             byte[] buffer = new byte[8192];
             int read = 0;
             while( (read = is.read(buffer)) > 0) {
@@ -142,7 +152,7 @@ public class KeY4EclipseResourcesUtil {
             is.close();
          }
          catch(Exception e) {
-            throw new RuntimeException("Unable to process file for MD5", e);
+            throw new RuntimeException("Unable to process file for MD5", e); // TODO: Bad idea, it is legal that exceptions are thrown, treat it by the caller of this method!
          }
       return md5;
    }
@@ -153,7 +163,7 @@ public class KeY4EclipseResourcesUtil {
     * @param kjt - the {@link KeYJavaType} to use
     * @return false if the {@link KeYJavaType} is an internal resource
     */
-   public static boolean filterKeYJavaType(KeYJavaType kjt){
+   public static boolean filterKeYJavaType(KeYJavaType kjt){ // TODO: Use KeYTypeUtil.isLibraryClass(...) instead after pull from master
       if (!(kjt.getJavaType() instanceof ClassDeclaration || 
             kjt.getJavaType() instanceof InterfaceDeclaration) || 
           ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
@@ -168,7 +178,7 @@ public class KeY4EclipseResourcesUtil {
     * @param kjts - the {@link KeYJavaType}s to filter and sort
     * @return the filtered and sorted {@link KeYJavaType[]}
     */
-   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){
+   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){ // TODO: Move to KeYUtil.sortKeYJavaTypes(Set<KeYJavaType>)
       Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
          KeYJavaType kjt = it.next();
@@ -194,7 +204,7 @@ public class KeY4EclipseResourcesUtil {
    public static void hideMetaFiles(IProject project) throws CoreException{
       boolean hide = KeYProjectProperties.isHideMetaFiles(project);
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append("proofs");
+      IPath proofFolderPath = project.getFullPath().append("proofs"); // TODO: Make a constant for folder name "proofs" and use it everywhere
       IFolder proofFolder = root.getFolder(proofFolderPath);
       if(proofFolder.exists()){
          LinkedList<IFile> metaFiles = collectAllMetaFiles(proofFolder);

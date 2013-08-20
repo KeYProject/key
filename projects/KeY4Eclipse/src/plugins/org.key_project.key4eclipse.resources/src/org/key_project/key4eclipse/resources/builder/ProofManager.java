@@ -204,12 +204,14 @@ public class ProofManager {
             IPath relatviePath = location.makeRelativeTo(project.getLocation().removeLastSegments(1));
             javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(relatviePath);
             scl = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo());
+            scl = KeYUtil.updateToMethodNameLocation(javaFile, scl);
          }
          for (IObserverFunction target : targets) {
             if(target instanceof IProgramMethod){
                IProgramMethod progMethod = (IProgramMethod) target;
                if(progMethod.getContainerType().getJavaType().equals(javaType)){
                   scl = KeYUtil.convertToSourceLocation(progMethod.getPositionInfo());
+                  scl = KeYUtil.updateToMethodNameLocation(javaFile, scl);
                }
             }
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
@@ -221,8 +223,7 @@ public class ProofManager {
       }
       return proofElements;
    }
-   
-   
+
    /**
     * Returns the proofFolder for the given java{@link IFile}.
     * @param javaFile - the java{@link IFile} to use
@@ -715,7 +716,7 @@ public class ProofManager {
             pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
          }
       }catch(Exception e){
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
       }
    }
    
@@ -943,7 +944,7 @@ public class ProofManager {
                            processProof(pe);
                         }
                      } catch (Exception e) {
-                        LogUtil.getLogger().createErrorStatus(e);
+                        LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
                         processProof(pe);
                      }
                   }
@@ -957,7 +958,7 @@ public class ProofManager {
             environment.dispose();
       
          } catch(Exception e){
-            LogUtil.getLogger().createErrorStatus(e);
+            LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
          }
       }
    }
