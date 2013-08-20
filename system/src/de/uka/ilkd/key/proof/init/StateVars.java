@@ -163,7 +163,7 @@ public class StateVars {
              copyVariable(orig.result, postfix, services),
              copyVariable(orig.exception, postfix, services),
              copyHeapSymbol(orig.heap, postfix, services),
-             newFunction(orig.mbyAtPre, postfix, services));
+             copyFunction(orig.mbyAtPre, postfix, services));
     }
 
 
@@ -248,15 +248,28 @@ public class StateVars {
 
 
     private static Term newFunction(Term t,
-                                    String postfix,
+                                    String name,
                                     Services services) {
         if (t == null) {
             return null;
         }
-        String newName = TB.newName(services, t.toString() + postfix);
-        final Function newFunc = new Function(new Name(newName), t.sort());
+        final Function newFunc = new Function(new Name(name), t.sort());
         register(newFunc, services);
         return TB.func(newFunc);
+    }
+
+
+    private static Term copyFunction(Term t,
+                                     String postfix,
+                                     Services services) {
+        if (t != null) {
+            Term tWithoutLables = TB.unlabel(t);
+            Term result =
+                   newFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
+            return TB.label(result, t.getLabels());
+        } else {
+            return null;
+        }
     }
 
 
