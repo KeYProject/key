@@ -300,10 +300,10 @@
       </category>
       <view
             category="org.key_project.keyide.ui.view.category"
-            class="org.key_project.keyide.ui.views.StrategyPropertiesView"
+            class="org.key_project.keyide.ui.views.StrategySettingsView"
             icon="icons/releng_gears.gif"
-            id="org.key_project.keyide.ui.view.StrategyProperties"
-            name="Strategy Properties"
+            id="org.key_project.keyide.ui.view.StrategySettings"
+            name="Strategy Settings"
             restorable="true">
       </view>
    </extension>

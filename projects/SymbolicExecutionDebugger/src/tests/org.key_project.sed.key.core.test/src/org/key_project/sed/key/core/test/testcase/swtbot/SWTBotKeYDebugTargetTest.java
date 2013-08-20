@@ -27,7 +27,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -43,6 +42,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * Tests for the functionality of a {@link KeYDebugTarget}.
@@ -1354,18 +1354,30 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
             // Configure operation contract and loop invariant usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
-            SWTBotCombo methodTreatmentCombo = symbolicSettingsView.bot().comboBox();
-            assertTrue(methodTreatmentCombo.isEnabled());
-            methodTreatmentCombo.setSelection(useOperationContracts ? SymbolicExecutionSettingsView.METHOD_TREATMENT_CONTRACT : SymbolicExecutionSettingsView.METHOD_TREATMENT_EXPAND);
-            SWTBotCombo loopInvariantCombo = symbolicSettingsView.bot().comboBox(1);
-            assertTrue(loopInvariantCombo.isEnabled());
-            loopInvariantCombo.setSelection(useLoopInvariants ? SymbolicExecutionSettingsView.LOOP_TREATMENT_INVARIANT : SymbolicExecutionSettingsView.LOOP_TREATMENT_EXPAND);
-            SWTBotCombo branchHidingCheckCombo = symbolicSettingsView.bot().comboBox(2);
-            assertTrue(branchHidingCheckCombo.isEnabled());
-            branchHidingCheckCombo.setSelection(nonExecutionBranchHidingSideProofs ? SymbolicExecutionSettingsView.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : SymbolicExecutionSettingsView.NON_EXECUTION_BRANCH_HIDING_OFF);
-            SWTBotCombo aliasCheckCombo = symbolicSettingsView.bot().comboBox(3);
-            assertTrue(aliasCheckCombo.isEnabled());
-            aliasCheckCombo.setSelection(aliasChecks ? SymbolicExecutionSettingsView.ALIAS_CHECK_IMMEDIATELY : SymbolicExecutionSettingsView.ALIAS_CHECK_NEVER);
+            if (useOperationContracts) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_EXPAND, 0));
+            }
+            if (useLoopInvariants) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_INVARIANT));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 1));
+            }
+            if (nonExecutionBranchHidingSideProofs) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_OFF));
+            }
+            if (aliasChecks) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.ALIAS_CHECK_IMMEDIATELY));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.ALIAS_CHECK_NEVER));
+            }
             // Get debug target TreeItem
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             // Create tree

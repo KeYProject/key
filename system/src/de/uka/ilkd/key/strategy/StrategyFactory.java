@@ -14,8 +14,10 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 /**
  * Interface for creating Strategy instances.
  * The strategy name and the name of the strategy factory are assumed to be the same
@@ -60,4 +62,11 @@ public abstract class StrategyFactory implements Named {
     public abstract Strategy create(Proof proof, 
             StrategyProperties strategyProperties);
     
+    /**
+     * Returns the {@link StrategySettingsDefinition} which describes
+     * how an user interface has to look like to edit {@link StrategySettings}
+     * supported by created {@link Strategy} instances.
+     * @return The {@link StrategySettingsDefinition} which describes the user interface.
+     */
+    public abstract StrategySettingsDefinition getSettingsDefinition();
 }

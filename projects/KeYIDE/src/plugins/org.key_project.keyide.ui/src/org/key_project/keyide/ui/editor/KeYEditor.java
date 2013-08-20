@@ -52,7 +52,9 @@ import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
+import org.key_project.keyide.ui.views.IStrategySettingsPage;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
+import org.key_project.keyide.ui.views.StrategySettingsPage;
 import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -578,6 +580,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
       else if (IPropertySheetPage.class.equals(adapter)) {
          return new TabbedPropertySheetPage(this);
+      }
+      else if (IStrategySettingsPage.class.equals(adapter)) {
+         return new StrategySettingsPage(this);
       }
       else if (Proof.class.equals(adapter)) {
          return getCurrentProof();
