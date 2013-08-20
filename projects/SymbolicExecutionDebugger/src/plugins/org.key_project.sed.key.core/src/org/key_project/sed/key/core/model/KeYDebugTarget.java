@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IMethod;
+import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
@@ -110,9 +111,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       Assert.isNotNull(launchSettings);
       this.launchSettings = launchSettings; 
       this.environment = environment;
+      Proof proof = environment.getProof();
+      ProofUserManager.getInstance().addUser(proof, environment, this);
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
-      Proof proof = environment.getBuilder().getProof();
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
       thread = new KeYThread(this, environment.getBuilder().getStartNode());
       registerDebugNode(thread);
@@ -262,9 +264,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             environment.getUi().waitWhileAutoMode();
          }
          // Remove proof from user interface
-         environment.getUi().removeProof(environment.getProof());
+         ProofUserManager.getInstance().removeUserAndDispose(environment.getProof(), this);
          // Clear cache
-         environment.dispose();
          environment = null;
       }
       // Inform UI that the process is terminated
@@ -426,6 +427,14 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       return environment != null ? environment.getProof() : null;
    }
    
+   /**
+    * Returns the used {@link SymbolicExecutionEnvironment}.
+    * @return The used {@link SymbolicExecutionEnvironment}.
+    */
+   public SymbolicExecutionEnvironment<?> getEnvironment() {
+      return environment;
+   }
+
    /**
     * Returns the {@link IMethod} which is debugged.
     * @return The debugged {@link IMethod}.

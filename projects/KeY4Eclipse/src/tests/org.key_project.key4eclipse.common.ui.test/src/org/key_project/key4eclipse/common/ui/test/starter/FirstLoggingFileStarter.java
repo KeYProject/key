@@ -15,13 +15,12 @@ package org.key_project.key4eclipse.common.ui.test.starter;
 
 import org.eclipse.core.resources.IFile;
 import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
-import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 
 /**
- * {@link IGlobalStarter} which logs the calls of {@link #open(IFile)}.
+ * {@link IFileStarter} which logs the calls of {@link #open(IFile)}.
  * @author Martin Hentschel
  */
 public class FirstLoggingFileStarter implements IFileStarter, ITestedStarter {

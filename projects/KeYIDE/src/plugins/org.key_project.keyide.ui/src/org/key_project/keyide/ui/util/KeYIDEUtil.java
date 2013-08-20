@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.util;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -39,25 +40,42 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
-// TODO: Document class KeYIDEUtil
-public class KeYIDEUtil {
+/**
+ * Provides utility method for the KeYIDE.
+ * @author Martin Hentschel
+ */
+public final class KeYIDEUtil {
+   /**
+    * Forbid instances.
+    */
+   private KeYIDEUtil() {
+   }
+   
    /**
     * Opens a dialog to select a contract for the specified method, furthermore creates the proof for that method
     * @param method The method to create the proof for.
@@ -67,7 +85,7 @@ public class KeYIDEUtil {
            if (method != null && method.exists()) {
                // Load location
                final IProject project = method.getResource().getProject();
-               final File location = ResourceUtil.getLocation(project);
+               final File location = KeYUtil.getSourceLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                  
@@ -214,5 +232,70 @@ public class KeYIDEUtil {
          }
       }
       return switchPerspective;
+   }
+
+   /**
+    * Collects all applicable {@link TacletApp}s for a given {@link PosInSequent} and {@link KeYMediator}.
+    * @param mediator - the {@link KeYMediator} of the current {@link Proof}.
+    * @param pos - the {@link PosInSequent} to find the {@link TacletApp}s for.
+    * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
+    */
+   // TODO: Where was this method copied from?
+   public static ImmutableList<TacletApp> findRules(KeYMediator mediator, PosInSequent pos) {
+      if(pos != null){
+         ImmutableList<TacletApp> findTacletList = mediator.getFindTaclet(pos);
+         ImmutableList<TacletApp> reWriteTacletList = mediator.getRewriteTaclet(pos);
+         ImmutableList<TacletApp> noFindTacletList = mediator.getNoFindTaclet();
+         
+         findTacletList = removeObsolete(findTacletList);
+         reWriteTacletList = removeObsolete(reWriteTacletList);
+         noFindTacletList = removeObsolete(noFindTacletList);
+         
+         ImmutableList<TacletApp> allTaclets = removeRewrites(findTacletList).prepend(reWriteTacletList);
+         
+         return allTaclets;
+      }
+      else{ 
+         return null;
+      }
+   }
+      
+   
+   /** Remove rules which belong to rule set "obsolete".
+    * Obsolete rules are sound, but are discouraged to use in
+    * both automated and interactive proofs, mostly because of proof complexity issues.
+    */
+   private static ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
+       ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+       for (TacletApp ta: list) {
+           boolean isObsolete = false;
+           for (RuleSet rs: ta.taclet().getRuleSets()) {
+               if (rs.name().equals(new Name("obsolete"))) {
+                   isObsolete = true;
+                   break;
+               }
+           }
+           if (!isObsolete)
+               result = result.append(ta);
+       }
+       return result;
+   }
+   
+   
+   /** removes RewriteTaclet from list
+    * @param list the IList<Taclet> from where the RewriteTaclet are
+    * removed
+    * @return list without RewriteTaclets
+    */
+   private static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
+      ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp> nil();
+      Iterator<TacletApp> it = list.iterator();
+
+      while (it.hasNext()) {
+         TacletApp tacletApp = it.next();
+         Taclet taclet = tacletApp.taclet();
+         result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
+      }
+      return result;
    }
 }

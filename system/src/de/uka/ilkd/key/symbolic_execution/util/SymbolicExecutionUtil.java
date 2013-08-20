@@ -1023,7 +1023,11 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as method return, {@code false} represent node as something else. 
     */
    public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
-      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
+      String displayName = MiscTools.getRuleDisplayName(ruleApp);
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallEmpty".equals(displayName) ||
+             "methodCallEmptyReturn".equals(ruleName) ||
+             "methodCallReturnIgnoreResult".equals(ruleName);
    }
 
    /**

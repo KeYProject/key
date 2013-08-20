@@ -23,12 +23,16 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -164,6 +168,13 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       // Check if a result variable is available
       MethodBodyStatement mbs = getMethodCall().getActiveStatement();
       IProgramVariable resultVar = mbs.getResultVariable();
+      // Create a temporary result variable for non void methods in case that it is missing in method frame
+      if (resultVar == null) {
+         IProgramMethod pm = mbs.getProgramMethod(getServices());
+         if (!pm.isVoid()) {
+            resultVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(getServices(), "TmpResultVar")), pm.getReturnType());
+         }
+      }
       if (resultVar != null) {
          // Search the node with applied rule "methodCallReturn" which provides the required updates
          Node methodReturnNode = findMethodReturnNode(getProofNode());
