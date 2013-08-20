@@ -43,7 +43,7 @@ public class MarkerManager {
     * @throws CoreException
     */
    public void setMarker(ProofElement pe) throws CoreException {
-      IMarker curMarker = pe.getMarker();
+      IMarker  curMarker = getOldProofMarkerForPe(pe);
       if(curMarker != null){
          curMarker.delete();
       }
@@ -81,14 +81,15 @@ public class MarkerManager {
     * @param pe - the {@link ProofElement} to use
     * @throws CoreException
     */
-   public void setCycleDetectedMarker(ProofElement pe) throws CoreException{
-      IMarker curMarker = pe.getMarker();
+   public void setCycleDetectedMarker(LinkedList<ProofElement> cycle) throws CoreException{
+      ProofElement pe = cycle.get(0);
+      IMarker  curMarker = getOldProofMarkerForPe(pe);
       if(curMarker != null){
          curMarker.delete();
       }
       IMarker marker = pe.getJavaFile().createMarker(CYCLEDETECTEDMARKER_ID);
       if (marker.exists()) {
-         marker.setAttribute(IMarker.MESSAGE, "Cycle detected");
+         marker.setAttribute(IMarker.MESSAGE, createCycleDetectedMarkerMessage(cycle));
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
          marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
          marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
@@ -96,6 +97,16 @@ public class MarkerManager {
       }
    }
    
+   
+   private String createCycleDetectedMarkerMessage(LinkedList<ProofElement> cycle){
+      StringBuffer sb = new StringBuffer();
+      sb.append("Cycle detected:");
+      for(ProofElement pe : cycle){
+         sb.append(System.lineSeparator());
+         sb.append(pe.getProofFile().getFullPath());
+      }
+      return sb.toString();
+   }
    
    /**
     * Creates the ProofLoaderException{@link IMarker} for the given {@link IResource}.
@@ -110,26 +121,38 @@ public class MarkerManager {
       }
    }
    
-   
    /**
-    * Searchs the {@link IMarker} int the given {@link IFile} for the given {@link SourceLocation}.
-    * @param scl - the {@link SourceLocation} to use
-    * @param file - the {@link IFile} to use
+    * Searches the {@link IMarker} for the given {@link ProofElement}.
+    * @param scl - the {@link ProofElement} to use
     * @return the {@link IMarker} if found. null otherwise
     * @throws CoreException
     */
-   public IMarker getMarkerForScl(SourceLocation scl, IFile file) throws CoreException{
-      LinkedList<IMarker> markerList = getAllKeYMarker(file);
+   public IMarker getOldProofMarkerForPe(ProofElement pe) throws CoreException{
+      LinkedList<IMarker> markerList = getAllkeYMarkerForScl(pe.getJavaFile(), pe.getSourceLocation());
       for(IMarker marker : markerList){
-         Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
-         Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
-         if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
-            return marker;
+         if(CLOSEDMARKER_ID.equals(marker.getType()) || NOTCLOSEDMARKER_ID.equals(marker.getType())){
+            String message = marker.getAttribute(IMarker.MESSAGE, "");
+            if(message.equals("Proof closed: " + pe.getProofFile().getFullPath()) || message.equals("Proof not closed: " + pe.getProofFile().getFullPath())){
+               return marker;
+            }
          }
       }
       return null;
    }
    
+   
+   private LinkedList<IMarker> getAllkeYMarkerForScl(IResource res, SourceLocation scl) throws CoreException{
+      LinkedList<IMarker> newMarkerList = new LinkedList<IMarker>();
+      LinkedList<IMarker> markerList = getAllKeYMarker(res);
+      for(IMarker marker : markerList){
+         Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+         Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+         if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
+            newMarkerList.add(marker);
+         }
+      }
+      return newMarkerList;
+   }
    
    /**
     * Collects all KeY{@link IMarker} for the given {@link IResource}.
@@ -171,5 +194,18 @@ public class MarkerManager {
       res.deleteMarkers(NOTCLOSEDMARKER_ID, true, depth);
       res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, depth);
       res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, depth);
+   }
+   
+   
+   public void deleteKeYMarkerByType(IResource res, String type, int depth) throws CoreException{
+      if(CLOSEDMARKER_ID.equals(type)){
+         res.deleteMarkers(CLOSEDMARKER_ID, true, depth);
+      } else if(NOTCLOSEDMARKER_ID.equals(type)){
+         res.deleteMarkers(NOTCLOSEDMARKER_ID, true, depth);
+      } else if(PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type)){
+         res.deleteMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, depth);
+      } else if(CYCLEDETECTEDMARKER_ID.equals(type)){
+         res.deleteMarkers(CYCLEDETECTEDMARKER_ID, true, depth);
+      }
    }
 }

@@ -155,9 +155,10 @@ public class ProofManager {
       LinkedList<ProofElement> proofElements = getAllProofElements();
       this.changedJavaFiles = changedJavaFiles;
       markerManager.deleteKeYMarker(project, IResource.DEPTH_ZERO);
+      markerManager.deleteKeYMarkerByType(project, MarkerManager.CYCLEDETECTEDMARKER_ID, IResource.DEPTH_INFINITE);
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
-      init(proofElements, changedJavaFiles, monitor);
+      initThreads(proofElements, changedJavaFiles, monitor);
       
       checkContractRecursion(proofElements);
       cleanMarker(proofElements);
@@ -214,8 +215,7 @@ public class ProofManager {
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
                IFolder proofFolder = getProofFolder(javaFile);
-               IMarker marker = markerManager.getMarkerForScl(scl, javaFile);
-               proofElements.add(new ProofElement(javaFile, scl, marker, environment, proofFolder, contract));
+               proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, contract));
             }
          }
       }
@@ -265,8 +265,7 @@ public class ProofManager {
     * @throws InterruptedException
     * @throws CoreException
     */
-   private void init(LinkedList<ProofElement> proofElements, LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws InterruptedException, CoreException {
-      //TODO: rename init?
+   private void initThreads(LinkedList<ProofElement> proofElements, LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws InterruptedException, CoreException {
       proofsToDo = Collections.synchronizedList(cloneLinkedList(proofElements));
 
       int numOfThreads = KeYProjectProperties.getNumberOfThreads(project);
@@ -369,8 +368,8 @@ public class ProofManager {
          ByteArrayOutputStream out = pairToSave.first;
          ProofElement pe = pairToSave.second;
          saveProof(out, pe);
-         ProofMetaFileWriter pmfw = new ProofMetaFileWriter();
-         pmfw.writeMetaFile(pe);
+         ProofMetaFileWriter pmfw = new ProofMetaFileWriter(pe);
+         pmfw.writeMetaFile();
       }
    }
    
@@ -423,39 +422,6 @@ public class ProofManager {
    
    
    /**
-    * Deletes unnecessary KeY{@link IMarker}.
-    * @param proofElements
-    * @throws CoreException
-    */
-   private void cleanMarker(LinkedList<ProofElement> proofElements) throws CoreException{
-      LinkedList<IMarker> peMarker = getAllMarkerFormProofElements(proofElements);
-      LinkedList<IMarker> projectMarker = markerManager.getAllKeYMarker(project);
-      for(IMarker marker : projectMarker){
-         if(!peMarker.contains(marker)){
-            marker.delete();
-         }
-      }
-   }
-   
-   
-   /**
-    * Collects all KeY{@link IMarker} from the given {@link LinkedList} of {@link ProofElement}s.
-    * @param proofElements - the {@link ProofElement}s to use
-    * @return a {@link LinkedList} with all KeY{@link IMarker}
-    */
-   private LinkedList<IMarker> getAllMarkerFormProofElements(LinkedList<ProofElement> proofElements){
-      LinkedList<IMarker> markerList = new LinkedList<IMarker>();
-      for(ProofElement pe : proofElements){
-         IMarker marker = pe.getMarker();
-         if(marker != null){
-            markerList.add(marker);
-         }
-      }
-      return markerList;
-   }
-   
-   
-   /**
     * Collects all proof- and meta{@link IFile}s from the given {@link LinkedList} of {@link ProofElement}s.
     * @param proofElements - the {@link ProofElement}s to use
     * @return a {@link LinkedList} with all proof- and meta{@link IFile}s
@@ -477,9 +443,31 @@ public class ProofManager {
     */
    private void checkContractRecursion(LinkedList<ProofElement> proofElements) throws CoreException{
       RecursionGraph graph = new RecursionGraph(proofElements);
-      LinkedHashSet<ProofElement> cyclingElements = graph.findCycles();
-      for(ProofElement pe : cyclingElements){
-         markerManager.setCycleDetectedMarker(pe);
+      LinkedHashSet<LinkedList<ProofElement>> cycles = graph.findCycles();
+      for(LinkedList<ProofElement> cycle : cycles){
+         markerManager.setCycleDetectedMarker(cycle);
+      }
+   }
+   
+   
+   private void cleanMarker(LinkedList<ProofElement> proofElements) throws CoreException{
+      LinkedList<IMarker> peMarker = new LinkedList<IMarker>();
+      for(ProofElement pe : proofElements){
+         if(pe.getMarker() == null){
+            IMarker marker = markerManager.getOldProofMarkerForPe(pe);
+            if(marker != null){
+               peMarker.add(marker);
+            }
+         }
+         else {
+            peMarker.add(pe.getMarker());
+         }
+      }
+      LinkedList<IMarker> allMarker = markerManager.getAllKeYMarker(project);
+      for(IMarker marker : allMarker){
+         if(!peMarker.contains(marker)){
+            marker.delete();
+         }
       }
    }
    
@@ -667,12 +655,11 @@ public class ProofManager {
     * @throws Exception
     */
    private void processProof(ProofElement pe) throws Exception{
-      
       IFile file = pe.getProofFile();
       if(!file.exists()){
          createProof(pe);
       }
-      else{
+      else {
          loadProof(pe);
          if(pe.getProof() == null){
             createProof(pe);
@@ -686,7 +673,8 @@ public class ProofManager {
          proofsToSave.add(new Pair<ByteArrayOutputStream, ProofElement>(out, pe));
          pe.getProof().dispose();
       }
-   }   
+   }
+   
    
    /**
     * Creates a {@link Proof} for the given {@link ProofElement} and runs the AutoMode.
@@ -785,7 +773,7 @@ public class ProofManager {
     * Checks if a type or a subtype from the metafile were changed.  
     * @param pmfr - the {@link ProofMetaFileReader} to use
     * @param javaTypes the {@link LinkedList} with all changed java{@link IFile}s
-    * @return true if a type or a subtype were changed. false otherwise
+    * @return true if a type or a subtype was changed. false otherwise
     * @throws JavaModelException
     */
    private boolean typeOrSubTypeChanged(ProofMetaFileReader pmfr, LinkedList<IType> javaTypes) throws JavaModelException{
@@ -913,6 +901,10 @@ public class ProofManager {
 
 
    
+   /**
+    * Inner class to process the proofs in threads.
+    * @author Stefan Käsdorf
+    */
    private class ProofRunnable implements Runnable {
       
       private KeYEnvironment<CustomConsoleUserInterface> environment;
@@ -941,27 +933,21 @@ public class ProofManager {
                   
                }
                else{
-                  if(changedJavaFiles.contains(pe.getJavaFile())){
-                     processProof(pe);
-                  }
-                  else{
-                     IFile metaFile = getProofMetaFile(pe.getProofFile());
-                     if(metaFile.exists()){
-                        try{
-                           ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
-                           LinkedList<IType> javaTypes = collectAllJavaITypes();
-                           //TODO warum nicht einfach über das delta abfragen ob sich die proofFile geändert hat?
-                           if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pmfr, javaTypes) || superTypeChanged(pe.getContract().getKJT(), changedJavaFiles, javaTypes)){
-                              processProof(pe);
-                           }
-                        } catch (Exception e) {
-                           LogUtil.getLogger().createErrorStatus(e);
+                  IFile metaFile = getProofMetaFile(pe.getProofFile());
+                  if(metaFile.exists()){
+                     try{
+                        ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
+                        LinkedList<IType> javaTypes = collectAllJavaITypes();
+                        if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pmfr, javaTypes) || superTypeChanged(pe.getContract().getKJT(), changedJavaFiles, javaTypes)){
                            processProof(pe);
                         }
-                     }
-                     else{
+                     } catch (Exception e) {
+                        LogUtil.getLogger().createErrorStatus(e);
                         processProof(pe);
                      }
+                  }
+                  else{
+                     processProof(pe);
                   }
                }
                

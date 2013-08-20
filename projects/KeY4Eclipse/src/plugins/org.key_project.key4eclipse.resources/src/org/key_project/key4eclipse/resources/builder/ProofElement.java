@@ -116,10 +116,9 @@ public class ProofElement {
    } 
    
    
-   public ProofElement(IFile javaFile, SourceLocation scl, IMarker marker, KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
-      this.marker =  marker;
       
       this.proofFolder = proofFolder;
       

@@ -14,7 +14,7 @@ public class RecursionGraph {
    
    private LinkedHashSet<RecursionGraphNode> nodes;
    private LinkedList<ProofElement> proofElements;
-   private LinkedHashSet<RecursionGraphNode> cyclingNodes;
+   private LinkedHashSet<LinkedList<RecursionGraphNode>> tmpNodeCycles;
 
    
    /**
@@ -23,7 +23,7 @@ public class RecursionGraph {
     */
    public RecursionGraph(LinkedList<ProofElement> proofElements){
       nodes = new LinkedHashSet<RecursionGraphNode>();
-      cyclingNodes = new LinkedHashSet<RecursionGraphNode>();
+      tmpNodeCycles = new LinkedHashSet<LinkedList<RecursionGraphNode>>();
       this.proofElements = proofElements;
       for(ProofElement pe : this.proofElements){
          addProofElement(pe);
@@ -136,18 +136,63 @@ public class RecursionGraph {
     * Checks the whole graph for cycles and returns all {@link ProofElement} which are part of a cycle.
     * @return all cycling {@link ProofElement}s
     */
-   public LinkedHashSet<ProofElement> findCycles(){
-      cyclingNodes = new LinkedHashSet<RecursionGraphNode>();
+   public LinkedHashSet<LinkedList<ProofElement>> findCycles(){
+      LinkedHashSet<LinkedList<ProofElement>> cycles = new LinkedHashSet<LinkedList<ProofElement>>();
+      LinkedList<RecursionGraphNode> checkedNodes = new LinkedList<RecursionGraphNode>();
       for(RecursionGraphNode node : nodes){
-         if(!cyclingNodes.contains(node)){
-            checkNode(node, new LinkedList<RecursionGraphNode>());
+         if(!checkedNodes.contains(node)){
+            tmpNodeCycles = new LinkedHashSet<LinkedList<RecursionGraphNode>>();
+            searchCycle(node, new LinkedList<RecursionGraphNode>());
+            for(LinkedList<RecursionGraphNode> tmpNodeCycle : tmpNodeCycles){
+               LinkedList<ProofElement> peCycle = new LinkedList<ProofElement>();
+               for(RecursionGraphNode tmpCycleNode : tmpNodeCycle){
+                  peCycle.add(tmpCycleNode.getProofElement());
+                  if(!checkedNodes.contains(tmpCycleNode)){
+                     checkedNodes.add(tmpCycleNode);
+                  }
+               }
+               cycles.add(peCycle);
+               cycles.addAll(rotateCycle(peCycle));
+            }
          }
       }
-      LinkedHashSet<ProofElement> cyclingElements = new LinkedHashSet<ProofElement>();
-      for(RecursionGraphNode cycleNode : cyclingNodes){
-         cyclingElements.add(cycleNode.getProofElement());
+      return cycles;
+   }
+   
+   
+   /**
+    * Rotates the given cycle and return a hashSet with all possible cycles.
+    * @param cycle - the cycle to rotate
+    * @return all cycles
+    */
+   private LinkedHashSet<LinkedList<ProofElement>> rotateCycle(LinkedList<ProofElement> cycle){
+      LinkedHashSet<LinkedList<ProofElement>> rotatedCycles = new LinkedHashSet<LinkedList<ProofElement>>();
+      for(int i = 1; i < cycle.size(); i++){
+         rotatedCycles.add(rotateCycleByTimes(cycle, i));
       }
-      return cyclingElements;
+      return rotatedCycles;
+   }
+   
+   
+   /**
+    * Rotates respectively shifts the given cycle by the given number.
+    * @param cycle - the cycle to rotate
+    * @param number - the number of shifts
+    * @return
+    */
+   private LinkedList<ProofElement> rotateCycleByTimes(LinkedList<ProofElement> cycle, int number){
+      LinkedList<ProofElement> rotatedCycle = new LinkedList<ProofElement>();
+      for(int i = 0; i < cycle.size(); i++){
+         int current = i + number;
+         if(current < cycle.size()){
+            rotatedCycle.add(cycle.get(current));
+         }
+         else {
+            current = current % cycle.size();
+            rotatedCycle.add(cycle.get(current));
+         }
+      }
+      return rotatedCycle;
    }
    
    
@@ -156,21 +201,20 @@ public class RecursionGraph {
     * @param node
     * @param cycle
     */
-   private void checkNode(RecursionGraphNode node, LinkedList<RecursionGraphNode> cycle){
+   private void searchCycle(RecursionGraphNode node, LinkedList<RecursionGraphNode> cycle){
       LinkedList<RecursionGraphNode> newCycle = cloneLinkedList(cycle);
       newCycle.add(node);
       LinkedHashSet<RecursionGraphNode> succs = node.getSuccs();
       for(RecursionGraphNode succNode : succs){
          if(!cycle.contains(succNode)){
-            checkNode(succNode, newCycle);
+            searchCycle(succNode, newCycle);
          }
          else{
-            //cyclefound
-            for(RecursionGraphNode newCycleNode : cycle){
-               if(!cyclingNodes.contains(newCycleNode)){
-                  cyclingNodes.add(newCycleNode);
-               }
+            //cycle found
+            while(newCycle.get(0) != succNode){
+               newCycle.remove(0);
             }
+            tmpNodeCycles.add(newCycle);
          }
       }
    }
@@ -188,5 +232,4 @@ public class RecursionGraph {
       }
       return clone;
    }
-   
 }

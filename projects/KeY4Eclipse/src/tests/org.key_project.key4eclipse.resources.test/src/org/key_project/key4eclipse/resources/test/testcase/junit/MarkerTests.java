@@ -250,7 +250,7 @@ public class MarkerTests extends TestCase{
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 138, 161));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 132, 153));
    }
    
    private void testProofNotClosedMarker(IProject project) throws CoreException{
@@ -265,7 +265,7 @@ public class MarkerTests extends TestCase{
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 144, 167));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 138, 159));
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{

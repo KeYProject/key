@@ -42,17 +42,23 @@ public class ProofMetaFileWriter {
     * {@link LinkedHashSet} with the full names of all types already added to the meta file.
     */
    private LinkedHashSet<String> addedTypes;
+   private ProofElement pe;
+   private Document doc;
    
+   
+   public ProofMetaFileWriter(ProofElement pe){
+      this.pe = pe;
+   }
    
    /**
     * Creates the meta file for the given {@link ProofElement}.
     * @param pe - the {@link ProofElement} to use
     */
-   public void writeMetaFile(ProofElement pe) {
+   public void writeMetaFile() {
       IFile metaIFile = pe.getMetaFile();
       try{
          this.addedTypes = new LinkedHashSet<String>();
-         Document doc = createDoument(pe);
+         doc = createDoument();
          
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
@@ -77,11 +83,11 @@ public class ProofMetaFileWriter {
     * @return the created {@link Document}
     * @throws ParserConfigurationException
     */
-   private Document createDoument(ProofElement pe) throws ParserConfigurationException{
+   private Document createDoument() throws ParserConfigurationException{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
-      Document doc = docBuilder.newDocument();
+      doc = docBuilder.newDocument();
       
       Element rootElement = doc.createElement("ProofMetaFile");
       doc.appendChild(rootElement);
@@ -90,26 +96,31 @@ public class ProofMetaFileWriter {
       String md5 = KeY4EclipseResourcesUtil.computeContentMD5(pe.getProofFile());
       proofFileMD5.appendChild(doc.createTextNode(md5));
       rootElement.appendChild(proofFileMD5);
+      createTypeElement(getKeYJavaTypeFromEnv(pe.getContract().getKJT(), pe.getKeYEnvironment()));
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){   
             KeYJavaType kjt = getKeYJavaType(proofRef);
             if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
-               kjt = getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment());
-               addedTypes.add(kjt.getFullName());
-               Element typeElement = doc.createElement("type");
-               typeElement.appendChild(doc.createTextNode(kjt.getFullName()));
-               ImmutableList<KeYJavaType> subTypes = pe.getKeYEnvironment().getServices().getJavaInfo().getAllSubtypes(kjt);
-               for(KeYJavaType subType : subTypes){
-                  Element subTypeElement = doc.createElement("subType");
-                  subTypeElement.appendChild(doc.createTextNode(subType.getFullName()));
-                  typeElement.appendChild(subTypeElement);
-               }
-               rootElement.appendChild(typeElement);
+               createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
             }
          }
       }
       return doc;
+   }
+   
+   
+   private void createTypeElement(KeYJavaType kjt){
+      addedTypes.add(kjt.getFullName());
+      Element typeElement = doc.createElement("type");
+      typeElement.appendChild(doc.createTextNode(kjt.getFullName()));
+      ImmutableList<KeYJavaType> subTypes = pe.getKeYEnvironment().getServices().getJavaInfo().getAllSubtypes(kjt);
+      for(KeYJavaType subType : subTypes){
+         Element subTypeElement = doc.createElement("subType");
+         subTypeElement.appendChild(doc.createTextNode(subType.getFullName()));
+         typeElement.appendChild(subTypeElement);
+      }
+      doc.getDocumentElement().appendChild(typeElement);
    }
    
    
