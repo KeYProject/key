@@ -30,6 +30,7 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.XMLUtil;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.GUIEvent;
@@ -340,7 +341,7 @@ public class StrategySettingsComposite extends Composite {
             }
             for (final StrategyPropertyValueDefinition value : op.getValues()) {
                final Button button = toolkit.createButton(buttonComposite, value.getValue(), SWT.RADIO);
-               button.setToolTipText(value.getTooltip());
+               button.setToolTipText(XMLUtil.replaceTags(value.getTooltip(), new XMLUtil.HTMLRendererReplacer()));
                button.setData(value.getApiValue());
                data.addPropertyButton(button, op.getApiKey());
                button.addSelectionListener(new SelectionAdapter() {
