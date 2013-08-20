@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

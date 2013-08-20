@@ -19,7 +19,6 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
@@ -33,11 +32,14 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.AnonHeapTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
 /**
  * <p>

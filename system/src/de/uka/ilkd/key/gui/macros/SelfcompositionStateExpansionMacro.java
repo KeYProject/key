@@ -53,7 +53,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected SelfCompExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
@@ -97,10 +97,11 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
                     name.startsWith(INF_FLOW_UNFOLD_PREFIX)
                ) &&
                     ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
+                JavaCardDLStrategy.Factory strategyFactory =
+                        new JavaCardDLStrategy.Factory();
                 Strategy javaDlStrategy =
-                        JavaCardDLStrategy.Factory.create(goal.proof(),
-                                                          "JavaCardDLStrategy",
-                                                          new StrategyProperties());
+                        strategyFactory.create(goal.proof(),
+                                               new StrategyProperties());
                 return javaDlStrategy.computeCost(ruleApp, pio, goal);
             } else {
                 return TopRuleAppCost.INSTANCE;
