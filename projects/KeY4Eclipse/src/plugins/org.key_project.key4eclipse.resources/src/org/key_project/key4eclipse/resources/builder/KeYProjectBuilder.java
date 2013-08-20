@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -61,7 +62,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             }
          }
          catch (Exception e){
-           LogUtil.getLogger().createErrorStatus(e);
+           LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing, you should throw a CoreException: throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
          }
          finally {
             if (proofManager != null) {
@@ -86,7 +87,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          super.clean(monitor);
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing, you should throw a CoreException: throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
       finally {
          if (proofManager != null) {
@@ -129,7 +130,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
             }
             // TODO: Why not when a resource is deleted?
          } catch (Exception e) {
-            LogUtil.getLogger().createErrorStatus(e);
+            LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing. What happens if a single file can't be processed? Continue build or throw exception? It might be bedder to throw an exception!?
          }
       }
       return deltasFiles;

@@ -73,7 +73,7 @@ public class ProofMetaFileWriter {
          metaIFile.refreshLocal(IResource.DEPTH_INFINITE, null);
          // TODO: Make meta file read-only so that the user sees that he should not modify it.
       } catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().createErrorStatus(e); // TODO: The caller should be responsible to handle exceptions. Do not catch them here
       }
    }
    

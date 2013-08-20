@@ -715,7 +715,7 @@ public class ProofManager {
             pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
          }
       }catch(Exception e){
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
       }
    }
    
@@ -943,7 +943,7 @@ public class ProofManager {
                            processProof(pe);
                         }
                      } catch (Exception e) {
-                        LogUtil.getLogger().createErrorStatus(e); // TODO: You did nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
+                        LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
                         processProof(pe);
                      }
                   }
@@ -957,7 +957,7 @@ public class ProofManager {
             environment.dispose();
       
          } catch(Exception e){
-            LogUtil.getLogger().createErrorStatus(e);
+            LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
          }
       }
    }
