@@ -11,28 +11,29 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The {@link ITermLabelWorker} used during prove to define how a
  * {@link SymbolicExecutionTermLabel} is maintained.
  * @author Martin Hentschel
  */
-public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
    /**
     * The only instance of this class.
     */
-   public static final LoopBodyTermLabelInstantiator INSTANCE = new LoopBodyTermLabelInstantiator();
+   public static final SymbolicExecutionTermLabelInstantiator INSTANCE = new SymbolicExecutionTermLabelInstantiator();
 
    /**
     * Constructor to forbid multiple instances.
     */
-   private LoopBodyTermLabelInstantiator() {
+   private SymbolicExecutionTermLabelInstantiator() {
    }
 
    /**
@@ -40,7 +41,7 @@ public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecuti
     */
    @Override
    protected ITermLabel getTermLabel(Term applicationTerm) {
-      return LoopBodyTermLabel.INSTANCE;
+      return SymbolicExecutionUtil.getSymbolicExecutionLabel(applicationTerm);
    }
 
    /**
@@ -48,6 +49,6 @@ public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecuti
     */
    @Override
    public String getName() {
-      return LoopBodyTermLabel.NAME.toString();
+      return SymbolicExecutionTermLabel.NAME.toString();
    }
 }

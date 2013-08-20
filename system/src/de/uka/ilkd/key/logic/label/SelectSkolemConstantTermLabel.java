@@ -10,30 +10,32 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.logic.label;
+
+import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.Name;
 
 
 /**
- * Label attached to anonymisation heap function symbols as for instance
- * introduce in UseOperationContractRule or WhileInvariantRule.
+ * Label attached to skolem constants introduced by the rule pullOutSelect.
  */
-public class AnonHeapTermLabel implements ITermLabel {
+public class SelectSkolemConstantTermLabel implements ITermLabel {
 
     /**
      * The unique name of this label.
      */
-    public static final Name NAME = new Name("anonHeapFunction");
+    public static final Name NAME = new Name("selectSK");
 
     /**
      * The only instance of this class.
      */
-    public static AnonHeapTermLabel INSTANCE = new AnonHeapTermLabel();
+    public static SelectSkolemConstantTermLabel INSTANCE = new SelectSkolemConstantTermLabel();
 
 
     /**
      * Constructor to forbid multiple instances.
      */
-    private AnonHeapTermLabel() {
+    private SelectSkolemConstantTermLabel() {
     }
 
 

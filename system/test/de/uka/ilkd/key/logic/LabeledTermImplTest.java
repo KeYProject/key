@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.op.Junctor;

@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;

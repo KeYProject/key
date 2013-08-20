@@ -11,13 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
 
 /**
  * The {@link ITermLabelWorker} used during prove to define how a

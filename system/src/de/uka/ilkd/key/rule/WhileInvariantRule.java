@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;

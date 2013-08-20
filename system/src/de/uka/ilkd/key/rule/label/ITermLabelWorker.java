@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.label;
 
 import java.util.List;
 
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Rule;
 
 /**
  * <p>

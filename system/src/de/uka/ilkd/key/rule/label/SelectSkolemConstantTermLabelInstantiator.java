@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,11 +19,12 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
+import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Rule;
 
 
 /**

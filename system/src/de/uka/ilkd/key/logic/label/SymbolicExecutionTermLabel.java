@@ -11,9 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.Name;
 
 /**
  * Label attached to a symbolic execution thread. 
