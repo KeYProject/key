@@ -89,7 +89,7 @@ public class MarkerManager {
       }
       IMarker marker = pe.getJavaFile().createMarker(CYCLEDETECTEDMARKER_ID);
       if (marker.exists()) {
-         marker.setAttribute(IMarker.MESSAGE, createCycleDetectedMarkerMessage(cycle));
+         marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
          marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
          marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
@@ -98,15 +98,21 @@ public class MarkerManager {
    }
    
    
-   private String createCycleDetectedMarkerMessage(LinkedList<ProofElement> cycle){
+   /** 
+    * Generates the message for the cyclemarker of the given cycle,
+    * @param cycle - the cycle to use
+    * @return the marker message
+    */
+   private String generateCycleDetectedMarkerMessage(LinkedList<ProofElement> cycle){
       StringBuffer sb = new StringBuffer();
       sb.append("Cycle detected:");
       for(ProofElement pe : cycle){
-         sb.append(System.lineSeparator());
+         sb.append("\n");
          sb.append(pe.getProofFile().getFullPath());
       }
       return sb.toString();
    }
+   
    
    /**
     * Creates the ProofLoaderException{@link IMarker} for the given {@link IResource}.
@@ -120,6 +126,7 @@ public class MarkerManager {
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
       }
    }
+   
    
    /**
     * Searches the {@link IMarker} for the given {@link ProofElement}.
@@ -141,6 +148,13 @@ public class MarkerManager {
    }
    
    
+   /**
+    * Returns all {@link IMarker} for the given {@link SourceLocation}.
+    * @param res - the {@link IResource} to use
+    * @param scl - the {@link SourceLocation} to use
+    * @return all {@link IMarker} for the {@link SourceLocation}
+    * @throws CoreException
+    */
    private LinkedList<IMarker> getAllkeYMarkerForScl(IResource res, SourceLocation scl) throws CoreException{
       LinkedList<IMarker> newMarkerList = new LinkedList<IMarker>();
       LinkedList<IMarker> markerList = getAllKeYMarker(res);
@@ -154,6 +168,7 @@ public class MarkerManager {
       return newMarkerList;
    }
    
+   
    /**
     * Collects all KeY{@link IMarker} for the given {@link IResource}.
     * @param res - the {@link IResource} to use
@@ -166,6 +181,25 @@ public class MarkerManager {
       markerList.addAll(markerArrayToList(res.findMarkers(NOTCLOSEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
       markerList.addAll(markerArrayToList(res.findMarkers(PROBLEMLOADEREXCEPTIONMARKER_ID, true, IResource.DEPTH_INFINITE)));
       markerList.addAll(markerArrayToList(res.findMarkers(CYCLEDETECTEDMARKER_ID, true, IResource.DEPTH_INFINITE)));
+      return markerList;
+   }
+   
+   
+   /**
+    * Returns all {@link IMarker} matching the given types for the given {@link IResource}.
+    * @param res - the {@link IResource} to use
+    * @param depth - the depth to use
+    * @param types - the types to look for
+    * @return a {@link LinkedList} with all matching {@link IMarker}
+    * @throws CoreException
+    */
+   public LinkedList<IMarker> getKeYMarkerByType(IResource res, int depth, String... types) throws CoreException{
+      LinkedList<IMarker> markerList = new LinkedList<IMarker>();
+      for(String type : types){
+         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || CYCLEDETECTEDMARKER_ID.equals(type)){
+            markerList.addAll(markerArrayToList(res.findMarkers(type, true, depth)));
+         }
+      }
       return markerList;
    }
    
@@ -186,7 +220,8 @@ public class MarkerManager {
  
    /**
     * Removes all KeYResource {@link IMarker} from the given {@link IResource}.
-    * @param res the {@link IResource} to use
+    * @param res - the {@link IResource} to use
+    * @param depth - the depth to use
     * @throws CoreException
     */
    public void deleteKeYMarker(IResource res, int depth) throws CoreException{
@@ -197,6 +232,13 @@ public class MarkerManager {
    }
    
    
+   /**
+    * Removes all KeYResource {@link IMarker} from the given {@link IResource} matching the given types using the given depth.
+    * @param res - the {@link IResource} to use
+    * @param type - the type to be delete
+    * @param depth - the depth to use
+    * @throws CoreException
+    */
    public void deleteKeYMarkerByType(IResource res, String type, int depth) throws CoreException{
       if(CLOSEDMARKER_ID.equals(type)){
          res.deleteMarkers(CLOSEDMARKER_ID, true, depth);

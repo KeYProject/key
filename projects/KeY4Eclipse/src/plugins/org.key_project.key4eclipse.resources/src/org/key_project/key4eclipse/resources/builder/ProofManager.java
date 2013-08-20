@@ -88,7 +88,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
- * The ProofManager is responsible for the maintasks during the build. He runs and saves the 
+ * The ProofManager is responsible for the maintasks during the build. It runs and saves the 
  * proofs, creates marker, initializes threads and manages the folderstructure.
  * @author Stefan Käsdorf
  */
@@ -456,6 +456,7 @@ public class ProofManager {
          if(pe.getMarker() == null){
             IMarker marker = markerManager.getOldProofMarkerForPe(pe);
             if(marker != null){
+               pe.setMarker(marker);
                peMarker.add(marker);
             }
          }
@@ -463,7 +464,7 @@ public class ProofManager {
             peMarker.add(pe.getMarker());
          }
       }
-      LinkedList<IMarker> allMarker = markerManager.getAllKeYMarker(project);
+      LinkedList<IMarker> allMarker = markerManager.getKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.CLOSEDMARKER_ID, MarkerManager.NOTCLOSEDMARKER_ID);
       for(IMarker marker : allMarker){
          if(!peMarker.contains(marker)){
             marker.delete();
