@@ -5,11 +5,11 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
 
 /**
@@ -48,7 +48,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
     @Override
     protected Strategy createStrategy(KeYMediator mediator,
                                       PosInOccurrence posInOcc) {
-        return new RemovePostStrategy();
+        return new RemovePostStrategy(mediator.getSelectedProof());
     }
 
 
@@ -56,14 +56,13 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name starts with a
      * string in the admitted set and rejects everything else.
      */
-    protected class RemovePostStrategy implements Strategy {
+    protected class RemovePostStrategy extends AbstractFeatureStrategy {
 
-        private final Name NAME =
-                new Name(PrepareInfFlowContractPreBranchesMacro
-                                .RemovePostStrategy.class.getSimpleName());
+        private final Name NAME = new Name("RemovePostStrategy");
 
 
-        public RemovePostStrategy() {
+        public RemovePostStrategy(Proof proof) {
+            super(proof);
         }
 
 
@@ -78,14 +77,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                                        PosInOccurrence pio,
                                        Goal goal) {
             String name = ruleApp.rule().name().toString();
-            String removePostName =
-                    RemovePostTacletBuilder.REMOVE_POST_RULENAME.toString();
-            String splitPostName =
-                    SplitPostTacletBuilder.SPLIT_POST_RULENAME.toString();
-            if (name.startsWith(removePostName)) {
-                return LongRuleAppCost.ZERO_COST;
-            } else if (name.startsWith(splitPostName)) {
-                return LongRuleAppCost.create(1);
+            if (name.equals("hide_right")) {
+                return applyTF( "b", IsPostConditionTermFeature.INSTANCE ).compute(ruleApp, pio, goal);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost impLeftCost =
                         FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE.compute(ruleApp, pio, goal);
@@ -101,9 +94,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                                      PosInOccurrence pio,
                                      Goal goal) {
             String name = app.rule().name().toString();
-            String removePostName =
-                    RemovePostTacletBuilder.REMOVE_POST_RULENAME.toString();
-            if (!name.startsWith(removePostName)) {
+            if (!name.equals("hide_right")) {
                 return true;
             }
 
@@ -136,10 +127,10 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public void instantiateApp(RuleApp app,
-                                   PosInOccurrence pio,
-                                   Goal goal,
-                                   RuleAppCostCollector collector) {
+        protected RuleAppCost instantiateApp(RuleApp app,
+                                             PosInOccurrence pio,
+                                             Goal goal) {
+            return computeCost(app, pio, goal);
         }
     }
 

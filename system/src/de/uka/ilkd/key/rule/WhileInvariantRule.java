@@ -67,8 +67,6 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
-import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -482,23 +480,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term finalTerm = TB.imp(selfComposedExec, post);
         infFlowGoal.proof().addLabeledIFSymbol(selfComposedExec);
         infFlowGoal.addFormula(new SequentFormula(finalTerm), false, true);
-
-        // create and add split-post and remove-post taclets
-        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-        final ArrayList<Taclet> splitPostTaclets =
-                splitPostTB.generateTaclets(post, ifVars, services);
-        for (final Taclet t : splitPostTaclets) {
-            infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            infFlowGoal.proof().addLabeledIFSymbol(t);
-        }
-        final RemovePostTacletBuilder removePostTB =
-                new RemovePostTacletBuilder(services);
-        final ArrayList<Taclet> removePostTaclets =
-                removePostTB.generateTaclets(post, ifVars, services);
-        for (final Taclet t : removePostTaclets) {
-            infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            infFlowGoal.proof().addLabeledIFSymbol(t);
-        }
 
         return infFlowData;
     }

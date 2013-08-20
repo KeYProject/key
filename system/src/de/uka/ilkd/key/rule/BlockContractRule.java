@@ -46,8 +46,6 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -409,22 +407,6 @@ public class BlockContractRule implements BuiltInRule {
         // add proof obligation to goal
         infFlowGoal.addFormulaToSuccedent(poFormula, true);
 
-        // create and add split-post and remove-post taclets
-        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-        final ArrayList<Taclet> splitPostTaclets =
-                splitPostTB.generateTaclets(post, ifVars, services);
-        for (final Taclet t : splitPostTaclets) {
-            infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            proof.addLabeledIFSymbol(t);
-        }
-        final RemovePostTacletBuilder removePostTB =
-                new RemovePostTacletBuilder(services);
-        final ArrayList<Taclet> removePostTaclets =
-                removePostTB.generateTaclets(post, ifVars, services);
-        for (final Taclet t : removePostTaclets) {
-            infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            proof.addLabeledIFSymbol(t);
-        }
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);
         proof.addGoalTemplates(informationFlowContractApp);

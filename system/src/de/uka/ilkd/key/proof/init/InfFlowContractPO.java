@@ -17,8 +17,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import java.io.IOException;
@@ -82,31 +80,6 @@ public class InfFlowContractPO extends AbstractOperationPO
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
                 addIFSymbol(t.taclet());
             }
-        }
-
-        // create and add split-post and remove-post taclets
-        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-        final ArrayList<Taclet> splitPostTaclets =
-                splitPostTB.generateTaclets(post, ifVars, services);
-        for (final Taclet t : splitPostTaclets) {
-            taclets = taclets.add(NoPosTacletApp
-                    .createFixedNoPosTacletApp(t,
-                                               SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                                               services));
-            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            addLabeledIFSymbol(t);
-        }
-        final RemovePostTacletBuilder removePostTB =
-                new RemovePostTacletBuilder(services);
-        final ArrayList<Taclet> removePostTaclets =
-                removePostTB.generateTaclets(post, ifVars, services);
-        for (final Taclet t : removePostTaclets) {
-            taclets = taclets.add(NoPosTacletApp
-                    .createFixedNoPosTacletApp(t,
-                                               SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                                               services));
-            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-            addLabeledIFSymbol(t);
         }
     }
 

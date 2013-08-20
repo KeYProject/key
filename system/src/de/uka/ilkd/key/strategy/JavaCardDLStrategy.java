@@ -602,6 +602,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         bindRuleSet(d, "information_flow_contract_appl", longConst(1000000));
+
+        bindRuleSet(d, "hide", inftyConst());
         
         return d;
     }
