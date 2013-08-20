@@ -29,6 +29,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -46,6 +47,21 @@ public final class MonKeYUtil {
     * Forbid instances.
     */
    private MonKeYUtil() {
+   }
+
+   /**
+    * Checks if the {@link KeYEnvironment} is shown in KeY's {@link MainWindow}.
+    * @param environment The {@link KeYEnvironment} to check.
+    * @return {@code true} {@link KeYEnvironment} is shown in {@link MainWindow}, {@code false} {@link KeYEnvironment} is not shown in {@link MainWindow}.
+    */
+   public static boolean isMainWindowEnvironment(KeYEnvironment<?> environment) {
+      if (environment != null) {
+         return MainWindow.hasInstance() && 
+                MainWindow.getInstance().getUserInterface() == environment.getUi();
+      }
+      else {
+         return false;
+      }
    }
 
    /**
@@ -111,7 +127,7 @@ public final class MonKeYUtil {
              for (IObserverFunction target : targets) {
                  ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
                  for (Contract contract : contracts) {
-                     proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment.getUi(), environment.getInitConfig(), contract));
+                     proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment, contract));
                  }
              }
              monitor.worked(1);

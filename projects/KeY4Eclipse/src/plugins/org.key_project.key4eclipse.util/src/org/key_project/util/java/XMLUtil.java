@@ -23,6 +23,136 @@ public final class XMLUtil {
     */
    private XMLUtil() {
    }
+
+   /**
+    * Replaces all tags in the given text with help of the given {@link ITagReplacer}.
+    * @param text The text to execute replacements on.
+    * @param replacer The {@link ITagReplacer} to use.
+    * @return The new created text.
+    */
+   public static String replaceTags(String text, ITagReplacer replacer) {
+      if (text != null && replacer != null) {
+         StringBuffer sb = new StringBuffer();
+         char[] signs = text.toCharArray();
+         boolean inTag = false;
+         boolean inAttribute = false;
+         StringBuffer tagSB = null;
+         for (char sign : signs) {
+            if (!inTag) {
+               if (sign == '<') {
+                  inTag = true;
+                  tagSB = new StringBuffer();
+                  tagSB.append(sign);
+               }
+               else {
+                  sb.append(sign);
+               }
+            }
+            else {
+               tagSB.append(sign);
+               if (sign == '>' && !inAttribute) {
+                  inTag = false;
+                  inAttribute = false;
+                  String replacement = replacer.replaceTag(tagSB.toString());
+                  if (replacement != null) {
+                     sb.append(replacement);
+                  }
+               }
+               else if (sign == '\'' || sign == '"') {
+                  inAttribute = !inAttribute;
+               }
+            }
+         }
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Instances of this interface are used in {@link XMLUtil#replaceTags(String, ITagReplacer)}
+    * to replace an individual found tag.
+    * @author Martin Hentschel
+    */
+   public static interface ITagReplacer {
+      /**
+       * Replaces the given tag by something esle.
+       * @param tag The found tag.
+       * @return The replacement to use or {@code null} to remove the tag.
+       */
+      public String replaceTag(String tag);
+   }
+   
+   /**
+    * This {@link ITagReplacer} can be used to render HTML into a plain text.
+    * Basically all tags will be removed. Only a limited set of tags is replaced
+    * by a new plain text which improves readability.
+    * @author Martin Hentschel
+    */
+   public static class HTMLRendererReplacer implements ITagReplacer {
+      @Override
+      public String replaceTag(String tag) {
+         if (tag.startsWith("<br")) {
+            return StringUtil.NEW_LINE.toString();
+         }
+         else if (tag.startsWith("<li")) {
+            return StringUtil.NEW_LINE + "- ";
+         }
+         else if (tag.startsWith("</ol")) {
+            return StringUtil.NEW_LINE.toString();
+         }
+         else if (tag.startsWith("</ul")) {
+            return StringUtil.NEW_LINE.toString();
+         }
+         else if (tag.startsWith("<center")) {
+            return StringUtil.NEW_LINE.toString();
+         }
+         else if (tag.startsWith("</center")) {
+            return StringUtil.NEW_LINE.toString();
+         }
+         else {
+            return null;
+         }
+      }
+   }
+
+   /**
+    * Removes all tags from the given text.
+    * @param text The text to remove tags from.
+    * @return The text without tags.
+    */
+   public static String removeTags(String text) {
+      if (text != null) {
+         StringBuffer sb = new StringBuffer();
+         char[] signs = text.toCharArray();
+         boolean inTag = false;
+         boolean inAttribute = false;
+         for (char sign : signs) {
+            if (!inTag) {
+               if (sign == '<') {
+                  inTag = true;
+               }
+               else {
+                  sb.append(sign);
+               }
+            }
+            else {
+               if (sign == '>' && !inAttribute) {
+                  inTag = false;
+                  inAttribute = false;
+               }
+               else if (sign == '\'' || sign == '"') {
+                  inAttribute = !inAttribute;
+               }
+            }
+         }
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
    
    /**
     * <p>

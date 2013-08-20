@@ -16,7 +16,6 @@ package org.key_project.key4eclipse.common.ui.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.common.ui.test.testcase.ImmutableCollectionContentProviderTest;
-import org.key_project.key4eclipse.common.ui.test.testcase.ProofUserManagerTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.StarterUtilTest;
 
 /**
@@ -26,7 +25,6 @@ import org.key_project.key4eclipse.common.ui.test.testcase.StarterUtilTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ImmutableCollectionContentProviderTest.class,
-    ProofUserManagerTest.class,
     StarterUtilTest.class
 })
 public class AllCommonUiTests {

@@ -12,7 +12,7 @@
 // 
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 

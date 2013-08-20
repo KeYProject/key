@@ -26,14 +26,17 @@ header {
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
+  import de.uka.ilkd.key.logic.label.*;
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
-
+  
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.tacletbuilder.*;
   import de.uka.ilkd.key.rule.conditions.*;
+  import de.uka.ilkd.key.rule.label.*;
+
  
   import de.uka.ilkd.key.speclang.*;
 

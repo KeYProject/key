@@ -14,42 +14,16 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 /**
  * Interface for creating Strategy instances.
  * The strategy name and the name of the strategy factory are assumed to be the same
  *  (you have to refactor if you want to change this).
  */
-public abstract class StrategyFactory implements Named {
-    
-    /**
-     * Create the strategy with the specified name.
-     * If there is no strategy with the specified name, this method behaves as
-     * if the name of the default strategy was given.
-     * @param proof the proof for which the strategy is to be created
-     * @param name the name of the strategy
-     * @return the strategy
-     */
-    
-    public static Strategy create ( Proof proof, String name,
-                                    StrategyProperties strategyProperties ) {
-     
-        StrategyFactory createdFactory = null;
-        try {
-            createdFactory = (StrategyFactory) Class.forName(
-                    "de.uka.ilkd.key.strategy."+name+"$Factory").newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } 
-        
-        return createdFactory.create ( proof , strategyProperties );
-    }
-    
+public interface StrategyFactory extends Named {
     /**
      * Create strategy for a proof.
      * @param proof the Proof a strategy is created for 
@@ -57,7 +31,13 @@ public abstract class StrategyFactory implements Named {
      * strategy
      * @return the newly created strategy
      */
-    public abstract Strategy create(Proof proof, 
-            StrategyProperties strategyProperties);
+    public Strategy create(Proof proof, StrategyProperties strategyProperties);
     
+    /**
+     * Returns the {@link StrategySettingsDefinition} which describes
+     * how an user interface has to look like to edit {@link StrategySettings}
+     * supported by created {@link Strategy} instances.
+     * @return The {@link StrategySettingsDefinition} which describes the user interface.
+     */
+    public StrategySettingsDefinition getSettingsDefinition();
 }

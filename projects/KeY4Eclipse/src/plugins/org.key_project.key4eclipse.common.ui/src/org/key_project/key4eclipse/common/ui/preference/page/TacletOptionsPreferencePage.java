@@ -14,6 +14,7 @@
 package org.key_project.key4eclipse.common.ui.preference.page;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -82,5 +83,21 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
    @Override
    protected ChoiceSettings getChoiceSettings() {
       return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, String> getDefaults() {
+      return getDefaultTacletOptions();
+   }
+   
+   /**
+    * Returns the default taclet options.
+    * @return The default taclet options.
+    */
+   public static Map<String, String> getDefaultTacletOptions() {
+      return SymbolicExecutionUtil.getDefaultTacletOptions();
    }
 }

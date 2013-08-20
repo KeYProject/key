@@ -55,27 +55,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    private AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStopped(ProofEvent e) {
-         Display display = viewer.getControl().getDisplay();
-         if (!display.isDisposed()) {
-            display.asyncExec(new Runnable() {
-               /**
-                * {@inheritDoc}
-                */
-               @Override
-               public void run() {
-                  try {
-                     refreshAfterAutoModeStopped = true;
-                     if (!viewer.getControl().isDisposed()) {
-                        viewer.refresh(); // Refresh structure
-                        viewer.refresh(); // Refresh labels and icons                        
-                     }
-                  }
-                  finally {
-                     refreshAfterAutoModeStopped = false;
-                  }
-               }
-            });
-         }
+         handleAutoModeStopped(e);
       }
       
       /**
@@ -91,7 +71,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * The ProofTreeListener
     */
    private ProofTreeListener proofTreeListener = new ProofTreeListener() {
-      
       /**
        * {@inheritDoc}
        */
@@ -110,21 +89,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        * {@inheritDoc}
        */
       @Override
-      public void proofPruned(final ProofTreeEvent e) {
-         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofPruned(MouseEvent) which is called here
-         if(!environment.getMediator().autoMode()){
-            Display display = viewer.getControl().getDisplay();
-            if (!display.isDisposed()) {
-               display.asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     if (!viewer.getControl().isDisposed()) {
-                        prune(e.getNode());
-                     }
-                  }
-               });
-            }
-         }
+      public void proofPruned(ProofTreeEvent e) {
+         handleProofPruned(e);
       }
       
       /**
@@ -145,40 +111,29 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        * {@inheritDoc}
        */
       @Override
-      public void proofGoalsAdded(final ProofTreeEvent e) {
+      public void proofGoalsAdded(ProofTreeEvent e) {
       }
       
       /**
        * {@inheritDoc}
        */
       @Override
-      public void proofGoalRemoved(final ProofTreeEvent e) {
+      public void proofGoalRemoved(ProofTreeEvent e) {
       }
       
       /**
        * {@inheritDoc}
        */
       @Override
-      public void proofExpanded(final ProofTreeEvent e) {
-         // TODO: Refactor functionality into LazyProofTreeContentProvider#handleProofExpanded(MouseEvent) which is called here
-         if(!environment.getMediator().autoMode()){
-            Display display = viewer.getControl().getDisplay();
-            display.asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  if (!viewer.getControl().isDisposed()) {
-                     viewer.refresh(); // TODO: Update viewer directly, will increase performance?
-                  }
-               }
-            });
-         }
+      public void proofExpanded(ProofTreeEvent e) {
+         handleProofExpanded(e);
       }
       
       /**
        * {@inheritDoc}
        */
       @Override
-      public void proofClosed(final ProofTreeEvent e) {
+      public void proofClosed(ProofTreeEvent e) {
       }
    };
 
@@ -193,6 +148,15 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       this.viewer=viewer;
       this.proof = proof;
       this.environment = environment;
+   }
+   
+   /**
+    * Removes the added listeners.
+    */
+   @Override
+   public void dispose() {
+      proof.removeProofTreeListener(proofTreeListener);
+      environment.getMediator().removeAutoModeListener(autoModeListener);
    }
 
    /**
@@ -285,14 +249,59 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       viewer.replace(parent, index, element);
       updateChildCount(element, -1);
    }
-   
-   /**
-    * Removes the added listeners.
-    */
-   @Override
-   public void dispose() {
-      proof.removeProofTreeListener(proofTreeListener);
-      environment.getMediator().removeAutoModeListener(autoModeListener);
+
+   protected void handleAutoModeStopped(ProofEvent e) {
+      Display display = viewer.getControl().getDisplay();
+      if (!display.isDisposed()) {
+         display.asyncExec(new Runnable() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void run() {
+               try {
+                  refreshAfterAutoModeStopped = true;
+                  if (!viewer.getControl().isDisposed()) {
+                     viewer.refresh(); // Refresh structure
+                     viewer.refresh(); // Refresh labels and icons                        
+                  }
+               }
+               finally {
+                  refreshAfterAutoModeStopped = false;
+               }
+            }
+         });
+      }
+   }
+
+   protected void handleProofPruned(final ProofTreeEvent e) {
+      if(!environment.getMediator().autoMode()){
+         Display display = viewer.getControl().getDisplay();
+         if (!display.isDisposed()) {
+            display.asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (!viewer.getControl().isDisposed()) {
+                     prune(e.getNode());
+                  }
+               }
+            });
+         }
+      }
+   }
+
+   protected void handleProofExpanded(ProofTreeEvent e) {
+      if(!environment.getMediator().autoMode()){
+         Display display = viewer.getControl().getDisplay();
+         display.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!viewer.getControl().isDisposed()) {
+                  viewer.refresh(); // TODO: Update viewer directly, will increase performance?
+               }
+            }
+         });
+      }
    }
    
    
