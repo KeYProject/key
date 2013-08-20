@@ -37,10 +37,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -1258,6 +1261,37 @@ public final class KeYUtil {
       }
       catch (IOException e) {
          throw new CoreException(LogUtil.getLogger().createErrorStatus(e.getMessage(), e));
+      }
+   }
+   
+   /**
+    * Returns for the given {@link SourceLocation} of a method in the given {@link IFile}
+    * the {@link SourceLocation} of the method name if available or the initial location otherwise.
+    * @param file The {@link IFile} which contains the method location.
+    * @param methodLocation The location of the method in the given {@link IFile}.
+    * @return The location of the method name or the initial location if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   public static SourceLocation updateToMethodNameLocation(IFile file, SourceLocation methodLocation) throws CoreException {
+      try {
+         if (file != null && methodLocation.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = null;
+            IJavaElement element = JavaCore.create(file);
+            if (element instanceof ICompilationUnit) {
+               compilationUnit = (ICompilationUnit)element;
+            }
+            if (compilationUnit != null) {
+               IMethod method = JDTUtil.findJDTMethod(compilationUnit, methodLocation.getCharEnd());
+               if (method != null) {
+                  ISourceRange range = method.getNameRange();
+                  methodLocation = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());
+               }
+            }
+         }
+         return methodLocation;
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
 }

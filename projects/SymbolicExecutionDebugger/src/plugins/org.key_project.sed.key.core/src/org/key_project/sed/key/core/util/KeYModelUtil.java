@@ -13,19 +13,13 @@
 
 package org.key_project.sed.key.core.util;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ISourceRange;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -261,36 +255,6 @@ public final class KeYModelUtil {
             if (element instanceof ICompilationUnit) {
                result = (ICompilationUnit)element;
             }
-         }
-      }
-      return result;
-   }
-   
-   /**
-    * Searches the {@link IMethod} as JDT representation which ends
-    * at the given index.
-    * @param cu The {@link ICompilationUnit} to search in.
-    * @param endIndex The index in the file at that the required method ends.
-    * @return The found {@link IMethod} or {@code null} if the JDT representation is not available.
-    * @throws JavaModelException Occurred Exception.
-    * @throws IOException Occurred Exception.
-    */
-   public static IMethod findJDTMethod(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
-      IMethod result = null;
-      if (cu != null) {
-         IType[] types = cu.getAllTypes();
-         int i = 0;
-         while (result == null && i < types.length) {
-            IMethod[] methods = types[i].getMethods();
-            int j = 0;
-            while (result == null && j < methods.length) {
-               ISourceRange methodRange = methods[j].getSourceRange();
-               if (endIndex == methodRange.getOffset() + methodRange.getLength()) {
-                  result = methods[j];
-               }
-               j++;
-            }
-            i++;
          }
       }
       return result;
