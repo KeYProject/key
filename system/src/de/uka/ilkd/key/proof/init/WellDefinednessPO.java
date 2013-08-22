@@ -10,9 +10,9 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -316,7 +316,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             this.heap = heap;
             this.heapAtPre = (atPres == null || atPres.get(heap) == null) ?
                     this.heap : atPres.get(heap);
-            this.anonHeap = TB.label(TB.func(anonHeap), AnonHeapTermLabel.INSTANCE);;
+            this.anonHeap = TB.label(TB.func(anonHeap), AnonHeapTermLabel.INSTANCE);
         }
     }
 }

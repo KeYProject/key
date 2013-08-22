@@ -98,6 +98,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -1528,5 +1529,15 @@ public class TestUtilsUtil {
       };
       Display.getDefault().syncExec(run);
       return run.getResult();
+   }
+
+   /**
+    * Blocks the current thread until the workspace is initialized
+    * by the {@link SetupStartup}.
+    */
+   public static void waitUntilWorkspaceInitialized() {
+      while (!SetupStartup.isSetupDone()) {
+         sleep(500);
+      }
    }
 }

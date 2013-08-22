@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import java.util.LinkedList;
 import java.util.List;
 

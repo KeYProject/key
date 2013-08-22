@@ -21,8 +21,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.rule.ITermLabelWorker;
-import de.uka.ilkd.key.rule.TermLabelWorkerManagement;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 
 /**
  * Provides all settings in context of term labels ({@link ITermLabel}).

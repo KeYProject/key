@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,7 +24,11 @@ import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandle
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
 
-// TODO: Document class StartAutoModeHandler
+/**
+ * This {@link IHandler} starts the auto mode of the currently active
+ * {@link IProofProvider}.
+ * @author Martin Hentschel
+ */
 public class StartAutoModeHandler extends AbstractSaveExecutionHandler {   
    /**
     * {@inheritDoc}
@@ -35,15 +40,15 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
       if (editorPart != null) {
          final IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
          if (proofProvider != null && 
-             proofProvider.getEnvironment().getUi().isAutoModeSupported(proofProvider.getCurrentProof()) && 
-             !proofProvider.getEnvironment().getMediator().autoMode()) {
+             proofProvider.getUI().isAutoModeSupported(proofProvider.getCurrentProof()) && 
+             !proofProvider.getMediator().autoMode()) {
             new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getEnvironment()) {
                // job that starts the automode in KeY
                @Override
                protected IStatus run(IProgressMonitor monitor) {
                   monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
                   proofProvider.getCurrentProof().getActiveStrategy(); // Make sure that the strategy is initialized correctly, otherwise the used settings are different to the one defined by the strategysettings which are shown in the UI.
-                  proofProvider.getEnvironment().getUi().startAndWaitForAutoMode(proofProvider.getCurrentProof());
+                  proofProvider.getUI().startAndWaitForAutoMode(proofProvider.getCurrentProof());
                   monitor.done();
                   return Status.OK_STATUS;
                }

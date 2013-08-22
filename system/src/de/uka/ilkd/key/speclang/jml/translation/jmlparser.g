@@ -28,6 +28,7 @@ header {
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
+    import de.uka.ilkd.key.logic.label.*;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.parser.ParserException;

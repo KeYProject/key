@@ -14,6 +14,8 @@
 package org.key_project.sed.key.ui.view;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.debug.core.DebugEvent;
@@ -26,25 +28,22 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.key_project.key4eclipse.common.ui.composite.StrategySettingsComposite;
+import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
+import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 import org.key_project.util.java.CollectionUtil;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * This view edits the proof search strategy settings in context of
@@ -52,71 +51,21 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * in view "Debug".
  * @author Martin Hentschel
  */
-public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
+public class SymbolicExecutionSettingsView extends AbstractViewBasedView implements IProofProvider {
    /**
     * ID of this view.
     */
    public static final String VIEW_ID = "org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView";
 
    /**
-    * Shown string for method treatment "Expand".
+    * Contains the registered {@link IProofProviderListener}.
     */
-   public static final String METHOD_TREATMENT_EXPAND = "Expand";
-
-   /**
-    * Shown string for method treatment "Contract".
-    */
-   public static final String METHOD_TREATMENT_CONTRACT = "Contract";
-
-   /**
-    * Shown string for loop treatment "Expand".
-    */
-   public static final String LOOP_TREATMENT_EXPAND = "Expand";
-
-   /**
-    * Shown string for loop treatment "Invariant".
-    */
-   public static final String LOOP_TREATMENT_INVARIANT = "Invariant";
-
-   /**
-    * Shown string for alias check "Never".
-    */
-   public static final String NON_EXECUTION_BRANCH_HIDING_OFF = "Off";
-
-   /**
-    * Shown string for alias check "Immediately".
-    */
-   public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "Via Side Proofs";
-
-   /**
-    * Shown string for alias check "Never".
-    */
-   public static final String ALIAS_CHECK_NEVER = "Never";
-
-   /**
-    * Shown string for alias check "Immediately".
-    */
-   public static final String ALIAS_CHECK_IMMEDIATELY = "Immediately";
+   private List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
    
    /**
-    * Control to define the method treatment.
+    * The {@link KeYEnvironment} in which {@link #proof} lives.
     */
-   private Combo methodTreatmentCombo;
-   
-   /**
-    * Control to define the loop treatment.
-    */
-   private Combo loopTreatmentCombo;
-
-   /**
-    * Control to define the execution branch hiding options.
-    */
-   private Combo nonExecutionBranchHidingCombo;
-
-   /**
-    * Control to define alias checks.
-    */
-   private Combo aliasChecksCombo;
+   private KeYEnvironment<?> environment;
    
    /**
     * The proof to edit its proof search strategy settings.
@@ -144,131 +93,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
    private IDebugEventSetListener debugEventListener;
    
    /**
+    * Control used to edit the strategy settings.
+    */
+   private StrategySettingsComposite settingsComposite;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
    public void createPartControl(Composite parent) {
-      // Initialize parent
-      parent.setLayout(new GridLayout(1, false));
-      // Method treatment
-      Group methodTreatmentGroup = new Group(parent, SWT.NONE);
-      methodTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      methodTreatmentGroup.setText("Method Treatment");
-      methodTreatmentGroup.setLayout(new FillLayout());
-      methodTreatmentCombo = new Combo(methodTreatmentGroup, SWT.READ_ONLY);
-      methodTreatmentCombo.add(METHOD_TREATMENT_EXPAND);
-      methodTreatmentCombo.add(METHOD_TREATMENT_CONTRACT);
-      methodTreatmentCombo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            updateStrategySettings();
-         }
-      });
-      // Loop treatment
-      Group loopTreatmentGroup = new Group(parent, SWT.NONE);
-      loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      loopTreatmentGroup.setText("Loop Treatment");
-      loopTreatmentGroup.setLayout(new FillLayout());
-      loopTreatmentCombo = new Combo(loopTreatmentGroup, SWT.READ_ONLY);
-      loopTreatmentCombo.add(LOOP_TREATMENT_EXPAND);
-      loopTreatmentCombo.add(LOOP_TREATMENT_INVARIANT);
-      loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            updateStrategySettings();
-         }
-      });
-      // Alias checks
-      Group nonExecutionBranchHidingGroup = new Group(parent, SWT.NONE);
-      nonExecutionBranchHidingGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      nonExecutionBranchHidingGroup.setText("Non Execution Branch Hiding");
-      nonExecutionBranchHidingGroup.setLayout(new FillLayout());
-      nonExecutionBranchHidingCombo = new Combo(nonExecutionBranchHidingGroup, SWT.READ_ONLY);
-      nonExecutionBranchHidingCombo.add(NON_EXECUTION_BRANCH_HIDING_OFF);
-      nonExecutionBranchHidingCombo.add(NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF);
-      nonExecutionBranchHidingCombo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            updateStrategySettings();
-         }
-      });
-      // Alias checks
-      Group aliasChecksGroup = new Group(parent, SWT.NONE);
-      aliasChecksGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      aliasChecksGroup.setText("Alias Checks");
-      aliasChecksGroup.setLayout(new FillLayout());
-      aliasChecksCombo = new Combo(aliasChecksGroup, SWT.READ_ONLY);
-      aliasChecksCombo.add(ALIAS_CHECK_NEVER);
-      aliasChecksCombo.add(ALIAS_CHECK_IMMEDIATELY);
-      aliasChecksCombo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            updateStrategySettings();
-         }
-      });
-      // Set read-only if required
-      updateShownValues();
-   }
-
-   /**
-    * Updates the proof search strategy settings in the UI control when {@link #proof} has changed.
-    */
-   protected void updateShownValues() {
-      setEditable(proof != null && !proof.isDisposed());
-      if (proof != null && !proof.isDisposed()) {
-         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         showSettings(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY), 
-                      sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY),
-                      sp.getProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY),
-                      sp.getProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
-      }
-      else {
-         showSettings(StrategyProperties.METHOD_EXPAND, 
-                      StrategyProperties.LOOP_EXPAND,
-                      StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
-                      StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
-      }
-   }
-
-   /**
-    * Makes UI controls editable or read-only.
-    * @param editable {@code true} editable, {@code false} read-only.
-    */
-   protected void setEditable(boolean editable) {
-      if (methodTreatmentCombo != null) {
-         methodTreatmentCombo.setEnabled(editable);
-      }
-      if (loopTreatmentCombo != null) {
-         loopTreatmentCombo.setEnabled(editable);
-      }
-      if (nonExecutionBranchHidingCombo != null) {
-         nonExecutionBranchHidingCombo.setEnabled(editable);
-      }
-      if (aliasChecksCombo != null) {
-         aliasChecksCombo.setEnabled(editable);
-      }
-   }
-
-   /**
-    * Updates the shown proof search strategy settings.
-    * @param methodOptionsKey The method treatment setting to show.
-    * @param loopOptionsKey The loop treatment setting to show.
-    * @param nonExecutionBranchHidingOptionsKey The non execution branch hiding setting to show.
-    * @param aliasCheckOptionsKey The alias treatment setting to show.
-    */
-   protected void showSettings(String methodOptionsKey, String loopOptionsKey, String nonExecutionBranchHidingOptionsKey, String aliasCheckOptionsKey) {
-      if (methodTreatmentCombo != null) {
-         methodTreatmentCombo.setText(StrategyProperties.METHOD_CONTRACT.equals(methodOptionsKey) ? METHOD_TREATMENT_CONTRACT : METHOD_TREATMENT_EXPAND);
-      }
-      if (loopTreatmentCombo != null) {
-         loopTreatmentCombo.setText(StrategyProperties.LOOP_INVARIANT.equals(loopOptionsKey) ? LOOP_TREATMENT_INVARIANT : LOOP_TREATMENT_EXPAND);
-      }
-      if (nonExecutionBranchHidingCombo != null) {
-         nonExecutionBranchHidingCombo.setText(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(nonExecutionBranchHidingOptionsKey) ? NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : NON_EXECUTION_BRANCH_HIDING_OFF);
-      }
-      if (aliasChecksCombo != null) {
-         aliasChecksCombo.setText(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(aliasCheckOptionsKey) ? ALIAS_CHECK_IMMEDIATELY : ALIAS_CHECK_NEVER);
-      }
+      settingsComposite = new StrategySettingsComposite(parent, this, "No compatible debug target selected.");
    }
 
    /**
@@ -276,7 +110,9 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     */
    @Override
    public void setFocus() {
-      methodTreatmentCombo.setFocus();
+      if (settingsComposite != null && !settingsComposite.isDisposed()) {
+         settingsComposite.setFocus();
+      }
    }
    
    /**
@@ -284,6 +120,9 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     */
    @Override
    public void dispose() {
+      if (settingsComposite != null) {
+         settingsComposite.dispose();
+      }
       if (debugEventListener != null) {
          DebugPlugin.getDefault().removeDebugEventListener(debugEventListener);
          debugEventListener = null;
@@ -336,6 +175,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       // Collect all selected proofs.
       Object[] elements = SWTUtil.toArray(selection);
       Set<Proof> proofs = new HashSet<Proof>();
+      Set<KeYEnvironment<?>> environments = new HashSet<KeYEnvironment<?>>();
       KeYDebugTarget target = null;
       for (Object element : elements) {
          // Try to find the IDebugTarget
@@ -349,8 +189,9 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          if (element instanceof KeYDebugTarget) {
             target = (KeYDebugTarget)element;
             Proof proof = target.getProof();
-            if (proof != null) {
+            if (proof != null && target.getEnvironment() != null) {
                proofs.add(proof);
+               environments.add(target.getEnvironment());
             }
          }
       }
@@ -369,7 +210,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          }
          // Update shown content
          proofsDebugTarget = target;
-         proofChanged(CollectionUtil.getFirst(proofs));
+         setProofAndEnvironment(CollectionUtil.getFirst(proofs), CollectionUtil.getFirst(environments));
       }
       else {
          // Make sure that the view does not listen for terminate events 
@@ -379,7 +220,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          }
          // Update shown content
          proofsDebugTarget = null;
-         CollectionUtil.getFirst(null);
+         setProofAndEnvironment(null, null);
       }
    }
 
@@ -393,8 +234,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
             getSite().getShell().getDisplay().syncExec(new Runnable() {
                @Override
                public void run() {
-                  // Update shown content and enabled state when the debug target was terminated
-                  updateShownValues();
+                  setProofAndEnvironment(null, null);
                }
             });
          }
@@ -402,23 +242,95 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
    }
    
    /**
-    * When the proof, to manipulate its setting, has changed.
-    * @param proof The new proof to manipulate proof search settings on it.
+    * Sets the currently provided {@link Proof} and its {@link KeYEnvironment}.
+    * @param proof The {@link Proof} to set.
+    * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
     */
-   protected void proofChanged(Proof proof) {
+   protected void setProofAndEnvironment(Proof proof, KeYEnvironment<?> environment) {
       this.proof = proof;
-      updateShownValues();
+      this.environment = environment;
+      fireCurrentProofChanged(new ProofProviderEvent(this, getCurrentProofs(), getCurrentProof(), getUI(), getEnvironment()));
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof getCurrentProof() {
+      return proof;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Proof[] getCurrentProofs() {
+      return new Proof[] {proof};
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYEnvironment<?> getEnvironment() {
+      return environment;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public UserInterface getUI() {
+      return environment != null ? environment.getUi() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+      return environment != null ? environment.getMediator() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.add(l);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProofProviderListener(IProofProviderListener l) {
+      if (l != null) {
+         proofProviderListener.remove(l);
+      }
    }
    
    /**
-    * Updates the {@link StrategyProperties} of {@link #proof} whe
-    * a value has changed in the UI.
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
     */
-   protected void updateStrategySettings() {
-      boolean useOperationContracts = METHOD_TREATMENT_CONTRACT.equals(methodTreatmentCombo.getText());
-      boolean useLoopInvariants = LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText());
-      boolean aliasChecksImmediately = ALIAS_CHECK_IMMEDIATELY.equals(aliasChecksCombo.getText());
-      boolean nonExecutionBranchHidingSideProofs = NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(nonExecutionBranchHidingCombo.getText());
-      SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecksImmediately);
+   protected void fireCurrentProofChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofChanged(e);
+      }
+   }
+   
+   /**
+    * Informs all registered {@link IProofProviderListener} about the event.
+    * @param e The {@link ProofProviderEvent}.
+    */
+   protected void fireCurrentProofsChanged(ProofProviderEvent e) {
+      IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
+      for (IProofProviderListener l : toInform) {
+         l.currentProofsChanged(e);
+      }
    }
 }

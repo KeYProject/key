@@ -14,6 +14,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.HashMap;
 import java.util.Iterator;
 

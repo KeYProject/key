@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.rule.AbstractSymbolicExecutionInstantiator;
 
 
