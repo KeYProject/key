@@ -83,8 +83,9 @@ public class ProofMetaFileWriter {
     * @param pe - the {@link ProofElement} to use
     * @return the created {@link Document}
     * @throws ParserConfigurationException
+    * @throws UnknownProofReferenceException 
     */
-   private Document createDoument() throws ParserConfigurationException{
+   private Document createDoument() throws ParserConfigurationException, UnknownProofReferenceException{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
@@ -100,13 +101,22 @@ public class ProofMetaFileWriter {
       createTypeElement(getKeYJavaTypeFromEnv(pe.getContract().getKJT(), pe.getKeYEnvironment()));
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
-         if(IProofReference.CALL_METHOD.equals(proofRef.getKind())){ // TODO: Method calls are not enough, you have to treat all possible reference kinds. For instance is a proof also invalid if a contract is changed    
+         String proofRefKind = proofRef.getKind();
+         if(IProofReference.ACCESS.equals(proofRefKind) ||
+               IProofReference.CALL_METHOD.equals(proofRefKind) ||
+               IProofReference.INLINE_METHOD.equals(proofRefKind) ||
+               IProofReference.USE_AXIOM.equals(proofRefKind) ||
+               IProofReference.USE_CONTRACT.equals(proofRefKind) ||
+               IProofReference.USE_INVARIANT.equals(proofRefKind)){
             KeYJavaType kjt = getKeYJavaType(proofRef);
             if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
                createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
             }
          }
-         // TODO: In case of an unknown reference kind throw an exception that the developer sees that something is wrong!
+         else {
+            throw new UnknownProofReferenceException("Unknown proof reference kind:" + proofRefKind);
+         }
+         
       }
       return doc;
    }
