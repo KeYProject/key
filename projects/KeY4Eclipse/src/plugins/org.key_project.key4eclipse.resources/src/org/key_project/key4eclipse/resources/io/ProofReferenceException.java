@@ -5,12 +5,12 @@ package org.key_project.key4eclipse.resources.io;
  * @author Stefan Käsdorf
  */
 @SuppressWarnings("serial")
-public class UnknownProofReferenceException extends Exception{
+public class ProofReferenceException extends Exception{
    
    /**
     * The Constructor
     */
-   public UnknownProofReferenceException(String message){
+   public ProofReferenceException(String message){
       super(message);
    }
 }

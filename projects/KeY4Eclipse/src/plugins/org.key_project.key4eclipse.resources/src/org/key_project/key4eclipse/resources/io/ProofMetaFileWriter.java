@@ -83,9 +83,9 @@ public class ProofMetaFileWriter {
     * @param pe - the {@link ProofElement} to use
     * @return the created {@link Document}
     * @throws ParserConfigurationException
-    * @throws UnknownProofReferenceException 
+    * @throws ProofReferenceException 
     */
-   private Document createDoument() throws ParserConfigurationException, UnknownProofReferenceException{
+   private Document createDoument() throws ParserConfigurationException, ProofReferenceException{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
@@ -101,22 +101,10 @@ public class ProofMetaFileWriter {
       createTypeElement(getKeYJavaTypeFromEnv(pe.getContract().getKJT(), pe.getKeYEnvironment()));
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
-         String proofRefKind = proofRef.getKind();
-         if(IProofReference.ACCESS.equals(proofRefKind) ||
-               IProofReference.CALL_METHOD.equals(proofRefKind) ||
-               IProofReference.INLINE_METHOD.equals(proofRefKind) ||
-               IProofReference.USE_AXIOM.equals(proofRefKind) ||
-               IProofReference.USE_CONTRACT.equals(proofRefKind) ||
-               IProofReference.USE_INVARIANT.equals(proofRefKind)){
-            KeYJavaType kjt = getKeYJavaType(proofRef);
-            if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
-               createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
-            }
+         KeYJavaType kjt = getKeYJavaType(proofRef);
+         if(!KeY4EclipseResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
+            createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
          }
-         else {
-            throw new UnknownProofReferenceException("Unknown proof reference kind:" + proofRefKind);
-         }
-         
       }
       return doc;
    }
@@ -157,29 +145,59 @@ public class ProofMetaFileWriter {
     * Returns the {@link KeYJavaType} for the given {@link IProofReference}.
     * @param proofRef - the {@link IProofReference} to use
     * @return the {@link KeYJavaType}
+    * @throws ProofReferenceException 
     */
-   private KeYJavaType getKeYJavaType(IProofReference<?> proofRef){
+   private KeYJavaType getKeYJavaType(IProofReference<?> proofRef) throws ProofReferenceException{
       KeYJavaType kjt = null;
       Object target = proofRef.getTarget();
-      if(target instanceof IProgramMethod){
-         IProgramMethod progMeth = (IProgramMethod) target;
-         kjt = progMeth.getContainerType();
+      if(IProofReference.ACCESS.equals(proofRef.getKind())){
+         if(target instanceof IProgramVariable){
+            IProgramVariable progVar = (IProgramVariable) target;
+            kjt = progVar.getKeYJavaType();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
       }
-      else if(target instanceof IProgramVariable){
-         IProgramVariable progVar = (IProgramVariable) target;
-         kjt = progVar.getKeYJavaType();
+      else if(IProofReference.CALL_METHOD.equals(proofRef.getKind()) || 
+            IProofReference.INLINE_METHOD.equals(proofRef.getKind())){
+         if(target instanceof IProgramMethod){
+            IProgramMethod progMeth = (IProgramMethod) target;
+            kjt = progMeth.getContainerType();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
       }
-      else if(target instanceof Contract){
-         Contract contract = (Contract) target;
-         kjt = contract.getKJT();
+      else if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
+         if(target instanceof ClassAxiom){
+            ClassAxiom classAx = (ClassAxiom) target;
+            kjt = classAx.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
       }
-      else if(target instanceof ClassInvariant){
-         ClassInvariant classInv = (ClassInvariant) target;
-         kjt = classInv.getKJT();
+      else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
+         if(target instanceof Contract){
+            Contract contract = (Contract) target;
+            kjt = contract.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
       }
-      else if(target instanceof ClassAxiom){
-         ClassAxiom classAx = (ClassAxiom) target;
-         kjt = classAx.getKJT();
+      else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
+         if(target instanceof ClassInvariant){
+            ClassInvariant classInv = (ClassInvariant) target;
+            kjt = classInv.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
+      }
+      else {
+         throw new ProofReferenceException("Unknow proof reference kind found: " + proofRef.getKind());
       }
       return kjt;
    }
