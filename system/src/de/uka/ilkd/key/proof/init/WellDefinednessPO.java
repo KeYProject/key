@@ -23,7 +23,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
@@ -261,6 +260,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term post = getPost(po.post);
         final Term[] updates = getUpdates(po.mod);
         // TODO: Do we need to assume something like a wellformed anonHeap?
+        // TODO: What about reachable terms in invariants?
         final Term updatedPost = TB.applySequential(updates, TB.wd(post, services));
         final Term poTerms = TB.and(wdPre,
                                     TB.imp(pre.term,

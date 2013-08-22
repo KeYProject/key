@@ -170,7 +170,7 @@ public abstract class WellDefinednessCheck implements Contract {
             Pair<ImmutableList<Term>, ImmutableList<Term>> imp2 = splitAndRelabel(spec.sub(1));
             Term i1 = TB.andSC(TB.andSC(imp1.first), TB.andSC(imp1.second));
             Term i2 = TB.andSC(TB.andSC(imp2.first), TB.andSC(imp2.second));
-            start = start.append(TB.imp(i1, i2));
+            end = end.append(TB.imp(i1, i2));
             return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
         } else {
             if(spec.hasLabels()
@@ -537,7 +537,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-     * Builds the "general assumption" using the self variable (selfVar),
+     * Builds the "general assumption" using the self variable (self),
      * the {@link KeYJavaType} of the self variable (selfKJT),
      * the parameters {@link ProgramVariable}s (paramVars), the heaps (heaps), and
      * @param the implicit precondition
