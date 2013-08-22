@@ -188,11 +188,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         final TypeConverter typeConverter = services.getTypeConverter();
         if (typeConverter.isReferenceType(varType) && !isImplicitVar) {
-
-            PositionedString ps
-            = new PositionedLabeledString(varName + " != null", fileName, pos,
-                                          ImplicitSpecTermLabel.INSTANCE);
-            result = result.add(ps);
             if (varType instanceof ArrayType &&
                     typeConverter.
                     isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
@@ -204,6 +199,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                               ImplicitSpecTermLabel.INSTANCE);
                 result = result.add(arrayElementsNonNull);
             }
+            PositionedString ps
+            = new PositionedLabeledString(varName + " != null", fileName, pos,
+                                          ImplicitSpecTermLabel.INSTANCE);
+            result = result.add(ps);
         }
         return result;
     }
@@ -260,11 +259,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
                 		    field instanceof ImplicitFieldSpecification,
-                		    fileName, member.getEndPosition(),services);
+                                    fileName, member.getEndPosition(), services);
                 	for(PositionedString classInv : nonNullInvs) {
                             result = result.add(
-                                    jsf.createJMLClassInvariant(kjt, visibility,
-                                                                isStatic, classInv));
+                                    jsf.createJMLClassInvariant(
+                                            kjt, visibility, isStatic,
+                                            classInv.label(ImplicitSpecTermLabel.INSTANCE)));
                 	}
                     }
                 }
@@ -408,7 +408,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
               TextualJMLConstruct[] t = new TextualJMLConstruct[constructsArray.length+1];
               startPos++;
               System.arraycopy(constructsArray, 0, t, 0, startPos);
-              System.arraycopy(constructsArray, startPos, t, startPos+1, constructsArray.length - startPos);
+              System.arraycopy(constructsArray, startPos, t, startPos+1,
+                               constructsArray.length - startPos);
               t[startPos] = modelSpec;
               constructsArray = t;
             }
@@ -463,8 +464,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     final ImmutableSet<PositionedString> nonNullParams =
                         createNonNullPositionedString(paramDecl.getName(),
                                 paramDecl.getProgramVariable().getKeYJavaType(),
-                                false,
-                                fileName, pm.getStartPosition(),services);
+                                false, fileName, pm.getStartPosition(), services);
                     for (PositionedString nonNull : nonNullParams) {
                         specCase.addRequires(nonNull.label(ImplicitSpecTermLabel.INSTANCE));
                     }
@@ -478,8 +478,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     !JMLInfoExtractor.resultIsNullable(pm) &&
                     specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<PositionedString> resultNonNull =
-                    createNonNullPositionedString("\\result", resultType, false,
-                            fileName, pm.getStartPosition(),services);
+                    createNonNullPositionedString("\\result", resultType,
+                            false, fileName, pm.getStartPosition(), services);
                 for (PositionedString nonNull : resultNonNull) {
                     specCase.addEnsures(
                             nonNull.prepend("ensures ").label(ImplicitSpecTermLabel.INSTANCE));

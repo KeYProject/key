@@ -97,6 +97,7 @@ public class ContractFactory {
             newPosts,
             foci.originalAxioms,
             foci.originalMods,
+            foci.originalDeps,
             foci.hasRealModifiesClause,
             foci.originalSelfVar,
             foci.originalParamVars,
@@ -152,6 +153,7 @@ public class ContractFactory {
                                                    foci.originalPosts,
                                                    foci.originalAxioms,
                                                    foci.originalMods,
+                                                   foci.originalDeps,
                                                    foci.hasRealModifiesClause,
                                                    foci.originalSelfVar,
                                                    foci.originalParamVars,
@@ -180,7 +182,8 @@ public class ContractFactory {
                                                    foci.specifiedIn, foci.modality,
                                                    foci.originalPres, foci.originalMby,
                                                    foci.originalPosts, foci.originalAxioms,
-                                                   foci.originalMods, foci.hasRealModifiesClause,
+                                                   foci.originalMods, foci.originalDeps,
+                                                   foci.hasRealModifiesClause,
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
@@ -263,6 +266,7 @@ public class ContractFactory {
                                              Map<LocationVariable,Term> posts,
                                              Map<LocationVariable,Term> axioms,
                                              Map<LocationVariable,Term> mods,
+                                             Map<ProgramVariable, Term> accs,
                                              Map<LocationVariable,Boolean> hasMod,
                                              ProgramVariable selfVar,
                                              ImmutableList<ProgramVariable> paramVars,
@@ -271,9 +275,9 @@ public class ContractFactory {
                                              Map<LocationVariable,LocationVariable> atPreVars,
                                              boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
-                                                   modality, pres, mby, posts, axioms, mods, hasMod,
-                                                   selfVar, paramVars, resultVar, excVar, atPreVars,
-                                                   null, Contract.INVALID_ID, toBeSaved,
+                                                   modality, pres, mby, posts, axioms, mods, accs,
+                                                   hasMod, selfVar, paramVars, resultVar, excVar,
+                                                   atPreVars, null, Contract.INVALID_ID, toBeSaved,
                                                    mods.get(services.getTypeConverter().getHeapLDT()
                                                            .getSavedHeap()) != null);
     }
@@ -286,10 +290,11 @@ public class ContractFactory {
                                              Map<LocationVariable, Term> posts,
                                              Map<LocationVariable, Term> axioms,
                                              Map<LocationVariable, Term> mods,
+                                             Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection pv) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms,
-                    mods, hasMod, pv, false, mods.get(
+                    mods, accessibles, hasMod, pv, false, mods.get(
                             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
@@ -302,14 +307,16 @@ public class ContractFactory {
                                              Map<LocationVariable, Term> posts,
                                              Map<LocationVariable, Term> axioms,
                                              Map<LocationVariable, Term> mods,
+                                             Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection progVars,
                                              boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                                                    pm.getContainerType(), modality, pres, mby,
-                                                   posts, axioms, mods, hasMod, progVars.selfVar,
-                                                   progVars.paramVars, progVars.resultVar,
-                                                   progVars.excVar, progVars.atPreVars, null,
+                                                   posts, axioms, mods, accessibles, hasMod,
+                                                   progVars.selfVar, progVars.paramVars,
+                                                   progVars.resultVar, progVars.excVar,
+                                                   progVars.atPreVars, null,
                                                    Contract.INVALID_ID, toBeSaved, transaction);
     }
 
@@ -371,6 +378,7 @@ public class ContractFactory {
             }
         }
         Map<LocationVariable,Term> mods = t.originalMods;
+        Map<ProgramVariable,Term> deps = t.originalDeps;
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
             Term otherMby = other.hasMby()
@@ -428,19 +436,60 @@ public class ContractFactory {
                Term m2 = other.getMod(h,t.originalSelfVar,
                                       t.originalParamVars,
                                       services);
-                Term nm = null;
-                if(m1 == null && m2 == null)
-                  continue;
-                if(m1 == null){
+               Term nm = null;
+               if(m1 == null && m2 == null)
+                   continue;
+               if(m1 == null){
                    nm = m2;
-                }else if(m2 == null) {
+               }else if(m2 == null) {
                    nm = m1;
-                }else{
+               }else{
                    nm = tb.union(services, m1, m2);
-                }
-                mods.put(h, nm);
+               }
+               mods.put(h, nm);
 
             }
+
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                Term a1 = deps.get(h);
+                Term a2 = other.getDep(h, false,
+                                       t.originalSelfVar,
+                                       t.originalParamVars,
+                                       t.originalAtPreVars,
+                                       services);
+                if (a1 != null || a2 != null) {
+                    Term na = null;
+                    if(a1 == null){
+                        na = a2;
+                    } else if(a2 == null) {
+                        na = a1;
+                    }else {
+                        na = tb.union(services, a1, a2);
+                    }
+                    deps.put(h, na);
+                }
+                boolean preHeap = t.originalAtPreVars.get(h) != null;
+                if (preHeap) {
+                    LocationVariable hPre = t.originalAtPreVars.get(h);
+                    Term a1Pre = deps.get(hPre);
+                    Term a2Pre = other.getDep(hPre, true,
+                                              t.originalSelfVar,
+                                              t.originalParamVars,
+                                              t.originalAtPreVars,
+                                              services);
+                    if (a1Pre != null || a2Pre != null) {
+                        Term naPre = null;
+                        if(a1Pre == null){
+                            naPre = a2Pre;
+                        }else if(a2Pre == null) {
+                            naPre = a1Pre;
+                        }else{
+                            naPre = tb.union(services, a1Pre, a2Pre);
+                        }
+                        deps.put(hPre, naPre);
+                    }
+                }
+             }
         }
 
         return new FunctionalOperationContractImpl(INVALID_ID,
@@ -454,6 +503,7 @@ public class ContractFactory {
                                                    posts,
                                                    axioms,
                                                    mods,
+                                                   deps,
                                                    hasMod,
                                                    t.originalSelfVar,
                                                    t.originalParamVars,

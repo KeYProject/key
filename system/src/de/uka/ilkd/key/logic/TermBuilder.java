@@ -1465,7 +1465,7 @@ public class TermBuilder {
         }
     }
 
-    public Iterable<Term> wd(Iterable<Term> l, Services services) {
+    public ImmutableList<Term> wd(Iterable<Term> l, Services services) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         for (Term t: l) {
             res = res.append(wd(t, services));

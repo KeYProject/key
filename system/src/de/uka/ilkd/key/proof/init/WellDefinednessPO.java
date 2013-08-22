@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
@@ -252,16 +253,18 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(this.vars);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc pre = check.getPre(po.pre, vars.self, vars.heap, vars.params, services);
+        final Term wdPre = TB.wd(pre.term, services);
+        final Term wdMod = TB.wd(po.mod, services);
+        final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
         register(pre.func);
         mbyAtPre = pre.func != null ? TB.func(pre.func) : TB.tt();
         final Term post = getPost(po.post);
         final Term[] updates = getUpdates(po.mod);
-
-        final Term poTerms = TB.and(TB.wd(pre.term, services),
+        // TODO: Do we need to assume something like a wellformed anonHeap?
+        final Term updatedPost = TB.applySequential(updates, TB.wd(post, services));
+        final Term poTerms = TB.and(wdPre,
                                     TB.imp(pre.term,
-                                           TB.and(TB.wd(po.mod, services),
-                                                  TB.and(TB.wd(po.rest, services)),
-                                           TB.applySequential(updates, TB.wd(post, services)))));
+                                           TB.and(wdMod, TB.and(wdRest), updatedPost)));
         generateTaclets();
         assignPOTerms(poTerms);
 

@@ -754,13 +754,13 @@ public class JMLSpecFactory {
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract =
                     cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
-                            clauses.assignables, clauses.hasMod, progVars);
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
-            FunctionalOperationContract contract = cf.func(
-                    name, pm, false, pres,
-                    clauses.measuredBy, posts, axioms, clauses.assignables, clauses.hasMod, progVars);
+            FunctionalOperationContract contract =
+                    cf.func(name, pm, false, pres, clauses.measuredBy, posts, axioms,
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -771,15 +771,13 @@ public class JMLSpecFactory {
                 break;
               }
             }
-            FunctionalOperationContract contract1 = cf.func(
-                    name, pm, true,
-                    pres,
-                    clauses.measuredBy, posts, axioms, clauses.assignables,
-                    clauses.hasMod, progVars);
+            FunctionalOperationContract contract1 =
+                    cf.func(name, pm, true, pres, clauses.measuredBy, posts, axioms,
+                            clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 =
                     cf.func(name, pm, false, clauses.requires, clauses.measuredBy, posts, axioms,
-                        clauses.assignables, clauses.hasMod, progVars);
+                        clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -863,6 +861,11 @@ public class JMLSpecFactory {
         Term inv = TB.convertToFormula(JMLTranslator.translate(originalInv, kjt, selfVar, null, null,
                                                                null, null, Term.class, services),
                                        services);
+        if (originalInv.hasLabels()) {
+            inv = TB.label(inv, originalInv.getLabels());
+        }
+        services.getSpecificationRepository().addImplicitInv(inv, kjt, selfVar);
+
         //create invariant
         String name = getDefaultInvName(null, kjt);
         return new ClassInvariantImpl(name,

@@ -279,12 +279,12 @@ public final class SLEnvInput extends AbstractEnvInput {
         	  || kjt.getJavaType() instanceof InterfaceDeclaration)) {
         	continue;
             }
-            
+
             //class invariants, represents clauses, ...
             final ImmutableSet<SpecificationElement> classSpecs 
             	= specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
-            
+
             // Check whether a static invariant is present.
             // Later, we will only add static invariants to contracts per default if
             // there is an explicit static invariant present.
@@ -295,7 +295,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     break;
                 }
             }
-            
+
             //contracts, loop invariants
             final ImmutableList<IProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
@@ -304,7 +304,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
         	specRepos.addSpecs(methodSpecs);
-                
+
                 //loop invariants
                 final JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
@@ -317,7 +317,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                         specRepos.addLoopInvariant(inv);
                     }
                 }
-                
+
                 //block contracts
                 final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
                 blockCollector.start();
@@ -337,7 +337,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     }
                 }
             }
-            
+
             //constructor contracts
             final ImmutableList<IProgramMethod> constructors 
             	= javaInfo.getConstructors(kjt);
@@ -347,11 +347,12 @@ public final class SLEnvInput extends AbstractEnvInput {
 			= specExtractor.extractMethodSpecs(constructor, staticInvPresent);
         	specRepos.addSpecs(constructorSpecs);
             }
+            specRepos.addRepresentsTermToModelFields(kjt);
         }
 
         //add initially clauses to constructor contracts
         specRepos.createContractsFromInitiallyClauses();
-        
+
         //show warnings to user
         ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();
         if(warnings != null && warnings.size() > 0) {

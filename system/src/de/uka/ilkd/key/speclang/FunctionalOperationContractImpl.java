@@ -41,6 +41,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -69,6 +70,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final Map<LocationVariable,Term> originalPosts;
     final Map<LocationVariable,Term> originalAxioms;
     final Map<LocationVariable,Term> originalMods;
+    final Map<ProgramVariable, Term> originalDeps;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final ProgramVariable originalResultVar;
@@ -121,6 +123,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Map<LocationVariable,Term> posts,
                                     Map<LocationVariable,Term> axioms,
                                     Map<LocationVariable,Term> mods,
+                                    Map<ProgramVariable, Term> accessibles,
                                     Map<LocationVariable,Boolean> hasRealMod,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
@@ -160,8 +163,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.originalPres           = pres;
         this.originalMby            = mby;
         this.originalPosts          = posts;
-        this.originalAxioms			= axioms;
+        this.originalAxioms         = axioms;
         this.originalMods           = mods;
+        this.originalDeps           = accessibles;
         this.hasRealModifiesClause  = hasRealMod;
         this.originalSelfVar        = selfVar;
         this.originalParamVars      = paramVars;
@@ -483,6 +487,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return originalMods.get(heap);
     }
 
+    @Override
+    public Term getAccessible(ProgramVariable heap) {
+        return originalDeps.get(heap);
+    }
+
+    @Override
+    public Term getMby() {
+        return this.originalMby;
+    }
 
     @Override
     public Term getMby(ProgramVariable selfVar,
@@ -961,6 +974,74 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public Term getDep(LocationVariable heap, boolean atPre,
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                       Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        if (originalSelfVar != null) {
+            map.put(originalSelfVar, selfVar);
+        }
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(originalParamVar, paramVars.head());
+            paramVars = paramVars.tail();
+        }
+        if(atPreVars != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(atPreVars.get(h) != null && originalAtPreVar != null) {
+                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                }
+            }
+        }
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
+    }
+
+
+    @Override
+    public Term getDep(LocationVariable heap, boolean atPre,
+                       Term heapTerm, Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable, Term> atPres,
+                       Services services) {
+        assert heapTerm != null;
+        assert (selfTerm == null) == (originalSelfVar == null);
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        map.put(TB.var(heap), heapTerm);
+        if (originalSelfVar != null) {
+            map.put(TB.var(originalSelfVar), selfTerm);
+        }
+        for(ProgramVariable originalParamVar : originalParamVars) {
+            map.put(TB.var(originalParamVar), paramTerms.head());
+            paramTerms = paramTerms.tail();
+        }
+        if(atPres != null && originalAtPreVars != null) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(originalAtPreVar != null && atPres.get(h) != null) {
+                    map.put(TB.var(originalAtPreVar), atPres.get(h));
+                }
+            }
+        }
+        OpReplacer or = new OpReplacer(map);
+        return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
+    }
+
+    @Override
+    public Term getGlobalDefs() {
+        return this.globalDefs;
+    }
+
+    @Override
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
                               ImmutableList<Term> paramTerms, Services services) {
         if (globalDefs==null) return null;
@@ -1036,6 +1117,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    originalPosts,
                                                    originalAxioms,
                                                    originalMods,
+                                                   originalDeps,
                                                    hasRealModifiesClause,
                                                    originalSelfVar,
                                                    originalParamVars,
@@ -1064,6 +1146,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    originalPosts,
                                                    originalAxioms,
                                                    originalMods,
+                                                   originalDeps,
                                                    hasRealModifiesClause,
                                                    originalSelfVar,
                                                    originalParamVars,

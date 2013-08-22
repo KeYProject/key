@@ -58,10 +58,10 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
      */
-    public ClassInvariantImpl(String name, 
+    public ClassInvariantImpl(String name,
                               String displayName,
-                              KeYJavaType kjt, 
-                              VisibilityModifier visibility,                              
+                              KeYJavaType kjt,
+                              VisibilityModifier visibility,
                               Term inv,
                               ParsableVariable selfVar) {
         assert name != null && !name.equals("");

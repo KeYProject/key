@@ -17,37 +17,36 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
-    /* accessible-clause, assignable-clause, breaks-clause, callable-clause, captures-clause,
+    /* breaks-clause, callable-clause, captures-clause,
      * choice-statement, continues-clause, diverges-clause, duration-clause, if-statement,
-     * measured-clause, returns-clause, when-clause, working-space-clause, requires-clause,
-     * initially-clause, constraint, ensures-clause, signals-clause */
-    private final FunctionalOperationContract contract;
+     * measured-clause, returns-clause, when-clause, working-space-clause,
+     * initially-clause, constraint, signals-clause */
+    private final Contract contract;
 
-    private Term forall;
-    private Term old;
-    private Term diverges = TB.ff();
-    private Term when;
-    private Term workingSpace;
-    private Term duration;
-    private Term signalsOnly;
-    private Term signals = TB.ff();
+    private final Term forall;
+    private final Term old;
+    private final Term when;
+    private final Term workingSpace;
+    private final Term duration;
+    private final Term globalDefs;
+    private final boolean model;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                   LocationVariable heap, OriginalVariables origVars,
-                                  Precondition requires, Term assignable, Term ensures,
-                                  FunctionalOperationContract contract, Term forall,
-                                  Term old, Term diverges, Term when, Term workingSpace,
-                                  Term duration, Term signalsOnly, Term signals) {
-        super(name, id, type, target, heap, origVars, requires, assignable, ensures);
+                                  Precondition requires, Term assignable, Term accessible,
+                                  Term ensures, Term mby, Term rep, Contract contract,
+                                  Term forall, Term old, Term when, Term workingSpace,
+                                  Term duration, Term globalDefs, boolean model) {
+        super(name, id, type, target, heap, origVars, requires,
+              assignable, accessible, ensures, mby, rep);
         this.contract = contract;
         this.forall = forall;
         this.old = old;
-        this.diverges = diverges;
         this.when = when;
         this.workingSpace = workingSpace;
         this.duration = duration;
-        this.signalsOnly = signalsOnly;
-        this.signals = signals;
+        this.globalDefs = globalDefs;
+        this.model = model;
     }
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
@@ -55,27 +54,57 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
               contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
-        LocationVariable h = getHeap();
+        this.model = false;
+        final LocationVariable h = getHeap();
+        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
-        this.setRequires(contract.getRequires(h));
-        this.setAssignable(contract.getAssignable(h));
-        this.setEnsures(contract.getEnsures(h));
+        setRequires(contract.getRequires(h));
+        setAssignable(contract.getAssignable(h));
+        setAccessible(contract.getAccessible(h),
+                      hPre != null ? contract.getAccessible(hPre) : null,
+                      services);
+        setEnsures(contract.getEnsures(h));
+        setMby(contract.getMby());
+        this.globalDefs = contract.getGlobalDefs();
 
         this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
         this.old = TB.tt(); // TODO: Where do we get the old-clause from?
-        this.diverges = TB.tt(); // TODO: Where do we get the diverges-clause from?
         this.when = TB.tt(); // TODO: Where do we get the when-clause from?
         this.workingSpace = TB.tt(); // TODO: Where do we get the working_space-clause from?
         this.duration = TB.tt(); // TODO: Where do we get the duration-clause from?
-        this.signalsOnly = TB.tt(); // TODO: Where do we get the signal_only-clause from?
-        this.signals = TB.tt(); // TODO: Where do we get the signals-clause from?
+    }
+
+    public MethodWellDefinedness(DependencyContract contract, Services services) {
+        super(contract.getTypeName(), contract.id(), contract.getTarget(),
+              contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        assert contract != null;
+        this.contract = contract;
+        this.model = true;
+        final LocationVariable h = getHeap();
+        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
+
+        setRequires(contract.getRequires(h));
+        setAssignable(TB.allLocs(services));
+        setAccessible(contract.getAccessible(h),
+                      hPre != null ? contract.getAccessible(hPre) : null,
+                      services);
+        setEnsures(TB.tt());
+        setMby(contract.getMby());
+        this.globalDefs = contract.getGlobalDefs();
+
+        this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
+        this.old = TB.tt(); // TODO: Where do we get the old-clause from?
+        this.when = TB.tt(); // TODO: Where do we get the when-clause from?
+        this.workingSpace = TB.tt(); // TODO: Where do we get the working_space-clause from?
+        this.duration = TB.tt(); // TODO: Where do we get the duration-clause from?
     }
 
     //-------------------------------------------------------------------------
     // Internal Methods
     //-------------------------------------------------------------------------
 
-    private static Term[] getArgs(SchemaVariable sv, LocationVariable heap, boolean isStatic,
+    private static Term[] getArgs(SchemaVariable sv, ParsableVariable heap,
+                                  boolean isStatic,
                                   ImmutableList<ParsableVariable> params) {
         Term[] args = new Term[params.size() + (isStatic ? 1 : 2)];
         int i = 0;
@@ -100,18 +129,30 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return paramsSV;
     }
 
+    private void setAccessible(Term acc, Term accPre, Services services) {
+        if (acc == null && accPre == null) {
+            setAccessible(null);
+        } else if (accPre == null) {
+            setAccessible(acc);
+        } else if (acc == null) {
+            setAccessible(accPre);
+        } else {
+            setAccessible(TB.union(services, acc, accPre));
+        }
+    }
+
     @Override
     TermAndFunc generateMbyAtPreDef(ParsableVariable self,
                                     ImmutableList<ParsableVariable> params,
                                     Services services) {
-        if (contract.hasMby()) {
+        if (hasMby()) {
             final Function mbyAtPreFunc =
                     new Function(new Name(TB.newName(services, "mbyAtPre")),
                                  services.getTypeConverter().getIntegerLDT().targetSort());
             OriginalVariables origVars = getOrigVars();
             final Term mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby;
-            if ( params != null && self != null && !params.isEmpty()
+            if (params != null && self != null && !params.isEmpty()
                     && (params.iterator().next() instanceof ProgramVariable)
                     && (self instanceof ProgramVariable)) {
                 ImmutableList<ProgramVariable> parameters =
@@ -130,12 +171,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         }
     }
 
+    ImmutableList<Term> getRest() {
+        ImmutableList<Term> rest = super.getRest();
+        final Term globalDefs = getGlobalDefs();
+        if (globalDefs != null) {
+            rest = rest.append(globalDefs);
+        }
+        return rest;
+    }
+
     //-------------------------------------------------------------------------
     // Public Interface
     //-------------------------------------------------------------------------
 
-    public FunctionalOperationContract getOperationContract() {
+    public Contract getMethodContract() {
         return this.contract;
+    }
+
+    @Override
+    public boolean isModel() {
+        return this.model;
     }
 
     public Term getForall() {
@@ -144,10 +199,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public Term getOld() {
         return this.old;
-    }
-
-    public Term getDiverges() {
-        return this.diverges;
     }
 
     public Term getWhen() {
@@ -162,26 +213,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return this.duration;
     }
 
-    public Term getSignalsOnly() {
-        return this.signalsOnly;
-    }
-
-    public Term getSignals() {
-        return this.signals;
-    }
-
     public Taclet createOperationTaclet(Services services) {
         final boolean isStatic = getTarget().isStatic();
         final LocationVariable heap = getHeap();
-        final SchemaVariable sv =
+        final SchemaVariable heapSV =
+                SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
+        final SchemaVariable selfSV =
                 SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
-        final Term pre = getPre(replaceSV(getRequires(), sv, paramsSV),
-                                sv, heap, paramsSV, services).term;
-        final Term[] args = getArgs(sv, heap, isStatic, paramsSV);
+
+        final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
+                                selfSV, heapSV, paramsSV, services).term;
+        final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
         final Term wdArgs = TB.and(TB.wd(args, services));
-        return createTaclet(OP_PREFIX, TB.var(sv), heap, TB.func(getTarget(), args),
+        return createTaclet(OP_PREFIX, TB.var(selfSV), TB.func(getTarget(), args),
                             TB.and(wdArgs, pre), services);
+    }
+
+    @Override
+    public Term getGlobalDefs() {
+        return this.globalDefs;
     }
 
     @Override
@@ -190,7 +241,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Contract setID(int newId) {
+    public MethodWellDefinedness setID(int newId) {
         return new MethodWellDefinedness(getName(),
                                          newId,
                                          type(),
@@ -199,20 +250,22 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getOrigVars(),
                                          getRequires(),
                                          getAssignable(),
+                                         getAccessible(),
                                          getEnsures(),
+                                         getMby(),
+                                         getRepresents(),
                                          contract,
                                          forall,
                                          old,
-                                         diverges,
                                          when,
                                          workingSpace,
                                          duration,
-                                         signalsOnly,
-                                         signals);
+                                         globalDefs,
+                                         isModel());
     }
 
     @Override
-    public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
+    public MethodWellDefinedness setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new MethodWellDefinedness(getName(),
                                          id(),
                                          type(),
@@ -221,22 +274,23 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getOrigVars(),
                                          getRequires(),
                                          getAssignable(),
+                                         getAccessible(),
                                          getEnsures(),
-                                         (FunctionalOperationContract)
-                                             contract.setTarget(newKJT, newPM),
+                                         getMby(),
+                                         getRepresents(),
+                                         contract.setTarget(newKJT, newPM),
                                          forall,
                                          old,
-                                         diverges,
                                          when,
                                          workingSpace,
                                          duration,
-                                         signalsOnly,
-                                         signals);
+                                         globalDefs,
+                                         isModel());
     }
 
     @Override
     public String getTypeName() {
-        return "Well-Definedness of " + contract.getTypeName();
+        return "Well-Definedness of " + (isModel() ? "model " : "") + contract.getTypeName();
     }
 
     @Override
@@ -247,14 +301,5 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     public KeYJavaType getKJT() {
         return contract.getKJT();
-    }
-
-    @Override
-    public POTerms createPOTerms() {
-        final Precondition pre = this.getRequires();
-        final Term mod = this.getAssignable();
-        final ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
-        final Term post = this.getEnsures();
-        return new POTerms(pre, mod, rest, post);
     }
 }

@@ -91,12 +91,38 @@ public interface Contract extends SpecificationElement {
                        Map<LocationVariable,Term> atPres,
 	    	       Services services);    
 
+    /**
+     * Returns the dependency set of the contract.
+     */
+    public Term getDep(LocationVariable heap, boolean atPre,
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                       Services services);
+
+    /**
+     * Returns the dependency set of the contract.
+     */
+    public Term getDep(LocationVariable heap, boolean atPre,
+                       Term heapTerm,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable, Term> atPres,
+                       Services services);
+
     public Term getRequires(LocationVariable heap);
 
     public Term getAssignable(LocationVariable heap);
 
+    public Term getAccessible(ProgramVariable heap);
+
+    public Term getGlobalDefs();
+
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
                               ImmutableList<Term> paramTerms, Services services);
+
+    public Term getMby();
+
     /**
      * Returns the measured_by clause of the contract.
      */

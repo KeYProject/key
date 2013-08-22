@@ -42,6 +42,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -331,7 +332,8 @@ public final class DLSpecFactory {
 					 null,// TODO measured_by in DL contracts not supported yet
 					 posts,
 					 null, // TODO no model methods in DL contracts
-					 mods, 
+					 mods,
+					 new LinkedHashMap<ProgramVariable,Term>(),
 					 hasMod, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 

@@ -327,7 +327,8 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    }
 	    return pos.isInAntec() ? TB.tt() : TB.ff();
 	} else if(in.op() instanceof Modality
-                  || in.op() instanceof UpdateApplication) {
+                  || in.op() instanceof UpdateApplication
+                  || in.op() instanceof TransformerProcedure) {
 	    return in;
 	} else {
 	    Term[] subs = new Term[in.arity()];

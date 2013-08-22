@@ -275,6 +275,16 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
+    public Term getAccessible(ProgramVariable heap) {
+        return originalDeps.get(heap);
+    }
+
+    @Override
+    public Term getMby() {
+        return this.originalMby;
+    }
+
+    @Override
     public Term getMby(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Services services) {
@@ -463,12 +473,14 @@ public final class DependencyContractImpl implements DependencyContract {
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
-
+    @Override
+    public Term getGlobalDefs() {
+        return this.globalDefs;
+    }
 
     @Override
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm,
             Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
-        // TODO Auto-generated method stub
         assert false: "old clauses are not yet supported for dependency contracts";
         return null;
     }
@@ -552,8 +564,10 @@ public final class DependencyContractImpl implements DependencyContract {
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
                 new LinkedHashMap<LocationVariable, ProgramVariable>();
-        for (LocationVariable h: originalAtPreVars.keySet()) {
-            atPreVars.put(h, originalAtPreVars.get(h));
+        if (originalAtPreVars != null) {
+            for (LocationVariable h: originalAtPreVars.keySet()) {
+                atPreVars.put(h, originalAtPreVars.get(h));
+            }
         }
         return new OriginalVariables(originalSelfVar, null, null,
                                      atPreVars, originalParamVars);
