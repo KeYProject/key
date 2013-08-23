@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.ImplicitSpecTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -50,7 +49,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -102,10 +100,6 @@ public final class SpecificationRepository {
                            ImmutableSet<WellDefinednessCheck>> wdChecks
                 = new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,
                                     ImmutableSet<WellDefinednessCheck>>();
-    private final Map<KeYJavaType, Integer> invCounter
-                = new LinkedHashMap<KeYJavaType, Integer>();
-    private final Map<KeYJavaType, Pair<Term, ProgramVariable>> implicitInvs
-                = new LinkedHashMap<KeYJavaType, Pair<Term, ProgramVariable>>();
     private final Map<String,Contract> contractsByName
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<IObserverFunction>> contractTargets
@@ -491,7 +485,7 @@ public final class SpecificationRepository {
                             ((DependencyContract)contract).getVisibility(),
                             TB.tt(), contract.getOrigVars().self);
             registerContract(
-                    new ClassWellDefinedness(inv, targetMethod, deps, mby, true, services));
+                    new ClassWellDefinedness(inv, targetMethod, deps, mby, services));
         } else if(contract instanceof DependencyContract
                 && ((DependencyContract)contract).getOrigVars().atPres.isEmpty()) {
             registerContract(
@@ -791,39 +785,6 @@ public final class SpecificationRepository {
         return result;
     }
 
-    public int getInvCount(KeYJavaType target) {
-        final int count;
-        if (invCounter.get(target) == null) {
-            count = 0;
-            invCounter.put(target, count);
-        } else {
-            count = invCounter.get(target) + 1;
-            invCounter.put(target, count);
-        }
-        return count;
-    }
-
-    public void addImplicitInv(Term inv, KeYJavaType kjt, ProgramVariable self) {
-        assert self != null;
-        Pair<Term, ProgramVariable> impl = implicitInvs.get(kjt);
-        if (impl == null) {
-            implicitInvs.put(kjt, new Pair<Term, ProgramVariable>(inv, self));
-        } else {
-            final Map<ProgramVariable, ProgramVariable> map =
-                    new LinkedHashMap<ProgramVariable, ProgramVariable>();
-            ProgramVariable oldSelf = impl.second;
-            assert self.sort().extendsTrans(oldSelf.sort());
-            map.put(oldSelf, self);
-            final OpReplacer or = new OpReplacer(map);
-            Term newInv = TB.andSC(or.replace(impl.first), inv);
-            implicitInvs.put(kjt, new Pair<Term, ProgramVariable>(newInv, self));
-        }
-    }
-
-    public Pair<Term, ProgramVariable> getImplicitInv(KeYJavaType kjt) {
-        return implicitInvs.get(kjt);
-    }
-
     /**
      * Registers the passed class invariant, and inherits it to all
      * subclasses if it is public or protected.
@@ -834,10 +795,15 @@ public final class SpecificationRepository {
                 inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt) :
                     services.getJavaInfo().getInv();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
-        if (!(inv.getOriginalInv().hasLabels()
-                && inv.getOriginalInv().containsLabel(ImplicitSpecTermLabel.INSTANCE))) {
-            registerContract(
-                    new ClassWellDefinedness(inv, target, null, null, false, services));
+        final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
+        if (cwds.isEmpty()) {
+            registerContract(new ClassWellDefinedness(inv, target, null, null, services));
+        } else {
+            for (ClassWellDefinedness cwd: cwds) {
+                unregisterContract(cwd);
+                cwd.addInv(inv.getInv(cwd.getOrigVars().self, services));
+                registerContract(cwd);
+            }
         }
 
         // in any case, create axiom with non-static target
@@ -855,12 +821,16 @@ public final class SpecificationRepository {
                         subInv.isStatic() ? services.getJavaInfo().getStaticInv(sub) :
                             services.getJavaInfo().getInv();
                 invs.put(sub, getClassInvariants(sub).add(subInv));
-                if (!(subInv.getOriginalInv().hasLabels()
-                        && subInv.getOriginalInv().containsLabel(
-                                ImplicitSpecTermLabel.INSTANCE))) {
+                final ImmutableSet<ClassWellDefinedness> subCwds = getWdClassChecks(sub);
+                if (subCwds.isEmpty()) {
                     registerContract(
-                            new ClassWellDefinedness(subInv, subTarget, null,
-                                                     null, false, services));
+                            new ClassWellDefinedness(subInv, subTarget, null, null, services));
+                } else {
+                    for (ClassWellDefinedness cwd: subCwds) {
+                        unregisterContract(cwd);
+                        cwd.addInv(subInv.getInv(cwd.getOrigVars().self, services));
+                        registerContract(cwd);
+                    }
                 }
             }
         }

@@ -18,6 +18,8 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -31,7 +33,8 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
-    protected static final String JAVA_LANG_OBJ = "java.lang.Object";
+    private static final String INV_TACLET = "wd_Invariant_";
+    private static final String OP_TACLET = "wd_Operation_";
 
     private final WellDefinednessCheck check;
     private final Variables vars;
@@ -51,10 +54,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     //-------------------------------------------------------------------------
     // Internal Methods
     //-------------------------------------------------------------------------
-
-    private static boolean isJavaLangObj(WellDefinednessCheck ch) {
-        return ch.getTarget().toString().startsWith(JAVA_LANG_OBJ);
-    }
 
     private static Function createAnonHeap(LocationVariable heap,
                                            Services services) {
@@ -189,36 +188,53 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private Term[] getUpdates(Term mod) {
+    private Term getUpdates(Term mod) {
         assert mod != null;
         final Term havocUpd = TB.elementary(services, vars.heap,
                 TB.anon(services, TB.var(vars.heap), mod, vars.anonHeap));
         final Term oldUpd = TB.elementary(services, TB.var(vars.heapAtPre), TB.var(vars.heap));
-        return new Term[] {oldUpd, havocUpd};
+        return TB.parallel(oldUpd, havocUpd);
     }
 
-    private Term getPost(Term post) {
-        final Term implicit;
-        if (vars.result != null) {
-            implicit = TB.reachableValue(services, vars.result);
-        } else {
-            implicit = TB.tt();
-        }
-        return TB.andSC(implicit, post);
+    private ImmutableSet<Taclet> createInvTaclet(String prefix, KeYJavaType kjt) {
+        final LocationVariable heap = vars.heap;
+        final SchemaVariable heapSV =
+                SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
+        boolean isStatic = getTarget().isStatic();
+        final SchemaVariable sv =
+                SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort());
+        final Term var = TB.var(sv);
+        final Term wdSelf = isStatic ? TB.tt() : TB.wd(var, services);
+        final Term[] heaps = new Term[] {TB.var(heapSV)};
+        final Term staticInvTerm = TB.staticInv(services, heaps, kjt);
+        final Term invTerm = TB.inv(services, heaps, var);
+        final Term wdHeaps = TB.and(TB.wd(heaps, services));
+        final Term pre = TB.and(wdSelf, wdHeaps);
+        final Taclet inv =
+                WellDefinednessCheck.createTaclet(prefix + kjt.getName(),
+                                                  var, invTerm, pre, false, services);
+        final Taclet staticInv =
+                WellDefinednessCheck.createTaclet(prefix + "Static_" + kjt.getName(),
+                                                  var, staticInvTerm, wdHeaps, true, services);
+        return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
     }
 
     private ImmutableSet<Taclet> generateTaclets() {
         ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<KeYJavaType> kjts = DefaultImmutableSet.<KeYJavaType>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
-            if (!isJavaLangObj(ch)) {
-                // WD(pv.<inv>)
-                res = res.add(ch.createInvTaclet(services));
+            if (!ch.getKJT().getName().equals("Object")) {
                 if (ch instanceof MethodWellDefinedness) {
                     MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
                     // WD(pv.m(...))
-                    res = res.add(mwd.createOperationTaclet(services));
+                    res = res.add(mwd.createOperationTaclet(OP_TACLET, services));
                 }
+                kjts = kjts.add(ch.getKJT());
             }
+        }
+        for (KeYJavaType kjt: kjts) {
+            // WD(pv.<inv>)
+            res = res.union(createInvTaclet(INV_TACLET, kjt));
         }
         register(res); // register taclets: Important!
         return res;
@@ -251,20 +267,19 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public void readProblem() throws ProofInputException {
         register(this.vars);
         final POTerms po = check.replace(check.createPOTerms(), vars);
-        final TermAndFunc pre = check.getPre(po.pre, vars.self, vars.heap, vars.params, services);
+        final TermAndFunc pre = check.getPre(po.pre, vars.self, vars.heap, vars.params,
+                                             false, services);
         final Term wdPre = TB.wd(pre.term, services);
         final Term wdMod = TB.wd(po.mod, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
         register(pre.func);
         mbyAtPre = pre.func != null ? TB.func(pre.func) : TB.tt();
-        final Term post = getPost(po.post);
-        final Term[] updates = getUpdates(po.mod);
-        // TODO: Do we need to assume something like a wellformed anonHeap?
-        // TODO: What about reachable terms in invariants?
-        final Term updatedPost = TB.applySequential(updates, TB.wd(post, services));
+        final Term post = check.getPost(po.post, vars.result, services);
+        final Term updates = getUpdates(po.mod);
+        final Term uPost = TB.apply(updates, TB.wd(post, services));
         final Term poTerms = TB.and(wdPre,
                                     TB.imp(pre.term,
-                                           TB.and(wdMod, TB.and(wdRest), updatedPost)));
+                                           TB.and(wdMod, TB.and(wdRest), uPost)));
         generateTaclets();
         assignPOTerms(poTerms);
 

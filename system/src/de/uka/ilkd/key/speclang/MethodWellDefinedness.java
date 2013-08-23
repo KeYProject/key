@@ -17,34 +17,22 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
 
 public final class MethodWellDefinedness extends WellDefinednessCheck {
-    /* breaks-clause, callable-clause, captures-clause,
-     * choice-statement, continues-clause, diverges-clause, duration-clause, if-statement,
-     * measured-clause, returns-clause, when-clause, working-space-clause,
-     * initially-clause, constraint, signals-clause */
+    /* breaks-clause, callable-clause, captures-clause, choice-statement,
+     * continues-clause, if-statement, returns-clause, when-clause,
+     * initially-clause, constraint */
     private final Contract contract;
 
-    private final Term forall;
-    private final Term old;
-    private final Term when;
-    private final Term workingSpace;
-    private final Term duration;
     private final Term globalDefs;
     private final boolean model;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                   LocationVariable heap, OriginalVariables origVars,
-                                  Precondition requires, Term assignable, Term accessible,
-                                  Term ensures, Term mby, Term rep, Contract contract,
-                                  Term forall, Term old, Term when, Term workingSpace,
-                                  Term duration, Term globalDefs, boolean model) {
-        super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep);
+                                  Condition requires, Term assignable, Term accessible,
+                                  Condition ensures, Term mby, Term rep, Contract contract,
+                                  Term globalDefs, boolean model) {
+        super(name, id, type, target, heap, origVars, requires, assignable, accessible,
+              ensures, mby, rep);
         this.contract = contract;
-        this.forall = forall;
-        this.old = old;
-        this.when = when;
-        this.workingSpace = workingSpace;
-        this.duration = duration;
         this.globalDefs = globalDefs;
         this.model = model;
     }
@@ -66,12 +54,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setEnsures(contract.getEnsures(h));
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
-
-        this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
-        this.old = TB.tt(); // TODO: Where do we get the old-clause from?
-        this.when = TB.tt(); // TODO: Where do we get the when-clause from?
-        this.workingSpace = TB.tt(); // TODO: Where do we get the working_space-clause from?
-        this.duration = TB.tt(); // TODO: Where do we get the duration-clause from?
     }
 
     public MethodWellDefinedness(DependencyContract contract, Services services) {
@@ -84,19 +66,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
-        setAssignable(TB.allLocs(services));
+        setAssignable(TB.empty(services));
         setAccessible(contract.getAccessible(h),
                       hPre != null ? contract.getAccessible(hPre) : null,
                       services);
         setEnsures(TB.tt());
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
-
-        this.forall = TB.tt(); // TODO: Where do we get the forall-clause from?
-        this.old = TB.tt(); // TODO: Where do we get the old-clause from?
-        this.when = TB.tt(); // TODO: Where do we get the when-clause from?
-        this.workingSpace = TB.tt(); // TODO: Where do we get the working_space-clause from?
-        this.duration = TB.tt(); // TODO: Where do we get the duration-clause from?
     }
 
     //-------------------------------------------------------------------------
@@ -188,33 +164,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return this.contract;
     }
 
-    @Override
-    public boolean isModel() {
-        return this.model;
-    }
-
-    public Term getForall() {
-        return this.forall;
-    }
-
-    public Term getOld() {
-        return this.old;
-    }
-
-    public Term getWhen() {
-        return this.when;
-    }
-
-    public Term getWorkingSpace() {
-        return this.workingSpace;
-    }
-
-    public Term getDuration() {
-        return this.duration;
-    }
-
-    public Taclet createOperationTaclet(Services services) {
-        final boolean isStatic = getTarget().isStatic();
+    public Taclet createOperationTaclet(String prefix, Services services) {
+        final IObserverFunction target = getTarget();
+        final String tName = target.name().toString();
+        final boolean isStatic = target.isStatic();
         final LocationVariable heap = getHeap();
         final SchemaVariable heapSV =
                 SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
@@ -223,11 +176,36 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
 
         final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
-                                selfSV, heapSV, paramsSV, services).term;
+                                selfSV, heapSV, paramsSV, true, services).term;
         final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
         final Term wdArgs = TB.and(TB.wd(args, services));
-        return createTaclet(OP_PREFIX, TB.var(selfSV), TB.func(getTarget(), args),
-                            TB.and(wdArgs, pre), services);
+        return createTaclet(prefix + (isStatic ? "Static " : "") + tName,
+                            TB.var(selfSV), TB.func(target, args),
+                            TB.and(wdArgs, pre), isStatic, services);
+    }
+
+    @Override
+    public String getBehaviour() {
+        if (getMethodContract().getName().contains("normal_behavior")) {
+            return "";
+        } else if (getMethodContract().getName().contains("exceptional_behavior")) {
+            return " (exc)";
+        } else if (getMethodContract().getName().contains("model_behavior")) {
+            return " (model)";
+        } else if (getMethodContract().getName().contains("break_behavior")) {
+            return " (break)";
+        } else if (getMethodContract().getName().contains("continue_behavior")) {
+            return " (cont)";
+        } else if (getMethodContract().getName().contains("return_behavior")) {
+            return " (return)";
+        } else {
+            return "";
+        }
+    }
+
+    @Override
+    public boolean isModel() {
+        return this.model;
     }
 
     @Override
@@ -255,11 +233,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getMby(),
                                          getRepresents(),
                                          contract,
-                                         forall,
-                                         old,
-                                         when,
-                                         workingSpace,
-                                         duration,
                                          globalDefs,
                                          isModel());
     }
@@ -279,11 +252,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getMby(),
                                          getRepresents(),
                                          contract.setTarget(newKJT, newPM),
-                                         forall,
-                                         old,
-                                         when,
-                                         workingSpace,
-                                         duration,
                                          globalDefs,
                                          isModel());
     }

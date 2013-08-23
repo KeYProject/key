@@ -498,7 +498,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        ec,
 	        services);
-	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
+	assert pm != null : "Getting program method failed.\nReference: " + mr +
+	                    ", static type: "+staticType+", execution context: " + ec;
 	final Term actualSelf = getActualSelf(mr, pm, ec, services);
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
@@ -572,13 +573,16 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
+        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(
+                ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION);
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext =
+                HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars =
+                HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -621,7 +625,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         for(LocationVariable h : heapContext) {
            heapTerms.put(h, TB.var(h));
         }
-        final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
+        final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
+                                                       contractParams, services);
         final Term originalPre  = contract.getPre(heapContext,
                                           heapTerms,
         				  contractSelf,
@@ -789,12 +794,17 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB
         	= replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final Term normalPost = TB.apply(anonUpdate,
-                                         TB.prog(inst.mod,
-                                                 postJavaBlock,
-                                                 inst.progPost.sub(0),
-                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
-                                         null);
+        final Term normalPost =
+                TB.apply(anonUpdate,
+                         TB.prog(inst.mod,
+                                 postJavaBlock,
+                                 inst.progPost.sub(0),
+                                 TermLabelWorkerManagement.instantiateLabels(
+                                         services, ruleApp.posInOccurrence(),
+                                         this, postGoal, null, inst.mod,
+                                         new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                         null, postJavaBlock)),
+                         null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon),
         	            true,
         	            false);
@@ -808,12 +818,17 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = TB.apply(anonUpdate,
-                                      TB.prog(inst.mod,
-                                              excJavaBlock,
-                                              inst.progPost.sub(0),
-                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
-                                      null);
+        final Term originalExcPost =
+                TB.apply(anonUpdate,
+                         TB.prog(inst.mod,
+                                 excJavaBlock,
+                                 inst.progPost.sub(0),
+                                 TermLabelWorkerManagement.instantiateLabels(
+                                         services, ruleApp.posInOccurrence(),
+                                         this, excPostGoal, null, inst.mod,
+                                         new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                         null, excJavaBlock)),
+                         null);
         final Term excPost = globalDefs==null? originalExcPost: TB.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
                 	       true,

@@ -406,14 +406,15 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    break;
 	  }
 	}
-    if(!hasRawSteps) {
-    	return false;
-    }
+	if(!hasRawSteps) {
+	    return false;
+	}
 	//there must be contracts for the observer
 	final KeYJavaType kjt
 		= target.isStatic()
 		  ? target.getContainerType()
-	          : services.getJavaInfo().getKeYJavaType(focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
+	          : services.getJavaInfo().getKeYJavaType(
+	                  focus.sub(target.getHeapCount(services)*target.getStateCount()).sort());
 	assert kjt != null : "could not determine receiver type for " + focus;
 	if(kjt.getSort() instanceof NullSort) {
 	    return false;

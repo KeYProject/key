@@ -864,7 +864,6 @@ public class JMLSpecFactory {
         if (originalInv.hasLabels()) {
             inv = TB.label(inv, originalInv.getLabels());
         }
-        services.getSpecificationRepository().addImplicitInv(inv, kjt, selfVar);
 
         //create invariant
         String name = getDefaultInvName(null, kjt);
