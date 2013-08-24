@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="LoopInvariantWithSplittingQuery.main(x);" pathCondition="true" pathConditionChanged="false">
-      <loopInvariant name="invariants: {heap=geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#)))};
-modifies: {heap=false};
-variant: LoopInvariantWithSplittingQuery::magic(heap,x)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+      <loopInvariant name="
+invariant: magic(x) &gt;= 0;
+variant: magic(x)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
          <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
             <branchCondition name="!x_0 &lt;= -1" pathCondition="!x_0 &lt;= -1" pathConditionChanged="true" branchCondition="!x_0 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
                <methodCall name="LoopInvariantWithSplittingQuery.magic(x_50);" pathCondition="!x_0 &lt;= -1" pathConditionChanged="false">

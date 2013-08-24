@@ -3,9 +3,10 @@
    <methodCall name="LoopSplittingCondition.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = x&gt;=0 ?x :-x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
-modifies: {heap=false};
-variant: i" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyValid="true">
+            <loopInvariant name="
+invariant: i &gt;= 0;
+variant: i
+mod: false" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="!i_1 &lt;= -1" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="true" branchCondition="!i_1 &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <methodCall name="LoopSplittingCondition.goOn(x_17);" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
                      <branchStatement name="if (x_17&gt;0) {return true; }else  {return false; }" pathCondition="i_1 &gt;= 0 &amp; x &gt;= 0" pathConditionChanged="false">
@@ -39,9 +40,10 @@ variant: i" pathCondition="!x &lt;= -1" pathConditionChanged="false" initiallyVa
             </loopInvariant>
          </branchCondition>
          <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <loopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
-modifies: {heap=false};
-variant: i" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyValid="true">
+            <loopInvariant name="
+invariant: i &gt;= 0;
+variant: i
+mod: false" pathCondition="!x &gt;= 0" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="false" pathCondition="false" pathConditionChanged="true" branchCondition="false" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <methodCall name="LoopSplittingCondition.goOn(x_7);" pathCondition="false" pathConditionChanged="false">
                      <branchStatement name="if (x_7&gt;0) {return true; }else  {return false; }" pathCondition="false" pathConditionChanged="false">

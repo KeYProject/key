@@ -30,9 +30,12 @@
                         <statement name="int i = 0;" pathCondition="!array = null" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
                            <callStackEntry path="/0/0/0"/>
-                           <loopInvariant name="invariants: {heap=and(and(geq(i,Z(0(#))),leq(i,length(array_1))),equals(sum_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array_1,arr(j))))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array_1),i)" pathCondition="!array = null" pathConditionChanged="false" initiallyValid="true">
+                           <loopInvariant name="
+invariant: i &gt;= 0
+&amp; i &lt;= array_1.length
+&amp; sum_1 = bsum{int j;}(0, i, array_1[j]);
+variant: javaSubInt(array_1.length, i)
+mod: false" pathCondition="!array = null" pathConditionChanged="false" initiallyValid="true">
                               <callStackEntry path="/0"/>
                               <callStackEntry path="/0/0/0"/>
                               <branchCondition name="!(    i_0 &gt;= 1

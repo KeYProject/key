@@ -11,9 +11,10 @@
                   <callStackEntry path="/0"/>
                   <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
+                     <loopInvariant name="
+invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="   array.length &gt;= 0
 -&gt;   i_0 &gt;= 0
