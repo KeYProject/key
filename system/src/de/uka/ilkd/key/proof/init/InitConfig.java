@@ -394,6 +394,7 @@ public class InitConfig {
                 (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
+        ic.env.setJavaModel(env.getJavaModel());
         return ic;
     }
 

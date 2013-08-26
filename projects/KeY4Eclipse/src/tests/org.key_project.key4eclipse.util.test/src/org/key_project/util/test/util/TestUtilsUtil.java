@@ -1036,20 +1036,6 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Waits until the given {@link Thread}s have terminated.
-    * @param threads The {@link Thread}s to wait for.
-    */
-   public static void waitForThreads(Thread[] threads) {
-      if (threads != null) {
-         for (Thread thread : threads) {
-            while (thread.isAlive()) {
-               sleep(100);
-            }
-         }
-      }
-   }
-
-   /**
     * Returns the active perspective of the active {@link IWorkbenchPage}.
     * @return The active perspective.
     */

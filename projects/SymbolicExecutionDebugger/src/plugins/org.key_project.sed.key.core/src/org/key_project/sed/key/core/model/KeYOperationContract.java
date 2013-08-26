@@ -26,6 +26,7 @@ import org.key_project.sed.core.model.ISEDOperationContract;
 import org.key_project.sed.core.model.impl.AbstractSEDOperationContract;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -195,7 +196,7 @@ public class KeYOperationContract extends AbstractSEDOperationContract implement
          if (location.getCharEnd() >= 0) {
             ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(this);
             if (compilationUnit != null) {
-               IMethod method = KeYModelUtil.findJDTMethod(compilationUnit, location.getCharEnd());
+               IMethod method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
                if (method != null) {
                   ISourceRange range = method.getNameRange();
                   location = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());

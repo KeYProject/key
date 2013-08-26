@@ -18,8 +18,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.util.java.ArrayUtil;
 
+/**
+ * The KeYProject nature.
+ * @author Stefan Käsdorf
+ */
 public class KeYProjectNature implements IProjectNature  {
    
    public final static String NATURE_ID = "org.key_project.key4eclipse.resources.KeYProjectNature";
@@ -47,6 +52,13 @@ public class KeYProjectNature implements IProjectNature  {
       ICommand[] newCommands = ArrayUtil.add(commands, command);
       desc.setBuildSpec(newCommands);
       project.setDescription(desc, null); // write to .project file
+      
+      project.setPersistentProperty(KeYProjectProperties.PROP_ENABLE_BUILD_PROOFS, "true");
+      project.setPersistentProperty(KeYProjectProperties.PROP_ENALBLE_BUILD_PROOFS_EFFICIENT, "true");
+      project.setPersistentProperty(KeYProjectProperties.PROP_ENABLE_MULTITHREADING, "true");
+      project.setPersistentProperty(KeYProjectProperties.PROP_NUMBER_OF_THREADS, "2");
+      project.setPersistentProperty(KeYProjectProperties.PROP_AUTO_DELETE_PROOFFILES, "true");
+      project.setPersistentProperty(KeYProjectProperties.PROP_HIDE_META_FILES, "false");
    }
       
    
