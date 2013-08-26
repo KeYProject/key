@@ -20,6 +20,15 @@
       </starter>
    </extension>
    <extension
+         point="org.key_project.key4eclipse.common.ui.proofStarter">
+      <starter
+            class="org.key_project.keyide.ui.starter.KeYIDEProofStarter"
+            description="An alternative user interface for KeY directly integrated into Eclipse."
+            id="org.key_project.keyide.ui.starter.KeYIDEProofStarter"
+            name="KeYIDE">
+      </starter>
+   </extension>
+   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="org.key_project.keyide.ui.editor.KeYEditor"
@@ -85,11 +94,23 @@
          <enabledWhen>
             <with
                   variable="activeEditor">
-               <test
-                     forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.AutoModeTester.start"
-                     value="true">
-               </test>
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.proofIsNotClosed"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canStartAutomode"
+                        value="true">
+                  </test>
+               </and>
             </with>
          </enabledWhen>
       </handler>
@@ -101,7 +122,7 @@
                   variable="activeEditor">
                <test
                      forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.AutoModeTester.stop"
+                     property="org.key_project.keyide.ui.isAutoMode"
                      value="true">
                </test>
             </with>
@@ -111,18 +132,40 @@
             class="org.key_project.keyide.ui.handlers.PruneProofHandler"
             commandId="org.key_project.keyide.ui.commands.pruneProof">
          <enabledWhen>
+            <and>
             <with
                   variable="activeMenuSelection">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.nodeSupportsPruning">
+                  </test>
+               </and>
+            </with>
+            <with
+                  variable="activeEditor">
                <test
                      forcePluginActivation="true"
-                     property="org.key_project.keyide.ui.PruneProofTester.isClosed">
+                     property="org.key_project.keyide.ui.canPruneProof"
+                     value="true">
                </test>
             </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
             commandId="org.key_project.keyide.ui.commands.applyrule">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.canApplyRules"
+                     value="true">
+               </test>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -257,10 +300,10 @@
       </category>
       <view
             category="org.key_project.keyide.ui.view.category"
-            class="org.key_project.keyide.ui.views.StrategyPropertiesView"
+            class="org.key_project.keyide.ui.views.StrategySettingsView"
             icon="icons/releng_gears.gif"
-            id="org.key_project.keyide.ui.view.StrategyProperties"
-            name="Strategy Properties"
+            id="org.key_project.keyide.ui.view.StrategySettings"
+            name="Strategy Settings"
             restorable="true">
       </view>
    </extension>
@@ -280,19 +323,101 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.key_project.keyide.ui.tester.AutoModeTester"
+            class="org.key_project.keyide.ui.propertyTester.AutoModePropertyTester"
             id="org.key_project.keyide.ui.AutoModeTester"
-            namespace="org.key_project.keyide.ui.AutoModeTester"
-            properties="start, stop"
+            namespace="org.key_project.keyide.ui"
+            properties="isAutoMode, isNotAutoMode"
             type="org.eclipse.ui.IEditorPart">
       </propertyTester>
       <propertyTester
-            class="org.key_project.keyide.ui.tester.PruneProofTester"
+            class="org.key_project.keyide.ui.propertyTester.PruneProofPropertyTester"
             id="org.key_project.keyide.ui.PruneProofTester"
-            namespace="org.key_project.keyide.ui.PruneProofTester"
-            properties="isClosed"
-            type="org.eclipse.jface.viewers.StructuredSelection">
+            namespace="org.key_project.keyide.ui"
+            properties="nodeSupportsPruning"
+            type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.CanFunctionPropertyTester"
+            id="org.key_project.keyide.ui.CanFunctionPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver"
+            type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.ProofPropertyTester"
+            id="org.key_project.keyide.ui.ProofPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="proofIsNotClosed"
+            type="org.eclipse.ui.IEditorPart">
       </propertyTester>
    </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+         <propertyContributor
+               contributorId="org.key_project.keyide.ui.KeYPropertyContributor">
+            <propertyCategory
+                  category="KeY">
+            </propertyCategory>
+         </propertyContributor>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+         <propertyTabs
+               contributorId="org.key_project.keyide.ui.KeYPropertyContributor">
+            <propertyTab
+                  category="KeY"
+                  id="org.key_project.keyide.ui.termPropertyTab"
+                  label="Term">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.keyide.ui.termPropertyTab"
+                  category="KeY"
+                  id="org.key_project.keyide.ui.nodePropertyTab"
+                  label="Node">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.keyide.ui.nodePropertyTab"
+                  category="KeY"
+                  id="org.key_project.keyide.ui.proofPropertyTab"
+                  label="Proof">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.keyide.ui.proofPropertyTab"
+                  category="KeY"
+                  id="org.key_project.keyide.ui.tacletPropertyTab"
+                  label="Taclet">
+            </propertyTab>
+         </propertyTabs>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertySections">
+         <propertySections
+               contributorId="org.key_project.keyide.ui.KeYPropertyContributor">
+            <propertySection
+                  class="org.key_project.keyide.ui.property.NodePropertySection"
+                  filter="org.key_project.keyide.ui.property.NodePropertyFilter"
+                  id="org.key_project.keyide.ui.property.NodePropertySection"
+                  tab="org.key_project.keyide.ui.nodePropertyTab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.keyide.ui.property.ProofPropertySection"
+                  filter="org.key_project.keyide.ui.property.ProofPropertyFilter"
+                  id="org.key_project.keyide.ui.property.ProofPropertySection"
+                  tab="org.key_project.keyide.ui.proofPropertyTab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.keyide.ui.property.TermPropertySection"
+                  filter="org.key_project.keyide.ui.property.TermPropertyFilter"
+                  id="org.key_project.keyide.ui.property.TermPropertySection"
+                  tab="org.key_project.keyide.ui.termPropertyTab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.keyide.ui.property.TacletPropertySection"
+                  filter="org.key_project.keyide.ui.property.TacletPropertyFilter"
+                  id="org.key_project.keyide.ui.property.TacletPropertySection"
+                  tab="org.key_project.keyide.ui.tacletPropertyTab">
+            </propertySection>
+         </propertySections>
+      </extension>  
 
 </plugin>

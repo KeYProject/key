@@ -1,22 +1,23 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.logic;
 
 
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -43,7 +44,6 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -62,6 +62,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -441,7 +442,7 @@ public class TermBuilder {
         return tf.createTerm(IfThenElse.IF_THEN_ELSE,
                          new Term[]{cond, _then, _else});
     }
-    
+
     /** Construct a term with the \ifEx operator. */
     public Term ifEx(QuantifiableVariable qv, Term cond, Term _then, Term _else) {
         return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
@@ -450,6 +451,15 @@ public class TermBuilder {
                             null);
     }
 
+    /** Construct a term with the \ifEx operator. */
+    public Term ifEx(ImmutableList<QuantifiableVariable> qvs, Term cond, Term _then, Term _else) {
+        if (qvs.isEmpty()) throw new TermCreationException("no quantifiable variables in ifEx term");
+        if (qvs.size()==1) {
+            return ifEx(qvs.head(), cond, _then, _else);
+        } else {
+            return ifEx(qvs.head(), tt(), ifEx(qvs.tail(), cond, _then, _else), _else);
+        }
+    }
 
     public Term cast(Services services, Sort s, Term t) {
     return tf.createTerm(s.getCastSymbol(services), t);
@@ -544,32 +554,96 @@ public class TermBuilder {
 
 
     /** Translation of JML's \min operator using \ifEx operator. */
-    public Term min(QuantifiableVariable qv, Term guard, Term t, boolean bigInt, Services services) {
+    public Term min(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
+        final TypeConverter tc = services.getTypeConverter();
+        final KeYJavaType longType = tc.getKeYJavaType(PrimitiveType.JAVA_LONG);
+        final KeYJavaType bigintType = tc.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+
+
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
-        final Term xvar = var(x);
-        final Term subst = subst(qv, xvar, guard);
-        final Term lhs = bigInt? subst: and(inInt(xvar,services),subst);
-        final Term qvar = var(qv);
-        if (!bigInt) guard = and(inInt(qvar,services),guard);
-        final Term minForm = and(guard,all(x,imp(lhs,leq(qvar,xvar, services))));
+        Term origGuard = guard;
+        ImmutableList<QuantifiableVariable> xs = ImmutableSLList.nil();
+        ImmutableList<Term> xvars = ImmutableSLList.nil();
+        Term body = tt();
+        Term qvsInInt = tt();
+        Term tx = t;
+
+        for (QuantifiableVariable qv: qvs){
+            // prepare forall part
+            final QuantifiableVariable x = new LogicVariable(
+                    new Name("_"+qv.name().toString()),qv.sort());
+            xs = xs.append(x);
+            final Term xvar = var(x);
+            xvars = xvars.append(xvar);
+            guard = subst(qv, xvar, guard);
+            tx = subst(qv, xvar, tx);
+            if (type == longType) {
+                body = and(inLong(xvar,services),body);
+            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
+                body = and(inInt(xvar,services),body);
+            }
+
+            // prepare terms for quantified variables
+            final Term qvar = var(qv);
+            if (type == longType) {
+                origGuard = and(inLong(qvar,services),origGuard);
+            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
+                origGuard = and(inInt(qvar,services),origGuard);
+            }
+        }
+        body = and(body,guard);
+        final Term forall = all(xs, imp(body, leq(t, tx, services)));
+        final Term minForm = and(qvsInInt, origGuard, forall);
+
         final Term undef = func(new Function(new Name("undefMin"), intSort));
-        return ifEx(qv, minForm, t, undef);
+        return ifEx(qvs, minForm, t, undef);
     }
 
 
     /** Translation of JML's \max operator using \ifEx operator. */
-    public Term max(QuantifiableVariable qv, Term guard, Term t, boolean bigInt, Services services) {
+    public Term max(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
+        final TypeConverter tc = services.getTypeConverter();
+        final KeYJavaType longType = tc.getKeYJavaType(PrimitiveType.JAVA_LONG);
+        final KeYJavaType bigintType = tc.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+
+
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
-        final Term xvar = var(x);
-        final Term subst = subst(qv, xvar, guard);
-        final Term lhs = bigInt? subst: and(inInt(xvar,services),subst);
-        final Term qvar = var(qv);
-        if (!bigInt) guard = and(inInt(qvar,services),guard);
-        final Term maxForm = and(guard,all(x,imp(lhs,geq(qvar,xvar, services))));
+        Term origGuard = guard;
+        ImmutableList<QuantifiableVariable> xs = ImmutableSLList.nil();
+        ImmutableList<Term> xvars = ImmutableSLList.nil();
+        Term body = tt();
+        Term qvsInInt = tt();
+        Term tx = t;
+
+        for (QuantifiableVariable qv: qvs){
+            // prepare forall part
+            final QuantifiableVariable x = new LogicVariable(
+                    new Name("_"+qv.name().toString()),qv.sort());
+            xs = xs.append(x);
+            final Term xvar = var(x);
+            xvars = xvars.append(xvar);
+            guard = subst(qv, xvar, guard);
+            tx = subst(qv, xvar, tx);
+            if (type == longType) {
+                body = and(inLong(xvar,services),body);
+            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
+                body = and(inInt(xvar,services),body);
+            }
+
+            // prepare terms for quantified variables
+            final Term qvar = var(qv);
+            if (type == longType) {
+                origGuard = and(inLong(qvar,services),origGuard);
+            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
+                origGuard = and(inInt(qvar,services),origGuard);
+            }
+        }
+        body = and(body,guard);
+        final Term forall = all(xs, imp(body, geq(t, tx, services)));
+        final Term maxForm = and(qvsInInt, origGuard, forall);
+
         final Term undef = func(new Function(new Name("undefMax"), intSort));
-        return ifEx(qv, maxForm, t, undef);
+        return ifEx(qvs, maxForm, t, undef);
     }
 
 
@@ -905,6 +979,10 @@ public class TermBuilder {
     }
     }
 
+    public Term apply(Term update, Term target) {
+        return apply(update,target,null);
+    }
+
     public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
     if(update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
@@ -1052,34 +1130,51 @@ public class TermBuilder {
      * @param services Services which contains the number-functions
      * @param numberString String representing an integer
      * @return Term in Z-Notation representing the given number
+     * @throws NumberFormatException if <code>numberString</code> is not a number
      */
     public Term zTerm(Services services, String numberString) {
-        Operator v;
-        Term t;
+
+        if (numberString == null || numberString.isEmpty()) {
+            throw new NumberFormatException(numberString + " is not a number.");
+        }
+
+        Term numberLiteralTerm;
         boolean negate = false;
         int j = 0;
 
-        Namespace funcNS = services.getNamespaces().functions();
+        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
-        if (numberString.substring(0,1).equals("-")) {
+        if (numberString.charAt(0) == '-') {
             negate = true;
-            j=1;
+            j = 1;
         }
-        v=(Function)  funcNS.lookup(new Name("#"));
-        t = func((Function)v);
-        v = (Function) funcNS.lookup(new Name(numberString.substring(j,j+1)));
-        t = func((Function)v,t);
-        for(int i=j+1;i<numberString.length();i++){
-            v = (Function)funcNS.lookup(new Name(numberString.substring(i,i+1)));
-            t = func((Function)v,t);
+        numberLiteralTerm = func(intLDT.getNumberTerminator());
+
+        int digit;
+        for(int i = j, sz = numberString.length(); i<sz; i++){
+
+            switch(numberString.charAt(i)) {
+                case '0' : digit = 0; break;
+                case '1' : digit = 1; break;
+                case '2' : digit = 2; break;
+                case '3' : digit = 3; break;
+                case '4' : digit = 4; break;
+                case '5' : digit = 5; break;
+                case '6' : digit = 6; break;
+                case '7' : digit = 7; break;
+                case '8' : digit = 8; break;
+                case '9' : digit = 9; break;
+                default:
+                    throw new NumberFormatException(numberString + " is not a number.");
+            }
+
+            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
         if (negate) {
-            v=(Function) funcNS.lookup(new Name("neglit"));
-            t = func((Function) v, t);
+            numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        v = (Function) funcNS.lookup(new Name("Z"));
-        t = func((Function)v,t);
-        return t;
+        numberLiteralTerm = func(intLDT.getNumberSymbol(), numberLiteralTerm);
+        return numberLiteralTerm;
     }
 
 
@@ -1101,6 +1196,16 @@ public class TermBuilder {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
                 new Name("inInt"));
+        return func(f, var);
+    }
+
+
+
+    public Term inLong(Term var,
+                      Services services) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inLong"));
         return func(f, var);
     }
 
@@ -1339,23 +1444,36 @@ public class TermBuilder {
     }
 
 
-    public Term inv(Services services, Term h, Term o) {
-    return func(services.getJavaInfo().getInv(),
-            h,
-            o);
+    public Term inv(Services services, Term[] h, Term o) {
+        Term[] p = new Term[h.length + 1];
+        System.arraycopy(h, 0, p, 0, h.length);
+        p[h.length] = o;
+        return func(services.getJavaInfo().getInv(), p);
     }
 
 
     public Term inv(Services services, Term o) {
-    return inv(services, getBaseHeap(services),  o);
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i=0;
+        for(LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return inv(services, hs,  o);
     }
 
-    public Term staticInv(Services services, Term h, KeYJavaType t){
+    public Term staticInv(Services services, Term[] h, KeYJavaType t){
         return func(services.getJavaInfo().getStaticInv(t), h);
     }
 
     public Term staticInv(Services services, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), getBaseHeap(services));
+        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        Term[] hs = new Term[heaps.size()];
+        int i=0;
+        for(LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
+        return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 
 
@@ -1401,12 +1519,12 @@ public class TermBuilder {
     public Term arr(Services services, Term idx) {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
-    
+
     public Term label(Term term, ImmutableArray<ITermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
         }
     }
@@ -1684,7 +1802,7 @@ public class TermBuilder {
     final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
     final Map<LocationVariable, LogicVariable> map
-        = new HashMap<LocationVariable, LogicVariable>();
+        = new LinkedHashMap<LocationVariable, LogicVariable>();
     map.put(heapLDT.getHeap(), heapLV);
     final OpReplacer or = new OpReplacer(map);
     t = or.replace(t);

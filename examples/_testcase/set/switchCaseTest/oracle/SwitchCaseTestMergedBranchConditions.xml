@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.switchCase(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int a;" pathCondition="true" pathConditionChanged="false">
-         <branchNode name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="x = 0" pathCondition="x = 0" pathConditionChanged="true" branchCondition="x = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="a=1;" pathCondition="x = 0" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="x = 0" pathConditionChanged="false">
@@ -13,59 +13,59 @@
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="x = 1 &amp; !x = 0" pathCondition="x = 1 &amp; !x = 0" pathConditionChanged="true" branchCondition="x = 1 &amp; !x = 0" mergedBranchCondition="true" isBranchConditionComputed="true">
-               <statement name="a=-1;" pathCondition="x = 1 &amp; !x = 0" pathConditionChanged="false">
-                  <statement name="a=x*x;" pathCondition="x = 1 &amp; !x = 0" pathConditionChanged="false">
-                     <statement name="return a;" pathCondition="x = 1 &amp; !x = 0" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 1 &amp; !x = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="x = 1 &amp; !x = 0" pathConditionChanged="false" terminationKind="NORMAL">
+            <branchCondition name="x = 1" pathCondition="x = 1" pathConditionChanged="true" branchCondition="x = 1" mergedBranchCondition="true" isBranchConditionComputed="true">
+               <statement name="a=-1;" pathCondition="x = 1" pathConditionChanged="false">
+                  <statement name="a=x*x;" pathCondition="x = 1" pathConditionChanged="false">
+                     <statement name="return a;" pathCondition="x = 1" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 1" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="x = 1" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="x = 2 &amp; !x = 1 &amp; !x = 0" pathCondition="x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="true" branchCondition="x = 2 &amp; !x = 1 &amp; !x = 0" mergedBranchCondition="true" isBranchConditionComputed="true">
-               <statement name="a=-1;" pathCondition="x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                  <statement name="a=x*x;" pathCondition="x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                     <statement name="return a;" pathCondition="x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" terminationKind="NORMAL">
+            <branchCondition name="x = 2" pathCondition="x = 2" pathConditionChanged="true" branchCondition="x = 2" mergedBranchCondition="true" isBranchConditionComputed="true">
+               <statement name="a=-1;" pathCondition="x = 2" pathConditionChanged="false">
+                  <statement name="a=x*x;" pathCondition="x = 2" pathConditionChanged="false">
+                     <statement name="return a;" pathCondition="x = 2" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 2" pathConditionChanged="false" isReturnValueComputed="false">
+                           <termination name="&lt;end&gt;" pathCondition="x = 2" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathCondition="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="true" branchCondition="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" mergedBranchCondition="true" isBranchConditionComputed="true">
-               <statement name="a=x*x;" pathCondition="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                  <statement name="return a;" pathCondition="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" terminationKind="NORMAL">
+            <branchCondition name="x = 3" pathCondition="x = 3" pathConditionChanged="true" branchCondition="x = 3" mergedBranchCondition="true" isBranchConditionComputed="true">
+               <statement name="a=x*x;" pathCondition="x = 3" pathConditionChanged="false">
+                  <statement name="return a;" pathCondition="x = 3" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 3" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="x = 3" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathCondition="x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="true" branchCondition="x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" mergedBranchCondition="true" isBranchConditionComputed="true">
-               <statement name="return 42;" pathCondition="x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" terminationKind="NORMAL">
+            <branchCondition name="x = 4" pathCondition="x = 4" pathConditionChanged="true" branchCondition="x = 4" mergedBranchCondition="true" isBranchConditionComputed="true">
+               <statement name="return 42;" pathCondition="x = 4" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 4" pathConditionChanged="false" isReturnValueComputed="false">
+                     <termination name="&lt;end&gt;" pathCondition="x = 4" pathConditionChanged="false" terminationKind="NORMAL">
                      </termination>
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathCondition="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="true" branchCondition="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" mergedBranchCondition="true" isBranchConditionComputed="true">
-               <statement name="a=x;" pathCondition="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                  <statement name="return a;" pathCondition="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!x = 4 &amp; !x = 3 &amp; !x = 2 &amp; !x = 1 &amp; !x = 0" pathConditionChanged="false" terminationKind="NORMAL">
+            <branchCondition name="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="true" branchCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" mergedBranchCondition="true" isBranchConditionComputed="true">
+               <statement name="a=x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false">
+                  <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" isReturnValueComputed="false">
+                        <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
                </statement>
             </branchCondition>
-         </branchNode>
+         </branchStatement>
       </statement>
    </methodCall>
-</startNode>
+</start>

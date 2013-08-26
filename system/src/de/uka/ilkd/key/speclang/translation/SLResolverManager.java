@@ -16,6 +16,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -50,7 +51,7 @@ public abstract class SLResolverManager {
         localVariablesNamespaces = ImmutableSLList.<Namespace>nil();
 
     private Map<ParsableVariable,KeYJavaType> kjts 
-	= new HashMap<ParsableVariable,KeYJavaType>();
+	= new LinkedHashMap<ParsableVariable,KeYJavaType>();
     
     //-------------------------------------------------------------------------
     //constructors

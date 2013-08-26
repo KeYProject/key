@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 /**
  * Trivial implementation of the Strategy interface
@@ -68,13 +69,18 @@ public class FIFOStrategy implements Strategy {
     
     public static Strategy INSTANCE = new FIFOStrategy ();
     
-    public static class Factory extends StrategyFactory {
+    public static class Factory implements StrategyFactory {
         public Name name () {
             return NAME;
         }
         
         public Strategy create ( Proof proof, StrategyProperties properties ) {
             return INSTANCE;
+        }
+
+        @Override
+        public StrategySettingsDefinition getSettingsDefinition() {
+            return null;
         }
     }
 

@@ -120,7 +120,7 @@ public class ExpansionState
     {
         tree = t;
         
-        paths = new HashSet();
+        paths = new LinkedHashSet();
 
         listener = createListener();
 
@@ -373,7 +373,7 @@ public class ExpansionState
     */
     public static void expandAll(JTree tree, TreePath path)
     {
-        for (Object o : extremalPaths(tree.getModel(), path, new HashSet())) tree.expandPath((TreePath) o);
+        for (Object o : extremalPaths(tree.getModel(), path, new LinkedHashSet())) tree.expandPath((TreePath) o);
     }
 
 

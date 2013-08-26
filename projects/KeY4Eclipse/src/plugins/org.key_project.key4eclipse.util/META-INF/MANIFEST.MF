@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KeY Project Utilities
-Bundle-SymbolicName: org.key_project.util
+Bundle-SymbolicName: org.key_project.util;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.util.Activator
 Require-Bundle: org.eclipse.core.runtime,
@@ -16,6 +16,7 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.util.bean,
  org.key_project.util.eclipse,
  org.key_project.util.eclipse.job,
+ org.key_project.util.eclipse.setup,
  org.key_project.util.eclipse.swt,
  org.key_project.util.eclipse.swt.dialog,
  org.key_project.util.eclipse.swt.view,

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui.macros;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -68,7 +69,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      * convert a string array to a set of strings
      */
     protected static Set<String> asSet(String[] strings) {
-        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(strings)));
+        return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
     }
 
     /*
@@ -136,7 +137,18 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE;
+            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
+                   // Assumptions are normally not considered by the cost
+                   // computation, because they are normally not yet
+                   // instantiated when the costs are computed. Because the
+                   // application of a rule sometimes makes sense only if
+                   // the assumptions are instantiated in a particular way
+                   // (for instance equalities should not be applied on
+                   // themselves), we need to give the delegate the possiblity
+                   // to reject the application of a rule by calling
+                   // isApprovedApp. Otherwise, in particular equalities may
+                   // be applied on themselves.
+                   delegate.isApprovedApp(app, pio, goal);
         }
 
         @Override

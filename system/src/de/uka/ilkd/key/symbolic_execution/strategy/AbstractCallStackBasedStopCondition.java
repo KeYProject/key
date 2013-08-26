@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
@@ -39,7 +40,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    /**
     * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
     */
-   private Map<Goal, NodeStartEntry> startingCallStackSizePerGoal = new HashMap<Goal, NodeStartEntry>();
+   private Map<Goal, NodeStartEntry> startingCallStackSizePerGoal = new LinkedHashMap<Goal, NodeStartEntry>();
 
    /**
     * {@inheritDoc}

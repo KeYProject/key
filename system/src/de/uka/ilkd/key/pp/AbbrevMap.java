@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.logic.Term;
 
@@ -34,9 +35,9 @@ public class AbbrevMap {
      * Creates a  AbbrevMap.
      */
     public AbbrevMap() {
-	termstring = new HashMap<AbbrevWrapper, String>();
-	stringterm = new HashMap<String, AbbrevWrapper>();
-	termenabled = new HashMap<AbbrevWrapper, Boolean>();
+	termstring = new LinkedHashMap<AbbrevWrapper, String>();
+	stringterm = new LinkedHashMap<String, AbbrevWrapper>();
+	termenabled = new LinkedHashMap<AbbrevWrapper, Boolean>();
     }
        
     /**

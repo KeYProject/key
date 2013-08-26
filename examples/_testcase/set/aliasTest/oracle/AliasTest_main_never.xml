@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -46,9 +46,9 @@
             <variable name="b" arrayIndex="-1" isArrayIndex="false">
                <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                     <value name="value {!b = a}" typeString="int" valueString="b.value" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
-                     </value>
                      <value name="value {b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="b = a">
+                     </value>
+                     <value name="value {!b = a}" typeString="int" valueString="b.value" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
                      </value>
                   </variable>
                </value>
@@ -65,9 +65,9 @@
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
                   <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                        <value name="value {!b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
-                        </value>
                         <value name="value {b = a}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="b = a">
+                        </value>
+                        <value name="value {!b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
                         </value>
                      </variable>
                   </value>
@@ -99,9 +99,9 @@ as result of self.main(a,b);&gt;" isReturnValueComputed="true">
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
                      <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                           <value name="value {!b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
-                           </value>
                            <value name="value {b = a}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="b = a">
+                           </value>
+                           <value name="value {!b = a}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="!b = a">
                            </value>
                         </variable>
                      </value>
@@ -125,4 +125,4 @@ as result of self.main(a,b);&gt;" isReturnValueComputed="true">
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

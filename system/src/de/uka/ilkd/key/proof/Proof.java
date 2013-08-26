@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -26,6 +26,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -40,7 +41,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -50,9 +50,9 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
@@ -156,7 +156,7 @@ public class Proof implements Named {
         StrategyProperties activeStrategyProperties =
             settings.getStrategySettings().getActiveStrategyProperties();
 
-        final Profile profile = settings.getProfile();
+        final Profile profile = services.getProfile();
 
         if (profile.supportsStrategyFactory(settings.getStrategySettings().getStrategy())) {
             setActiveStrategy
@@ -217,27 +217,6 @@ public class Proof implements Named {
             BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
         this ( name, sequent, rules, builtInRules, services, settings );
         problemHeader = header;
-    }
-
-
-    /** copy constructor */
-    public Proof(Proof p) {
-        this(p.name, p.env().getInitConfig().getServices(),
-             new ProofSettings(p.settings));
-        activeStrategy =
-            StrategyFactory.create(this,
-                    p.getActiveStrategy().name().toString(),
-                    getSettings().getStrategySettings().getActiveStrategyProperties());
-
-        InitConfig ic = p.env().getInitConfig();
-        Node rootNode = new Node(this, p.root.sequent());
-        setRoot(rootNode);
-	Goal firstGoal = new Goal(rootNode,
-            new RuleAppIndex(new TacletAppIndex(ic.createTacletIndex()),
-	    new BuiltInRuleAppIndex(ic.createBuiltInRuleIndex())));
-	localMgt = new ProofCorrectnessMgt(this);
-	openGoals = openGoals.prepend(firstGoal);
-        setNamespaces(ic.namespaces());
     }
 
 
@@ -1011,70 +990,10 @@ public class Proof implements Named {
 
     /** Retrieves a bunch of statistics to the proof tree.
      * This implementation traverses the proof tree only once.
+     * Statistics are not cached; don't call this method too often.
      */
-    public List<Pair<String,String>> statistics() {
-        final List<Pair<String,String>> res = new ArrayList<Pair<String,String>>(10);
-        final NodeIterator it = root().subtreeIterator();
-
-        int nodes = 0;
-        int branches = 1;
-        int interactive = 0;
-        int oss = 0;
-        int ossCaptured = 0;
-        int smt = 0;
-        int dep = 0;
-        int contr = 0;
-        int inv = 0;
-
-        while (it.hasNext()) {
-            nodes++;
-            final Node node = it.next();
-            final int c = node.childrenCount();
-            if (c>1) branches += c-1;
-
-            if (node.getNodeInfo().getInteractiveRuleApplication()) {
-                interactive++;
-            }
-
-            final RuleApp ruleApp = node.getAppliedRuleApp();
-            if (ruleApp != null) {
-
-                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
-                    oss++;
-                    final Protocol protocol = ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
-                    if (protocol != null) ossCaptured += protocol.size()-1;
-                }
-                else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) smt++;
-                else if (ruleApp instanceof UseDependencyContractApp) dep++;
-                else if (ruleApp instanceof ContractRuleApp) contr++;
-                else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) inv++;
-            }
-        }
-
-        final String nodeString = EnhancedStringBuffer.format(nodes).toString();
-        res.add(new Pair<String, String>("Nodes", nodeString));
-        res.add(new Pair<String, String>("Branches",
-                EnhancedStringBuffer.format(branches).toString()));
-        res.add(new Pair<String, String>("Interactive steps", ""+interactive));
-        final long time = getAutoModeTime();
-        res.add(new Pair<String, String>("Automode time",
-                EnhancedStringBuffer.formatTime(time).toString()));
-        if (time >= 10000) res.add(new Pair<String, String>("Automode time",""+time+"ms"));
-        if (nodes > 0) {
-            final String avgTime = ""+(time/nodes)+"."+((time*10/nodes)%10);
-            res.add(new Pair<String, String>("Avg. time per step", ""+avgTime+"ms"));
-        }
-
-        res.add(new Pair<String, String>("Rule applications",""));
-        res.add(new Pair<String, String>("One-step Simplifier apps", ""+oss));
-        res.add(new Pair<String, String>("SMT solver apps", ""+smt));
-        res.add(new Pair<String, String>("Dependency Contract apps", ""+dep));
-        res.add(new Pair<String, String>("Operation Contract apps", ""+contr));
-        res.add(new Pair<String, String>("Loop invariant apps", ""+inv));
-        res.add(new Pair<String, String>("Total rule apps",
-                EnhancedStringBuffer.format(nodes+ossCaptured).toString()));
-
-        return res;
+    public Statistics statistics() {
+        return new Statistics(this);
     }
 
     /** toString */
@@ -1089,5 +1008,169 @@ public class Proof implements Named {
 	result.append("\nProoftree:\n");
 	result.append(root.toString());
 	return result.toString();
+    }
+
+    public final static class Statistics {
+        public final int nodes;
+        public final int branches;
+        public final int interactiveSteps;
+        public final int quantifierInstantiations;
+        public final int ossApps;
+        public final int totalRuleApps;
+        public final int smtSolverApps;
+        public final int dependencyContractApps;
+        public final int operationContractApps;
+        public final int loopInvApps;
+        public final long autoModeTime;
+        public final long time;
+
+        private List<Pair<String, String>> summaryList =
+                new ArrayList<Pair<String, String>>(14);
+
+
+        private Statistics(Proof proof) {
+            final NodeIterator it = proof.root().subtreeIterator();
+
+            int tmpNodes = 0;
+            int tmpBranches = 1;
+            int tmpInteractive = 0;
+            int tmpQuant = 0;
+            int tmpOss = 0;
+            int tmpOssCaptured = 0;
+            int tmpSmt = 0;
+            int tmpDep = 0;
+            int tmpContr = 0;
+            int tmpInv = 0;
+
+            while (it.hasNext()) {
+                tmpNodes++;
+                final Node node = it.next();
+                final int c = node.childrenCount();
+                if (c > 1) {
+                    tmpBranches += c - 1;
+                }
+
+                if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                    tmpInteractive++;
+                }
+
+                final RuleApp ruleApp = node.getAppliedRuleApp();
+                if (ruleApp != null) {
+
+                    if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                        tmpOss++;
+                        final Protocol protocol =
+                                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                        if (protocol != null) {
+                            tmpOssCaptured += protocol.size() - 1;
+                        }
+                    } else if (ruleApp instanceof de.uka.ilkd.key.smt.RuleAppSMT) {
+                        tmpSmt++;
+                    } else if (ruleApp instanceof UseDependencyContractApp) {
+                        tmpDep++;
+                    } else if (ruleApp instanceof ContractRuleApp) {
+                        tmpContr++;
+                    } else if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
+                        tmpInv++;
+                    } else if (ruleApp instanceof TacletApp) {
+                        final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
+                        final String tName = t.name().toString();
+                        if (tName.startsWith("allLeft") || tName.startsWith("exRight")) {
+                            tmpQuant++;
+                        }
+                    }
+                }
+            }
+
+            this.nodes = tmpNodes;
+            this.branches = tmpBranches;
+            this.interactiveSteps = tmpInteractive;
+            this.quantifierInstantiations = tmpQuant;
+            this.ossApps = tmpOss;
+            this.totalRuleApps = tmpNodes + tmpOssCaptured;
+            this.smtSolverApps = tmpSmt;
+            this.dependencyContractApps = tmpDep;
+            this.operationContractApps = tmpContr;
+            this.loopInvApps = tmpInv;
+            this.autoModeTime = proof.getAutoModeTime();
+            this.time = System.currentTimeMillis() - Main.getStartTime();
+
+            generateSummary(proof, tmpNodes, tmpBranches, tmpInteractive, tmpQuant, tmpOss, tmpSmt, tmpDep, tmpContr, tmpInv, tmpOssCaptured);
+        }
+
+
+        private void generateSummary(Proof proof,
+                                     int tmpNodes,
+                                     int tmpBranches,
+                                     int tmpInteractive,
+                                     int quant,
+                                     int tmpOss,
+                                     int tmpSmt,
+                                     int tmpDep,
+                                     int tmpContr,
+                                     int tmpInv,
+                                     int tmpOssCaptured) {
+            final String nodeString =
+                    EnhancedStringBuffer.format(tmpNodes).toString();
+            summaryList.add(new Pair<String, String>("Nodes", nodeString));
+            summaryList.add(new Pair<String, String>("Branches",
+                                                     EnhancedStringBuffer.format(tmpBranches).toString()));
+            summaryList.add(new Pair<String, String>("Interactive steps", "" +
+                                                                          tmpInteractive));
+            final long time = proof.getAutoModeTime();
+            summaryList.add(new Pair<String, String>("Automode time",
+                                                     EnhancedStringBuffer.formatTime(time).toString()));
+            if (time >= 10000) {
+                summaryList.add(new Pair<String, String>("Automode time", "" +
+                                                                          time +
+                                                                          "ms"));
+            }
+            if (tmpNodes > 0) { // TODO: real rounding
+                final String avgTime = "" + (time / tmpNodes) + "." + ((time *
+                                                                        10 /
+                                                                        tmpNodes) %
+                                                                       10);
+                summaryList.add(new Pair<String, String>("Avg. time per step", "" +
+                                                                               avgTime +
+                                                                               "ms"));
+            }
+
+            summaryList.add(new Pair<String, String>("Rule applications", ""));
+            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quant));
+            summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
+                                                                                 tmpOss));
+            summaryList.add(new Pair<String, String>("SMT solver apps", "" +
+                                                                        tmpSmt));
+            summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
+                                                                                 tmpDep));
+            summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
+                                                                                tmpContr));
+            summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
+                                                                            tmpInv));
+            summaryList.add(new Pair<String, String>("Total rule apps",
+                                                     EnhancedStringBuffer.format(tmpNodes +
+                                                                                 tmpOssCaptured).toString()));
+        }
+
+
+        public List<Pair<String, String>> getSummary() {
+            return summaryList;
+        }
+
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer("Proof Statistics:\n");
+            for (Pair<String,String> p: summaryList) {
+                final String c = p.first;
+                final String s = p.second;
+                sb = sb.append(c);
+                if (!"".equals(s)) {
+                    sb = sb.append(": ").append(s);
+                }
+                sb = sb.append('\n');
+            }
+            sb.deleteCharAt(sb.length()-1);
+            return sb.toString();
+        }
     }
 }

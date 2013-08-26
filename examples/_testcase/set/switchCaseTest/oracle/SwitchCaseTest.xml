@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.switchCase(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int a;" pathCondition="true" pathConditionChanged="false">
-         <branchNode name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="x = 0" pathCondition="x = 0" pathConditionChanged="true" branchCondition="x = 0" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="a=1;" pathCondition="x = 0" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="x = 0" pathConditionChanged="false">
@@ -73,7 +73,7 @@
                   </branchCondition>
                </branchCondition>
             </branchCondition>
-         </branchNode>
+         </branchStatement>
       </statement>
    </methodCall>
-</startNode>
+</start>

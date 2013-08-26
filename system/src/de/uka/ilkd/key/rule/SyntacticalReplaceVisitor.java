@@ -20,6 +20,7 @@
  */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
@@ -126,10 +127,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             true);
     }
 
-    public SyntacticalReplaceVisitor(Constraint metavariableInst, TermLabelWorkerManagement labelInstantiator) { 
-       this(null, metavariableInst, labelInstantiator);
-    }
-
     private JavaProgramElement addContext(StatementBlock pe) {
 	final ContextInstantiationEntry cie =
 	    svInst.getContextInstantiation();
@@ -149,9 +146,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     }
 
     private Services getServices () {
-	if ( services == null )
-	    services = new Services ();
-	return services;
+       return services;
     }
 
     private TypeConverter getTypeConverter () {
@@ -220,7 +215,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =
-                    new SyntacticalReplaceVisitor (metavariableInst, labelInstantiator);
+                    new SyntacticalReplaceVisitor (getServices(), metavariableInst, labelInstantiator);
                 t.execPostOrder ( srv );
                 return srv.getTerm ();
             }

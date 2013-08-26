@@ -79,7 +79,6 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
     */
    @Override
    public void init(IWorkbench workbench) {
-      noDefaultAndApplyButton();
       if (isChoiceSettingsLoadingRequired()) {
          doLoadChoiceSettings();
       }
@@ -186,8 +185,20 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
     */
    @Override
    protected void performDefaults() {
-      throw new UnsupportedOperationException();
+      Map<String, String> defaults = getDefaults();
+      if (defaults != null) {
+         for (Entry<String, String> entry : defaults.entrySet()) {
+            ButtonViewer viewer = category2ChoiceViewerMapping.get(entry.getKey());
+            viewer.setSelection(SWTUtil.createSelection(entry.getValue()));
+         }
+      }
    }
+   
+   /**
+    * Returns the default values.
+    * @return The default values.
+    */
+   public abstract Map<String, String> getDefaults();
 
    /**
     * {@inheritDoc}

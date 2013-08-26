@@ -3,7 +3,8 @@ class Iterator {
     private int index;
     
     
-    /*@ requires l.\inv && l.size() >= 0;
+    /*@ normal_behavior
+      @ requires l.\inv && l.size() >= 0;
       @ assignable \nothing;
       @ ensures list() == l;
       @ ensures \fresh(footprint);
@@ -21,7 +22,8 @@ class Iterator {
     }
     
     
-    /*@ requires hasNext();
+    /*@ normal_behavior
+      @ requires hasNext();
       @ assignable footprint;
       @ ensures list() == \old(list());
       @ ensures \new_elems_fresh(footprint);
@@ -31,7 +33,8 @@ class Iterator {
     }
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ accessible footprint, list().footprint;
       @ ensures \result == hasNext();
       @*/
@@ -40,7 +43,8 @@ class Iterator {
     }
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ accessible footprint;
       @ ensures \result == list();
       @*/

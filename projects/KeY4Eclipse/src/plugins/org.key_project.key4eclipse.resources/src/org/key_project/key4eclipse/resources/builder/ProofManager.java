@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -113,7 +112,7 @@ public class ProofManager {
       mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append("proofs"));
       this.project = project;
       try {
-         File location = ResourceUtil.getLocation(project);
+         File location = KeYUtil.getSourceLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
          List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
          environment = KeYEnvironment.load(location, classPaths, bootClassPath);
@@ -334,7 +333,7 @@ public class ProofManager {
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(environment.getServices().copy(), profile);
+      InitConfig initConfig = new InitConfig(environment.getServices().copy(profile));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -562,38 +561,16 @@ public class ProofManager {
     * @param path - the {@link IPath} for the {@link IFile} 
     * @return - the {@link IFile} for the Proof
     */
-   private IFile getProofFile(String name, IPath path){
-      if(path != null && name != null){
-         name = makePathValid(name);
-         name = name + ".proof";
+   private IFile getProofFile(String name, IPath path) {
+      if (path != null && name != null) {
+         name = ResourceUtil.validateWorkspaceFileName(name);
+         name = name + "." + KeYUtil.PROOF_FILE_EXTENSION;
          path = path.append(name);
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
          return file;
       }
       else return null;
-   }
-   
-   
-   /**
-    * Replaces invalid characters in the given {@link String} with '_' and returns a valid {@link String}.
-    * @param str - the {@link String} to be made valid.
-    * @return the valid {@link String}
-    */
-   private String makePathValid(String str){
-
-      String tmp;
-      for(int i = 1; i<=str.length();i++){
-         tmp = str.substring(0, i);
-         IStatus validStatus = ResourcesPlugin.getWorkspace().validateName(tmp, IResource.FILE);
-         if(!validStatus.isOK()){
-            StringBuilder strbuilder = new StringBuilder(str);
-            strbuilder.setCharAt(i-1, '_');
-            str = strbuilder.toString();
-         }
-      }
-      return str;
-   }
-   
+   }   
    
    /**
     * Collects all {@link IType}s of the project.

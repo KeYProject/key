@@ -90,12 +90,17 @@ public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant 
     * @return The prefix or {@code null} if no prefix is available.
     */
    protected String findPrefix(List<File> locations, final String path) {
-      File prefixFile = CollectionUtil.search(locations, new IFilter<File>() {
-         @Override
-         public boolean select(File element) {
-            return path.startsWith(element.toString());
-         }
-      });
-      return prefixFile != null ? prefixFile.toString() : null;
+      if (path != null) {
+         File prefixFile = CollectionUtil.search(locations, new IFilter<File>() {
+            @Override
+            public boolean select(File element) {
+               return path.startsWith(element.toString());
+            }
+         });
+         return prefixFile != null ? prefixFile.toString() : null;
+      }
+      else {
+         return null;
+      }
    }
 }

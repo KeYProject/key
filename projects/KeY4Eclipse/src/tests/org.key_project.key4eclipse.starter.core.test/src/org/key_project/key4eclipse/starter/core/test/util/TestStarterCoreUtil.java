@@ -57,14 +57,11 @@ public final class TestStarterCoreUtil {
       // Make sure that the location is contained in a Java project
       IProject project = method.getResource().getProject();
       Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-      // Get source paths from class path
-      List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-      Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
       // Get KeY project settings
       final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
       final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
       // Get local file for the eclipse resource
-      final File location = sourcePaths.get(0);
+      final File location = KeYUtil.getSourceLocation(project);
       Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
       // Load environment
       KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);

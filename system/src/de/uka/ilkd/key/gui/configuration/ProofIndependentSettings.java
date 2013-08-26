@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -16,7 +16,6 @@ package de.uka.ilkd.key.gui.configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -27,11 +26,11 @@ import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 public class ProofIndependentSettings implements SettingsListener {
-        public static final ProofIndependentSettings DEFAULT_INSTANCE = 
+        public static final ProofIndependentSettings DEFAULT_INSTANCE =
         		new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
-        private final ProofIndependentSMTSettings smtSettings = 
+        private final ProofIndependentSMTSettings smtSettings =
         		ProofIndependentSMTSettings.getDefaultSettingsData();
-        private final LemmaGeneratorSettings lemmaGeneratorSettings = 
+        private final LemmaGeneratorSettings lemmaGeneratorSettings =
         		new LemmaGeneratorSettings();
         private final GeneralSettings generalSettings= new GeneralSettings();
         private final ViewSettings viewSettings = new ViewSettings();
@@ -42,7 +41,7 @@ public class ProofIndependentSettings implements SettingsListener {
                         generalSettings,
                         viewSettings};
 
-        
+
 
         private ProofIndependentSettings(String filename) {
                 this.filename = filename;
@@ -57,11 +56,11 @@ public class ProofIndependentSettings implements SettingsListener {
                saveSettings();
 
         }
-        
-   
-        
 
-        
+
+
+
+
         public void loadSettings(){
                 try {
                     File testFile = new File(filename);
@@ -71,9 +70,9 @@ public class ProofIndependentSettings implements SettingsListener {
                 } catch (IOException e){
                     throw new RuntimeException(e);
                 }
-      
+
         }
-        
+
         private void load(File file) throws IOException{
             FileInputStream in = new FileInputStream(file);
             Properties properties = new Properties();
@@ -81,32 +80,33 @@ public class ProofIndependentSettings implements SettingsListener {
             for(Settings settings : settingsSet){
                 settings.readSettings(this,properties);
             }
+            in.close();
         }
-        
+
         public void saveSettings(){
-              
+
                 try {
                     File file = new File(filename);
-                    if (!file.exists()) {                        
+                    if (!file.exists()) {
                             new File(PathConfig.getKeyConfigDir()+File.separator).mkdirs();
                             file.createNewFile();
-                    }            
+                    }
                     Properties result = new Properties();
                     for (Settings settings : settingsSet) {
                             settings.writeSettings(this,result);
                     }
-                    FileOutputStream out = new FileOutputStream(file);                   
-                    try { 
+                    FileOutputStream out = new FileOutputStream(file);
+                    try {
                         result.store(out, "Proof-Independent-Settings-File");
-                    } finally { 
+                    } finally {
                         out.close();
                     }
                 } catch (IOException e){
                     throw new RuntimeException(e);
                 }
-            
+
         }
-      
+
         public GeneralSettings getGeneralSettings() {
             //ensureInitialized();
             return generalSettings;
@@ -119,11 +119,11 @@ public class ProofIndependentSettings implements SettingsListener {
         public LemmaGeneratorSettings getLemmaGeneratorSettings() {
             return lemmaGeneratorSettings;
         }
-        
+
         public ProofIndependentSMTSettings getSMTSettings() {
                return smtSettings;
         }
 
-        
+
 
 }

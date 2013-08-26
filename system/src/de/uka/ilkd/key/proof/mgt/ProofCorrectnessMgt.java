@@ -14,8 +14,8 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -45,7 +45,7 @@ public final class ProofCorrectnessMgt {
 	= new DefaultMgtProofTreeListener();
 
     private KeYMediator mediator;
-    private Set<RuleApp> cachedRuleApps = new HashSet<RuleApp>();
+    private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
     
     

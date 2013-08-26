@@ -16,17 +16,10 @@ package de.uka.ilkd.key.proof;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the goal, especially the split and set back mechanism. */
@@ -41,7 +34,7 @@ public class TestGoal extends TestCase {
 
         public void setUp() {
                 TacletForTests.parse();
-                proof = new Proof(new Services());
+                proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
 
         }
 

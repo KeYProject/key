@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = obj.magic(123);" pathCondition="true" pathConditionChanged="false">
-         <useOperationContract name="result = self.magic(x) catch(exc)
+         <operationContract name="result = self.magic(x) catch(exc)
 pre: self.&lt;inv&gt;
 post: !exc = null
 &amp; (  (   java.lang.Exception::instance(exc) = TRUE
       -&gt; self.&lt;inv&gt;)
-   &amp; java.lang.Exception::instance(exc) = TRUE)
+   &amp; (    java.lang.RuntimeException::instance(exc)
+        = TRUE
+      | java.lang.Exception::instance(exc) = TRUE))
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
             <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
@@ -18,7 +20,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   </methodReturn>
                </statement>
             </branchCondition>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

@@ -34,6 +34,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -44,9 +46,12 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
+import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -64,8 +69,10 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -390,6 +397,27 @@ public class MonKeYComposite extends Composite implements IProofProvider {
               handleSelectedProofChanged(event);
            }
         });
+        // Proof viewer menu
+        Menu menu = new Menu(proofViewer.getControl());
+        final MenuItem openProofMenuItem = new MenuItem(menu, SWT.NONE);
+        openProofMenuItem.setText("Open selected Proofs");
+        openProofMenuItem.addSelectionListener(new SelectionAdapter() {
+           @Override
+           public void widgetSelected(SelectionEvent e) {
+              openSelectedProofs();
+           }
+        });
+        menu.addMenuListener(new MenuListener() {
+           @Override
+           public void menuShown(MenuEvent e) {
+              openProofMenuItem.setEnabled(canOpenSelectedProofs());
+           }
+         
+           @Override
+           public void menuHidden(MenuEvent e) {
+           }
+        });
+        proofViewer.getControl().setMenu(menu);
         // Accumulated values
         Composite sumComposite = new Composite(proofGroup, SWT.NONE);
         sumComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -420,7 +448,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             }
         });
         Button startProofsButton = new Button(buttonComposite, SWT.PUSH);
-        startProofsButton.setText("&Start selected proofs");
+        startProofsButton.setText("&Start selected Proofs");
         startProofsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         startProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -454,6 +482,53 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         });
     }
 
+    /**
+     * Checks if it is possible to open selected {@link Proof}s
+     * via {@link StarterUtil#openProofStarter(org.eclipse.swt.widgets.Shell, Proof, KeYEnvironment, org.eclipse.jdt.core.IMethod, boolean, boolean, boolean, boolean)}.
+     * @return {@code true} can open proofs, {@code false} can not open proofs.
+     */
+   protected boolean canOpenSelectedProofs() {
+      boolean canOpen = false;
+      if (StarterUtil.areProofStartersAvailable() &&
+          !MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
+         Object[] objects = SWTUtil.toArray(proofViewer.getSelection());
+         for (Object obj : objects) {
+            if (obj instanceof MonKeYProof) {
+               MonKeYProof proof = (MonKeYProof)obj;
+               if (proof.getProof() != null) {
+                  canOpen = true;
+               }
+            }
+         }
+      }
+      return canOpen;
+   }
+
+   /**
+    * Opens the selected {@link Proof}s via 
+    * {@link StarterUtil#openProofStarter(org.eclipse.swt.widgets.Shell, Proof, KeYEnvironment, org.eclipse.jdt.core.IMethod, boolean, boolean, boolean, boolean)}.
+    */
+   @SuppressWarnings("unchecked")
+   protected void openSelectedProofs() {
+      try {
+         if (!MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
+            Object[] objects = SWTUtil.toArray(proofViewer.getSelection());
+            for (Object obj : objects) {
+               if (obj instanceof MonKeYProof) {
+                  MonKeYProof proof = (MonKeYProof)obj;
+                  if (proof.getProof() != null) {
+                     StarterUtil.openProofStarter(getShell(), proof.getProof(), (KeYEnvironment<CustomConsoleUserInterface>)proof.getEnvironment(), null, true, true, true, true);
+                  }
+               }
+            }
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+   }
+
    /**
      * {@inheritDoc}
      */
@@ -461,7 +536,23 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     public void dispose() {
        // Dispose proofs
        try {
-           removeProofs();
+           if (MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
+               new AbstractKeYMainWindowJob("Remove Proofs from KeY") {
+                  @Override
+                  protected IStatus run(IProgressMonitor monitor) {
+                      try {
+                          removeProofs();
+                          return Status.OK_STATUS;
+                      }
+                      catch (Exception e) {
+                          return LogUtil.getLogger().createErrorStatus(e);
+                      }
+                  }
+               }.schedule();
+           }
+           else {
+               removeProofs();
+           }
        }
        catch (Exception e) {
            LogUtil.getLogger().logError(e);
@@ -912,13 +1003,17 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     */
    @Override
    public UserInterface getUI() {
-      Object selectedProof = SWTUtil.getFirstElement(proofViewer.getSelection());
-      if (selectedProof instanceof MonKeYProof) {
-         return ((MonKeYProof) selectedProof).getUi();
-      }
-      else {
-         return null;
-      }
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getUi() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getMediator() : null;
    }
 
    /**
@@ -926,7 +1021,12 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     */
    @Override
    public KeYEnvironment<?> getEnvironment() {
-      return null;
+      if (proofs != null && !proofs.isEmpty()) {
+         return proofs.get(0).getEnvironment();
+      }
+      else {
+         return null;
+      }
    }
 
    /**

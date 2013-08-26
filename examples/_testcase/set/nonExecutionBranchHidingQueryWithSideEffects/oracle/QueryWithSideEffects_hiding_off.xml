@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result = self.magic(x) catch(exc)
+pre: self.&lt;inv&gt;
+post: result = self.subMagic(x)
+&amp; (  (x &gt;= 0 -&gt; self.instanceField = 12)
+   &amp; (  (   x &lt; 0
+         -&gt; self.instanceField = javaUnaryMinusInt(21))
+      &amp; (  (   x &gt;= 0
+            -&gt; QueryWithSideEffects.classField = 66)
+         &amp; (  (   x &lt; 0
+               -&gt;   QueryWithSideEffects.classField
+                  = javaUnaryMinusInt(55))
+            &amp; self.&lt;inv&gt;))))
+&amp; exc = null
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="!x &lt;= -1" pathCondition="!x &lt;= -1" pathConditionChanged="true" branchCondition="!x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue+this.instanceField+classField;" pathCondition="!x &lt;= -1" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="!x &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 120 as result of self.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="120" returnValueString="120" hasCondition="false">
+                     </methodReturnValue>
+                     <termination name="&lt;end&gt;" pathCondition="!x &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </branchCondition>
+            <branchCondition name="!x &gt;= 0" pathCondition="!x &gt;= 0" pathConditionChanged="true" branchCondition="!x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return magicValue+this.instanceField+classField;" pathCondition="!x &gt;= 0" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4787 as result of self.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="-4787" returnValueString="-4787" hasCondition="false">
+                     </methodReturnValue>
+                     <termination name="&lt;end&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </branchCondition>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

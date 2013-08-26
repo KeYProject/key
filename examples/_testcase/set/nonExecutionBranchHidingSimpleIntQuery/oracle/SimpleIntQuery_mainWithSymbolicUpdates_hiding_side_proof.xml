@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleIntQuery.mainWithSymbolicUpdates(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="x=x+11;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
+            <operationContract name="result = magic(x) catch(exc)
+pre: true
+post: result = subMagic(x) &amp; exc = null
+mod: {}
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+               <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	-4711 {!x &gt;= -11}, 
+	42 {!x &lt;= -12}
+as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComputed="true">
+                     <methodReturnValue name="-4711 {!x &gt;= -11}" returnValueString="-4711" hasCondition="true" conditionString="!x &gt;= -11">
+                     </methodReturnValue>
+                     <methodReturnValue name="42 {!x &lt;= -12}" returnValueString="42" hasCondition="true" conditionString="!x &lt;= -12">
+                     </methodReturnValue>
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </operationContract>
+         </statement>
+      </statement>
+   </methodCall>
+</start>

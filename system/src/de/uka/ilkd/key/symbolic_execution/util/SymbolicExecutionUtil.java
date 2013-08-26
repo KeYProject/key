@@ -13,8 +13,13 @@
 
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +32,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -56,22 +60,26 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -83,6 +91,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -100,15 +109,15 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.ITermLabelWorker;
-import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -236,7 +245,7 @@ public final class SymbolicExecutionUtil {
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(source.getServices().copy(), profile);
+      InitConfig initConfig = new InitConfig(source.getServices().copy(profile));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -472,6 +481,9 @@ public final class SymbolicExecutionUtil {
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
+      if (!proof.isDisposed()) {
+         starter.getProof().getSettings().getLabelSettings().setLabelInstantiators(proof.getSettings().getLabelSettings().getLabelInstantiators()); // Use label instantiators of original proof also in side proof.
+      }
       return starter;
    }
    
@@ -493,8 +505,11 @@ public final class SymbolicExecutionUtil {
       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_INVARIANT); // Loop Treatment: Invariant
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON); // Dependency Contracts: On
       sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON); // Query Treatment: On
+      sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON); // Expand local queries: Off
       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING); // Quantifier treatment: No Splits 
+      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER); // Alias checks 
+      sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF); // Avoid branches caused by modalities not part of the main execution 
       starter.setStrategy(sp);
       // Execute proof in the current thread
       return starter.start();
@@ -838,14 +853,7 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               if (KeYTypeUtil.isImplicitConstructor(pm)) {
-                  IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(node.proof().getServices(), pm);
-                  return explicitConstructor != null && 
-                         !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
-               }
-               else {
-                  return !pm.isImplicit(); // Do not include implicit methods, but always constructors
-               }
+               return isNotImplicite(node.proof().getServices(), pm);
             }
          }
          else {
@@ -858,27 +866,49 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the given node should be represented as branch node.
+    * Checks if the given {@link IProgramMethod} is not implicit.
+    * @param services The {@link Services} to use.
+    * @param pm The {@link IProgramMethod} to check.
+    * @return {@code true} is not implicite, {@code false} is implicite 
+    */
+   public static boolean isNotImplicite(Services services, IProgramMethod pm) {
+      if (pm != null) {
+         if (KeYTypeUtil.isImplicitConstructor(pm)) {
+            IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
+            return explicitConstructor != null && 
+                   !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
+         }
+         else {
+            return !pm.isImplicit(); // Do not include implicit methods, but always constructors
+         }
+      }
+      else {
+         return true;
+      }
+   }
+   
+   /**
+    * Checks if the given node should be represented as branch statement.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @param statement The statement ({@link SourceElement}).
     * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as branch node, {@code false} represent node as something else. 
+    * @return {@code true} represent node as branch statement, {@code false} represent node as something else. 
     */
-   public static boolean isBranchNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isBranchStatement(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
       return isStatementNode(node, ruleApp, statement, posInfo) &&
              (statement instanceof BranchStatement); 
    }
    
    /**
-    * Checks if the given node should be represented as loop node.
+    * Checks if the given node should be represented as loop statement.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @param statement The statement ({@link SourceElement}).
     * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as loop node, {@code false} represent node as something else. 
+    * @return {@code true} represent node as loop statement, {@code false} represent node as something else. 
     */
-   public static boolean isLoopNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isLoopStatement(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
       return isStatementNode(node, ruleApp, statement, posInfo) &&
              (statement instanceof LoopStatement);
    }
@@ -957,12 +987,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given node should be represented as use operation contract.
+    * Checks if the given node should be represented as operation contract.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-    * @return {@code true} represent node as use operation contract, {@code false} represent node as something else. 
+    * @return {@code true} represent node as operation contract, {@code false} represent node as something else. 
     */
-   public static boolean isUseOperationContract(Node node, RuleApp ruleApp) {
+   public static boolean isOperationContract(Node node, RuleApp ruleApp) {
       return "Use Operation Contract".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
 
@@ -972,7 +1002,7 @@ public final class SymbolicExecutionUtil {
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @return {@code true} represent node as use loop invariant, {@code false} represent node as something else. 
     */
-   public static boolean isUseLoopInvariant(Node node, RuleApp ruleApp) {
+   public static boolean isLoopInvariant(Node node, RuleApp ruleApp) {
       return "Loop Invariant".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
    
@@ -983,7 +1013,11 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as method return, {@code false} represent node as something else. 
     */
    public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
-      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
+      String displayName = MiscTools.getRuleDisplayName(ruleApp);
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallEmpty".equals(displayName) ||
+             "methodCallEmptyReturn".equals(ruleName) ||
+             "methodCallReturnIgnoreResult".equals(ruleName);
    }
 
    /**
@@ -1151,7 +1185,80 @@ public final class SymbolicExecutionUtil {
     */
    public static Term findModalityWithMaxSymbolicExecutionLabelId(Term term) {
       if (term != null) {
-         FindModalityWithMaxSymbolicExecutionLabelId visitor = new FindModalityWithMaxSymbolicExecutionLabelId();
+         FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(true);
+         term.execPreOrder(visitor);
+         return visitor.getModality();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
+    * @param sequent The {@link Sequent} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
+      if (sequent != null) {
+         Term nextAntecedent = findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent());
+         Term nextSuccedent = findModalityWithMinSymbolicExecutionLabelId(sequent.succedent());
+         if (nextAntecedent != null) {
+            if (nextSuccedent != null) {
+               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent);
+               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent);
+               return antecedentLabel.getId() < succedentLabel.getId() ? nextAntecedent : nextSuccedent;
+            }
+            else {
+               return nextAntecedent;
+            }
+         }
+         else {
+            return nextSuccedent;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
+    * @param semisequent The {@link Semisequent} to search in.
+    * @return The modality {@link Term} with the minimal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMinSymbolicExecutionLabelId(Semisequent semisequent) {
+      if (semisequent != null) {
+         int maxId = Integer.MIN_VALUE;
+         Term modality = null;
+         for (SequentFormula sf : semisequent) {
+            Term current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+            if (current != null) {
+               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(current);
+               if (modality == null || label.getId() < maxId) {
+                  modality = current;
+                  maxId = label.getId();
+               }
+            }
+         }
+         return modality;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+    * @param term The {@link Term} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMinSymbolicExecutionLabelId(Term term) {
+      if (term != null) {
+         FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(false);
          term.execPreOrder(visitor);
          return visitor.getModality();
       }
@@ -1165,7 +1272,7 @@ public final class SymbolicExecutionUtil {
     * used by {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
     * @author Martin Hentschel
     */
-   private static final class FindModalityWithMaxSymbolicExecutionLabelId extends DefaultVisitor {
+   private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor {
       /**
        * The modality {@link Term} with the maximal ID.
        */
@@ -1175,6 +1282,19 @@ public final class SymbolicExecutionUtil {
        * The maximal ID.
        */
       private int maxId;
+      
+      /**
+       * {@code true} search maximal ID, {@code false} search minimal ID.
+       */
+      private boolean maximum;
+      
+      /**
+       * Constructor.
+       * @param maximum {@code true} search maximal ID, {@code false} search minimal ID.
+       */
+      public FindModalityWithSymbolicExecutionLabelId(boolean maximum) {
+         this.maximum = maximum;
+      }
 
       /**
        * {@inheritDoc}
@@ -1183,7 +1303,7 @@ public final class SymbolicExecutionUtil {
       public void visit(Term visited) {
          SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
          if (label != null) {
-            if (modality == null || label.getId() > maxId) {
+            if (modality == null || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
                modality = visited;
                maxId = label.getId();
             }
@@ -1196,92 +1316,6 @@ public final class SymbolicExecutionUtil {
        */
       public Term getModality() {
          return modality;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param sequent The {@link Sequent} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Sequent sequent) {
-      if (sequent != null) {
-         int nextAntecedent = computeNextSymbolicExecutionLabelId(sequent.antecedent());
-         int nextSuccedent = computeNextSymbolicExecutionLabelId(sequent.succedent());
-         return nextAntecedent > nextSuccedent ? nextAntecedent : nextSuccedent;
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param semisequent The {@link Semisequent} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Semisequent semisequent) {
-      if (semisequent != null) {
-         int nextId = SymbolicExecutionTermLabel.START_ID;
-         for (SequentFormula sf : semisequent) {
-            int nextSfId = computeNextSymbolicExecutionLabelId(sf.formula());
-            if (nextSfId > nextId) {
-               nextId = nextSfId;
-            }
-         }
-         return nextId;
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-
-   /**
-    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
-    * @param term The {@link Term} to compute the next unused ID in.
-    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
-    */
-   public static int computeNextSymbolicExecutionLabelId(Term term) {
-      if (term != null) {
-         NextSymbolicExecutionLabelIdVisitor visitor = new NextSymbolicExecutionLabelIdVisitor();
-         term.execPreOrder(visitor);
-         return visitor.getNextId();
-      }
-      else {
-         return SymbolicExecutionTermLabel.START_ID;
-      }
-   }
-   
-   /**
-    * Utility class used to compute the next unused ID of {@link SymbolicExecutionTermLabel}s
-    * used by {@link SymbolicExecutionUtil#computeNextSymbolicExecutionLabelId(Term)}.
-    * @author Martin Hentschel
-    */
-   private static final class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
-      /**
-       * The next unused ID.
-       */
-      private int nextId = SymbolicExecutionTermLabel.START_ID;
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void visit(Term visited) {
-         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
-         if (label != null) {
-            if (label.getId() + 1 > nextId) {
-               nextId = label.getId() + 1;
-            }
-         }
-      }
-
-      /**
-       * Returns the next unused ID.
-       * @return The next unused ID.
-       */
-      public int getNextId() {
-         return nextId;
       }
    }
 
@@ -1299,10 +1333,10 @@ public final class SymbolicExecutionUtil {
          if (isMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
-         else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
+         else if (isLoopStatement(node, ruleApp, statement, posInfo)) { 
             return isFirstLoopIteration(node, ruleApp, statement);
          }
-         else if (isBranchNode(node, ruleApp, statement, posInfo) ||
+         else if (isBranchStatement(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
                   isStatementNode(node, ruleApp, statement, posInfo) ||
                   isTerminationNode(node, ruleApp)) {
@@ -1313,10 +1347,10 @@ public final class SymbolicExecutionUtil {
                    !isDoWhileLoopCondition(node, statement) && 
                    !isForLoopCondition(node, statement);
          }
-         else if (isUseOperationContract(node, ruleApp)) {
+         else if (isOperationContract(node, ruleApp)) {
             return true;
          }
-         else if (isUseLoopInvariant(node, ruleApp)) {
+         else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
          else {
@@ -1922,6 +1956,8 @@ public final class SymbolicExecutionUtil {
       if (simplify) {
          result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }
+      // Make sure that no skolem constant is contained in the result.
+      result = replaceSkolemConstants(node.sequent(), result);
       return result;
    }
 
@@ -1967,7 +2003,7 @@ public final class SymbolicExecutionUtil {
     */
    public static void setChoiceSetting(String key, String value) {
       HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-      HashMap<String, String> clone = new HashMap<String, String>();
+      HashMap<String, String> clone = new LinkedHashMap<String, String>();
       clone.putAll(settings);
       clone.put(key, value);
       ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
@@ -2091,11 +2127,192 @@ public final class SymbolicExecutionUtil {
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
+      Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
+      originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
       if (additionalAntecedent != null) {
          sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
       return sequentToProve;
+   }
+
+   /**
+    * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)} as well as the skolem constants
+    * used in the find once recursive.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param term The {@link Term} to start collection in.
+    * @return The found skolem {@link Term}s.
+    */
+   private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
+      // Collect skolem constants in term
+      Set<Term> result = collectSkolemConstantsNonRecursive(term);
+      // Collect all skolem constants used in skolem constants
+      List<Term> toCheck = new LinkedList<Term>(result);
+      while (!toCheck.isEmpty()) {
+         Term skolemConstant = toCheck.remove(0);
+         Term replacement = findSkolemReplacement(sequent, skolemConstant);
+         Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+         for (Term checkConstant : checkResult) {
+            if (result.add(checkConstant)) {
+               toCheck.add(checkConstant);
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)}.
+    * @param term The {@link Term} to collect in.
+    * @return The found skolem {@link Term}s.
+    */
+   private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
+      final Set<Term> result = new HashSet<Term>();
+      term.execPreOrder(new DefaultVisitor() {
+         @Override
+         public void visit(Term visited) {
+            if (isSkolemConstant(visited)) {
+               result.add(visited);
+            }
+         }
+      });
+      return result;
+   }
+
+   /**
+    * Checks if the given {@link Term} is a skolem {@link Term} meaning
+    * that it has the {@link SelectSkolemConstantTermLabel}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
+    */
+   public static boolean isSkolemConstant(Term term) {
+      return term.containsLabel(SelectSkolemConstantTermLabel.INSTANCE);
+   }
+   
+   /**
+    * Removes all {@link SequentFormula}s with a skolem equality from the given {@link Sequent}
+    * if the skolem {@link Term} is not contained in the given {@link Collection}.
+    * @param sequent The {@link Sequent} to modify.
+    * @param skolemConstants The allowed skolem {@link Term}s.
+    * @return The modified {@link Sequent} in which all not listed skolem {@link Term} equalites are removed.
+    */
+   private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, Collection<Term> skolemConstants) {
+      Sequent result = sequent;
+      for (SequentFormula sf : sequent.antecedent()) {
+         result = removeAllUnusedSkolemEqualities(result, sf, true, skolemConstants);
+      }
+      for (SequentFormula sf : sequent.succedent()) {
+         result = removeAllUnusedSkolemEqualities(result, sf, false, skolemConstants);
+      }
+      return result;
+      
+   }
+   
+   /**
+    * Helper method of {@link #removeAllUnusedSkolemEqualities(Sequent, Collection)} 
+    * which removes the given {@link SequentFormula} if required.
+    * @param sequent The {@link Sequent} to modify.
+    * @param sf The {@link SequentFormula} to remove if its skolem {@link Term} is not listed.
+    * @param antecedent {@code true} antecedent, {@code false} succedent.
+    * @param skolemConstants The allowed skolem {@link Term}s.
+    * @return The modified {@link Sequent} in which the {@link SequentFormula} might be removed.
+    */
+   private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, 
+                                                          SequentFormula sf, 
+                                                          boolean antecedent, 
+                                                          Collection<Term> skolemConstants) {
+      Term term = sf.formula();
+      boolean remove = false;
+      if (term.op() == Equality.EQUALS) {
+         if (isSkolemConstant(term.sub(0))) {
+            remove = !skolemConstants.contains(term.sub(0));
+         }
+         if (!remove && isSkolemConstant(term.sub(1))) {
+            remove = !skolemConstants.contains(term.sub(1));
+         }
+      }
+      if (remove) {
+         return sequent.removeFormula(new PosInOccurrence(sf, PosInTerm.TOP_LEVEL, antecedent)).sequent();
+      }
+      else {
+         return sequent;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link SequentFormula} is a skolem equality.
+    * @param sf The {@link SequentFormula} to check.
+    * @return {@code true} is skolem equality, {@code false} is not a skolem equality.
+    */
+   public static boolean isSkolemEquality(SequentFormula sf) {
+      boolean skolemEquality = false;
+      Term term = sf.formula();
+      if (term.op() == Equality.EQUALS) {
+         if (isSkolemConstant(term.sub(0))) {
+            skolemEquality = true;
+         }
+         if (isSkolemConstant(term.sub(1))) {
+            skolemEquality = true;
+         }
+      }
+      return skolemEquality;
+   }
+
+   /**
+    * Replaces all skolem constants in the given {@link Term}.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param term The {@link Term} to replace its skolem constants.
+    * @return The skolem constant free {@link Term}.
+    */
+   public static Term replaceSkolemConstants(Sequent sequent, Term term) {
+      if (isSkolemConstant(term)) {
+         return findSkolemReplacement(sequent, term);
+      }
+      else {
+         List<Term> newChildren = new LinkedList<Term>();
+         boolean changed = false;
+         for (int i = 0; i < term.arity(); i++) {
+            Term oldChild = term.sub(i);
+            Term newChild = replaceSkolemConstants(sequent, oldChild);
+            if (newChild != oldChild) {
+               changed = true;
+            }
+            newChildren.add(newChild);
+         }
+         return changed ? TermFactory.DEFAULT.createTerm(term.op(), 
+                                                         new ImmutableArray<Term>(newChildren), 
+                                                         term.boundVars(), 
+                                                         term.javaBlock(), 
+                                                         term.getLabels()) : 
+                          term;
+      }
+   }
+
+   /**
+    * Utility method of {@link #replaceSkolemConstants(Sequent, Term)} to
+    * find the equality part of the given skolem constant.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param skolemConstant The skolem constant to solve.
+    * @return The equality part of the given skolem constant or the skolem constant itself it was not possible to find it.
+    */
+   private static Term findSkolemReplacement(Sequent sequent, Term skolemConstant) {
+      Term result = null;
+      Iterator<SequentFormula> iter = sequent.iterator();
+      while (result == null && iter.hasNext()) {
+         SequentFormula sf = iter.next();
+         Term term = sf.formula();
+         if (term.op() == Equality.EQUALS) {
+            if (term.sub(0) == skolemConstant) {
+               result = term.sub(1);
+            }
+            if (term.sub(1) == skolemConstant) {
+               result = term.sub(0);
+            }
+         }
+      }
+      return result != null ? result : skolemConstant;
    }
 
    /**
@@ -2105,13 +2322,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is Null-Sort, {@code false} is something else.
     */
    public static boolean isNullSort(Sort sort, Services services) {
-      if (sort != null && services != null) {
-         JavaInfo javaInfo = services.getJavaInfo();
-         return javaInfo.getKeYJavaType(sort) == javaInfo.getNullType();
-      }
-      else {
-         return false;
-      }
+      return sort instanceof NullSort;
    }
 
    /**
@@ -2266,27 +2477,30 @@ public final class SymbolicExecutionUtil {
     */
    public static IProgramVariable extractExceptionVariable(Proof proof) {
       Node root = proof.root();
-      if (root.sequent().succedent().size() == 1) {
-         Term succedent = root.sequent().succedent().getFirst().formula(); // Succedent term
-         if (succedent.subs().size() == 2) {
-            Term updateApplication = succedent.subs().get(1);
-            if (updateApplication.subs().size() == 2) {
-               JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
-               if (updateContent instanceof StatementBlock) { // try catch inclusive
-                  ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
-                  if (updateContentBody.size() == 2 && updateContentBody.get(1) instanceof Try) {
-                     Try tryStatement = (Try)updateContentBody.get(1);
-                     if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
-                        Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
-                        if (catchStatement.getBody() instanceof StatementBlock) {
-                           StatementBlock  catchBlock = (StatementBlock)catchStatement.getBody();
-                           if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
-                              Assignment assignment = (Assignment)catchBlock.getBody().get(0);
-                              if (assignment.getFirstElement() instanceof IProgramVariable) {
-                                 IProgramVariable var = (IProgramVariable)assignment.getFirstElement();
-                                 return var;
-                              }
-                           }
+      Term modalityTerm = SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
+      if (modalityTerm != null) {
+         modalityTerm = TermBuilder.DF.goBelowUpdates(modalityTerm);
+         JavaProgramElement updateContent = modalityTerm.javaBlock().program();
+         if (updateContent instanceof StatementBlock) { // try catch inclusive
+            ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
+            Try tryStatement = null;
+            Iterator<? extends Statement> iter = updateContentBody.iterator();
+            while (tryStatement == null && iter.hasNext()) {
+               Statement next = iter.next();
+               if (next instanceof Try) {
+                  tryStatement = (Try)next;
+               }
+            }
+            if (tryStatement != null) {
+               if (tryStatement.getBranchCount() == 1 && tryStatement.getBranchList().get(0) instanceof Catch) {
+                  Catch catchStatement = (Catch)tryStatement.getBranchList().get(0);
+                  if (catchStatement.getBody() instanceof StatementBlock) {
+                     StatementBlock  catchBlock = (StatementBlock)catchStatement.getBody();
+                     if (catchBlock.getBody().size() == 1 && catchBlock.getBody().get(0) instanceof Assignment) {
+                        Assignment assignment = (Assignment)catchBlock.getBody().get(0);
+                        if (assignment.getFirstElement() instanceof IProgramVariable) {
+                           IProgramVariable var = (IProgramVariable)assignment.getFirstElement();
+                           return var;
                         }
                      }
                   }
@@ -2302,11 +2516,13 @@ public final class SymbolicExecutionUtil {
     * @param proof The {@link Proof} to configure.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
     * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param useLoopInvariants {@code true} immediately alias checks, {@code false} alias checks never.
     */
    public static void updateStrategySettings(Proof proof, 
                                              boolean useOperationContracts,
                                              boolean useLoopInvariants,
+                                             boolean nonExecutionBranchHidingSideProofs,
                                              boolean aliasChecksImmediately) {
       if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
@@ -2315,12 +2531,16 @@ public final class SymbolicExecutionUtil {
          String loopTreatmentValue = useLoopInvariants ? 
                                      StrategyProperties.LOOP_INVARIANT : 
                                      StrategyProperties.LOOP_EXPAND;
+         String nonExecutionBranchHidingValue = nonExecutionBranchHidingSideProofs ? 
+                                                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : 
+                                                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF;
          String aliasChecksValue = aliasChecksImmediately ? 
                                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : 
                                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, nonExecutionBranchHidingValue);
          sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecksValue);
          updateStrategySettings(proof, sp);
       }
@@ -2346,10 +2566,16 @@ public final class SymbolicExecutionUtil {
     */
    public static void configureProof(Proof proof) {
       if (proof != null) {
-         ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
-         labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
+         if (!labelInstantiators.contains(SymbolicExecutionTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         }
+         if (!labelInstantiators.contains(LoopBodyTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
+         }
+         if (!labelInstantiators.contains(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         }
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
@@ -2434,6 +2660,71 @@ public final class SymbolicExecutionUtil {
       if (result != null && result.startsWith("FILE:")) {
          result = result.substring("FILE:".length());
       }
+      return result;
+   }
+
+   /**
+    * Checks if the given {@link Term} is a select on a heap.
+    * @param services The {@link Services} to use.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is select, {@code false} is something else.
+    */
+   public static boolean isSelect(Services services, Term term) {
+      if (!isNullSort(term.sort(), services)) {
+         Function select = services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
+         return select == term.op();
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the given {@link Operator} is a number.
+    * @param op The {@link Operator} to check.
+    * @return {@code true} is number, {@code false} is something else.
+    */
+   public static boolean isNumber(Operator op) {
+      if (op instanceof Function) {
+         String[] numbers = {"#", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Z", "neglit"};
+         Arrays.sort(numbers);
+         int index = Arrays.binarySearch(numbers, op.name().toString());
+         return index >= 0;
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the given {@link Operator} is a boolean.
+    * @param op The {@link Operator} to check.
+    * @return {@code true} is boolean, {@code false} is something else.
+    */
+   public static boolean isBoolean(Services services, Operator op) {
+      BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+      return booleanLDT.getFalseConst() == op ||
+             booleanLDT.getTrueConst() == op;
+   }
+   
+   /**
+    * Returns the default taclet options for symbolic execution.
+    * @return The default taclet options for symbolic execution.
+    */
+   public static HashMap<String, String> getDefaultTacletOptions() {
+      HashMap<String, String> result = new HashMap<String, String>();
+      result.put("Strings", "Strings:on");
+      result.put("reach", "reach:on");
+      result.put("JavaCard", "JavaCard:on");
+      result.put("assertions", "assertions:on");
+      result.put("bigint", "bigint:on");
+      result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
+      result.put("programRules", "programRules:Java");
+      result.put("modelFields", "modelFields:showSatisfiability");
+      result.put("initialisation", "initialisation:disableStaticInitialisation");
+      result.put("sequences", "sequences:on");
+      result.put("runtimeExceptions", "runtimeExceptions:allow");
+      result.put("integerSimplificationRules", "integerSimplificationRules:full");
       return result;
    }
 }

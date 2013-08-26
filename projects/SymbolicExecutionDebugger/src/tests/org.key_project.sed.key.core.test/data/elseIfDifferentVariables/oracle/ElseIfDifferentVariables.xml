@@ -3,7 +3,7 @@
    <sedTarget xml:id="_7797d657-76f6-4df7-a17c-9ba4096576d1" name="main(boolean, boolean)" modelIdentifier="org.key_project.sed.key.core">
       <sedThread xml:id="_b704a9e4-3b30-49f6-b2a1-e21fad4c55e8" name="&lt;start&gt;" pathCondition="true">
          <sedMethodCall xml:id="_b60c7802-e5ef-4677-b22d-2d93f37d9151" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="55" charEnd="59">
-            <sedBranchNode xml:id="_7d68737c-f93b-47f7-8a76-f90c0c98ff19" name="if (a) {return 1; }else if (b) {return 2;   }else  {return 3;   }" pathCondition="true" lineNumber="-1" charStart="87" charEnd="179">
+            <sedBranchStatement xml:id="_7d68737c-f93b-47f7-8a76-f90c0c98ff19" name="if (a) {return 1; }else if (b) {return 2;   }else  {return 3;   }" pathCondition="true" lineNumber="-1" charStart="87" charEnd="179">
                <sedBranchCondition xml:id="_dd6f18cb-d926-4ab0-97d0-7ca0b45cf5dd" name="a = TRUE" pathCondition="a = TRUE">
                   <sedStatement xml:id="_3f82fba8-63ce-4d96-819d-4d294f9adafc" name="return 1;" pathCondition="a = TRUE" lineNumber="-1" charStart="100" charEnd="109">
                      <sedMethodReturn xml:id="_ec6c72f2-fd84-4dd7-a148-74b7606f3a02" name="&lt;return 1 as result of self.main(a,b);&gt;" pathCondition="a = TRUE" lineNumber="-1" charStart="55" charEnd="59">
@@ -13,7 +13,7 @@
                   </sedStatement>
                </sedBranchCondition>
                <sedBranchCondition xml:id="_b558b717-9a05-4ddf-935f-e184ec359c3c" name="!a = TRUE" pathCondition="!a = TRUE">
-                  <sedBranchNode xml:id="_5b07ca69-b239-4482-ad67-21efb5b73e53" name="if (b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE" lineNumber="-1" charStart="87" charEnd="179">
+                  <sedBranchStatement xml:id="_5b07ca69-b239-4482-ad67-21efb5b73e53" name="if (b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE" lineNumber="-1" charStart="87" charEnd="179">
                      <sedBranchCondition xml:id="_266176e7-6a76-4dda-a922-c379fb0fbebb" name="b = TRUE" pathCondition="!a = TRUE &amp; b = TRUE">
                         <sedStatement xml:id="_180446b8-c7fc-4602-99dd-1e3474b48616" name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE" lineNumber="-1" charStart="136" charEnd="145">
                            <sedMethodReturn xml:id="_ca03a18b-b6bc-4f5f-8d56-b512cace9826" name="&lt;return 2 as result of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" lineNumber="-1" charStart="55" charEnd="59">
@@ -30,9 +30,9 @@
                            </sedMethodReturn>
                         </sedStatement>
                      </sedBranchCondition>
-                  </sedBranchNode>
+                  </sedBranchStatement>
                </sedBranchCondition>
-            </sedBranchNode>
+            </sedBranchStatement>
          </sedMethodCall>
       </sedThread>
    </sedTarget>

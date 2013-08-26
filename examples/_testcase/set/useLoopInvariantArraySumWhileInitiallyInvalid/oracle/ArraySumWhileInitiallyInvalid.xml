@@ -1,86 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ArraySumWhileInitiallyInvalid.sum(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 1;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
+            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                <callStackEntry path="/0"/>
                <branchCondition name="   array.length &gt;= 0
--&gt;   array.length &gt;= 1 + i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathCondition="   array.length &gt;= 0
--&gt;   array.length &gt;= 1 + i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   array.length &gt;= 1 + i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &gt;= 1 + i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathCondition="   array.length &gt;= 0
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &gt;= 1 + i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &gt;= 1 + i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
                   <statement name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
--&gt;   array.length &gt;= 1 + i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &gt;= 1 + i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <statement name="i++;" pathCondition="   array.length &gt;= 0
--&gt;   array.length &gt;= 1 + i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &gt;= 1 + i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   array.length &gt;= 1 + i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false" terminationKind="LOOP_BODY">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &gt;= 1 + i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" terminationKind="LOOP_BODY">
                         </termination>
                      </statement>
                   </statement>
                </branchCondition>
                <branchCondition name="   array.length &gt;= 0
--&gt;   array.length &lt;= i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathCondition="   array.length &gt;= 0
--&gt;   array.length &lt;= i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   array.length &lt;= i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &lt;= i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathCondition="   array.length &gt;= 0
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &lt;= i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &lt;= i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
                   <statement name="return result_1;" pathCondition="   array.length &gt;= 0
--&gt;   array.length &lt;= i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &lt;= i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <methodReturn name="&lt;return of ArraySumWhileInitiallyInvalid.sum(array);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   array.length &lt;= i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false" isReturnValueComputed="false">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &lt;= i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" isReturnValueComputed="false">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   array.length &lt;= i
-   &amp; (  i_0 &gt;= 0
-      &amp; (  array.length &gt;= i_0
-         &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0))" pathConditionChanged="false" terminationKind="NORMAL">
+-&gt;   i_0 &gt;= 0
+   &amp; array.length &lt;= i
+   &amp; array.length &gt;= i_0
+   &amp; bsum{int j;}(0, i_0, array[j]) = result_1_0" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </useLoopInvariant>
+            </loopInvariant>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

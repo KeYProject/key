@@ -24,6 +24,7 @@ package de.uka.ilkd.key.util.make;
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 
 public class Config {
@@ -45,7 +46,7 @@ public class Config {
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
     
-    static HashMap<String,StringBuffer> map = new HashMap<String,StringBuffer>();
+    static HashMap<String,StringBuffer> map = new LinkedHashMap<String,StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
@@ -102,7 +103,7 @@ public class Config {
 	StringBuffer path = new StringBuffer();
 	path = readUntil(fr,']');
 
-	StringBuffer result = (StringBuffer) map.get(identifier);
+	StringBuffer result = map.get(identifier.toString());
 	if (map.get(identifier.toString()) == null) {
 	    map.put(identifier.toString(), path);
 	} else {
@@ -135,8 +136,19 @@ public class Config {
 	} catch (IOException io) {
 	    System.err.println("File "+filename+" can not be written.\n"+io);
 	    System.exit(-1);	   
+	} finally {
+	        try {
+	            if (fr != null) {
+	                fr.close();
+	            }
+	            if (fw != null) {
+	                fw.close();
+	            }
+            } catch (IOException e) {
+                // ignore
+            }
+	    }
 	}
-    }
 
     private static void writeToKeYConfig(File file, String header, 
 					 String key, String prop) {
@@ -167,7 +179,7 @@ public class Config {
 	FileReader fr = null;
 	try {
 	    fr = new FileReader(args[0]);       	
-	    map = new HashMap<String, StringBuffer>();
+	    map = new LinkedHashMap<String, StringBuffer>();
 	    while (readIdentifier(fr)!=-1) {	    
 	    }
 	    fr.close();

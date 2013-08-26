@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class TermProgramVariableCollector extends DefaultVisitor {
 
-    private final HashSet<LocationVariable> result = new HashSet<LocationVariable> ();
+    private final HashSet<LocationVariable> result = new LinkedHashSet<LocationVariable> ();
     private final Services services;
 
     

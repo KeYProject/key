@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class SumFeature implements Feature {
     
+    @Override
     public RuleAppCost compute (RuleApp app, PosInOccurrence pos, Goal goal) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)
@@ -43,7 +44,7 @@ public class SumFeature implements Feature {
         features = p_features;
     }
 
-    public static Feature createSum (Feature[] fs) {
+    public static Feature createSum (Feature... fs) {
         Debug.assertFalse ( fs.length == 0,
                             "Cannot compute the sum of zero features" );
         final Feature[] fsCopy = new Feature [ fs.length ];

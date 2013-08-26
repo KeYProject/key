@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.eclipse.ui.IEditorPart;
 
-import de.hentschel.visualdbc.dbcmodel.diagram.custom.util.GMFUtil;
 import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
+import de.hentschel.visualdbc.dbcmodel.diagram.util.GMFUtil;
 import de.hentschel.visualdbc.statistic.ui.control.IProofReferenceProvider;
 import de.hentschel.visualdbc.statistic.ui.util.StatisticUtil;
 import de.hentschel.visualdbc.statistic.ui.view.DbcProofReferencesViewPart;

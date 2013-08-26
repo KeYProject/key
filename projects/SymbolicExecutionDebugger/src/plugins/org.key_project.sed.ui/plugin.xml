@@ -142,5 +142,11 @@
                id="org.key_project.sed.ui.category"
                name="Symbolic Execution Debugger (SED)">
          </category>
+      </extension>
+      <extension
+            point="org.key_project.util.setupParticipants">
+         <participant
+               class="org.key_project.sed.ui.setup.PreferenceSetupParticipant">
+         </participant>
       </extension>  
 </plugin>

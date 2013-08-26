@@ -23,11 +23,16 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -163,6 +168,13 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       // Check if a result variable is available
       MethodBodyStatement mbs = getMethodCall().getActiveStatement();
       IProgramVariable resultVar = mbs.getResultVariable();
+      // Create a temporary result variable for non void methods in case that it is missing in method frame
+      if (resultVar == null) {
+         IProgramMethod pm = mbs.getProgramMethod(getServices());
+         if (!pm.isVoid()) {
+            resultVar = new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(getServices(), "TmpResultVar")), pm.getReturnType());
+         }
+      }
       if (resultVar != null) {
          // Search the node with applied rule "methodCallReturn" which provides the required updates
          Node methodReturnNode = findMethodReturnNode(getProofNode());
@@ -178,8 +190,10 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
             ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), input.getSequentToProve(), StrategyProperties.SPLITTING_NORMAL);
             try {
                if (info.getProof().openGoals().size() == 1) {
-                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(info.getProof().openGoals().head(), input.getOperator());
+                  Goal goal = info.getProof().openGoals().head();
+                  Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
                   assert returnValue != null;
+                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue);
                   return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getMediator(), getProofNode(), returnValue, null)};
                }
                else {
@@ -188,6 +202,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                   for (Goal goal : info.getProof().openGoals()) {
                      Term returnValue = SymbolicExecutionUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
+                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue);
                      List<Node> nodeList = valueNodeMap.get(returnValue);
                      if (nodeList == null) {
                         nodeList = new LinkedList<Node>();
@@ -233,17 +248,23 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    
    /**
     * Searches from the given {@link Node} the parent which applies
-    * the rule "methodCallReturn".
+    * the rule "methodCallReturn" in the same modality.
     * @param node The {@link Node} to start search from.
     * @return The found {@link Node} with rule "methodCallReturn" or {@code null} if no node was found.
     */
    protected Node findMethodReturnNode(Node node) {
       Node resultNode = null;
-      while (node != null && resultNode == null) {
-         if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
-            resultNode = node;
+      SymbolicExecutionTermLabel origianlLabel = SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+      if (origianlLabel != null) {
+         while (node != null && resultNode == null) {
+            if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
+               SymbolicExecutionTermLabel currentLabel = SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+               if (currentLabel != null && origianlLabel.equals(currentLabel)) {
+                  resultNode = node;
+               }
+            }
+            node = node.parent();
          }
-         node = node.parent();
       }
       return resultNode;
    }

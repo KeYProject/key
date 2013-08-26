@@ -20,8 +20,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
@@ -35,7 +37,7 @@ public abstract class AbstractUserInterface implements UserInterface {
 	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
-		        bootClassPath, mediator);
+		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
 		pl.addTaskListener(this);
 		pl.run();
 	}
@@ -53,10 +55,10 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+    public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
        try {
           getMediator().stopInterface(true);
-          DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, getMediator());
+          DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
           loader.load(isRegisterProofs());
           return loader;
        }
@@ -76,7 +78,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException {
-       ProblemInitializer init = createProblemInitializer();
+       ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
        return init.startProver(initConfig, input, 0);
     }
     

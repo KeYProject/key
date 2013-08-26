@@ -2,7 +2,8 @@ class Cell {
     private int x;
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ ensures getX() == 0;
       @ ensures \fresh(footprint);
       @*/
@@ -10,7 +11,8 @@ class Cell {
     }
     
     
-    /*@ assignable \nothing;
+    /*@ normal_behavior
+      @ assignable \nothing;
       @ accessible footprint;
       @ ensures \result == getX();
       @*/
@@ -19,7 +21,8 @@ class Cell {
     }
     
     
-    /*@ assignable footprint;
+    /*@ normal_behavior
+      @ assignable footprint;
       @ ensures getX() == value;
       @ ensures \new_elems_fresh(footprint); 
       @*/

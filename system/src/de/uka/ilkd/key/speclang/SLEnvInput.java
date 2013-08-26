@@ -22,7 +22,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,8 +43,11 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaReduxFileCollection;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -50,6 +56,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
@@ -71,16 +78,18 @@ public final class SLEnvInput extends AbstractEnvInput {
     
     public SLEnvInput(String javaPath,
   	      	      List<File> classPath,
-  	      	      File bootClassPath) {
+  	      	      File bootClassPath,
+  	      	      Profile profile) {
 	super(getLanguage() + " specifications", 
 	      javaPath, 
 	      classPath, 
-	      bootClassPath);
+	      bootClassPath, profile);
     }
     
     
-    public SLEnvInput(String javaPath) {
-	this(javaPath, null, null);
+    public SLEnvInput(String javaPath,
+                     Profile profile) {
+	this(javaPath, null, null, profile);
     }    
     
 
@@ -208,7 +217,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 
                 //rule source found? -> read
                 if(rs != null) {
-                    final KeYFile keyFile = new KeYFile(path, rs, null);
+                    final KeYFile keyFile = new KeYFile(path, rs, null, getProfile());
                     keyFile.setInitConfig(initConfig);
                     keyFile.read();
                 }

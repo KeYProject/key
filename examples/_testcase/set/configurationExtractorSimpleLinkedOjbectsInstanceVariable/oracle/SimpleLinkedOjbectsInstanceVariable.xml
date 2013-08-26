@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="this.value=1;" pathCondition="true" pathConditionChanged="false">
          <statement name="this.next.value=2;" pathCondition="true" pathConditionChanged="false">
@@ -26,4 +26,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

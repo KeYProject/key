@@ -1,66 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ObjectArrayIndexWriteAccess.compute(array);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (array!=null) {if (array.length==1) {     array[0]=new ObjectIntWrapper (42);return array[0].value;   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null) {if (array.length==1) {     array[0]=new ObjectIntWrapper (42);return array[0].value;   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchNode name="if (array.length==1) {   array[0]=new ObjectIntWrapper (42);return array[0].value; }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
+            <branchStatement name="if (array.length==1) {   array[0]=new ObjectIntWrapper (42);return array[0].value; }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
                <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="array[0]=new ObjectIntWrapper (42);" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                      <methodCall name="ObjectIntWrapper(var);" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                         <statement name="this.value=var;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                            <methodReturn name="&lt;return of ObjectIntWrapper(var);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
                               <branchCondition name="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length &gt;= 1
-   &amp; arrayStoreValid(array, o_3)" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; (  !array = null
-      &amp; array.length &gt;= 1
-      &amp; arrayStoreValid(array, o_3))" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length &gt;= 1
-   &amp; arrayStoreValid(array, o_3)" mergedBranchCondition="false" isBranchConditionComputed="true">
+-&gt;   arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length &gt;= 1" pathCondition="   array.length &gt;= 0
+-&gt;   arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length = 1" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
+-&gt;   arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length &gt;= 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                                  <statement name="return array[0].value;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; (  !array = null
-      &amp; array.length &gt;= 1
-      &amp; arrayStoreValid(array, o_3))" pathConditionChanged="false">
+-&gt;   arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length = 1" pathConditionChanged="false">
                                     <methodReturn name="&lt;return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; (  !array = null
-      &amp; array.length &gt;= 1
-      &amp; arrayStoreValid(array, o_3))" pathConditionChanged="false" isReturnValueComputed="false">
+-&gt;   arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
                                        <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; (  !array = null
-      &amp; array.length &gt;= 1
-      &amp; arrayStoreValid(array, o_3))" pathConditionChanged="false" terminationKind="NORMAL">
+-&gt;   arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length = 1" pathConditionChanged="false" terminationKind="NORMAL">
                                        </termination>
                                     </methodReturn>
                                  </statement>
                               </branchCondition>
                               <branchCondition name="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length &gt;= 1
-   &amp; !arrayStoreValid(array, o_3)" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; (  !array = null
-      &amp; array.length &gt;= 1
-      &amp; !arrayStoreValid(array, o_3))" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length &gt;= 1
-   &amp; !arrayStoreValid(array, o_3)" mergedBranchCondition="false" isBranchConditionComputed="true">
+-&gt;   !arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length &gt;= 1" pathCondition="   array.length &gt;= 0
+-&gt;   !arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length = 1" pathConditionChanged="true" branchCondition="   array.length &gt;= 0
+-&gt;   !arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length &gt;= 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                                  <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="   array.length &gt;= 0
--&gt;   !array = null
-   &amp; array.length = 1
-   &amp; (  !array = null
-      &amp; array.length &gt;= 1
-      &amp; !arrayStoreValid(array, o_3))" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+-&gt;   !arrayStoreValid(array, o_3)
+   &amp; !array = null
+   &amp; array.length = 1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                                  </termination>
                               </branchCondition>
                            </methodReturn>
@@ -76,7 +64,7 @@
                      </methodReturn>
                   </statement>
                </branchCondition>
-            </branchNode>
+            </branchStatement>
          </branchCondition>
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
@@ -86,6 +74,6 @@
                </methodReturn>
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

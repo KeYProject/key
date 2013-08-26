@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6b4cbdb9-3e1d-4771-a3a1-0cc6b32edcef" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_0caa62be-9062-4a21-b53d-b2846a1e264d" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_cd92b2b3-9097-4ce3-8dbd-059406e951b3" name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
-            <sedStatement xml:id="_11249bc8-26be-40e9-8aa3-9c0389c46b02" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211">
-               <sedUseOperationContract xml:id="_06f25b4e-818b-40c2-a4e0-b05ffa4680dc" name="result = magic(x) catch(exc)
+   <sedTarget xml:id="_4c5c3388-2374-41c4-9cba-b567a7cf2e4c" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_d1031cc9-6978-4816-8b21-c4fb78e932d9" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_a214e085-5e08-4cab-a05b-12eb56136ac9" name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
+            <sedStatement xml:id="_dfce5874-eee6-468c-8bb6-021097931241" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211">
+               <sedOperationContract xml:id="_2f249717-93f9-4e20-8868-2de7bb5328c0" name="result = magic(x) catch(exc)
 pre: x &lt; 0 | x &gt;= 0
 post: (   x &lt; 0
    -&gt;   !exc = null
-      &amp; java.lang.Exception::instance(exc) = TRUE)
+      &amp; (    java.lang.RuntimeException::instance(exc)
+           = TRUE
+         | java.lang.Exception::instance(exc) = TRUE))
 &amp; (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
 mod: allLocs \cup allLocs
-termination: diamond" pathCondition="true" lineNumber="-1" charStart="586" charEnd="591" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedStatement xml:id="_6ef2c4e8-d1fd-4844-9ca3-92008403b2cd" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250">
-                     <sedStatement xml:id="_1564b250-238f-45da-90f6-e53b91a2258b" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292">
-                        <sedMethodReturn xml:id="_71c22558-8b82-4f57-be94-518416a15263" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
-                           <sedTermination xml:id="_b56749da-415f-4246-82a7-4dd290e28175" name="&lt;end&gt;" pathCondition="true">
+termination: diamond" pathCondition="true" lineNumber="-1" charStart="576" charEnd="581" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                  <sedStatement xml:id="_0136e9d9-36f3-40e6-9056-013126cf90a6" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250">
+                     <sedStatement xml:id="_c98ec5de-01fd-42c0-bb41-8380cdf4f30c" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292">
+                        <sedMethodReturn xml:id="_18ea12e1-922b-4099-af24-453bcfc8bad7" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
+                           <sedTermination xml:id="_d4a914c9-4308-4182-a410-8f87d4ad27c7" name="&lt;end&gt;" pathCondition="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedStatement>
-               </sedUseOperationContract>
+               </sedOperationContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

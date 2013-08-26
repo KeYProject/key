@@ -51,6 +51,11 @@ public class KeYEnvironment<U extends UserInterface> {
     * An optional {@link Proof} which was loaded by the specified proof file. 
     */
    private Proof loadedProof;
+   
+   /**
+    * Indicates that this {@link KeYEnvironment} is disposed.
+    */
+   private boolean disposed;
 
    /**
     * Constructor
@@ -156,11 +161,30 @@ public class KeYEnvironment<U extends UserInterface> {
                                                                 List<File> classPaths,
                                                                 File bootClassPath,
                                                                 boolean makeMainWindowVisible) throws ProblemLoaderException {
+      return loadInMainWindow(null, location, classPaths, bootClassPath, makeMainWindowVisible);
+   }
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}
+    * with KeY's {@link MainWindow}.
+    * @param profile The {@link Profile} to use.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<UserInterface> loadInMainWindow(Profile profile,
+                                                                File location,
+                                                                List<File> classPaths,
+                                                                File bootClassPath,
+                                                                boolean makeMainWindowVisible) throws ProblemLoaderException {
       MainWindow main = MainWindow.getInstance();
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      DefaultProblemLoader loader = main.getUserInterface().load(location, classPaths, bootClassPath);
+      DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
@@ -177,8 +201,25 @@ public class KeYEnvironment<U extends UserInterface> {
    public static KeYEnvironment<CustomConsoleUserInterface> load(File location,
                                                                  List<File> classPaths,
                                                                  File bootClassPath) throws ProblemLoaderException {
+      return load(null, location, classPaths, bootClassPath);
+   }
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}.
+    * The {@link MainWindow} is not involved in the whole process.
+    * @param profile The {@link Profile} to use.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<CustomConsoleUserInterface> load(Profile profile,
+                                                                 File location,
+                                                                 List<File> classPaths,
+                                                                 File bootClassPath) throws ProblemLoaderException {
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-      DefaultProblemLoader loader = ui.load(location, classPaths, bootClassPath); 
+      DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath); 
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<CustomConsoleUserInterface>(ui, initConfig, loader.getProof());
    }
@@ -190,5 +231,15 @@ public class KeYEnvironment<U extends UserInterface> {
       if (loadedProof != null) {
          loadedProof.dispose();
       }
+      disposed = true;
+   }
+   
+   /**
+    * Checks if this {@link KeYEnvironment} is disposed meaning that
+    * {@link #dispose()} was already executed at least once.
+    * @return {@code true} disposed, {@code false} not disposed and still functionable.
+    */
+   public boolean isDisposed() {
+      return disposed;
    }
 }

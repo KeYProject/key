@@ -87,7 +87,8 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
       boolean methodTreatmentContract = StrategyProperties.METHOD_CONTRACT.equals(sp.get(StrategyProperties.METHOD_OPTIONS_KEY));
       boolean loopTreatmentInvariant = StrategyProperties.LOOP_INVARIANT.equals(sp.get(StrategyProperties.LOOP_OPTIONS_KEY));
       boolean aliasChecks = StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
-      configureProofForSymbolicExecution(proof, maximalNumberOfNodesPerBranch, methodTreatmentContract, loopTreatmentInvariant, aliasChecks);
+      boolean nonExecutionBranchHidingSideProofs = StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
+      configureProofForSymbolicExecution(proof, maximalNumberOfNodesPerBranch, methodTreatmentContract, loopTreatmentInvariant, nonExecutionBranchHidingSideProofs, aliasChecks);
    }
    
    /**
@@ -96,15 +97,17 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
     * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand methods.
     * @param loopTreatmentInvariant {@code true} use invariants, {@code false} expand loops.
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
     */
    public static void configureProofForSymbolicExecution(Proof proof, 
                                                          int maximalNumberOfNodesPerBranch, 
                                                          boolean methodTreatmentContract,
                                                          boolean loopTreatmentInvariant,
+                                                         boolean nonExecutionBranchHidingSideProofs,
                                                          boolean aliasChecks) {
       if (proof != null) {
-         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant, aliasChecks);
+         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant, nonExecutionBranchHidingSideProofs, aliasChecks);
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractQueryTest.main(value);" pathCondition="true" pathConditionChanged="false">
       <statement name="return magicTransformation(value);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <useOperationContract name="result = magicTransformation(value) catch(exc)
+         <operationContract name="result = magicTransformation(value) catch(exc)
 pre: true
-post: (exc = null -&gt; result = javaMulInt(value, 2))
-&amp; exc = null
+post: result = javaMulInt(value, 2) &amp; exc = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <callStackEntry path="/0"/>
@@ -15,7 +14,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                </termination>
             </methodReturn>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

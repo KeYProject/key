@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.internal.intro.impl.IntroPlugin;
 import org.junit.Test;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -37,19 +38,27 @@ public class SWTBotBankingWizardIntroActionTest extends TestCase {
     */
    @Test
    public void testExecution() {
-      // Open intro
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      TestUtilsUtil.menuClick(bot, "Help", "Welcome");
-      // Execute command
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            BankingWizardIntroAction action = new BankingWizardIntroAction();
-            action.run(IntroPlugin.getIntro().getIntroSite(), new Properties());
-         }
-      });
-      // Get opened wizard dialog and close it
-      SWTBotShell shell = bot.shell("New Java Project with content from Banking Example");
-      shell.close();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
+      try {
+         // Open intro
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         TestUtilsUtil.closeWelcomeView(bot); // Close welcome view required for standalone execution
+         TestUtilsUtil.menuClick(bot, "Help", "Welcome");
+         // Execute command
+         Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               BankingWizardIntroAction action = new BankingWizardIntroAction();
+               action.run(IntroPlugin.getIntro().getIntroSite(), new Properties());
+            }
+         });
+         // Get opened wizard dialog and close it
+         SWTBotShell shell = bot.shell("New Java Project with content from Banking Example");
+         shell.close();
+      }
+      finally {
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
+      }
    }
 }

@@ -36,12 +36,12 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -56,13 +56,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
-import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.TermLabelWorkerManagement;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
 public final class WhileInvariantTransformer {
@@ -340,7 +339,8 @@ public final class WhileInvariantTransformer {
        // Replace symbolic execution label with a new one which has a new ID
        for (int i = 0; i < newLabels.length; i++) {
           if (newLabels[i] instanceof SymbolicExecutionTermLabel) {
-             newLabels[i] = new SymbolicExecutionTermLabel(SymbolicExecutionUtil.computeNextSymbolicExecutionLabelId(applicationSequent));
+             int labelID = services.getCounter(SymbolicExecutionTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+             newLabels[i] = new SymbolicExecutionTermLabel(labelID);
           }
        }
        return new ImmutableArray<ITermLabel>(newLabels);

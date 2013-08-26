@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ConfigurationExtractorWithOperationContractsTest.compute(x,y);" pathCondition="true" pathConditionChanged="false">
       <statement name="x.value=2;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="y.value=3;" pathCondition="!x = null" pathConditionChanged="false">
                <branchCondition name="!y = null" pathCondition="!x = null &amp; !y = null" pathConditionChanged="true" branchCondition="!y = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="int add = sub(x,y);" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
-                     <useOperationContract name="result = sub(x, y) catch(exc)
+                     <operationContract name="result = sub(x, y) catch(exc)
 pre: !x = null &amp; !y = null
-post: (exc = null -&gt; result = javaAddInt(x.value, y.value))
-&amp; exc = null
+post: result = javaAddInt(x.value, y.value) &amp; exc = null
 mod: allLocs
 termination: diamond" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
@@ -18,11 +17,11 @@ termination: diamond" pathCondition="!x = null &amp; !y = null" pathConditionCha
                               </termination>
                            </methodReturn>
                         </statement>
-                     </useOperationContract>
+                     </operationContract>
                   </statement>
                </branchCondition>
                <branchCondition name="y = null" pathCondition="!x = null &amp; y = null" pathConditionChanged="true" branchCondition="y = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <useOperationContract name="self = new NullPointerException() catch(exc)
+                  <operationContract name="self = new NullPointerException() catch(exc)
 pre: true
 post: self.message = null
 &amp; self.cause = null
@@ -32,12 +31,12 @@ mod: {(self, message)} \cup {(self, cause)}
 termination: diamond" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                      <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                      </termination>
-                  </useOperationContract>
+                  </operationContract>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <useOperationContract name="self = new NullPointerException() catch(exc)
+            <operationContract name="self = new NullPointerException() catch(exc)
 pre: true
 post: self.message = null
 &amp; self.cause = null
@@ -47,8 +46,8 @@ mod: {(self, message)} \cup {(self, cause)}
 termination: diamond" pathCondition="x = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                </termination>
-            </useOperationContract>
+            </operationContract>
          </branchCondition>
       </statement>
    </methodCall>
-</startNode>
+</start>
