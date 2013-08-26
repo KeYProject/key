@@ -595,8 +595,8 @@ public final class OneStepSimplifier implements BuiltInRule,
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
        Proof proof = e.getSource().getSelectedProof(); 
-       OneStepSimplifier simplifiierInstance = MiscTools.findOneStepSimplifier(proof);
-       if (simplifiierInstance == this) {
+       OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
+       if (simplifierInstance == this) {
           refresh(proof);
        }
     }
