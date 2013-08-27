@@ -121,6 +121,11 @@ public final class SEDImages {
      * The key for the image that is used for loop body termination.
      */
     public static final String LOOP_BODY_TERMINATION = "org.key_project.sed.ui.images.loopBodyTermination";
+    
+    /**
+     * The key for the image that is used for KeY watchpoints in the Breakpoints View.
+     */
+    public static final String KEY_WATCHPOINT = "org.key_project.sed.ui.images.keyWatchpoint";
 
     /**
      * Forbid instances.
@@ -199,6 +204,8 @@ public final class SEDImages {
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
+        }else if(KEY_WATCHPOINT.equals(key)){
+           path = "icons/watchpoint.gif";
         }
         // Load image if possible
         if (path != null) {

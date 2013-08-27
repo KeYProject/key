@@ -18,6 +18,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+/**
+ * This{@link JavaWatchpointStopCondition} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective
+ * variable is accessed or modified.
+ * 
+ * @author Marco Drebing
+ */
 public class JavaWatchpointStopCondition extends
       ExecutedSymbolicExecutionTreeNodesStopCondition {
 
@@ -45,6 +51,18 @@ public class JavaWatchpointStopCondition extends
     */
    private int hitted = 0;
 
+
+   /**
+    * Creates a new {@link JavaWatchpointStopCondition}.
+    * 
+    * @param enabled flag if the Breakpoint is enabled
+    * @param hitCount the number of hits after which the execution should hold at this breakpoint
+    * @param fieldName the field to watch
+    * @param isAcces flag to watch for accesses
+    * @param isModification flag to watch for modifications
+    * @param containerType the type of the element containing the breakpoint
+    * @param proof the {@link Proof} that will be executed and should stop
+    */
    public JavaWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces,
          boolean isModification, KeYJavaType containerKJT, Proof proof) {
       super();
@@ -192,19 +210,31 @@ public class JavaWatchpointStopCondition extends
       return false;
    }
 
+   /**
+    * @return the current hitCount
+    */
    public int getHitCount() {
       return hitCount;
    }
 
+   /**
+    * @param hitCount the new hitCount
+    */
    public void setHitCount(int hitCount) {
       this.hitCount = hitCount;
    }
 
 
+   /**
+    * @return if the breakpoint is enabled
+    */
    public boolean isEnabled() {
       return enabled;
    }
 
+   /**
+    * @param enabled the new enabled value
+    */
    public void setEnabled(boolean enabled) {
       this.enabled = enabled;
    }

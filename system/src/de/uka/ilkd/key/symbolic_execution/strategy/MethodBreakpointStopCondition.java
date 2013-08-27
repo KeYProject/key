@@ -16,23 +16,87 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public class MethodBreakpointStopCondition extends AbstractBreakpointStopCondition {
+public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCondition {
 
+   /**
+    * flag to tell whether to stop on method entry
+    */
    private boolean isEntry;
    
+   /**
+    * flag to tell whether to stop on method exit
+    */
    private boolean isExit;
 
+   /**
+    * Creates a new {@link AbstractLineBreakpointStopCondition}.
+    * 
+    * @param classPath the path of the class the associated Breakpoint lies within
+    * @param lineNumber the line where the associated Breakpoint is located in the class
+    * @param hitCount the number of hits after which the execution should hold at this breakpoint
+    * @param environment the environment the that the proof that should be stopped is working in
+    * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
+    * @param proof the {@link Proof} that will be executed and should stop
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
+    * @param condition the condition as given by the user
+    * @param enabled flag if the Breakpoint is enabled
+    * @param conditionEnabled flag if the condition is enabled
+    * @param methodStart the line the containing method of this breakpoint starts at
+    * @param methodEnd the line the containing method of this breakpoint ends at
+    * @param containerType the type of the element containing the breakpoint
+    * @param isEntry flag to tell whether to stop on method entry
+    * @param isExit flag to tell whether to stop on method exit
+    * @throws SLTranslationException if the condition could not be parsed to a valid Term
+    */
    public MethodBreakpointStopCondition(String classPath, int lineNumber,
          int hitCount, KeYEnvironment<?> environment, IProgramMethod pm,
          Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
       super(classPath, lineNumber, hitCount, environment, pm, proof, parentCondition,
-               condition, enabled, conditionEnabled, methodStart, methodEnd);
+               condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;
    }
    
+   @Override
+   protected boolean breakpointHit(int line, String path, RuleApp ruleApp,
+         Proof proof, Node node) throws ProofInputException {
+      return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&super.breakpointHit(line, path, ruleApp, proof, node);
+   }
+
+   /**
+    * @param node to check
+    * @param ruleApp the applied rule app
+    * @return true if the node represents a method call
+    */
+   private boolean isMethodCallNode(Node node, RuleApp ruleApp){
+      SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
+      IProgramMethod currentPm=null;
+      if (statement instanceof MethodBodyStatement) {
+         MethodBodyStatement mbs = (MethodBodyStatement)statement;
+         currentPm = mbs.getProgramMethod(environment.getServices()); 
+      }
+      if(SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(pm)){
+            return true;
+      }
+      return false;
+      
+   }
+   
+   /**
+    * @param node to check
+    * @param ruleApp the applied rule app
+    * @return true if the node represents a method return
+    */
+   private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
+      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
+            &&isInScope(node)){
+            return true;
+      }
+      return false;
+      
+   }
    /**
     * {@inheritDoc}
     */
@@ -42,7 +106,7 @@ public class MethodBreakpointStopCondition extends AbstractBreakpointStopConditi
          if(goal!=null){
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-            if(varsForCondition!=null&&ruleApp!=null&&node!=null){
+            if(getVarsForCondition()!=null&&ruleApp!=null&&node!=null){
                refreshVarMaps(ruleApp, node);
             }
                if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
@@ -61,7 +125,7 @@ public class MethodBreakpointStopCondition extends AbstractBreakpointStopConditi
                      }
                      else {
                            try {
-                              if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&enabled&&(!conditionEnabled||conditionMet(ruleApp, proof, node))){
+                              if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&enabled&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))){
                                  // Increase number of set nodes on this goal and allow rule application
                                  if(hitcountExceeded(node)){
                                     executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
@@ -86,29 +150,6 @@ public class MethodBreakpointStopCondition extends AbstractBreakpointStopConditi
             
          }
       return true;
-   }
-   
-   private boolean isMethodCallNode(Node node, RuleApp ruleApp){
-      SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
-      IProgramMethod currentPm=null;
-      if (statement instanceof MethodBodyStatement) {
-         MethodBodyStatement mbs = (MethodBodyStatement)statement;
-         currentPm = mbs.getProgramMethod(environment.getServices()); 
-      }
-      if(SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(pm)){
-            return true;
-      }
-      return false;
-      
-   }
-   
-   private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
-            &&isInScope(node)){
-            return true;
-      }
-      return false;
-      
    }
 
    @Override

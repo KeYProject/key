@@ -73,6 +73,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -1071,7 +1072,15 @@ public final class KeYUtil {
          return (IMethod) javaElement;
       }
       return null;
-   }  
+   } 
+   
+   public static LinkedList<IProgramMethod> getProgramMethods(LinkedList<IMethod> methods, JavaInfo javaInfo) throws ProofInputException{
+      LinkedList<IProgramMethod> programMethods = new LinkedList<IProgramMethod>();
+      for(IMethod method : methods){
+         programMethods.add(getProgramMethod(method, javaInfo));
+      }
+      return programMethods;
+   }
    
 
    public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {

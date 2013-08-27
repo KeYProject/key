@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.sed.key.core.launch,
+Export-Package: org.key_project.sed.key.core.breakpoints,
+ org.key_project.sed.key.core.launch,
  org.key_project.sed.key.core.model,
- org.key_project.sed.key.core.model.breakpoints,
  org.key_project.sed.key.core.util

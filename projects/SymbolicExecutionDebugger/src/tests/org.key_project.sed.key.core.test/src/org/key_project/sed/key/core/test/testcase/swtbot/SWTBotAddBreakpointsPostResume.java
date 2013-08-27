@@ -1,7 +1,6 @@
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
@@ -13,7 +12,6 @@ import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotAddBreakpointsPostResume extends AbstractKeYDebugTargetTestCase {
    

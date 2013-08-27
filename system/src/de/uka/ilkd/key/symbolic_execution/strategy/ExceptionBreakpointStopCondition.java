@@ -18,18 +18,57 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+/**
+ * This{@link ExceptionBreakpointStopCondition} represents an exception breakpoint and is responsible to tell the debugger to stop execution when the respective
+ * breakpoint is hit.
+ * 
+ * @author Marco Drebing
+ */
 public class ExceptionBreakpointStopCondition extends
       ExecutedSymbolicExecutionTreeNodesStopCondition {
+
+   /**
+    * The {@link KeYEnvironment} the proof is running in
+    */
    private SymbolicExecutionEnvironment<?> env;
+   
+   /**
+    * The exception to watch for
+    */
    private String exceptionName;
+   
+   /**
+    * a Set of Nodes that represent exceptions
+    */
    private Set<Node> exceptionNodes;
+   
+   /**
+    * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
+    */
    private Set<Node> exceptionParentNodes;
+   
+   /**
+    * a flag whether to watch for an uncaught exception
+    */
    private boolean caught;
+   
+   /**
+    * a flag whether to suspend on subclasses of the exception aswell
+    */
    private boolean suspendOnSubclasses;
+   
+   /**
+    * a flag to tell whether to stop at uncaught exceptions or not
+    */
    private boolean uncaught;
+   
+   /**
+    * enablement of the breakpoint
+    */
    private boolean enabled;
    
    
@@ -42,9 +81,23 @@ public class ExceptionBreakpointStopCondition extends
     * Counter for how often the Breakpoint was hit.
     */
    private int hitted = 0;
-   
+
+   /**
+    * Map to save the nodes that already have been reached, so nodes are not counted twice for the hitcount
+    */
    private Map<Integer, Boolean> hittedNodes;
 
+   /**
+    * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
+    * 
+    * @param env the environment the that the proof that should be stopped is working in
+    * @param exceptionName the name of the exception to watch for
+    * @param caught flag to tell if caught exceptions lead to a stop
+    * @param uncaught flag to tell if uncaught exceptions lead to a stop
+    * @param suspendOnSubclasses flag to tell if the execution should suspend on subclasses of the exception aswell
+    * @param enabled flag if the Breakpoint is enabled
+    * @param hitCount the number of hits after which the execution should hold at this breakpoint
+    */
    public ExceptionBreakpointStopCondition(SymbolicExecutionEnvironment<?>env, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
       this.env = env;
       this.exceptionName = exceptionName;
