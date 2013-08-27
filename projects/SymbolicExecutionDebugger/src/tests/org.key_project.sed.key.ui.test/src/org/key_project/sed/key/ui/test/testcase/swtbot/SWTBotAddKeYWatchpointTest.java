@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.sed.key.core.test.testcase.swtbot;
+package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 import junit.framework.TestCase;
 
@@ -26,7 +26,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
-import org.key_project.sed.key.core.test.Activator;
+import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 

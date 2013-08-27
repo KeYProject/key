@@ -111,7 +111,9 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
        de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
        de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class,
+       de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+    };
+    static Class<? extends TestCase>[] breakpointTests = new Class[] {
        de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionCaughtOrUncaught.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithHitCount.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,
@@ -124,7 +126,6 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointMethodsOnSatisfiable.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithHitCount.class
     };
-    
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
        de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
        de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
@@ -166,6 +167,7 @@ public class TestKey extends TestSuite {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+        suite.addTest(createSuite(breakpointTests, "Testing breakpoints"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
    suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));

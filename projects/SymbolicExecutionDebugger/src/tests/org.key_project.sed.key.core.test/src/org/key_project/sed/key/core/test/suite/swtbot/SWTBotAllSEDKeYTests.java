@@ -18,7 +18,6 @@ import org.junit.runners.Suite;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddBreakpointsPostResume;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddBreakpointsPostTarget;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddBreakpointsPreTarget;
-import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotAddKeYWatchpointTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotChangeAccessModification;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotChangeCaughtUncaughtSubclasses;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotChangeConditonWithErrorCancel;
@@ -54,16 +53,16 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-//   SWTBotContractTest.class,
-//   SWTBotKeYDebugTargetProofFileTest.class,
-//   SWTBotKeYDebugTargetTest.class,
-//   SWTBotKeYLaunchConfigurationDelegateTest.class,
-//   SWTBotKeYModelThreadSaveChildAccessTest.class,
-//   SWTBotKeYSourceLookupParticipantTest.class,
-//   SWTBotLaunchDefaultPreferencesTest.class,
-//   SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest.class,
-//   SWTBotStepOverTest.class,
-//   SWTBotStepReturnTest.class,
+   SWTBotContractTest.class,
+   SWTBotKeYDebugTargetProofFileTest.class,
+   SWTBotKeYDebugTargetTest.class,
+   SWTBotKeYLaunchConfigurationDelegateTest.class,
+   SWTBotKeYModelThreadSaveChildAccessTest.class,
+   SWTBotKeYSourceLookupParticipantTest.class,
+   SWTBotLaunchDefaultPreferencesTest.class,
+   SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest.class,
+   SWTBotStepOverTest.class,
+   SWTBotStepReturnTest.class,
    SWTBotAddBreakpointsPostResume.class,
    SWTBotAddBreakpointsPostTarget.class,
    SWTBotAddBreakpointsPreTarget.class,
@@ -84,8 +83,7 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
    SWTBotRemoveExceptionBreakpoint.class,
    SWTBotRemoveLineBreakpoint.class,
    SWTBotRemoveMethodBreakpoint.class,
-   SWTBotRemoveWatchpoint.class,
-   SWTBotAddKeYWatchpointTest.class
+   SWTBotRemoveWatchpoint.class
 })
 public class SWTBotAllSEDKeYTests {
 }
