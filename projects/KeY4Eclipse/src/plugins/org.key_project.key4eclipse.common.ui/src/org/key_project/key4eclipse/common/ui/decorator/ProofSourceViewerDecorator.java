@@ -13,20 +13,24 @@
 
 package org.key_project.key4eclipse.common.ui.decorator;
 
-import java.util.Iterator;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.ui.services.IDisposable;
+import org.key_project.util.bean.Bean;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -34,10 +38,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
@@ -47,46 +48,178 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class ProofSourceViewerDecorator {
-   // TODO: Document missing members of class ProofSourceViewerDecorator
-
-   private SequentPrintFilter filter;
+public class ProofSourceViewerDecorator extends Bean implements IDisposable {
+   /**
+    * Property {@link #getSelectedPosInSequent()}.
+    */
+   public static final String PROP_SELECTED_POS_IN_SEQUENT = "selectedPosInSequent";
    
-   private LogicPrinter printer;
-   
-   private StyleRange marked1;
-   
-   private StyleRange marked2;
-   
-   private StyleRange firstStatementStyleRange;
-   
-   private TextPresentation textPresentation;
-   
+   /**
+    * The {@link ISourceViewer} to decorate.
+    */
    private ISourceViewer viewer;
    
-   public ISourceViewer getISourceViewer(){
-      return this.viewer;
-   }
+   /**
+    * The {@link StyledText} provided by {@link #viewer} via {@link ISourceViewer#getTextWidget()}.
+    */
+   private StyledText viewerText;
+   
+   /**
+    * The currently shown node.
+    */
+   private Node node;
 
+   /**
+    * The {@link SequentPrintFilter} used to compute the shown text in {@link #viewer}.
+    */
+   private SequentPrintFilter filter;
+   
+   /**
+    * The {@link LogicPrinter} used to compute the shown text in {@link #viewer}.
+    */
+   private LogicPrinter printer;
+   
+   /**
+    * The {@link TextPresentation} shown in {@link #viewerText}.
+    */
+   private TextPresentation textPresentation;
+   
+   /**
+    * The first range used to highlight the selected {@link Term}.
+    */
+   private StyleRange marked1;
+   
+   /**
+    * The second range used to highlight the selected {@link Term}.
+    */
+   private StyleRange marked2;
+   
+   /**
+    * The {@link StyleRange} to highlight the active statement.
+    */
+   private StyleRange firstStatementStyleRange;
+   
+   /**
+    * The currently selected {@link PosInSequent}.
+    */
+   private PosInSequent selectedPosInSequent;
+   
+   /**
+    * Listens for mouse move events on {@link #viewerText}.
+    */
+   private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
+      @Override
+      public void mouseMove(MouseEvent e) {
+         handleMouseMoved(e);
+      }
+   };
+
+   /**
+    * Constructor.
+    * @param viewer The {@link ISourceViewer} to decorate.
+    */
    public ProofSourceViewerDecorator(ISourceViewer viewer) {
       this.viewer = viewer;
+      this.viewerText = viewer.getTextWidget();
+      this.viewerText.addMouseMoveListener(mouseMoveListener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (viewerText != null && !viewerText.isDisposed()) {
+         viewerText.removeMouseMoveListener(mouseMoveListener);
+      }
    }
    
-   private void initializeValuesForHover(){
-      marked1 = new StyleRange();
-      marked1.background=new Color(null,196,205,226);
-      marked2 = new StyleRange();
-      marked2.background=new Color(null,196,205,226);
-      firstStatementStyleRange = new StyleRange();
-      firstStatementStyleRange.background = new Color(null, 167,174,192);
-      textPresentation = new TextPresentation();
-//      textPresentation.addStyleRange(marked1);
-//      textPresentation.mergeStyleRange(firstStatementStyleRange);
-      viewer.changeTextPresentation(textPresentation, true);
+   /**
+    * Shows the given {@link Node} with help of the given {@link KeYMediator}
+    * in the decorated {@link ISourceViewer}.
+    * @param node The {@link Node} to show.
+    * @param mediator The {@link KeYMediator} to use.
+    */
+   public void showNode(Node node, KeYMediator mediator) {
+      this.node = node;
+      filter = new IdentitySequentPrintFilter(node.sequent());
+      printer = new LogicPrinter(new ProgramPrinter(null), 
+                                 mediator.getNotationInfo(), 
+                                 node.proof().getServices());
+      String str = computeText(mediator, node, filter, printer);
+      viewer.setDocument(new Document(str));
+      if (node.getAppliedRuleApp() != null) {
+         PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+         setGreenBackground(pio);
+      }
+   }
+   
+   /**
+    * Computes the text to show in the {@link KeYEditor}} which consists
+    * of the sequent including the applied rule.
+    * @param mediator The {@link KeYMediator} to use.
+    * @param node The {@link Node} to use.
+    * @param filter The {@link SequentPrintFilter} to use.
+    * @param printer The {@link LogicPrinter} to use.
+    * @return The text to show.
+    */
+   public static String computeText(KeYMediator mediator, 
+                                    Node node, 
+                                    SequentPrintFilter filter, 
+                                    LogicPrinter printer) {
       
+        printer.printSequent (filter);
+        String s = printer.toString();
+             printer=null;
+        RuleApp app = node.getAppliedRuleApp();
+             s += "\nNode Nr "+node.serialNr()+"\n";
+             s += ruleToString(mediator, app, true);
+
+        return s;
    }
    
-   private void initializeValuesForGreenBackground(){
+   public static String ruleToString(KeYMediator mediator, RuleApp app, boolean withHeadder) {
+      String s = StringUtil.EMPTY_STRING;
+      if ( app != null ) {
+         if (withHeadder) {
+            s = s + "\n \nUpcoming rule application: \n";
+         }
+         if (app.rule() instanceof Taclet) {
+        LogicPrinter tacPrinter = new LogicPrinter 
+            (new ProgramPrinter(null),                        
+             mediator.getNotationInfo(),
+             mediator.getServices(),
+             true);  
+        tacPrinter.printTaclet((Taclet)(app.rule()));    
+        s += tacPrinter;
+         } else {
+           s = s + app.rule();
+         }
+
+         if ( app instanceof TacletApp ) {
+        TacletApp tapp = (TacletApp)app;
+        if ( tapp.instantiations ().getGenericSortInstantiations () !=
+             GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
+            s = s + "\n\nWith sorts:\n";
+            s = s +
+           tapp.instantiations ().getGenericSortInstantiations ();
+        }
+         }        
+     }
+      return s;
+   }
+   
+   protected void setGreenBackground(PosInOccurrence pos){
+      initializeValuesForGreenBackground();
+      ImmutableList<Integer> path = printer.getPositionTable().pathForPosition(pos, filter);
+      Range range = printer.getPositionTable().rangeForPath(path);
+      marked1.start = range.start();
+      marked1.length = range.end()-range.start();
+      TextPresentation.applyTextPresentation(textPresentation, viewerText);
+      viewer.changeTextPresentation(textPresentation, true);
+   }
+   
+   protected void initializeValuesForGreenBackground(){
       marked1 = new StyleRange();
       marked1.background=new Color(null,128,255,128);    
       textPresentation = new TextPresentation();
@@ -94,18 +227,33 @@ public class ProofSourceViewerDecorator {
       viewer.changeTextPresentation(textPresentation, true);
       
    }
-   
-   public void setDocumentForNode(Node node, KeYMediator mediator){
-      filter = new IdentitySequentPrintFilter(node.sequent());
-      printer = new LogicPrinter(new ProgramPrinter(null), 
-                                              mediator.getNotationInfo(), 
-                                              node.proof().getServices());
-      String str = computeText(mediator, node, filter, printer);
-      viewer.setDocument(new Document(str));
+
+   /**
+    * Handles a mouse move event on {@link #viewerText}.
+    * @param e The event.
+    */
+   protected void handleMouseMoved(MouseEvent e) {
+      // Update selected PosInSequent
+      PosInSequent oldPos = selectedPosInSequent;
+      int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
+      if (textOffset >= 0) {
+         selectedPosInSequent = printer.getPositionTable().getPosInSequent(textOffset, filter);
+      }
+      else {
+         selectedPosInSequent = null;
+      }
+      // Update shown highlighting if PosInSequent has changed
+      if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
+         // Update highlighting only on goals.
+         if (node.getAppliedRuleApp() == null){
+            setBackgroundColorForHover();
+         }
+         // Inform listener
+         firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, oldPos, selectedPosInSequent);
+      }
    }
 
-   @SuppressWarnings("static-access")
-   public void setBackgroundColorForHover(){
+   protected void setBackgroundColorForHover(){
       initializeValuesForHover();
       
       int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
@@ -157,155 +305,28 @@ public class ProofSourceViewerDecorator {
       StyleRange[] ranges = {marked1, marked2, firstStatementStyleRange};
       textPresentation.mergeStyleRanges(ranges);
 //      textPresentation.addStyleRange(firstStatementStyleRange);
-      textPresentation.applyTextPresentation(textPresentation, viewer.getTextWidget());
+      TextPresentation.applyTextPresentation(textPresentation, viewerText);
       viewer.changeTextPresentation(textPresentation, true);
    }
    
-   @SuppressWarnings("static-access")
-   public void setGreenBackground(PosInOccurrence pos){
-      initializeValuesForGreenBackground();
-      ImmutableList<Integer> path = printer.getPositionTable().pathForPosition(pos, filter);
-      Range range = printer.getPositionTable().rangeForPath(path);
-      marked1.start = range.start();
-      marked1.length = range.end()-range.start();
-      textPresentation.applyTextPresentation(textPresentation, viewer.getTextWidget());
+   protected void initializeValuesForHover(){
+      marked1 = new StyleRange();
+      marked1.background=new Color(null,196,205,226);
+      marked2 = new StyleRange();
+      marked2.background=new Color(null,196,205,226);
+      firstStatementStyleRange = new StyleRange();
+      firstStatementStyleRange.background = new Color(null, 167,174,192);
+      textPresentation = new TextPresentation();
+//      textPresentation.addStyleRange(marked1);
+//      textPresentation.mergeStyleRange(firstStatementStyleRange);
       viewer.changeTextPresentation(textPresentation, true);
    }
-   
-   
-   /**
-    * <p>
-    * Computes the text to show in the {@link KeYEditor}} which consists
-    * of the sequent including the applied rule.
-    * </p>
-    * <p>
-    * This information is also relevant for other tools like the
-    * Symbolic Execution Debugger.
-    * </p>
-    * @param mediator The {@link KeYMediator} to use.
-    * @param node The {@link Node} to use.
-    * @param filter The {@link SequentPrintFilter} to use.
-    * @param printer The {@link LogicPrinter} to use.
-    * @return The text to show.
-    */
-   public static String computeText(KeYMediator mediator, 
-                                    Node node, 
-                                    SequentPrintFilter filter, 
-                                    LogicPrinter printer) {
-      
-        printer.printSequent (filter);
-        String s = printer.toString();
-             printer=null;
-        RuleApp app = node.getAppliedRuleApp();
-             s += "\nNode Nr "+node.serialNr()+"\n";
-             
-        if ( app != null ) {
-            s = s + "\n \nUpcoming rule application: \n";
-            if (app.rule() instanceof Taclet) {
-           LogicPrinter tacPrinter = new LogicPrinter 
-               (new ProgramPrinter(null),                        
-                mediator.getNotationInfo(),
-                mediator.getServices(),
-                true);  
-           tacPrinter.printTaclet((Taclet)(app.rule()));    
-           s += tacPrinter;
-            } else {
-              s = s + app.rule();
-            }
 
-            if ( app instanceof TacletApp ) {
-           TacletApp tapp = (TacletApp)app;
-           if ( tapp.instantiations ().getGenericSortInstantiations () !=
-                GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
-               s = s + "\n\nWith sorts:\n";
-               s = s +
-              tapp.instantiations ().getGenericSortInstantiations ();
-           }
-
-           StringBuffer sb = new StringBuffer("\n\n");
-           s = s + sb;
-            }        
-        }
-        return s;
-   }
-   
-   
    /**
-    * Returns the {@link PosInSequent} for the current cursor location.
-    * @return PosInSequent - the {@link PosInSequent} for the current cursor location.
+    * Returns the selected {@link PosInSequent} for the current cursor location.
+    * @return The selected {@link PosInSequent} for the current cursor location.
     */
-   public PosInSequent getPosInSequent(){
-      int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
-      if(textOffset >= 0){
-         return printer.getPositionTable().getPosInSequent(textOffset, filter);
-      }
-      else return null;
+   public PosInSequent getSelectedPosInSequent() {
+      return selectedPosInSequent;
    }
-   
-   
-   /**
-    * Collects all applicable {@link TacletApp}s for a given {@link PosInSequent} and {@link KeYMediator}.
-    * @param mediator - the {@link KeYMediator} of the current {@link Proof}.
-    * @param pos - the {@link PosInSequent} to find the {@link TacletApp}s for.
-    * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
-    */
-   public ImmutableList<TacletApp> findRules(KeYMediator mediator, PosInSequent pos){
-      if(pos != null){
-         ImmutableList<TacletApp> findTacletList = mediator.getFindTaclet(pos);
-         ImmutableList<TacletApp> reWriteTacletList = mediator.getRewriteTaclet(pos);
-         ImmutableList<TacletApp> noFindTacletList = mediator.getNoFindTaclet();
-         
-         findTacletList = removeObsolete(findTacletList);
-         reWriteTacletList = removeObsolete(reWriteTacletList);
-         noFindTacletList = removeObsolete(noFindTacletList);
-         
-         ImmutableList<TacletApp> allTaclets = removeRewrites(findTacletList).prepend(reWriteTacletList);
-         
-         return allTaclets;
-      }
-      else{ 
-         return null;
-      }
-   }
-      
-   
-   /** Remove rules which belong to rule set "obsolete".
-    * Obsolete rules are sound, but are discouraged to use in
-    * both automated and interactive proofs, mostly because of proof complexity issues.
-    */
-   private ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
-       ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-       for (TacletApp ta: list) {
-           boolean isObsolete = false;
-           for (RuleSet rs: ta.taclet().getRuleSets()) {
-               if (rs.name().equals(new Name("obsolete"))) {
-                   isObsolete = true;
-                   break;
-               }
-           }
-           if (!isObsolete)
-               result = result.append(ta);
-       }
-       return result;
-   }
-   
-   
-   /** removes RewriteTaclet from list
-    * @param list the IList<Taclet> from where the RewriteTaclet are
-    * removed
-    * @return list without RewriteTaclets
-    */
-   private ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-  ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-  Iterator<TacletApp> it = list.iterator();
-
-  while(it.hasNext()) {
-      TacletApp tacletApp = it.next();
-      Taclet taclet=tacletApp.taclet();
-      result = (taclet instanceof RewriteTaclet ? result :
-           result.prepend(tacletApp));
-  }
-  return result;
-   }
-   
 }

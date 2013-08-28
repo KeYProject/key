@@ -39,6 +39,7 @@ import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
@@ -120,6 +121,16 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
                    StarterPreferenceUtil.DONT_ASK_FOR_PROJECT_STARTER, 
                    StarterPreferenceUtil.PROJECT_STARTER_DISABLED);
       }
+      // Proof starter
+      ImmutableList<StarterDescription<IProofStarter>> proofStarter = StarterUtil.getProofStarters();
+      if (!proofStarter.isEmpty()) {
+         createTab(starterKindsTabFolder, 
+                   "Open Proof", 
+                   proofStarter, 
+                   StarterPreferenceUtil.SELECTED_PROOF_STARTER_ID, 
+                   StarterPreferenceUtil.DONT_ASK_FOR_PROOF_STARTER, 
+                   StarterPreferenceUtil.PROOF_STARTER_DISABLED);
+      }
    }
    
    /**
@@ -157,7 +168,7 @@ public class StarterPreferencePage extends FieldEditorPreferencePage implements 
       descriptionGroup.setLayout(new FillLayout());
       final Text descriptionText = new Text(descriptionGroup, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI | SWT.WRAP);
       descriptionText.setEditable(false);
-      StarterDescription<I> initialSd = StarterUtil.searchGlobalStarter(starterDescriptions, getPreferenceStore().getString(selectedStarterProperty));
+      StarterDescription<I> initialSd = StarterUtil.searchStarter(starterDescriptions, getPreferenceStore().getString(selectedStarterProperty));
       if (initialSd == null && !starterDescriptions.isEmpty()) {
          initialSd = starterDescriptions.head();
       }

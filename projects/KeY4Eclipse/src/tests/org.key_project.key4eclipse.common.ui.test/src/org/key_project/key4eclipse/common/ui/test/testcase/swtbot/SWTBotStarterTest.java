@@ -158,8 +158,8 @@ public class SWTBotStarterTest extends TestCase {
             }
          };
          ImmutableList<StarterDescription<IProjectStarter>> starters = StarterUtil.getProjectStarters();
-         StarterDescription<IProjectStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingProjectStarter.ID);
-         StarterDescription<IProjectStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingProjectStarter.ID);
+         StarterDescription<IProjectStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingProjectStarter.ID);
+         StarterDescription<IProjectStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingProjectStarter.ID);
          assertTrue(firstSD.getInstance() instanceof FirstLoggingProjectStarter);
          assertTrue(secondSD.getInstance() instanceof SecondLoggingProjectStarter);
          doStarterTest(helper, 
@@ -266,8 +266,8 @@ public class SWTBotStarterTest extends TestCase {
             }
          };
          ImmutableList<StarterDescription<IFileStarter>> starters = StarterUtil.getFileStarters();
-         StarterDescription<IFileStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingFileStarter.ID);
-         StarterDescription<IFileStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingFileStarter.ID);
+         StarterDescription<IFileStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingFileStarter.ID);
+         StarterDescription<IFileStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingFileStarter.ID);
          assertTrue(firstSD.getInstance() instanceof FirstLoggingFileStarter);
          assertTrue(secondSD.getInstance() instanceof SecondLoggingFileStarter);
          doStarterTest(helper, 
@@ -469,8 +469,8 @@ public class SWTBotStarterTest extends TestCase {
     */
    protected void doMethodStarterTest(ITestHelper<FirstLoggingMethodStarter, SecondLoggingMethodStarter> helper) throws Exception {
       ImmutableList<StarterDescription<IMethodStarter>> starters = StarterUtil.getMethodStarters();
-      StarterDescription<IMethodStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingMethodStarter.ID);
-      StarterDescription<IMethodStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingMethodStarter.ID);
+      StarterDescription<IMethodStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingMethodStarter.ID);
+      StarterDescription<IMethodStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingMethodStarter.ID);
       assertTrue(firstSD.getInstance() instanceof FirstLoggingMethodStarter);
       assertTrue(secondSD.getInstance() instanceof SecondLoggingMethodStarter);
       doStarterTest(helper, 
@@ -517,8 +517,8 @@ public class SWTBotStarterTest extends TestCase {
     */
    protected void doGlobalStarterTest(ITestHelper<FirstLoggingGlobalStarter, SecondLoggingGlobalStarter> helper) throws Exception {
       ImmutableList<StarterDescription<IGlobalStarter>> starters = StarterUtil.getGlobalStarters();
-      StarterDescription<IGlobalStarter> firstSD = StarterUtil.searchGlobalStarter(starters, FirstLoggingGlobalStarter.ID);
-      StarterDescription<IGlobalStarter> secondSD = StarterUtil.searchGlobalStarter(starters, SecondLoggingGlobalStarter.ID);
+      StarterDescription<IGlobalStarter> firstSD = StarterUtil.searchStarter(starters, FirstLoggingGlobalStarter.ID);
+      StarterDescription<IGlobalStarter> secondSD = StarterUtil.searchStarter(starters, SecondLoggingGlobalStarter.ID);
       assertTrue(firstSD.getInstance() instanceof FirstLoggingGlobalStarter);
       assertTrue(secondSD.getInstance() instanceof SecondLoggingGlobalStarter);
       doStarterTest(helper, 

@@ -19,9 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -175,7 +173,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             }
 
             // apply OSS to <inv>() calls.
-            if(rule == OneStepSimplifier.INSTANCE) {
+            if(rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();

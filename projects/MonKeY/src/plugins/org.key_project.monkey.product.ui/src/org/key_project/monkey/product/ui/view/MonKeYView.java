@@ -25,15 +25,15 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.composite.MonKeYComposite;
-import org.key_project.util.eclipse.ResourceUtil;
 
 /**
  * Implementation of the view "MonKeY".
  * @author Martin Hentschel
  */
 public class MonKeYView extends ViewPart {
-    /**
+   /**
      * The ID of this view.
      */
     public static final String ID = "org.key_project.monkey.product.ui.view.MonKeYView";
@@ -47,7 +47,18 @@ public class MonKeYView extends ViewPart {
      * The {@link IMemento} to load the last state from.
      */
     private IMemento mementoToLoadFrom;
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+        if (composite != null) {
+            composite.dispose();
+        }
+        super.dispose();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -107,7 +118,7 @@ public class MonKeYView extends ViewPart {
      */
     public void loadProject(IProject project) throws CoreException {
         if (composite != null && !composite.isDisposed()) {
-           File location = ResourceUtil.getLocation(project);
+           File location = KeYUtil.getSourceLocation(project);
            composite.setLocation(location != null ? location.getAbsolutePath() : null);
            composite.setBootClassPath(KeYResourceProperties.getBootClassPath(project));
            composite.loadSource();
