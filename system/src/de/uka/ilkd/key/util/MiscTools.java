@@ -521,7 +521,7 @@ public final class MiscTools {
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
-       if (proof != null) {
+       if (proof != null && !proof.isDisposed()) {
           Profile profile = proof.env().getInitConfig().getProfile();
           return findOneStepSimplifier(profile);
        }
