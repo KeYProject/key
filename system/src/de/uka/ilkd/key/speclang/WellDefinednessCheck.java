@@ -500,12 +500,22 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private Term generateParamsOK(ImmutableList<ParsableVariable> paramVars, Services services) {
         Term paramsOK = TB.tt();
-        final Iterator<ProgramVariable> origParams = getOrigVars().params.iterator();
-        for (ParsableVariable paramVar : paramVars) {
-            assert origParams.hasNext();
-            paramsOK = TB.and(paramsOK,
-                    TB.reachableValue(services, TB.var(paramVar),
-                            origParams.next().getKeYJavaType()));
+        if (paramVars.size() == getOrigVars().params.size()) {
+            final Iterator<ProgramVariable> origParams = getOrigVars().params.iterator();
+            for (ParsableVariable paramVar : paramVars) {
+                assert origParams.hasNext();
+                paramsOK = TB.and(paramsOK,
+                                  TB.reachableValue(services, TB.var(paramVar),
+                                                    origParams.next().getKeYJavaType()));
+            }
+        } else {
+            for (ParsableVariable paramVar : paramVars) {
+                assert paramVar instanceof ProgramVariable;
+                ProgramVariable pv = (ProgramVariable)paramVar;
+                paramsOK = TB.and(paramsOK,
+                                  TB.reachableValue(services, TB.var(paramVar),
+                                                    pv.getKeYJavaType()));
+            }
         }
         return paramsOK;
     }
@@ -576,8 +586,13 @@ public abstract class WellDefinednessCheck implements Contract {
         this.requires = new Condition(requires.first, requires.second);
     }
 
-    void setAssignable(Term ass) {
+    void setAssignable(Term ass, Services services) {
         this.assignable = ass;
+        if (ass == TB.ff()) {
+            this.assignable = TB.empty(services);
+        } else if (ass == TB.tt()) {
+            this.assignable = TB.allLocs(services);
+        }
     }
 
     void setAccessible(Term acc) {

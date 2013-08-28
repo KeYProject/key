@@ -29,7 +29,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         assert inv != null;
         this.inv = inv;
         setRequires(TB.tt());
-        setAssignable(TB.empty(services));
+        setAssignable(TB.empty(services), services);
         setEnsures(inv.getOriginalInv());
         setAccessible(accessible);
         setMby(mby);

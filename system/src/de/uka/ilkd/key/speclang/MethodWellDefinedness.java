@@ -47,7 +47,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
-        setAssignable(contract.getAssignable(h));
+        setAssignable(contract.getAssignable(h), services);
         setAccessible(contract.getAccessible(h),
                       hPre != null ? contract.getAccessible(hPre) : null,
                       services);
@@ -66,7 +66,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
-        setAssignable(TB.empty(services));
+        setAssignable(TB.empty(services), services);
         setAccessible(contract.getAccessible(h),
                       hPre != null ? contract.getAccessible(hPre) : null,
                       services);

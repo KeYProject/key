@@ -647,10 +647,12 @@ public class InvariantConfigurator {
                 }
 
                 if (requirementsAreMet) {
-                    newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, variantTerm, loopInv
-                            .getInternalSelfTerm(), loopInv
-                            .getInternalAtPres());
+                    newInvariant =
+                            new LoopInvariantImpl(loopInv.getLoop(), loopInv.getTarget(),
+                                                  loopInv.getKJT(), invariantTerm,
+                                                  modifiesTerm, variantTerm,
+                                                  loopInv.getInternalSelfTerm(),
+                                                  loopInv.getInternalAtPres());
                     return true;
                 } else
                     return false;

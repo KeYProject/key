@@ -1319,6 +1319,8 @@ public class JMLSpecFactory {
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
+                                     pm,
+                                     pm.getContainerType(),
                                      invariants,
                                      mods,
                                      variant,

@@ -25,11 +25,13 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
@@ -124,12 +126,24 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return addGhostParams(params, origParams);
     }
 
+    private static ImmutableList<ProgramVariable> getLocalIns(LoopWellDefinedness lwd,
+                                                              Services services) {
+        //bla
+        ImmutableList<ProgramVariable> params = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableSet<ProgramVariable> newParams =
+                MiscTools.getLocalIns(lwd.getInvariant().getLoop(), services);
+        for (ProgramVariable pv: newParams) {
+            params = params.append(pv);
+        }
+        return params;
+    }
+
     /**
      * This should only be executed once per proof.
      * @return new variables
      */
     private static Variables buildVariables(WellDefinednessCheck check,
-                                                       Services services) {
+                                            Services services) {
         final OriginalVariables vars = check.getOrigVars();
         final KeYJavaType kjt = check.getKJT();
         final LocationVariable heap = check.getHeap();
@@ -165,6 +179,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final ImmutableList<ProgramVariable> params;
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
+        } else if (check instanceof LoopWellDefinedness) {
+            params = getLocalIns((LoopWellDefinedness)check, services);
         } else {
             params = ImmutableSLList.<ProgramVariable>nil();
         }

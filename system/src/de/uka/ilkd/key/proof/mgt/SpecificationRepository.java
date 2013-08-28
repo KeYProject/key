@@ -68,6 +68,7 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
@@ -1192,7 +1193,7 @@ public final class SpecificationRepository {
         LoopInvariant inv = getLoopInvariant(from);
         if(inv != null) {
             inv = inv.setLoop(to);
-            addLoopInvariant(inv);
+            setLoopInvariant(inv);
         }
     }
 
@@ -1201,11 +1202,15 @@ public final class SpecificationRepository {
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void addLoopInvariant(LoopInvariant inv) {
+    public void setLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
 
+    public void addLoopInvariant(LoopInvariant inv) {
+        setLoopInvariant(inv);
+        registerContract(new LoopWellDefinedness(inv, services));
+    }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         if (blockContracts.get(block) == null) {
@@ -1244,6 +1249,7 @@ public final class SpecificationRepository {
     public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         blockContracts.put(block, getBlockContracts(block).add(contract));
+        // TODO: Add BlockWellDefinedness
     }
 
 
@@ -1265,11 +1271,9 @@ public final class SpecificationRepository {
             }
             else if (spec instanceof LoopInvariant) {
                 addLoopInvariant((LoopInvariant)spec);
-                addWellDefinednessCheck((LoopInvariant)spec);
             }
             else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
-                addWellDefinednessCheck((BlockContract)spec);
             }
             else {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
@@ -1415,20 +1419,7 @@ public final class SpecificationRepository {
     }
 
 
-    public void addWellDefinednessCheck(LoopInvariant li) {
-        // Loop Invariant
-        // TODO
-    }
-
-
-    public void addWellDefinednessCheck(BlockContract bc) {
-        // Block Contract
-        // TODO
-    }
-
-
-    public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
-	    					IObserverFunction obs) {
+    public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null
 	       : " observer is already limited: " + obs;
 	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
