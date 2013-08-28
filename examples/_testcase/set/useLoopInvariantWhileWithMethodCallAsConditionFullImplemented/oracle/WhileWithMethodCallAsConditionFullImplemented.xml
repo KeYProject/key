@@ -88,7 +88,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -131,7 +131,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                               </termination>
                            </statement>
                         </branchStatement>
@@ -181,7 +181,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL">
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

@@ -41,6 +41,10 @@ public abstract class AbstractSEDTermination extends AbstractSEDTerminateCompati
     */
    @Override
    public String getNodeType() {
-      return "Termination";
+      String kind = "Termination";
+      if (!isVerified()) {
+         kind += " (not verified)";
+      }
+      return kind;
    }
 }

@@ -39,6 +39,120 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notLoop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notLoop(int)].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notLoop.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_loop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::loop(int)].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_loop.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notMagic() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notMagic()].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notMagic.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_magic() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::magic()].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_magic.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notMagicException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notMagicException()].JML exceptional_behavior operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notMagicException.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_magicException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::magicException()].JML exceptional_behavior operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_magicException.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/methodCallReturnTests
     */
    public void testMethodCallReturnTests() throws Exception {

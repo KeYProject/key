@@ -5,7 +5,7 @@
          <statement name="i++;" pathCondition="true" pathConditionChanged="false">
             <statement name="return i;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of LabelTest.doubled();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

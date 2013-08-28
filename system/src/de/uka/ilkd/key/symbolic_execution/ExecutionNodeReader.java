@@ -59,18 +59,18 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
@@ -435,7 +435,7 @@ public class ExecutionNodeReader {
          return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
-         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes));
+         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes), getBranchVerified(attributes));
       }
       else if (ExecutionNodeWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
          return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
@@ -590,6 +590,15 @@ public class ExecutionNodeReader {
     */
    protected boolean getHasCondition(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_CONDITION));
+   }
+
+   /**
+    * Returns the is branch verified value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean getBranchVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_VERIFIED));
    }
 
    /**
@@ -1017,20 +1026,28 @@ public class ExecutionNodeReader {
       private TerminationKind terminationKind;
       
       /**
+       * The branch verified flag.
+       */
+      private boolean branchVerified;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param exceptionalTermination Exceptional termination?
+       * @param branchVerified The branch verified flag.
        */
       public KeYlessTermination(IExecutionNode parent, 
                                 String name, 
                                 String formatedPathCondition, 
                                 boolean pathConditionChanged, 
-                                TerminationKind terminationKind) {
+                                TerminationKind terminationKind,
+                                boolean branchVerified) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.terminationKind = terminationKind;
+         this.branchVerified = branchVerified;
       }
 
       /**
@@ -1067,6 +1084,14 @@ public class ExecutionNodeReader {
       @Override
       public TerminationKind getTerminationKind() {
          return terminationKind;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isBranchVerified() {
+         return branchVerified;
       }
    }
 

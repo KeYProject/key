@@ -12,7 +12,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   <methodReturn name="&lt;return of SimpleIntQuery.mainWithUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleIntQuery.mainWithUpdates(x);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

@@ -110,7 +110,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                     </termination>
                                  </statement>
                               </statement>
@@ -131,7 +131,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; !result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </branchCondition>
                         </branchCondition>
@@ -151,7 +151,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
@@ -236,7 +236,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
            -&gt; result_1_0 = i_0))
    &amp; i_0 &lt;= -1
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                     </termination>
                                  </statement>
                               </statement>
@@ -259,7 +259,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
            -&gt; result_1_0 = i_0))
    &amp; i_0 &lt;= -1
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; !result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </branchCondition>
                         </branchCondition>
@@ -277,7 +277,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
@@ -336,7 +336,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; (i_0 &gt;= 0 &amp; !array = null)" pathConditionChanged="false" terminationKind="NORMAL">
+   &amp; (i_0 &gt;= 0 &amp; !array = null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </branchCondition>

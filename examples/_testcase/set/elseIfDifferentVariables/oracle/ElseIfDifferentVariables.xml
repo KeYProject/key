@@ -5,7 +5,7 @@
          <branchCondition name="a = TRUE" pathCondition="a = TRUE" pathConditionChanged="true" branchCondition="a = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="a = TRUE" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="a = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="a = TRUE" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="a = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
@@ -15,7 +15,7 @@
                <branchCondition name="b = TRUE" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="true" branchCondition="b = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -23,7 +23,7 @@
                <branchCondition name="!b = TRUE" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="true" branchCondition="!b = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return 3;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

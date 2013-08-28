@@ -66,6 +66,13 @@ public interface IExecutionTermination extends IExecutionNode {
    public TerminationKind getTerminationKind();
    
    /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public boolean isBranchVerified();
+   
+   /**
     * Defines the possible termination kinds.
     * @author Martin Hentschel
     */

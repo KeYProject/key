@@ -79,7 +79,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
-   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </statement>
                         </branchStatement>
@@ -100,7 +100,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
-   &amp; array = null" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                      </termination>
                   </branchCondition>
                </branchCondition>
@@ -148,7 +148,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL">
+         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

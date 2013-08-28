@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_710e7e66-48a2-4d37-a2f9-f0f8ef767055" name="main(AliasTest.IntWrapper, AliasTest.IntWrapper)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_098698bd-0e0c-4f87-8d92-d367b38b511e" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_62b1a6f8-fee2-409f-9457-f70cc7263815" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="217" charEnd="221">
-            <sedStatement xml:id="_8a22cf9e-8ae5-4a4e-ad5f-62a62b3775bb" name="a.value=2;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="267">
-               <sedBranchCondition xml:id="_189059bd-e0af-4d7b-942f-2f1c64186978" name="!a = null" pathCondition="!a = null">
-                  <sedStatement xml:id="_6263f94a-2b9e-42c1-9d60-d6a62e189d68" name="b.value=3;" pathCondition="!a = null" lineNumber="-1" charStart="271" charEnd="283">
-                     <sedBranchCondition xml:id="_5a6e06ed-3826-4cd3-a169-d5daedc77e91" name="!b = null" pathCondition="!a = null &amp; !b = null">
-                        <sedBranchCondition xml:id="_f118ef4f-592a-4896-9a83-0b2dc1277f8b" name="!b = a" pathCondition="!a = null &amp; !b = null &amp; !b = a">
-                           <sedStatement xml:id="_7a56ba8c-9e0d-459b-b0d7-75230ba761b1" name="return a.value+b.value;" pathCondition="!a = null &amp; !b = null &amp; !b = a" lineNumber="-1" charStart="287" charEnd="312">
-                              <sedMethodReturn xml:id="_d6372f23-ab78-4033-ac63-ca7d6f62e6fc" name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = null &amp; !b = null &amp; !b = a" lineNumber="-1" charStart="217" charEnd="221">
-                                 <sedTermination xml:id="_f4ab9f42-2fcc-47ef-872f-3a3f2dc09ec9" name="&lt;end&gt;" pathCondition="!a = null &amp; !b = null &amp; !b = a">
+   <sedTarget xml:id="_efcab82f-c43b-4989-b7fa-78b357f133bf" name="main(AliasTest.IntWrapper, AliasTest.IntWrapper)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_bd623ff1-30c6-493b-844f-824f14f59e66" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_44cefb04-0b6c-4f55-bff9-18bfe570e7e9" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="217" charEnd="221">
+            <sedStatement xml:id="_d9396138-85d7-4f34-b152-d58526bf104e" name="a.value=2;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="267">
+               <sedBranchCondition xml:id="_fb378f98-6405-43f1-b7cc-bdd8296f9c5b" name="!a = null" pathCondition="!a = null">
+                  <sedStatement xml:id="_3adc9e9b-3d5f-4626-99da-ebbe5772d5b5" name="b.value=3;" pathCondition="!a = null" lineNumber="-1" charStart="271" charEnd="283">
+                     <sedBranchCondition xml:id="_de2d6af6-7c7a-4cf2-a79d-fb35e8d3d0c8" name="!b = null" pathCondition="!a = null &amp; !b = null">
+                        <sedBranchCondition xml:id="_253ec253-70d4-47e1-9dc3-fb68a3d7aa91" name="!b = a" pathCondition="!a = null &amp; !b = null &amp; !b = a">
+                           <sedStatement xml:id="_c7fcfa51-82f1-448a-9de7-88dca8353967" name="return a.value+b.value;" pathCondition="!a = null &amp; !b = null &amp; !b = a" lineNumber="-1" charStart="287" charEnd="312">
+                              <sedMethodReturn xml:id="_0f2b2565-59f6-4ad3-b9b3-121eb959bf37" name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = null &amp; !b = null &amp; !b = a" lineNumber="-1" charStart="217" charEnd="221">
+                                 <sedTermination xml:id="_b7aa8a99-6be9-4c62-8450-fe024574e6e2" name="&lt;end&gt;" pathCondition="!a = null &amp; !b = null &amp; !b = a" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_ae4d16ca-002f-48ef-9b33-816774c86c8a" name="b = a" pathCondition="!a = null &amp; b = a">
-                           <sedStatement xml:id="_99836431-9c39-45ad-9ee6-3f18a6b3594c" name="return a.value+b.value;" pathCondition="!a = null &amp; b = a" lineNumber="-1" charStart="287" charEnd="312">
-                              <sedMethodReturn xml:id="_87c66e63-781c-454f-b4ea-1895f80b0a7e" name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = null &amp; b = a" lineNumber="-1" charStart="217" charEnd="221">
-                                 <sedTermination xml:id="_da471554-fe87-4d66-806f-2fd853a3da84" name="&lt;end&gt;" pathCondition="!a = null &amp; b = a">
+                        <sedBranchCondition xml:id="_9079d229-e1d0-4171-b288-c8623c738a2b" name="b = a" pathCondition="!a = null &amp; b = a">
+                           <sedStatement xml:id="_8d271b6e-f5b4-4c3a-a743-2bf2b1b24718" name="return a.value+b.value;" pathCondition="!a = null &amp; b = a" lineNumber="-1" charStart="287" charEnd="312">
+                              <sedMethodReturn xml:id="_a10c9515-62b0-4529-83ec-035d261235cf" name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = null &amp; b = a" lineNumber="-1" charStart="217" charEnd="221">
+                                 <sedTermination xml:id="_8a1b1ff4-db5f-4b4b-8407-0f98cd9421b3" name="&lt;end&gt;" pathCondition="!a = null &amp; b = a" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedBranchCondition>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_be3e302c-82e1-42f8-827c-929187af4134" name="b = null" pathCondition="!a = null &amp; b = null">
-                        <sedExceptionalTermination xml:id="_364d6cae-e1cb-4a72-afcb-4308e37db6d2" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!a = null &amp; b = null">
+                     <sedBranchCondition xml:id="_957236a2-de67-4b92-81bb-707d5e77431c" name="b = null" pathCondition="!a = null &amp; b = null">
+                        <sedExceptionalTermination xml:id="_a7154f93-5baa-407f-8336-09aee3dabf2e" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!a = null &amp; b = null" verified="true">
                         </sedExceptionalTermination>
                      </sedBranchCondition>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_cb23e959-9d6d-4381-842e-911b5b566ef0" name="a = null" pathCondition="a = null">
-                  <sedExceptionalTermination xml:id="_cf6a1d44-a6b0-4966-b92c-9d38ceb9b994" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="a = null">
+               <sedBranchCondition xml:id="_c38464ee-43a8-4773-831f-c2ca90f2df57" name="a = null" pathCondition="a = null">
+                  <sedExceptionalTermination xml:id="_798d6ce8-0754-4d7b-bb23-9b02a5e36844" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="a = null" verified="true">
                   </sedExceptionalTermination>
                </sedBranchCondition>
             </sedStatement>

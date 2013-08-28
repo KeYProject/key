@@ -16,7 +16,7 @@ as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true">
                   </methodReturnValue>
                   <methodReturnValue name="42 {!x &lt;= -1}" returnValueString="42" hasCondition="true" conditionString="!x &lt;= -1">
                   </methodReturnValue>
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

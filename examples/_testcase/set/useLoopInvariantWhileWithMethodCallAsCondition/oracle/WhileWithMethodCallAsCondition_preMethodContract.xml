@@ -76,7 +76,7 @@ termination: diamond" pathCondition="!(  array.length &gt;= 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY">
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                            </termination>
                         </statement>
                      </statement>
@@ -126,7 +126,7 @@ termination: diamond" pathCondition="!(  array.length &gt;= 0
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL">
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

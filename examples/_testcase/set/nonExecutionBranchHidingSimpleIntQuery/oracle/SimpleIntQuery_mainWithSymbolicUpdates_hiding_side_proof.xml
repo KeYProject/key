@@ -17,7 +17,7 @@ as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComput
                      </methodReturnValue>
                      <methodReturnValue name="42 {!x &lt;= -12}" returnValueString="42" hasCondition="true" conditionString="!x &lt;= -12">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

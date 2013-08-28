@@ -1485,6 +1485,7 @@ public final class TestSedCoreUtil {
                                             boolean compareVariables,
                                             boolean compareCallStack) throws DebugException {
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      assertEquals(expected.isVerified(), current.isVerified());
    }
    
    /**

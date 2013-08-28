@@ -12,7 +12,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                <callStackEntry path="/0"/>
                <methodReturn name="&lt;return of LoopBodyBranchClosed.deadBody();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                   <callStackEntry path="/0"/>
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

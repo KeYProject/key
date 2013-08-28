@@ -14,7 +14,7 @@
                   <statement name="throw new Exception ();" pathCondition="array = null" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0"/>
-                     <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                     <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </statement>
                </branchCondition>
@@ -87,7 +87,7 @@ mod: false" pathCondition="!array = null" pathConditionChanged="false" initially
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))" pathConditionChanged="false" terminationKind="LOOP_BODY">
+           -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -162,7 +162,7 @@ mod: false" pathCondition="!array = null" pathConditionChanged="false" initially
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))
-   &amp; i_0 = 0" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; i_0 = 0" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                              </termination>
                                           </branchCondition>
                                           <branchCondition name="!i_0 = 0" pathCondition="   array.length &gt;= 0
@@ -196,7 +196,7 @@ as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true">
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))
-   &amp; !i_0 = 0" pathConditionChanged="false" terminationKind="NORMAL">
+   &amp; !i_0 = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                 </termination>
                                              </methodReturn>
                                           </branchCondition>

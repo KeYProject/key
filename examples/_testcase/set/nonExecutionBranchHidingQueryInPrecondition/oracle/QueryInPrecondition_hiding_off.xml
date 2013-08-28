@@ -16,7 +16,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -26,7 +26,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="x &gt;= 0 &amp; y &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -37,7 +37,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="!x &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

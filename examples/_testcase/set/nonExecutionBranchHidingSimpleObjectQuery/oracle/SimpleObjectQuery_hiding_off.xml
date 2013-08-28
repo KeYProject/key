@@ -13,7 +13,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      <methodReturn name="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -23,7 +23,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      <methodReturn name="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -4711 as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
                         <methodReturnValue name="-4711" returnValueString="-4711" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!SimpleObjectQuery.INSTANCE = x" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

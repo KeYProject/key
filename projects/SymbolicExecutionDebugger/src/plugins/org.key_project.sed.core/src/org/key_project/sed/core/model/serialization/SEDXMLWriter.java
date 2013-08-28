@@ -261,6 +261,11 @@ public class SEDXMLWriter {
     * Attribute name to store {@link ISEDLoopInvariant#isInitiallyValid()}.
     */
    public static final String ATTRIBUTE_INITIALLY_VALID = "initiallyValid";
+
+   /**
+    * Attribute name to store {@link ISEDTermination#isVerified()}.
+    */
+   public static final String ATTRIBUTE_VERIFIED = "verified";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -594,8 +599,10 @@ public class SEDXMLWriter {
                           ISEDExceptionalTermination exceptionalTermination, 
                           boolean saveVariables,
                           boolean saveCallStack) throws DebugException {
+      Map<String, String> attributeValues = createDefaultNodeAttributes(exceptionalTermination);
+      attributeValues.put(ATTRIBUTE_VERIFIED, exceptionalTermination.isVerified() + "");
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, saveVariables, saveCallStack, sb);
+      appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, saveVariables, saveCallStack, attributeValues, sb);
       return sb.toString();
    }
    
@@ -612,8 +619,10 @@ public class SEDXMLWriter {
                           ISEDLoopBodyTermination loopBodyTermination, 
                           boolean saveVariables,
                           boolean saveCallStack) throws DebugException {
+      Map<String, String> attributeValues = createDefaultNodeAttributes(loopBodyTermination);
+      attributeValues.put(ATTRIBUTE_VERIFIED, loopBodyTermination.isVerified() + "");
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_LOOP_BODY_TERMINATION, loopBodyTermination, saveVariables, saveCallStack, sb);
+      appendNode(level, TAG_LOOP_BODY_TERMINATION, loopBodyTermination, saveVariables, saveCallStack, attributeValues, sb);
       return sb.toString();
    }
    
@@ -762,8 +771,10 @@ public class SEDXMLWriter {
                           ISEDTermination termination, 
                           boolean saveVariables,
                           boolean saveCallStack) throws DebugException {
+      Map<String, String> attributeValues = createDefaultNodeAttributes(termination);
+      attributeValues.put(ATTRIBUTE_VERIFIED, termination.isVerified() + "");
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_TERMINATION, termination, saveVariables, saveCallStack, sb);
+      appendNode(level, TAG_TERMINATION, termination, saveVariables, saveCallStack, attributeValues, sb);
       return sb.toString();
    }
    
