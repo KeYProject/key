@@ -150,8 +150,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         //scrollable warning list
         JScrollPane scrollpane = new JScrollPane();
         scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList<PositionedString> list =
-                new JList<PositionedString>(warnings.toArray(new PositionedString[warnings.size()]));
+        JList list =
+                new JList(warnings.toArray(new PositionedString[warnings.size()]));
         list.setBorder(BorderFactory.createLoweredBevelBorder());
         scrollpane.setViewportView(list);
         pane.add(scrollpane, BorderLayout.CENTER);

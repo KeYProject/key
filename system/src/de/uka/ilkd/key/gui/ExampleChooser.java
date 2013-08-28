@@ -63,7 +63,7 @@ public final class ExampleChooser extends JDialog {
     
     private static ExampleChooser instance;
     
-    private final JList<ShortFile> exampleList;
+    private final JList exampleList;
     private final JTextArea descriptionText;    
     private final JButton loadButton;
     private final JButton cancelButton;
@@ -108,12 +108,12 @@ public final class ExampleChooser extends JDialog {
 	getContentPane().add(listPanel);
 	
 	//create example list
-	final DefaultListModel<ShortFile> model = new DefaultListModel<ShortFile>();
+	final DefaultListModel model = new DefaultListModel();
 	List<ShortFile> examples = listExamples(examplesDir);
 	for (ShortFile example : examples) {
 	   model.addElement(example);
 	}
-	exampleList = new JList<ShortFile>();
+	exampleList = new JList();
 	exampleList.setModel(model);
 	exampleList.addListSelectionListener(
 		new ListSelectionListener() {
