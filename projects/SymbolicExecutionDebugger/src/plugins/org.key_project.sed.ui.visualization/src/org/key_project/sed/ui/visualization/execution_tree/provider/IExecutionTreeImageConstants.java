@@ -61,6 +61,11 @@ public interface IExecutionTreeImageConstants {
    public static final String IMG_EXCEPTIONAL_TERMINATION = PREFIX + "exceptionalTermination";
 
    /**
+    * Key of the image for {@link ISEDExceptionalTermination}s.
+    */
+   public static final String IMG_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = PREFIX + "exceptionalTerminationNotVerified";
+
+   /**
     * Key of the image for {@link ISEDLoopCondition}s.
     */
    public static final String IMG_LOOP_CONDITION = PREFIX + "loopCondition";
@@ -89,6 +94,11 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDTermination}s.
     */
    public static final String IMG_TERMINATION = PREFIX + "termination";
+
+   /**
+    * Key of the image for {@link ISEDTermination}s.
+    */
+   public static final String IMG_TERMINATION_NOT_VERIFIED = PREFIX + "terminationNotVerified";
 
    /**
     * Key of the image for {@link ISEDOperationContract}s.
@@ -124,6 +134,11 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDLoopBodyTermination}s.
     */
    public static final String IMG_LOOP_BODY_TERMINATION = PREFIX + "loopBodyTermination";
+
+   /**
+    * Key of the image for {@link ISEDLoopBodyTermination}s.
+    */
+   public static final String IMG_LOOP_BODY_TERMINATION_NOT_VERIFIED = PREFIX + "loopBodyTerminationNotVerified";
    
    /**
     * Key of the image for {@link ISEDThread}s.

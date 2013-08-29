@@ -61,7 +61,7 @@ public class ExceptionalTerminationCreateFeature extends AbstractDebugNodeCreate
                                               ISEDDebugNode parent,
                                               ISEDThread thread,
                                               String name) throws DebugException {
-      SEDMemoryExceptionalTermination result = new SEDMemoryExceptionalTermination(target, parent, thread);
+      SEDMemoryExceptionalTermination result = new SEDMemoryExceptionalTermination(target, parent, thread, true);
       result.setName(name);
       return result;
    }

@@ -407,6 +407,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
+         assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
       }
       else if (expected instanceof IExecutionBranchStatement) {
          assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
@@ -1370,33 +1371,74 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
          SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
-         // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
-         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
-         env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-         int nodeCount;
-         // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
-         do {
-            // Store the number of nodes before start of the auto mode 
-            nodeCount = env.getProof().countNodes();
-            // Run proof
-            env.getUi().startAndWaitForAutoMode(env.getProof());
-            // Update symbolic execution tree 
-            env.getBuilder().analyse();
-            // Make sure that not to many set nodes are executed
-            Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
-            for (Integer value : executedSetNodesPerGoal.values()) {
-               assertNotNull(value);
-               assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
-            }
-         } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
-         // Create new oracle file if required in a temporary directory
-         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues);
-         // Read oracle file
-         ExecutionNodeReader reader = new ExecutionNodeReader();
-         IExecutionNode oracleRoot = reader.read(oracleFile);
-         assertNotNull(oracleRoot);
-         // Make sure that the created symbolic execution tree matches the expected one.
-         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues);
+         internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
+         return env;
+      }
+      finally {
+         // Restore taclet options
+         restoreTacletOptions(originalTacletOptions);
+      }
+   }
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param baseContractName The name of the contract.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
+    * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param aliasChecks Do alias checks?
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> doSETTest(File baseDir,
+                                                                                String javaPathInBaseDir,
+                                                                                String baseContractName,
+                                                                                String oraclePathInBaseDirFile,
+                                                                                boolean includeVariables,
+                                                                                boolean includeCallStack,
+                                                                                boolean includeReturnValues,
+                                                                                int maximalNumberOfExecutedSetNodes,
+                                                                                boolean mergeBranchConditions,
+                                                                                boolean useOperationContracts,
+                                                                                boolean useLoopInvariants,
+                                                                                boolean nonExecutionBranchHidingSideProofs,
+                                                                                boolean aliasChecks) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      HashMap<String, String> originalTacletOptions = null;
+      try {
+         // Make sure that parameter are valid.
+         assertNotNull(javaPathInBaseDir);
+         assertNotNull(baseContractName);
+         assertNotNull(oraclePathInBaseDirFile);
+         File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+         }
+         assertTrue(maximalNumberOfExecutedSetNodes >= 1);
+         // Make sure that the correct taclet options are defined.
+         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
+         // Create proof environment for symbolic execution
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+         internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
       finally {
@@ -1405,6 +1447,41 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
    }
 
+   /**
+    * Internal test method called by
+    * {@link #doSETTest(File, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)} and
+    * {@link #doSETTest(File, String, String, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)}.
+    */
+   private void internalDoSETTest(File oracleFile, SymbolicExecutionEnvironment<CustomConsoleUserInterface> env, String oraclePathInBaseDirFile, int maximalNumberOfExecutedSetNodes, boolean includeVariables, boolean includeCallStack, boolean includeReturnValues) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
+      env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      int nodeCount;
+      // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
+      do {
+         // Store the number of nodes before start of the auto mode 
+         nodeCount = env.getProof().countNodes();
+         // Run proof
+         env.getUi().startAndWaitForAutoMode(env.getProof());
+         // Update symbolic execution tree 
+         env.getBuilder().analyse();
+         // Make sure that not to many set nodes are executed
+         Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+         for (Integer value : executedSetNodesPerGoal.values()) {
+            assertNotNull(value);
+            assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+         }
+      } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
+      // Create new oracle file if required in a temporary directory
+      createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues);
+      // Read oracle file
+      ExecutionNodeReader reader = new ExecutionNodeReader();
+      IExecutionNode oracleRoot = reader.read(oracleFile);
+      assertNotNull(oracleRoot);
+      // Make sure that the created symbolic execution tree matches the expected one.
+      assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues);
+   }
+   
    /**
     * Ensures that the default taclet options are defined.
     * @param baseDir The base directory which contains the java file.

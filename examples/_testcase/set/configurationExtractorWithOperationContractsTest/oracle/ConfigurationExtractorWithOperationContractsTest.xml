@@ -13,7 +13,7 @@ mod: allLocs
 termination: diamond" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false">
                            <methodReturn name="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" terminationKind="NORMAL">
+                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !y = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -29,7 +29,7 @@ post: self.message = null
 &amp; exc = null
 mod: {(self, message)} \cup {(self, cause)}
 termination: diamond" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; y = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </operationContract>
                </branchCondition>
@@ -44,7 +44,7 @@ post: self.message = null
 &amp; exc = null
 mod: {(self, message)} \cup {(self, cause)}
 termination: diamond" pathCondition="x = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                </termination>
             </operationContract>
          </branchCondition>

@@ -16,7 +16,7 @@ as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
                   </methodReturnValue>
                   <methodReturnValue name="-4711 {!x = TRUE}" returnValueString="-4711" hasCondition="true" conditionString="!x = TRUE">
                   </methodReturnValue>
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

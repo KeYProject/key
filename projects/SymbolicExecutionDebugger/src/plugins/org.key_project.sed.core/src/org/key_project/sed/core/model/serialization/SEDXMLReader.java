@@ -509,7 +509,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryExceptionalTermination}.
     */   
    protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread);
+      SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -526,7 +526,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryLoopBodyTermination}.
     */   
    protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryLoopBodyTermination termination = new SEDMemoryLoopBodyTermination(target, parent, thread);
+      SEDMemoryLoopBodyTermination termination = new SEDMemoryLoopBodyTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -680,7 +680,7 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryTermination}.
     */   
    protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread);
+      SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
       return termination;
    }
@@ -829,6 +829,15 @@ public class SEDXMLReader {
     */
    protected boolean isAllocated(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_ALLOCATED));
+   }
+   
+   /**
+    * Returns the verified value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isVerified(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_VERIFIED));
    }
    
    /**

@@ -20,7 +20,7 @@ as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
                      </methodReturnValue>
                      <methodReturnValue name="-4711 {!x = null &amp; !SimpleObjectQuery.INSTANCE = x}" returnValueString="-4711" hasCondition="true" conditionString="!x = null &amp; !SimpleObjectQuery.INSTANCE = x">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

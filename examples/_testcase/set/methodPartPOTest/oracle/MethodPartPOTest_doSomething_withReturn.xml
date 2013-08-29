@@ -10,7 +10,7 @@
                         <methodReturn name="&lt;return of self.doubleValue(value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                            <statement name="int z = x+y+doubleValue;" pathCondition="true" pathConditionChanged="false">
                               <statement name="return z;" pathCondition="true" pathConditionChanged="false">
-                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </statement>
                            </statement>

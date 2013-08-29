@@ -11,7 +11,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="!obj = null" pathConditionChanged="false">
                   <statement name="return magicNumber+magicNumberCopy;" pathCondition="!obj = null" pathConditionChanged="false">
                      <methodReturn name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

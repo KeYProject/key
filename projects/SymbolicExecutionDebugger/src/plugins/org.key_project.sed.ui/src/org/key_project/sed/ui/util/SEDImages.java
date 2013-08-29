@@ -63,6 +63,11 @@ public final class SEDImages {
     public static final String TERMINATION = "org.key_project.sed.ui.images.termination";
     
     /**
+     * The key for the image that is used for termination.
+     */
+    public static final String TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.terminationNotVerified";
+    
+    /**
      * The key for the image that is used for branch statement.
      */
     public static final String BRANCH_STATEMENT = "org.key_project.sed.ui.images.branchStatement";
@@ -76,6 +81,11 @@ public final class SEDImages {
      * The key for the image that is used for exceptional termination.
      */
     public static final String EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.exceptionalTermination";
+    
+    /**
+     * The key for the image that is used for exceptional termination which is not verified.
+     */
+    public static final String EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.exceptionalTerminationNotVerified";
     
     /**
      * The key for the image that is used for loop statement.
@@ -121,6 +131,11 @@ public final class SEDImages {
      * The key for the image that is used for loop body termination.
      */
     public static final String LOOP_BODY_TERMINATION = "org.key_project.sed.ui.images.loopBodyTermination";
+    
+    /**
+     * The key for the image that is used for loop body termination not verified.
+     */
+    public static final String LOOP_BODY_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.loopBodyTerminationNotVerified";
 
     /**
      * Forbid instances.
@@ -170,6 +185,9 @@ public final class SEDImages {
         else if (TERMINATION.equals(key)) {
            path = "icons/termination.gif";
         }
+        else if (TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/termination_not_verified.gif";
+        }
         else if (BRANCH_STATEMENT.equals(key)) {
            path = "icons/branch_statement.gif";
         }
@@ -178,6 +196,9 @@ public final class SEDImages {
         }
         else if (EXCEPTIONAL_TERMINATION.equals(key)) {
            path = "icons/exceptional_termination.gif";
+        }
+        else if (EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/exceptional_termination_not_verified.gif";
         }
         else if (LOOP_STATEMENT.equals(key)) {
            path = "icons/loop_statement.gif";
@@ -205,6 +226,9 @@ public final class SEDImages {
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
+        }
+        else if (LOOP_BODY_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/exceptional_termination_not_verified.gif";
         }
         // Load image if possible
         if (path != null) {
@@ -278,13 +302,31 @@ public final class SEDImages {
           return getImage(SEDImages.METHOD_RETURN);
        }
        else if (element instanceof ISEDExceptionalTermination) {
-          return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+          ISEDExceptionalTermination node = (ISEDExceptionalTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+          }
        }
        else if (element instanceof ISEDLoopBodyTermination) {
-          return getImage(SEDImages.LOOP_BODY_TERMINATION);
+          ISEDLoopBodyTermination node = (ISEDLoopBodyTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.LOOP_BODY_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
+          }
        }
        else if (element instanceof ISEDTermination) {
-          return getImage(SEDImages.TERMINATION);
+          ISEDTermination node = (ISEDTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.TERMINATION_NOT_VERIFIED);
+          }
        }
        else if (element instanceof ISEDBranchCondition) {
           return getImage(SEDImages.BRANCH_CONDITION);

@@ -27,7 +27,7 @@
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="false" terminationKind="NORMAL">
+   &amp; array[0].value = 42" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
@@ -51,7 +51,7 @@
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="false" terminationKind="NORMAL">
+   &amp; !array[0].value = 42" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
@@ -60,7 +60,7 @@
                      <branchCondition name="array[0] = null" pathCondition="   array.length &gt;= 0
 -&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="true" branchCondition="array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+-&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         </termination>
                      </branchCondition>
                   </branchStatement>
@@ -68,7 +68,7 @@
                <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
                      <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -78,7 +78,7 @@
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
                <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

@@ -26,7 +26,7 @@ as result of self.main(x);&gt;" isReturnValueComputed="true">
                   </methodReturnValue>
                   <methodReturnValue name="-4787 {!x &gt;= 0}" returnValueString="-4787" hasCondition="true" conditionString="!x &gt;= 0">
                   </methodReturnValue>
-                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
