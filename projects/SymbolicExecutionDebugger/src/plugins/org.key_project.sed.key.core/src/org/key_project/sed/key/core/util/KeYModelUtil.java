@@ -31,29 +31,29 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
+import org.key_project.sed.key.core.model.KeYLoopInvariant;
 import org.key_project.sed.key.core.model.KeYLoopStatement;
 import org.key_project.sed.key.core.model.KeYMethodCall;
+import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
-import org.key_project.sed.key.core.model.KeYLoopInvariant;
-import org.key_project.sed.key.core.model.KeYOperationContract;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
@@ -156,7 +156,7 @@ public final class KeYModelUtil {
          result = new KeYStatement(target, parent, thread, (IExecutionStatement)executionNode);
       }
       else if (executionNode instanceof IExecutionOperationContract) {
-         result = new KeYOperationContract(target, parent, thread, (IExecutionOperationContract)executionNode);
+         result = new KeYMethodContract(target, parent, thread, (IExecutionOperationContract)executionNode);
       }
       else if (executionNode instanceof IExecutionLoopInvariant) {
          result = new KeYLoopInvariant(target, parent, thread, (IExecutionLoopInvariant)executionNode);

@@ -52,7 +52,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopInvariant;
-import org.key_project.sed.core.model.memory.SEDMemoryOperationContract;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.core.model.memory.SEDMemoryValue;
 import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 import org.xml.sax.Attributes;
@@ -418,8 +418,8 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_VALUE.equals(qName)) {
          return createValue(target, uri, localName, qName, attributes);
       }
-      else if (SEDXMLWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
-         return createOperationContract(target, parent, thread, uri, localName, qName, attributes);
+      else if (SEDXMLWriter.TAG_METHOD_CONTRACT.equals(qName)) {
+         return createMethodContract(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return createLoopInvariant(target, parent, thread, uri, localName, qName, attributes);
@@ -627,7 +627,7 @@ public class SEDXMLReader {
    }
    
    /**
-    * Creates a {@link SEDMemoryOperationContract} instance for the content in the given tag.
+    * Creates a {@link SEDMemoryMethodContract} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
@@ -638,14 +638,14 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryStatement}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryOperationContract createOperationContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      SEDMemoryOperationContract operationContract = new SEDMemoryOperationContract(target, parent, thread);
-      fillDebugNode(operationContract, attributes);
-      fillStackFrame(operationContract, attributes);
-      operationContract.setPreconditionComplied(isPreconditionComplied(attributes));
-      operationContract.setHasNotNullCheck(hasNotNullCheck(attributes));
-      operationContract.setNotNullCheckComplied(isNotNullCheckComplied(attributes));
-      return operationContract;
+   protected SEDMemoryMethodContract createMethodContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryMethodContract methodContract = new SEDMemoryMethodContract(target, parent, thread);
+      fillDebugNode(methodContract, attributes);
+      fillStackFrame(methodContract, attributes);
+      methodContract.setPreconditionComplied(isPreconditionComplied(attributes));
+      methodContract.setHasNotNullCheck(hasNotNullCheck(attributes));
+      methodContract.setNotNullCheckComplied(isNotNullCheckComplied(attributes));
+      return methodContract;
    }
    
    /**

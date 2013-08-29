@@ -16,19 +16,19 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDOperationContract;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link IAddFeature} for {@link ISEDOperationContract}s.
+ * Implementation of {@link IAddFeature} for {@link ISEDMethodContract}s.
  * @author Martin Hentschel
  */
-public class OperationContractAddFeature extends AbstractDebugNodeAddFeature {
+public class MethodContractAddFeature extends AbstractDebugNodeAddFeature {
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
     */
-   public OperationContractAddFeature(IFeatureProvider fp) {
+   public MethodContractAddFeature(IFeatureProvider fp) {
       super(fp);
    }
 
@@ -37,7 +37,7 @@ public class OperationContractAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected boolean canAddBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDOperationContract;
+      return businessObject instanceof ISEDMethodContract;
    }
 
    /**
@@ -45,21 +45,21 @@ public class OperationContractAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected String getImageId(ISEDDebugNode node) {
-      ISEDOperationContract contractNode = (ISEDOperationContract)node;
+      ISEDMethodContract contractNode = (ISEDMethodContract)node;
       if (contractNode.isPreconditionComplied()) {
          if (!contractNode.hasNotNullCheck() || contractNode.isNotNullCheckComplied()) {
-            return IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT;
+            return IExecutionTreeImageConstants.IMG_METHOD_CONTRACT;
          }
          else {
-            return IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT_NOT_NPC;
+            return IExecutionTreeImageConstants.IMG_METHOD_CONTRACT_NOT_NPC;
          }
       }
       else {
          if (!contractNode.hasNotNullCheck() || contractNode.isNotNullCheckComplied()) {
-            return IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT_NOT_PRE;
+            return IExecutionTreeImageConstants.IMG_METHOD_CONTRACT_NOT_PRE;
          }
          else {
-            return IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT_NOT_PRE_NOT_NPC;
+            return IExecutionTreeImageConstants.IMG_METHOD_CONTRACT_NOT_PRE_NOT_NPC;
          }
       }
    }

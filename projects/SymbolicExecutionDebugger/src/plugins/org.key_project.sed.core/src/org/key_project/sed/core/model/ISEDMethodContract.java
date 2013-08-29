@@ -14,21 +14,21 @@
 package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.model.IStackFrame;
-import org.key_project.sed.core.model.impl.AbstractSEDOperationContract;
-import org.key_project.sed.core.model.memory.SEDMemoryOperationContract;
+import org.key_project.sed.core.model.impl.AbstractSEDMethodContract;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 
 /**
- * A node in the symbolic execution tree which represents a use of an operation contract.
+ * A node in the symbolic execution tree which represents a use of an method contract.
  * <p>
  * Clients may implement this interface. It is recommended to subclass
- * from {@link AbstractSEDOperationContract} instead of implementing this
- * interface directly. {@link SEDMemoryOperationContract} is also a default
+ * from {@link AbstractSEDMethodContract} instead of implementing this
+ * interface directly. {@link SEDMemoryMethodContract} is also a default
  * implementation that stores all values in the memory.
  * </p>
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDOperationContract extends ISEDDebugNode, IStackFrame {
+public interface ISEDMethodContract extends ISEDDebugNode, IStackFrame {
    /**
     * Checks if the precondition is complied.
     * @return {@code true} precondition complied, {@code false} precondition not complied.

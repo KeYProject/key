@@ -20,21 +20,21 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDOperationContract;
-import org.key_project.sed.core.model.memory.SEDMemoryOperationContract;
+import org.key_project.sed.core.model.ISEDMethodContract;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ISEDOperationContract}s.
+ * Implementation of {@link ICreateFeature} for {@link ISEDMethodContract}s.
  * @author Martin Hentschel
  */
-public class OperationContractCreateFeature extends AbstractDebugNodeCreateFeature {
+public class MethodContractCreateFeature extends AbstractDebugNodeCreateFeature {
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
     */
-   public OperationContractCreateFeature(IFeatureProvider fp) {
-       super(fp, "Operation Contract", "Create a new Operation Contract");
+   public MethodContractCreateFeature(IFeatureProvider fp) {
+       super(fp, "Method Contract", "Create a new Method Contract");
    }
    
    /**
@@ -42,7 +42,7 @@ public class OperationContractCreateFeature extends AbstractDebugNodeCreateFeatu
     */
    @Override
    public String getCreateImageId() {
-      return IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT;
+      return IExecutionTreeImageConstants.IMG_METHOD_CONTRACT;
    }
 
    /**
@@ -50,7 +50,7 @@ public class OperationContractCreateFeature extends AbstractDebugNodeCreateFeatu
     */   
    @Override
    public String getNodeType() {
-      return "Operation Contract";
+      return "Method Contract";
    }
 
    /**
@@ -61,7 +61,7 @@ public class OperationContractCreateFeature extends AbstractDebugNodeCreateFeatu
                                               ISEDDebugNode parent,
                                               ISEDThread thread,
                                               String name) throws DebugException {
-      SEDMemoryOperationContract result = new SEDMemoryOperationContract(target, parent, thread);
+      SEDMemoryMethodContract result = new SEDMemoryMethodContract(target, parent, thread);
       result.setName(name);
       return result;
    }

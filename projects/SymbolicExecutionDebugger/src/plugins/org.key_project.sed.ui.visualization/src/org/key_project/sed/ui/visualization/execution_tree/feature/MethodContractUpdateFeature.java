@@ -13,21 +13,20 @@
 
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
-import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.ILayoutFeature;
-import org.key_project.sed.core.model.ISEDOperationContract;
+import org.eclipse.graphiti.features.IUpdateFeature;
+import org.key_project.sed.core.model.ISEDMethodContract;
 
 /**
- * Implementation of {@link ILayoutFeature} for {@link ISEDOperationContract}s.
+ * Implementation of {@link IUpdateFeature} for {@link ISEDMethodContract}s.
  * @author Martin Hentschel
  */
-public class OperationContractLayoutFeature extends AbstractDebugNodeLayoutFeature {
+public class MethodContractUpdateFeature extends AbstractDebugNodeUpdateFeature {
    /**
     * Constructor.
-    * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
-    */
-   public OperationContractLayoutFeature(IFeatureProvider fp) {
+    * @param fp The {@link IFeatureProvider} which provides this {@link IUpdateFeature}.
+    */   
+   public MethodContractUpdateFeature(IFeatureProvider fp) {
       super(fp);
    }
 
@@ -35,7 +34,7 @@ public class OperationContractLayoutFeature extends AbstractDebugNodeLayoutFeatu
     * {@inheritDoc}
     */
    @Override
-   protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDOperationContract;
+   protected boolean canUpdateBusinessObject(Object businessObject) {
+      return businessObject instanceof ISEDMethodContract;
    }
 }

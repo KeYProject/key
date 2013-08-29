@@ -17,23 +17,23 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDOperationContract;
+import org.key_project.sed.core.model.ISEDMethodContract;
 
 /**
- * Provides a basic implementation of {@link ISEDOperationContract}.
+ * Provides a basic implementation of {@link ISEDMethodContract}.
  * @author Martin Hentschel
  * @see ISEDBranchCondition
  */
-public abstract class AbstractSEDOperationContract extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDOperationContract {
+public abstract class AbstractSEDMethodContract extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDMethodContract {
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this operation contract is contained.
+    * @param target The {@link ISEDDebugTarget} in that this method contract is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this node is contained.
     */
-   public AbstractSEDOperationContract(ISEDDebugTarget target, 
-                                       ISEDDebugNode parent,
-                                       ISEDThread thread) {
+   public AbstractSEDMethodContract(ISEDDebugTarget target, 
+                                    ISEDDebugNode parent,
+                                    ISEDThread thread) {
       super(target, parent, thread);
    }
 
@@ -42,7 +42,7 @@ public abstract class AbstractSEDOperationContract extends AbstractSEDStackFrame
     */
    @Override
    public String getNodeType() {
-      String kind = "Operation Contract";
+      String kind = "Method Contract";
       if (isPreconditionComplied()) {
          if (!hasNotNullCheck() || isNotNullCheckComplied()) {
             return kind;

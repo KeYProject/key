@@ -82,9 +82,9 @@ public class SEDMemoryLoopInvariant extends AbstractSEDLoopInvariant implements 
    
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this operation contract is contained.
+    * @param target The {@link ISEDDebugTarget} in that this loop invariant is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this operation contract is contained.
+    * @param thread The {@link ISEDThread} in that this loop invariant is contained.
     */
    public SEDMemoryLoopInvariant(ISEDDebugTarget target, 
                                  ISEDDebugNode parent, 

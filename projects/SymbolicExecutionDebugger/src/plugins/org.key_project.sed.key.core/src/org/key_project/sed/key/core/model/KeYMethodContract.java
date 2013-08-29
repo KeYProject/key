@@ -21,9 +21,9 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDOperationContract;
-import org.key_project.sed.core.model.impl.AbstractSEDOperationContract;
+import org.key_project.sed.core.model.impl.AbstractSEDMethodContract;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
@@ -34,13 +34,13 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDOperationContract} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEDMethodContract} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYOperationContract extends AbstractSEDOperationContract implements IKeYSEDDebugNode<IExecutionOperationContract> {
+public class KeYMethodContract extends AbstractSEDMethodContract implements IKeYSEDDebugNode<IExecutionOperationContract> {
    /**
-    * The {@link IExecutionOperationContract} to represent by this debug node.
+    * The {@link IExecutionMethodContract} to represent by this debug node.
     */
    private IExecutionOperationContract executionNode;
 
@@ -71,15 +71,15 @@ public class KeYOperationContract extends AbstractSEDOperationContract implement
 
    /**
     * Constructor.
-    * @param target The {@link KeYDebugTarget} in that this operation contract is contained.
+    * @param target The {@link KeYDebugTarget} in that this method contract is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this node is contained.
-    * @param executionNode The {@link IExecutionOperationContract} to represent by this debug node.
+    * @param executionNode The {@link IExecutionMethodContract} to represent by this debug node.
     */
-   public KeYOperationContract(KeYDebugTarget target, 
-                               IKeYSEDDebugNode<?> parent, 
-                               ISEDThread thread, 
-                               IExecutionOperationContract executionNode) {
+   public KeYMethodContract(KeYDebugTarget target, 
+                            IKeYSEDDebugNode<?> parent, 
+                            ISEDThread thread, 
+                            IExecutionOperationContract executionNode) {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
