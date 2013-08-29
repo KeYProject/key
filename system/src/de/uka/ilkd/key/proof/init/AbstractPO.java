@@ -43,7 +43,10 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -151,6 +154,30 @@ public abstract class AbstractPO implements IPersistablePO {
         return result;
     }
 
+    ImmutableSet<Taclet> generateWdTaclets() {
+        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<KeYJavaType> kjts = DefaultImmutableSet.<KeYJavaType>nil();
+        for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
+            if (!ch.getKJT().getName().equals("Object")) {
+                if (ch instanceof MethodWellDefinedness) {
+                    MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
+                    // WD(pv.m(...))
+                    res = res.add(mwd.createOperationTaclet(services));
+                }
+                kjts = kjts.add(ch.getKJT());
+            }
+        }
+        for (KeYJavaType kjt: kjts) {
+            // WD(pv.<inv>)
+            res = res.union(ClassWellDefinedness.createInvTaclet(kjt, services));
+        }
+
+        for (Taclet t: res) {
+            register(t);
+        }
+        return res;
+    }
+
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
         return specRepos.getClassAxioms(selfKJT);
     }
@@ -167,13 +194,11 @@ public abstract class AbstractPO implements IPersistablePO {
 
                 // only include if choices are appropriate
                 if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
-                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-                            axiomTaclet));
-                    initConfig.getProofEnv().registerRule(axiomTaclet,
-                            AxiomJustification.INSTANCE);
+                    register(axiomTaclet);
                 }
             }
         }
+        generateWdTaclets();
     }
 
     /** Check whether a taclet conforms with the currently active choices.
@@ -183,6 +208,13 @@ public abstract class AbstractPO implements IPersistablePO {
         for (Choice tacletChoices: taclet.getChoices())
             if (!choices.contains(tacletChoices)) return false;
         return true;
+    }
+
+
+    private void register(Taclet t) {
+        assert t != null;
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+        initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
     }
 
 

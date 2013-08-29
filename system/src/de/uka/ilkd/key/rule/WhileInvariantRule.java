@@ -58,6 +58,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -86,16 +87,17 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
+    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, Services services)
+            throws RuleAbortException {
 	
-    Term focusTerm = app.posInOccurrence().subTerm();
+        Term focusTerm = app.posInOccurrence().subTerm();
         
-    if(focusTerm == lastFocusTerm
-	   && lastInstantiation.inv 
-	       == services.getSpecificationRepository()
+        if(focusTerm == lastFocusTerm
+                && lastInstantiation.inv
+                    == services.getSpecificationRepository()
 	                  .getLoopInvariant(lastInstantiation.loop)) {
-	    return lastInstantiation;
-	}
+            return lastInstantiation;
+        }
 
 	//leading update?
 	Pair<Term, Term> update = applyUpdates(focusTerm);
@@ -111,7 +113,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final While loop = (While) app.getLoopStatement();
 	
 	// try to get invariant from JML specification
-	LoopInvariant inv = app.getInvariant(); 
+	LoopInvariant inv = app.getInvariant();
 	if (inv == null) // may happen after reloading proof 
 	    throw new RuleAbortException("no invariant found");
 
@@ -238,8 +240,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
-   final Sequent applicationSequent = goal.sequent();
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+            throws RuleAbortException {
+        final Sequent applicationSequent = goal.sequent();
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
 	final KeYJavaType intKJT 
@@ -248,29 +251,27 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//get instantiation
 	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 	
-    final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
-    final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
+	final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
+	final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
 
-    Term invTerm = null;
-    for(LocationVariable heap : heapContext) {
-      final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
-      if(i == null) continue;
-      if(invTerm == null) {
-        invTerm = i;
-      }else{
-        invTerm = TB.and(invTerm, i);
-      }
-    }
+	Term invTerm = null;
+	for(LocationVariable heap : heapContext) {
+	    final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+	    if(i == null) continue;
+	    if(invTerm == null) {
+	        invTerm = i;
+	    } else {
+	        invTerm = TB.and(invTerm, i);
+	    }
+	}
 
-    final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
-    for(LocationVariable heap : heapContext) {
-      final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
-      mods.put(heap, m);
-    }
+	final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+	for(LocationVariable heap : heapContext) {
+	    final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
+	    mods.put(heap, m);
+	}
 
-	final Term variant = inst.inv.getVariant(inst.selfTerm, 
-						 atPres, 
-						 services);
+	final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
 	//collect input and output local variables, 
 	//prepare reachableIn and reachableOut
 	final ImmutableSet<ProgramVariable> localIns 
@@ -279,27 +280,29 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= MiscTools.getLocalOuts(inst.loop, services);
 	Term reachableIn = TB.tt();
 	for(ProgramVariable pv : localIns) {
-	    reachableIn = TB.and(reachableIn, 
+	    reachableIn = TB.and(reachableIn,
 		                 TB.reachableValue(services, pv));
-	}	
+	}
 	Term reachableOut = TB.tt();
 	for(ProgramVariable pv : localOuts) {
-	    reachableOut = TB.and(reachableOut, 
+	    reachableOut = TB.and(reachableOut,
 		                  TB.reachableValue(services, pv));
 	}
-	
+
 	Term beforeLoopUpdate = null;
 
-        final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
+        final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop =
+                new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
         for(LocationVariable heap : heapContext) {
           heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
-          final LocationVariable lv = TB.heapAtPreVar(services, heap.name()+"BeforeLoop", heap.sort(), true);
+          final LocationVariable lv =
+                  TB.heapAtPreVar(services, heap.name()+"BeforeLoop", heap.sort(), true);
    	  services.getNamespaces().programVariables().addSafely(lv);
           final Term u = TB.elementary(services, lv, TB.var(heap));
           if(beforeLoopUpdate == null) {
              beforeLoopUpdate = u;
-          }else{
+          } else {
              beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
           }
           heapToBeforeLoop.get(heap).put(TB.var(heap), TB.var(lv));
@@ -316,7 +319,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 		    			   TB.elementary(services, 
 		    				   	 pvBeforeLoop, 
 		    				   	 TB.var(pv)));
-	    heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap()).put(TB.var(pv), TB.var(pvBeforeLoop));
+	    heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap())
+	                                      .put(TB.var(pv), TB.var(pvBeforeLoop));
 	}
 	
 	//prepare anon update, frame condition, etc.
@@ -325,29 +329,31 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = reachableIn;
+        Term anonHeap = null;
         for(LocationVariable heap : heapContext) {
-	  final Pair<Term,Term> tAnon 
-	      = createAnonUpdate(heap, inst.loop, mods.get(heap), services);
+	  final Pair<Term,Term> tAnon =
+	          createAnonUpdate(heap, inst.loop, mods.get(heap), services);
           if(anonUpdate == null) {
-            anonUpdate = tAnon.first;
-          }else{
-            anonUpdate = TB.parallel(anonUpdate, tAnon.first);
+              anonUpdate = tAnon.first;
+          } else {
+              anonUpdate = TB.parallel(anonUpdate, tAnon.first);
           }
           if(wellFormedAnon == null) {
-            wellFormedAnon = TB.wellFormed(tAnon.second, services);
-          }else{
-            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.second, services));
+              anonHeap = tAnon.second;
+              wellFormedAnon = TB.wellFormed(tAnon.second, services);
+          } else {
+              wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.second, services));
           }
           final Term m = mods.get(heap);
           final Term fc;
           if(TB.strictlyNothing().equals(m)) {
             fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
-          }else{
+          } else {
             fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
           }
-          if(frameCondition == null){
+          if(frameCondition == null) {
             frameCondition = fc;
-          }else{
+          } else {
             frameCondition = TB.and(frameCondition, fc);
           }
           reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
@@ -370,10 +376,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                       : TB.tt();
 	
 	//split goal into three branches
-	ImmutableList<Goal> result = goal.split(3);
+	ImmutableList<Goal> result = goal.split(4);
+	Goal wdGoal = result.tail().tail().tail().head();
 	Goal initGoal = result.tail().tail().head();
 	Goal bodyGoal = result.tail().head();
 	Goal useGoal = result.head();
+	wdGoal.setBranchLabel("Well-Definedness of Invariant");
 	initGoal.setBranchLabel("Invariant Initially Valid");
 	bodyGoal.setBranchLabel("Body Preserves Invariant");
 	useGoal.setBranchLabel("Use Case");
@@ -457,12 +465,15 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 	
 	final Term invTerm2;
-	final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-	final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
+	final StrategyProperties props =
+	        goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+	final boolean queryTreatmenIsOn =
+	        props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
 	if(queryTreatmenIsOn || 
-	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
+	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)
+	                       == StrategyProperties.QUERY_RESTRICTED) {
 	   invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
-	}else{
+	} else {
 	   invTerm2 = invTerm;
 	}
 	
@@ -492,13 +503,32 @@ public final class WhileInvariantRule implements BuiltInRule {
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+	Term restPsi =
+	        TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
+	                TermLabelWorkerManagement.instantiateLabels(
+	                        services, ruleApp.posInOccurrence(), this,
+	                        useGoal, null, inst.progPost.op(),
+	                        new ImmutableArray<Term>(inst.progPost.sub(0)),
+	                        null, useJavaBlock));
 	Term guardFalseRestPsi = TB.box(guardJb, 
 					TB.imp(guardFalseTerm, restPsi));
 	useGoal.changeFormula(new SequentFormula(TB.applySequential(
 							uAnon,
 							guardFalseRestPsi)), 
                               ruleApp.posInOccurrence());
+
+	LoopWellDefinedness lwd =  new LoopWellDefinedness(inst.inv, localIns, services);
+	final ProgramVariable self;
+	if(inst.selfTerm != null && inst.selfTerm.op() instanceof ProgramVariable) {
+	    self = (ProgramVariable)inst.selfTerm.op();
+	} else {
+	    self = null;
+	}
+	services.getSpecificationRepository().addLoopWellDefinedness(lwd);
+	final Term wdInv = lwd.generatePO(self, heapContext.get(0),
+	                                  anonHeap, localIns, inst.u, services);
+	wdGoal.changeFormula(new SequentFormula(wdInv), ruleApp.posInOccurrence());
+
 	return result;
     }
 

@@ -53,6 +53,8 @@ public abstract class WellDefinednessCheck implements Contract {
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
 
+    public static final String INV_TACLET = "wd_Invariant_";
+    public static final String OP_TACLET = "wd_Operation_";
     private static final ITermLabel IMPLICIT = ImplicitSpecTermLabel.INSTANCE;
 
     static enum Type {
@@ -558,7 +560,7 @@ public abstract class WellDefinednessCheck implements Contract {
                     implicitPre, paramsOK, mbyAtPreDef.term };
         } else {
             result = new Term[]
-                    { implicitPre, paramsOK, mbyAtPreDef.term };
+                    { wellFormed, implicitPre, paramsOK, mbyAtPreDef.term };
         }
         for (Term t: result) {
             resList = resList.append(t);
@@ -710,6 +712,15 @@ public abstract class WellDefinednessCheck implements Contract {
             reachable = TB.tt();
         }
         return TB.andSC(reachable, post.implicit, post.explicit);
+    }
+
+    public Term getUpdates(Term mod, LocationVariable heap, ProgramVariable heapAtPre,
+                           Term anonHeap, Services services) {
+        assert mod != null;
+        final Term havocUpd = TB.elementary(services, heap,
+                TB.anon(services, TB.var(heap), mod, anonHeap));
+        final Term oldUpd = TB.elementary(services, TB.var(heapAtPre), TB.var(heap));
+        return TB.parallel(oldUpd, havocUpd);
     }
 
     public POTerms replace(POTerms po, Variables vars) {

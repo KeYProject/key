@@ -618,7 +618,6 @@ public class ContractFactory {
                methodShortName + "(" +
                concadinate(",", target.getParamTypes()) + ")" + "]"
                + "." + baseName;
-
     }
 
 

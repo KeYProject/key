@@ -493,13 +493,28 @@ public final class SpecificationRepository {
                     new MethodWellDefinedness((DependencyContract)contract,
                                               services));
         } else if (contract instanceof WellDefinednessCheck) {
-            WellDefinednessCheck wdc = (WellDefinednessCheck)contract;
-            wdChecks.put(targetPair, getWdChecks(targetKJT, targetMethod).add(wdc));
+            registerWdCheck((WellDefinednessCheck)contract);
         }
         contractsByName.put(contract.getName(), contract);
         final ImmutableSet<IObserverFunction> oldTargets = getContractTargets(targetKJT);
         final ImmutableSet<IObserverFunction> newTargets = oldTargets.add(targetMethod);
         contractTargets.put(targetKJT, newTargets);
+    }
+
+
+    private void registerWdCheck(WellDefinednessCheck check) {
+        wdChecks.put(
+                new Pair<KeYJavaType, IObserverFunction>
+                                       (check.getKJT(), check.getTarget()),
+                getWdChecks(check.getKJT(), check.getTarget()).add(check));
+    }
+
+
+    private void unregisterWdCheck(WellDefinednessCheck check) {
+        wdChecks.put(
+                new Pair<KeYJavaType, IObserverFunction>
+                                          (check.getKJT(), check.getTarget()),
+                getWdChecks(check.getKJT(), check.getTarget()).remove(check));
     }
 
 
@@ -517,8 +532,7 @@ public final class SpecificationRepository {
                     operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
         }
         if (contract instanceof WellDefinednessCheck) {
-            wdChecks.put(tp,
-                         wdChecks.get(tp).remove((WellDefinednessCheck)contract));
+            unregisterWdCheck((WellDefinednessCheck)contract);
         }
         contractsByName.remove(contract.getName());
     }
@@ -1193,7 +1207,7 @@ public final class SpecificationRepository {
         LoopInvariant inv = getLoopInvariant(from);
         if(inv != null) {
             inv = inv.setLoop(to);
-            setLoopInvariant(inv);
+            addLoopInvariant(inv);
         }
     }
 
@@ -1202,14 +1216,13 @@ public final class SpecificationRepository {
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void setLoopInvariant(LoopInvariant inv) {
+    public void addLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
 
-    public void addLoopInvariant(LoopInvariant inv) {
-        setLoopInvariant(inv);
-        registerContract(new LoopWellDefinedness(inv, services));
+    public void addLoopWellDefinedness(LoopWellDefinedness lwd) {
+        registerWdCheck(lwd);
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
@@ -1288,10 +1301,8 @@ public final class SpecificationRepository {
     public ImmutableSet<WellDefinednessCheck> getAllWdChecks() {
         ImmutableSet<WellDefinednessCheck> result =
                 DefaultImmutableSet.<WellDefinednessCheck>nil();
-        for(Contract s : getAllContracts()) {
-            if (s instanceof WellDefinednessCheck) {
-                result = result.add((WellDefinednessCheck)s);
-            }
+        for(ImmutableSet<WellDefinednessCheck> s : wdChecks.values()) {
+            result = result.union(s);
         }
         return result;
     }
@@ -1353,6 +1364,33 @@ public final class SpecificationRepository {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns all registered well-definedness checks for method contracts.
+     */
+    public ImmutableSet<LoopWellDefinedness> getAllWdLoopChecks() {
+        ImmutableSet<LoopWellDefinedness> result =
+                DefaultImmutableSet.<LoopWellDefinedness>nil();
+        for(Contract s : getAllWdChecks()) {
+            if (s instanceof LoopWellDefinedness) {
+                result = result.add((LoopWellDefinedness)s);
+            }
+        }
+        return result;
+    }
+
+    public ImmutableSet<LoopWellDefinedness> getWdLoopChecks(KeYJavaType kjt,
+                                                             IObserverFunction target) {
+        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
+        ImmutableSet<LoopWellDefinedness> loops =
+                DefaultImmutableSet.<LoopWellDefinedness>nil();
+        for(WellDefinednessCheck check: checks) {
+            if (check instanceof LoopWellDefinedness) {
+                loops = loops.add((LoopWellDefinedness)check);
+            }
+        }
+        return loops;
     }
 
     /**

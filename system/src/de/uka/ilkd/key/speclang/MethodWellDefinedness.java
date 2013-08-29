@@ -20,6 +20,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /* breaks-clause, callable-clause, captures-clause, choice-statement,
      * continues-clause, if-statement, returns-clause, when-clause,
      * initially-clause, constraint */
+
     private final Contract contract;
 
     private final Term globalDefs;
@@ -164,7 +165,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return this.contract;
     }
 
-    public Taclet createOperationTaclet(String prefix, Services services) {
+    public Taclet createOperationTaclet(Services services) {
+        final String prefix = WellDefinednessCheck.OP_TACLET;
         final IObserverFunction target = getTarget();
         final String tName = target.name().toString();
         final boolean isStatic = target.isStatic();

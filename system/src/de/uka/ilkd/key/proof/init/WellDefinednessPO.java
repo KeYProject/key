@@ -18,25 +18,14 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
-import de.uka.ilkd.key.speclang.LoopWellDefinedness;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
-import de.uka.ilkd.key.util.MiscTools;
 
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
-
-    private static final String INV_TACLET = "wd_Invariant_";
-    private static final String OP_TACLET = "wd_Operation_";
 
     private final WellDefinednessCheck check;
     private final Variables vars;
@@ -126,18 +115,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return addGhostParams(params, origParams);
     }
 
-    private static ImmutableList<ProgramVariable> getLocalIns(LoopWellDefinedness lwd,
-                                                              Services services) {
-        //bla
-        ImmutableList<ProgramVariable> params = ImmutableSLList.<ProgramVariable>nil();
-        ImmutableSet<ProgramVariable> newParams =
-                MiscTools.getLocalIns(lwd.getInvariant().getLoop(), services);
-        for (ProgramVariable pv: newParams) {
-            params = params.append(pv);
-        }
-        return params;
-    }
-
     /**
      * This should only be executed once per proof.
      * @return new variables
@@ -179,8 +156,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final ImmutableList<ProgramVariable> params;
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
-        } else if (check instanceof LoopWellDefinedness) {
-            params = getLocalIns((LoopWellDefinedness)check, services);
         } else {
             params = ImmutableSLList.<ProgramVariable>nil();
         }
@@ -194,66 +169,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(vars.exception);
         register(vars.atPres.get(vars.heap));
         register(vars.params);
-    }
-
-    private void register(ImmutableSet<Taclet> ts) {
-        for (Taclet t: ts) {
-            assert t != null;
-            taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
-            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
-        }
-    }
-
-    private Term getUpdates(Term mod) {
-        assert mod != null;
-        final Term havocUpd = TB.elementary(services, vars.heap,
-                TB.anon(services, TB.var(vars.heap), mod, vars.anonHeap));
-        final Term oldUpd = TB.elementary(services, TB.var(vars.heapAtPre), TB.var(vars.heap));
-        return TB.parallel(oldUpd, havocUpd);
-    }
-
-    private ImmutableSet<Taclet> createInvTaclet(String prefix, KeYJavaType kjt) {
-        final LocationVariable heap = vars.heap;
-        final SchemaVariable heapSV =
-                SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
-        boolean isStatic = getTarget().isStatic();
-        final SchemaVariable sv =
-                SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort());
-        final Term var = TB.var(sv);
-        final Term wdSelf = isStatic ? TB.tt() : TB.wd(var, services);
-        final Term[] heaps = new Term[] {TB.var(heapSV)};
-        final Term staticInvTerm = TB.staticInv(services, heaps, kjt);
-        final Term invTerm = TB.inv(services, heaps, var);
-        final Term wdHeaps = TB.and(TB.wd(heaps, services));
-        final Term pre = TB.and(wdSelf, wdHeaps);
-        final Taclet inv =
-                WellDefinednessCheck.createTaclet(prefix + kjt.getName(),
-                                                  var, invTerm, pre, false, services);
-        final Taclet staticInv =
-                WellDefinednessCheck.createTaclet(prefix + "Static_" + kjt.getName(),
-                                                  var, staticInvTerm, wdHeaps, true, services);
-        return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
-    }
-
-    private ImmutableSet<Taclet> generateTaclets() {
-        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-        ImmutableSet<KeYJavaType> kjts = DefaultImmutableSet.<KeYJavaType>nil();
-        for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
-            if (!ch.getKJT().getName().equals("Object")) {
-                if (ch instanceof MethodWellDefinedness) {
-                    MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
-                    // WD(pv.m(...))
-                    res = res.add(mwd.createOperationTaclet(OP_TACLET, services));
-                }
-                kjts = kjts.add(ch.getKJT());
-            }
-        }
-        for (KeYJavaType kjt: kjts) {
-            // WD(pv.<inv>)
-            res = res.union(createInvTaclet(INV_TACLET, kjt));
-        }
-        register(res); // register taclets: Important!
-        return res;
     }
 
     @Override
@@ -291,14 +206,14 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(pre.func);
         mbyAtPre = pre.func != null ? TB.func(pre.func) : TB.tt();
         final Term post = check.getPost(po.post, vars.result, services);
-        final Term updates = getUpdates(po.mod);
+        final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
+                                              vars.anonHeap, services);
+        final Term wfAnon = TB.wellFormed(vars.anonHeap, services);
         final Term uPost = TB.apply(updates, TB.wd(post, services));
         final Term poTerms = TB.and(wdPre,
-                                    TB.imp(pre.term,
+                                    TB.imp(TB.and(pre.term, wfAnon),
                                            TB.and(wdMod, TB.and(wdRest), uPost)));
-        generateTaclets();
         assignPOTerms(poTerms);
-
         // add axioms
         collectClassAxioms(getKJT());
     }
@@ -332,13 +247,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final ProgramVariable heapAtPre;
         final Term anonHeap;
 
-        private Variables(final ProgramVariable self,
-                          final ProgramVariable result,
-                          final ProgramVariable exception,
-                          final Map<LocationVariable, ProgramVariable> atPres,
-                          final ImmutableList<ProgramVariable> params,
-                          final LocationVariable heap,
-                          final Function anonHeap) {
+        public Variables(final ProgramVariable self,
+                         final ProgramVariable result,
+                         final ProgramVariable exception,
+                         final Map<LocationVariable, ProgramVariable> atPres,
+                         final ImmutableList<ProgramVariable> params,
+                         final LocationVariable heap,
+                         final Term anonHeap) {
             this.self = self;
             this.result = result;
             this.exception = exception;
@@ -347,7 +262,18 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             this.heap = heap;
             this.heapAtPre = (atPres == null || atPres.get(heap) == null) ?
                     this.heap : atPres.get(heap);
-            this.anonHeap = TB.label(TB.func(anonHeap), AnonHeapTermLabel.INSTANCE);
+            this.anonHeap = anonHeap;
+        }
+
+        private Variables(final ProgramVariable self,
+                          final ProgramVariable result,
+                          final ProgramVariable exception,
+                          final Map<LocationVariable, ProgramVariable> atPres,
+                          final ImmutableList<ProgramVariable> params,
+                          final LocationVariable heap,
+                          final Function anonHeap) {
+            this(self, result, exception, atPres, params, heap,
+                 TB.label(TB.func(anonHeap), AnonHeapTermLabel.INSTANCE));
         }
     }
 }

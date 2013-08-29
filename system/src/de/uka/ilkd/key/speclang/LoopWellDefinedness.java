@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -8,6 +10,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
 public class LoopWellDefinedness extends WellDefinednessCheck {
 
@@ -22,12 +26,15 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
         this.inv = inv;
     }
 
-    public LoopWellDefinedness(LoopInvariant inv, Services services) {
+    public LoopWellDefinedness(LoopInvariant inv, ImmutableSet<ProgramVariable> params,
+                               Services services) {
         super(ContractFactory.generateContractTypeName(inv.getName(),
                                                        inv.getKJT(),
                                                        inv.getTarget(),
                                                        inv.getKJT()),
-              inv.getLoop().getStartPosition().getLine(), inv.getTarget(), inv.getOrigVars(),
+              inv.getLoop().getStartPosition().getLine(), inv.getTarget(),
+              new OriginalVariables(inv.getOrigVars().self, null, null,
+                                    inv.getOrigVars().atPres, convertParams(params)),
               Type.LOOP_INVARIANT, services);
         assert inv != null;
         final LocationVariable h = getHeap();
@@ -36,6 +43,14 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
         setRequires(inv.getInternalInvariants().get(h));
         setAssignable(inv.getInternalModifies().get(h), services);
         setEnsures(inv.getInternalInvariants().get(h));
+    }
+
+    private static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
+        ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil();
+        for (ProgramVariable pv: set) {
+            list = list.append(pv);
+        }
+        return list;
     }
 
     @Override
@@ -47,6 +62,35 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
     @Override
     ImmutableList<Term> getRest() {
         return super.getRest();
+    }
+
+    public Term generatePO(ProgramVariable self, LocationVariable heap,
+                           Term anonHeap, ImmutableSet<ProgramVariable> ps,
+                           Term leadingUpdate, Services services) {
+        // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
+
+        ImmutableList<ProgramVariable> params = ImmutableSLList.<ProgramVariable>nil();
+        for (ProgramVariable p: ps) {
+            params = params.append(p);
+        }
+        final Variables vars = new Variables(self, null, null, null, params, heap, anonHeap);
+        final POTerms po =
+                replace(new POTerms(this.getRequires(), this.getAssignable(),
+                                    this.getRest(), this.getEnsures()),
+                        vars);
+        final Term pre = getPre(po.pre, self, heap, params, false, services).term;
+        final Term post = getPost(po.post, vars.result, services);
+        final Term wdPre = TB.wd(pre, services);
+        final Term wdMod = TB.wd(po.mod, services);
+        final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
+        final Term updates = getUpdates(po.mod, heap, heap, anonHeap, services);
+        final Term wfAnon = TB.wellFormed(anonHeap, services);
+        final Term uPost = TB.apply(updates, TB.and(TB.wd(post, services), TB.and(wdRest)));
+        final Term poTerms = TB.apply(leadingUpdate,
+                                      TB.and(wdPre,
+                                             TB.imp(TB.and(pre, wfAnon),
+                                                    TB.and(wdMod, TB.and(wdRest), uPost))));
+        return poTerms;
     }
 
     public LoopInvariant getInvariant() {

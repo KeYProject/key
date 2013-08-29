@@ -1,13 +1,19 @@
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.rule.Taclet;
 
 public final class ClassWellDefinedness extends WellDefinednessCheck {
 
@@ -45,6 +51,29 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     ImmutableList<Term> getRest() {
         return super.getRest();
+    }
+
+    public static ImmutableSet<Taclet> createInvTaclet(KeYJavaType kjt, Services services) {
+        final String prefix = WellDefinednessCheck.INV_TACLET;
+        final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        final SchemaVariable heapSV =
+                SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
+        final SchemaVariable sv =
+                SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort());
+        final Term var = TB.var(sv);
+        final Term wdSelf = TB.wd(var, services);
+        final Term[] heaps = new Term[] {TB.var(heapSV)};
+        final Term staticInvTerm = TB.staticInv(services, heaps, kjt);
+        final Term invTerm = TB.inv(services, heaps, var);
+        final Term wdHeaps = TB.and(TB.wd(heaps, services));
+        final Term pre = TB.and(wdSelf, wdHeaps);
+        final Taclet inv =
+                WellDefinednessCheck.createTaclet(prefix + kjt.getName(),
+                                                  var, invTerm, pre, false, services);
+        final Taclet staticInv =
+                WellDefinednessCheck.createTaclet(prefix + "Static_" + kjt.getName(),
+                                                  var, staticInvTerm, wdHeaps, true, services);
+        return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
     }
 
     public ClassInvariant getInvariant() {

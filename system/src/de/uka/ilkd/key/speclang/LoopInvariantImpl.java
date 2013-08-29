@@ -95,10 +95,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
-    public LoopInvariantImpl(LoopStatement loop, 
+    public LoopInvariantImpl(LoopStatement loop,
+                             IProgramMethod pm,
+                             KeYJavaType kjt,
 	    		     Term selfTerm, 
 	    		     Map<LocationVariable,Term> atPres) {
-        this(loop, null, null, null, null, null, selfTerm, atPres);
+        this(loop, pm, kjt, null, null, null, selfTerm, atPres);
     }
     
     
