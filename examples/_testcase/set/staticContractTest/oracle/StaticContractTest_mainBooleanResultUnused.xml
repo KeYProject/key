@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="StaticContractTest.mainBooleanResultUnused(x);" pathCondition="true" pathConditionChanged="false">
+      <operationContract name="result_0 = booleanResult(x) catch(exc_0)
+pre: true
+post: result_0
+  = \if (!x = TRUE)  \then (TRUE)  \else (FALSE)
+&amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <methodReturn name="&lt;return of StaticContractTest.mainBooleanResultUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of StaticContractTest.mainBooleanResultUnused(x);&gt;" isReturnValueComputed="true">
+            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            </termination>
+         </methodReturn>
+      </operationContract>
+   </methodCall>
+</start>

@@ -23,10 +23,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -49,11 +45,10 @@ import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
-import de.uka.ilkd.key.util.MiscTools;
 
 
 public final class StrategySelectionView extends JPanel {
@@ -220,16 +215,13 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
 
         rdBut17 = newButton("Default", StrategyProperties.STOPMODE_DEFAULT, true, false);
-	rdBut17.setToolTipText( "<html>Stop when (i) the maximum number of rule<br>" +
-                                "applications is reached or (ii) no more rules are<br>"+
-				"applicable on the proof tree.</html>");
+	rdBut17.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_STOP_AT_DEFAULT);
         stopModeGroup.add(rdBut17);
         addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut18 = newButton(
                 "Unclosable", StrategyProperties.STOPMODE_NONCLOSE, false, false);
-	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
-                                "closable goal is encountered.</html>");
+	rdBut18.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_STOP_AT_UNCLOSABLE);
         stopModeGroup.add(rdBut18);
         addJavaDLOption ( rdBut18, javaDLOptionsLayout, 4, yCoord, 2 );        
        
@@ -252,42 +244,18 @@ public final class StrategySelectionView extends JPanel {
                        StrategyProperties.SPLITTING_NORMAL, false, false);
         splittingGroup.add(splittingNormal);
         addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 2, yCoord, 2 );     
-        splittingNormal.setToolTipText("<html>" +
-                                        "Split formulas (if-then-else expressions,<br>" +
-                                        "disjunctions in the antecedent, conjunctions in<br>" +
-                                        "the succedent) freely without restrictions." +
-                                        "</html>");
+        splittingNormal.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_PROOF_SPLITTING_FREE);
         
 
         splittingDelayed = newButton("Delayed",
                      StrategyProperties.SPLITTING_DELAYED, true, false);
-        splittingDelayed.setToolTipText("<html>" +
-                                        "Do not split formulas (if-then-else expressions,<br>" +
-                                        "disjunctions in the antecedent, conjunctions in<br>" +
-                                        "the succedent) as long as programs are present in<br>" +
-                                        "the sequent.<br>" +
-                                        "NB: This does not affect the splitting of formulas<br>" +
-                                        "that themselves contain programs.<br>" +
-                                        "NB2: Delaying splits often prevents KeY from finding<br>" +
-                                        "short proofs, but in some cases it can significantly<br>" +
-                                        "improve the performance." +
-                                        "</html>");
+        splittingDelayed.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_PROOF_SPLITTING_DELAYED);
         splittingGroup.add(splittingDelayed);
         addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 4, yCoord, 2 );
 
         splittingOff = newButton("Off",
                      StrategyProperties.SPLITTING_OFF, false, false);
-        splittingOff.setToolTipText("<html>" +
-                                    "Do never split formulas (if-then-else expressions,<br>" +
-                                    "disjunctions in the antecedent, conjunctions in<br>" +
-                                    "the succedent).<br>" +
-                                    "NB: This does not affect the splitting of formulas<br>" +
-                                    "that contain programs.<br>" +
-                                    "NB2: Without splitting, KeY is often unable to find<br>" +
-                                    "proofs even for simple problems. This option can,<br>" +
-                                    "nevertheless, be meaningful to keep the complexity<br>" +
-                                    "of proofs small and support interactive proving." +
-                                    "</html>");
+        splittingOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_PROOF_SPLITTING_OFF);
         splittingGroup.add(splittingOff);
         addJavaDLOption ( splittingOff, javaDLOptionsLayout, 6, yCoord, 2 );
 
@@ -304,29 +272,17 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
 
         rdBut10 = newButton("Invariant", StrategyProperties.LOOP_INVARIANT, false, false);
-        rdBut10.setToolTipText("<html>"+
-			"Use loop invariants for loops.<br>"+
-			"Three properties have to be shown:<br>"+
-			"<ul><li>Validity of invariant of a loop is preserved by the<br>"+
-			"loop guard and loop body (initially valid).</li>"+
-			"<li>If the invariant was valid at the start of the loop, it holds <br>"+
-			"after arbitrarily many loop iterations (body preserves invariant).</li>"+
-			"<li>Invariant holds after the loop terminates (use case).</li>"+
-			"</ul></html>");
+        rdBut10.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_LOOP_INVARIANT);
         loopGroup.add(rdBut10);
         addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );
 
         rdBut9 = newButton("Expand", StrategyProperties.LOOP_EXPAND, true, false);
-        rdBut9.setToolTipText("<html>"+
-			"Unroll loop body."+
-			"</html>");
+        rdBut9.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_LOOP_EXPAND);
         loopGroup.add(rdBut9);
         addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );
 
         rdBut11 = newButton("None", StrategyProperties.LOOP_NONE, false, false);
-        rdBut11.setToolTipText("<html>"+
-			"Leave loops untouched."+
-			"</html>");
+        rdBut11.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_LOOP_NONE);
         loopGroup.add(rdBut11);
         addJavaDLOption ( rdBut11, javaDLOptionsLayout, 6, yCoord, 2 );        
 
@@ -342,20 +298,12 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
 
         blockContractRadioButton = newButton("Contract", StrategyProperties.BLOCK_CONTRACT, false, false);
-        blockContractRadioButton.setToolTipText("<html>"+
-        					"If block contracts are specified, Java blocks are replaced by their contract.<br>"+
-        					"Three properties have to be shown:"+
-        					"<ul><li>Validity of block contract</li>"+
-        					"<li>Precondition of contract holds</li>"+
-        					"<li>Postcondition holds after block terminates</li>"+
-        					"</ul></html>");
+        blockContractRadioButton.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_BLOCK_CONTRACT);
         blockGroup.add(blockContractRadioButton);
         addJavaDLOption(blockContractRadioButton, javaDLOptionsLayout, 2, yCoord, 2);
 
         blockExpandRadioButton = newButton("Expand", StrategyProperties.BLOCK_EXPAND, true, false);
-        blockExpandRadioButton.setToolTipText("<html>"+
-						"Do not use block contracts for Java blocks. Expand Java blocks."+
-						"</html>");
+        blockExpandRadioButton.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_BLOCK_EXPAND);
         blockGroup.add(blockExpandRadioButton);
         addJavaDLOption(blockExpandRadioButton, javaDLOptionsLayout, 4, yCoord, 2);
 
@@ -378,24 +326,18 @@ public final class StrategySelectionView extends JPanel {
 
         rdBut13 = newButton(
                 "Contract", StrategyProperties.METHOD_CONTRACT, false, false);
-        rdBut13.setToolTipText("<html>Replace method calls by contracts. In some cases<br>" +
-        		               "a method call may also be replaced by its method body.<br>" +
-        		               "If query treatment is activated, this behavior applies<br>" +
-        		               "to queries as well.</html>");
+        rdBut13.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_CONTRACT);
         methodGroup.add(rdBut13);
         addJavaDLOption ( rdBut13, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut12 = newButton("Expand", StrategyProperties.METHOD_EXPAND, true, false);
-        rdBut12.setToolTipText("<html>Replace method calls by their bodies, i.e. by their<br>" +
-        		               "implementation. Method contracts are strictly deactivated.</html>");
+        rdBut12.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_EXPAND);
         methodGroup.add(rdBut12);
         addJavaDLOption ( rdBut12, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut14 = newButton("None",
                 StrategyProperties.METHOD_NONE, false, false);
-        rdBut14.setToolTipText("<html>" +
-                "Stop when encountering a method" +
-                "</html>");
+        rdBut14.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_NONE);
         methodGroup.add(rdBut14);
         addJavaDLOption ( rdBut14, javaDLOptionsLayout, 6, yCoord, 2 );        
         
@@ -413,23 +355,13 @@ public final class StrategySelectionView extends JPanel {
 
         depOn = newButton("On", 
                 StrategyProperties.DEP_ON, false, false);
-        depOn.setToolTipText("<html>Uses the information in JML's <tt>accessible</tt> clauses<br>" +
-        		             "in order to simplify heap terms. For instance, consider the term<br>" +
-        		             "<center><i>f(store(heap,o,a,1))</i></center>" +
-        		             "If <i>f</i> does not depend on the location <i>(o,a)</i>, which is<br>" +
-        		             "expressed by an <tt>accessible</tt> clause, then the term can be <br>" +
-        		             "simplified to <i>f(heap)</i>.</html>");
+        depOn.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_DEPENDENCY_ON);
         depGroup.add(depOn);
         addJavaDLOption ( depOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
         depOff = newButton("Off", 
                 StrategyProperties.DEP_OFF, false, false);
-        depOff.setToolTipText("<html>Does <i>not</i> use the framing information contained in JML's <br>" +
-                                     "<tt>accessible</tt> clauses automatically in order to simplify heap terms.<br>" +
-        		             "This prevents the automatic proof search to find proofs for a number of problems.<br>" +
-        		             "On the other hand, the automatic proof search does not use a particular order in<br>" +
-                                     "which <tt>accessible</tt> clauses are used. Since the usage of an <tt>accessible</tt><br>" +
-                                     "clause is splitting, this might result in huge (or even infeasible) proofs.</html>");
+        depOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_DEPENDENCY_OFF);
 //        queryProgramsToRight.setToolTipText ( "<html>Move all program blocks to the" +
 //                                              " succedent.<br>" +
 //                                              " This is necessary" +
@@ -456,36 +388,19 @@ public final class StrategySelectionView extends JPanel {
 
         queryOn = newButton("On", 
                 StrategyProperties.QUERY_ON, false, false);
-        queryOn.setToolTipText("<html>Rewrite query to a method call so that contracts or inlining<br>" +
-        		                     "can be used. A query is a method that is used as a function <br>" +
-        		                     "in the logic and stems from the specification.<br><br>" +
-        		                     "Whether contracts or inlining are used depends on the <br>" +
-        		                     "Method Treatment settings.</html>");
+        queryOn.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_ON);
         queryGroup.add(queryOn);
         addJavaDLOption ( queryOn, javaDLOptionsLayout, 2, yCoord, 2 );        
         
         queryRestricted = newButton("Restricted", 
                 StrategyProperties.QUERY_RESTRICTED, false, false);
-        queryRestricted.setToolTipText ( "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>" +
-                                         "<ul><li> Priority of expanding queries occuring earlier on a branch is higher than<br>" +
-        		                         " for queries introduced more recently. This approximates in a breath-first search<br>" +
-                                         " with respect to query expansion.</li>" +
-        		                         "<li> Reexpansion of identical query terms is suppressed.</li>" +
-        		                         "<li> A query is not expanded if one of its arguments contains a literal greater<br>" +
-        		                         " than "+QueryExpandCost.ConsideredAsBigLiteral+", or smaller than "+(-QueryExpandCost.ConsideredAsBigLiteral)+". This helps detecting loops in a proof.</li>" +
-        		                         "<li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>" +
-        		                         " branch of the loop invariant rule.</li>" +
-        		                         "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>" +
-        		                         " branch when using Auto Induction.</li>" +
-        		                         "</ul></html>" ); 
+        queryRestricted.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_RESTRICTED); 
         queryGroup.add(queryRestricted);
         addJavaDLOption ( queryRestricted, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         queryOff = newButton("Off", 
                 StrategyProperties.QUERY_OFF, false, false);
-        queryOff.setToolTipText("<html>"+
-                               "Turn rewriting of query off."+
-                              "</html>");
+        queryOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_OFF);
 
         queryGroup.add(queryOff);
         addJavaDLOption ( queryOff, javaDLOptionsLayout, 6, yCoord, 2 );
@@ -495,27 +410,17 @@ public final class StrategySelectionView extends JPanel {
         
         queryAxiomOn = newButton("On", 
                 StrategyProperties.QUERYAXIOM_ON, false, false);
-        String queryAxiomToolTip = "<html>Replaces queries by their method body in certain safe cases.<br>" + 
-                                          "Safe cases are:"+
-                                           "<ul><li>the return type of the expanded method is known</li>"+
-                                          "<li>the object on which the methodcall is invoked, is self or a parent of self</li></ul>"+
-        		                  "This mechanism works independently of the query treatment <br>" +
-                                          "and method treatment settings above.<br>" +
-                                          "<i>The internal rule name is Query Axiom</i></html>";
-        queryAxiomOn.setToolTipText(queryAxiomToolTip);
+        queryAxiomOn.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_EXPAND_LOCAL_QUERIES_ON);
         queryAxiomGroup.add(queryAxiomOn);
 
         queryAxiomOff = newButton("Off", 
                 StrategyProperties.QUERYAXIOM_OFF, false, false);
-        queryAxiomOff.setToolTipText("<html>"+
-                                    "Expansion of local queries is turned off. <br>"+
-        		             "This setting is independent of the query treatment setting."+
-        		            "</html>");
+        queryAxiomOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_EXPAND_LOCAL_QUERIES_OFF);
         queryAxiomGroup.add(queryAxiomOff);
 
         JPanel queryAxiomPanel = new JPanel();
         JLabel queryAxiomLabel = new JLabel("Expand local queries:");
-        	queryAxiomLabel.setToolTipText(queryAxiomToolTip);
+        	queryAxiomLabel.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_EXPAND_LOCAL_QUERIES_ON);
         queryAxiomPanel.add(queryAxiomLabel);
         queryAxiomPanel.add(queryAxiomOn);
         queryAxiomPanel.add(queryAxiomOff);
@@ -535,46 +440,19 @@ public final class StrategySelectionView extends JPanel {
 
         nonLinArithNone = newButton("Basic", 
                 StrategyProperties.NON_LIN_ARITH_NONE, true, false);
-        nonLinArithNone.setToolTipText("<html>" +
-                "Basic arithmetic support:" +
-                "<ul>" +
-                "<li>Simplification of polynomial expressions</li>" +
-                "<li>Computation of Gr&ouml;bner Bases for polynomials in the antecedent</li>" +
-                "<li>(Partial) Omega procedure for handling linear inequations</li>" +
-                "</ul>" +
-                "</html>");
+        nonLinArithNone.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_BASE);
         nonLinArithGroup.add(nonLinArithNone);
         addJavaDLOption ( nonLinArithNone, javaDLOptionsLayout, 2, yCoord, 2 );
                                           
         nonLinArithDefOps = newButton("DefOps", 
                 StrategyProperties.NON_LIN_ARITH_DEF_OPS, false, false);
-        nonLinArithDefOps.setToolTipText ( "<html>" +
-                "Automatically expand defined symbols like:" +
-                "<ul>" +
-                "<li><tt>/</tt>, <tt>%</tt>, <tt>jdiv</tt>, <tt>jmod</tt>, ...</li>" +
-                "<li><tt>int_RANGE</tt>, <tt>short_MIN</tt>, ...</li>" +
-                "<li><tt>inInt</tt>, <tt>inByte</tt>, ...</li>" +
-                "<li><tt>addJint</tt>, <tt>mulJshort</tt>, ...</li>" +
-                "</ul>" +
-                "</html>" );
+        nonLinArithDefOps.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_DEF_OPS);
         nonLinArithGroup.add(nonLinArithDefOps);
         addJavaDLOption ( nonLinArithDefOps, javaDLOptionsLayout, 4, yCoord, 2 );
 
         nonLinArithCompletion = newButton("Model Search", 
                 StrategyProperties.NON_LIN_ARITH_COMPLETION, false, false);
-        nonLinArithCompletion.setToolTipText ( "<html>" +
-                "Support for non-linear inequations and model search.<br>" +
-                "In addition, this performs:" +
-                "<ul>" +
-                "<li>Multiplication of inequations with each other</li>" +
-                "<li>Systematic case distinctions (cuts)</li>" +
-                "</ul>" +
-                "This method is guaranteed to find counterexamples for<br>" +
-                "invalid goals that only contain polynomial (in)equations.<br>" +
-                "Such counterexamples turn up as trivially unprovable goals.<br>" +
-                "It is also able to prove many more valid goals involving<br>" +
-                "(in)equations, but will in general not terminate on such goals." +
-                "</html>" );
+        nonLinArithCompletion.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_MODEL_SEARCH);
         nonLinArithGroup.add(nonLinArithCompletion);
         addJavaDLOption ( nonLinArithCompletion, javaDLOptionsLayout, 6, yCoord, 2 );
         
@@ -592,21 +470,13 @@ public final class StrategySelectionView extends JPanel {
         
         quantifierNone = newButton("None", 
                          StrategyProperties.QUANTIFIERS_NONE, true, false);
-        quantifierNone.setToolTipText ( "<html>" +
-            "Do not instantiate quantified formulas automatically" +
-            "</html>" );
+        quantifierNone.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_QUANTIFIER_NONE);
         quantifierGroup.add(quantifierNone);
         addJavaDLOption ( quantifierNone, javaDLOptionsLayout, 2, yCoord, 4 );
 
         quantifierNonSplitting = newButton("No Splits", 
                              StrategyProperties.QUANTIFIERS_NON_SPLITTING, true, false);
-        quantifierNonSplitting.setToolTipText ( "<html>" +
-            "Instantiate quantified formulas automatically<br>" +
-            "with terms that occur in a sequent, but only if<br>" +
-            "this does not cause proof splitting. Further, quantified<br>" +
-            "formulas that contain queries are not instantiated<br>" +
-            "automatically." +
-            "</html>" );
+        quantifierNonSplitting.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_QUANTIFIER_NO_SPLITS);
         quantifierGroup.add(quantifierNonSplitting);
         addJavaDLOption ( quantifierNonSplitting, javaDLOptionsLayout, 6, yCoord, 2 );
 
@@ -615,24 +485,13 @@ public final class StrategySelectionView extends JPanel {
         quantifierNonSplittingWithProgs
                  = newButton("No Splits with Progs", 
             StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, true, false);
-        quantifierNonSplittingWithProgs.setToolTipText ( "<html>" +
-            "Instantiate quantified formulas automatically<br>" +
-            "with terms that occur in a sequent, but if the<br>" +
-            "sequent contains programs then only perform<br>" +
-            "instantiations that do not cause proof splitting.<br>" +
-            "Further, quantified formulas that contain queries<br>" +
-            "are not instantiated automatically." +
-            "</html>" );
+        quantifierNonSplittingWithProgs.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS);
         quantifierGroup.add(quantifierNonSplittingWithProgs);
         addJavaDLOption ( quantifierNonSplittingWithProgs, javaDLOptionsLayout, 2, yCoord, 4 );
 
         quantifierInstantiate = newButton("Free", 
                               StrategyProperties.QUANTIFIERS_INSTANTIATE, true, false);
-        quantifierInstantiate.setToolTipText ( "<html>" +
-            "Instantiate quantified formulas automatically<br>" +
-            "with terms that occur in a sequent, also if this<br>" +
-            "might cause proof splitting." +
-            "</html>" );
+        quantifierInstantiate.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_QUANTIFIER_FREE);
         quantifierGroup.add(quantifierInstantiate);
         addJavaDLOption ( quantifierInstantiate, javaDLOptionsLayout, 6, yCoord, 2 );
 
@@ -666,50 +525,21 @@ public final class StrategySelectionView extends JPanel {
         autoInductionLemmaOn = newButton("On", 
                 StrategyProperties.AUTO_INDUCTION_LEMMA_ON, false, false);
         
-        autoInductionLemmaOn.setToolTipText ( "<html>" +
-            "Create an inductive proof for formulas of the form:<br>" +
-            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
-            "and certain other forms. The induction hypothesis<br>" +
-            "is the subformula phi. The rule is applied before<br>" +
-            "beta rules are applied.<br>" +
-            "<br>" +
-            "When encountering a formula of the form<br>" +
-            "      ==>  (\\forall int i; 0&lt;=i->phi) & psi <br>" +
-            "and certain similar forms, then the quantified formula<br>" +
-            "is used in the Use Case branch as a lemma for psi,<br>" +
-            "i.e., the sequent in the Use Case has the form:<br>" +
-            "      (\\forall int i; 0&lt;=i->phi) ==>  psi <br>" +
-            "</html>" );
+        autoInductionLemmaOn.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_AUTO_INDUCTION_ON);
             autoInductionGroup.add(autoInductionLemmaOn);
             addJavaDLOption ( autoInductionLemmaOn, javaDLOptionsLayout, 2, yCoord, 2 );
             
         
        autoInductionRestricted = newButton("Restricted", 
                     StrategyProperties.AUTO_INDUCTION_RESTRICTED, false, false);
-       autoInductionRestricted.setToolTipText ( "<html>" +
-    		"Performs auto induction only on quantified formulas that<br>" +
-    		"(a) fullfill a certain pattern (as described for the \"on\"option)<br>" +
-    		"and (b) whose quantified variable has the suffix \"Ind\" or \"IND\".<br>" +
-    		"For instance, auto induction will be applied on:<br>" +
-            "      ==>  \\forall int iIND; 0&lt;=iIND->phi <br>" +
-            "but not on: <br>" +
-            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
-            "</html>" );
+       autoInductionRestricted.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_AUTO_INDUCTION_RESTRICTED);
        autoInductionGroup.add(autoInductionRestricted);
        addJavaDLOption ( autoInductionRestricted, javaDLOptionsLayout, 4, yCoord, 2 );
 
    
         autoInductionOff = newButton("Off", 
                          StrategyProperties.AUTO_INDUCTION_OFF, true, false);
-        autoInductionOff.setToolTipText ( "<html>" +
-            "Deactivates automatic creation of inductive proofs.<br>" +
-            "In order to make use of auto induction, activate <br>" +
-            "auto induction early in proofs before the <br>" +
-            "quantified formula that is to be proven inductively<br>" +
-            "is Skolemized (using the delta rule). Auto induction<br>" +
-            "is not applied on Skolemized formulas in order to<br>" +
-            "limit the number of inductive proofs." +
-            "</html>" );
+        autoInductionOff.setToolTipText (JavaCardDLStrategy.Factory.TOOL_TIP_AUTO_INDUCTION_OFF);
         autoInductionGroup.add(autoInductionOff);
         addJavaDLOption ( autoInductionOff, javaDLOptionsLayout, 6, yCoord, 2 );
 
@@ -858,24 +688,21 @@ public final class StrategySelectionView extends JPanel {
         
         final JRadioButton userTacletsOff = newButton("Off", 
                         StrategyProperties.USER_TACLETS_OFF + num, true, false);
-        userTacletsOff.setToolTipText("Taclets of the rule set \"userTaclets" + num 
-                                      + "\" are not applied automatically");
+        userTacletsOff.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_USER_OFF(num));
         group.add(userTacletsOff);
         userTacletsOff.addActionListener(optListener);
         addJavaDLOption ( userTacletsOff, javaDLOptionsLayout, 3, yCoord, 1 );
         
         final JRadioButton userTacletsLow = newButton("Low prior.", 
                         StrategyProperties.USER_TACLETS_LOW + num, true, false);
-        userTacletsLow.setToolTipText("Taclets of the rule set \"userTaclets" + num 
-                                      + "\" are applied automatically with low priority");
+        userTacletsLow.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_USER_LOW(num));
         group.add(userTacletsLow);
         userTacletsLow.addActionListener(optListener);
         addJavaDLOption ( userTacletsLow, javaDLOptionsLayout, 4, yCoord, 2 );
         
         final JRadioButton userTacletsHigh = newButton("High prior.", 
                          StrategyProperties.USER_TACLETS_HIGH + num, true, false);
-        userTacletsHigh.setToolTipText("Taclets of the rule set \"userTaclets" + num 
-                                       + "\" are applied automatically with high priority");
+        userTacletsHigh.setToolTipText(JavaCardDLStrategy.Factory.TOOL_TIP_USER_HIGH(num));
         group.add(userTacletsHigh);
         userTacletsHigh.addActionListener(optListener);
         addJavaDLOption ( userTacletsHigh, javaDLOptionsLayout, 6, yCoord, 2 );

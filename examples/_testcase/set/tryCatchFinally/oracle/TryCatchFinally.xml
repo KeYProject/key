@@ -8,7 +8,7 @@
                   <statement name="result_1=result_1*2;" pathCondition="input = 0" pathConditionChanged="false">
                      <statement name="return result_1;" pathCondition="input = 0" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="input = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="input = 0" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="input = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -19,7 +19,7 @@
                <statement name="result_1=result_1*2;" pathCondition="!input = 0" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!input = 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="!input = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!input = 0" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!input = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

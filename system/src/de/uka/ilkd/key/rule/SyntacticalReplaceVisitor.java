@@ -20,6 +20,7 @@
  */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;

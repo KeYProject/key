@@ -141,4 +141,12 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
          return callStack;
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isVerified() {
+      return executionNode.isBranchVerified();
+   }
 }

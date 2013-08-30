@@ -19,7 +19,7 @@
                                                    <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                       <statement name="return x;" pathCondition="true" pathConditionChanged="false">
                                                          <methodReturn name="&lt;return of StaticMethodCall.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>

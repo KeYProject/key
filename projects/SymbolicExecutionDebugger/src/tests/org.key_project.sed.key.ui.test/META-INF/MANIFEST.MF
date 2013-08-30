@@ -7,6 +7,7 @@ Bundle-Activator: org.key_project.sed.key.ui.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.ui,
+ org.eclipse.ui.editors,
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200",
  org.eclipse.ui.workbench.texteditor;bundle-version="3.7.0",
  org.eclipse.debug.ui;bundle-version="3.7.0",
@@ -16,6 +17,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.eclipse.swtbot.eclipse.gef.finder;bundle-version="2.0.4",
  org.key_project.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse;bundle-version="1.0.0",
+ org.key_project.key4eclipse.starter.core;bundle-version="1.0.0",
+ org.key_project.key4eclipse.common.ui;bundle-version="1.0.0",
  org.key_project.util.test;bundle-version="1.0.0",
  org.key_project.sed.key.ui;bundle-version="1.0.0",
  org.key_project.sed.core;bundle-version="1.0.0",
@@ -25,7 +29,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.sed.ui;bundle-version="1.0.0",
  org.key_project.sed.ui.test;bundle-version="1.0.0",
  org.key_project.sed.ui.visualization;bundle-version="1.0.0",
- org.key_project.sed.ui.visualization.test;bundle-version="1.0.0"
+ org.key_project.sed.ui.visualization.test;bundle-version="1.0.0",
+ org.key_project.keyide.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.key_project.sed.key.ui.test.suite,

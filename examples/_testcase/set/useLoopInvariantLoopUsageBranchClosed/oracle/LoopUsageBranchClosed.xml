@@ -3,11 +3,12 @@
    <methodCall name="LoopUsageBranchClosed.deadCodeAfterLoop();" pathCondition="true" pathConditionChanged="false">
       <statement name="int i = 2;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <loopInvariant name="invariants: {heap=geq(i,Z(0(#)))};
-modifies: {heap=false};
-variant: i" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+         <loopInvariant name="
+invariant: i &gt;= 0;
+variant: i
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
             <callStackEntry path="/0"/>
-            <termination name="&lt;loop body end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="LOOP_BODY">
+            <termination name="&lt;loop body end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
             </termination>
          </loopInvariant>
       </statement>

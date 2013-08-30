@@ -14,18 +14,15 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -97,10 +94,10 @@ public class StaticInitialisation extends ProgramTransformer {
 	    return null;
 	}
 
- 	return new PassiveExpression(new MethodReference
- 	    (new ImmutableArray<Expression>(), 
-	     new ProgramElementName
-	     (ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER),
- 	     new TypeRef(typeToBeInitialised)));
+	final MethodReference methodCall = KeYJavaASTFactory.methodCall(
+		typeToBeInitialised,
+		ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
+
+	return KeYJavaASTFactory.passiveExpression(methodCall);
     }
 }

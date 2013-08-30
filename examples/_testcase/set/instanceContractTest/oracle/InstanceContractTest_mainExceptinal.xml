@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.mainExceptinal(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="return exceptinal(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = self.exceptinal(x) catch(exc_0)
+pre: self.&lt;inv&gt;
+post: !exc_0 = null
+&amp; (  (   java.lang.Exception::instance(exc_0) = TRUE
+      -&gt; self.&lt;inv&gt;)
+   &amp; (    java.lang.RuntimeException::instance(exc_0)
+        = TRUE
+      | java.lang.Exception::instance(exc_0) = TRUE))
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+            </termination>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

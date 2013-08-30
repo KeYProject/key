@@ -13,7 +13,7 @@
                            <methodReturn name="&lt;return of ArrayIndexReadAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0
 -&gt; !array = null &amp; array.length = 1 &amp; array[0] = 42" pathConditionChanged="false" isReturnValueComputed="false">
                               <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; array[0] = 42" pathConditionChanged="false" terminationKind="NORMAL">
+-&gt; !array = null &amp; array.length = 1 &amp; array[0] = 42" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -25,7 +25,7 @@
                            <methodReturn name="&lt;return of ArrayIndexReadAccess.compute(array);&gt;" pathCondition="   array.length &gt;= 0
 -&gt; !array = null &amp; array.length = 1 &amp; !array[0] = 42" pathConditionChanged="false" isReturnValueComputed="false">
                               <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; !array[0] = 42" pathConditionChanged="false" terminationKind="NORMAL">
+-&gt; !array = null &amp; array.length = 1 &amp; !array[0] = 42" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -35,7 +35,7 @@
                <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
                      <methodReturn name="&lt;return of ArrayIndexReadAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -45,7 +45,7 @@
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
                <methodReturn name="&lt;return of ArrayIndexReadAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

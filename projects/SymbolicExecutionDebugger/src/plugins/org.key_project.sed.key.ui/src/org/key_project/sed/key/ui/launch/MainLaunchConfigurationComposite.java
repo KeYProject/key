@@ -90,7 +90,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
- * Contains the controls to define a project, type, method and an operation contract to debug.
+ * Contains the controls to define a project, type, method and a contract to debug.
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
@@ -545,7 +545,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
    }
 
    /**
-    * Updates the shown operation contract.
+    * Updates the shown contract.
     */
    protected void updateShownContractComposite() {
        // Update shown top control of stack layout
@@ -596,9 +596,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
            if (method != null && method.exists()) {
                IProject project = method.getResource().getProject();
                // Get source paths from class path
-               List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-               Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
-               final File location = sourcePaths.get(0);
+               final File location = KeYUtil.getSourceLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                // Load location
@@ -1143,41 +1141,36 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
     * @param settings The {@link KeYLaunchSettings} to show.
     */
    public void initializeFrom(KeYLaunchSettings settings) {
-      try {
-         boolean newDebugSession = settings.isNewDebugSession();
-         newDebugSessionButton.setSelection(newDebugSession);
-         continueDebugSessionButton.setSelection(!newDebugSession);
-         SWTUtil.setText(proofFileText, settings.getProofFileToContinue());
-         IMethod method = settings.getMethod();
-         SWTUtil.setText(projectText, KeySEDUtil.getProjectValue(method));
-         SWTUtil.setText(typeText, KeySEDUtil.getTypeValue(method));
-         SWTUtil.setText(methodText, KeySEDUtil.getMethodValue(method));
-         boolean useExistingContract = settings.isUseExistingContract();
-         useGeneratedContractButton.setSelection(!useExistingContract);
-         useExistingContractButton.setSelection(useExistingContract);
-         SWTUtil.setText(existingContractText, settings.getExistingContract());
-         preconditionViewer.setText(settings.getPrecondition());
-         boolean executeMethodRange = settings.isExecuteMethodRange();
-         executeMethodBodyButton.setSelection(!executeMethodRange);
-         executeMethodRangeButton.setSelection(executeMethodRange);
-         Position startPosition = settings.getMethodRangeStart();
-         if (startPosition != null) {
-            startLineText.setText(startPosition.getLine() + StringUtil.EMPTY_STRING);
-            startColumnText.setText(startPosition.getColumn() + StringUtil.EMPTY_STRING);
-         }
-         Position endPosition = settings.getMethodRangeEnd();
-         if (endPosition != null) {
-            endLineText.setText(endPosition.getLine() + StringUtil.EMPTY_STRING);
-            endColumnText.setText(endPosition.getColumn() + StringUtil.EMPTY_STRING);
-         }
-         updateShownSessionComposite();
-         updateRangeTextEditableState();
-         updateShownContractComposite();
-         updatePreconditionViewerComposite();
+      boolean newDebugSession = settings.isNewDebugSession();
+      newDebugSessionButton.setSelection(newDebugSession);
+      continueDebugSessionButton.setSelection(!newDebugSession);
+      SWTUtil.setText(proofFileText, settings.getProofFileToContinue());
+      IMethod method = settings.getMethod();
+      SWTUtil.setText(projectText, KeySEDUtil.getProjectValue(method));
+      SWTUtil.setText(typeText, KeySEDUtil.getTypeValue(method));
+      SWTUtil.setText(methodText, settings.getMethodSignature());
+      boolean useExistingContract = settings.isUseExistingContract();
+      useGeneratedContractButton.setSelection(!useExistingContract);
+      useExistingContractButton.setSelection(useExistingContract);
+      SWTUtil.setText(existingContractText, settings.getExistingContract());
+      preconditionViewer.setText(settings.getPrecondition());
+      boolean executeMethodRange = settings.isExecuteMethodRange();
+      executeMethodBodyButton.setSelection(!executeMethodRange);
+      executeMethodRangeButton.setSelection(executeMethodRange);
+      Position startPosition = settings.getMethodRangeStart();
+      if (startPosition != null) {
+         startLineText.setText(startPosition.getLine() + StringUtil.EMPTY_STRING);
+         startColumnText.setText(startPosition.getColumn() + StringUtil.EMPTY_STRING);
       }
-      catch (JavaModelException e) {
-         LogUtil.getLogger().logError(e);
+      Position endPosition = settings.getMethodRangeEnd();
+      if (endPosition != null) {
+         endLineText.setText(endPosition.getLine() + StringUtil.EMPTY_STRING);
+         endColumnText.setText(endPosition.getColumn() + StringUtil.EMPTY_STRING);
       }
+      updateShownSessionComposite();
+      updateRangeTextEditableState();
+      updateShownContractComposite();
+      updatePreconditionViewerComposite();
    }
    
    /**

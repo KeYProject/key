@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -24,6 +24,9 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
+import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
@@ -195,7 +198,47 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * The {@link StrategyFactory} to create instances of {@link SymbolicExecutionStrategy}.
     * @author Martin Hentschel
     */
-   public static class Factory extends StrategyFactory {
+   public static class Factory implements StrategyFactory {
+      /**
+       * Shown string for method treatment "Expand".
+       */
+      public static final String METHOD_TREATMENT_EXPAND = "Expand";
+
+      /**
+       * Shown string for method treatment "Contract".
+       */
+      public static final String METHOD_TREATMENT_CONTRACT = "Contract";
+
+      /**
+       * Shown string for loop treatment "Expand".
+       */
+      public static final String LOOP_TREATMENT_EXPAND = "Expand";
+
+      /**
+       * Shown string for loop treatment "Invariant".
+       */
+      public static final String LOOP_TREATMENT_INVARIANT = "Invariant";
+
+      /**
+       * Shown string for alias check "Never".
+       */
+      public static final String NON_EXECUTION_BRANCH_HIDING_OFF = "Off";
+
+      /**
+       * Shown string for alias check "Immediately".
+       */
+      public static final String NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "Via Side Proofs";
+
+      /**
+       * Shown string for alias check "Never".
+       */
+      public static final String ALIAS_CHECK_NEVER = "Never";
+
+      /**
+       * Shown string for alias check "Immediately".
+       */
+      public static final String ALIAS_CHECK_IMMEDIATELY = "Immediately";
+      
       /**
        * {@inheritDoc}
        */
@@ -210,6 +253,38 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       @Override
       public Name name() {
          return name;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public StrategySettingsDefinition getSettingsDefinition() {
+         // Properties
+         OneOfStrategyPropertyDefinition methodTreatment = new OneOfStrategyPropertyDefinition(StrategyProperties.METHOD_OPTIONS_KEY,
+               "Method Treatment",
+               new StrategyPropertyValueDefinition(StrategyProperties.METHOD_EXPAND, METHOD_TREATMENT_EXPAND, null),
+               new StrategyPropertyValueDefinition(StrategyProperties.METHOD_CONTRACT, METHOD_TREATMENT_CONTRACT, null));
+         OneOfStrategyPropertyDefinition loopTreatment = new OneOfStrategyPropertyDefinition(StrategyProperties.LOOP_OPTIONS_KEY,
+               "Loop Treatment",
+               new StrategyPropertyValueDefinition(StrategyProperties.LOOP_EXPAND, LOOP_TREATMENT_EXPAND, null),
+               new StrategyPropertyValueDefinition(StrategyProperties.LOOP_INVARIANT, LOOP_TREATMENT_INVARIANT, null));
+         OneOfStrategyPropertyDefinition branchHiding = new OneOfStrategyPropertyDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+               "Non Execution Branch Hiding",
+               new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF, NON_EXECUTION_BRANCH_HIDING_OFF, null),
+               new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF, NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF, null));
+         OneOfStrategyPropertyDefinition aliasChecks = new OneOfStrategyPropertyDefinition(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
+               "Alias Checks",
+               new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER, ALIAS_CHECK_NEVER, null),
+               new StrategyPropertyValueDefinition(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY, ALIAS_CHECK_IMMEDIATELY, null));
+         // Model
+         return new StrategySettingsDefinition(false, 
+                                          null, 
+                                          "Symbolic Execution Options",
+                                          methodTreatment,
+                                          loopTreatment,
+                                          branchHiding,
+                                          aliasChecks);
       }
    }
 }

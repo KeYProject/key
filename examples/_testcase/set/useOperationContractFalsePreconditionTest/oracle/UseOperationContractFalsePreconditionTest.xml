@@ -2,16 +2,16 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractFalsePreconditionTest.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
-         <operationContract name="result = magic(x) catch(exc)
+         <operationContract name="result_0 = magic(123) catch(exc_0)
 pre: false
-post: result = 42 &amp; exc = null
+post: result_0 = 42 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
                      <methodReturn name="&lt;return of UseOperationContractFalsePreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

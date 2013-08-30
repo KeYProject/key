@@ -19,8 +19,10 @@ import java.util.List;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.util.KeySEDUtil;
 
 import de.uka.ilkd.key.java.Position;
 
@@ -46,6 +48,11 @@ public class KeYLaunchSettings {
     * The {@link IMethod} to debug.
     */
    private IMethod method;
+   
+   /**
+    * The signature of {@link #method} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    */
+   private String methodSignature;
    
    /**
     * Use an existing contract or generate default contract?
@@ -132,6 +139,7 @@ public class KeYLaunchSettings {
     * @param location The launched location.
     * @param classPaths The used class path entries.
     * @param bootClassPath The used boot class path.
+    * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
                             String proofFileToContinue,
@@ -148,10 +156,11 @@ public class KeYLaunchSettings {
                             Position methodRangeEnd,
                             File location,
                             List<File> classPaths,
-                            File bootClassPath) {
+                            File bootClassPath) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
+      this.methodSignature = KeySEDUtil.getMethodValue(method); // It can't be done later because the method might be renamed and JDT throws than an exception. But now the method exists definitively.
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.precondition = precondition;
@@ -166,7 +175,7 @@ public class KeYLaunchSettings {
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
    }
-   
+
    /**
     * Checks if a new debug session should be started or an existing one continued.
     * @return {@code true} new debug session, {@code false} continue existing *.proof file.
@@ -189,6 +198,14 @@ public class KeYLaunchSettings {
     */
    public IMethod getMethod() {
       return method;
+   }
+   
+   /**
+    * Returns the signature of {@link #getMethod()} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    * @return The signature of {@link #getMethod()} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    */
+   public String getMethodSignature() {
+      return methodSignature;
    }
 
    /**

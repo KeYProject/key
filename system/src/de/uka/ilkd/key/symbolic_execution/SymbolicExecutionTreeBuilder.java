@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -158,8 +158,14 @@ public class SymbolicExecutionTreeBuilder {
    private ExecutionStart startNode;
    
    /**
+    * <p>
     * Maps a {@link Node} of KeY's proof tree to his execution tree model representation
     * if it is available.
+    * </p>
+    * <p>
+    * In case that the {@link Node} is represented by multiple {@link AbstractExecutionNode}s,
+    * e.g. a return statement and a method return, the last node is returned.
+    * </p>
     */
    private Map<Node, AbstractExecutionNode> keyNodeMapping = new LinkedHashMap<Node, AbstractExecutionNode>();
    
@@ -589,15 +595,10 @@ public class SymbolicExecutionTreeBuilder {
          if (executionNode == null) {
             // Try to create a new node
             executionNode = createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
-            // Check if a new node was created
-            if (executionNode != null) {
-               // Add new node to symbolic execution tree
-               addChild(parentToAddTo, executionNode);
-               keyNodeMapping.put(node, executionNode);
-               parentToAddTo = executionNode;
-               // Set call stack on new created node
-               executionNode.setCallStack(createCallStack(node.getAppliedRuleApp()));
-            }
+            parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
+            // Check if execution node is a method return
+            executionNode = createMehtodReturn(parentToAddTo, node, statement);
+            parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
          }
          else {
             parentToAddTo = executionNode;
@@ -622,6 +623,29 @@ public class SymbolicExecutionTreeBuilder {
       return parentToAddTo;
    }
    
+   /**
+    * Adds the new created {@link AbstractExecutionNode} to the symbolic execution tree
+    * if available and returns the new parent for future detected nodes.
+    * @param node The {@link Node}.
+    * @param parentToAddTo The parent {@link AbstractExecutionNode}.
+    * @param executionNode The new child {@link AbstractExecutionNode}.
+    * @return The new parent {@link AbstractExecutionNode}.
+    */
+   protected AbstractExecutionNode addNodeToTreeAndUpdateParent(Node node, 
+                                                                AbstractExecutionNode parentToAddTo, 
+                                                                AbstractExecutionNode executionNode) {
+      // Check if a new node was created
+      if (executionNode != null) {
+         // Add new node to symbolic execution tree
+         addChild(parentToAddTo, executionNode);
+         keyNodeMapping.put(node, executionNode);
+         parentToAddTo = executionNode;
+         // Set call stack on new created node
+         executionNode.setCallStack(createCallStack(node.getAppliedRuleApp()));
+      }
+      return parentToAddTo;
+   }
+
    /**
     * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
     * in KeY's proof tree is a method call.
@@ -665,21 +689,6 @@ public class SymbolicExecutionTreeBuilder {
             if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
                result = new ExecutionMethodCall(mediator, node);
             }
-            else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
-               // Find the Node in the proof tree of KeY for that this Node is the return
-               Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
-               if (callNode != null) {
-                  // Make sure that the return should not be ignored
-                  Set<Node> methodReturnsToIgnore = getMethodReturnsToIgnore(node.getAppliedRuleApp()); 
-                  if (!methodReturnsToIgnore.contains(callNode)) {
-                     // Find the call Node representation in SED, if not available ignore it.
-                     IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
-                     if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
-                        result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
-                     }
-                  }
-               }
-            }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
                   result = new ExecutionTermination(mediator, node, exceptionVariable, null);
@@ -718,6 +727,32 @@ public class SymbolicExecutionTreeBuilder {
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
          result = new ExecutionTermination(mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
+      }
+      return result;
+   }
+   
+   protected AbstractExecutionNode createMehtodReturn(AbstractExecutionNode parent,
+                                                      Node node, 
+                                                      SourceElement statement) {
+      AbstractExecutionNode result = null;
+      if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
+         if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
+            if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
+               // Find the Node in the proof tree of KeY for that this Node is the return
+               Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
+               if (callNode != null) {
+                  // Make sure that the return should not be ignored
+                  Set<Node> methodReturnsToIgnore = getMethodReturnsToIgnore(node.getAppliedRuleApp()); 
+                  if (!methodReturnsToIgnore.contains(callNode)) {
+                     // Find the call Node representation in SED, if not available ignore it.
+                     IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
+                     if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
+                        result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
+                     }
+                  }
+               }
+            }
+         }
       }
       return result;
    }
@@ -915,11 +950,16 @@ public class SymbolicExecutionTreeBuilder {
    }
 
    /**
+    * <p>
     * Searches the {@link IExecutionNode} which represents the given {@link Node} of KeY's proof tree.
+    * <p>
+    * In case that the {@link Node} is represented by multiple {@link AbstractExecutionNode}s,
+    * e.g. a return statement and a method return, the last node is returned.
+    * </p>
     * @param proofNode The {@link Node} in KeY's proof tree.
     * @return The {@link IExecutionNode} representation or {@code null} if no one is available.
     */
-   public IExecutionNode getExecutionNode(Node proofNode) {
+   protected IExecutionNode getExecutionNode(Node proofNode) {
       IExecutionNode result = keyNodeMapping.get(proofNode);
       if (result == null) {
          result = keyNodeBranchConditionMapping.get(proofNode);

@@ -155,4 +155,10 @@ public interface Contract extends SpecificationElement {
      * Returns technical name for the contract type.
      */
     public String getTypeName();
+    
+    /**
+     * Checks if a self variable is originally provided.
+     * @return {@code true} self variable is originally provided, {@code false} no self variable available.
+     */
+    public boolean hasSelfVar();
 }
