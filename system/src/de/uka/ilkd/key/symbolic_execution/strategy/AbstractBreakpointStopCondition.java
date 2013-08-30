@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
@@ -31,26 +30,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public abstract class AbstractBreakpointStopCondition extends
       ExecutedSymbolicExecutionTreeNodesStopCondition {
-
-   /**
-    * The path of the class this {@link LineBreakpointStopCondition} is associated with.
-    */
-   private String classPath;
    
    /**
     * The flag if the Breakpoint is enabled.
     */
-   protected boolean enabled;
-   
-   /**
-    * The {@link IProgramMethod} this Breakpoint lies within
-    */
-   protected IProgramMethod pm;
-
-   /**
-    * The {@link KeYEnvironment} the proof is running in
-    */
-   protected KeYEnvironment<?> environment;
+   private boolean enabled;
 
    /**
     * The {@link ITermProgramVariableCollectorFactory} for others to use when collecting variables to dismiss.
@@ -61,25 +45,25 @@ public abstract class AbstractBreakpointStopCondition extends
     * The {@link CompoundStopCondition} containing all BreakpointStopConditions relevant for the current {@link KeYEnvironment}
     */
    private CompoundStopCondition parentCondition;
+   
+   /**
+    * The proof this stop condition is associated with
+    */
+   private Proof proof;
 
 
    /**
     * Creates a new {@link AbstractBreakpointStopCondition}.
     * 
-    * @param classPath the path of the class the associated Breakpoint lies within
-    * @param environment the environment the that the proof that should be stopped is working in
-    * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractBreakpointStopCondition(String classPath, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, boolean enabled){
+   public AbstractBreakpointStopCondition(Proof proof, CompoundStopCondition parentCondition, boolean enabled){
       super();
-      this. environment = environment;
-      this.pm = pm;
-      this.classPath=classPath;
       this.enabled=enabled;
       this.parentCondition=parentCondition;
+      this.setProof(proof);
       createNewFactory();
       proof.getServices().setFactory(programVariableCollectorFactory);
    }
@@ -115,9 +99,9 @@ public abstract class AbstractBreakpointStopCondition extends
                            try{
                               if(breakpointHit(line, path, ruleApp, proof, node)){
                                  // Increase number of set nodes on this goal and allow rule application
-                                    executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                                    getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                                    getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                                 executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+                                 getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
+                                 getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
                                  }
                            }catch(ProofInputException e){
                               //TODO
@@ -181,12 +165,18 @@ public abstract class AbstractBreakpointStopCondition extends
    public void setEnabled(boolean enabled) {
       this.enabled = enabled;
    }
-      
+
    /**
-    * Returns the path of the class the breakpoint is in.
-    * @return the path of the class the breakpoint is in
+    * @return the proof
     */
-   public String getClassPath() {
-      return classPath;
+   public Proof getProof() {
+      return proof;
+   }
+
+   /**
+    * @param proof the proof to set
+    */
+   public void setProof(Proof proof) {
+      this.proof = proof;
    }
 }

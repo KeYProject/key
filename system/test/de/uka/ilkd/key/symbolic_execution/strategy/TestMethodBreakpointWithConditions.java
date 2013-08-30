@@ -43,7 +43,7 @@ public class TestMethodBreakpointWithConditions extends
             } 
          }
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         MethodBreakpointStopCondition mainBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 6, -1, envMain, main, envMain.getBuilder().getProof(),allBreakpoints, "z==-1", true, true,6,11,true,true);
+         MethodBreakpointStopCondition mainBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 6, -1, main, envMain.getBuilder().getProof(),allBreakpoints, "z==-1", true, true,6,11,true,true);
          
          allBreakpoints.addChildren(mainBreakpoint);
          
@@ -65,8 +65,8 @@ public class TestMethodBreakpointWithConditions extends
             } 
          }
          allBreakpoints = new CompoundStopCondition();
-         MethodBreakpointStopCondition somethingMainBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 13, -1, envSomethingMain, somethingMain, envSomethingMain.getBuilder().getProof(), allBreakpoints, "a==2", true, true,13,17,true, true);
-         MethodBreakpointStopCondition somethingBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 19, -1, envSomethingMain, something, envSomethingMain.getBuilder().getProof(), allBreakpoints, "b==3", true, true,19,21,true,true);
+         MethodBreakpointStopCondition somethingMainBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 13, -1, somethingMain, envSomethingMain.getBuilder().getProof(), allBreakpoints, "a==2", true, true,13,17,true, true);
+         MethodBreakpointStopCondition somethingBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 19, -1, something, envSomethingMain.getBuilder().getProof(), allBreakpoints, "b==3", true, true,19,21,true,true);
          allBreakpoints.addChildren(somethingBreakpoint, somethingMainBreakpoint);
          assertSetTreeAfterStep(envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
@@ -88,8 +88,8 @@ public class TestMethodBreakpointWithConditions extends
             } 
          }
          allBreakpoints = new CompoundStopCondition();
-         MethodBreakpointStopCondition somethingLocalBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 30, -1, envSomethingLocalMain, somethingLocal, envSomethingLocalMain.getBuilder().getProof(), allBreakpoints, "y==42*42||x==42", true, true,30,34,true,true);
-         MethodBreakpointStopCondition somethingLocalMainBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 23, -1, envSomethingLocalMain, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(), allBreakpoints, "x==42*42", true, true,23,28,true,true);
+         MethodBreakpointStopCondition somethingLocalBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 30, -1, somethingLocal, envSomethingLocalMain.getBuilder().getProof(), allBreakpoints, "y==42*42||x==42", true, true,30,34,true,true);
+         MethodBreakpointStopCondition somethingLocalMainBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithConditionsTest\\test\\SimpleConditionExample.java", 23, -1, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(), allBreakpoints, "x==42*42", true, true,23,28,true,true);
          allBreakpoints.addChildren(somethingLocalBreakpoint, somethingLocalMainBreakpoint);
          assertSetTreeAfterStep(envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

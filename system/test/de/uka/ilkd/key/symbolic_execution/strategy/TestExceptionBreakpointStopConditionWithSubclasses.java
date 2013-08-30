@@ -50,7 +50,7 @@ public class TestExceptionBreakpointStopConditionWithSubclasses extends
          props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(props);
          
-         ExceptionBreakpointStopCondition firstBreakpoint = new ExceptionBreakpointStopCondition(env, "java.lang.Exception", true, true, true, true, -1);
+         ExceptionBreakpointStopCondition firstBreakpoint = new ExceptionBreakpointStopCondition(proof, allBreakpoints, "java.lang.Exception", true, true, true, true, -1);
          allBreakpoints.addChildren(firstBreakpoint);
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

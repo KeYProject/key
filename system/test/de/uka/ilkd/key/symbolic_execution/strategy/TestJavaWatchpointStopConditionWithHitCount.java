@@ -39,9 +39,9 @@ public class TestJavaWatchpointStopConditionWithHitCount extends
             }
          }
          
-         JavaWatchpointStopCondition firstBreakpoint = new JavaWatchpointStopCondition(true, 2, "access", true, false, containerType, env.getBuilder().getProof());
-         JavaWatchpointStopCondition secondBreakpoint = new JavaWatchpointStopCondition(true, -1, "modification", false, true, containerType, env.getBuilder().getProof());
-         JavaWatchpointStopCondition thirdBreakpoint = new JavaWatchpointStopCondition(true, 2, "accessAndModification", true, true, containerType, env.getBuilder().getProof());
+         JavaWatchpointStopCondition firstBreakpoint = new JavaWatchpointStopCondition(true, 2, "access", true, allBreakpoints, false, containerType, env.getBuilder().getProof());
+         JavaWatchpointStopCondition secondBreakpoint = new JavaWatchpointStopCondition(true, -1, "modification", false, allBreakpoints, true, containerType, env.getBuilder().getProof());
+         JavaWatchpointStopCondition thirdBreakpoint = new JavaWatchpointStopCondition(true, 2, "accessAndModification", true, allBreakpoints, true, containerType, env.getBuilder().getProof());
          allBreakpoints.addChildren(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

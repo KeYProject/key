@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -18,8 +16,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -29,12 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Marco Drebing
  */
 public class ExceptionBreakpointStopCondition extends
-      ExecutedSymbolicExecutionTreeNodesStopCondition {
-
-   /**
-    * The {@link KeYEnvironment} the proof is running in
-    */
-   private SymbolicExecutionEnvironment<?> env;
+      AbstractHitCountBreakpointStopCondition {
    
    /**
     * The exception to watch for
@@ -65,32 +56,12 @@ public class ExceptionBreakpointStopCondition extends
     * a flag to tell whether to stop at uncaught exceptions or not
     */
    private boolean uncaught;
-   
-   /**
-    * enablement of the breakpoint
-    */
-   private boolean enabled;
-   
-   
-   /**
-    * The HitCount of the Breakpoint (set by user).
-    */
-   private int hitCount;
-   
-   /**
-    * Counter for how often the Breakpoint was hit.
-    */
-   private int hitted = 0;
-
-   /**
-    * Map to save the nodes that already have been reached, so nodes are not counted twice for the hitcount
-    */
-   private Map<Integer, Boolean> hittedNodes;
 
    /**
     * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
     * 
-    * @param env the environment the that the proof that should be stopped is working in
+    * @param proof the {@link Proof} that will be executed and should stop
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param exceptionName the name of the exception to watch for
     * @param caught flag to tell if caught exceptions lead to a stop
     * @param uncaught flag to tell if uncaught exceptions lead to a stop
@@ -98,17 +69,14 @@ public class ExceptionBreakpointStopCondition extends
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     */
-   public ExceptionBreakpointStopCondition(SymbolicExecutionEnvironment<?>env, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
-      this.env = env;
+   public ExceptionBreakpointStopCondition(Proof proof, CompoundStopCondition parentCondition, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
+      super(hitCount, proof, parentCondition, enabled);
       this.exceptionName = exceptionName;
       exceptionNodes = new HashSet<Node>();
       exceptionParentNodes = new HashSet<Node>();
-      this.enabled=enabled;
       this.caught=caught;
       this.uncaught=uncaught;
       this.suspendOnSubclasses=suspendOnSubclasses;
-      this.hitCount = hitCount;
-      hittedNodes=new HashMap<Integer, Boolean>();
    }
    /**
     * {@inheritDoc}
@@ -127,7 +95,7 @@ public class ExceptionBreakpointStopCondition extends
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
          SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
          Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-         if(activeStatement!=null&&activeStatement instanceof Throw&&enabled){
+         if(activeStatement!=null&&activeStatement instanceof Throw&&isEnabled()){
             Throw throwStatement = (Throw)activeStatement;
             for(int i = 0; i<throwStatement.getChildCount();i++){
                SourceElement childElement = throwStatement.getChildAt(i);
@@ -137,7 +105,7 @@ public class ExceptionBreakpointStopCondition extends
                      exceptionNodes.add(node);
                      exceptionParentNodes.add(SETParent);
                   }else if(suspendOnSubclasses){
-                     JavaInfo info = env.getServices().getJavaInfo();
+                     JavaInfo info = proof.getServices().getJavaInfo();
                      KeYJavaType kjt = locVar.getKeYJavaType();
                      ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
                      for(KeYJavaType kjtloc: kjts){
@@ -227,34 +195,6 @@ public class ExceptionBreakpointStopCondition extends
       
       return false;
    }
-
-   /**
-    * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
-    * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
-    * 
-    * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
-    */
-   private boolean hitcountExceeded(Node node){
-      if (!(hitCount == -1)) {
-         if(!hittedNodes.containsKey(node.serialNr())){
-            if (hitCount == hitted + 1) {
-               hitted=0;
-               hittedNodes.put(node.serialNr(), Boolean.TRUE);
-               return true;
-            }
-            else {
-               hittedNodes.put(node.serialNr(), Boolean.FALSE);
-               hitted++;
-            }
-         }else {
-            return hittedNodes.get(node.serialNr());
-         }
-      }
-      else {
-         return true;
-      }
-      return false;
-   }
    
    /**
     * @return the isCaught
@@ -279,35 +219,6 @@ public class ExceptionBreakpointStopCondition extends
     */
    public void setUncaught(boolean isUncaught) {
       this.uncaught = isUncaught;
-   }
-   /**
-    * @return the isEnabled
-    */
-   public boolean isEnabled() {
-      return enabled;
-   }
-   /**
-    * @param isEnabled the isEnabled to set
-    */
-   public void setEnabled(boolean isEnabled) {
-      this.enabled = isEnabled;
-   }
-   
-
-   /**
-    * Returns the hitCount of the associated Breakpoint.
-    * @return the hitCount of the associated Breakpoint
-    */
-   public int getHitCount() {
-      return hitCount;
-   }
-   
-   /**
-    * Set the hitCount to the new value
-    * @param hitCount the new value
-    */
-   public void setHitCount(int hitCount) {
-      this.hitCount = hitCount;
    }
    
    /**

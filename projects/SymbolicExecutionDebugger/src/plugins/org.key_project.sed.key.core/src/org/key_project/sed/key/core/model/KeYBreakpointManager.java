@@ -65,8 +65,8 @@ public class KeYBreakpointManager {
          String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
-         KeYWatchpointStopCondition stopCondition = new KeYWatchpointStopCondition(watchpoint.getMarker().getResource().getLocation().toOSString(),
-               watchpoint.getHitCount(), environment, environment
+         KeYWatchpointStopCondition stopCondition = new KeYWatchpointStopCondition(
+               watchpoint.getHitCount(), environment
                .getBuilder().getProof(), breakpointStopConditions,
                watchpoint.getCondition(), watchpoint.isEnabled(),
                watchpoint.isConditionEnabled(), containerKJT, watchpoint.isSuspendOnTrue());
@@ -93,7 +93,7 @@ public class KeYBreakpointManager {
          MethodBreakpointStopCondition stopCondition = new MethodBreakpointStopCondition(
                methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
                methodBreakpoint.getLineNumber(),
-               methodBreakpoint.getHitCount(), environment, pm, environment
+               methodBreakpoint.getHitCount(), pm, environment
                      .getBuilder().getProof(), breakpointStopConditions,
                      methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
                      methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
@@ -118,7 +118,7 @@ public class KeYBreakpointManager {
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
          JavaWatchpointStopCondition stopCondition = new JavaWatchpointStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
-                     javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), javaWatchpoint.isModification(), containerKJT,
+                     javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), breakpointStopConditions, javaWatchpoint.isModification(), containerKJT,
                      environment.getBuilder().getProof());
          breakpointStopConditions.addChildren(stopCondition);
          breakpointMap.put(javaWatchpoint, stopCondition);
@@ -134,7 +134,7 @@ public class KeYBreakpointManager {
     * @throws ProofInputException
     */
    public void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException {
-      ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment, exceptionBreakpoint.getTypeName(),
+      ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment.getBuilder().getProof(),breakpointStopConditions, exceptionBreakpoint.getTypeName(),
             exceptionBreakpoint.isCaught(), exceptionBreakpoint.isUncaught(), exceptionBreakpoint.isSuspendOnSubclasses(),
             exceptionBreakpoint.isEnabled(), exceptionBreakpoint.getHitCount());
       breakpointStopConditions.addChildren(stopCondition);
@@ -158,9 +158,9 @@ public class KeYBreakpointManager {
          int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
          int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
          LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(
-               lineBreakpoint.getMarker().getResource().getLocation().toOSString(),
+               resource.getLocation().toOSString(),
                lineBreakpoint.getLineNumber(),
-               lineBreakpoint.getHitCount(), environment, pm, environment
+               lineBreakpoint.getHitCount(), pm, environment
                      .getBuilder().getProof(), breakpointStopConditions,
                lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
                lineBreakpoint.isConditionEnabled(), start, end);

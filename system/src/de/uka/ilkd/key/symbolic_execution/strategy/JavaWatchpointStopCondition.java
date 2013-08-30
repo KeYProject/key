@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,7 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Marco Drebing
  */
 public class JavaWatchpointStopCondition extends
-      ExecutedSymbolicExecutionTreeNodesStopCondition {
+      AbstractHitCountBreakpointStopCondition {
 
    private boolean isAccess;
 
@@ -33,23 +30,9 @@ public class JavaWatchpointStopCondition extends
 
    private String fieldName;
 
-   private boolean enabled;
-
-   private KeYJavaType containerKJT;
-
    private String fullFieldName;
    
-   private Map<Integer, Boolean> hittedNodes;
-   
-   /**
-    * The HitCount of the Breakpoint (set by user).
-    */
-   private int hitCount;
-   
-   /**
-    * Counter for how often the Breakpoint was hit.
-    */
-   private int hitted = 0;
+   private KeYJavaType containerKJT;
 
 
    /**
@@ -59,21 +42,19 @@ public class JavaWatchpointStopCondition extends
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param fieldName the field to watch
     * @param isAcces flag to watch for accesses
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param isModification flag to watch for modifications
     * @param containerType the type of the element containing the breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     */
    public JavaWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces,
-         boolean isModification, KeYJavaType containerKJT, Proof proof) {
-      super();
-      this.enabled = enabled;
+         CompoundStopCondition parentCondition, boolean isModification, KeYJavaType containerKJT, Proof proof) {
+      super(hitCount, proof, parentCondition, enabled);
+      this.containerKJT=containerKJT;
       this.isAccess = isAcces;
       this.isModification = isModification;
       this.fieldName = fieldName;
-      this.containerKJT = containerKJT;
       this.fullFieldName = containerKJT.getSort().toString()+"::"+fieldName;
-      this.hitCount = hitCount;
-      hittedNodes=new HashMap<Integer, Boolean>();
    }
 
    /**
@@ -102,7 +83,7 @@ public class JavaWatchpointStopCondition extends
                   return false; // Limit of set nodes of this goal exceeded
                }
                else {
-                     if (enabled) {
+                     if (isEnabled()) {
                         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
                         if (activeStatement != null && activeStatement instanceof Assignment) {
                            Assignment assignment = (Assignment) activeStatement;
@@ -181,64 +162,6 @@ public class JavaWatchpointStopCondition extends
       }
       return found;
    }
-   
-   /**
-    * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}.
-    * If the Hitcount is not exceeded the hitted counter is incremented, otherwise its set to 0.
-    * 
-    * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
-    */
-   private boolean hitcountExceeded(Node node){
-      if (!(hitCount == -1)) {
-         if(!hittedNodes.containsKey(node.serialNr())){
-            if (hitCount == hitted + 1) {
-               hitted=0;
-               hittedNodes.put(node.serialNr(), Boolean.TRUE);
-               return true;
-            }
-            else {
-               hittedNodes.put(node.serialNr(), Boolean.FALSE);
-               hitted++;
-            }
-         }else {
-            return hittedNodes.get(node.serialNr());
-         }
-      }
-      else {
-         return true;
-      }
-      return false;
-   }
-
-   /**
-    * @return the current hitCount
-    */
-   public int getHitCount() {
-      return hitCount;
-   }
-
-   /**
-    * @param hitCount the new hitCount
-    */
-   public void setHitCount(int hitCount) {
-      this.hitCount = hitCount;
-   }
-
-
-   /**
-    * @return if the breakpoint is enabled
-    */
-   public boolean isEnabled() {
-      return enabled;
-   }
-
-   /**
-    * @param enabled the new enabled value
-    */
-   public void setEnabled(boolean enabled) {
-      this.enabled = enabled;
-   }
-
    /**
     * @return the isAccess
     */

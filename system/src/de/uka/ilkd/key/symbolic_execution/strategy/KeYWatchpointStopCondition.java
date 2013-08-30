@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
@@ -39,9 +38,7 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
    /**
     * Creates a new {@link AbstractConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
     * 
-    * @param classPath the path of the class the associated Breakpoint lies within
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-    * @param environment the environment the that the proof that should be stopped is working in
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
@@ -54,11 +51,10 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public KeYWatchpointStopCondition(String classPath, int hitCount,
-         SymbolicExecutionEnvironment<?> environment, Proof proof,
-         CompoundStopCondition parentCondition, String condition,
+   public KeYWatchpointStopCondition(int hitCount,
+         Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
-      super(classPath, hitCount, environment, null, proof, parentCondition, enabled, conditionEnabled, -1, -1, containerType);
+      super(hitCount, null, proof, parentCondition, enabled, conditionEnabled, -1, -1, containerType);
       setSuspendOnTrue(suspendOnTrue);
       this.setCondition(condition);
    }

@@ -36,7 +36,7 @@ public class TestKeYWatchpointGlobalVariablesOnTrueWithHitCount extends
          JavaInfo javaInfo = env.getServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
          
-         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\keyWatchpointGlobalVariablesOnTrueWithHitCount\\test\\GlobalVariablesOnTrue.java", 2, env, env.getBuilder().getProof(), allBreakpoints, "x_global==17", true, true, containerType, true);
+         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(2, env.getBuilder().getProof(), allBreakpoints, "x_global==17", true, true, containerType, true);
          
          allBreakpoints.addChildren(globalVariableCondition);
          // Do steps

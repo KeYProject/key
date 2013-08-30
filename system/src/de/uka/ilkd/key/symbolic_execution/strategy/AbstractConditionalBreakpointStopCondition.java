@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -55,7 +55,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public abstract class AbstractConditionalBreakpointStopCondition extends
@@ -105,13 +104,16 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * A {@link ProgramVariable} representing the instance the class KeY is working on
     */
    private ProgramVariable selfVar;
+   
+   /**
+    * The {@link IProgramMethod} this Breakpoint lies within
+    */
+   private IProgramMethod pm;
 
    /**
     * Creates a new {@link AbstractConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
     * 
-    * @param classPath the path of the class the associated Breakpoint lies within
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-    * @param environment the environment the that the proof that should be stopped is working in
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
@@ -121,12 +123,12 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractConditionalBreakpointStopCondition(String classPath,
-         int hitCount, KeYEnvironment<?> environment,
-         IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition,
+   public AbstractConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
+         CompoundStopCondition parentCondition,
          boolean enabled, boolean conditionEnabled,
          int methodStart, int methodEnd, KeYJavaType containerType){
-      super(classPath, hitCount, environment, pm, proof, parentCondition, enabled, containerType);
+      super(hitCount, proof, parentCondition, enabled);
+      this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
       setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());
       toKeep = new HashSet<LocationVariable>();
@@ -285,26 +287,26 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
          return TermBuilder.DF.tt();
       }
       //collect all variables needed to parse the condition
-      setSelfVar(new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(environment.getServices(), "self")), containerType, null, false, false));
+      setSelfVar(new LocationVariable(new ProgramElementName(TermBuilder.DF.newName(getProof().getServices(), "self")), containerType, null, false, false));
       ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
-      if(pm!=null){
+      if(getPm()!=null){
        //collect parameter variables
-         for (ParameterDeclaration pd : pm.getParameters()) {
+         for (ParameterDeclaration pd : getPm().getParameters()) {
             for (VariableSpecification vs : pd.getVariables()) {
                this.paramVars.add((LocationVariable) vs.getProgramVariable());
                varsForCondition = varsForCondition.append((ProgramVariable) vs.getProgramVariable());
             }
          }
          // Collect local variables
-         StatementBlock result = getStatementBlock(pm.getBody());
-         ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, environment.getServices());
+         StatementBlock result = getStatementBlock(getPm().getBody());
+         ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, getProof().getServices());
          variableCollector.start();
          Set<LocationVariable> undeclaredVariables = variableCollector.result();
          for (LocationVariable x : undeclaredVariables) {
             varsForCondition = saveAddVariable(x, varsForCondition);
          }
       }
-      JavaInfo info = environment.getServices().getJavaInfo();
+      JavaInfo info = getProof().getServices().getJavaInfo();
       ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
       ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
       for(KeYJavaType kjtloc: kjts){
@@ -319,7 +321,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
       //parse string
       PositionedString ps = new PositionedString(condition);
       KeYJMLParser parser = new KeYJMLParser(ps, 
-                                             environment.getServices(), 
+                                             getProof().getServices(), 
                                              containerType, 
                                              getSelfVar(), 
                                              varsForCondition, 
@@ -490,5 +492,19 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     */
    public void setVarsForCondition(ImmutableList<ProgramVariable> varsForCondition) {
       this.varsForCondition = varsForCondition;
+   }
+
+   /**
+    * @return the pm
+    */
+   public IProgramMethod getPm() {
+      return pm;
+   }
+
+   /**
+    * @param pm the pm to set
+    */
+   public void setPm(IProgramMethod pm) {
+      this.pm = pm;
    }
 }

@@ -50,7 +50,7 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends
          props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(props);
          
-         ExceptionBreakpointStopCondition firstBreakpoint = new ExceptionBreakpointStopCondition(env, "java.lang.NullPointerException", true, true, false, true, 2);
+         ExceptionBreakpointStopCondition firstBreakpoint = new ExceptionBreakpointStopCondition(proof, allBreakpoints, "java.lang.NullPointerException", true, true, false, true, 2);
          allBreakpoints.addChildren(firstBreakpoint);
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

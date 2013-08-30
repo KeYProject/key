@@ -36,7 +36,7 @@ public class TestKeYWatchpointGlobalVariablesOnSatisfiable extends
          JavaInfo javaInfo = env.getServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
          
-         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\keyWatchpointGlobalVariablesOnSatisfiable\\test\\GlobalVariablesOnSatisfiable.java", -1, env, env.getBuilder().getProof(), allBreakpoints, "x_global==17", true, true, containerType, false);
+         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(-1, env.getBuilder().getProof(), allBreakpoints, "x_global==17", true, true, containerType, false);
          
          allBreakpoints.addChildren(globalVariableCondition);
          // Do steps

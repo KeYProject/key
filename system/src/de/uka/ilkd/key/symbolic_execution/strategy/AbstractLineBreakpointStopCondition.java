@@ -23,11 +23,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.util.ExtList;
 
 public class AbstractLineBreakpointStopCondition extends
       AbstractConditionalBreakpointStopCondition {
+
+   /**
+    * The path of the class this {@link LineBreakpointStopCondition} is associated with.
+    */
+   private String classPath;
    
    /**
     * The line of the Breakpoint in the respective class.
@@ -50,7 +54,6 @@ public class AbstractLineBreakpointStopCondition extends
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-    * @param environment the environment the that the proof that should be stopped is working in
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
@@ -63,14 +66,15 @@ public class AbstractLineBreakpointStopCondition extends
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public AbstractLineBreakpointStopCondition(String classPath, int lineNumber,
-         int hitCount, KeYEnvironment<?> environment, IProgramMethod pm,
+         int hitCount, IProgramMethod pm,
          Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, KeYJavaType containerType)
          throws SLTranslationException {
-      super(classPath, hitCount, environment, pm, proof, parentCondition,
+      super(hitCount, pm, proof, parentCondition,
             enabled, conditionEnabled, methodStart, methodEnd,
             containerType);
+      this.classPath=classPath;
       this.methodEnd=methodEnd;
       this.methodStart=methodStart;
       this.lineNumber=lineNumber;
@@ -151,6 +155,24 @@ public class AbstractLineBreakpointStopCondition extends
          checkNode = checkNode.parent();
       }
       return false;
+   }
+
+
+
+   /**
+    * @return the classPath
+    */
+   public String getClassPath() {
+      return classPath;
+   }
+
+
+
+   /**
+    * @param classPath the classPath to set
+    */
+   public void setClassPath(String classPath) {
+      this.classPath = classPath;
    }
 
 }

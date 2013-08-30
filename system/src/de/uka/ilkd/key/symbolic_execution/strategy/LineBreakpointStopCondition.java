@@ -3,7 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This{@link LineBreakpointStopCondition} represents a line breakpoint and is responsible to tell the debugger to stop execution when the respective
@@ -21,7 +20,6 @@ public class LineBreakpointStopCondition extends AbstractLineBreakpointStopCondi
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
     * @param hitCount the hitCount for this Breakpoint, given by user
-    * @param environment the environment the that the proof that should be stopped is working in
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
@@ -32,8 +30,8 @@ public class LineBreakpointStopCondition extends AbstractLineBreakpointStopCondi
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public LineBreakpointStopCondition(String classPath, int lineNumber, int hitCount, KeYEnvironment<?> environment, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, environment, pm, proof, parentCondition,
+   public LineBreakpointStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+      super(classPath, lineNumber, hitCount, pm, proof, parentCondition,
             condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType()); 
    }
 }

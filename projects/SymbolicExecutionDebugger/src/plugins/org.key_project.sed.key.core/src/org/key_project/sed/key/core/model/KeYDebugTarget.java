@@ -88,7 +88,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * The {@link KeYBreakpointManager} that manages breakpoints for this target.
     */
-   private KeYBreakpointManager breakpointManager;
+   private KeYBreakpointManager breakpointManager = new KeYBreakpointManager();;
   
    /**
     * The used model identifier.
@@ -207,7 +207,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false, false);
-      breakpointManager = new KeYBreakpointManager();
       addBreakpoints();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
    }

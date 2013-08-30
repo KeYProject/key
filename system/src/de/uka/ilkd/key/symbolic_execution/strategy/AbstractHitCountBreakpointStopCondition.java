@@ -15,13 +15,10 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 public abstract class AbstractHitCountBreakpointStopCondition extends
       AbstractBreakpointStopCondition {
@@ -47,20 +44,13 @@ public abstract class AbstractHitCountBreakpointStopCondition extends
    /**
     * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
     * 
-    * @param classPath the path of the class the associated Breakpoint lies within
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-    * @param environment the environment the that the proof that should be stopped is working in
-    * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
-    * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
-    * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractHitCountBreakpointStopCondition(String classPath, int hitCount, KeYEnvironment<?> environment,
-         IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition,
-         boolean enabled, KeYJavaType containerType){
-      super(classPath, environment, pm, proof, parentCondition, enabled);
+   public AbstractHitCountBreakpointStopCondition(int hitCount, Proof proof, CompoundStopCondition parentCondition, boolean enabled){
+      super(proof, parentCondition, enabled);
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
    }

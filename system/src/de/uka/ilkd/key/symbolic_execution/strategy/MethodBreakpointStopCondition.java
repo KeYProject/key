@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCondition {
@@ -34,7 +33,6 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-    * @param environment the environment the that the proof that should be stopped is working in
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
     * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
@@ -49,11 +47,11 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public MethodBreakpointStopCondition(String classPath, int lineNumber,
-         int hitCount, KeYEnvironment<?> environment, IProgramMethod pm,
+         int hitCount, IProgramMethod pm,
          Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, environment, pm, proof, parentCondition,
+      super(classPath, lineNumber, hitCount, pm, proof, parentCondition,
                condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;
@@ -75,9 +73,9 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
       IProgramMethod currentPm=null;
       if (statement instanceof MethodBodyStatement) {
          MethodBodyStatement mbs = (MethodBodyStatement)statement;
-         currentPm = mbs.getProgramMethod(environment.getServices()); 
+         currentPm = mbs.getProgramMethod(getProof().getServices()); 
       }
-      if(SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(pm)){
+      if(SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, NodeInfo.computeActiveStatement(ruleApp))&&currentPm != null&&currentPm.equals(getPm())){
             return true;
       }
       return false;
@@ -125,7 +123,7 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
                      }
                      else {
                            try {
-                              if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&enabled&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))){
+                              if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&isEnabled()&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))){
                                  // Increase number of set nodes on this goal and allow rule application
                                  if(hitcountExceeded(node)){
                                     executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
