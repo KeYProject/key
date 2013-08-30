@@ -2,24 +2,25 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(value);" pathCondition="true" pathConditionChanged="false">
-         <operationContract name="result = magic(x) catch(exc)
-pre: x &lt; 0 &amp; x &gt;= javaUnaryMinusInt(10)
-| x &lt; javaUnaryMinusInt(10)
-| x &gt;= 0
-&amp; x &lt; 10
-| x &gt;= 10
-post: (   x &lt; 0 &amp; x &gt;= javaUnaryMinusInt(10)
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+         <operationContract name="result_0 = magic(value) catch(exc_0)
+pre: value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
+| value &lt; javaUnaryMinusInt(10)
+| value &gt;= 0
+&amp; value &lt; 10
+| value &gt;= 10
+post: (   value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
            = TRUE
-         | java.lang.Exception::instance(exc) = TRUE))
-&amp; (   x &lt; javaUnaryMinusInt(10)
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (   value &lt; javaUnaryMinusInt(10)
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
            = TRUE
-         | java.lang.Exception::instance(exc) = TRUE))
-&amp; (x &gt;= 0 &amp; x &lt; 10 -&gt; result = 42 &amp; exc = null)
-&amp; (x &gt;= 10 -&gt; result = 84 &amp; exc = null)
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (   value &gt;= 0 &amp; value &lt; 10
+   -&gt; result_0 = 42 &amp; exc_0 = null)
+&amp; (value &gt;= 10 -&gt; result_0 = 84 &amp; exc_0 = null)
 mod: allLocs \cup allLocs \cup allLocs \cup allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="!value &lt;= -1" pathCondition="!value &lt;= -1" pathConditionChanged="true" branchCondition="!value &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">

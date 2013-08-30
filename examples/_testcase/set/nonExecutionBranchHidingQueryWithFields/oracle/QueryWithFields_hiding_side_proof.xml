@@ -2,9 +2,9 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
-         <operationContract name="result = self.magic(x) catch(exc)
+         <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
-post: result = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc = null
+post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">

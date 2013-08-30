@@ -3,9 +3,9 @@
    <methodCall name="UseOperationContractQueryTest.main(value);" pathCondition="true" pathConditionChanged="false">
       <statement name="return magicTransformation(value);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <operationContract name="result = magicTransformation(value) catch(exc)
+         <operationContract name="result_0 = magicTransformation(value) catch(exc_0)
 pre: true
-post: result = javaMulInt(value, 2) &amp; exc = null
+post: result_0 = javaMulInt(value, 2) &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <callStackEntry path="/0"/>

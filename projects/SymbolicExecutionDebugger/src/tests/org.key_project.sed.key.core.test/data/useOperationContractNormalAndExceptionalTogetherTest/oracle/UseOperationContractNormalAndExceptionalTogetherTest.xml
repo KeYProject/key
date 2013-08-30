@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_160f632a-26f0-44cb-ab63-872628db0617" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_8a8ab08e-9156-4a91-aed0-cc597502409f" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_6b9b37dd-1866-453e-906b-7940d2dac621" name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
-            <sedStatement xml:id="_cb6329e7-40e9-4afb-afc8-8b6af62941e1" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211">
-               <sedMethodContract xml:id="_efc4b779-fda4-42c7-b99c-e215fffb7e52" name="result = magic(x) catch(exc)
-pre: x &lt; 0 | x &gt;= 0
-post: (   x &lt; 0
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+   <sedTarget xml:id="_5f1a8836-0dd8-45a6-a31f-f16895f3449e" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_55f7b1d5-9add-4cc4-aad7-d6ffca944317" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_312c15d3-2753-49e9-99eb-18e3ddba3dcc" name="UseOperationContractNormalAndExceptionalTogetherTest.main();" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
+            <sedStatement xml:id="_834837ef-ece9-40b6-9aeb-e0922050828d" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="182" charEnd="211">
+               <sedMethodContract xml:id="_dd99f338-383a-4098-aa5a-b01fc80e6014" name="result_0 = magic(123) catch(exc_0)
+pre: 123 &lt; 0 | 123 &gt;= 0
+post: (   123 &lt; 0
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
            = TRUE
-         | java.lang.Exception::instance(exc) = TRUE))
-&amp; (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (123 &gt;= 0 -&gt; result_0 = 42 &amp; exc_0 = null)
 mod: allLocs \cup allLocs
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="576" charEnd="581" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedStatement xml:id="_9f5b468b-684d-428d-b1e1-27807909f99b" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250">
-                     <sedStatement xml:id="_8c17b7eb-64f3-449f-a388-6ffab212b56c" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292">
-                        <sedMethodReturn xml:id="_c86d2949-d91c-491b-a506-eb810edee4d7" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
-                           <sedTermination xml:id="_a9c560f9-0bbb-416b-9198-b3e219c9d4d5" name="&lt;end&gt;" pathCondition="true" verified="true">
+                  <sedStatement xml:id="_c7f57d0a-ce66-4010-8824-a432ea2a40e9" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="216" charEnd="250">
+                     <sedStatement xml:id="_8e8cbe96-8650-417b-b1f8-8990a88be628" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="292">
+                        <sedMethodReturn xml:id="_7ddb5d95-ae5e-4322-9ce0-9e93be3afd97" name="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="160" charEnd="164">
+                           <sedTermination xml:id="_ba179418-dd6a-46fe-80f4-8d7c67668ac5" name="&lt;end&gt;" pathCondition="true" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
