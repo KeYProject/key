@@ -45,11 +45,11 @@
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <operationContract name="result = self.sum(array) catch(exc)
+               <operationContract name="result_0 = self.sum(array) catch(exc_0)
 pre: !array = null &amp; (self.&lt;inv&gt; &amp; !array = null)
-post: result = bsum{int i;}(0, array.length, array[i])
+post: result_0 = bsum{int i;}(0, array.length, array[i])
 &amp; self.&lt;inv&gt;
-&amp; exc = null
+&amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="!array = null" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">

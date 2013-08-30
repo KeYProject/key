@@ -559,6 +559,10 @@ public final class DependencyContractImpl implements DependencyContract {
                 specifiedIn);
     }
 
+    @Override
+    public boolean hasSelfVar() {
+        return originalSelfVar != null;
+    }
 
     @Override
     public OriginalVariables getOrigVars() {

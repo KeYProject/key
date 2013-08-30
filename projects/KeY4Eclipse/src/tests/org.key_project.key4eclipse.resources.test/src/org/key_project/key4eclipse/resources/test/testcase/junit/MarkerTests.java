@@ -250,7 +250,7 @@ public class MarkerTests extends TestCase{
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 132, 153));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 115, 118));
    }
    
    private void testProofNotClosedMarker(IProject project) throws CoreException{
@@ -265,7 +265,7 @@ public class MarkerTests extends TestCase{
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 138, 159));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 115, 118));
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{
@@ -357,11 +357,11 @@ public class MarkerTests extends TestCase{
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile) == 2);
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 296, 361)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 449, 487));
+      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447));
       }
-      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 449, 487)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 296, 361));
+      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294));
       }
       else{
          fail();

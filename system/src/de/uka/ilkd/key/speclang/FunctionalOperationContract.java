@@ -90,5 +90,16 @@ public interface FunctionalOperationContract extends OperationContract {
         ImmutableList<ProgramVariable> paramVars,
         ProgramVariable resultVar,
         Map<LocationVariable,? extends ProgramVariable> atPreVars,
-        Services services);    
+        Services services);
+
+    public Term getRepresentsAxiom(LocationVariable heap,
+                                   Term heapTerm,
+                                   Term selfTerm,
+                                   ImmutableList<Term> paramTerms,
+                                   Term resultTerm,
+                                   Term excTerm,
+                                   Map<LocationVariable,Term> atPres,
+                                   Services services);
+
+    public boolean hasResultVar();
 }

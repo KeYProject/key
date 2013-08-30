@@ -35,20 +35,20 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          &amp; array.length &gt;= i_0
       -&gt; result_1_0 = i_0))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <operationContract name="result = goOnNice(array, i) catch(exc)
+                  <operationContract name="result_3 = goOnNice(array, i) catch(exc_3)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+   -&gt;   !exc_3 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_3)
            = TRUE
-         |   java.lang.RuntimeException::instance(exc)
+         |   java.lang.RuntimeException::instance(exc_3)
            = TRUE))
 &amp; (   !array = null &amp; i &gt;= 0
-   -&gt;     result
+   -&gt;     result_3
         = \if (i &lt; array.length)
               \then (TRUE)
               \else (FALSE)
-      &amp; exc = null)
+      &amp; exc_3 = null)
 mod: allLocs \cup allLocs \cup allLocs \cup allLocs
 termination: diamond" pathCondition="!(  array.length &gt;= 0
   &amp; (    !i_0 = 0

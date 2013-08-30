@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_71f8521d-ce77-462f-b7e8-4ea342304cbc" name="main(UseOperationContractExceptionalNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_09425a93-9869-4b79-b157-2efa9708121d" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_b5c4f5c8-d400-4c52-b7c0-e3b6f8a7594d" name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="100" charEnd="104">
-            <sedStatement xml:id="_a0646cc7-75d9-4f5a-89a2-05b362c4165c" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="188" charEnd="221">
-               <sedOperationContract xml:id="_598e6e32-5a48-436a-839d-a8f68814fa07" name="result = self.magic(x) catch(exc)
-pre: self.&lt;inv&gt;
-post: !exc = null
-&amp; (  (   java.lang.Exception::instance(exc) = TRUE
-      -&gt; self.&lt;inv&gt;)
-   &amp; (    java.lang.RuntimeException::instance(exc)
+   <sedTarget xml:id="_ee4a0290-0d8f-4ecf-8355-3bc99f0e4d95" name="main(UseOperationContractExceptionalNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_419ca4e5-d7ab-47ac-bbf6-e9e34e1f3ad7" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_544780a1-44dc-43ae-aa40-057ccc9fed69" name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="100" charEnd="104">
+            <sedStatement xml:id="_bfcfa070-b40f-4119-9ec8-e9f03feed222" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="188" charEnd="221">
+               <sedMethodContract xml:id="_1a413f6c-5ec0-4942-84ee-82afe97fbe23" name="result_0 = obj.magic(123) catch(exc_0)
+pre: obj.&lt;inv&gt;
+post: !exc_0 = null
+&amp; (  (   java.lang.Exception::instance(exc_0) = TRUE
+      -&gt; obj.&lt;inv&gt;)
+   &amp; (    java.lang.RuntimeException::instance(exc_0)
         = TRUE
-      | java.lang.Exception::instance(exc) = TRUE))
+      | java.lang.Exception::instance(exc_0) = TRUE))
 mod: allLocs
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="453" charEnd="458" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_d897d5d4-6a02-479b-9bcc-b24cc949f8aa" name="Exceptional Post (magic): !obj = null" pathCondition="!obj = null">
-                     <sedStatement xml:id="_40f56462-a82b-4610-95e8-3d011991f6c1" name="return -1;" pathCondition="!obj = null" lineNumber="-1" charStart="337" charEnd="347">
-                        <sedMethodReturn xml:id="_2d3721c4-9801-4065-93b5-36b296eb819b" name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" lineNumber="-1" charStart="100" charEnd="104">
-                           <sedTermination xml:id="_fc87ff0d-d408-4aa7-a2dd-c33e52e31483" name="&lt;end&gt;" pathCondition="!obj = null" verified="true">
+                  <sedBranchCondition xml:id="_40ddcc81-7f82-4673-90cb-f5978cf562d2" name="Exceptional Post (magic): !obj = null" pathCondition="!obj = null">
+                     <sedStatement xml:id="_3668d3fb-bfae-4ac7-9e2c-2cc6ffbdc987" name="return -1;" pathCondition="!obj = null" lineNumber="-1" charStart="337" charEnd="347">
+                        <sedMethodReturn xml:id="_37f86ef8-73c2-495f-8c67-cf22d71de6f4" name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" lineNumber="-1" charStart="100" charEnd="104">
+                           <sedTermination xml:id="_970aa44b-a9c9-411e-98b9-95d5e61790ca" name="&lt;end&gt;" pathCondition="!obj = null" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-               </sedOperationContract>
+               </sedMethodContract>
             </sedStatement>
          </sedMethodCall>
       </sedThread>

@@ -190,6 +190,13 @@ public interface Contract extends SpecificationElement {
      */
     public String getTypeName();
 
+    /**
+     * Checks if a self variable is originally provided.
+     * @return {@code true} self variable is originally provided,
+     *         {@code false} no self variable available.
+     */
+    public boolean hasSelfVar();
+
     final public class OriginalVariables {
 
         public final ProgramVariable self;

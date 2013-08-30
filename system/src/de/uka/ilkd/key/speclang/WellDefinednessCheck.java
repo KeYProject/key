@@ -572,23 +572,23 @@ public abstract class WellDefinednessCheck implements Contract {
                                              ImmutableList<ParsableVariable> params,
                                              Services services);
 
-    Condition replaceSV(Condition pre, SchemaVariable self,
-                           ImmutableList<ParsableVariable> params) {
+    final Condition replaceSV(Condition pre, SchemaVariable self,
+                              ImmutableList<ParsableVariable> params) {
         final Term implicit = replaceSV(pre.implicit, self, params);
         final Term explicit = replaceSV(pre.explicit, self, params);
         return new Condition(implicit, explicit);
     }
 
-    void setMby(Term mby) {
+    final void setMby(Term mby) {
         this.mby = mby;
     }
 
-    void setRequires(Term req) {
+    final void setRequires(Term req) {
         Pair<Term, Term> requires = split(req);
         this.requires = new Condition(requires.first, requires.second);
     }
 
-    void setAssignable(Term ass, Services services) {
+    final void setAssignable(Term ass, Services services) {
         this.assignable = ass;
         if (ass == TB.ff()) {
             this.assignable = TB.empty(services);
@@ -597,23 +597,23 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    void setAccessible(Term acc) {
+    final void setAccessible(Term acc) {
         this.accessible = acc;
     }
 
-    void addEnsures(Term ens) {
+    final void addEnsures(Term ens) {
         final Pair<Term, Term> ensures = split(ens);
         final Condition oldEnsures = getEnsures();
         this.ensures = new Condition(TB.andSC(ensures.first, oldEnsures.implicit),
                                      TB.andSC(ensures.second, oldEnsures.explicit));
     }
 
-    void setEnsures(Term ens) {
+    final void setEnsures(Term ens) {
         Pair<Term, Term> ensures = split(ens);
         this.ensures = new Condition(ensures.first, ensures.second);
     }
 
-    Type type() {
+    final Type type() {
         return this.type;
     }
 
@@ -642,12 +642,12 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public abstract boolean isModel();
 
-    public static Taclet createTaclet(String name,
-                                      Term callee,
-                                      Term callTerm,
-                                      Term pre,
-                                      boolean isStatic,
-                                      Services services) {
+    public final static Taclet createTaclet(String name,
+                                            Term callee,
+                                            Term callTerm,
+                                            Term pre,
+                                            boolean isStatic,
+                                            Services services) {
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         final Term notNull = isStatic ?
                 TB.tt() : TB.not(TB.equals(callee, TB.NULL(services)));
@@ -663,7 +663,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /** collects terms for precondition,
      * assignable clause and other specification elements,
      * and postcondition & signals-clause */
-    public POTerms createPOTerms() {
+    public final POTerms createPOTerms() {
         final Condition pre = this.getRequires();
         final Term mod = this.getAssignable();
         final ImmutableList<Term> rest = this.getRest();
@@ -671,17 +671,17 @@ public abstract class WellDefinednessCheck implements Contract {
         return new POTerms(pre, mod, rest, post);
     }
 
-    public WellDefinednessCheck addRepresents(Term rep) {
+    public final WellDefinednessCheck addRepresents(Term rep) {
         this.represents = rep;
         return this;
     }
 
-    public TermAndFunc getPre(final Condition pre,
-                              ParsableVariable self,
-                              ParsableVariable heap,
-                              ImmutableList<? extends ParsableVariable> parameters,
-                              boolean taclet,
-                              Services services) {
+    public final TermAndFunc getPre(final Condition pre,
+                                    ParsableVariable self,
+                                    ParsableVariable heap,
+                                    ImmutableList<? extends ParsableVariable> parameters,
+                                    boolean taclet,
+                                    Services services) {
         ImmutableList<ParsableVariable> params = ImmutableSLList.<ParsableVariable>nil();
         for (ParsableVariable pv: parameters) {
             params = params.append(pv);
@@ -703,7 +703,8 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    public Term getPost(final Condition post, ParsableVariable result, Services services) {
+    public final Term getPost(final Condition post, ParsableVariable result,
+                              Services services) {
         final Term reachable;
         if (result != null) {
             reachable = TB.reachableValue(services, TB.var(result),
@@ -714,8 +715,9 @@ public abstract class WellDefinednessCheck implements Contract {
         return TB.andSC(reachable, post.implicit, post.explicit);
     }
 
-    public Term getUpdates(Term mod, LocationVariable heap, ProgramVariable heapAtPre,
-                           Term anonHeap, Services services) {
+    public final Term getUpdates(Term mod, LocationVariable heap,
+                                 ProgramVariable heapAtPre,
+                                 Term anonHeap, Services services) {
         assert mod != null;
         final Term havocUpd = TB.elementary(services, heap,
                 TB.anon(services, TB.var(heap), mod, anonHeap));
@@ -723,7 +725,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return TB.parallel(oldUpd, havocUpd);
     }
 
-    public POTerms replace(POTerms po, Variables vars) {
+    public final POTerms replace(POTerms po, Variables vars) {
         final Condition pre = replace(po.pre, vars);
         final Term mod = replace(po.mod, vars);
         final ImmutableList<Term> rest = replace(po.rest, vars);
@@ -731,114 +733,114 @@ public abstract class WellDefinednessCheck implements Contract {
         return new POTerms(pre, mod, rest, post);
     }
 
-    public LocationVariable getHeap() {
+    public final LocationVariable getHeap() {
         return this.heap;
     }
 
-    public Name name() {
+    public final Name name() {
         return new Name(getName());
     }
 
-    public Condition getRequires() {
+    public final Condition getRequires() {
         assert this.requires != null;
         return this.requires;
     }
 
-    public Term getAssignable() {
+    public final Term getAssignable() {
         assert this.assignable != null;
         return this.assignable;
     }
 
-    public Term getAccessible() {
+    public final Term getAccessible() {
         return this.accessible;
     }
 
-    public Condition getEnsures() {
+    public final Condition getEnsures() {
         assert this.ensures != null;
         return this.ensures;
     }
 
-    public Term getEnsures(LocationVariable heap) {
+    public final Term getEnsures(LocationVariable heap) {
         return TB.andSC(getEnsures().implicit, getEnsures().explicit);
     }
 
-    public Term getRepresents() {
+    public final Term getRepresents() {
         return this.represents;
     }
 
-    public boolean isConstructor() {
+    public final boolean isConstructor() {
         IObserverFunction target = getTarget();
         return target instanceof IProgramMethod
                 && ((IProgramMethod)target).isConstructor();
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return getName();
     }
 
     @Override
-    public String getName() {
+    public final String getName() {
         return this.name;
     }
 
     @Override
-    public int id() {
+    public final int id() {
         return id;
     }
 
     @Override
-    public Term getMby() {
+    public final Term getMby() {
         return this.mby;
     }
 
     @Override
-    public boolean hasMby() {
+    public final boolean hasMby() {
         return this.mby != null;
     }
 
     @Override
-    public Term getRequires(LocationVariable heap) {
+    public final Term getRequires(LocationVariable heap) {
         return TB.andSC(getRequires().implicit, getRequires().explicit);
     }
 
-    public Term getAssignable(LocationVariable heap) {
+    public final Term getAssignable(LocationVariable heap) {
         return getAssignable();
     }
 
-    public Term getAccessible(ProgramVariable heap) {
+    public final Term getAccessible(ProgramVariable heap) {
         return getAccessible();
     }
 
     @Override
-    public String getHTMLText(Services services) {
+    public final String getHTMLText(Services services) {
         return getText(true, services);
     }
 
     @Override
-    public String getPlainText(Services services) {
+    public final String getPlainText(Services services) {
         return getText(false, services);
     }
 
     @Override
-    public String proofToString(Services services) {
+    public final String proofToString(Services services) {
         assert false;
         return null;
     }
 
     @Override
-    public IObserverFunction getTarget() {
+    public final IObserverFunction getTarget() {
         return this.target;
     }
 
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
+    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         assert contract instanceof WellDefinednessCheck;
         return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
     }
 
     @Override
-    public String getDisplayName() {
+    public final String getDisplayName() {
         return "Well-Definedness of JML " +
                (isModel() ? "model " : "") +
                typeString() +
@@ -847,17 +849,21 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
-    public boolean toBeSaved() {
+    public final boolean toBeSaved() {
         return false;
     }
 
+    public final boolean hasSelfVar() {
+        return origVars.self != null;
+    }
+
     @Override
-    public OriginalVariables getOrigVars() {
+    public final OriginalVariables getOrigVars() {
         return this.origVars;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (!(o instanceof WellDefinednessCheck)) {
             return false;
         }
@@ -866,73 +872,73 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return this.name.hashCode();
     }
 
     @Deprecated
-    public Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-            Services services) throws UnsupportedOperationException {
+    public final Term getPre(LocationVariable heap, ProgramVariable selfVar,
+                             ImmutableList<ProgramVariable> paramVars,
+                             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getPre(List<LocationVariable> heapContext,
-                       ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-                       Services services) throws UnsupportedOperationException {
+    public final Term getPre(List<LocationVariable> heapContext,
+                             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+                             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
-                       ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
-                       Services services) throws UnsupportedOperationException {
+    public final Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
+                             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+                             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getPre(List<LocationVariable> heapContext,
-                       Map<LocationVariable, Term> heapTerms, Term selfTerm,
-                       ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
-                       Services services) throws UnsupportedOperationException {
+    public final Term getPre(List<LocationVariable> heapContext,
+                             Map<LocationVariable, Term> heapTerms, Term selfTerm,
+                             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+                             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getDep(LocationVariable heap, boolean atPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars,
-            Services services) {
+    public final Term getDep(LocationVariable heap, boolean atPre,
+                             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+                             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                             Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
-            Term selfTerm, ImmutableList<Term> paramTerms,
-            Map<LocationVariable, Term> atPres, Services services) {
+    public final Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
+                             Term selfTerm, ImmutableList<Term> paramTerms,
+                             Map<LocationVariable, Term> atPres, Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                              ImmutableList<Term> paramTerms, Services services) {
+    public final Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                    ImmutableList<Term> paramTerms, Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getMby(ProgramVariable selfVar,
-                       ImmutableList<ProgramVariable> paramVars,
-                       Services services) throws UnsupportedOperationException {
+    public final Term getMby(ProgramVariable selfVar,
+                             ImmutableList<ProgramVariable> paramVars,
+                             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Deprecated
-    public Term getMby(Map<LocationVariable,Term> heapTerms, Term selfTerm,
-                       ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
-                       Services services) throws UnsupportedOperationException {
+    public final Term getMby(Map<LocationVariable,Term> heapTerms, Term selfTerm,
+                             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+                             Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 

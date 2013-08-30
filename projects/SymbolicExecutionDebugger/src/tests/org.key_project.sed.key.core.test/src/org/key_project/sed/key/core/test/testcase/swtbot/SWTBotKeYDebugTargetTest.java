@@ -1314,7 +1314,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
-    * @param useOperationContracts Use operation contracts?
+    * @param useMethodContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
@@ -1332,7 +1332,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  final boolean stepIntoInsteadOfRun,
                                  final boolean showKeYMainWindow,
                                  final boolean mergeBranchConditions,
-                                 final boolean useOperationContracts,
+                                 final boolean useMethodContracts,
                                  final boolean useLoopInvariants,
                                  final boolean nonExecutionBranchHidingSideProofs,
                                  final boolean aliasChecks) throws Exception {
@@ -1354,7 +1354,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
             // Configure operation contract and loop invariant usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
-            if (useOperationContracts) {
+            if (useMethodContracts) {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
             }
             else {

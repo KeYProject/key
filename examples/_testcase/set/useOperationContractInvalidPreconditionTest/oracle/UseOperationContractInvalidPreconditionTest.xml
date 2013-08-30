@@ -5,9 +5,9 @@
          <methodCall name="UseOperationContractInvalidPreconditionTest();" pathCondition="true" pathConditionChanged="false">
             <methodReturn name="&lt;return of UseOperationContractInvalidPreconditionTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                <statement name="int magicNumber = obj.magic(-123);" pathCondition="true" pathConditionChanged="false">
-                  <operationContract name="result = self.magic(x) catch(exc)
-pre: x &gt;= 0 &amp; self.&lt;inv&gt;
-post: result = 42 &amp; self.&lt;inv&gt; &amp; exc = null
+                  <operationContract name="result_0 = obj.magic(-123) catch(exc_0)
+pre: -123 &gt;= 0 &amp; obj.&lt;inv&gt;
+post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
                      <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
