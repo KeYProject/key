@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.resources.test.testcase.junit;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -26,7 +24,7 @@ import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestU
 import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
-public class HideMetaFilesTests extends TestCase{
+public class HideMetaFilesTests extends AbstractResourceTest {
    
    @Test
    public void testHideMetaFiles() throws CoreException, InterruptedException{
