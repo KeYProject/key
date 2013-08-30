@@ -68,12 +68,12 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
@@ -1221,8 +1221,8 @@ public final class SpecificationRepository {
         loopInvs.put(loop, inv);
     }
 
-    public void addLoopWellDefinedness(LoopWellDefinedness lwd) {
-        registerWdCheck(lwd);
+    public void addStatementWellDefinedness(StatementWellDefinedness swd) {
+        registerWdCheck(swd);
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
@@ -1262,7 +1262,6 @@ public final class SpecificationRepository {
     public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         blockContracts.put(block, getBlockContracts(block).add(contract));
-        // TODO: Add BlockWellDefinedness
     }
 
 
@@ -1367,30 +1366,30 @@ public final class SpecificationRepository {
     }
 
     /**
-     * Returns all registered well-definedness checks for method contracts.
+     * Returns all registered well-definedness checks for (annotation) statements.
      */
-    public ImmutableSet<LoopWellDefinedness> getAllWdLoopChecks() {
-        ImmutableSet<LoopWellDefinedness> result =
-                DefaultImmutableSet.<LoopWellDefinedness>nil();
+    public ImmutableSet<StatementWellDefinedness> getAllWdStatementChecks() {
+        ImmutableSet<StatementWellDefinedness> result =
+                DefaultImmutableSet.<StatementWellDefinedness>nil();
         for(Contract s : getAllWdChecks()) {
-            if (s instanceof LoopWellDefinedness) {
-                result = result.add((LoopWellDefinedness)s);
+            if (s instanceof StatementWellDefinedness) {
+                result = result.add((StatementWellDefinedness)s);
             }
         }
         return result;
     }
 
-    public ImmutableSet<LoopWellDefinedness> getWdLoopChecks(KeYJavaType kjt,
-                                                             IObserverFunction target) {
+    public ImmutableSet<StatementWellDefinedness> getWdStatementChecks(KeYJavaType kjt,
+                                                                       IObserverFunction target) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
-        ImmutableSet<LoopWellDefinedness> loops =
-                DefaultImmutableSet.<LoopWellDefinedness>nil();
+        ImmutableSet<StatementWellDefinedness> result =
+                DefaultImmutableSet.<StatementWellDefinedness>nil();
         for(WellDefinednessCheck check: checks) {
-            if (check instanceof LoopWellDefinedness) {
-                loops = loops.add((LoopWellDefinedness)check);
+            if (check instanceof StatementWellDefinedness) {
+                result = result.add((StatementWellDefinedness)check);
             }
         }
-        return loops;
+        return result;
     }
 
     /**

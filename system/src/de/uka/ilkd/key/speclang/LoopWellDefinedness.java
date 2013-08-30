@@ -9,11 +9,10 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
-public class LoopWellDefinedness extends WellDefinednessCheck {
+public class LoopWellDefinedness extends StatementWellDefinedness {
 
     private final LoopInvariant inv;
 
@@ -28,14 +27,8 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
 
     public LoopWellDefinedness(LoopInvariant inv, ImmutableSet<ProgramVariable> params,
                                Services services) {
-        super(ContractFactory.generateContractTypeName(inv.getName(),
-                                                       inv.getKJT(),
-                                                       inv.getTarget(),
-                                                       inv.getKJT()),
-              inv.getLoop().getStartPosition().getLine(), inv.getTarget(),
-              new OriginalVariables(inv.getOrigVars().self, null, null,
-                                    inv.getOrigVars().atPres, convertParams(params)),
-              Type.LOOP_INVARIANT, services);
+        super(inv.getName(), inv.getLoop().getStartPosition().getLine(), inv.getTarget(),
+              inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
         assert inv != null;
         final LocationVariable h = getHeap();
         this.inv = inv;
@@ -45,28 +38,17 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
         setEnsures(inv.getInternalInvariants().get(h));
     }
 
-    private static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
-        ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil();
-        for (ProgramVariable pv: set) {
-            list = list.append(pv);
-        }
-        return list;
-    }
-
-    @Override
-    TermAndFunc generateMbyAtPreDef(ParsableVariable self,
-            ImmutableList<ParsableVariable> params, Services services) {
-        return new TermAndFunc(TB.tt(), null);
-    }
-
-    @Override
-    ImmutableList<Term> getRest() {
-        return super.getRest();
-    }
-
-    public Term generatePO(ProgramVariable self, LocationVariable heap,
-                           Term anonHeap, ImmutableSet<ProgramVariable> ps,
+    public Term generatePO(ProgramVariable self, ProgramVariable exception,
+                           ProgramVariable result, LocationVariable heap,
+                           ProgramVariable heapAtPre, Term anonHeap,
+                           ImmutableSet<ProgramVariable> ps,
                            Term leadingUpdate, Services services) {
+        return generatePO(self, heap, anonHeap, ps, leadingUpdate, services);
+    }
+
+    private Term generatePO(ProgramVariable self, LocationVariable heap,
+                            Term anonHeap, ImmutableSet<ProgramVariable> ps,
+                            Term leadingUpdate, Services services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
 
         ImmutableList<ProgramVariable> params = ImmutableSLList.<ProgramVariable>nil();
@@ -93,18 +75,8 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
         return poTerms;
     }
 
-    public LoopInvariant getInvariant() {
+    public LoopInvariant getStatement() {
         return this.inv;
-    }
-
-    @Override
-    public String getBehaviour() {
-        return "";
-    }
-
-    @Override
-    public Term getGlobalDefs() {
-        throw new UnsupportedOperationException("Not applicable for well-definedness of loops.");
     }
 
     @Override
@@ -117,7 +89,7 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
         return new LoopWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
                                        getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getInvariant());
+                                       getRepresents(), getStatement());
     }
 
     @Override
@@ -125,7 +97,7 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
         return new LoopWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
                                        getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getInvariant().setTarget(newKJT, newPM));
+                                       getRepresents(), getStatement().setTarget(newKJT, newPM));
     }
 
     @Override
@@ -141,10 +113,5 @@ public class LoopWellDefinedness extends WellDefinednessCheck {
     @Override
     public KeYJavaType getKJT() {
         return inv.getKJT();
-    }
-
-    @Override
-    public boolean isModel() {
-        return false;
     }
 }

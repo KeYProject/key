@@ -613,7 +613,7 @@ public final class Goal  {
                         tacletApp.matchConditions().getInstantiations().getUpdateContext();
                 MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
                         MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
-                ImmutableList<UpdateLabelPair> newUpdCtx = 
+                ImmutableList<UpdateLabelPair> newUpdCtx =
                         newConditions.getInstantiations().getUpdateContext();
 
                 if(!oldUpdCtx.equals(newUpdCtx)) {

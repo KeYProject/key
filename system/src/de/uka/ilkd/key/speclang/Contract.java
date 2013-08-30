@@ -213,5 +213,9 @@ public interface Contract extends SpecificationElement {
                 this.params = paramVars;
             }
         }
+
+        public OriginalVariables add(ImmutableList<ProgramVariable> newParams) {
+            return new OriginalVariables(self, result, exception, atPres, newParams);
+        }
     }
 }

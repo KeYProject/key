@@ -239,6 +239,24 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
+    private void setupWdGoal(final Goal goal, final LoopInvariant inv,
+                             final Term update, final Term selfTerm,
+                             final LocationVariable heap, final Term anonHeap,
+                             final ImmutableSet<ProgramVariable> localIns,
+                             PosInOccurrence pio, Services services) {
+        LoopWellDefinedness lwd =  new LoopWellDefinedness(inv, localIns, services);
+        final ProgramVariable self;
+        if(selfTerm != null && selfTerm.op() instanceof ProgramVariable) {
+            self = (ProgramVariable)selfTerm.op();
+        } else {
+            self = null;
+        }
+        services.getSpecificationRepository().addStatementWellDefinedness(lwd);
+        final Term wdInv = lwd.generatePO(self, null, null, heap, null,
+                                          anonHeap, localIns, update, services);
+        goal.changeFormula(new SequentFormula(wdInv), pio);
+    }
+
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
@@ -381,7 +399,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	Goal initGoal = result.tail().tail().head();
 	Goal bodyGoal = result.tail().head();
 	Goal useGoal = result.head();
-	wdGoal.setBranchLabel("Well-Definedness of Invariant");
+	wdGoal.setBranchLabel("Well-Definedness");
 	initGoal.setBranchLabel("Invariant Initially Valid");
 	bodyGoal.setBranchLabel("Body Preserves Invariant");
 	useGoal.setBranchLabel("Use Case");
@@ -434,6 +452,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                 TB.apply(inst.u, TB.and(variantNonNeg, 
                        TB.and(invTerm, reachableState)), null)),
 			         ruleApp.posInOccurrence());
+
+	setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
+	            anonHeap, localIns, ruleApp.posInOccurrence(), services);
 
 	//"Body Preserves Invariant":
         // \replacewith (==>  #atPreEqs(anon1) 
@@ -516,19 +537,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 							uAnon,
 							guardFalseRestPsi)), 
                               ruleApp.posInOccurrence());
-
-	LoopWellDefinedness lwd =  new LoopWellDefinedness(inst.inv, localIns, services);
-	final ProgramVariable self;
-	if(inst.selfTerm != null && inst.selfTerm.op() instanceof ProgramVariable) {
-	    self = (ProgramVariable)inst.selfTerm.op();
-	} else {
-	    self = null;
-	}
-	services.getSpecificationRepository().addLoopWellDefinedness(lwd);
-	final Term wdInv = lwd.generatePO(self, heapContext.get(0),
-	                                  anonHeap, localIns, inst.u, services);
-	wdGoal.changeFormula(new SequentFormula(wdInv), ruleApp.posInOccurrence());
-
 	return result;
     }
 

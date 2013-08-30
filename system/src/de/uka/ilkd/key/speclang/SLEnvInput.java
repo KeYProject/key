@@ -262,8 +262,6 @@ public final class SLEnvInput extends AbstractEnvInput {
             = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
-        // TODO: Somewhere here we want to put a new SpecificationElement in addSpecs()
-        // (then there starts the wd check stuff probably)
 
         //read DL library specs before any other specs
         createDLLibrarySpecs();
