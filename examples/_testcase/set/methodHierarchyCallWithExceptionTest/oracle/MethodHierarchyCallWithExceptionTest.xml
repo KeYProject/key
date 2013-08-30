@@ -35,7 +35,7 @@
                                     <callStackEntry path="/0/0/0"/>
                                     <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;" isReturnValueComputed="true">
                                        <callStackEntry path="/0"/>
-                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                        </termination>
                                     </methodReturn>
                                  </methodReturn>

@@ -61,7 +61,7 @@ public class TerminationCreateFeature extends AbstractDebugNodeCreateFeature {
                                               ISEDDebugNode parent,
                                               ISEDThread thread,
                                               String name) throws DebugException {
-      SEDMemoryTermination result = new SEDMemoryTermination(target, parent, thread);
+      SEDMemoryTermination result = new SEDMemoryTermination(target, parent, thread, true);
       result.setName(name);
       return result;
    }

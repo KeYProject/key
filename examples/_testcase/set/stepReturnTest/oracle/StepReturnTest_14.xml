@@ -45,7 +45,7 @@
                                                                                                                                  <methodReturn name="&lt;return of self.firstLevel(a_8);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                                                                                                     <statement name="a=a*4;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                        <methodReturn name="&lt;return of self.main(a);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                                                                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                                           </termination>
                                                                                                                                        </methodReturn>
                                                                                                                                     </statement>

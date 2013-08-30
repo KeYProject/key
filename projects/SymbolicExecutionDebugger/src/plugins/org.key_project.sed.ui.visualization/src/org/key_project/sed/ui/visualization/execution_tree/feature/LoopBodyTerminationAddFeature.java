@@ -45,6 +45,12 @@ public class LoopBodyTerminationAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected String getImageId(ISEDDebugNode node) {
-      return IExecutionTreeImageConstants.IMG_LOOP_BODY_TERMINATION;
+      ISEDLoopBodyTermination terminationNode = (ISEDLoopBodyTermination)node;
+      if (terminationNode.isVerified()) {
+         return IExecutionTreeImageConstants.IMG_LOOP_BODY_TERMINATION;
+      }
+      else {
+         return IExecutionTreeImageConstants.IMG_LOOP_BODY_TERMINATION_NOT_VERIFIED;
+      }
    }
 }

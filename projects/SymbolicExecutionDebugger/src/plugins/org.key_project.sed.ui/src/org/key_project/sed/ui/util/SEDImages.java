@@ -31,7 +31,7 @@ import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDOperationContract;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
@@ -63,6 +63,11 @@ public final class SEDImages {
     public static final String TERMINATION = "org.key_project.sed.ui.images.termination";
     
     /**
+     * The key for the image that is used for termination.
+     */
+    public static final String TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.terminationNotVerified";
+    
+    /**
      * The key for the image that is used for branch statement.
      */
     public static final String BRANCH_STATEMENT = "org.key_project.sed.ui.images.branchStatement";
@@ -78,6 +83,11 @@ public final class SEDImages {
     public static final String EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.exceptionalTermination";
     
     /**
+     * The key for the image that is used for exceptional termination which is not verified.
+     */
+    public static final String EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.exceptionalTerminationNotVerified";
+    
+    /**
      * The key for the image that is used for loop statement.
      */
     public static final String LOOP_STATEMENT = "org.key_project.sed.ui.images.loopStatement";
@@ -88,24 +98,24 @@ public final class SEDImages {
     public static final String LOOP_CONDITION = "org.key_project.sed.ui.images.loopCondition";
     
     /**
-     * The key for the image that is used for operation contract.
+     * The key for the image that is used for method contract.
      */
-    public static final String OPERATION_CONTRACT = "org.key_project.sed.ui.images.operationContract";
+    public static final String METHOD_CONTRACT = "org.key_project.sed.ui.images.methodContract";
     
     /**
-     * The key for the image that is used for operation contract.
+     * The key for the image that is used for method contract.
      */
-    public static final String OPERATION_CONTRACT_NOT_PRE = "org.key_project.sed.ui.images.operationContractNotPre";
+    public static final String METHOD_CONTRACT_NOT_PRE = "org.key_project.sed.ui.images.methodContractNotPre";
     
     /**
-     * The key for the image that is used for operation contract.
+     * The key for the image that is used for method contract.
      */
-    public static final String OPERATION_CONTRACT_NOT_NPC = "org.key_project.sed.ui.images.operationContractNotNpc";
+    public static final String METHOD_CONTRACT_NOT_NPC = "org.key_project.sed.ui.images.methodContractNotNpc";
     
     /**
-     * The key for the image that is used for operation contract.
+     * The key for the image that is used for method contract.
      */
-    public static final String OPERATION_CONTRACT_NOT_PRE_NOT_NPC = "org.key_project.sed.ui.images.operationContractNotPreNotNpc";
+    public static final String METHOD_CONTRACT_NOT_PRE_NOT_NPC = "org.key_project.sed.ui.images.methodContractNotPreNotNpc";
     
     /**
      * The key for the image that is used for loop invariant.
@@ -121,6 +131,11 @@ public final class SEDImages {
      * The key for the image that is used for loop body termination.
      */
     public static final String LOOP_BODY_TERMINATION = "org.key_project.sed.ui.images.loopBodyTermination";
+    
+    /**
+     * The key for the image that is used for loop body termination not verified.
+     */
+    public static final String LOOP_BODY_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.loopBodyTerminationNotVerified";
 
     /**
      * Forbid instances.
@@ -170,6 +185,9 @@ public final class SEDImages {
         else if (TERMINATION.equals(key)) {
            path = "icons/termination.gif";
         }
+        else if (TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/termination_not_verified.gif";
+        }
         else if (BRANCH_STATEMENT.equals(key)) {
            path = "icons/branch_statement.gif";
         }
@@ -179,23 +197,26 @@ public final class SEDImages {
         else if (EXCEPTIONAL_TERMINATION.equals(key)) {
            path = "icons/exceptional_termination.gif";
         }
+        else if (EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/exceptional_termination_not_verified.gif";
+        }
         else if (LOOP_STATEMENT.equals(key)) {
            path = "icons/loop_statement.gif";
         }
         else if (LOOP_CONDITION.equals(key)) {
            path = "icons/loop_condition.gif";
         }
-        else if (OPERATION_CONTRACT.equals(key)) {
-           path = "icons/operation_contract.gif";
+        else if (METHOD_CONTRACT.equals(key)) {
+           path = "icons/method_contract.gif";
         }
-        else if (OPERATION_CONTRACT_NOT_PRE.equals(key)) {
-           path = "icons/operation_contract_not_pre.gif";
+        else if (METHOD_CONTRACT_NOT_PRE.equals(key)) {
+           path = "icons/method_contract_not_pre.gif";
         }
-        else if (OPERATION_CONTRACT_NOT_NPC.equals(key)) {
-           path = "icons/operation_contract_not_npc.gif";
+        else if (METHOD_CONTRACT_NOT_NPC.equals(key)) {
+           path = "icons/method_contract_not_npc.gif";
         }
-        else if (OPERATION_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
-           path = "icons/operation_contract_not_pre_not_npc.gif";
+        else if (METHOD_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
+           path = "icons/method_contract_not_pre_not_npc.gif";
         }
         else if (LOOP_INVARIANT.equals(key)) {
            path = "icons/loop_invariant.gif";
@@ -205,6 +226,9 @@ public final class SEDImages {
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
+        }
+        else if (LOOP_BODY_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/exceptional_termination_not_verified.gif";
         }
         // Load image if possible
         if (path != null) {
@@ -255,10 +279,10 @@ public final class SEDImages {
                registry.remove(TERMINATION);
                registry.remove(LOOP_INVARIANT);
                registry.remove(LOOP_INVARIANT_INITIALLY_INVALID);
-               registry.remove(OPERATION_CONTRACT);
-               registry.remove(OPERATION_CONTRACT_NOT_NPC);
-               registry.remove(OPERATION_CONTRACT_NOT_PRE);
-               registry.remove(OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
+               registry.remove(METHOD_CONTRACT);
+               registry.remove(METHOD_CONTRACT_NOT_NPC);
+               registry.remove(METHOD_CONTRACT_NOT_PRE);
+               registry.remove(METHOD_CONTRACT_NOT_PRE_NOT_NPC);
                registry.remove(LOOP_BODY_TERMINATION);
             }
          });
@@ -278,13 +302,31 @@ public final class SEDImages {
           return getImage(SEDImages.METHOD_RETURN);
        }
        else if (element instanceof ISEDExceptionalTermination) {
-          return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+          ISEDExceptionalTermination node = (ISEDExceptionalTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+          }
        }
        else if (element instanceof ISEDLoopBodyTermination) {
-          return getImage(SEDImages.LOOP_BODY_TERMINATION);
+          ISEDLoopBodyTermination node = (ISEDLoopBodyTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.LOOP_BODY_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
+          }
        }
        else if (element instanceof ISEDTermination) {
-          return getImage(SEDImages.TERMINATION);
+          ISEDTermination node = (ISEDTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.TERMINATION_NOT_VERIFIED);
+          }
        }
        else if (element instanceof ISEDBranchCondition) {
           return getImage(SEDImages.BRANCH_CONDITION);
@@ -298,22 +340,22 @@ public final class SEDImages {
        else if (element instanceof ISEDLoopCondition) {
           return getImage(SEDImages.LOOP_CONDITION);
        }
-       else if (element instanceof ISEDOperationContract) {
-          ISEDOperationContract node = (ISEDOperationContract)element;
+       else if (element instanceof ISEDMethodContract) {
+          ISEDMethodContract node = (ISEDMethodContract)element;
           if (node.isPreconditionComplied()) {
              if (!node.hasNotNullCheck() || node.isNotNullCheckComplied()) {
-                return getImage(SEDImages.OPERATION_CONTRACT);
+                return getImage(SEDImages.METHOD_CONTRACT);
              }
              else {
-                return getImage(SEDImages.OPERATION_CONTRACT_NOT_NPC);
+                return getImage(SEDImages.METHOD_CONTRACT_NOT_NPC);
              }
           }
           else {
              if (!node.hasNotNullCheck() || node.isNotNullCheckComplied()) {
-                return getImage(SEDImages.OPERATION_CONTRACT_NOT_PRE);
+                return getImage(SEDImages.METHOD_CONTRACT_NOT_PRE);
              }
              else {
-                return getImage(SEDImages.OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
+                return getImage(SEDImages.METHOD_CONTRACT_NOT_PRE_NOT_NPC);
              }
           }
        }

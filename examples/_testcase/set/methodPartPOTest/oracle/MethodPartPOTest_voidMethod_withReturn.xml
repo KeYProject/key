@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <statement name="int b = 3*y;" pathCondition="true" pathConditionChanged="false">
       <statement name="return ;" pathCondition="true" pathConditionChanged="false">
-         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
          </termination>
       </statement>
    </statement>

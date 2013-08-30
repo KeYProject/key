@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="VerifiedTest.notMagic();" pathCondition="true" pathConditionChanged="false">
+      <statement name="return 66;" pathCondition="true" pathConditionChanged="false">
+         <methodReturn name="&lt;return of VerifiedTest.notMagic();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
+            </termination>
+         </methodReturn>
+      </statement>
+   </methodCall>
+</start>

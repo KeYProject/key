@@ -35,5 +35,9 @@ import org.key_project.sed.core.model.memory.SEDMemoryTermination;
  * @see ISEDDebugNode
  */
 public interface ISEDTermination extends ISEDDebugNode, ITerminate {
-
+   /**
+    * Checks if this branch is verified.
+    * @return {@code true} verified, {@code false} not verified.
+    */
+   public boolean isVerified();
 }

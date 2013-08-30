@@ -108,7 +108,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             expectedResources.add(dFile);
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
-            // Configure operation contract usage
+            // Configure method contract usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
             TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
             // Get debug target TreeItem

@@ -38,7 +38,7 @@
                                                                                                             <statement name="return i_14;" pathCondition="a = 0" pathConditionChanged="false">
                                                                                                                <methodReturn name="&lt;return of self.value(i_14);&gt;" pathCondition="a = 0" pathConditionChanged="false" isReturnValueComputed="false">
                                                                                                                   <methodReturn name="&lt;return of self.main(a);&gt;" pathCondition="a = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                     <termination name="&lt;end&gt;" pathCondition="a = 0" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                                                                     <termination name="&lt;end&gt;" pathCondition="a = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                      </termination>
                                                                                                                   </methodReturn>
                                                                                                                </methodReturn>
@@ -114,7 +114,7 @@
                                                                                                                   <statement name="return j_8;" pathCondition="!a = 0" pathConditionChanged="false">
                                                                                                                      <methodReturn name="&lt;return of self.valueLonger(i_15);&gt;" pathCondition="!a = 0" pathConditionChanged="false" isReturnValueComputed="false">
                                                                                                                         <methodReturn name="&lt;return of self.main(a);&gt;" pathCondition="!a = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                           <termination name="&lt;end&gt;" pathCondition="!a = 0" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                                                                           <termination name="&lt;end&gt;" pathCondition="!a = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                            </termination>
                                                                                                                         </methodReturn>
                                                                                                                      </methodReturn>

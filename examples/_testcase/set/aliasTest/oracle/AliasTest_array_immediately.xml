@@ -11,7 +11,7 @@
                            <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 6 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="6" returnValueString="6" hasCondition="false">
                               </methodReturnValue>
-                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL">
+                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; !array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -21,7 +21,7 @@
                            <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 8 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="8" returnValueString="8" hasCondition="false">
                               </methodReturnValue>
-                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL">
+                              <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = w &amp; !array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -32,7 +32,7 @@
                         <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="7" returnValueString="7" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="!array[0] = w &amp; array[1] = array[0]" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -46,7 +46,7 @@
                         <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="7" returnValueString="7" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; !array[1] = w" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -56,7 +56,7 @@
                         <methodReturn name="&lt;return of self.array(w,array);&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 9 as result of self.array(w,array);&gt;" isReturnValueComputed="true">
                            <methodReturnValue name="9" returnValueString="9" hasCondition="false">
                            </methodReturnValue>
-                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="array[0] = w &amp; array[1] = w" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>

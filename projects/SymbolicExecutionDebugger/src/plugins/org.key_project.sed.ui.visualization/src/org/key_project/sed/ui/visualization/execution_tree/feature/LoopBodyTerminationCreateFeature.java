@@ -61,7 +61,7 @@ public class LoopBodyTerminationCreateFeature extends AbstractDebugNodeCreateFea
                                               ISEDDebugNode parent,
                                               ISEDThread thread,
                                               String name) throws DebugException {
-      SEDMemoryLoopBodyTermination result = new SEDMemoryLoopBodyTermination(target, parent, thread);
+      SEDMemoryLoopBodyTermination result = new SEDMemoryLoopBodyTermination(target, parent, thread, true);
       result.setName(name);
       return result;
    }
