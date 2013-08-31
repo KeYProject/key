@@ -99,9 +99,12 @@ public final class TermLabelWorkerManagement {
    public ImmutableArray<ITermLabel> instantiateLabels(Term tacletTerm, 
                                                        Operator newTermOp, 
                                                        ImmutableArray<Term> newTermSubs, 
-                                                       ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                                       ImmutableArray<QuantifiableVariable>
+                                                                           newTermBoundVars,
                                                        JavaBlock newTermJavaBlock) {
-      return instantiateLabels(labelInstantiators, applicationPosInOccurrence, rule, null, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+       return instantiateLabels(labelInstantiators, applicationPosInOccurrence, rule,
+                                null, tacletTerm, newTermOp, newTermSubs,
+                                newTermBoundVars, newTermJavaBlock);
    }
    
    /**
@@ -153,19 +156,26 @@ public final class TermLabelWorkerManagement {
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
     * @return The {@link ITermLabel}s to add to the new {@link Term} which should be created.
     */
-   public static ImmutableArray<ITermLabel> instantiateLabels(ImmutableList<ITermLabelWorker> labelInstantiators,
-                                                              PosInOccurrence applicationPosInOccurrence,
-                                                              Rule rule,
-                                                              Goal goal,
-                                                              Term tacletTerm, 
-                                                              Operator newTermOp, 
-                                                              ImmutableArray<Term> newTermSubs, 
-                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                              JavaBlock newTermJavaBlock) {
+   public static ImmutableArray<ITermLabel>
+                       instantiateLabels(ImmutableList<ITermLabelWorker> labelInstantiators,
+                                         PosInOccurrence applicationPosInOccurrence,
+                                         Rule rule,
+                                         Goal goal,
+                                         Term tacletTerm,
+                                         Operator newTermOp,
+                                         ImmutableArray<Term> newTermSubs,
+                                         ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                         JavaBlock newTermJavaBlock) {
       List<ITermLabel> instantiatedLabels = new LinkedList<ITermLabel>();
       if (labelInstantiators != null) {
          for (ITermLabelWorker instantiator : labelInstantiators) {
-            List<ITermLabel> labels = instantiator.instantiateLabels(tacletTerm, applicationPosInOccurrence, applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null, rule, goal, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+            List<ITermLabel> labels =
+                    instantiator.instantiateLabels(tacletTerm, applicationPosInOccurrence,
+                                                   applicationPosInOccurrence != null ?
+                                                           applicationPosInOccurrence.subTerm()
+                                                               : null,
+                                                   rule, goal, newTermOp, newTermSubs,
+                                                   newTermBoundVars, newTermJavaBlock);
             if (labels != null) {
                instantiatedLabels.addAll(labels);
             }

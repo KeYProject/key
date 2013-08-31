@@ -54,10 +54,11 @@ public class LabelSettings implements Settings, Cloneable {
          String[] instantiators = instantiatorsValue.split(",");
          ImmutableList<ITermLabelWorker> loadedInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
          for (String instantiator : instantiators) {
-            ITermLabelWorker instance = TermLabelWorkerManagement.getInstantiator(instantiator.trim());
-            if (instance != null) {
-               loadedInstantiators = loadedInstantiators.append(instance);
-            }
+             ITermLabelWorker instance =
+                     TermLabelWorkerManagement.getInstantiator(instantiator.trim());
+             if (instance != null) {
+                 loadedInstantiators = loadedInstantiators.append(instance);
+             }
          }
          labelInstantiators = loadedInstantiators;
       }

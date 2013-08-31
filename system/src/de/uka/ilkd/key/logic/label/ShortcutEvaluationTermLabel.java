@@ -11,7 +11,7 @@ public class ShortcutEvaluationTermLabel implements ITermLabel {
     /**
      * The unique name of this label.
      */
-    public static final Name NAME = new Name("Shortcut");
+    public static final Name NAME = new Name("SC");
 
     /**
      * The only instance of this class.

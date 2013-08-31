@@ -128,5 +128,25 @@ The non-optimised rules use in-place rewriting for the evaluation of select term
 The optimised rules pull out select-terms before they evaluate them. Because other occurences of the same select-term are replaced by the skolem constant introduced by the pullout-rule (application of equalities), each select term has to be evaluated only once. Intelligent hiding of no longer needed auxiliary equations holds the sequent human-readable and increases performance. The result of the evaluation of a select term is stored such that it can be reapplied immediately if the same select term occurs again.
 </entry>
 
+<entry key="wdOperator">
+Treatment of formulas and terms for Well-Definedness Checks:
+
+* L-Operator:
+     More intuitive for Software developers and along the lines of
+     runtime assertion semantics. Well-Definedness Checks will be
+     stricter using this operator, since the order of terms/formulas
+     matters. It is based on McCarthy Logic. Cf. "Are the Logical
+     Foundations of Verifying Compiler Prototypes Matching User
+     Expectations?" by Patrice Chalin
+
+* Y-Operator:
+     More complete and along the lines of classical logic, where the
+     order of terms/formulas is irrelevant. This operator is not as
+     strict as the L-Operator, based on Strong Kleene Logic.
+     Cf. "Efficient Well-Definedness Checking" by Ádám Darvas,
+     Farhad Mehta, and Arsenii Rudich
+
+</entry>
+
 </properties>
 

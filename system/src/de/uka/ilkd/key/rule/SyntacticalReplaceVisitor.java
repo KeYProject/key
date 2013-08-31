@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -95,9 +96,9 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     /**
      */
-    public SyntacticalReplaceVisitor(Services services, 
-				                         SVInstantiations svInst,
-				                         TermLabelWorkerManagement labelInstantiator,
+    public SyntacticalReplaceVisitor(Services services,
+                                     SVInstantiations svInst,
+                                     TermLabelWorkerManagement labelInstantiator,
                                      Constraint metavariableInst,
                                      boolean allowPartialReplacement,
                                      boolean  resolveSubsts) { 
@@ -337,7 +338,9 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp)
                         .isListSV()))) {
             Term newTerm = toTerm(svInst.getInstantiation((SchemaVariable) visitedOp));            
-            pushNew(TermBuilder.DF.label(newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock())));
+            pushNew(TermBuilder.DF.label(
+                    newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
+                                               newTerm.boundVars(), newTerm.javaBlock())));
         } else if ((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp)
                         .op() != visitedOp) {
@@ -376,7 +379,9 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 assert neededsubs.length == 1;
                 Term newTerm = TermBuilder.DF.elementary(services,
                         elementaryUpdateLhs, neededsubs[0]);
-                ImmutableArray<ITermLabel> labels = instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock());
+                ImmutableArray<ITermLabel> labels =
+                        instantiateLabels(visited, newTerm.op(), newTerm.subs(),
+                                          newTerm.boundVars(), newTerm.javaBlock());
                 if (labels.size() != 0) {
                     newTerm = TermBuilder.DF.label(newTerm, labels);
                 }
@@ -384,18 +389,23 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             } else if (boundVars != visited.boundVars() || jblockChanged
                     || operatorInst
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-               ImmutableArray<ITermLabel> labels = instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs), boundVars, jb);
+               ImmutableArray<ITermLabel> labels =
+                       instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs),
+                                         boundVars, jb);
                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
-                ImmutableArray<ITermLabel> labels = instantiateLabels(visited, visited.op(), visited.subs(), visited.boundVars(), visited.javaBlock());
+                ImmutableArray<ITermLabel> labels =
+                        instantiateLabels(visited, visited.op(), visited.subs(),
+                                          visited.boundVars(), visited.javaBlock());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                    t = visited;
                 }
                 else {
-                   t = TermFactory.DEFAULT.createTerm(visited.op(), visited.subs(), visited.boundVars(), 
-                       visited.javaBlock(), labels);
+                   t = TermFactory.DEFAULT.createTerm(visited.op(), visited.subs(),
+                                                      visited.boundVars(),
+                                                      visited.javaBlock(), labels);
                 }
                 t = resolveSubst(t);
                 if (t == visited)
@@ -409,10 +419,12 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private ImmutableArray<ITermLabel> instantiateLabels(Term tacletTerm, 
                                                          Operator newTermOp, 
                                                          ImmutableArray<Term> newTermSubs, 
-                                                         ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                                         ImmutableArray<QuantifiableVariable>
+                                                                            newTermBoundVars,
                                                          JavaBlock newTermJavaBlock) {
        if (labelInstantiator != null) {
-          return labelInstantiator.instantiateLabels(tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+          return labelInstantiator.instantiateLabels(tacletTerm, newTermOp, newTermSubs,
+                                                     newTermBoundVars, newTermJavaBlock);
        }
        else {
           return null;
@@ -488,7 +500,9 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 	if (subtreeRoot.op() instanceof TermTransformer) {
 	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
 	    Term newTerm = mop.transform((Term)subStack.pop(),svInst, getServices());
-	    pushNew(TermBuilder.DF.label(newTerm, instantiateLabels(subtreeRoot, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock())));
+	    pushNew(TermBuilder.DF.label(
+	            newTerm, instantiateLabels(subtreeRoot, newTerm.op(), newTerm.subs(),
+	                                       newTerm.boundVars(), newTerm.javaBlock())));
 	} 
    }
 }

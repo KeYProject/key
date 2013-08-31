@@ -10,7 +10,7 @@ public class ImplicitSpecTermLabel implements ITermLabel {
     /**
      * The unique name of this label.
      */
-    public static final Name NAME = new Name("ImplicitSpec");
+    public static final Name NAME = new Name("impl");
 
     /**
      * The only instance of this class.

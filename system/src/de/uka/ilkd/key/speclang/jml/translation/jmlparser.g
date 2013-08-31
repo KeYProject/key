@@ -753,10 +753,10 @@ impliesexpr returns [SLExpression result=null] throws SLTranslationException
                     assert t != null;
 
                     if (t.sort() == Sort.FORMULA) {
-                        result = new SLExpression(TB.or(TB.convertToFormula(result.getTerm(), services),
+                        result = new SLExpression(TB.orSC(TB.convertToFormula(result.getTerm(), services),
                                                         TB.convertToFormula(TB.not(t), services)));
                     } else if(t.sort() == booleanLDT.targetSort()) {
-                        result = new SLExpression(TB.or(TB.convertToFormula(result.getTerm(), services),
+                        result = new SLExpression(TB.orSC(TB.convertToFormula(result.getTerm(), services),
                                                         TB.convertToFormula(
                                                                 TB.not(TB.equals(t, TB.TRUE(services))),
                                                                 services)));

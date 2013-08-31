@@ -859,8 +859,10 @@ public abstract class Taclet implements Rule, Named {
 				      PosInOccurrence applicationPosInOccurrence) {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
-                                     mc.getInstantiations(),
-                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, getLabelInstantiators(services)));
+	                                  mc.getInstantiations(),
+	                                  new TermLabelWorkerManagement(
+	                                          applicationPosInOccurrence, this,
+	                                          getLabelInstantiators(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();

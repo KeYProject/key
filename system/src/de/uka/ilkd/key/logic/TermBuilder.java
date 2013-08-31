@@ -1599,9 +1599,15 @@ public class TermBuilder {
     public Term label(Term term, ImmutableArray<ITermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
-        } else {
+        } else if (!term.hasLabels()) {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
+        } else {
+            ITermLabel[] newLabels = new ITermLabel[labels.size() + term.getLabels().size()];
+            labels.arraycopy(0, newLabels, 0, labels.size());
+            term.getLabels().arraycopy(0, newLabels, labels.size(), term.getLabels().size());
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
+                    term.javaBlock(), new ImmutableArray<ITermLabel>(newLabels));
         }
     }
 
