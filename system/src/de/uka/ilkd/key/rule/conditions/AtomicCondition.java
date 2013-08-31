@@ -2,6 +2,8 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -10,10 +12,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class AtomicCondition extends VariableConditionAdapter {
 
-    private final TermSV t;
+    private final AbstractSortedOperator t;
     private final boolean negated;
 
-    public AtomicCondition(TermSV t, boolean negated) {
+    public AtomicCondition(AbstractSortedOperator t, boolean negated) {
         this.t = t;
         this.negated = negated;
     }
@@ -23,12 +25,23 @@ public class AtomicCondition extends VariableConditionAdapter {
                          SVSubstitute instCandidate,
                          SVInstantiations instMap,
                          Services services) {
-        if (!(var instanceof TermSV) || (TermSV)var != this.t) {
+        if ((!(var instanceof TermSV)
+                    || (TermSV)var != this.t)
+                && (!(var instanceof FormulaSV)
+                        || (FormulaSV)var != this.t)) {
             return true;
         }
-        Term tInst = (Term) instMap.getInstantiation(t);
-        boolean atomic = (tInst.arity() == 0);
-        return negated ? !atomic : atomic;
+        if (var instanceof TermSV) {
+            Term tInst = (Term) instMap.getInstantiation((TermSV)t);
+            boolean atomic = (tInst.arity() == 0);
+            return negated ? !atomic : atomic;
+        }
+        if (var instanceof FormulaSV) {
+            Term tInst = (Term) instMap.getInstantiation((FormulaSV)t);
+            boolean atomic = (tInst.arity() == 0);
+            return negated ? !atomic : atomic;
+        }
+        return false;
     }
 
     @Override

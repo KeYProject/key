@@ -4168,7 +4168,12 @@ varcond_atomic [TacletBuilder b, boolean negated]
 :
    ISATOMIC
         LPAREN x=varId RPAREN {
-           b.addVariableCondition(new AtomicCondition((TermSV) x, negated ));
+           if (x instanceof TermSV) {
+                b.addVariableCondition(new AtomicCondition((TermSV) x, negated ));
+           } else {
+                assert x instanceof FormulaSV;
+                b.addVariableCondition(new AtomicCondition((FormulaSV) x, negated ));
+           }
         }
 ;
 
