@@ -3685,6 +3685,7 @@ varexp[TacletBuilder b]
         | varcond_atomic[b, negated]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
+        | varcond_subFormulas[b, negated]
       )
   )
 ;
@@ -4197,6 +4198,17 @@ varcond_static_field [TacletBuilder b, boolean negated]
    ISSTATICFIELD
         LPAREN field=varId RPAREN {
            b.addVariableCondition(new StaticFieldCondition((SchemaVariable) field, negated ));
+        }
+;
+
+varcond_subFormulas [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   HASSUBFORMULAS
+        LPAREN x=varId RPAREN {
+           b.addVariableCondition(new SubFormulaCondition((FormulaSV) x, negated ));
         }
 ;
 

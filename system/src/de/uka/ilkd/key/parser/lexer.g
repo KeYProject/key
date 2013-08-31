@@ -76,6 +76,7 @@ tokens {
 	FIELDTYPE = "\\fieldType";
 	ELEMSORT = "\\elemSort";
 	HASLABEL="\\hasLabel";
+	HASSUBFORMULAS="\\hasSubFormulas";
 	ISARRAY="\\isArray";
 	ISARRAYLENGTH="\\isArrayLength";
 	ISATOMIC="\\isAtomic";

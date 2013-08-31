@@ -204,7 +204,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term wdMod = TB.wd(po.mod, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
         register(pre.func);
-        mbyAtPre = pre.func != null ? TB.func(pre.func) : TB.tt();
+        mbyAtPre = pre.func != null ? TB.func(pre.func) : null;
         final Term post = check.getPost(po.post, vars.result, services);
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
                                               vars.anonHeap, services);
