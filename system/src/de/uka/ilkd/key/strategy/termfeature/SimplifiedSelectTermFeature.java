@@ -16,6 +16,9 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import java.util.Iterator;
 
 
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
@@ -36,7 +39,8 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
             return  // either the operator is not a select operator
                     !isSelectOp ||
                     // or the heap term of the select operator is the base heap
-                    t.sub(0).op() == heapLDT.getHeap() ||
+                    // or another primitive heap variable
+                    isPrimitiveHeapVariable(t.sub(0).op()) ||
                     // or the heap term of the select operator is an anon heap symbol
                     // (for instance an anonHeap function)
                     (   t.sub(0).hasLabels() &&
@@ -44,5 +48,14 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                         t.sub(0).op().arity() == 0 &&
                         t.sub(0).op() instanceof Function);
 
+    }
+
+    private boolean isPrimitiveHeapVariable(Operator op) {
+        boolean isPrimitive = false;
+        Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();
+        while(!isPrimitive && it.hasNext()) {
+            isPrimitive = (it.next() == op);
+        }
+        return isPrimitive;
     }
 }
