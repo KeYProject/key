@@ -17,14 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-import junit.framework.TestCase;
-
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.key.ui.test.Activator;
@@ -34,7 +33,7 @@ import de.hentschel.visualdbc.key.ui.test.util.TestKeYUIUtil;
  * Provides the basic functionality for proof reference tests.
  * @author Martin Hentschel
  */
-public class AbstractProofReferenceModelCreatorTest extends TestCase {
+public class AbstractProofReferenceModelCreatorTest extends AbstractSetupTestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with

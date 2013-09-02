@@ -13,9 +13,8 @@
 
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
@@ -25,7 +24,7 @@ import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
  * Tests the handling of invariants in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class InvariantTest extends TestCase {
+public class InvariantTest extends AbstractSetupTestCase {
    /**
     * Tests attributes.
     */

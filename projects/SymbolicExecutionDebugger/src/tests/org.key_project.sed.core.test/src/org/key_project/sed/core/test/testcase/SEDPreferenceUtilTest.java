@@ -19,12 +19,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Test;
 import org.key_project.sed.core.test.testcase.swtbot.SWTBotDebugViewHierarchyTest;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Tests for {@link SEDPreferenceUtil}.
  * @author Martin Hentschel
  */
-public class SEDPreferenceUtilTest extends TestCase {
+public class SEDPreferenceUtilTest extends AbstractSetupTestCase {
    /**
     * Tests the preference toggle functionality of
     * {@link SEDPreferenceUtil#toggleShowCompactExecutionTreePreference()}.
