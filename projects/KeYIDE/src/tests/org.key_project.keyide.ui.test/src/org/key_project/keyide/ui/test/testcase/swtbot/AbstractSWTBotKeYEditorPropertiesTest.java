@@ -55,15 +55,19 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
             }
             // Test root
             KeYMediator mediator = environment.getMediator();
+            editor.setFocus(); // Make sure that correct properties are shown (required in Eclipse 4.x)
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
             // Apply rule interactively
             applyTaclet(mediator, mediator.getSelectedNode().sequent(), false, 0, PosInTerm.TOP_LEVEL, "impRight");
+            editor.setFocus(); // Make sure that correct properties are shown (required in Eclipse 4.x)
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
             // Select root
             mediator.getSelectionModel().setSelectedNode(proof.root());
+            editor.setFocus(); // Make sure that correct properties are shown (required in Eclipse 4.x)
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
             // Finish proof
             environment.getUi().waitWhileAutoMode();
+            editor.setFocus(); // Make sure that correct properties are shown (required in Eclipse 4.x)
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
          }
       };
