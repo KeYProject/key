@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.hentschel.visualdbc.datasource.key.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.6.1",
- org.junit4;bundle-version="4.8.1",
+ org.junit;bundle-version="4.8.1",
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.key_project.swtbot.swing;bundle-version="1.0.0",
  org.key_project.util;bundle-version="1.0.0",

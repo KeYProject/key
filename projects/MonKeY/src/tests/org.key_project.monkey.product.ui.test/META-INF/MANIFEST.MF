@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.monkey.product.ui.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- org.junit4;bundle-version="4.8.1",
+ org.junit;bundle-version="4.8.1",
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.monkey.product.ui;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
