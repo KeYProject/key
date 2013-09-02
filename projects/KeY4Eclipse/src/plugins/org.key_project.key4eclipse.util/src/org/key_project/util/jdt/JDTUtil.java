@@ -14,6 +14,7 @@
 package org.key_project.util.jdt;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -58,6 +60,36 @@ public class JDTUtil {
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
+   }
+   
+   /**
+    * Searches the {@link IMethod} as JDT representation which ends
+    * at the given index.
+    * @param cu The {@link ICompilationUnit} to search in.
+    * @param endIndex The index in the file at that the required method ends.
+    * @return The found {@link IMethod} or {@code null} if the JDT representation is not available.
+    * @throws JavaModelException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public static IMethod findJDTMethod(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
+      IMethod result = null;
+      if (cu != null) {
+         IType[] types = cu.getAllTypes();
+         int i = 0;
+         while (result == null && i < types.length) {
+            IMethod[] methods = types[i].getMethods();
+            int j = 0;
+            while (result == null && j < methods.length) {
+               ISourceRange methodRange = methods[j].getSourceRange();
+               if (endIndex == methodRange.getOffset() + methodRange.getLength()) {
+                  result = methods[j];
+               }
+               j++;
+            }
+            i++;
+         }
+      }
+      return result;
    }
    
    /**

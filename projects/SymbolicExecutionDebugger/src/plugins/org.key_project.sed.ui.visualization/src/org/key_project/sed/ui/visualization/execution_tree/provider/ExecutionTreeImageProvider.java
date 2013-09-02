@@ -48,20 +48,23 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_BRANCH_CONDITION, ROOT_FOLDER_FOR_IMG + "branch_condition.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_BRANCH_STATEMENT, ROOT_FOLDER_FOR_IMG + "branch_statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_EXCEPTIONAL_TERMINATION, ROOT_FOLDER_FOR_IMG + "exceptional_termination.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_EXCEPTIONAL_TERMINATION_NOT_VERIFIED, ROOT_FOLDER_FOR_IMG + "exceptional_termination_not_verified.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_CONDITION, ROOT_FOLDER_FOR_IMG + "loop_condition.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_STATEMENT, ROOT_FOLDER_FOR_IMG + "loop_statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_CALL, ROOT_FOLDER_FOR_IMG + "method_call.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_RETURN, ROOT_FOLDER_FOR_IMG + "method_return.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_STATEMENT, ROOT_FOLDER_FOR_IMG + "statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATION, ROOT_FOLDER_FOR_IMG + "termination.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATION_NOT_VERIFIED, ROOT_FOLDER_FOR_IMG + "termination_not_verified.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_THREAD, ROOT_FOLDER_FOR_IMG + "thread.gif");
-       addImageFilePath(IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT, ROOT_FOLDER_FOR_IMG + "operation_contract.gif");
-       addImageFilePath(IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT_NOT_NPC, ROOT_FOLDER_FOR_IMG + "operation_contract_not_npc.gif");
-       addImageFilePath(IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT_NOT_PRE, ROOT_FOLDER_FOR_IMG + "operation_contract_not_pre.gif");
-       addImageFilePath(IExecutionTreeImageConstants.IMG_OPERATION_CONTRACT_NOT_PRE_NOT_NPC, ROOT_FOLDER_FOR_IMG + "operation_contract_not_pre_not_npc.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_CONTRACT, ROOT_FOLDER_FOR_IMG + "method_contract.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_CONTRACT_NOT_NPC, ROOT_FOLDER_FOR_IMG + "method_contract_not_npc.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_CONTRACT_NOT_PRE, ROOT_FOLDER_FOR_IMG + "method_contract_not_pre.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_CONTRACT_NOT_PRE_NOT_NPC, ROOT_FOLDER_FOR_IMG + "method_contract_not_pre_not_npc.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_INVARIANT, ROOT_FOLDER_FOR_IMG + "loop_invariant.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_INVARIANT_INITIALLY_INVALID, ROOT_FOLDER_FOR_IMG + "loop_invariant _initially_invalid.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_BODY_TERMINATION, ROOT_FOLDER_FOR_IMG + "loop_body_termination.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_BODY_TERMINATION_NOT_VERIFIED, ROOT_FOLDER_FOR_IMG + "loop_body_termination_not_verified.gif");
 
        addImageFilePath(IExecutionTreeImageConstants.IMG_RESUME, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "resume_co.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_SUSPEND, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "suspend_co.gif");

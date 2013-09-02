@@ -41,6 +41,6 @@ public abstract class AbstractSEDExceptionalTermination extends AbstractSEDTermi
     */
    @Override
    public String getNodeType() {
-      return "Exceptional Termination";
+      return "Exceptional " + super.getNodeType();
    }
 }

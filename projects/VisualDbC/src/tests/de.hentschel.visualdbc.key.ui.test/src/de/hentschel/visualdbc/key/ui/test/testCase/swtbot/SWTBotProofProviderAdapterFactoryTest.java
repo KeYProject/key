@@ -67,8 +67,6 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
       LogStartProofJobListener startProofListener = new LogStartProofJobListener();
       StartProofJob.addStartProofJobListener(startProofListener);
       try {
-         // Made sure that workspace is initialized and correct taclet options are set.
-         TestUtilsUtil.waitUntilWorkspaceInitialized();
          // Create and fill project if not already available
          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("SWTBotProofProviderAdapterFactoryTest");
          IFolder src;

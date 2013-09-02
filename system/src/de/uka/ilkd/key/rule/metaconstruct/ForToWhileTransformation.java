@@ -14,13 +14,11 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -72,10 +70,10 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             if (x.getGuard() != null) {            
                 guard = (Guard) changeList.removeFirst();
                 if (guard.getExpression() == null) {
-                    guard  = new Guard(BooleanLiteral.TRUE); 
+		    guard = KeYJavaASTFactory.trueGuard();
                 }
             } else {
-                guard = new Guard(BooleanLiteral.TRUE);
+		guard = KeYJavaASTFactory.trueGuard();
             }
 
             if (changeList.get(0) instanceof IForUpdates) {
@@ -85,7 +83,8 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             body = (Statement) changeList.removeFirst();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
-                body = new LabeledStatement(breakInnerLabel.getLabel(), body);
+		body = KeYJavaASTFactory.labeledStatement(
+			breakInnerLabel.getLabel(), body);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
@@ -109,16 +108,16 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                 }
             }
             
-            outerBlockStatements[initSize] = new While(guard.getExpression(),
-                    new StatementBlock(new ImmutableArray<Statement>(
-                            innerBlockStatements)), null);
+	    outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
+		    guard.getExpression(),
+		    KeYJavaASTFactory.block(innerBlockStatements), null);
 
-            Statement outerBlock = new StatementBlock(new ImmutableArray<Statement>(
-                    outerBlockStatements));
+	    Statement outerBlock = KeYJavaASTFactory
+		    .block(outerBlockStatements);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
-                outerBlock = new LabeledStatement(breakOuterLabel.getLabel(),
-                        outerBlock);
+		outerBlock = KeYJavaASTFactory.labeledStatement(
+			breakOuterLabel.getLabel(), outerBlock);
             }
             
             // copy loop invariant to the created while loop

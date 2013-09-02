@@ -15,15 +15,20 @@
 package de.uka.ilkd.key.speclang;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -31,6 +36,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -41,6 +47,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -50,6 +57,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -524,6 +532,129 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
+       return getText(pm, 
+                      originalResultVar, 
+                      originalSelfVar, 
+                      originalParamVars, 
+                      originalExcVar, 
+                      hasMby(), 
+                      originalMby, 
+                      originalMods, 
+                      hasRealModifiesClause, 
+                      globalDefs, 
+                      originalPres, 
+                      originalPosts, 
+                      originalAxioms, 
+                      getModality(), 
+                      transactionApplicableContract(), 
+                      includeHtmlMarkup, 
+                      services);
+    }
+    
+    public static String getText(FunctionalOperationContract contract,
+                                 ImmutableList<Term> contractParams,
+                                 Term resultTerm,
+                                 Term contractSelf,
+                                 Term excTerm,
+                                 LocationVariable baseHeap,
+                                 Term baseHeapTerm,
+                                 List<LocationVariable> heapContext,
+                                 Map<LocationVariable,Term> atPres,
+                                 boolean includeHtmlMarkup, 
+                                 Services services) {
+       ProgramVariable originalSelfVar = contractSelf != null ? (ProgramVariable)contractSelf.op() : null;
+       ProgramVariable originalResultVar = resultTerm != null ? (ProgramVariable)resultTerm.op() : null;
+       
+       Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
+       for(LocationVariable h : heapContext) {
+          heapTerms.put(h, TB.var(h));
+       }
+       
+       Term originalMby = contract.hasMby()
+             ? contract.getMby(heapTerms,
+                   contractSelf,
+                   contractParams,
+                   atPres,
+                   services)
+           : null;
+       
+       Map<LocationVariable,Term> originalMods = new HashMap<LocationVariable, Term>();
+       for(LocationVariable heap : heapContext) {
+          Term m = contract.getMod(heap, TB.var(heap), contractSelf,contractParams, services);
+          originalMods.put(heap, m);
+       }
+       
+       Map<LocationVariable,Boolean> hasRealModifiesClause = new HashMap<LocationVariable, Boolean>();
+       for (LocationVariable heap : heapContext) {
+          hasRealModifiesClause.put(heap, contract.hasModifiesClause(heap));
+       }
+       
+       Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
+       
+       Map<LocationVariable,Term> originalPres = new HashMap<LocationVariable, Term>();
+       for (LocationVariable heap : heapContext) {
+          Term preTerm = contract.getPre(heap, heapTerms.get(heap), contractSelf, contractParams, atPres, services);
+          originalPres.put(heap, preTerm);
+       }
+       
+       Map<LocationVariable,Term> originalPosts = new HashMap<LocationVariable, Term>();
+       for(LocationVariable heap : heapContext) {
+          Term p = contract.getPost(heap, heapTerms.get(heap), contractSelf, contractParams, resultTerm, excTerm, atPres, services);
+          originalPosts.put(heap, p);
+       }
+
+       Map<LocationVariable, ProgramVariable> atPresVars = new HashMap<LocationVariable, ProgramVariable>();
+       for (Entry<LocationVariable, Term> entry : atPres.entrySet()) {
+          if (entry.getValue() != null) {
+             atPresVars.put(entry.getKey(), (ProgramVariable)entry.getValue().op());
+          }
+          else {
+             atPresVars.put(entry.getKey(), null);
+          }
+       }
+       
+       Map<LocationVariable,Term> originalAxioms = new HashMap<LocationVariable, Term>();
+       for(LocationVariable heap : heapContext) {
+          Term p = contract.getRepresentsAxiom(heap, heapTerms.get(heap), contractSelf, contractParams, resultTerm, excTerm, atPres, services);
+          originalAxioms.put(heap, p);
+       }
+       
+       return getText(contract.getTarget(), 
+                      originalResultVar, 
+                      originalSelfVar, 
+                      contractParams, 
+                      (ProgramVariable)excTerm.op(), 
+                      contract.hasMby(), 
+                      originalMby, 
+                      originalMods, 
+                      hasRealModifiesClause, 
+                      globalDefs, 
+                      originalPres, 
+                      originalPosts, 
+                      originalAxioms, 
+                      contract.getModality(), 
+                      contract.transactionApplicableContract(), 
+                      includeHtmlMarkup, 
+                      services);
+    }
+
+    private static String getText(IProgramMethod pm, 
+                                  ProgramVariable originalResultVar, 
+                                  ProgramVariable originalSelfVar, 
+                                  ImmutableList<? extends SVSubstitute> originalParamVars,
+                                  ProgramVariable originalExcVar,
+                                  boolean hasMby,
+                                  Term originalMby,
+                                  Map<LocationVariable,Term> originalMods,
+                                  Map<LocationVariable,Boolean> hasRealModifiesClause,
+                                  Term globalDefs,
+                                  Map<LocationVariable,Term> originalPres,
+                                  Map<LocationVariable,Term> originalPosts,
+                                  Map<LocationVariable,Term> originalAxioms,
+                                  Modality modality,
+                                  boolean transaction,
+                                  boolean includeHtmlMarkup, 
+                                  Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuffer sig = new StringBuffer();
@@ -541,8 +672,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
         sig.append(pm.getName());
         sig.append("(");
-        for (ProgramVariable pv : originalParamVars) {
-            sig.append(pv.name()).append(", ");
+        for (SVSubstitute subst : originalParamVars) {
+           if (subst instanceof Named) {
+              Named named = (Named)subst;
+              sig.append(named.name()).append(", ");
+           }
+           else if (subst instanceof Term) {
+              sig.append(ProofSaver.printAnything(subst, services)).append(", ");
+           }
+           else {
+              sig.append(subst).append(", ");
+           }
         }
         if (!originalParamVars.isEmpty()) {
             sig.setLength(sig.length() - 2);
@@ -554,7 +694,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             sig.append(")");
         }
 
-        final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
+        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
 
         String mods = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
@@ -634,10 +774,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     + posts
                     + axioms
                     + mods
-                    + (hasMby() ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
+                    + (hasMby ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
                     + "<br><b>termination</b> "
-                    + getModality()
-                    + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") +
+                    + modality
+                    + (transaction ? "<br><b>transaction applicable</b>" : "") +
                     "</html>";
 
         }
@@ -648,10 +788,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                     + posts
                     + axioms
                     + mods
-                    + (hasMby() ? "\nmeasured-by: "+ mby : "")
+                    + (hasMby ? "\nmeasured-by: "+ mby : "")
                     + "\ntermination: "
-                    + getModality()
-                    + (transactionApplicableContract() ? "\ntransaction applicable:" : "");
+                    + modality
+                    + (transaction ? "\ntransaction applicable:" : "");
         }
     }
 
@@ -880,6 +1020,38 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(originalAxioms.get(heap));
     }
 
+    @Override
+    public Term getRepresentsAxiom(LocationVariable heap, 
+                                   Term heapTerm, 
+                                   Term selfTerm, 
+                                   ImmutableList<Term> paramTerms, 
+                                   Term resultTerm, 
+                                   Term excTerm,
+                                   Map<LocationVariable, Term> atPres, 
+                                   Services services) {
+       assert heapTerm != null;
+       assert (selfTerm == null) == (originalSelfVar == null);
+       assert paramTerms != null;
+       paramTerms = addGhostParamTerms(paramTerms);
+       assert paramTerms.size() == originalParamVars.size();
+       assert (resultTerm == null) == (originalResultVar == null);
+       assert pm.isModel() || excTerm != null;
+       assert atPres.size() != 0;
+       assert services != null;
+       final Map<LocationVariable,Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+       heapTerms.put(heap, heapTerm);
+
+       final Map<Term, Term> replaceMap = getReplaceMap(heapTerms,
+               selfTerm,
+               paramTerms,
+               resultTerm,
+               excTerm,
+               atPres,
+               services);
+       final OpReplacer or = new OpReplacer(replaceMap);
+       return or.replace(originalAxioms.get(heap));
+    }
+
     public boolean isReadOnlyContract(Services services) {
         return originalMods.get(services.getTypeConverter().getHeapLDT().getHeap()).op() ==
                 services.getTypeConverter().getLocSetLDT().getEmpty();
@@ -980,7 +1152,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 + originalMods
                 + "; hasMod: "
                 + hasRealModifiesClause
-                + (originalAxioms.size() > 0 ?  ("; axioms: " + originalAxioms) : "")
+                + (originalAxioms != null && originalAxioms.size() > 0 ?  ("; axioms: " + originalAxioms) : "")
                 + "; termination: "
                 + getModality()
                 + "; transaction: "
@@ -1071,5 +1243,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
     }
 
+   @Override
+   public boolean hasResultVar() {
+      return originalResultVar != null;
+   }
+
+   @Override
+   public boolean hasSelfVar() {
+      return originalSelfVar != null;
+   }
 }
 

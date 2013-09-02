@@ -18,12 +18,13 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtilInitializer;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Tests for {@link SEDPreferenceUtilInitializer}.
  * @author Martin Hentschel
  */
-public class SEDPreferenceUtilInitializerTest extends TestCase {
+public class SEDPreferenceUtilInitializerTest extends AbstractSetupTestCase {
    /**
     * Tests the defined default values.
     */

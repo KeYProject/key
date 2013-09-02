@@ -2,20 +2,20 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = obj.magic(123);" pathCondition="true" pathConditionChanged="false">
-         <operationContract name="result = self.magic(x) catch(exc)
-pre: self.&lt;inv&gt;
-post: !exc = null
-&amp; (  (   java.lang.Exception::instance(exc) = TRUE
-      -&gt; self.&lt;inv&gt;)
-   &amp; (    java.lang.RuntimeException::instance(exc)
+         <operationContract name="result_0 = obj.magic(123) catch(exc_0)
+pre: obj.&lt;inv&gt;
+post: !exc_0 = null
+&amp; (  (   java.lang.Exception::instance(exc_0) = TRUE
+      -&gt; obj.&lt;inv&gt;)
+   &amp; (    java.lang.RuntimeException::instance(exc_0)
         = TRUE
-      | java.lang.Exception::instance(exc) = TRUE))
+      | java.lang.Exception::instance(exc_0) = TRUE))
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
             <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
                <statement name="return -1;" pathCondition="!obj = null" pathConditionChanged="false">
                   <methodReturn name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

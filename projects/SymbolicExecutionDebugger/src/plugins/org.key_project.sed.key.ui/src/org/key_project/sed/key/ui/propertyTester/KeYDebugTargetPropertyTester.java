@@ -19,6 +19,8 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.java.ArrayUtil;
 
+import de.uka.ilkd.key.gui.MainWindow;
+
 /**
  * This property tester can be used to make sure that an {@link ILaunch} 
  * contains exactly one {@link KeYDebugTarget} and that {@link IDebugElement}s
@@ -30,7 +32,12 @@ public class KeYDebugTargetPropertyTester extends PropertyTester {
     * Argument to verify also that the {@link KeYDebugTarget} is not terminated.
     */
    public static final String NOT_DISPOSED_ARGUMENT = "notTerminated";
-   
+
+   /**
+    * Argument to verify also that the proof is not shown in KeY's {@link MainWindow}.
+    */
+   public static final String NOT_KEY_MAIN_WINDOW = "notKeYMainWindow";
+
    /**
     * {@inheritDoc}
     */
@@ -54,11 +61,13 @@ public class KeYDebugTargetPropertyTester extends PropertyTester {
             target = (KeYDebugTarget)element.getDebugTarget();
          }
       }
-      if (ArrayUtil.contains(args, NOT_DISPOSED_ARGUMENT)) {
-         return target != null && !target.isTerminated();
+      boolean result = target != null;
+      if (result && ArrayUtil.contains(args, NOT_DISPOSED_ARGUMENT)) {
+         result = !target.isTerminated();
       }
-      else {
-         return target != null;
+      if (result && ArrayUtil.contains(args, NOT_KEY_MAIN_WINDOW)) {
+         result = !target.getLaunchSettings().isShowKeYMainWindow();
       }
+      return result;
    }
 }

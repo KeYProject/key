@@ -24,7 +24,9 @@ import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class OneStepSimplificationToggleAction extends MainWindowAction {
 
@@ -56,7 +58,14 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
 	ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(b);
 //	ProofSettings.DEFAULT_SETTINGS.getGeneralSettings()
 //	        .setOneStepSimplification(b);
-	OneStepSimplifier.INSTANCE.refresh(getMediator().getSelectedProof());
+	OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(getMediator().getProfile());
+	if (simplifier != null) {
+	   simplifier.refresh(getMediator().getSelectedProof());
+	}
     }
 
+   @Override
+   public boolean isEnabled() {
+      return super.isEnabled() && getMediator().getProfile() instanceof JavaProfile;
+   }
 }

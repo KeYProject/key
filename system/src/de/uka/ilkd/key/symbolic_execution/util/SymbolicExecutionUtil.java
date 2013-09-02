@@ -14,8 +14,10 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -63,18 +65,21 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -104,19 +109,19 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.ITermLabelWorker;
-import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -238,17 +243,7 @@ public final class SymbolicExecutionUtil {
       InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
-      JavaProfile profile = new JavaProfile() {
-         private OneStepSimplifier simplifier;
-         
-         @Override
-         protected OneStepSimplifier getInitialOneStepSimpilifier() {
-            if (simplifier == null) {
-               simplifier = new OneStepSimplifier();
-            }
-            return simplifier;
-         }
-      };
+      JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(source.getServices().copy(profile));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
@@ -1018,7 +1013,11 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as method return, {@code false} represent node as something else. 
     */
    public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
-      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
+      String displayName = MiscTools.getRuleDisplayName(ruleApp);
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallEmpty".equals(displayName) ||
+             "methodCallEmptyReturn".equals(ruleName) ||
+             "methodCallReturnIgnoreResult".equals(ruleName);
    }
 
    /**
@@ -1627,46 +1626,11 @@ public final class SymbolicExecutionUtil {
       else {
          // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
          // Find Term to extract implications from.
-         Semisequent antecedent = node.sequent().antecedent();
-         SequentFormula sf = antecedent.get(antecedent.size() - 1);
-         Term workingTerm = sf.formula();
-         Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
-         workingTerm = updatesAndTerm.second;
-         if (workingTerm.op() != Junctor.AND) {
-            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
-         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
-         if (workingTerm.op() != Junctor.AND) {
-            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
-         Term exceptionDefinition = workingTerm;
-         while (exceptionDefinition.op() == Junctor.AND) {
-            exceptionDefinition = exceptionDefinition.sub(0);
-         }
-         // Make sure that exception equality was found
-         Term exceptionEquality;
-         if (exceptionDefinition.op() == Junctor.NOT) {
-            exceptionEquality = exceptionDefinition.sub(0);
-         }
-         else {
-            exceptionEquality = exceptionDefinition;
-         }
-         if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
-            throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         if (!isNullSort(exceptionEquality.sub(1).sort(), parent.proof().getServices())) {
-            throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         KeYJavaType exceptionType = parent.proof().getServices().getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
-         if (!parent.proof().getServices().getJavaInfo().isSubtype(exceptionType, parent.proof().getServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
-            throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
-         }
+         ContractPostOrExcPostExceptionVariableResult search = serachContractPostOrExcPostExceptionVariable(node, node.proof().getServices());
          // Collect all implications for normal or exceptional preconditions
          Term result;
-         Term implications = workingTerm.sub(1);
-         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
+         Term implications = search.getWorkingTerm().sub(1);
+         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), search.getExceptionDefinition(), childIndex == 1, implications);
          if (!implicationTerms.isEmpty()) {
             // Implications find, return their conditions as branch condition
             ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
@@ -1675,7 +1639,7 @@ public final class SymbolicExecutionUtil {
             }
             result = TermBuilder.DF.or(condtionTerms);
             // Add updates
-            result = TermBuilder.DF.applyParallel(updatesAndTerm.first, result);
+            result = TermBuilder.DF.applyParallel(search.getUpdatesAndTerm().first, result);
          }
          else {
             // No preconditions available, branch condition is true
@@ -1703,6 +1667,146 @@ public final class SymbolicExecutionUtil {
             result = simplify(node.proof(), result);
          }
          return result;
+      }
+   }
+   
+   /**
+    * Searches the used exception variable in the post or exceptional post branch of an applied {@link ContractRuleApp} on the parent of the given {@link Node}. 
+    * @param node The {@link Node} which is the post or exceptional post branch of an applied {@link ContractRuleApp}.
+    * @param services The {@link Services} to use.
+    * @return The result.
+    * @throws ProofInputException Occurred exception if something is not as expected.
+    */
+   public static ContractPostOrExcPostExceptionVariableResult serachContractPostOrExcPostExceptionVariable(Node node, Services services) throws ProofInputException {
+      Semisequent antecedent = node.sequent().antecedent();
+      SequentFormula sf = antecedent.get(antecedent.size() - 1);
+      Term workingTerm = sf.formula();
+      Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
+      workingTerm = updatesAndTerm.second;
+      if (workingTerm.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
+      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+      if (workingTerm.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
+      Term exceptionDefinitionParent = null;
+      Term exceptionDefinition = workingTerm;
+      while (exceptionDefinition.op() == Junctor.AND) {
+         exceptionDefinitionParent = exceptionDefinition;
+         exceptionDefinition = exceptionDefinition.sub(0);
+      }
+      // Make sure that exception equality was found
+      Term exceptionEquality;
+      if (exceptionDefinition.op() == Junctor.NOT) {
+         exceptionEquality = exceptionDefinition.sub(0);
+      }
+      else {
+         exceptionEquality = exceptionDefinition;
+      }
+      if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
+         throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      if (!isNullSort(exceptionEquality.sub(1).sort(), services)) {
+         throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      KeYJavaType exceptionType = services.getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
+      if (!services.getJavaInfo().isSubtype(exceptionType, services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+         throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionDefinitionParent, exceptionEquality);
+   }
+   
+   /**
+    * The result of {@link SymbolicExecutionUtil#serachContractPostOrExcPostExceptionVariable(Node, Services)}.
+    * @author Martin Hentschel
+    */
+   public static class ContractPostOrExcPostExceptionVariableResult {
+      /**
+       * The working {@link Term}.
+       */
+      private Term workingTerm;
+      
+      /**
+       * The updates.
+       */
+      private Pair<ImmutableList<Term>,Term> updatesAndTerm;
+      
+      /**
+       * The exception definition.
+       */
+      private Term exceptionDefinition;
+      
+      /**
+       * The found parent of {@link #exceptionDefinition}.
+       */
+      private Term exceptionDefinitionParent;
+      
+      /**
+       * The equality which contains the equality.
+       */
+      private Term exceptionEquality;
+      
+      /**
+       * Constructor.
+       * @param workingTerm The working {@link Term}.
+       * @param updatesAndTerm The updates.
+       * @param exceptionDefinition The exception definition.
+       * @param exceptionDefinitionParent The found parent of the given exception definition.
+       * @param exceptionEquality The equality which contains the equality.
+       */
+      public ContractPostOrExcPostExceptionVariableResult(Term workingTerm, 
+                                                          Pair<ImmutableList<Term>, Term> updatesAndTerm, 
+                                                          Term exceptionDefinition,
+                                                          Term exceptionDefinitionParent,
+                                                          Term exceptionEquality) {
+         this.workingTerm = workingTerm;
+         this.updatesAndTerm = updatesAndTerm;
+         this.exceptionDefinition = exceptionDefinition;
+         this.exceptionDefinitionParent = exceptionDefinitionParent;
+         this.exceptionEquality = exceptionEquality;
+      }
+      
+      /**
+       * Returns the working {@link Term}.
+       * @return The working {@link Term}.
+       */
+      public Term getWorkingTerm() {
+         return workingTerm;
+      }
+
+      /**
+       * Returns the updates.
+       * @return The updates.
+       */
+      public Pair<ImmutableList<Term>, Term> getUpdatesAndTerm() {
+         return updatesAndTerm;
+      }
+      
+      /**
+       * Returns the exception definition.
+       * @return The exception definition.
+       */
+      public Term getExceptionDefinition() {
+         return exceptionDefinition;
+      }
+      
+      /**
+       * Returns the found parent of {@link #getExceptionDefinition()}.
+       * @return The found parent of {@link #getExceptionDefinition()}.
+       */
+      public Term getExceptionDefinitionParent() {
+         return exceptionDefinitionParent;
+      }
+      
+      /**
+       * Returns the equality which contains the equality.
+       * @return The equality which contains the equality.
+       */
+      public Term getExceptionEquality() {
+         return exceptionEquality;
       }
    }
    
@@ -1957,6 +2061,8 @@ public final class SymbolicExecutionUtil {
       if (simplify) {
          result = SymbolicExecutionUtil.simplify(node.proof(), result);
       }
+      // Make sure that no skolem constant is contained in the result.
+      result = replaceSkolemConstants(node.sequent(), result);
       return result;
    }
 
@@ -2126,11 +2232,192 @@ public final class SymbolicExecutionUtil {
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
+      Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
+      originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
       if (additionalAntecedent != null) {
          sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
       return sequentToProve;
+   }
+
+   /**
+    * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)} as well as the skolem constants
+    * used in the find once recursive.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param term The {@link Term} to start collection in.
+    * @return The found skolem {@link Term}s.
+    */
+   private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
+      // Collect skolem constants in term
+      Set<Term> result = collectSkolemConstantsNonRecursive(term);
+      // Collect all skolem constants used in skolem constants
+      List<Term> toCheck = new LinkedList<Term>(result);
+      while (!toCheck.isEmpty()) {
+         Term skolemConstant = toCheck.remove(0);
+         Term replacement = findSkolemReplacement(sequent, skolemConstant);
+         Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+         for (Term checkConstant : checkResult) {
+            if (result.add(checkConstant)) {
+               toCheck.add(checkConstant);
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Collects all contained skolem {@link Term}s which fulfill
+    * {@link #isSkolemConstant(Term)}.
+    * @param term The {@link Term} to collect in.
+    * @return The found skolem {@link Term}s.
+    */
+   private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
+      final Set<Term> result = new HashSet<Term>();
+      term.execPreOrder(new DefaultVisitor() {
+         @Override
+         public void visit(Term visited) {
+            if (isSkolemConstant(visited)) {
+               result.add(visited);
+            }
+         }
+      });
+      return result;
+   }
+
+   /**
+    * Checks if the given {@link Term} is a skolem {@link Term} meaning
+    * that it has the {@link SelectSkolemConstantTermLabel}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is skolem {@link Term}, {@code false} is not a skolem {@link Term}.
+    */
+   public static boolean isSkolemConstant(Term term) {
+      return term.containsLabel(SelectSkolemConstantTermLabel.INSTANCE);
+   }
+   
+   /**
+    * Removes all {@link SequentFormula}s with a skolem equality from the given {@link Sequent}
+    * if the skolem {@link Term} is not contained in the given {@link Collection}.
+    * @param sequent The {@link Sequent} to modify.
+    * @param skolemConstants The allowed skolem {@link Term}s.
+    * @return The modified {@link Sequent} in which all not listed skolem {@link Term} equalites are removed.
+    */
+   private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, Collection<Term> skolemConstants) {
+      Sequent result = sequent;
+      for (SequentFormula sf : sequent.antecedent()) {
+         result = removeAllUnusedSkolemEqualities(result, sf, true, skolemConstants);
+      }
+      for (SequentFormula sf : sequent.succedent()) {
+         result = removeAllUnusedSkolemEqualities(result, sf, false, skolemConstants);
+      }
+      return result;
+      
+   }
+   
+   /**
+    * Helper method of {@link #removeAllUnusedSkolemEqualities(Sequent, Collection)} 
+    * which removes the given {@link SequentFormula} if required.
+    * @param sequent The {@link Sequent} to modify.
+    * @param sf The {@link SequentFormula} to remove if its skolem {@link Term} is not listed.
+    * @param antecedent {@code true} antecedent, {@code false} succedent.
+    * @param skolemConstants The allowed skolem {@link Term}s.
+    * @return The modified {@link Sequent} in which the {@link SequentFormula} might be removed.
+    */
+   private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent, 
+                                                          SequentFormula sf, 
+                                                          boolean antecedent, 
+                                                          Collection<Term> skolemConstants) {
+      Term term = sf.formula();
+      boolean remove = false;
+      if (term.op() == Equality.EQUALS) {
+         if (isSkolemConstant(term.sub(0))) {
+            remove = !skolemConstants.contains(term.sub(0));
+         }
+         if (!remove && isSkolemConstant(term.sub(1))) {
+            remove = !skolemConstants.contains(term.sub(1));
+         }
+      }
+      if (remove) {
+         return sequent.removeFormula(new PosInOccurrence(sf, PosInTerm.TOP_LEVEL, antecedent)).sequent();
+      }
+      else {
+         return sequent;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link SequentFormula} is a skolem equality.
+    * @param sf The {@link SequentFormula} to check.
+    * @return {@code true} is skolem equality, {@code false} is not a skolem equality.
+    */
+   public static boolean isSkolemEquality(SequentFormula sf) {
+      boolean skolemEquality = false;
+      Term term = sf.formula();
+      if (term.op() == Equality.EQUALS) {
+         if (isSkolemConstant(term.sub(0))) {
+            skolemEquality = true;
+         }
+         if (isSkolemConstant(term.sub(1))) {
+            skolemEquality = true;
+         }
+      }
+      return skolemEquality;
+   }
+
+   /**
+    * Replaces all skolem constants in the given {@link Term}.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param term The {@link Term} to replace its skolem constants.
+    * @return The skolem constant free {@link Term}.
+    */
+   public static Term replaceSkolemConstants(Sequent sequent, Term term) {
+      if (isSkolemConstant(term)) {
+         return findSkolemReplacement(sequent, term);
+      }
+      else {
+         List<Term> newChildren = new LinkedList<Term>();
+         boolean changed = false;
+         for (int i = 0; i < term.arity(); i++) {
+            Term oldChild = term.sub(i);
+            Term newChild = replaceSkolemConstants(sequent, oldChild);
+            if (newChild != oldChild) {
+               changed = true;
+            }
+            newChildren.add(newChild);
+         }
+         return changed ? TermFactory.DEFAULT.createTerm(term.op(), 
+                                                         new ImmutableArray<Term>(newChildren), 
+                                                         term.boundVars(), 
+                                                         term.javaBlock(), 
+                                                         term.getLabels()) : 
+                          term;
+      }
+   }
+
+   /**
+    * Utility method of {@link #replaceSkolemConstants(Sequent, Term)} to
+    * find the equality part of the given skolem constant.
+    * @param sequent The {@link Sequent} which provides the skolem equalities.
+    * @param skolemConstant The skolem constant to solve.
+    * @return The equality part of the given skolem constant or the skolem constant itself it was not possible to find it.
+    */
+   private static Term findSkolemReplacement(Sequent sequent, Term skolemConstant) {
+      Term result = null;
+      Iterator<SequentFormula> iter = sequent.iterator();
+      while (result == null && iter.hasNext()) {
+         SequentFormula sf = iter.next();
+         Term term = sf.formula();
+         if (term.op() == Equality.EQUALS) {
+            if (term.sub(0) == skolemConstant) {
+               result = term.sub(1);
+            }
+            if (term.sub(1) == skolemConstant) {
+               result = term.sub(0);
+            }
+         }
+      }
+      return result != null ? result : skolemConstant;
    }
 
    /**
@@ -2384,10 +2671,16 @@ public final class SymbolicExecutionUtil {
     */
    public static void configureProof(Proof proof) {
       if (proof != null) {
-         ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
-         labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
-         labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
+         if (!labelInstantiators.contains(SymbolicExecutionTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         }
+         if (!labelInstantiators.contains(LoopBodyTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
+         }
+         if (!labelInstantiators.contains(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE)) {
+            labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+         }
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
@@ -2517,5 +2810,26 @@ public final class SymbolicExecutionUtil {
       BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
       return booleanLDT.getFalseConst() == op ||
              booleanLDT.getTrueConst() == op;
+   }
+   
+   /**
+    * Returns the default taclet options for symbolic execution.
+    * @return The default taclet options for symbolic execution.
+    */
+   public static HashMap<String, String> getDefaultTacletOptions() {
+      HashMap<String, String> result = new HashMap<String, String>();
+      result.put("Strings", "Strings:on");
+      result.put("reach", "reach:on");
+      result.put("JavaCard", "JavaCard:on");
+      result.put("assertions", "assertions:on");
+      result.put("bigint", "bigint:on");
+      result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
+      result.put("programRules", "programRules:Java");
+      result.put("modelFields", "modelFields:showSatisfiability");
+      result.put("initialisation", "initialisation:disableStaticInitialisation");
+      result.put("sequences", "sequences:on");
+      result.put("runtimeExceptions", "runtimeExceptions:allow");
+      result.put("integerSimplificationRules", "integerSimplificationRules:full");
+      return result;
    }
 }

@@ -24,25 +24,31 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IMarkerResolution2;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
+/**
+ * Provides the QuickFixes for the KeY{@link IMarker}.
+ * @author Stefan Käsdorf
+ */
 public class ProofMarkerResolution implements IMarkerResolution2{
 
    private String label;
    private String description;
-
+   private boolean openInKeY;
    
    /**
     * Initializes the global variables depending on the given {@link IMarker#getType()}.
     * @param markerType - the given {@link IMarker#getType()}
     */
-   public ProofMarkerResolution(String markerType) {
+   public ProofMarkerResolution(String markerType, boolean openInKeY) {
+      this.openInKeY = openInKeY;
       if(markerType.equals(MarkerManager.CLOSEDMARKER_ID)){
-         description = "Open Proof";
+         description = (openInKeY ? "Open proof in KeY" : "Open proof");
       }
       else if(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         description = "Open Proof to close it manually";
+         description = (openInKeY ? "Open proof in KeY to close it manually" : "Open proof to close it manually");
       }
-      this.label = "Open Proof";
+      this.label = (openInKeY ? "Open proof in KeY" : "Open proof");
    }
    
    /**
@@ -61,10 +67,15 @@ public class ProofMarkerResolution implements IMarkerResolution2{
    public void run(IMarker marker) {
       try {
          IFile file = getProofFile(marker);
-         StarterUtil.openFileStarter(null, file);
+         if(!openInKeY){
+            StarterUtil.openFileStarter(null, file);
+         }
+         else{
+            KeYUtil.loadAsync(file);
+         }
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e);
+         LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
       }
    }
 

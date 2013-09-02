@@ -5,6 +5,7 @@
    <extension-point id="org.key_project.key4eclipse.common.ui.methodStarter" name="Method Starter" schema="schema/org.key_project.key4eclipse.common.ui.methodStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.fileStarter" name="File Starter" schema="schema/org.key_project.key4eclipse.common.ui.fileStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.projectStarter" name="Project Starter" schema="schema/org.key_project.key4eclipse.common.ui.projectStarter.exsd"/>
+   <extension-point id="org.key_project.key4eclipse.common.ui.proofStarter" name="Proof Starter" schema="schema/org.key_project.key4eclipse.common.ui.proofStarter.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
@@ -570,6 +571,13 @@
             id="org.key_project.key4eclipse.common.ui.expression.ProjectStarterAvailablePropertyTester"
             namespace="org.key_project.key4eclipse.common.ui"
             properties="projectStarterAvailable"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.key4eclipse.common.ui.expression.ProofStarterAvailablePropertyTester"
+            id="org.key_project.key4eclipse.common.ui.expression.ProofStarterAvailablePropertyTester"
+            namespace="org.key_project.key4eclipse.common.ui"
+            properties="proofStarterAvailable"
             type="java.lang.Object">
       </propertyTester>
    </extension>

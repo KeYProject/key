@@ -19,7 +19,7 @@
                                                    <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                       <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                          <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
                                                       </methodReturn>

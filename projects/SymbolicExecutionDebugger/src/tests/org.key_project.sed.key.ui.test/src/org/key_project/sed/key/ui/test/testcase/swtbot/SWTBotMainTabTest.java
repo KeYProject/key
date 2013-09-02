@@ -16,7 +16,7 @@ package org.key_project.sed.key.ui.test.testcase.swtbot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 /**
  * Tests the property page tab "Main".

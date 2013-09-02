@@ -8,6 +8,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.core.expressions;bundle-version="3.4.300",
  org.eclipse.ui,
+ org.eclipse.ui.forms,
  org.eclipse.ui.editors;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.jdt.core;bundle-version="3.7.0";resolution:=optional,
@@ -18,7 +19,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.key4eclipse.common.ui.decorator,
+Export-Package: org.key_project.key4eclipse.common.ui.composite,
+ org.key_project.key4eclipse.common.ui.decorator,
  org.key_project.key4eclipse.common.ui.dialog,
  org.key_project.key4eclipse.common.ui.expression,
  org.key_project.key4eclipse.common.ui.handler,

@@ -5,9 +5,12 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+            <loopInvariant name="
+invariant: i &gt;= 0
+&amp; (  i &lt;= array.length
+   &amp; result_1 = bsum{int j;}(0, i, array[j]));
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <branchCondition name="!(    i_0 &gt;= 1
     &amp; array.length &gt;= 0
@@ -76,7 +79,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
-   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </statement>
                         </branchStatement>
@@ -97,7 +100,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt;   bsum{int j;}(0, i_0, array[j])
               = result_1_0))
-   &amp; array = null" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                      </termination>
                   </branchCondition>
                </branchCondition>
@@ -145,7 +148,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL">
+         -&gt; bsum{int j;}(0, i_0, array[j]) = result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

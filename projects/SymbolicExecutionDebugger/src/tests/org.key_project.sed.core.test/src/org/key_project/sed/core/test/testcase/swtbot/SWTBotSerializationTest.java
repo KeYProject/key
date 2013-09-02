@@ -18,8 +18,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunch;
@@ -35,13 +33,14 @@ import org.key_project.sed.core.model.serialization.SEDXMLReader;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests {@link SEDXMLWriter} and {@link SEDXMLReader}.
  * @author Martin Hentschel
  */
-public class SWTBotSerializationTest extends TestCase {
+public class SWTBotSerializationTest extends AbstractSetupTestCase {
    /**
     * Tests the reading and writing process via
     * {@link SEDXMLWriter#toXML(IDebugTarget[], String)},

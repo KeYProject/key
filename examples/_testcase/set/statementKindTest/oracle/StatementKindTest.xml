@@ -21,7 +21,7 @@
                                                          <methodReturn name="&lt;return of self.get42();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                             <statement name="i=(2+4)*2;" pathCondition="true" pathConditionChanged="false">
                                                                <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                   </termination>
                                                                </methodReturn>
                                                             </statement>

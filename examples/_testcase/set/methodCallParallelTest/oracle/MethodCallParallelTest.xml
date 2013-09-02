@@ -45,7 +45,7 @@
                                                                                        <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 252 as result of self.main();&gt;" isReturnValueComputed="true">
                                                                                           <methodReturnValue name="252" returnValueString="252" hasCondition="false">
                                                                                           </methodReturnValue>
-                                                                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                           </termination>
                                                                                        </methodReturn>
                                                                                     </statement>

@@ -19,6 +19,7 @@ import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 
 /**
  * Provides utility methods to edit the starter preferences.
@@ -84,6 +85,21 @@ public final class StarterPreferenceUtil {
     * Property that indicates that the project start functionality is disabled or enabled.
     */
    public static final String PROJECT_STARTER_DISABLED = "org.key_project.key4eclipse.common.ui.projectStarterDisabled";
+
+   /**
+    * Property which stores the ID of the selected {@link IProofStarter}.
+    */
+   public static final String SELECTED_PROOF_STARTER_ID = "org.key_project.key4eclipse.common.ui.selectedProofStarterID";
+
+   /**
+    * Property that indicates not to ask for an {@link IProofStarter} and to use the selected {@link IProofStarter} instead.
+    */
+   public static final String DONT_ASK_FOR_PROOF_STARTER = "org.key_project.key4eclipse.common.ui.dontAskForProofStarter";
+
+   /**
+    * Property that indicates that the project start functionality is disabled or enabled.
+    */
+   public static final String PROOF_STARTER_DISABLED = "org.key_project.key4eclipse.common.ui.proofStarterDisabled";
    
    /**
     * Forbid instances.
@@ -505,5 +521,107 @@ public final class StarterPreferenceUtil {
     */
    public static void setDefaultProjectStarterDisabled(boolean disabled) {
       getStore().setDefault(PROJECT_STARTER_DISABLED, disabled);
+   }
+   
+   
+   
+   /**
+    * Returns the current value of property {@link #SELECTED_PROOF_STARTER_ID}.
+    * @return The current value of property{@link #SELECTED_PROOF_STARTER_ID}.
+    */
+   public static String getSelectedProofStarterID() {
+      return getStore().getString(SELECTED_PROOF_STARTER_ID);
+   }
+   
+   /**
+    * Returns the default value of property {@link #SELECTED_PROOF_STARTER_ID}.
+    * @return The default value of property{@link #SELECTED_PROOF_STARTER_ID}.
+    */
+   public static String getDefaultSelectedProofStarterID() {
+      return getStore().getDefaultString(SELECTED_PROOF_STARTER_ID);
+   }
+   
+   /**
+    * Sets the current value of property {@link #SELECTED_PROOF_STARTER_ID}.
+    * @param selectedGlobalStarterId The new value to set.
+    */
+   public static void setSelectedProofStarterID(String selectedGlobalStarterId) {
+      getStore().setValue(SELECTED_PROOF_STARTER_ID, selectedGlobalStarterId);
+   }
+   
+   /**
+    * Sets the default value of property {@link #SELECTED_PROOF_STARTER_ID}.
+    * @param selectedGlobalStarterId The new value to set.
+    */
+   public static void setDefaultSelectedProofStarterID(String selectedGlobalStarterId) {
+      getStore().setDefault(SELECTED_PROOF_STARTER_ID, selectedGlobalStarterId);
+   }
+   
+
+   
+   /**
+    * Returns the current value of property {@link #DONT_ASK_FOR_PROOF_STARTER}.
+    * @return The current value of property{@link #DONT_ASK_FOR_PROOF_STARTER}.
+    */
+   public static boolean isDontAskForProofStarter() {
+      return getStore().getBoolean(DONT_ASK_FOR_PROOF_STARTER);
+   }
+   
+   /**
+    * Returns the default value of property {@link #DONT_ASK_FOR_PROOF_STARTER}.
+    * @return The default value of property{@link #DONT_ASK_FOR_PROOF_STARTER}.
+    */
+   public static boolean isDefaultDontAskForProofStarter() {
+      return getStore().getDefaultBoolean(DONT_ASK_FOR_PROOF_STARTER);
+   }
+   
+   /**
+    * Sets the current value of property {@link #DONT_ASK_FOR_PROOF_STARTER}.
+    * @param dontAsk The new value to set.
+    */
+   public static void setDontAskForProofStarter(boolean dontAsk) {
+      getStore().setValue(DONT_ASK_FOR_PROOF_STARTER, dontAsk);
+   }
+   
+   /**
+    * Sets the default value of property {@link #DONT_ASK_FOR_PROOF_STARTER}.
+    * @param dontAsk The new value to set.
+    */
+   public static void setDefaultDontAskForProofStarter(boolean dontAsk) {
+      getStore().setDefault(DONT_ASK_FOR_PROOF_STARTER, dontAsk);
+   }
+   
+
+   
+   /**
+    * Returns the current value of property {@link #PROOF_STARTER_DISABLED}.
+    * @return The current value of property{@link #PROOF_STARTER_DISABLED}.
+    */
+   public static boolean isProofStarterDisabled() {
+      return getStore().getBoolean(PROOF_STARTER_DISABLED);
+   }
+   
+   /**
+    * Returns the default value of property {@link #PROOF_STARTER_DISABLED}.
+    * @return The default value of property{@link #PROOF_STARTER_DISABLED}.
+    */
+   public static boolean isDefaultProofStarterDisabled() {
+      return getStore().getDefaultBoolean(PROOF_STARTER_DISABLED);
+   }
+   
+   /**
+    * Sets the current value of property {@link #PROOF_STARTER_DISABLED}.
+    * @param disabled The new value to set.
+    */
+   public static void setProofStarterDisabled(boolean disabled) {
+      getStore().setValue(PROOF_STARTER_DISABLED, disabled);
+   }
+   
+   /**
+    * Sets the default value of property {@link #PROOF_STARTER_DISABLED}.
+    * @param disabled The new value to set.
+    */
+   public static void setDefaultProofStarterDisabled(boolean disabled) {
+      getStore().setDefault(PROOF_STARTER_DISABLED, disabled);
    }
 }

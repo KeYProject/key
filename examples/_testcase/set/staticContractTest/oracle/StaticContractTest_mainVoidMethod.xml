@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="StaticContractTest.mainVoidMethod();" pathCondition="true" pathConditionChanged="false">
+      <operationContract name="voidMethod() catch(exc_0)
+pre: true
+post: StaticContractTest.value = 42 &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <statement name="return value;" pathCondition="true" pathConditionChanged="false">
+            <methodReturn name="&lt;return of StaticContractTest.mainVoidMethod();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of StaticContractTest.mainVoidMethod();&gt;" isReturnValueComputed="true">
+               <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+               </methodReturnValue>
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               </termination>
+            </methodReturn>
+         </statement>
+      </operationContract>
+   </methodCall>
+</start>

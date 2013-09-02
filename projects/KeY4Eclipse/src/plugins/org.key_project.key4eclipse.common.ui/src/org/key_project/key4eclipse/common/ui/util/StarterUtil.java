@@ -30,6 +30,7 @@ import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -39,6 +40,9 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Provides utility method to work with starts registered via extension points.
@@ -66,6 +70,11 @@ public final class StarterUtil {
    public static final String PROJECT_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.projectStarter";
    
    /**
+    * ID of the used extension point.
+    */
+   public static final String PROOF_STARTER_EXTENSION_POINT = "org.key_project.key4eclipse.common.ui.proofStarter";
+   
+   /**
     * Contains all available {@link StarterDescription}s of {@link IGlobalStarter}s.
     */
    private static ImmutableList<StarterDescription<IGlobalStarter>> globalStarters;
@@ -84,6 +93,11 @@ public final class StarterUtil {
     * Contains all available {@link StarterDescription}s of {@link IProjectStarter}s.
     */
    private static ImmutableList<StarterDescription<IProjectStarter>> projectStarters;
+   
+   /**
+    * Contains all available {@link StarterDescription}s of {@link IProofStarter}s.
+    */
+   private static ImmutableList<StarterDescription<IProofStarter>> proofStarters;
 
    /**
     * Forbid instances.
@@ -140,6 +154,18 @@ public final class StarterUtil {
    }
    
    /**
+    * Returns all available {@link StarterDescription}s of {@link IProofStarter}s.
+    * @return The available {@link StarterDescription}s of  {@link IProofStarter}s.
+    */
+   public static ImmutableList<StarterDescription<IProofStarter>> getProofStarters() {
+      // Lazy loading if needed
+      if (proofStarters == null) {
+         proofStarters = createStarters(PROOF_STARTER_EXTENSION_POINT, IProofStarter.class);
+      }
+      return proofStarters;
+   }
+   
+   /**
     * Reads all available {@link StarterDescription}s from the extension point.
     * @param extensionPoint The extension point to read from.
     * @param expectedClass The expected {@link Class} of the registered instances.
@@ -164,7 +190,7 @@ public final class StarterUtil {
                      if (StringUtil.isEmpty(id)) {
                         throw new IllegalStateException("ID of starter is not defined.");
                      }
-                     if (searchGlobalStarter(result, id) != null) {
+                     if (searchStarter(result, id) != null) {
                         throw new IllegalStateException("Starter ID \"" + id + "\" is used multiple times.");
                      }
                      String name = configElement.getAttribute("name");
@@ -201,8 +227,8 @@ public final class StarterUtil {
     * @param id The ID to search.
     * @return The found {@link StarterDescription} or {@code null} if not available.
     */
-   public static <I> StarterDescription<I> searchGlobalStarter(ImmutableList<StarterDescription<I>> starters, 
-                                                               final String id) {
+   public static <I> StarterDescription<I> searchStarter(ImmutableList<StarterDescription<I>> starters, 
+                                                         final String id) {
       return CollectionUtil.search(starters, new IFilter<StarterDescription<I>>() {
          @Override
          public boolean select(StarterDescription<I> element) {
@@ -329,6 +355,49 @@ public final class StarterUtil {
          starter.getInstance().open(project);
       }
    }
+   
+   /**
+    * Checks if project starter are available or not.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public static boolean areProofStartersAvailable() {
+      ImmutableList<StarterDescription<IProofStarter>> starter = getProofStarters();
+      return !starter.isEmpty() && !StarterPreferenceUtil.isProofStarterDisabled();
+   }
+   
+   /**
+    * Opens the project starter.
+    * @param parentShell The parent {@link Shell} to use.
+    * @param proof The {@link Proof} to load.
+    * @param environment The {@link KeYEnvironment} in which the {@link Proof} lives.
+    * @param method An optional {@link IMethod} from which the {@link Proof} was started.
+    * @param canStartAutomode {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    * @param canApplyRules {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    * @param canPruneProof {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    * @param canStartSMTSolver {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    * @throws Exception Occurred Exception.
+    */
+   public static void openProofStarter(Shell parentShell, 
+                                       Proof proof, 
+                                       KeYEnvironment<CustomConsoleUserInterface> environment, 
+                                       IMethod method,
+                                       boolean canStartAutomode,
+                                       boolean canApplyRules,
+                                       boolean canPruneProof,
+                                       boolean canStartSMTSolver) throws Exception {
+      ImmutableList<StarterDescription<IProofStarter>> starterDescriptions = getProofStarters();
+      StarterDescription<IProofStarter> starter = StarterWizard.openWizard(parentShell, 
+                                                                           "Open Proof", 
+                                                                           "Select application", 
+                                                                           "Select the application to open proof in.", 
+                                                                           starterDescriptions, 
+                                                                           StarterPreferenceUtil.SELECTED_PROOF_STARTER_ID, 
+                                                                           StarterPreferenceUtil.DONT_ASK_FOR_PROOF_STARTER, 
+                                                                           StarterPreferenceUtil.PROOF_STARTER_DISABLED);
+      if (starter != null && starter.getInstance() != null) {
+         starter.getInstance().open(proof, environment, method, canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver);
+      }
+   }
 
    /**
     * Re-evaluates all properties defined by {@link GlobalStarterAvailablePropertyTester},
@@ -339,7 +408,8 @@ public final class StarterUtil {
       WorkbenchUtil.updatePropertyTesters("org.key_project.key4eclipse.common.ui.globalStarterAvailable",
                                           "org.key_project.key4eclipse.common.ui.methodStarterAvailable",
                                           "org.key_project.key4eclipse.common.ui.fileStarterAvailable",
-                                          "org.key_project.key4eclipse.common.ui.projectStarterAvailable");
+                                          "org.key_project.key4eclipse.common.ui.projectStarterAvailable",
+                                          "org.key_project.key4eclipse.common.ui.proofStarterAvailable");
       WorkbenchUtil.updateToolBars();
    }
 }

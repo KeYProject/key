@@ -175,8 +175,6 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       try {
-         // Made sure that workspace is initialized and correct taclet options are set.
-         TestUtilsUtil.waitUntilWorkspaceInitialized();
          // Create test project
          IProject project = TestUtilsUtil.createProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project);

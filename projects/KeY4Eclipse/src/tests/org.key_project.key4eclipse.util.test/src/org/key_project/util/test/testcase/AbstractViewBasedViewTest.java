@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
@@ -33,6 +34,7 @@ public class AbstractViewBasedViewTest extends TestCase {
    /**
     * {@inheritDoc}
     */
+   @Before
    @Override
    public void setUp() throws Exception {
       TestUtilsUtil.closeWelcomeView();

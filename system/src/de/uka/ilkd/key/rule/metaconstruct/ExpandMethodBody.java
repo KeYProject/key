@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -28,12 +29,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -79,7 +78,6 @@ public class ExpandMethodBody extends ProgramTransformer {
 	    // static method
 	    newCalled = null;
 	}
-	TypeReference classContext = new TypeRef(mbs.getBodySource());
 
 // removed this again. see bugs #437,#479 -- vladimir
 //	result = prettyNewObjectNames(result, methDecl, classContext);
@@ -115,11 +113,9 @@ public class ExpandMethodBody extends ProgramTransformer {
             }
 	}
 
-        return 
-	    new MethodFrame(mbs.getResultVariable(),
-			    new ExecutionContext(classContext, pm, newCalled),
-			    result,
-                            PositionInfo.UNDEFINED); 
+	return KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
+		KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm,
+			newCalled), result, PositionInfo.UNDEFINED);
     }
 
 }
