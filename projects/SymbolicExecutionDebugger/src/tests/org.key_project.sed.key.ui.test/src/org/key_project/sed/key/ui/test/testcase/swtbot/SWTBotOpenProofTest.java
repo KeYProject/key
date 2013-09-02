@@ -99,12 +99,13 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                // Resume on thread
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                stepInto(bot, item, target);
-               // Open editor
+               // Make sure that open proof is not available
                try {
-                  TestUtilsUtil.clickContextMenu(debugTree, "Open Proof");
-                  fail("Opening a Proof with opened KeY MainWindow should not be possible.");
+                  TestUtilsUtil.clickContextMenu(debugTree, "Open Proof"); // Behavior in Eclipse 3.x is to throw an Exception because not available, in Eclipse 4.x the item is disabled and no Exception is thrown. 
+                  assertFalse(debugTree.contextMenu("Open Proof").isEnabled()); // Behavior in Eclipse 4.x
                }
                catch (WidgetNotFoundException e) {
+                  // Not visible (behavior in Eclipse 3.x)
                }
             }
          };
