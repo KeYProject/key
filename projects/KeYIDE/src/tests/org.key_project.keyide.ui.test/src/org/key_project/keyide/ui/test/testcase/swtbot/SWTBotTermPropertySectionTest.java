@@ -38,7 +38,7 @@ public class SWTBotTermPropertySectionTest extends AbstractSWTBotKeYEditorProper
     * Tests the shown values on different selected nodes.
     */
    @Test
-   public void testValuesOnDifferentNodes_PropertiesView() throws Exception {
+   public void testValuesOnDifferentNodes_OutlineView() throws Exception {
       doPropertiesTest("SWTBotTermPropertySectionTest_testValuesOnDifferentNodes_PropertiesView", 
                        "data/paycard",
                        TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
