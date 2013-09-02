@@ -162,10 +162,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             
     }
     
-    static public class ProveUserDefinedTaclets extends LemmaGenerationAction{
-
+    static public class ProveUserDefinedTaclets extends LemmaGenerationAction {
 
         private static final long serialVersionUID = 1L;
+        private FileChooser chooser;
 
         public ProveUserDefinedTaclets(MainWindow mainWindow) {
                 super(mainWindow);
@@ -173,7 +173,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected void loadTaclets() {
-                FileChooser chooser = new FileChooser();
+                if(chooser == null) {
+                    chooser = new FileChooser();
+                }
 
                 boolean loaded = chooser.showAsDialog();
 
