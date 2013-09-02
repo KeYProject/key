@@ -21,7 +21,7 @@
                                                          <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_3);&gt;" pathCondition="!self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
                                                             <statement name="return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;" pathCondition="!self.next = null" pathConditionChanged="false">
                                                                <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                  <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
+                                                                  <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                   </termination>
                                                                </methodReturn>
                                                             </statement>
@@ -37,7 +37,7 @@
                                  <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                                          <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
+                                          <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                           </termination>
                                        </methodReturn>
                                     </statement>

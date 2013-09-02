@@ -141,4 +141,12 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
          return callStack;
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isVerified() {
+      return executionNode.isBranchVerified();
+   }
 }

@@ -110,7 +110,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="!b = a" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="!b = a" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
@@ -168,7 +168,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="b = a" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="b = a" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

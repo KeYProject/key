@@ -33,7 +33,11 @@ public final class KeYProjectProperties {
    
    public static boolean isEnableBuildProofs(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENABLE_BUILD_PROOFS));
+         String value = project.getPersistentProperty(PROP_ENABLE_BUILD_PROOFS);
+         if(value == null){
+            return true;
+         }
+         else return Boolean.parseBoolean(value);
       }
       else {
          return false;
@@ -49,7 +53,11 @@ public final class KeYProjectProperties {
    
    public static boolean isEnableBuildProofsEfficient(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENALBLE_BUILD_PROOFS_EFFICIENT));
+         String value = project.getPersistentProperty(PROP_ENALBLE_BUILD_PROOFS_EFFICIENT);
+         if(value == null){
+            return true;
+         }
+         else return Boolean.parseBoolean(value);
       }
       else {
          return false;
@@ -65,7 +73,13 @@ public final class KeYProjectProperties {
    
    public static boolean isEnableMultiThreading(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_ENABLE_MULTITHREADING));
+         String value = project.getPersistentProperty(PROP_ENABLE_MULTITHREADING);
+         if(value == null){
+            return true;
+         }
+         else{
+            return Boolean.parseBoolean(value);
+         }
       }
       else {
          return false;
@@ -84,8 +98,8 @@ public final class KeYProjectProperties {
          try{
             return Integer.parseInt(project.getPersistentProperty(PROP_NUMBER_OF_THREADS));
          }
-         catch (Exception e) {
-            return 1;
+         catch (NumberFormatException e) {
+            return 2;
          }
       }
       else {
@@ -102,7 +116,13 @@ public final class KeYProjectProperties {
    
    public static boolean isAutoDeleteProofFiles(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_AUTO_DELETE_PROOFFILES));
+         String value = project.getPersistentProperty(PROP_AUTO_DELETE_PROOFFILES);
+         if(value == null){
+            return true;
+         }
+         else{
+            return Boolean.parseBoolean(value); 
+         }
       }
       else {
          return false;
@@ -119,7 +139,13 @@ public final class KeYProjectProperties {
    
    public static boolean isHideMetaFiles(IProject project) throws CoreException {
       if (project != null) {
-         return Boolean.parseBoolean(project.getPersistentProperty(PROP_HIDE_META_FILES));
+         String value = project.getPersistentProperty(PROP_HIDE_META_FILES);
+         if(value == null){
+            return false;
+         }
+         else{
+            return Boolean.parseBoolean(value);
+         }
       }
       else {
          return false;

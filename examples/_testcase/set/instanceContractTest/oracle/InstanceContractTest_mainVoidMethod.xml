@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.mainVoidMethod();" pathCondition="true" pathConditionChanged="false">
+      <operationContract name="self.voidMethod() catch(exc_0)
+pre: self.&lt;inv&gt;
+post: self.value = 42 &amp; self.&lt;inv&gt; &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <statement name="return this.value;" pathCondition="true" pathConditionChanged="false">
+            <methodReturn name="&lt;return of self.mainVoidMethod();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.mainVoidMethod();&gt;" isReturnValueComputed="true">
+               <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+               </methodReturnValue>
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               </termination>
+            </methodReturn>
+         </statement>
+      </operationContract>
+   </methodCall>
+</start>

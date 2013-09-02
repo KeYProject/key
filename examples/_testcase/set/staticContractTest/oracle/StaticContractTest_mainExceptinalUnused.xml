@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="StaticContractTest.mainExceptinalUnused(x);" pathCondition="true" pathConditionChanged="false">
+      <operationContract name="result_0 = exceptinal(x) catch(exc_0)
+pre: true
+post: !exc_0 = null
+&amp; (  java.lang.RuntimeException::instance(exc_0) = TRUE
+   | java.lang.Exception::instance(exc_0) = TRUE)
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+         </termination>
+      </operationContract>
+   </methodCall>
+</start>

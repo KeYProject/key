@@ -90,7 +90,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
- * Contains the controls to define a project, type, method and an operation contract to debug.
+ * Contains the controls to define a project, type, method and a contract to debug.
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
@@ -545,7 +545,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
    }
 
    /**
-    * Updates the shown operation contract.
+    * Updates the shown contract.
     */
    protected void updateShownContractComposite() {
        // Update shown top control of stack layout

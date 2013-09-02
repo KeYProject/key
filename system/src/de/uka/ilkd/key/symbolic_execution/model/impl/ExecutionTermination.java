@@ -27,8 +27,12 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -175,6 +179,51 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          case EXCEPTIONAL : return "Exceptional Termination";
          case LOOP_BODY : return "Loop Body Termination";
          default : return "Termination";
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isBranchVerified() {
+      if (!isDisposed()) {
+         // Find uninterpreted predicate
+         Term predicate = null;
+         ProofOblInput problem = getServices().getSpecificationRepository().getProofOblInput(getProof());
+         if (problem instanceof AbstractOperationPO) {
+            AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+            if (operationPO.isAddUninterpretedPredicate()) {
+               predicate = operationPO.getUninterpretedPredicate();
+            }
+         }
+         // Check if node can be treated as verified/closed
+         if (predicate != null) {
+            boolean verified = true;
+            NodeIterator leafsIter = getProofNode().leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Term toSearch = predicate;
+                  SequentFormula topLevelPredicate = JavaUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return toSearch.op() == element.formula().op();
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return getProofNode().isClosed();
+         }
+      }
+      else {
+         return false;
       }
    }
 }

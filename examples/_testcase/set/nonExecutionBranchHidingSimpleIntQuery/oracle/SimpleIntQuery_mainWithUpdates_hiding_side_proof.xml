@@ -3,16 +3,16 @@
    <methodCall name="SimpleIntQuery.mainWithUpdates(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="x=11;" pathCondition="true" pathConditionChanged="false">
          <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
-            <operationContract name="result = magic(x) catch(exc)
+            <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
-post: result = subMagic(x) &amp; exc = null
+post: result_0 = subMagic(x) &amp; exc_0 = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleIntQuery.mainWithUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of SimpleIntQuery.mainWithUpdates(x);&gt;" isReturnValueComputed="true">
                      <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

@@ -16,8 +16,6 @@ package org.key_project.key4eclipse.resources.test.testcase.junit;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -28,7 +26,7 @@ import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
-public class ProofMetaFileContentExceptionTests extends TestCase{
+public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
    
    
    @Test

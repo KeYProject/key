@@ -7,7 +7,7 @@
                <statement name="a=1;" pathCondition="x = 0" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="x = 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 0" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="x = 0" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="x = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -18,7 +18,7 @@
                   <statement name="a=x*x;" pathCondition="x = 1" pathConditionChanged="false">
                      <statement name="return a;" pathCondition="x = 1" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="x = 1" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="x = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -30,7 +30,7 @@
                   <statement name="a=x*x;" pathCondition="x = 2" pathConditionChanged="false">
                      <statement name="return a;" pathCondition="x = 2" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 2" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="x = 2" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="x = 2" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -41,7 +41,7 @@
                <statement name="a=x*x;" pathCondition="x = 3" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="x = 3" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 3" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="x = 3" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -50,7 +50,7 @@
             <branchCondition name="x = 4" pathCondition="x = 4" pathConditionChanged="true" branchCondition="x = 4" mergedBranchCondition="true" isBranchConditionComputed="true">
                <statement name="return 42;" pathCondition="x = 4" pathConditionChanged="false">
                   <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 4" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="x = 4" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="x = 4" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
@@ -59,7 +59,7 @@
                <statement name="a=x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

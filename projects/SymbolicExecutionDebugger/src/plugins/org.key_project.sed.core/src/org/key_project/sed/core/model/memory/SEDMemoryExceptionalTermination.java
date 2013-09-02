@@ -50,15 +50,23 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    private ISEDDebugNode[] callStack;
    
    /**
+    * Verified?
+    */
+   private boolean verified;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this exceptional termination is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this exceptional termination is contained.
+    * @param verified Verified?
     */
    public SEDMemoryExceptionalTermination(ISEDDebugTarget target, 
                                           ISEDDebugNode parent,
-                                          ISEDThread thread) {
+                                          ISEDThread thread,
+                                          boolean verified) {
       super(target, parent, thread);
+      this.verified = verified;
    }
 
    /**
@@ -171,5 +179,13 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isVerified() {
+      return verified;
    }
 }

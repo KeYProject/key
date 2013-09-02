@@ -140,7 +140,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        bzero.setPathCondition("pc8");
        s3.addChild(bzero);
        
-       SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero, thread);
+       SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero, thread, true);
        et.setName("throws DivisionByZeroException()");
        et.setPathCondition("pc9");
        bzero.addChild(et);
@@ -173,7 +173,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setCallStack(new ISEDDebugNode[] {call});
        bnegative.addChild(returnNegative);
        
-       SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread);
+       SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
        terminationNegative.setName("<end>");
        terminationNegative.setPathCondition("pc15");
        returnNegative.addChild(terminationNegative);
@@ -220,7 +220,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnPositiveVar2.setValue(returnPositiveVar2value);
        returnPositive.addVariable(returnPositiveVar2);
        
-       SEDMemoryLoopBodyTermination terminationPositive = new SEDMemoryLoopBodyTermination(target, returnPositive, thread);
+       SEDMemoryLoopBodyTermination terminationPositive = new SEDMemoryLoopBodyTermination(target, returnPositive, thread, true);
        terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);

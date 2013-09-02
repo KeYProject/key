@@ -141,4 +141,12 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
          return callStack;
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isVerified() {
+      return executionNode.isBranchVerified();
+   }
 }
