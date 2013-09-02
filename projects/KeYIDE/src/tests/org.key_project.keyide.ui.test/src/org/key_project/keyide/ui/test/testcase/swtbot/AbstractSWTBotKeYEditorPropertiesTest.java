@@ -47,9 +47,11 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
                           KeYEditor keyEditor) throws Exception {
             TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
             SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
-            editor.setFocus(); // Required in Eclipse 4.x to make sure that properties tab is filled
             if (inPropertiesView) {
                propertiesView.setFocus();
+            }
+            else {
+               editor.setFocus();
             }
             // Test root
             KeYMediator mediator = environment.getMediator();

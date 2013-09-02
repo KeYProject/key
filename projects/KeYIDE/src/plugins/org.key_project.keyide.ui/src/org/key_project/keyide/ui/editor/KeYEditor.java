@@ -579,7 +579,17 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          return outlinePage;
       }
       else if (IPropertySheetPage.class.equals(adapter)) {
-         return new TabbedPropertySheetPage(this);
+         final TabbedPropertySheetPage pcp = new TabbedPropertySheetPage(this);
+         // Make sure that initial content is shown even if the focus is set to the outline view and not to the editor. 
+         getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!pcp.getControl().isDisposed()) {
+                  pcp.selectionChanged(KeYEditor.this, getSelectionProvider().getSelection());
+               }
+            }
+         });
+         return pcp;
       }
       else if (IStrategySettingsPage.class.equals(adapter)) {
          return new StrategySettingsPage(this);
