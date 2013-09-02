@@ -4,12 +4,12 @@
       <statement name="return param.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!param = null" pathCondition="!param = null" pathConditionChanged="true" branchCondition="!param = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <methodReturn name="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" isReturnValueComputed="false">
-               <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" terminationKind="NORMAL">
+               <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </branchCondition>
          <branchCondition name="param = null" pathCondition="param = null" pathConditionChanged="true" branchCondition="param = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="param = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="param = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>

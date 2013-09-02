@@ -120,7 +120,7 @@
 &amp; self.next.x = 2
 &amp; ObjectConditionTest.instance.next.x = 5
 &amp; self.next.next.x = 3
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                </termination>
                                                             </methodReturn>
                                                          </statement>
@@ -168,7 +168,7 @@
 &amp; self.next.x = 2
 &amp; ObjectConditionTest.instance.next.x = 5
 &amp; self.next.next.x = 3
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                </termination>
                                                             </methodReturn>
                                                          </statement>
@@ -193,7 +193,7 @@
 &amp; ObjectConditionTest.instance.x = 4
 &amp; self.next.x = 2
 &amp; ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                                       </termination>
                                                    </branchCondition>
                                                 </branchStatement>
@@ -233,7 +233,7 @@
 &amp; ObjectConditionTest.instance.x = 4
 &amp; self.next.x = 2
 &amp; !ObjectConditionTest.instance.next.x = 5
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                       </termination>
                                                    </methodReturn>
                                                 </statement>
@@ -254,7 +254,7 @@
 &amp; self.x = 1
 &amp; ObjectConditionTest.instance.x = 4
 &amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                              </termination>
                                           </branchCondition>
                                        </branchStatement>
@@ -286,7 +286,7 @@
 &amp; self.x = 1
 &amp; !ObjectConditionTest.instance.x = 4
 &amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                              </termination>
                                           </methodReturn>
                                        </statement>
@@ -303,7 +303,7 @@
 &amp; !self.next.next = null
 &amp; self.x = 1
 &amp; self.next.x = 2
-&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+&amp; self.next.next.x = 3" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                     </termination>
                                  </branchCondition>
                               </branchStatement>
@@ -327,7 +327,7 @@
 &amp; !self.next.next = null
 &amp; self.x = 1
 &amp; self.next.x = 2
-&amp; !self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; !self.next.next.x = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                     </termination>
                                  </methodReturn>
                               </statement>
@@ -340,7 +340,7 @@
                            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  !self.next = null
 &amp; self.next.next = null
 &amp; self.x = 1
-&amp; self.next.x = 2" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+&amp; self.next.x = 2" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </branchStatement>
@@ -348,14 +348,14 @@
                   <branchCondition name="!self.next.x = 2" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="true" branchCondition="!self.next.x = 2" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return -200;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="!self.next = null &amp; self.x = 1 &amp; !self.next.x = 2" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                </branchCondition>
                <branchCondition name="self.next = null" pathCondition="self.next = null &amp; self.x = 1" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.next = null &amp; self.x = 1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.next = null &amp; self.x = 1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   </termination>
                </branchCondition>
             </branchStatement>
@@ -363,7 +363,7 @@
          <branchCondition name="!self.x = 1" pathCondition="!self.x = 1" pathConditionChanged="true" branchCondition="!self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="!self.x = 1" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

@@ -9,7 +9,7 @@
                      <statement name="int[] localArray = {4,5 };" pathCondition="!self.next = null" pathConditionChanged="false">
                         <statement name="return localArray[0]+localArray[1];" pathCondition="!self.next = null" pathConditionChanged="false">
                            <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
+                              <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -19,7 +19,7 @@
                <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

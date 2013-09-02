@@ -23,9 +23,9 @@ import org.eclipse.ui.IPageLayout;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.ui.test.Activator;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**

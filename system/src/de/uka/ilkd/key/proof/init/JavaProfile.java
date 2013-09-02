@@ -53,6 +53,8 @@ public class JavaProfile extends AbstractProfile {
     private final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
 
+    private OneStepSimplifier oneStepSimpilifier;
+    
     protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
         super(standardRules, gcb);
      }
@@ -78,7 +80,7 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getInitialOneStepSimpilifier())
+                                   .prepend(getOneStepSimpilifier())
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
         			   .prepend(QueryExpand.INSTANCE);
   
@@ -101,8 +103,13 @@ public class JavaProfile extends AbstractProfile {
      * </p> 
      * @return The {@link OneStepSimplifier} instance to use.
      */
-    protected OneStepSimplifier getInitialOneStepSimpilifier() {
-       return OneStepSimplifier.INSTANCE;
+    public OneStepSimplifier getOneStepSimpilifier() {
+       synchronized (this) {
+          if (oneStepSimpilifier == null) {
+             oneStepSimpilifier = new OneStepSimplifier();
+          }
+          return oneStepSimpilifier;
+       }
     }
 
     /**

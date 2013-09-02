@@ -157,11 +157,11 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bc.addCallStackEntry(root);
       bc.addCallStackEntry(bc);
       root.addChild(bc);
-      KeYlessTermination tNormal = new KeYlessTermination(root, "t normal", "pc3", true, TerminationKind.NORMAL);
+      KeYlessTermination tNormal = new KeYlessTermination(root, "t normal", "pc3", true, TerminationKind.NORMAL, true);
       root.addChild(tNormal);
-      KeYlessTermination tExceptional = new KeYlessTermination(root, "t exceptional", "pc4", false, TerminationKind.EXCEPTIONAL);
+      KeYlessTermination tExceptional = new KeYlessTermination(root, "t exceptional", "pc4", false, TerminationKind.EXCEPTIONAL, false);
       root.addChild(tExceptional);
-      KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY);
+      KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY, true);
       root.addChild(tloop);
       KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true);
       bn.addCallStackEntry(root);

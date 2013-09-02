@@ -19,5 +19,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.test.suite,
  org.key_project.sed.ui.test.suite.swtbot,
- org.key_project.sed.ui.test.testcase.swtbot,
- org.key_project.sed.ui.test.util
+ org.key_project.sed.ui.test.testcase.swtbot

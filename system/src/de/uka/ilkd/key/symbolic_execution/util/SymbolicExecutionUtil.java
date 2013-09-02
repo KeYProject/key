@@ -65,21 +65,21 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -109,19 +109,19 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.ITermLabelWorker;
-import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -243,17 +243,7 @@ public final class SymbolicExecutionUtil {
       InitConfig sourceInitConfig = sourceEnv.getInitConfig();
       RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
-      JavaProfile profile = new JavaProfile() {
-         private OneStepSimplifier simplifier;
-         
-         @Override
-         protected OneStepSimplifier getInitialOneStepSimpilifier() {
-            if (simplifier == null) {
-               simplifier = new OneStepSimplifier();
-            }
-            return simplifier;
-         }
-      };
+      JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(source.getServices().copy(profile));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
@@ -1023,7 +1013,11 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} represent node as method return, {@code false} represent node as something else. 
     */
    public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
-      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
+      String displayName = MiscTools.getRuleDisplayName(ruleApp);
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallEmpty".equals(displayName) ||
+             "methodCallEmptyReturn".equals(ruleName) ||
+             "methodCallReturnIgnoreResult".equals(ruleName);
    }
 
    /**
@@ -1632,46 +1626,11 @@ public final class SymbolicExecutionUtil {
       else {
          // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
          // Find Term to extract implications from.
-         Semisequent antecedent = node.sequent().antecedent();
-         SequentFormula sf = antecedent.get(antecedent.size() - 1);
-         Term workingTerm = sf.formula();
-         Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
-         workingTerm = updatesAndTerm.second;
-         if (workingTerm.op() != Junctor.AND) {
-            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
-         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
-         if (workingTerm.op() != Junctor.AND) {
-            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
-         Term exceptionDefinition = workingTerm;
-         while (exceptionDefinition.op() == Junctor.AND) {
-            exceptionDefinition = exceptionDefinition.sub(0);
-         }
-         // Make sure that exception equality was found
-         Term exceptionEquality;
-         if (exceptionDefinition.op() == Junctor.NOT) {
-            exceptionEquality = exceptionDefinition.sub(0);
-         }
-         else {
-            exceptionEquality = exceptionDefinition;
-         }
-         if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
-            throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         if (!isNullSort(exceptionEquality.sub(1).sort(), parent.proof().getServices())) {
-            throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-         }
-         KeYJavaType exceptionType = parent.proof().getServices().getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
-         if (!parent.proof().getServices().getJavaInfo().isSubtype(exceptionType, parent.proof().getServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
-            throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
-         }
+         ContractPostOrExcPostExceptionVariableResult search = serachContractPostOrExcPostExceptionVariable(node, node.proof().getServices());
          // Collect all implications for normal or exceptional preconditions
          Term result;
-         Term implications = workingTerm.sub(1);
-         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
+         Term implications = search.getWorkingTerm().sub(1);
+         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), search.getExceptionDefinition(), childIndex == 1, implications);
          if (!implicationTerms.isEmpty()) {
             // Implications find, return their conditions as branch condition
             ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
@@ -1680,7 +1639,7 @@ public final class SymbolicExecutionUtil {
             }
             result = TermBuilder.DF.or(condtionTerms);
             // Add updates
-            result = TermBuilder.DF.applyParallel(updatesAndTerm.first, result);
+            result = TermBuilder.DF.applyParallel(search.getUpdatesAndTerm().first, result);
          }
          else {
             // No preconditions available, branch condition is true
@@ -1708,6 +1667,146 @@ public final class SymbolicExecutionUtil {
             result = simplify(node.proof(), result);
          }
          return result;
+      }
+   }
+   
+   /**
+    * Searches the used exception variable in the post or exceptional post branch of an applied {@link ContractRuleApp} on the parent of the given {@link Node}. 
+    * @param node The {@link Node} which is the post or exceptional post branch of an applied {@link ContractRuleApp}.
+    * @param services The {@link Services} to use.
+    * @return The result.
+    * @throws ProofInputException Occurred exception if something is not as expected.
+    */
+   public static ContractPostOrExcPostExceptionVariableResult serachContractPostOrExcPostExceptionVariable(Node node, Services services) throws ProofInputException {
+      Semisequent antecedent = node.sequent().antecedent();
+      SequentFormula sf = antecedent.get(antecedent.size() - 1);
+      Term workingTerm = sf.formula();
+      Pair<ImmutableList<Term>,Term> updatesAndTerm = TermBuilder.DF.goBelowUpdates2(workingTerm);
+      workingTerm = updatesAndTerm.second;
+      if (workingTerm.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
+      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+      if (workingTerm.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
+      Term exceptionDefinitionParent = null;
+      Term exceptionDefinition = workingTerm;
+      while (exceptionDefinition.op() == Junctor.AND) {
+         exceptionDefinitionParent = exceptionDefinition;
+         exceptionDefinition = exceptionDefinition.sub(0);
+      }
+      // Make sure that exception equality was found
+      Term exceptionEquality;
+      if (exceptionDefinition.op() == Junctor.NOT) {
+         exceptionEquality = exceptionDefinition.sub(0);
+      }
+      else {
+         exceptionEquality = exceptionDefinition;
+      }
+      if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
+         throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      if (!isNullSort(exceptionEquality.sub(1).sort(), services)) {
+         throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      KeYJavaType exceptionType = services.getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
+      if (!services.getJavaInfo().isSubtype(exceptionType, services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+         throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionDefinitionParent, exceptionEquality);
+   }
+   
+   /**
+    * The result of {@link SymbolicExecutionUtil#serachContractPostOrExcPostExceptionVariable(Node, Services)}.
+    * @author Martin Hentschel
+    */
+   public static class ContractPostOrExcPostExceptionVariableResult {
+      /**
+       * The working {@link Term}.
+       */
+      private Term workingTerm;
+      
+      /**
+       * The updates.
+       */
+      private Pair<ImmutableList<Term>,Term> updatesAndTerm;
+      
+      /**
+       * The exception definition.
+       */
+      private Term exceptionDefinition;
+      
+      /**
+       * The found parent of {@link #exceptionDefinition}.
+       */
+      private Term exceptionDefinitionParent;
+      
+      /**
+       * The equality which contains the equality.
+       */
+      private Term exceptionEquality;
+      
+      /**
+       * Constructor.
+       * @param workingTerm The working {@link Term}.
+       * @param updatesAndTerm The updates.
+       * @param exceptionDefinition The exception definition.
+       * @param exceptionDefinitionParent The found parent of the given exception definition.
+       * @param exceptionEquality The equality which contains the equality.
+       */
+      public ContractPostOrExcPostExceptionVariableResult(Term workingTerm, 
+                                                          Pair<ImmutableList<Term>, Term> updatesAndTerm, 
+                                                          Term exceptionDefinition,
+                                                          Term exceptionDefinitionParent,
+                                                          Term exceptionEquality) {
+         this.workingTerm = workingTerm;
+         this.updatesAndTerm = updatesAndTerm;
+         this.exceptionDefinition = exceptionDefinition;
+         this.exceptionDefinitionParent = exceptionDefinitionParent;
+         this.exceptionEquality = exceptionEquality;
+      }
+      
+      /**
+       * Returns the working {@link Term}.
+       * @return The working {@link Term}.
+       */
+      public Term getWorkingTerm() {
+         return workingTerm;
+      }
+
+      /**
+       * Returns the updates.
+       * @return The updates.
+       */
+      public Pair<ImmutableList<Term>, Term> getUpdatesAndTerm() {
+         return updatesAndTerm;
+      }
+      
+      /**
+       * Returns the exception definition.
+       * @return The exception definition.
+       */
+      public Term getExceptionDefinition() {
+         return exceptionDefinition;
+      }
+      
+      /**
+       * Returns the found parent of {@link #getExceptionDefinition()}.
+       * @return The found parent of {@link #getExceptionDefinition()}.
+       */
+      public Term getExceptionDefinitionParent() {
+         return exceptionDefinitionParent;
+      }
+      
+      /**
+       * Returns the equality which contains the equality.
+       * @return The equality which contains the equality.
+       */
+      public Term getExceptionEquality() {
+         return exceptionEquality;
       }
    }
    

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="VerifiedTest.magicException();" pathCondition="true" pathConditionChanged="false">
+      <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
+         <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+         </termination>
+      </statement>
+   </methodCall>
+</start>

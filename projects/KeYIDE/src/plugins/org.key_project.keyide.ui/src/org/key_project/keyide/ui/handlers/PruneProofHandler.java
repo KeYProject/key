@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
@@ -21,9 +22,17 @@ import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
-// TODO: Document members in class PruneProofHandler
+/**
+ * This {@link IHandler} prunes the {@link Proof} at the currently selected
+ * {@link Node}.
+ * @author Martin Hentschel
+ */
 public class PruneProofHandler extends AbstractSaveExecutionHandler {
+   /**
+    * {@inheritDoc}
+    */
    @Override
    protected Object doExecute(ExecutionEvent event) throws Exception {
       ISelection selection = HandlerUtil.getCurrentSelection(event);

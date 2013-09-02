@@ -26,7 +26,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
@@ -42,6 +41,8 @@ import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.ui.view.SymbolicExecutionSettingsView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * SWTBot tests for {@link KeYSourceLookupParticipant}.
@@ -107,11 +108,9 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             expectedResources.add(dFile);
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
-            // Configure operation contract usage
+            // Configure method contract usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
-            SWTBotCombo methodTreatmentCombo = symbolicSettingsView.bot().comboBox();
-            assertTrue(methodTreatmentCombo.isEnabled());
-            methodTreatmentCombo.setSelection(SymbolicExecutionSettingsView.METHOD_TREATMENT_CONTRACT);
+            TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
             // Get debug target TreeItem
             SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             // Resume execution

@@ -56,11 +56,18 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+       DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
+          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
           loader.load(isRegisterProofs());
           return loader;
+       }
+       catch (ProblemLoaderException e) {
+          if (loader != null && loader.getProof() != null) {
+             loader.getProof().dispose();
+          }
+          throw e;
        }
        finally {
           getMediator().startInterface(true);

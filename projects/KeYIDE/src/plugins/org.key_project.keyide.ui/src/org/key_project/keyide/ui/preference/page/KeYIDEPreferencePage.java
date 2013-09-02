@@ -15,12 +15,16 @@ package org.key_project.keyide.ui.preference.page;
 
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
 
-// TODO: Document class KeYIDEPreferencePage
+/**
+ * This {@link IPreferencePage} allows to edit the KeYIDE specific settings.
+ * @author Martin Hentschel
+ */
 public class KeYIDEPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
    /**
     * Constructor

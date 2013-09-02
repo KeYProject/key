@@ -3,9 +3,10 @@
    <methodCall name="WhileWithMethodCallAsConditionFullImplemented.size(array);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+            <loopInvariant name="
+invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="!(    i_0 &gt;= 1
     &amp; array.length &gt;= 0
     &amp; array.length &lt;= -1 + i_0
@@ -87,7 +88,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !array = null" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -130,7 +131,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                               </termination>
                            </statement>
                         </branchStatement>
@@ -180,7 +181,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
        &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
        &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
      | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL">
+         -&gt; result_1_0 = i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

@@ -333,7 +333,7 @@ public class SWTBotKeYUtilTest extends TestCase {
             fail("Loading general projects should not be possible.");
         }
         catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project + "\" is no Java project."));
+            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project.getName() + "\" is no Java project."));
         }
         // Load java project with multiple source directories
         final IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java");

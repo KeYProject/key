@@ -10,26 +10,26 @@
                         <statement name="x.next=x.next.next;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                            <statement name="return x.value+x.next.value;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                               <methodReturn name="&lt;return of SimpleLinkedOjbectsDeletion.compute(x);&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" terminationKind="NORMAL">
+                                 <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
                         </statement>
                      </branchCondition>
                      <branchCondition name="x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="true" branchCondition="x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         </termination>
                      </branchCondition>
                   </statement>
                </branchCondition>
                <branchCondition name="x.next = null" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="true" branchCondition="x.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>

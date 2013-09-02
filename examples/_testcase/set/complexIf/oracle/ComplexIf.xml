@@ -7,7 +7,7 @@
                <statement name="result_1=j;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -17,7 +17,7 @@
                <statement name="result_1=i;" pathCondition="!j &lt;= i" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!j &lt;= i" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &lt;= i" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!j &lt;= i" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!j &lt;= i" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

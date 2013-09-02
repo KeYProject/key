@@ -20,7 +20,7 @@
                                                 <methodReturn name="&lt;return of MethodCallOnObjectWithException.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodCallOnObjectWithException.main();&gt;" isReturnValueComputed="true">
                                                    <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                                                    </methodReturnValue>
-                                                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                                                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                    </termination>
                                                 </methodReturn>
                                              </methodReturn>

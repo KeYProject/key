@@ -16,9 +16,13 @@ package org.key_project.keyide.ui.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotAutoModeHandlerTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEPreferencePageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicationTest;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotNodePropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotProofPropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTacletPropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTermPropertySectionTest;
 
 /**
  * <p>
@@ -36,9 +40,13 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterT
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotAutoModeHandlerTest.class,
+   SWTBotKeYIDEMethodStarterTest.class,
    SWTBotKeYIDEPreferencePageTest.class,
    SWTBotManualRuleApplicationTest.class,
-   SWTBotKeYIDEMethodStarterTest.class
+   SWTBotNodePropertySectionTest.class,
+   SWTBotProofPropertySectionTest.class,
+   SWTBotTacletPropertySectionTest.class,
+   SWTBotTermPropertySectionTest.class
 })
 public class SWTBotAllKeYIDEUITests {
 }
