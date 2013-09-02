@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
@@ -216,6 +219,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         assignPOTerms(poTerms);
         // add axioms
         collectClassAxioms(getKJT());
+
+        generateWdTaclets();
     }
 
     @Override
@@ -235,6 +240,37 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     public Term getMbyAtPre() {
         return this.mbyAtPre;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        super.fillSaveProperties(properties);
+        properties.setProperty("wd check", check.getName());
+    }
+
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+            throws IOException {
+       String contractName = properties.getProperty("wd check");
+       final Contract contract =
+               initConfig.getServices().getSpecificationRepository()
+                                .getContractByName(contractName);
+       if (contract == null) {
+           throw new RuntimeException("Contract not found: " + contractName);
+       }
+       else {
+           final ProofOblInput po = contract.createProofObl(initConfig, contract);
+           return new LoadedPOContainer(po);
+       }
     }
 
     public static class Variables {

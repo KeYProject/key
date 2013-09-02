@@ -155,7 +155,11 @@ public abstract class AbstractPO implements IPersistablePO {
         return result;
     }
 
-    ImmutableSet<Taclet> generateWdTaclets() {
+    /**
+     * Generate well-definedness taclets to resolve formulas as
+     * WD(pv.<inv>) or WD(pv.m(...)).
+     */
+    void generateWdTaclets() {
         ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
         ImmutableSet<KeYJavaType> kjts = DefaultImmutableSet.<KeYJavaType>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
@@ -176,7 +180,6 @@ public abstract class AbstractPO implements IPersistablePO {
         for (Taclet t: res) {
             register(t);
         }
-        return res;
     }
 
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
@@ -185,7 +188,6 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected void collectClassAxioms(KeYJavaType selfKJT) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
-
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
                     getSCC(axiom, axioms);
@@ -199,7 +201,6 @@ public abstract class AbstractPO implements IPersistablePO {
                 }
             }
         }
-        generateWdTaclets();
     }
 
     /** Check whether a taclet conforms with the currently active choices.

@@ -252,8 +252,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             self = null;
         }
         services.getSpecificationRepository().addStatementWellDefinedness(lwd);
-        final Term wdInv = lwd.generatePO(self, null, null, heap, null,
-                                          anonHeap, localIns, update, services);
+        final Term wdInv = lwd.generatePO(self, null, null, heap, null, anonHeap,
+                                          localIns, update, services);
         goal.changeFormula(new SequentFormula(wdInv), pio);
     }
 

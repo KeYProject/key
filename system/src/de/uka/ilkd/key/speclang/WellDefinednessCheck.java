@@ -864,7 +864,8 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final boolean equals(Object o) {
-        if (!(o instanceof WellDefinednessCheck)) {
+        if (!(o instanceof WellDefinednessCheck)
+                || !((WellDefinednessCheck)o).getKJT().equals(getKJT())) {
             return false;
         }
         WellDefinednessCheck wd = (WellDefinednessCheck)o;

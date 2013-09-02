@@ -770,10 +770,11 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Well-Definedness");
             BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
             services.getSpecificationRepository().addStatementWellDefinedness(bwd);
+            final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
+            final Term anon = TB.func(anonHeap);
             final Term wdBlock = bwd.generatePO(variables.self, variables.exception,
-                                                variables.result, heap,
-                                                variables.remembranceHeaps.get(heap),
-                                                TB.func(anonHeap), localIns, update, services);
+                                                variables.result, heap, heapAtPre,
+                                                anon, localIns, update, services);
             goal.changeFormula(new SequentFormula(wdBlock), occurrence);
         }
 

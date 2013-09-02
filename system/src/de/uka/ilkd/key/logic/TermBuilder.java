@@ -1601,13 +1601,27 @@ public class TermBuilder {
             return term;
         } else if (!term.hasLabels()) {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.javaBlock(), labels);
+                                                  term.javaBlock(), labels);
         } else {
-            ITermLabel[] newLabels = new ITermLabel[labels.size() + term.getLabels().size()];
+            ImmutableList<ITermLabel> newLabelList = ImmutableSLList.<ITermLabel>nil();
+            for (ITermLabel l: labels) {
+                if (!term.getLabels().contains(l)) {
+                    newLabelList = newLabelList.append(l);
+                }
+            }
+            ITermLabel[] newLabelArr = new ITermLabel[newLabelList.size()];
+            Iterator<ITermLabel> it = newLabelList.iterator();
+            for (int i = 0; i < newLabelArr.length; i++) {
+                assert it.hasNext();
+                newLabelArr[i] = it.next();
+            }
+            ITermLabel[] newLabels = new ITermLabel[labels.size() + newLabelArr.length];
             labels.arraycopy(0, newLabels, 0, labels.size());
-            term.getLabels().arraycopy(0, newLabels, labels.size(), term.getLabels().size());
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
-                    term.javaBlock(), new ImmutableArray<ITermLabel>(newLabels));
+            new ImmutableArray<ITermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
+                                                                  newLabelArr.length);
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(),
+                                                  term.boundVars(), term.javaBlock(),
+                                                  new ImmutableArray<ITermLabel>(newLabels));
         }
     }
 

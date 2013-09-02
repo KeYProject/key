@@ -139,6 +139,13 @@ Treatment of formulas and terms for Well-Definedness Checks:
      Cf. "Are the Logical Foundations of Verifying Compiler
      Prototypes Matching User Expectations?" by Patrice Chalin.
 
+* Y-Operator:
+     Complete and along the lines of classical logic, where the
+     order of terms/formulas is irrelevant. This operator is
+     equivalent to the D-Operator, but more efficient.
+     Cf. "Efficient Well-Definedness Checking" by Ádám Darvas,
+     Farhad Mehta, and Arsenii Rudich.
+
 * D-Operator:
      Complete and along the lines of classical logic, where the
      order of terms/formulas is irrelevant. This operator is not as
@@ -146,14 +153,6 @@ Treatment of formulas and terms for Well-Definedness Checks:
      used with care, since formulas may blow up exponentially.
      Cf. "Well Defined B" by Patrick Behm, Lilian Burdy, and
      Jean-Marc Meynadier
-
-* Y-Operator:
-     Complete and along the lines of classical logic, where the
-     order of terms/formulas is irrelevant. This operator equivalent
-     to the D-Operator, but more efficient.
-     Cf. "Efficient Well-Definedness Checking" by Ádám Darvas,
-     Farhad Mehta, and Arsenii Rudich.
-
 </entry>
 
 </properties>
