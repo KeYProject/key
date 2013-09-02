@@ -26,6 +26,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
@@ -43,7 +44,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * Tests for the interactive mode of a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class SWTBotKeyInteractiveMainTest extends TestCase {
+public class SWTBotKeyInteractiveMainTest extends AbstractSetupTestCase {
    /**
     * Makes sure that the {@link IDSConnection} closes the opened 
     * {@link MainWindow} {@link JFrame} when the connection is

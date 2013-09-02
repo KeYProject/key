@@ -39,15 +39,15 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainVoidMethod() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainVoidMethod", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainVoidMethod.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainVoidMethod.xml",
                 false,
                 false,
                 true,
@@ -60,15 +60,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainNoArgs() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainNoArgs", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainNoArgs.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainNoArgs.xml",
                 false,
                 false,
                 true,
@@ -81,15 +81,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainResult() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainResult", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainResult.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainResult.xml",
                 false,
                 false,
                 true,
@@ -102,15 +102,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainResultNotSpecified() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainResultNotSpecified", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainResultNotSpecified.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainResultNotSpecified.xml",
                 false,
                 false,
                 true,
@@ -123,15 +123,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainExceptinalVoid() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainExceptinalVoid", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainExceptinalVoid.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinalVoid.xml",
                 false,
                 false,
                 true,
@@ -144,15 +144,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainExceptinalUnused() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainExceptinalUnused", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainExceptinalUnused.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinalUnused.xml",
                 false,
                 false,
                 true,
@@ -165,15 +165,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainExceptinal() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainExceptinal", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainExceptinal.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinal.xml",
                 false,
                 false,
                 true,
@@ -186,15 +186,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainBooleanResultUnused() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainBooleanResultUnused", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnused.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnused.xml",
                 false,
                 false,
                 true,
@@ -207,15 +207,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainBooleanResultUnspecifiedUnused", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnspecifiedUnused.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnspecifiedUnused.xml",
                 false,
                 false,
                 true,
@@ -228,15 +228,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainExceptionalConstructor() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainExceptionalConstructor", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainExceptionalConstructor.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptionalConstructor.xml",
                 false,
                 false,
                 true,
@@ -249,15 +249,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainConstructor() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainConstructor", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainConstructor.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainConstructor.xml",
                 false,
                 false,
                 true,
@@ -270,15 +270,15 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
-    * Tests example: examples/_testcase/set/InstanceContractTest
+    * Tests example: examples/_testcase/set/instanceContractTest
     */
    public void testInstanceContractTest_mainOnObject() throws Exception {
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/InstanceContractTest/test/InstanceContractTest.java", 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
                 "InstanceContractTest", 
                 "mainOnObject", 
                 null,
-                "examples/_testcase/set/InstanceContractTest/oracle/InstanceContractTest_mainOnObject.xml",
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainOnObject.xml",
                 false,
                 false,
                 true,

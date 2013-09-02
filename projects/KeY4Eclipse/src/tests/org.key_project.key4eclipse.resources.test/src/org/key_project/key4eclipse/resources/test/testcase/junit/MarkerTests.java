@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -30,7 +28,7 @@ import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
-public class MarkerTests extends TestCase{
+public class MarkerTests extends AbstractResourceTest {
    
    
    //Full build - single thread
@@ -250,7 +248,7 @@ public class MarkerTests extends TestCase{
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 132, 153));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 115, 118));
    }
    
    private void testProofNotClosedMarker(IProject project) throws CoreException{
@@ -265,7 +263,7 @@ public class MarkerTests extends TestCase{
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 138, 159));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 115, 118));
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{
@@ -357,11 +355,11 @@ public class MarkerTests extends TestCase{
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile) == 2);
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 296, 361)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 449, 487));
+      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447));
       }
-      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 449, 487)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 296, 361));
+      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294));
       }
       else{
          fail();

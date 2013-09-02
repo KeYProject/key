@@ -20,8 +20,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
@@ -51,6 +49,7 @@ import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
@@ -60,7 +59,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * Provides the functionality to test {@link KeYDebugTarget}s.
  * @author Martin Hentschel
  */
-public class AbstractKeYDebugTargetTestCase extends TestCase {
+public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
    /**
     * <p>
     * If this constant is {@code true} a temporary directory is created with
@@ -591,8 +590,6 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        Boolean mergeBranchConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
-      // Made sure that workspace is initialized
-      TestUtilsUtil.waitUntilWorkspaceInitialized();
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block

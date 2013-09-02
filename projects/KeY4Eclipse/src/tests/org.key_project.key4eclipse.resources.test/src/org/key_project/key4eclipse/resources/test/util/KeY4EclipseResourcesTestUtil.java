@@ -110,15 +110,18 @@ public class KeY4EclipseResourcesTestUtil {
    /**
     * Enables or disables the AutoBuild function in eclipse.
     * @param enable - true if the AutoBuild should be enabled. False otherwise
+    * @return Returns the old enabled state.
     * @throws CoreException
     */
-   public static void enableAutoBuild(boolean enable) throws CoreException{
+   public static boolean enableAutoBuild(boolean enable) throws CoreException{
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       IWorkspaceDescription desc = workspace.getDescription();
-      if(desc.isAutoBuilding() != enable){
+      boolean oldEnabled = desc.isAutoBuilding(); 
+      if (oldEnabled != enable) {
          desc.setAutoBuilding(enable);
          workspace.setDescription(desc);
       }
+      return oldEnabled;
    }
    
    

@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -61,6 +59,7 @@ import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.key4eclipse.common.ui.wizard.page.StarterWizardPage;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -71,7 +70,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
  * {@link StarterPreferencePage} and the UI integration.
  * @author Martin Hentschel
  */
-public class SWTBotStarterTest extends TestCase {
+public class SWTBotStarterTest extends AbstractSetupTestCase {
    /**
     * Tests {@link StarterUtil#openProjectStarter(org.eclipse.swt.widgets.Shell, IProject)}
     * starter via context menu in the navigator.

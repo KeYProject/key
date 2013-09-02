@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.resources.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -24,13 +22,14 @@ import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.ui.handlers.ConvertJavaToKeYProjectHandler;
 import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link ConvertJavaToKeYProjectHandler}.
  * @author Martin Hentschel
  */
-public class SWTBotConvertToKeYProjectTest extends TestCase {   
+public class SWTBotConvertToKeYProjectTest extends AbstractSetupTestCase {   
    /**
     * Creates a new {@link IJavaProject} and converts it into a KeYProject. The used view is the ProjectExplorer.
     * @throws Exception Occurred Exception.

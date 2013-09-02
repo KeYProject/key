@@ -1,10 +1,9 @@
 package org.key_project.key4eclipse.starter.core.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.java.Services;
@@ -17,7 +16,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * Tests for {@link ProofUserManager}.
  * @author Martin Hentschel
  */
-public class ProofUserManagerTest extends TestCase {
+public class ProofUserManagerTest extends AbstractSetupTestCase {
    /**
     * Tests {@link ProofUserManager#addUser(de.uka.ilkd.key.proof.Proof, Object)},
     * {@link ProofUserManager#removeUserAndDispose(de.uka.ilkd.key.proof.Proof, Object)},
