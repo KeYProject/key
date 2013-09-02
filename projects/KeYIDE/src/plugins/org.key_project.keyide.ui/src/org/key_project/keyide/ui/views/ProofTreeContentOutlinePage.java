@@ -137,7 +137,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       getTreeViewer().getControl().setMenu(menu);
       getSite().registerContextMenu ("org.key_project.keyide.ui.view.outline.popup", menuManager, getTreeViewer());
       // Update selected node
-      updateSelectedNodeThreadSafe();
+      updateSelectedNode();
    }
 
    /**
