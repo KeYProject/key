@@ -120,6 +120,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             assertEquals(ruleNameToApply, MiscTools.getRuleDisplayName(node));
             assertEquals(expectedProofClosed, node.isClosed());
             // Make sure that start stop auto mode buttons are as expected
+            TestUtilsUtil.sleepUIRefreshCycle();
             assertEquals(!expectedProofClosed, bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          }
