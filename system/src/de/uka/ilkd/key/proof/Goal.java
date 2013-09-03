@@ -621,7 +621,7 @@ public final class Goal  {
                 MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
                 if(newConditions == null) {
-                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': "
+                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
                             + ruleApp);
                 }
 
