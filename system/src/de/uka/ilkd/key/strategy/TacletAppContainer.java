@@ -319,11 +319,11 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if ( !app.complete() )
             app = app.tryToInstantiate ( services );
 
-        Taclet taclet = app.taclet();
+        Taclet taclet = app == null ? null : app.taclet();
         if (taclet instanceof RewriteTaclet) {
-            RewriteTaclet rwtaclet = (RewriteTaclet) taclet;
+            RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
             MatchConditions check = 
-                    rwtaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
+                    rwTaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
             assert check != null : "A taclet with illegal prefix is chosen: " + taclet.name();
         }
         
