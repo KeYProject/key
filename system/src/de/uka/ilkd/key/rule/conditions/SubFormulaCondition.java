@@ -29,15 +29,12 @@ public class SubFormulaCondition extends VariableConditionAdapter {
         if (tInst.arity() == 0) {
             return negated;
         } else {
-            boolean hasSubFormulas = negated;
             for (Term sub: tInst.subs()) {
                 if (sub.sort() == Sort.FORMULA) {
-                    hasSubFormulas = true;
-                } else {
-                    hasSubFormulas = false;
+                    return !negated;
                 }
             }
-            return negated ? !hasSubFormulas : hasSubFormulas;
+            return negated;
         }
     }
 
