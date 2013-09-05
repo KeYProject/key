@@ -1526,12 +1526,4 @@ public class TestUtilsUtil {
          sleep(500);
       }
    }
-
-   /**
-    * Blocks the current {@link Thread} for the time Eclipse needs
-    * to update the UI (e.g. to make sure that enabled flags of actions are updated).
-    */
-   public static void sleepUIRefreshCycle() {
-      sleep(100); // TODO: Use exact time
-   }
 }

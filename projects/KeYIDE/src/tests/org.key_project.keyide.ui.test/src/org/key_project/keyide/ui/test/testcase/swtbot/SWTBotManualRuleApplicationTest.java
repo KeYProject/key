@@ -16,6 +16,7 @@ package org.key_project.keyide.ui.test.testcase.swtbot;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.junit.Test;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
@@ -120,7 +121,12 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             assertEquals(ruleNameToApply, MiscTools.getRuleDisplayName(node));
             assertEquals(expectedProofClosed, node.isClosed());
             // Make sure that start stop auto mode buttons are as expected
-            TestUtilsUtil.sleepUIRefreshCycle();
+            if (expectedProofClosed) {
+               bot.waitWhile(Conditions.widgetIsEnabled(bot.toolbarButtonWithTooltip("Start Auto Mode")));
+            }
+            else {
+               bot.waitUntil(Conditions.widgetIsEnabled(bot.toolbarButtonWithTooltip("Start Auto Mode")));
+            }
             assertEquals(!expectedProofClosed, bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          }
