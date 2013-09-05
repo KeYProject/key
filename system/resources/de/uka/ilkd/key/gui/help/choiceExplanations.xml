@@ -155,5 +155,8 @@ Treatment of formulas and terms for Well-Definedness Checks:
      Jean-Marc Meynadier
 </entry>
 
+<entry key="wdProofs">
+Well-Definedness Checks of JML Statements (e.g. loop invariants and block contracts) can be turned on/off.
+</entry>
 </properties>
 

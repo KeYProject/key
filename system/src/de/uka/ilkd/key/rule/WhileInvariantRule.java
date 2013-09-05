@@ -59,6 +59,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
+import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -244,6 +245,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                              final LocationVariable heap, final Term anonHeap,
                              final ImmutableSet<ProgramVariable> localIns,
                              PosInOccurrence pio, Services services) {
+        if (goal == null) {
+            return;
+        }
         LoopWellDefinedness lwd =  new LoopWellDefinedness(inv, localIns, services);
         final ProgramVariable self;
         if(selfTerm != null && selfTerm.op() instanceof ProgramVariable) {
@@ -392,17 +396,25 @@ public final class WhileInvariantRule implements BuiltInRule {
 		= dia ? TB.and(variantNonNeg, 
 			       TB.lt(variant, TB.var(variantPV), services)) 
                       : TB.tt();
-	
-	//split goal into three branches
-	ImmutableList<Goal> result = goal.split(4);
-	Goal wdGoal = result.tail().tail().tail().head();
+
+	final ImmutableList<Goal> result;
+	Goal wdGoal;
+	if (StatementWellDefinedness.checkOn()) {
+	    //split goal into four branches
+	    result = goal.split(4);
+	    wdGoal = result.tail().tail().tail().head();
+	    wdGoal.setBranchLabel("Well-Definedness");
+	} else {
+	    //split goal into three branches
+	    result = goal.split(3);
+	    wdGoal = null;
+	}
 	Goal initGoal = result.tail().tail().head();
-	Goal bodyGoal = result.tail().head();
-	Goal useGoal = result.head();
-	wdGoal.setBranchLabel("Well-Definedness");
-	initGoal.setBranchLabel("Invariant Initially Valid");
-	bodyGoal.setBranchLabel("Body Preserves Invariant");
-	useGoal.setBranchLabel("Use Case");
+        Goal bodyGoal = result.tail().head();
+        Goal useGoal = result.head();
+        initGoal.setBranchLabel("Invariant Initially Valid");
+        bodyGoal.setBranchLabel("Body Preserves Invariant");
+        useGoal.setBranchLabel("Use Case");
 
 	//prepare guard
 	final ProgramElementName guardVarName 

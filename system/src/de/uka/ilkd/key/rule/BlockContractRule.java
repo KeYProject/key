@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
+import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -215,15 +216,19 @@ public class BlockContractRule implements BuiltInRule {
                 updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps,
                                                         /*anonymisationLocalVariables, */
                                                         modifiesClauses);
-
-        final ImmutableList<Goal> result = goal.split(4);
+        final ImmutableList<Goal> result;
         final GoalsConfigurator configurator =
                 new GoalsConfigurator(instantiation, contract.getLabels(), variables,
                                       application.posInOccurrence(), services);
-        configurator.setUpWdGoal(result.tail().tail().tail().head(),
-                                 contract, contextUpdate, heaps.get(0),
-                                 anonymisationHeaps.get(heaps.get(0)), localInVariables
-        );
+        if (StatementWellDefinedness.checkOn()) {
+            result = goal.split(4);
+            configurator.setUpWdGoal(result.tail().tail().tail().head(),
+                                     contract, contextUpdate, heaps.get(0),
+                                     anonymisationHeaps.get(heaps.get(0)),
+                                     localInVariables);
+        } else {
+            result = goal.split(3);
+        }
         configurator.setUpValidityGoal(
             result.tail().tail().head(),
             new Term[] {contextUpdate, remembranceUpdate},
@@ -767,6 +772,9 @@ public class BlockContractRule implements BuiltInRule {
                                 final Term update, final LocationVariable heap,
                                 final Function anonHeap,
                                 final ImmutableSet<ProgramVariable> localIns) {
+            if (goal == null) {
+                return;
+            }
             goal.setBranchLabel("Well-Definedness");
             BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
             services.getSpecificationRepository().addStatementWellDefinedness(bwd);

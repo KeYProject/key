@@ -3,6 +3,7 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -11,6 +12,8 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public abstract class StatementWellDefinedness extends WellDefinednessCheck {
+
+    private final static String PROOFS = "wdProofs";
 
     StatementWellDefinedness(String name, int id, IObserverFunction target,
             OriginalVariables origVars, Type type, Services services) {
@@ -53,6 +56,19 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     @Override
     final ImmutableList<Term> getRest() {
         return super.getRest();
+    }
+
+    public static boolean checkOn() {
+        final String setting =
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(PROOFS);
+        if (setting.equals(PROOFS + ":on")) {
+            return true;
+        } else if (setting.equals(PROOFS + ":off")) {
+            return false;
+        } else {
+            throw new RuntimeException("The setting for the wdProofs-option is not valid: "
+                    + setting);
+        }
     }
 
     @Override
