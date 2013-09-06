@@ -1022,6 +1022,8 @@ public final class UseOperationContractRule implements BuiltInRule {
              TB.resultVar(services, inst.pm, true);
    }
 
+
+   private static class AnonUpdateData {
         public final Term assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
 
 

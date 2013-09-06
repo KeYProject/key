@@ -614,7 +614,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    // the following code is legacy code
+   @Override
+   public boolean hasSelfVar() {
+      return origSelf != null;
+   }
+
+
+
+   // the following code is legacy code
     
     @Override
     @Deprecated
