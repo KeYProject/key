@@ -542,4 +542,9 @@ public final class DependencyContractImpl implements DependencyContract {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
                 specifiedIn);
     }
+
+    @Override
+    public boolean hasSelfVar() {
+        return originalSelfVar != null;
+    }
 }

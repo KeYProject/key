@@ -41,6 +41,6 @@ public abstract class AbstractSEDLoopBodyTermination extends AbstractSEDTerminat
     */
    @Override
    public String getNodeType() {
-      return "Loop Body Termination";
+      return "Loop Body " + super.getNodeType();
    }
 }

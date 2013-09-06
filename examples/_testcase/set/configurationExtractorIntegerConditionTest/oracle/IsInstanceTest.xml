@@ -10,7 +10,7 @@
                         <branchCondition name="IntegerConditionTest.y = 3" pathCondition="a = 1 &amp; self.x = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="true" branchCondition="IntegerConditionTest.y = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return 42;" pathCondition="a = 1 &amp; self.x = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="false">
                               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="a = 1 &amp; self.x = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <termination name="&lt;end&gt;" pathCondition="a = 1 &amp; self.x = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="false" terminationKind="NORMAL">
+                                 <termination name="&lt;end&gt;" pathCondition="a = 1 &amp; self.x = 1 &amp; IntegerConditionTest.y = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
@@ -18,7 +18,7 @@
                         <branchCondition name="!IntegerConditionTest.y = 3" pathCondition="a = 1 &amp; self.x = 1 &amp; !IntegerConditionTest.y = 3" pathConditionChanged="true" branchCondition="!IntegerConditionTest.y = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return -300;" pathCondition="a = 1 &amp; self.x = 1 &amp; !IntegerConditionTest.y = 3" pathConditionChanged="false">
                               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="a = 1 &amp; self.x = 1 &amp; !IntegerConditionTest.y = 3" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <termination name="&lt;end&gt;" pathCondition="a = 1 &amp; self.x = 1 &amp; !IntegerConditionTest.y = 3" pathConditionChanged="false" terminationKind="NORMAL">
+                                 <termination name="&lt;end&gt;" pathCondition="a = 1 &amp; self.x = 1 &amp; !IntegerConditionTest.y = 3" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
                            </statement>
@@ -28,7 +28,7 @@
                   <branchCondition name="!a = 1" pathCondition="!a = 1 &amp; self.x = 1" pathConditionChanged="true" branchCondition="!a = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return -200;" pathCondition="!a = 1 &amp; self.x = 1" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!a = 1 &amp; self.x = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="!a = 1 &amp; self.x = 1" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="!a = 1 &amp; self.x = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -39,7 +39,7 @@
          <branchCondition name="!self.x = 1" pathCondition="!self.x = 1" pathConditionChanged="true" branchCondition="!self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="!self.x = 1" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

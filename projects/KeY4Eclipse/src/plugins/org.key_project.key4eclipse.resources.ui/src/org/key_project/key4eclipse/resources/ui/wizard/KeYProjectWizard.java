@@ -36,7 +36,6 @@ import org.key_project.util.java.ObjectUtil;
 
 @SuppressWarnings("restriction")
 public class KeYProjectWizard extends JavaProjectWizard {
-//TODO: irgendwas war mit dem title oder der description.
    
    /**
     * The Constructor that sets the Window Title of the Wizard to "New KeYProject"

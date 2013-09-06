@@ -6,7 +6,7 @@
             <statement name="x.next.next.value=3;" pathCondition="true" pathConditionChanged="false">
                <statement name="return x.value+x.next.value+x.next.next.value;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

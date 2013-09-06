@@ -5,16 +5,17 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+            <loopInvariant name="
+invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <methodCall name="WhileWithMethodCallAsCondition.goOnNice(array_3,i_3);" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0/0/0"/>
-                     <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                     <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </statement>
                </methodCall>

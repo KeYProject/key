@@ -150,10 +150,12 @@ public class ProofObligationCreator {
                 
                 collectUserDefinedSymbols(formula.getFormula(), userDefinedSymbols);
    
-                String header = userDefinedSymbols.createHeader(initConfig.getServices());
+                // In the new saving scheme, no header needs to stored
+                // this is encoded in the properties of the TacletProofObligationInput.
+                // (MU 2013-08)
+                // String header = userDefinedSymbols.createHeader(initConfig.getServices());
           
-      
-                Proof proof = new Proof(name, formula.getFormula(), header,
+                Proof proof = new Proof(name, formula.getFormula(), "" /*header*/,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
                                 initConfig.getServices());

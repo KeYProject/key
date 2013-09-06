@@ -25,12 +25,13 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -526,12 +527,39 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public String getPlainText(Services services) {
-       return "invariants: " 
-             + JavaUtil.toSortedString(originalInvariants)
-             + ";\nmodifies: " 
-             + originalModifies
+       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+       final LocationVariable baseHeap = heapLDT.getHeap();
+       
+       String mods = "";
+       for (LocationVariable h : heapLDT.getAllHeaps()) {
+           if (originalModifies.get(h) != null) {
+               String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services);
+               mods = mods
+                       + "\n"
+                       + "mod"
+                       + (h == baseHeap ? "" : "[" + h + "]")
+                       + ": "
+                       + printMods.trim();
+           }
+       }
+       
+       String invariants = "";
+       for (LocationVariable h : heapLDT.getAllHeaps()) {
+           if (originalInvariants.get(h) != null) {
+               String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services);
+               invariants = invariants
+                       + "\n"
+                       + "invariant"
+                       + (h == baseHeap ? "" : "[" + h + "]")
+                       + ": "
+                       + printPosts.trim();
+           }
+       }
+       
+       return invariants
              + ";\nvariant: "
-             + originalVariant;
+             + LogicPrinter.quickPrintTerm(originalVariant, services).trim() +
+             mods;
     }
 
 

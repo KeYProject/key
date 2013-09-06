@@ -9,7 +9,7 @@
                      <statement name="mid=y;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false">
                         <statement name="return mid;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false">
                            <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
-                              <termination name="&lt;end&gt;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL">
+                              <termination name="&lt;end&gt;" pathCondition="y &gt;= x &amp; z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
@@ -18,7 +18,7 @@
                   <branchCondition name="!y &gt;= x" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="true" branchCondition="!y &gt;= x" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return mid;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false">
                         <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="y &lt;= -1 + x &amp; z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -29,7 +29,7 @@
                <statement name="mid=y;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false">
                   <statement name="return mid;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false">
                      <methodReturn name="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="!z &gt;= 1 + y" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>

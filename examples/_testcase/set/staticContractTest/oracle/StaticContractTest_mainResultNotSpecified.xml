@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="StaticContractTest.mainResultNotSpecified(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="return result(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = result(x) catch(exc_0)
+pre: x &gt;= 0
+post: result_0 = javaMulInt(x, x) &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (result)">
+               <methodReturn name="&lt;return of StaticContractTest.mainResultNotSpecified(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return result_0 as result of StaticContractTest.mainResultNotSpecified(x);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="result_0" returnValueString="result_0" hasCondition="false">
+                  </methodReturnValue>
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </branchCondition>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

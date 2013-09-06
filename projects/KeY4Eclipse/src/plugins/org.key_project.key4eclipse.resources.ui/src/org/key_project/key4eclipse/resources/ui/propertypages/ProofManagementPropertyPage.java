@@ -16,21 +16,80 @@ package org.key_project.key4eclipse.resources.ui.propertypages;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.util.KeY4EclipseResourcesUtil;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
+   
+   private Button enableBuildProofsButton;
 
-   private Button enableEfficentProofManagementButton;
+   private Button enableBuildProofsEfficentButton;
+   
+   private Spinner setNumberOfThreadsSpinner;
+   
+   private Text setNumberOfThreadsText;
+   
+   private Button enableMultiThreadingButton;
    
    private Button autoDeleteProofFilesButton;
+   
+   private Button hideMefaFiles;
+   
+   private Text fillText;
+
+   
+   private SelectionListener buildProofButtonSelectionListener = new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+         boolean isSelected = enableBuildProofsButton.getSelection();
+         if(isSelected){
+            enableBuildProofsEfficentButton.setEnabled(true);
+         }
+         else{
+            enableBuildProofsEfficentButton.setEnabled(false);
+         }
+         
+      }
+      
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+   };
+   
+   
+private SelectionListener enableMultiThreadingButtonSelectionListener = new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+         boolean isSelected = enableMultiThreadingButton.getSelection();
+         if(isSelected){
+            setNumberOfThreadsSpinner.setEnabled(true);
+         }
+         else{
+            setNumberOfThreadsSpinner.setEnabled(false);
+         }
+         
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+   };
 
    
    /**
@@ -41,6 +100,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       initializeDialogUnits(parent);
       Composite root = new Composite(parent, SWT.NONE);
       root.setLayout(new GridLayout(1, false));
+      
       Group builderSettings = new Group(root, SWT.NONE);
       builderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       builderSettings.setLayout(new GridLayout(1, false));
@@ -48,31 +108,142 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       Composite builderSettingsComposite = new Composite(builderSettings, SWT.NONE);
       builderSettingsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       builderSettingsComposite.setLayout(new GridLayout(1, false));
-      enableEfficentProofManagementButton = new Button(builderSettingsComposite, SWT.CHECK);
-      enableEfficentProofManagementButton.setText("Efficient proof management enabled");
-enableEfficentProofManagementButton.setEnabled(false); // TODO@Stefan: Remove this line it is only added to disable the functionality on the master branch where it is not available yet
-      setSelectionForEnableEfficientProofManagementButton();
-      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      
+      enableBuildProofsButton = new Button(builderSettingsComposite, SWT.CHECK);
+      enableBuildProofsButton.setText("Build proofs");
+      enableBuildProofsButton.addSelectionListener(buildProofButtonSelectionListener);
+      setSelectionForBuildProofsButton();
+      
+      enableBuildProofsEfficentButton = new Button(builderSettingsComposite, SWT.CHECK);
+      enableBuildProofsEfficentButton.setText("Build proof efficient");
+      setSelectionForEnableBuildProofsEfficientButton();
+      setEnabledForBuildProofsEfficientButton();
+      
+      
+      Group multiThreadingSettings = new Group(root, SWT.NONE);
+      multiThreadingSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      multiThreadingSettings.setLayout(new GridLayout(1, false));
+      multiThreadingSettings.setText("Multi Threading");
+      Composite multiThreadingComposite = new Composite(multiThreadingSettings, SWT.NONE);
+      multiThreadingComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      multiThreadingComposite.setLayout(new GridLayout(2, false));
+      
+      enableMultiThreadingButton = new Button(multiThreadingComposite, SWT.CHECK);
+      enableMultiThreadingButton.setText("Enable multithreading");
+      enableMultiThreadingButton.addSelectionListener(enableMultiThreadingButtonSelectionListener);
+      setSelectionForEnableMultiThreadingButton();
+      
+      fillText = new Text(multiThreadingComposite, SWT.SINGLE);
+      fillText.setText("");
+      Display display = Display.getCurrent();
+      Color backgroundColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+      fillText.setBackground(backgroundColor);
+      
+      setNumberOfThreadsText = new Text(multiThreadingComposite, SWT.SINGLE);
+      setNumberOfThreadsText.setText("Number of threads:");
+      setNumberOfThreadsText.setBackground(backgroundColor);
+
+      setNumberOfThreadsSpinner = new Spinner(multiThreadingComposite, SWT.NONE);
+      setNumberOfThreadsSpinner.setMinimum(1);
+      setNumberOfThreadsSpinner.setMaximum(100);
+      setNumberOfThreadsSpinner.setIncrement(1);
+      setSelectionForSetNumberOfThreads();
+      setEnabledForSetNumberOfThreads();
+      
+      Group folderSettings = new Group(root, SWT.NONE);
+      folderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      folderSettings.setLayout(new GridLayout(1, false));
+      folderSettings.setText("Proof folder settings");
+      Composite folderSettingsComposite = new Composite(folderSettings, SWT.NONE);
+      folderSettingsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      folderSettingsComposite.setLayout(new GridLayout(1, false));
+      
+      autoDeleteProofFilesButton = new Button(folderSettingsComposite, SWT.CHECK);
       autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
       setSelectionForAutoDeleteProofFilesButton();
       
+      hideMefaFiles = new Button(folderSettingsComposite, SWT.CHECK);
+      hideMefaFiles.setText("Hide meta files (Refresh the project afterwards)");
+      setSelectionForHideMetaFilesButton();
+      
       return root;
+   }
+   
+   
+   private void setSelectionForBuildProofsButton(){
+      try{
+         IProject project = getProject();
+         enableBuildProofsButton.setSelection(KeYProjectProperties.isEnableBuildProofs(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         enableBuildProofsButton.setEnabled(false);
+      }      
    }
 
    
    /**
     * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
     */
-   private void setSelectionForEnableEfficientProofManagementButton(){
+   private void setSelectionForEnableBuildProofsEfficientButton(){
       try {
          IProject project = getProject();
-         enableEfficentProofManagementButton.setSelection(KeYProjectProperties.isEnableEfficientProofManagement(project));
+         enableBuildProofsEfficentButton.setSelection(KeYProjectProperties.isEnableBuildProofsEfficient(project));
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
          LogUtil.getLogger().openErrorDialog(getShell(), e);
-         enableEfficentProofManagementButton.setEnabled(false);
+         enableBuildProofsEfficentButton.setEnabled(false);
       }
+   }
+   
+   
+   private void setEnabledForBuildProofsEfficientButton(){
+      enableBuildProofsEfficentButton.setEnabled(enableBuildProofsButton.getSelection());
+   }
+   
+   
+   /**
+    * Sets the selection for the EnableMultiThreadingButton CheckBox.
+    */
+   private void setSelectionForEnableMultiThreadingButton(){
+      try {
+         IProject project = getProject();
+         enableMultiThreadingButton.setSelection(KeYProjectProperties.isEnableMultiThreading(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         enableMultiThreadingButton.setEnabled(false);
+      }
+   }
+   
+   
+   
+   /**
+    * Sets the selection for the setNumberOfThreads DropDown Menu.
+    */
+   private void setSelectionForSetNumberOfThreads(){
+      try {
+         IProject project = getProject();
+         int index = KeYProjectProperties.getNumberOfThreads(project);
+         if(index < 0 || index > 100){
+            setNumberOfThreadsSpinner.setSelection(1);
+         }
+         else{
+            setNumberOfThreadsSpinner.setSelection(index);
+         }
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         setNumberOfThreadsSpinner.setEnabled(false);
+      }
+   }
+   
+   private void setEnabledForSetNumberOfThreads(){
+      setNumberOfThreadsSpinner.setEnabled(enableMultiThreadingButton.getSelection());
    }
    
 
@@ -93,14 +264,35 @@ enableEfficentProofManagementButton.setEnabled(false); // TODO@Stefan: Remove th
    
    
    /**
+    * Sets the selection for the HideMetaFilesButton CheckBox.
+    */
+   private void setSelectionForHideMetaFilesButton(){
+      try {
+         IProject project = getProject();
+         hideMefaFiles.setSelection(KeYProjectProperties.isHideMetaFiles(project));
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+         hideMefaFiles.setEnabled(false);
+      }
+   }
+   
+   
+   /**
     * {@inheritDoc}
     */
    @Override
    public boolean performOk() {
       try {
          IProject project = getProject();
-         KeYProjectProperties.setEnableEfficientProofManagement(project, enableEfficentProofManagementButton.getSelection());
+         KeYProjectProperties.setEnableBuildProofs(project, enableBuildProofsButton.getSelection());
+         KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildProofsEfficentButton.getSelection());
+         KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
+         KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
+         KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
+         KeY4EclipseResourcesUtil.hideMetaFiles(project);
          return super.performOk();
       }
       catch (CoreException e) {
@@ -116,8 +308,12 @@ enableEfficentProofManagementButton.setEnabled(false); // TODO@Stefan: Remove th
     */
    @Override
    protected void performDefaults() {
-      enableEfficentProofManagementButton.setSelection(false);
-      autoDeleteProofFilesButton.setSelection(false);
+      enableBuildProofsButton.setSelection(true);
+      enableBuildProofsEfficentButton.setSelection(true);
+      enableMultiThreadingButton.setSelection(true);
+      setNumberOfThreadsSpinner.setSelection(2);
+      autoDeleteProofFilesButton.setSelection(true);
+      hideMefaFiles.setSelection(false);
       super.performDefaults();
    }
 }

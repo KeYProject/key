@@ -85,16 +85,14 @@ public class BuiltInRuleAppIndex {
     private void scanSimplificationRule ( Goal       goal,
 					  NewRuleListener listener ) {
         for (BuiltInRule builtInRule : index.rules()) {
-            final BuiltInRule bir = builtInRule;
-            
-            if(bir.isApplicable(goal, null)) {
-                IBuiltInRuleApp app = bir.createApp( null );                            
+            if(builtInRule.isApplicable(goal, null)) {
+                IBuiltInRuleApp app = builtInRule.createApp( null );                            
                 listener.ruleAdded ( app, null );
             }
             
             
-            scanSimplificationRule(bir, goal, false, listener);
-            scanSimplificationRule(bir, goal, true, listener);
+            scanSimplificationRule(builtInRule, goal, false, listener);
+            scanSimplificationRule(builtInRule, goal, true, listener);
         }
     }
 

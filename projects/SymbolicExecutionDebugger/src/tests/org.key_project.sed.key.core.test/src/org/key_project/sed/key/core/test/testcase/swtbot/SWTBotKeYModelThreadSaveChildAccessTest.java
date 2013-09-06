@@ -30,7 +30,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
@@ -71,7 +71,7 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
                for (int i = 0; i < threads.length; i++) {
                   threads[i].start();
                }
-               TestUtilsUtil.waitForThreads(threads);
+               ObjectUtil.waitForThreads(threads);
                // Test result
                ISEDDebugNode[] children = current.getChildren();
                assertNotNull(children);

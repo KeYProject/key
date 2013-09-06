@@ -5,7 +5,7 @@
          <branchCondition name="IsInstanceTest.A = obj" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="true" branchCondition="IsInstanceTest.A = obj" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false">
                <methodReturn name="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="IsInstanceTest.A = obj" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
@@ -13,7 +13,7 @@
          <branchCondition name="!IsInstanceTest.A = obj" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="true" branchCondition="!IsInstanceTest.A = obj" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 0;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false">
                <methodReturn name="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false" isReturnValueComputed="false">
-                  <termination name="&lt;end&gt;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false" terminationKind="NORMAL">
+                  <termination name="&lt;end&gt;" pathCondition="!IsInstanceTest.A = obj" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>

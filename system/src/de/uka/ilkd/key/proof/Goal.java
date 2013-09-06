@@ -629,7 +629,12 @@ public final class Goal  {
                         tacletApp.matchConditions().getInstantiations().getUpdateContext();
                 MatchConditions newConditions = rwt.checkPrefix(ruleApp.posInOccurrence(), 
                         MatchConditions.EMPTY_MATCHCONDITIONS, proof.getServices());
-                ImmutableList<UpdateLabelPair> newUpdCtx = 
+                if(newConditions == null) {
+                    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " 
+                            + ruleApp);
+                }
+
+                ImmutableList<UpdateLabelPair> newUpdCtx =
                         newConditions.getInstantiations().getUpdateContext();
 
                 if(!oldUpdCtx.equals(newUpdCtx)) {

@@ -41,7 +41,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -142,7 +141,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final Feature instantiationF;
 
     private final HeapLDT heapLDT;
-
     
     protected final RuleSetDispatchFeature getCostComputationDispatcher() {
         return costComputationDispatcher;
@@ -153,17 +151,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     protected final StrategyProperties strategyProperties;
-    private OneStepSimplifier oneStepSimplifierRuleInstance;
     
     protected JavaCardDLStrategy(Proof p_proof,
                                  StrategyProperties strategyProperties) {
         
         super ( p_proof );
-
         heapLDT = p_proof.getServices().getTypeConverter().getHeapLDT();
-
-        this.oneStepSimplifierRuleInstance = 
-              MiscTools.findOneStepSimplifier(p_proof);
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
@@ -308,7 +301,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(oneStepSimplifierRuleInstance);
+	
+	filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
 
         return ConditionalFeature.createConditional(filter, cost);        
     }

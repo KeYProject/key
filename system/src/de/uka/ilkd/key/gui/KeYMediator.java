@@ -65,6 +65,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 public class KeYMediator {
@@ -96,6 +97,13 @@ public class KeYMediator {
     private boolean stupidMode; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
+    
+    /**
+     * The currently used {@link OneStepSimplifier} which has to be changed
+     * when the current {@link Proof} lives in a different {@link Profile}
+     * than the {@link Proof} before.
+     */
+    private OneStepSimplifier currentOneStepSimplifier;
 
 
     /** creates the KeYMediator with a reference to the application's
@@ -118,11 +126,6 @@ public class KeYMediator {
 	// There may be other interruption listeners, but the interaction
 	// engine listens by default.
 	addInterruptedListener(interactiveProver);
-
-	// moved from layout main here; but does not actually belong here at all;
-	// we should get that rule to behave like a normal built-in rule
-	addKeYSelectionListener(OneStepSimplifier.INSTANCE);
-
     }
 
 
@@ -301,17 +304,33 @@ public class KeYMediator {
     }
 
 
-    private void setProofHelper(Proof p) {
-	if (getSelectedProof() != null) {
-	    getSelectedProof().removeProofTreeListener(proofTreeListener);
-	}
-	if (p!=null) notationInfo.setAbbrevMap(p.abbreviations());
-	Proof proof = p;
-	if (proof != null) {
-	    proof.addProofTreeListener(proofTreeListener);
-	    proof.mgt().setMediator(this);
-	}
-        keySelectionModel.setSelectedProof(proof);
+    private void setProofHelper(Proof newProof) {
+      Proof oldProof = getSelectedProof();
+      if (oldProof != null) {
+         oldProof.removeProofTreeListener(proofTreeListener);
+      }
+      if (newProof != null) {
+         notationInfo.setAbbrevMap(newProof.abbreviations());
+      }
+      if (newProof != null) {
+         newProof.addProofTreeListener(proofTreeListener);
+         newProof.mgt().setMediator(this);
+      }
+      
+      // moved from layout main here; but does not actually belong here at all;
+      // we should get that rule to behave like a normal built-in rule
+      OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
+      if (currentOneStepSimplifier != newSimplifier) {
+         if (currentOneStepSimplifier != null) {
+            removeKeYSelectionListener(currentOneStepSimplifier);
+         }
+         currentOneStepSimplifier = newSimplifier;
+         if (currentOneStepSimplifier != null) {
+            addKeYSelectionListener(currentOneStepSimplifier);
+         }
+      }
+      
+      keySelectionModel.setSelectedProof(newProof);
     }
 
 

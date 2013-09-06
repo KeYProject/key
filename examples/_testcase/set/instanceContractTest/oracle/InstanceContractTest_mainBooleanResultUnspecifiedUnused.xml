@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.mainBooleanResultUnspecifiedUnused(x);" pathCondition="true" pathConditionChanged="false">
+      <operationContract name="result_0 = self.booleanResultUnspecified(x) catch(exc_0)
+pre: self.&lt;inv&gt;
+post: self.&lt;inv&gt; &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <methodReturn name="&lt;return of self.mainBooleanResultUnspecifiedUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.mainBooleanResultUnspecifiedUnused(x);&gt;" isReturnValueComputed="true">
+            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+            </termination>
+         </methodReturn>
+      </operationContract>
+   </methodCall>
+</start>

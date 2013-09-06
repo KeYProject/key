@@ -594,7 +594,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        mr,
 	        pm,
-	        actualParams);
+	        actualParams,
+	        mod == Modality.DIA_TRANSACTION || mod == Modality.BOX_TRANSACTION);
 	return result;
     }
 
@@ -650,15 +651,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
-        boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION);
-        final List<LocationVariable> heapContext =
-                HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), inst.transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars =
-                HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars = computeAtPreVars(heapContext, services, inst);
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -667,10 +664,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         //create variables for result and exception
-        final ProgramVariable resultVar
-        	= inst.pm.isConstructor()
-        	  ? TB.selfVar(services, inst.staticType, true)
-                  : TB.resultVar(services, inst.pm, true);
+        final ProgramVariable resultVar = computeResultVar(inst, services); 
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
@@ -683,20 +677,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         //translate the contract
         final Term baseHeapTerm = TB.getBaseHeap(services);
-        final Term contractSelf
-        	= OpReplacer.replace(baseHeapTerm,
-        		             atPres.get(baseHeap),
-        		             inst.pm.isConstructor()
-        		               ? TB.var(resultVar)
-        		               : inst.actualSelf);
-        final ImmutableList<Term> contractParams
-        	= OpReplacer.replace(baseHeapTerm,
-        			    atPres.get(baseHeap),
-        			    inst.actualParams);
+        final ImmutableList<Term> contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst);
         final Term contractResult
         	= inst.pm.isConstructor() || resultVar == null
         	  ? null
                   : TB.var(resultVar);
+        final Term contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, inst, contractResult == null && resultVar != null ? TB.var(resultVar) : contractResult);
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : heapContext) {
            heapTerms.put(h, TB.var(h));
@@ -934,7 +920,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    @Override
+   @Override
     public Name name() {
         return NAME;
     }
@@ -967,6 +953,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	public final MethodOrConstructorReference mr;
 	public final IProgramMethod pm;
 	public final ImmutableList<Term> actualParams;
+	public final boolean transaction;
 
 	public Instantiation(Term u,
 			     Term progPost,
@@ -976,7 +963,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			     KeYJavaType staticType,
 			     MethodOrConstructorReference mr,
 			     IProgramMethod pm,
-			     ImmutableList<Term> actualParams) {
+			     ImmutableList<Term> actualParams,
+			     boolean transaction) {
 	    assert u != null;
 	    assert u.sort() == Sort.UPDATE;
 	    assert progPost != null;
@@ -994,6 +982,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    this.mr = mr;
 	    this.pm = pm;
 	    this.actualParams = actualParams;
+	    this.transaction = transaction;
 	}
     }
 
@@ -1004,8 +993,34 @@ public final class UseOperationContractRule implements BuiltInRule {
 		return new ContractRuleApp(this, pos);
     }
 
+   public static Map<LocationVariable, LocationVariable> computeAtPreVars(List<LocationVariable> heapContext, 
+                                                                          Services services, 
+                                                                          Instantiation inst) {
+      return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+   }
 
-    private static class AnonUpdateData {
+   public static Term computeSelf(Term baseHeapTerm, 
+                                  Map<LocationVariable,Term> atPres, 
+                                  LocationVariable baseHeap, 
+                                  Instantiation inst, 
+                                  Term resultTerm) {
+      return OpReplacer.replace(baseHeapTerm,
+                                atPres.get(baseHeap),
+                                inst.pm.isConstructor() ? resultTerm : inst.actualSelf);
+   }
+
+   public static ImmutableList<Term> computeParams(Term baseHeapTerm, 
+                                                   Map<LocationVariable,Term> atPres, 
+                                                   LocationVariable baseHeap, 
+                                                   Instantiation inst) {
+      return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams);
+   }
+
+   public static ProgramVariable computeResultVar(Instantiation inst, Services services) {
+      return inst.pm.isConstructor() ? 
+             TB.selfVar(services, inst.staticType, true) : 
+             TB.resultVar(services, inst.pm, true);
+   }
 
         public final Term assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
 

@@ -25,7 +25,7 @@ import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDOperationContract;
+import org.key_project.sed.core.model.ISEDMethodContract;
 
 /**
  * <p>
@@ -61,6 +61,11 @@ public interface IExecutionTreeImageConstants {
    public static final String IMG_EXCEPTIONAL_TERMINATION = PREFIX + "exceptionalTermination";
 
    /**
+    * Key of the image for {@link ISEDExceptionalTermination}s.
+    */
+   public static final String IMG_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = PREFIX + "exceptionalTerminationNotVerified";
+
+   /**
     * Key of the image for {@link ISEDLoopCondition}s.
     */
    public static final String IMG_LOOP_CONDITION = PREFIX + "loopCondition";
@@ -91,24 +96,29 @@ public interface IExecutionTreeImageConstants {
    public static final String IMG_TERMINATION = PREFIX + "termination";
 
    /**
-    * Key of the image for {@link ISEDOperationContract}s.
+    * Key of the image for {@link ISEDTermination}s.
     */
-   public static final String IMG_OPERATION_CONTRACT = PREFIX + "operationContract";
+   public static final String IMG_TERMINATION_NOT_VERIFIED = PREFIX + "terminationNotVerified";
 
    /**
-    * Key of the image for {@link ISEDOperationContract}s.
+    * Key of the image for {@link ISEDMethodContract}s.
     */
-   public static final String IMG_OPERATION_CONTRACT_NOT_NPC = PREFIX + "operationContractNotNpc";
+   public static final String IMG_METHOD_CONTRACT = PREFIX + "methodContract";
 
    /**
-    * Key of the image for {@link ISEDOperationContract}s.
+    * Key of the image for {@link ISEDMethodContract}s.
     */
-   public static final String IMG_OPERATION_CONTRACT_NOT_PRE = PREFIX + "operationContractNotPre";
+   public static final String IMG_METHOD_CONTRACT_NOT_NPC = PREFIX + "methodContractNotNpc";
 
    /**
-    * Key of the image for {@link ISEDOperationContract}s.
+    * Key of the image for {@link ISEDMethodContract}s.
     */
-   public static final String IMG_OPERATION_CONTRACT_NOT_PRE_NOT_NPC = PREFIX + "operationContractNotPreAndNotNpc";
+   public static final String IMG_METHOD_CONTRACT_NOT_PRE = PREFIX + "methodContractNotPre";
+
+   /**
+    * Key of the image for {@link ISEDMethodContract}s.
+    */
+   public static final String IMG_METHOD_CONTRACT_NOT_PRE_NOT_NPC = PREFIX + "methodContractNotPreAndNotNpc";
 
    /**
     * Key of the image for {@link ISEDLoopInvariant}s.
@@ -124,6 +134,11 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDLoopBodyTermination}s.
     */
    public static final String IMG_LOOP_BODY_TERMINATION = PREFIX + "loopBodyTermination";
+
+   /**
+    * Key of the image for {@link ISEDLoopBodyTermination}s.
+    */
+   public static final String IMG_LOOP_BODY_TERMINATION_NOT_VERIFIED = PREFIX + "loopBodyTerminationNotVerified";
    
    /**
     * Key of the image for {@link ISEDThread}s.
