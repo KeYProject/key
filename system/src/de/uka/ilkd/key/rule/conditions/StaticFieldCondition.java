@@ -10,6 +10,12 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * This variable condition checks if an instantiation for a field is static or an instance.
+ * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
+ *
+ * @author Michael Kirsten
+ */
 public class StaticFieldCondition extends VariableConditionAdapter {
 
     private final SchemaVariable field;

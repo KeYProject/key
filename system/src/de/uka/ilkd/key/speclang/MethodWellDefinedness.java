@@ -16,10 +16,14 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
 
+/**
+ * A contract for checking the well-definedness of a specification for a method or model field.
+ * Additionally to the general well-definedness contract, it consists of other definitions for
+ * the contract.
+ *
+ * @author Michael Kirsten
+ */
 public final class MethodWellDefinedness extends WellDefinednessCheck {
-    /* breaks-clause, callable-clause, captures-clause, choice-statement,
-     * continues-clause, if-statement, returns-clause, when-clause,
-     * initially-clause, constraint */
 
     private final Contract contract;
 

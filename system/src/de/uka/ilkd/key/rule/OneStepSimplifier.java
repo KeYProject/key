@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.op.TransformerFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -322,7 +322,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    return pos.isInAntec() ? TB.tt() : TB.ff();
 	} else if(in.op() instanceof Modality
                   || in.op() instanceof UpdateApplication
-                  || in.op() instanceof TransformerProcedure) {
+                  || in.op() instanceof TransformerFunction) {
 	    return in;
 	} else {
 	    Term[] subs = new Term[in.arity()];
@@ -528,7 +528,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	}
 
 	// abort if inside of transformer
-	if (TransformerProcedure.inTransformer(pio)) {
+	if (TransformerFunction.inTransformer(pio)) {
 	    return false;
 	}
 

@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- *  This variable condition checks if an instantiation is an array. 
+ *  This variable condition checks if an instantiation is an array.
  *  
  *  @author mulbrich
  *  @since 2006-12-03

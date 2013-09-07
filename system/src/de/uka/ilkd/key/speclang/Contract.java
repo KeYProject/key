@@ -197,6 +197,14 @@ public interface Contract extends SpecificationElement {
      */
     public boolean hasSelfVar();
 
+    /**
+     * Class for storing the original variables without always distinguishing
+     * several different cases depending on which variables are present/needed
+     * in order to provide a general interface. At the moment only used for
+     * well-definedness checks (as those refer to already existing structures).
+     *
+     * @author Michael Kirsten
+     */
     final public class OriginalVariables {
 
         public final ProgramVariable self;

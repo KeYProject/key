@@ -51,7 +51,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.op.TransformerFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
@@ -1460,9 +1460,9 @@ public class TermBuilder {
 
     public Term wd(Term t, Services services) {
         if (t.sort().equals(Sort.FORMULA)) {
-            return func(TransformerProcedure.wdFormula(services), t);
+            return func(TransformerFunction.wdFormula(services), t);
         } else {
-            return func(TransformerProcedure.wdAny(services), t);
+            return func(TransformerFunction.wdAny(services), t);
         }
     }
 

@@ -10,6 +10,12 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * This variable condition checks if an instantiation is an atomic formula or term,
+ * i.e. its arity is equal to zero.
+ *
+ * @author Michael Kirsten
+ */
 public class AtomicCondition extends VariableConditionAdapter {
 
     private final AbstractSortedOperator t;

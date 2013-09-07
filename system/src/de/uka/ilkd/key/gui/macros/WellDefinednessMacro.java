@@ -14,6 +14,11 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+/**
+ * Resolve well-definedness predicate
+ *
+ * @author Michael Kirsten
+ */
 public class WellDefinednessMacro extends StrategyProofMacro {
 
     public static final String WD_PREFIX = "wd_";

@@ -15,6 +15,11 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.Taclet;
 
+/**
+ * A contract for checking the well-definedness of a specification for a class invariant.
+ *
+ * @author Michael Kirsten
+ */
 public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private final ClassInvariant inv;

@@ -10,6 +10,12 @@ import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * This variable condition checks if an instantiation for term labels contains a specific
+ * term label.
+ *
+ * @author Michael Kirsten
+ */
 public class TermLabelCondition extends VariableConditionAdapter {
 
     private final TermLabelSV l;

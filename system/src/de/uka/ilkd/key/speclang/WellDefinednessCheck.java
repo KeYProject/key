@@ -39,14 +39,12 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * A contract for checking the well-definedness of a specification element
- * (i.e. a class invariant, a method contract, a loop invariant or a block contract),
- * consisting of precondition, assignable-clause and postcondition/invariant
- * (depending on which kind of contract it is).
- */
-/**
- * @author kirsten
+ * A contract for checking the well-definedness of a jml specification element
+ * (i.e. a class invariant, a method contract, a model field or any jml statement),
+ * consisting of precondition, assignable-clause, postcondition, accessible-clause,
+ * measured-by-clause and represents-clause.
  *
+ * @author Michael Kirsten
  */
 public abstract class WellDefinednessCheck implements Contract {
 

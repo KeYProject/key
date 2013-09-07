@@ -139,7 +139,7 @@ public class BlockContractRule implements BuiltInRule {
             return false;
         }
         // abort if inside of transformer
-        if (TransformerProcedure.inTransformer(occurrence)) {
+        if (TransformerFunction.inTransformer(occurrence)) {
             return false;
         }
         final Instantiation instantiation =
@@ -776,14 +776,14 @@ public class BlockContractRule implements BuiltInRule {
                 return;
             }
             goal.setBranchLabel("Well-Definedness");
-            BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
-            services.getSpecificationRepository().addStatementWellDefinedness(bwd);
+            final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
+            services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = TB.func(anonHeap);
-            final Term wdBlock = bwd.generatePO(variables.self, variables.exception,
-                                                variables.result, heap, heapAtPre,
-                                                anon, localIns, update, services);
-            goal.changeFormula(new SequentFormula(wdBlock), occurrence);
+            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
+                                                               variables.result, heap, heapAtPre,
+                                                               anon, localIns, update, services);
+            goal.changeFormula(wdBlock, occurrence);
         }
 
         public void setUpValidityGoal(final Goal goal, final Term[] updates,

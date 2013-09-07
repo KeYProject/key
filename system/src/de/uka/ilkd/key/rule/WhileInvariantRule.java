@@ -51,7 +51,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TransformerProcedure;
+import de.uka.ilkd.key.logic.op.TransformerFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -211,7 +211,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             return false;
         }
         // abort if inside of transformer
-        if (TransformerProcedure.inTransformer(pio)) {
+        if (TransformerFunction.inTransformer(pio)) {
             return false;
         }
         Pair<Term, Term> up = applyUpdates(pio.subTerm());
@@ -248,17 +248,17 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (goal == null) {
             return;
         }
-        LoopWellDefinedness lwd =  new LoopWellDefinedness(inv, localIns, services);
+        final LoopWellDefinedness lwd =  new LoopWellDefinedness(inv, localIns, services);
         final ProgramVariable self;
         if(selfTerm != null && selfTerm.op() instanceof ProgramVariable) {
             self = (ProgramVariable)selfTerm.op();
         } else {
             self = null;
         }
-        services.getSpecificationRepository().addStatementWellDefinedness(lwd);
-        final Term wdInv = lwd.generatePO(self, null, null, heap, null, anonHeap,
-                                          localIns, update, services);
-        goal.changeFormula(new SequentFormula(wdInv), pio);
+        services.getSpecificationRepository().addWdStatement(lwd);
+        final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
+                                                         update, services);
+        goal.changeFormula(wdInv, pio);
     }
 
     @Override

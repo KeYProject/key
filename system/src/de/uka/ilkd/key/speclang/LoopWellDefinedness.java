@@ -1,17 +1,20 @@
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
+/**
+ * A contract for checking the well-definedness of a jml loop invariant.
+ *
+ * @author Michael Kirsten
+ */
 public class LoopWellDefinedness extends StatementWellDefinedness {
 
     private final LoopInvariant inv;
@@ -38,41 +41,13 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         setEnsures(inv.getInternalInvariants().get(h));
     }
 
-    public Term generatePO(ProgramVariable self, ProgramVariable exception,
-                           ProgramVariable result, LocationVariable heap,
-                           ProgramVariable heapAtPre, Term anonHeap,
-                           ImmutableSet<ProgramVariable> ps,
-                           Term leadingUpdate, Services services) {
-        return generatePO(self, heap, anonHeap, ps, leadingUpdate, services);
-    }
-
-    private Term generatePO(ProgramVariable self, LocationVariable heap,
-                            Term anonHeap, ImmutableSet<ProgramVariable> ps,
-                            Term leadingUpdate, Services services) {
+    SequentFormula generateSequent(SequentTerms seq, Services services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
-
-        ImmutableList<ProgramVariable> params = ImmutableSLList.<ProgramVariable>nil();
-        for (ProgramVariable p: ps) {
-            params = params.append(p);
-        }
-        final Variables vars = new Variables(self, null, null, null, params, heap, anonHeap);
-        final POTerms po =
-                replace(new POTerms(this.getRequires(), this.getAssignable(),
-                                    this.getRest(), this.getEnsures()),
-                        vars);
-        final Term pre = getPre(po.pre, self, heap, params, false, services).term;
-        final Term post = getPost(po.post, vars.result, services);
-        final Term wdPre = TB.wd(pre, services);
-        final Term wdMod = TB.wd(po.mod, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
-        final Term updates = getUpdates(po.mod, heap, heap, anonHeap, services);
-        final Term wfAnon = TB.wellFormed(anonHeap, services);
-        final Term uPost = TB.apply(updates, TB.and(TB.wd(post, services), TB.and(wdRest)));
-        final Term poTerms = TB.apply(leadingUpdate,
-                                      TB.and(wdPre,
-                                             TB.imp(TB.and(pre, wfAnon),
-                                                    TB.and(wdMod, TB.and(wdRest), uPost))));
-        return poTerms;
+        final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
+                                TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
+        final Term wdPre = TB.wd(seq.pre, services);
+        return new SequentFormula(TB.apply(seq.context,
+                                           TB.and(wdPre, imp)));
     }
 
     public LoopInvariant getStatement() {

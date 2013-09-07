@@ -232,7 +232,7 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isAcceptedOperator(Operator op) {
         return op instanceof IfThenElse
-               || (op instanceof Function && !(op instanceof TransformerProcedure))
+               || (op instanceof Function && !(op instanceof TransformerFunction))
                || op instanceof Junctor
                || op instanceof Equality
                || op instanceof Quantifier

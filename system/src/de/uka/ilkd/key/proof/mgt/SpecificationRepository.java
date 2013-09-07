@@ -157,6 +157,74 @@ public final class SpecificationRepository {
     // internal methods
     // -------------------------------------------------------------------------
 
+    private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
+                                                      IObserverFunction unlimited) {
+        assert limited.arity() == unlimited.arity();
+
+        // create schema terms
+        final Term[] subs = new Term[limited.arity()];
+        for (int i = 0; i < subs.length; i++) {
+            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(
+                    new Name("t" + i), limited.argSort(i), false, false);
+            subs[i] = TB.var(argSV);
+        }
+        final Term limitedTerm = TB.func(limited, subs);
+        final Term unlimitedTerm = TB.func(unlimited, subs);
+
+        // create taclet
+        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        tacletBuilder.setFind(limitedTerm);
+        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
+                Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet> nil(),
+                unlimitedTerm));
+        tacletBuilder.setName(MiscTools.toValidTacletName("unlimit "
+                + unlimited.name()));
+
+        return tacletBuilder.getTaclet();
+    }
+
+    private static Taclet getUnlimitedToLimitedTaclet(IObserverFunction limited,
+                                                      IObserverFunction unlimited) {
+        assert limited.arity() == unlimited.arity();
+
+        // create schema terms
+        final Term[] subs = new Term[limited.arity()];
+        for (int i = 0; i < subs.length; i++) {
+            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(
+                    new Name("t" + i), limited.argSort(i), false, false);
+            subs[i] = TB.var(argSV);
+        }
+        final Term limitedTerm = TB.func(limited, subs);
+        final Term unlimitedTerm = TB.func(unlimited, subs);
+
+        // create taclet
+        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        tacletBuilder.setFind(TB.func(unlimited, subs));
+        final SequentFormula cf = new SequentFormula(TB.equals(limitedTerm,
+                unlimitedTerm));
+        final Sequent addedSeq = Sequent
+                .createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
+                        .insertFirst(cf).semisequent());
+        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
+                addedSeq, ImmutableSLList.<Taclet> nil(), TB.func(unlimited,
+                        subs)));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+        tacletBuilder.setName(MiscTools.toValidTacletName("limit "
+                + unlimited.name()));
+        tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
+
+        return tacletBuilder.getTaclet();
+    }
+
+    private static Modality getMatchModality(final Modality modality) {
+        if (modality.transaction()) {
+            return modality == Modality.DIA_TRANSACTION ? Modality.DIA
+                    : Modality.BOX;
+        } else {
+            return modality;
+        }
+    }
+
     private IObserverFunction getCanonicalFormForKJT(IObserverFunction obs,
                                                      KeYJavaType kjt) {
         assert obs != null;
@@ -247,7 +315,7 @@ public final class SpecificationRepository {
     /**
      * Returns all known class invariants for the passed type.
      */
-    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
+    private ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
         ImmutableSet<ClassInvariant> result = invs.get(kjt);
         return result == null ? DefaultImmutableSet.<ClassInvariant> nil()
                 : result;
@@ -292,92 +360,6 @@ public final class SpecificationRepository {
             }
         }
         return result;
-    }
-
-    private static Taclet getLimitedToUnlimitedTaclet(
-            IObserverFunction limited, IObserverFunction unlimited) {
-        assert limited.arity() == unlimited.arity();
-
-        // create schema terms
-        final Term[] subs = new Term[limited.arity()];
-        for (int i = 0; i < subs.length; i++) {
-            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(
-                    new Name("t" + i), limited.argSort(i), false, false);
-            subs[i] = TB.var(argSV);
-        }
-        final Term limitedTerm = TB.func(limited, subs);
-        final Term unlimitedTerm = TB.func(unlimited, subs);
-
-        // create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setFind(limitedTerm);
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
-                Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet> nil(),
-                unlimitedTerm));
-        tacletBuilder.setName(MiscTools.toValidTacletName("unlimit "
-                + unlimited.name()));
-
-        return tacletBuilder.getTaclet();
-    }
-
-    private static Taclet getUnlimitedToLimitedTaclet(
-            IObserverFunction limited, IObserverFunction unlimited) {
-        assert limited.arity() == unlimited.arity();
-
-        // create schema terms
-        final Term[] subs = new Term[limited.arity()];
-        for (int i = 0; i < subs.length; i++) {
-            final SchemaVariable argSV = SchemaVariableFactory.createTermSV(
-                    new Name("t" + i), limited.argSort(i), false, false);
-            subs[i] = TB.var(argSV);
-        }
-        final Term limitedTerm = TB.func(limited, subs);
-        final Term unlimitedTerm = TB.func(unlimited, subs);
-
-        // create taclet
-        final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setFind(TB.func(unlimited, subs));
-        final SequentFormula cf = new SequentFormula(TB.equals(limitedTerm,
-                unlimitedTerm));
-        final Sequent addedSeq = Sequent
-                .createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
-                        .insertFirst(cf).semisequent());
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
-                addedSeq, ImmutableSLList.<Taclet> nil(), TB.func(unlimited,
-                        subs)));
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
-        tacletBuilder.setName(MiscTools.toValidTacletName("limit "
-                + unlimited.name()));
-        tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
-
-        return tacletBuilder.getTaclet();
-    }
-
-    public void addRepresentsTermToModelFields(KeYJavaType kjt) {
-        ImmutableSet<ClassAxiom> axs = axioms.get(kjt);
-        if (axs == null) {
-            return;
-        }
-        ImmutableSet<RepresentsAxiom> reps = DefaultImmutableSet
-                .<RepresentsAxiom> nil();
-        for (ClassAxiom ax : axs) {
-            if (ax instanceof RepresentsAxiom) {
-                reps = reps.add((RepresentsAxiom) ax);
-            }
-        }
-        ProgramVariable heap = services.getTypeConverter().getHeapLDT()
-                .getHeap();
-        for (RepresentsAxiom rep : reps) {
-            for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
-                if (ch.isModel() && ch.getTarget().equals(rep.getTarget())) {
-                    unregisterContract(ch);
-                    Term represents = rep.getAxiom(heap, ch.getOrigVars().self,
-                            services);
-                    WellDefinednessCheck newCh = ch.addRepresents(represents);
-                    registerContract(newCh);
-                }
-            }
-        }
     }
 
     private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
@@ -481,26 +463,6 @@ public final class SpecificationRepository {
         contractTargets.put(targetKJT, newTargets);
     }
 
-    /**
-     * Registers a well-definedness check. It does not take care of its
-     * visibility in the proof management dialog (this is done in
-     * {@link #registerContract(Contract, Pair)}).
-     * @param check The well-definedness check to be registered
-     */
-    private void registerWdCheck(WellDefinednessCheck check) {
-        ImmutableSet<WellDefinednessCheck> checks =
-                getWdChecks(check.getKJT(), check.getTarget()).add(check);
-        wdChecks.put(new Pair<KeYJavaType, IObserverFunction>
-                           (check.getKJT(), check.getTarget()),
-                     checks);
-    }
-
-    private void unregisterWdCheck(WellDefinednessCheck check) {
-        wdChecks.put(new Pair<KeYJavaType, IObserverFunction>(check.getKJT(),
-                check.getTarget()),
-                getWdChecks(check.getKJT(), check.getTarget()).remove(check));
-    }
-
     /** Removes the contract from the repository, but keeps its target. */
     private void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
@@ -557,6 +519,107 @@ public final class SpecificationRepository {
                 }
             }
         }
+    }
+
+    // Internal interface for well-definedness checks
+
+    /**
+     * Registers a well-definedness check. It does not take care of its
+     * visibility in the proof management dialog (this is done in
+     * {@link #registerContract(Contract, Pair)}).
+     * @param check The well-definedness check to be registered
+     */
+    private void registerWdCheck(WellDefinednessCheck check) {
+        ImmutableSet<WellDefinednessCheck> checks =
+                getWdChecks(check.getKJT(), check.getTarget()).add(check);
+        wdChecks.put(new Pair<KeYJavaType, IObserverFunction>
+                           (check.getKJT(), check.getTarget()),
+                     checks);
+    }
+
+    /**
+     * Unregisters a well-definedness check. It does not take care of its
+     * visibility in the proof management dialog.
+     * @param check The well-definedness check to be unregistered
+     */
+    private void unregisterWdCheck(WellDefinednessCheck check) {
+        wdChecks.put(new Pair<KeYJavaType, IObserverFunction>(check.getKJT(),
+                check.getTarget()),
+                getWdChecks(check.getKJT(), check.getTarget()).remove(check));
+    }
+
+    /**
+     * Returns all registered (atomic) well-definedness checks for the passed
+     * kjt.
+     */
+    private ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt) {
+        assert kjt != null;
+        ImmutableSet<WellDefinednessCheck> result = DefaultImmutableSet
+                .<WellDefinednessCheck> nil();
+        for (WellDefinednessCheck ch : getAllWdChecks()) {
+            if (ch.getKJT().equals(kjt)) {
+                result = result.add(ch);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns all registered (atomic) well-definedness checks for the passed
+     * target.
+     */
+    private ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt,
+                                                           IObserverFunction target) {
+        assert kjt != null;
+        assert target != null;
+        target = getCanonicalFormForKJT(target, kjt);
+        final Pair<KeYJavaType, IObserverFunction> pair =
+                new Pair<KeYJavaType, IObserverFunction>(kjt, target);
+        final ImmutableSet<WellDefinednessCheck> result = wdChecks.get(pair);
+        return result == null ? DefaultImmutableSet
+                .<WellDefinednessCheck> nil() : result;
+    }
+
+    /**
+     * Returns all registered well-definedness checks for method contracts.
+     */
+    private ImmutableSet<MethodWellDefinedness> getAllWdMethodChecks() {
+        ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet
+                .<MethodWellDefinedness> nil();
+        for (Contract s : getAllWdChecks()) {
+            if (s instanceof MethodWellDefinedness) {
+                result = result.add((MethodWellDefinedness) s);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns all registered (atomic) well-definedness method checks for the
+     * passed kjt.
+     */
+    private ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt) {
+        assert kjt != null;
+        ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet
+                .<MethodWellDefinedness> nil();
+        for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
+            if (ch.getKJT().equals(kjt)) {
+                result = result.add(ch);
+            }
+        }
+        return result;
+    }
+
+    private ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
+        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt);
+        ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet
+                .<ClassWellDefinedness> nil();
+        for (WellDefinednessCheck check : checks) {
+            if (check instanceof ClassWellDefinedness) {
+                invs = invs.add((ClassWellDefinedness) check);
+            }
+        }
+        return invs;
     }
 
     // -------------------------------------------------------------------------
@@ -1183,10 +1246,6 @@ public final class SpecificationRepository {
         loopInvs.put(loop, inv);
     }
 
-    public void addStatementWellDefinedness(StatementWellDefinedness swd) {
-        registerWdCheck(swd);
-    }
-
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         if (blockContracts.get(block) == null) {
             return DefaultImmutableSet.<BlockContract> nil();
@@ -1210,15 +1269,6 @@ public final class SpecificationRepository {
         return result;
     }
 
-    private Modality getMatchModality(final Modality modality) {
-        if (modality.transaction()) {
-            return modality == Modality.DIA_TRANSACTION ? Modality.DIA
-                    : Modality.BOX;
-        } else {
-            return modality;
-        }
-    }
-
     public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         blockContracts.put(block, getBlockContracts(block).add(contract));
@@ -1232,10 +1282,8 @@ public final class SpecificationRepository {
                 addClassInvariant((ClassInvariant) spec);
             } else if (spec instanceof InitiallyClause) {
                 addInitiallyClause((InitiallyClause) spec);
-                // TODO: Sense of WellDefinedness?
             } else if (spec instanceof ClassAxiom) {
                 addClassAxiom((ClassAxiom) spec);
-                // TODO: Sense of WellDefinedness?
             } else if (spec instanceof LoopInvariant) {
                 addLoopInvariant((LoopInvariant) spec);
             } else if (spec instanceof BlockContract) {
@@ -1245,170 +1293,6 @@ public final class SpecificationRepository {
                         + spec.getClass() + ")";
             }
         }
-    }
-
-    /**
-     * Returns all registered well-definedness checks.
-     */
-    public ImmutableSet<WellDefinednessCheck> getAllWdChecks() {
-        ImmutableSet<WellDefinednessCheck> result = DefaultImmutableSet
-                .<WellDefinednessCheck> nil();
-        for (ImmutableSet<WellDefinednessCheck> s : wdChecks.values()) {
-            result = result.union(s);
-        }
-        return result;
-    }
-
-    /**
-     * Returns all registered (atomic) well-definedness checks for the passed
-     * kjt.
-     */
-    public ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt) {
-        assert kjt != null;
-        ImmutableSet<WellDefinednessCheck> result = DefaultImmutableSet
-                .<WellDefinednessCheck> nil();
-        for (WellDefinednessCheck ch : getAllWdChecks()) {
-            if (ch.getKJT().equals(kjt)) {
-                result = result.add(ch);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all registered (atomic) well-definedness checks for the passed
-     * target.
-     */
-    public ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt,
-                                                          IObserverFunction target) {
-        assert kjt != null;
-        assert target != null;
-        target = getCanonicalFormForKJT(target, kjt);
-        final Pair<KeYJavaType, IObserverFunction> pair =
-                new Pair<KeYJavaType, IObserverFunction>(kjt, target);
-        final ImmutableSet<WellDefinednessCheck> result = wdChecks.get(pair);
-        return result == null ? DefaultImmutableSet
-                .<WellDefinednessCheck> nil() : result;
-    }
-
-    /**
-     * Returns all registered well-definedness checks for class invariants.
-     */
-    public ImmutableSet<ClassWellDefinedness> getAllWdClassChecks() {
-        ImmutableSet<ClassWellDefinedness> result = DefaultImmutableSet
-                .<ClassWellDefinedness> nil();
-        for (Contract s : getAllWdChecks()) {
-            if (s instanceof ClassWellDefinedness) {
-                result = result.add((ClassWellDefinedness) s);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all registered well-definedness checks for method contracts.
-     */
-    public ImmutableSet<MethodWellDefinedness> getAllWdMethodChecks() {
-        ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet
-                .<MethodWellDefinedness> nil();
-        for (Contract s : getAllWdChecks()) {
-            if (s instanceof MethodWellDefinedness) {
-                result = result.add((MethodWellDefinedness) s);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all registered well-definedness checks for (annotation)
-     * statements.
-     */
-    public ImmutableSet<StatementWellDefinedness> getAllWdStatementChecks() {
-        ImmutableSet<StatementWellDefinedness> result = DefaultImmutableSet
-                .<StatementWellDefinedness> nil();
-        for (Contract s : getAllWdChecks()) {
-            if (s instanceof StatementWellDefinedness) {
-                result = result.add((StatementWellDefinedness) s);
-            }
-        }
-        return result;
-    }
-
-    public ImmutableSet<StatementWellDefinedness> getWdStatementChecks(
-            KeYJavaType kjt, IObserverFunction target) {
-        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
-        ImmutableSet<StatementWellDefinedness> result = DefaultImmutableSet
-                .<StatementWellDefinedness> nil();
-        for (WellDefinednessCheck check : checks) {
-            if (check instanceof StatementWellDefinedness) {
-                result = result.add((StatementWellDefinedness) check);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all registered (atomic) well-definedness method checks for the
-     * passed kjt.
-     */
-    public ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt) {
-        assert kjt != null;
-        ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet
-                .<MethodWellDefinedness> nil();
-        for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
-            if (ch.getKJT().equals(kjt)) {
-                result = result.add(ch);
-            }
-        }
-        return result;
-    }
-
-    public ImmutableSet<MethodWellDefinedness> getWdMethodChecks(
-            KeYJavaType kjt, IObserverFunction target) {
-        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
-        ImmutableSet<MethodWellDefinedness> methods = DefaultImmutableSet
-                .<MethodWellDefinedness> nil();
-        for (WellDefinednessCheck check : checks) {
-            if (check instanceof MethodWellDefinedness) {
-                methods = methods.add((MethodWellDefinedness) check);
-            }
-        }
-        return methods;
-    }
-
-    public ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
-        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt);
-        ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet
-                .<ClassWellDefinedness> nil();
-        for (WellDefinednessCheck check : checks) {
-            if (check instanceof ClassWellDefinedness) {
-                invs = invs.add((ClassWellDefinedness) check);
-            }
-        }
-        return invs;
-    }
-
-    public ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt,
-                                                               IObserverFunction target) {
-        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
-        ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet
-                .<ClassWellDefinedness> nil();
-        for (WellDefinednessCheck check : checks) {
-            if (check instanceof ClassWellDefinedness) {
-                invs = invs.add((ClassWellDefinedness) check);
-            }
-        }
-        return invs;
-    }
-
-    public ImmutableSet<Contract> getWdContracts(KeYJavaType kjt,
-                                                 IObserverFunction target) {
-        ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt, target);
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract> nil();
-        for (WellDefinednessCheck check : checks) {
-            result = result.add((Contract) check);
-        }
-        return result;
     }
 
     public Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(IObserverFunction obs) {
@@ -1453,6 +1337,59 @@ public final class SpecificationRepository {
         IObserverFunction result = limitedToUnlimited.get(obs);
         if (result == null) {
             result = obs;
+        }
+        return result;
+    }
+
+    // Public interface for well-definedness checks
+
+    /**
+     * Represent terms belong to model fields, so the well-definedness check
+     * considers both of them together.
+     * @param kjt The relevant KeYJavaType
+     */
+    public void addRepresentsTermToWdChecksForModelFields(KeYJavaType kjt) {
+        ImmutableSet<ClassAxiom> axs = axioms.get(kjt);
+        if (axs == null) {
+            return;
+        }
+        ImmutableSet<RepresentsAxiom> reps = DefaultImmutableSet.<RepresentsAxiom> nil();
+        for (ClassAxiom ax : axs) {
+            if (ax instanceof RepresentsAxiom) {
+                reps = reps.add((RepresentsAxiom) ax);
+            }
+        }
+        ProgramVariable heap = services.getTypeConverter().getHeapLDT()
+                .getHeap();
+        for (RepresentsAxiom rep : reps) {
+            for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
+                if (ch.isModel() && ch.getTarget().equals(rep.getTarget())) {
+                    unregisterContract(ch);
+                    Term represents = rep.getAxiom(heap, ch.getOrigVars().self, services);
+                    WellDefinednessCheck newCh = ch.addRepresents(represents);
+                    registerContract(newCh);
+                }
+            }
+        }
+    }
+
+    /**
+     * Registers a well-definedness check for a jml statement. It does not
+     * take care of its visibility in the proof management dialog.
+     * @param swd The well-definedness check
+     */
+    public void addWdStatement(StatementWellDefinedness swd) {
+        registerWdCheck(swd);
+    }
+
+    /**
+     * Returns all registered well-definedness checks.
+     */
+    public ImmutableSet<WellDefinednessCheck> getAllWdChecks() {
+        ImmutableSet<WellDefinednessCheck> result = DefaultImmutableSet
+                .<WellDefinednessCheck> nil();
+        for (ImmutableSet<WellDefinednessCheck> s : wdChecks.values()) {
+            result = result.union(s);
         }
         return result;
     }

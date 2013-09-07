@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
@@ -28,6 +29,25 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 
+/**
+ * <p>
+ * The proof obligation for well-definedness checks.
+ * </p>
+ * <p>
+ * The generated {@link Sequent} has the following form:
+ * <pre>
+ * <code>
+ * ==>
+ * WD(&lt;generalAssumptions&gt; && &lt;preconditions&gt;) &
+ * (&lt;generalAssumptions&gt; & &lt;preconditions&gt;
+ *    -> WD(&lt;otherClauses&gt;) &
+ *       {anon^assignable}WD(&lt;postconditions&gt;)
+ * </code>
+ * </pre>
+ * </p>
+ *
+ * @author Michael Kirsten
+ */
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private final WellDefinednessCheck check;
@@ -205,7 +225,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                              false, services);
         final Term wdPre = TB.wd(pre.term, services);
         final Term wdMod = TB.wd(po.mod, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest, services);
+        final Term wdRest = TB.and(TB.wd(po.rest, services));
         register(pre.func);
         mbyAtPre = pre.func != null ? TB.func(pre.func) : null;
         final Term post = check.getPost(po.post, vars.result, services);
@@ -213,9 +233,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                               vars.anonHeap, services);
         final Term wfAnon = TB.wellFormed(vars.anonHeap, services);
         final Term uPost = TB.apply(updates, TB.wd(post, services));
-        final Term poTerms = TB.and(wdPre,
-                                    TB.imp(TB.and(pre.term, wfAnon),
-                                           TB.and(wdMod, TB.and(wdRest), uPost)));
+        final Term imp = TB.imp(TB.and(pre.term, wfAnon),
+                                TB.and(wdMod, wdRest, uPost));
+        final Term poTerms = TB.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms
         collectClassAxioms(getKJT());
@@ -279,9 +299,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         public final ProgramVariable exception;
         public final Map<LocationVariable, ProgramVariable> atPres;
         public final ImmutableList<ProgramVariable> params;
-        final LocationVariable heap;
-        final ProgramVariable heapAtPre;
-        final Term anonHeap;
+        public final LocationVariable heap;
+        public final ProgramVariable heapAtPre;
+        public final Term anonHeap;
 
         public Variables(final ProgramVariable self,
                          final ProgramVariable result,

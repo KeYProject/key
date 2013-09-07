@@ -9,6 +9,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * This variable condition checks if an instantiation for a formula has sub formulas
+ * which are formulas. It returns false for an arity equal to zero or no sub formulas.
+ * This is needed to simplify distinguishing between different well-definedness operators
+ * in taclets, since the difference exists only for formulas.
+ *
+ * @author Michael Kirsten
+ *
+ */
 public class SubFormulaCondition extends VariableConditionAdapter {
 
     private final FormulaSV a;

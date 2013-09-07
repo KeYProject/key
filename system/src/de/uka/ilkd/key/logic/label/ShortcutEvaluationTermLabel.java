@@ -4,8 +4,10 @@ import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- * Label attached to a term with the logical operator '||' or '&&' to
- * distinguish from '|' or '&'. 
+ * Label attached to a term with the logical operator '||' or '&&' to distinguish
+ * from '|' or '&' respectively.
+ *
+ * @author Michael Kirsten
  */
 public class ShortcutEvaluationTermLabel implements ITermLabel {
     /**

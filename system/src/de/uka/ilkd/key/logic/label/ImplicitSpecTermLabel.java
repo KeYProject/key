@@ -5,6 +5,8 @@ import de.uka.ilkd.key.logic.Name;
 
 /**
  * Label attached to a term which is specified implicitly (by the JML specification).
+ *
+ * @author Michael Kirsten
  */
 public class ImplicitSpecTermLabel implements ITermLabel {
     /**
