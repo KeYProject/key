@@ -58,6 +58,8 @@ public class MarkerManager {
             if (marker.exists()) {
                marker.setAttribute(IMarker.MESSAGE, "Proof closed: " + proofFile.getFullPath());
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+               marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+               marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
                pe.setMarker(marker);
@@ -68,6 +70,8 @@ public class MarkerManager {
             if (marker.exists()) {
                marker.setAttribute(IMarker.MESSAGE, "Proof not closed: " + proofFile.getFullPath());
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+               marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+               marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
                marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
                marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
                pe.setMarker(marker);
@@ -92,6 +96,8 @@ public class MarkerManager {
       if (marker.exists()) {
          marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+         marker.setAttribute(IMarker.LINE_NUMBER, pe.getSourceLocation().getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+         marker.setAttribute(IMarker.LOCATION, "line " + pe.getSourceLocation().getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
          marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
          marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
          pe.setMarker(marker);
