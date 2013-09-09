@@ -310,14 +310,23 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final PosInOccurrence pio = getPosInOccurrence ( p_goal );
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
 
+        Services services = p_goal.proof().getServices();
         if ( pio != null ) {
-            app = app.setPosInOccurrence ( pio, p_goal.proof().getServices() );
+            app = app.setPosInOccurrence ( pio, services );
             if ( app == null ) return null;
         }
 
         if ( !app.complete() )
-            app = app.tryToInstantiate ( p_goal.proof().getServices() );
+            app = app.tryToInstantiate ( services );
 
+        Taclet taclet = app == null ? null : app.taclet();
+        if (taclet instanceof RewriteTaclet) {
+            RewriteTaclet rwtaclet = (RewriteTaclet) taclet;
+            MatchConditions check = 
+                    rwtaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            assert check != null : "A taclet with illegal prefix is chosen: " + taclet.name();
+        }
+        
         return app;
     }
 
