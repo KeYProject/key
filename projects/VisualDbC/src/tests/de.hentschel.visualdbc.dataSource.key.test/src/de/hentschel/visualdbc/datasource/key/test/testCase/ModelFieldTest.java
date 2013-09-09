@@ -14,17 +14,17 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import org.junit.Test;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.test.util.TestKeyUtil;
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
-import junit.framework.TestCase;
 
 /**
  * Tests the handling of model field clauses in a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class ModelFieldTest extends TestCase {
+public class ModelFieldTest extends AbstractSetupTestCase {
    /**
     * Tests model field.
     */

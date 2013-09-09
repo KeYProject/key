@@ -13,8 +13,6 @@
 
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -23,13 +21,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
 import org.key_project.keyide.ui.preference.page.KeYIDEPreferencePage;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * SWTBot tests for {@link KeYIDEPreferencePage}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYIDEPreferencePageTest extends TestCase {
+public class SWTBotKeYIDEPreferencePageTest extends AbstractSetupTestCase {
    /**
     * Tests the perspective is always changed functionality by changing the value under "Window->Preferences->General->Perspectives->KeY Preferences"
     * @throws InterruptedException 

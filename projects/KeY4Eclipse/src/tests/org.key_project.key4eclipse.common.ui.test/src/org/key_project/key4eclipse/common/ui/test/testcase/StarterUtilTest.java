@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.common.ui.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
@@ -35,6 +33,7 @@ import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -43,7 +42,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  * Tests for {@link StarterUtil}.
  * @author Martin Hentschel
  */
-public class StarterUtilTest extends TestCase {
+public class StarterUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link StarterUtil#areProofStartersAvailable()}
     */

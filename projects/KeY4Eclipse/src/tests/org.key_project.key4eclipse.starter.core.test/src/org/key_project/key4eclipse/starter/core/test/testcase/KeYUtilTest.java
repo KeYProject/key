@@ -15,8 +15,6 @@ package org.key_project.key4eclipse.starter.core.test.testcase;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
@@ -44,6 +42,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -55,7 +54,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * Tests for {@link KeYUtil}
  * @author Martin Hentschel
  */
-public class KeYUtilTest extends TestCase {
+public class KeYUtilTest extends AbstractSetupTestCase {
    /**
     * {@link KeYUtil#getSourceLocation(IProject)}
     */

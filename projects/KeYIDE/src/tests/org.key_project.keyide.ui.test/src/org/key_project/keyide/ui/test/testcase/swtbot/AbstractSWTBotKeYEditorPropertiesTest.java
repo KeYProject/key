@@ -28,14 +28,14 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
     * @param projectName The project name to use.
     * @param pathToSourceFilesInBundle The path to the plug-in to the source files to extract into the created project.
     * @param contractName The name of the contract to prove.
-    * @param inPropertiesView {@code true} set focus to properties view, {@code false} set focus to editor.
+    * @param inOutlineView {@code true} set focus to properties view, {@code false} set focus to editor.
     * @param pSteps The {@link IPropertiesTestSteps} to execute.
     * @throws Exception Occurred Exception
     */
    protected void doPropertiesTest(String projectName,
                                    String pathToSourceFilesInBundle,
                                    String contractName,
-                                   final boolean inPropertiesView,
+                                   final boolean inOutlineView,
                                    final IPropertiesTestSteps pSteps) throws Exception {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
@@ -47,8 +47,9 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
                           KeYEditor keyEditor) throws Exception {
             TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
             SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
-            if (inPropertiesView) {
-               propertiesView.setFocus();
+            if (inOutlineView) {
+               SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
+               outlineView.setFocus();
             }
             else {
                editor.setFocus();
