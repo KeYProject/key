@@ -22,6 +22,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -403,7 +404,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    //split goal into four branches
 	    result = goal.split(4);
 	    wdGoal = result.tail().tail().tail().head();
-	    wdGoal.setBranchLabel("Well-Definedness");
+	    wdGoal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
 	} else {
 	    //split goal into three branches
 	    result = goal.split(3);

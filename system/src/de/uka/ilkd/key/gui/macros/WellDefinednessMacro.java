@@ -4,9 +4,10 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 public class WellDefinednessMacro extends StrategyProofMacro {
 
     public static final String WD_PREFIX = "wd_";
+    public static final String WD_BRANCH = "Well-Definedness";
 
     @Override
     public String getName() {
@@ -41,9 +43,23 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        final Proof p = mediator.getSelectedProof();
-        final SpecificationRepository rep = mediator.getServices().getSpecificationRepository();
-        return rep.getPOForProof(p) instanceof WellDefinednessPO;
+        final ContractPO po =
+                mediator.getServices().getSpecificationRepository()
+                        .getPOForProof(mediator.getSelectedProof());
+        if (po instanceof WellDefinednessPO) {
+            return true;
+        } else if (!(po instanceof FunctionalOperationContractPO)) {
+            return false;
+        }
+        Node n = mediator.getSelectedNode();
+        while(n != null) {
+            if (n.getNodeInfo().getBranchLabel() != null
+                    && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
+                return true;
+            }
+            n = n.parent();
+        }
+        return false;
     }
 
     /**

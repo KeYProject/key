@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -775,7 +776,7 @@ public class BlockContractRule implements BuiltInRule {
             if (goal == null) {
                 return;
             }
-            goal.setBranchLabel("Well-Definedness");
+            goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
             final BlockWellDefinedness bwd = new BlockWellDefinedness(contract, localIns, services);
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
