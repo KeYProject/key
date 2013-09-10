@@ -15,16 +15,13 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -66,7 +63,6 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public static final String INV_TACLET = "wd_Invariant_";
     public static final String OP_TACLET = "wd_Operation_";
-    private static final ITermLabel IMPLICIT = ImplicitSpecTermLabel.INSTANCE;
 
     static enum Type {
         CLASS_INVARIANT, CLASS_AXIOM, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
@@ -118,39 +114,14 @@ public abstract class WellDefinednessCheck implements Contract {
     // Internal Methods
     //-------------------------------------------------------------------------
 
-    private static Term removeImplicitSpecLabel(Term t) {
-        ImmutableArray<ITermLabel> ls = t.getLabels();
-        LinkedList<ITermLabel> res = new LinkedList<ITermLabel>();
-        for (ITermLabel l: ls) {
-            if(!l.equals(IMPLICIT)) {
-                res.add(l);
-            }
-        }
-        if (res.isEmpty()) {
-            ls = new ImmutableArray<ITermLabel>();
-        } else {
-            ls = new ImmutableArray<ITermLabel>(res);
-        }
-        res.clear();
-        if (t.arity() > 1) {
-            Term[] subs = new Term[t.arity()];
-            int i = 0;
-            for(Term sub: t.subs()) {
-                subs[i++] = removeImplicitSpecLabel(sub);
-            }
-            t = TF.createTerm(t.op(), subs, t.getLabels());
-        }
-        return TB.relabel(t, ls);
-    }
-
     private static Pair<Term, Term> split(Term spec) {
-        Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitAndRelabel(spec);
+        Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(spec);
         ImmutableList<Term> start = p.first;
         ImmutableList<Term> end   = p.second;
         return new Pair<Term, Term> (TB.andSC(start), TB.andSC(end));
     }
 
-    private static Pair<ImmutableList<Term>, ImmutableList<Term>> splitAndRelabel(Term spec) {
+    private static Pair<ImmutableList<Term>, ImmutableList<Term>> splitRecursively(Term spec) {
         assert spec != null;
         ImmutableList<Term> start = ImmutableSLList.<Term>nil();
         ImmutableList<Term> end = ImmutableSLList.<Term>nil();
@@ -158,12 +129,11 @@ public abstract class WellDefinednessCheck implements Contract {
                 && spec.op().equals(Junctor.AND)) {
             for (Term sub: spec.subs()) {
                 if(sub.hasLabels()
-                        && sub.getLabels().contains(IMPLICIT)) {
-                    sub = removeImplicitSpecLabel(sub);
-                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitAndRelabel(sub);
+                        && sub.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
+                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
                     start = start.append(p.first).append(p.second);
                 } else {
-                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitAndRelabel(sub);
+                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
                     start = start.append(p.first);
                     end = end.append(p.second);
                 }
@@ -172,17 +142,13 @@ public abstract class WellDefinednessCheck implements Contract {
         } else if (spec.arity() > 0
                 && spec.op().equals(Junctor.IMP)) {
             assert spec.arity() == 2;
-            Pair<ImmutableList<Term>, ImmutableList<Term>> imp1 = splitAndRelabel(spec.sub(0));
-            Pair<ImmutableList<Term>, ImmutableList<Term>> imp2 = splitAndRelabel(spec.sub(1));
+            Pair<ImmutableList<Term>, ImmutableList<Term>> imp1 = splitRecursively(spec.sub(0));
+            Pair<ImmutableList<Term>, ImmutableList<Term>> imp2 = splitRecursively(spec.sub(1));
             Term i1 = TB.andSC(TB.andSC(imp1.first), TB.andSC(imp1.second));
             Term i2 = TB.andSC(TB.andSC(imp2.first), TB.andSC(imp2.second));
             end = end.append(TB.imp(i1, i2));
             return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
         } else {
-            if(spec.hasLabels()
-                    && spec.getLabels().contains(IMPLICIT)) {
-                spec = removeImplicitSpecLabel(spec);
-            }
             end = end.append(spec);
             return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
         }
