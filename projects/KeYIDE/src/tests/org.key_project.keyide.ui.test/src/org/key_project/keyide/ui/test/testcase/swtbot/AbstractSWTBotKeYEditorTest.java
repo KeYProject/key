@@ -1,7 +1,5 @@
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -23,6 +21,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -43,7 +42,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * Provides the basic functionality to test the {@link KeYEditor}.
  * @author Martin Hentschel
  */
-public abstract class AbstractSWTBotKeYEditorTest extends TestCase {
+public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase {
    /**
     * Opens a {@link Proof} in a {@link KeYEditor} and executes the given {@link IKeYEditorTestSteps}. 
     * @param projectName The project name to use.

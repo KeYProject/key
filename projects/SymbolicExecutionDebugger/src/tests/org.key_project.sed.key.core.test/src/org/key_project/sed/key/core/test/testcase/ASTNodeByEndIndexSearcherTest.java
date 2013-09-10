@@ -13,8 +13,6 @@
 
 package org.key_project.sed.key.core.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -29,6 +27,7 @@ import org.junit.Test;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.ASTNodeByEndIndexSearcher;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -36,7 +35,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class ASTNodeByEndIndexSearcherTest extends TestCase {
+public class ASTNodeByEndIndexSearcherTest extends AbstractSetupTestCase {
    /**
     * Tests the search result of the search process via
     * {@link ASTNodeByEndIndexSearcher#search(org.eclipse.jdt.core.dom.ASTNode, int)}.

@@ -1305,7 +1305,10 @@ public final class KeYUtil {
                IMethod method = JDTUtil.findJDTMethod(compilationUnit, methodLocation.getCharEnd());
                if (method != null) {
                   ISourceRange range = method.getNameRange();
-                  methodLocation = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());
+                  Position cursorStartPosition = getCursorPositionForOffset(element, range.getOffset()); 
+                  methodLocation = new SourceLocation(cursorStartPosition != null ? cursorStartPosition.getLine() : -1, 
+                                                      range.getOffset(), 
+                                                      range.getOffset() + range.getLength());
                }
             }
          }

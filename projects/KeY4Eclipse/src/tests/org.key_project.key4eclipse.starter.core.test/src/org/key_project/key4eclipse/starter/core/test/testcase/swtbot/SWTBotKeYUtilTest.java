@@ -41,6 +41,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -53,7 +54,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * SWT Bot tests for {@link KeYUtil}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYUtilTest extends TestCase {
+public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link KeYUtil#getRuleDisplayName(de.uka.ilkd.key.proof.Node)}.
     */

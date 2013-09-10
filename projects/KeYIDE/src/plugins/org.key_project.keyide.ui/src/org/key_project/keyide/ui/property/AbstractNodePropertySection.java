@@ -143,7 +143,7 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
     * Updates the shown content {@link Thread} save.
     */
    protected void updateShownContentThreadSave() {
-      Display.getDefault().syncExec(new Runnable() {
+      Display.getDefault().asyncExec(new Runnable() {
          @Override
          public void run() {
             updateShownContent(mediator, getSelectedNode());

@@ -15,13 +15,12 @@ package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
@@ -34,7 +33,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Contains tests for {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class KeyConnectionTest extends TestCase {
+public class KeyConnectionTest extends AbstractSetupTestCase {
    /**
     * Tests
     * {@link KeyConnection#connect(java.util.Map, boolean, org.eclipse.core.runtime.IProgressMonitor)},
