@@ -37,6 +37,7 @@ sub runAuto {
 
 
 # load each proof file in key and print the result
+my $numOfFiles = 0;
 my $numOfLoadableFiles = 0;
 my @failedFiles = ();
 my @successfulFiles = ();
@@ -44,6 +45,7 @@ foreach my $filename (@filenames) {
     $filename = $dir.$filename;
     next if (-d $filename); # skip directories (like ..)
     
+    $numOfFiles++;
     my $result = &runAuto($filename);
     
     if ($result == 0) {
@@ -57,10 +59,10 @@ foreach my $filename (@filenames) {
 }
 
 # print overall result
-if ($numOfLoadableFiles == @filenames) {
+if ($numOfLoadableFiles == $numOfFiles) {
     print "All files could be loaded successfully.\n";
 } else {
-    print "Failed to load ".(@filenames-$numOfLoadableFiles)." files out of ".@filenames.".\n";
+    print "Failed to load ".($numOfFiles-$numOfLoadableFiles)." files out of ".$numOfFiles.".\n";
     print "successful:\n";
     foreach my $filename (@successfulFiles) {
 	print "  $filename\n";

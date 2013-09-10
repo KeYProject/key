@@ -48,7 +48,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -297,7 +296,6 @@ public final class ProblemInitializer {
         	                                              bootClassPath));
     }
     
-    
     /**
      * Removes all schema variables, all generic sorts and all sort
      * depending symbols for a generic sort out of the namespaces.
@@ -332,25 +330,19 @@ public final class ProblemInitializer {
 			      InitConfig initConfig)
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
-	    //read includes
+	    // read includes
 	    if(!(envInput instanceof LDTInput)) {
 		readIncludes(envInput, initConfig);
 	    }
 
-	    //sanity check
-	    assert initConfig.varNS().allElements().size() == 0;
-	    for(Named n : initConfig.sortNS().allElements()) {
-		assert n instanceof Sort && !(n instanceof GenericSort);
-	    }
-
-	    //read envInput itself
+	    // read envInput itself
 	    reportStatus("Reading "+envInput.name(),
 		    	 envInput.getNumberOfChars());
 	    envInput.setInitConfig(initConfig);
 	    envInput.read();
 
-	    //clean namespaces
-	    cleanupNamespaces(initConfig);	    	    
+	    // reset the variables namespace
+	    initConfig.namespaces().setVariables(new Namespace());
 	}
     }
 
@@ -476,6 +468,8 @@ public final class ProblemInitializer {
 						profile);
 				readEnvInput(tacletBaseFile, newBaseConfig);
 			}
+			// remove traces of the generic sorts within the base configuration
+			cleanupNamespaces(newBaseConfig);
 			baseConfig = newBaseConfig;
 	}
 	return prepare(envInput, baseConfig);
