@@ -26,8 +26,15 @@ provable: ./heap/comprehensions/bprodSplit.key
 notprovable: ./heap/comprehensions/bsumSplitInvalid.key
 
 # Performance tests
-provable: ./performance-test/disjoint-test-1.key
-provable: ./performance-test/disjoint-test-2.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key
+provable: ./performance-test/key-files/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
 
 # Tests for rule application restrictions
 provable: ./heap/polarity_tests/wellformed1.key
