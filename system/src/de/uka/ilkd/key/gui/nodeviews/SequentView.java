@@ -22,6 +22,8 @@ import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_CO
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -262,6 +264,9 @@ public abstract class SequentView extends JTextArea
                             tOpClassString.lastIndexOf('.') + 1);
                     // What is the purpose of displaying the java hashcode here?
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
+
+                    Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();
+                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
                 }
             }
 
