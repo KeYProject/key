@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -186,7 +187,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final String prefix = WellDefinednessCheck.OP_TACLET;
         final IObserverFunction target = getTarget();
         final String tName = target.name().toString();
-        final boolean isStatic = target.isStatic();
+        final boolean isStatic = target.isStatic()
+                || (target instanceof IProgramMethod
+                        && ((IProgramMethod)target).isConstructor());
         final LocationVariable heap = getHeap();
         final SchemaVariable heapSV =
                 SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
