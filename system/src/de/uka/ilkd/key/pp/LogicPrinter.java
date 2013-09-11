@@ -16,7 +16,6 @@ package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -46,7 +45,6 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -74,7 +72,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
@@ -822,6 +819,7 @@ public final class LogicPrinter {
      * Pretty-prints a Semisequent.  Formulae are separated by commas.
      *
      * @param semiseq the semisequent to be printed
+     * @throws java.io.IOException
      */
     public void printSemisequent(Semisequent semiseq)
         throws IOException
@@ -890,6 +888,9 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
+        if(NotationInfo.TERMLABELS_HIDDEN){
+            return;
+        }
         layouter.beginC().print("<<");
         boolean afterFirst = false;
         for (ITermLabel l : t.getLabels()) {
@@ -953,7 +954,8 @@ public final class LogicPrinter {
      * </pre>
      *
      *
-     * @param t the Term to be printed */
+     * @param t the Term to be printed
+     * @throws java.io.IOException */
     public void printTermContinuingBlock(Term t) throws IOException {
        if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print("(");
@@ -1353,6 +1355,7 @@ public final class LogicPrinter {
      * @param name the infix operator
      * @param r    the right subterm
      * @param assRight associativity for right subterm
+     * @throws java.io.IOException
      * */
     public void printInfixTermContinuingBlock(Term l,int assLeft,
                                               String name,
@@ -2132,6 +2135,7 @@ public final class LogicPrinter {
 
         /** Receive a mark and act appropriately.
          */
+        @Override
         public void mark(Object o) {
 
             // IMPLEMENTATION NOTE

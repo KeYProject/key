@@ -99,6 +99,7 @@ import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.TermLabelToggleAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
 import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
@@ -135,6 +136,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.pp.NotationInfo;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -770,6 +772,7 @@ public final class MainWindow extends JFrame  {
         final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 vs.setUseSystemLaF(((JCheckBoxMenuItem)e.getSource()).
                 isSelected());
@@ -781,6 +784,7 @@ public final class MainWindow extends JFrame  {
 
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
+        view.add(new JCheckBoxMenuItem(new TermLabelToggleAction(this)));
 
         view.addSeparator();
         {

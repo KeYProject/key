@@ -152,6 +152,7 @@ public final class NotationInfo {
      * are printed.
      */
     public static boolean UNICODE_ENABLED = false;
+    public static boolean TERMLABELS_HIDDEN = false;
         
     
     /** This maps operators and classes of operators to {@link
