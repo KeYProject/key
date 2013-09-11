@@ -84,13 +84,15 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term staticInvTerm = TB.staticInv(services, heaps, kjt);
         final Term invTerm = TB.inv(services, heaps, var);
         final Term wdHeaps = TB.and(TB.wd(heaps, services));
-        final Term pre = TB.and(wdSelf, wdHeaps);
+        final Term wellFormed = TB.wellFormed(TB.var(heapSV), services);
+        final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
+        final Term staticPre = TB.and(wdHeaps, wellFormed);
         final Taclet inv =
                 WellDefinednessCheck.createTaclet(prefix + kjt.getName(),
                                                   var, invTerm, pre, false, services);
         final Taclet staticInv =
                 WellDefinednessCheck.createTaclet(prefix + "Static_" + kjt.getName(),
-                                                  var, staticInvTerm, wdHeaps, true, services);
+                                                  var, staticInvTerm, staticPre, true, services);
         return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
     }
 
