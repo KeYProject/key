@@ -20,6 +20,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -58,9 +59,9 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class WellDefinednessCheck implements Contract {
 
+    private static final String PROOFS = "wdProofs";
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
-
     public static final String INV_TACLET = "wd_Invariant_";
     public static final String OP_TACLET = "wd_Operation_";
 
@@ -618,6 +619,23 @@ public abstract class WellDefinednessCheck implements Contract {
     public abstract String getBehaviour();
 
     public abstract boolean isModel();
+
+    /**
+     * This method checks, if well-definedness checks for jml statements are turned on or off.
+     * @return true if on and false if off
+     */
+    public final static boolean checkOn() {
+        final String setting =
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(PROOFS);
+        if (setting.equals(PROOFS + ":on")) {
+            return true;
+        } else if (setting.equals(PROOFS + ":off")) {
+            return false;
+        } else {
+            throw new RuntimeException("The setting for the wdProofs-option is not valid: "
+                    + setting);
+        }
+    }
 
     public final static Taclet createTaclet(String name,
                                             Term callee,

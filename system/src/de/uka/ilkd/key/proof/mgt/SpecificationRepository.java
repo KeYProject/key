@@ -524,6 +524,24 @@ public final class SpecificationRepository {
     // Internal interface for well-definedness checks
 
     /**
+     * Remove well-definedness checks from a given set of contracts
+     * @param contracts A set of contracts
+     * @return contracts without well-definedness checks
+     */
+    private static ImmutableSet<Contract> removeWdChecks(ImmutableSet<Contract> contracts) {
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        if (contracts == null) {
+            return contracts;
+        }
+        for (Contract c: contracts) {
+            if (!(c instanceof WellDefinednessCheck)) {
+                result = result.add(c);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Registers a well-definedness check. It does not take care of its
      * visibility in the proof management dialog (this is done in
      * {@link #registerContract(Contract, Pair)}).
@@ -634,7 +652,7 @@ public final class SpecificationRepository {
         for (ImmutableSet<Contract> s : contracts.values()) {
             result = result.union(s);
         }
-        return result;
+        return WellDefinednessCheck.checkOn() ? result : removeWdChecks(result);
     }
 
     /**
@@ -646,7 +664,8 @@ public final class SpecificationRepository {
         target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
-        final ImmutableSet<Contract> result = contracts.get(pair);
+        final ImmutableSet<Contract> result = WellDefinednessCheck.checkOn() ?
+                contracts.get(pair) : removeWdChecks(contracts.get(pair));
         return result == null ? DefaultImmutableSet.<Contract> nil() : result;
     }
 

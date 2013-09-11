@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -221,7 +221,7 @@ public class BlockContractRule implements BuiltInRule {
         final GoalsConfigurator configurator =
                 new GoalsConfigurator(instantiation, contract.getLabels(), variables,
                                       application.posInOccurrence(), services);
-        if (StatementWellDefinedness.checkOn()) {
+        if (WellDefinednessCheck.checkOn()) {
             result = goal.split(4);
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
                                      contract, contextUpdate, heaps.get(0),

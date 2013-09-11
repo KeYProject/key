@@ -60,7 +60,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -400,7 +400,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	final ImmutableList<Goal> result;
 	Goal wdGoal;
-	if (StatementWellDefinedness.checkOn()) {
+	if (WellDefinednessCheck.checkOn()) {
 	    //split goal into four branches
 	    result = goal.split(4);
 	    wdGoal = result.tail().tail().tail().head();

@@ -19,7 +19,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -43,8 +42,6 @@ import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
  * @author Michael Kirsten
  */
 public abstract class StatementWellDefinedness extends WellDefinednessCheck {
-
-    private final static String PROOFS = "wdProofs";
 
     StatementWellDefinedness(String name, int id, IObserverFunction target,
             OriginalVariables origVars, Type type, Services services) {
@@ -93,24 +90,6 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term updates = getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services);
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post, services), TB.and(wdRest)));
         return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost, services);
-    }
-
-    /**
-     * This method checks, if "on-the-fly" well-definedness checks for jml statements are
-     * turned on or off.
-     * @return true if on and false if off
-     */
-    public static boolean checkOn() {
-        final String setting =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(PROOFS);
-        if (setting.equals(PROOFS + ":on")) {
-            return true;
-        } else if (setting.equals(PROOFS + ":off")) {
-            return false;
-        } else {
-            throw new RuntimeException("The setting for the wdProofs-option is not valid: "
-                    + setting);
-        }
     }
 
     /**
