@@ -59,7 +59,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     protected SequentViewListener listener;
     
     // an object that detects opening and closing of an Taclet instantiation dialog
-    private GUIListener guiListener;
+    private final GUIListener guiListener;
     
     // enables this component to be a Drag Source
     DragSource dragSource = null;
@@ -83,6 +83,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 	
 	guiListener = new GUIListener(){
 		/** invoked if a frame that wants modal access is opened */
+                @Override
 		public void modalDialogOpened(GUIEvent e){
 		 
 		    // enable textual DnD in case that the opened model dialog
@@ -96,6 +97,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 		}
 		
 		/** invoked if a frame that wants modal access is closed */
+                @Override
 		public void modalDialogClosed(GUIEvent e){
 		    if (e.getSource() instanceof ApplyTacletDialog){
 			// disable drag'n'drop ...
@@ -110,6 +112,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 		}
 		
 		/** invoked if the user wants to abort the proving session */
+                @Override
 		public void shutDown(GUIEvent e){
 		}	
 	    };
@@ -171,11 +174,13 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /** sets the text being printed */
+    @Override
     public synchronized void printSequent() {
         if (SwingUtilities.isEventDispatchThread()) {
             printSequentImmediately();
         } else {
             Runnable sequentUpdater = new Runnable() {
+                @Override
                 public void run() {
                     printSequentImmediately();
                 }
@@ -232,15 +237,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
     
     /** sets the LogicPrinter to use in case there is no proof available.
-     * @param sp the LogicPrinter that is used
      */
     public void setPrinterNoProof() {
     	printer = new LogicPrinter(new ProgramPrinter(null), null, null);
     }
     
     /** sets the LogicPrinter to use
-     * @param sp the LogicPrinter that is used
-     * @param f the SequentPrintFilter that is used
      */
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
@@ -251,13 +253,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
 
     protected SequentPrintFilter getSequentPrintFilter() {
     	return filter;
-    }
-
-    /** return used LogicPrinter
-     * @return the LogicPrinter that is used
-     */
-    public LogicPrinter getPrinter() {
-    	return printer;
     }
 
     /** sets the mediator
@@ -314,6 +309,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * used for autoscrolling when performing drag and drop actions.
      * Computes the rectangle to be made visible. 
      */
+    @Override
     public void autoscroll(Point loc) {       
         final Insets insets = getAutoscrollInsets();
         final Rectangle outer = getVisibleRect();
@@ -334,10 +330,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * used to define the area in which autoscrolling will be
      * initialized
      */
+    @Override
     public Insets getAutoscrollInsets() {      
         return autoScrollSensitiveRegion;
     }
 
+    @Override
     public String getTitle() {
         return "Current Goal";
     }
