@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -187,6 +188,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final IObserverFunction target = getTarget();
         final String tName = target.name().toString();
         final boolean isStatic = target.isStatic();
+        final boolean isConstructor =
+                target instanceof IProgramMethod && ((IProgramMethod)target).isConstructor();
         final LocationVariable heap = getHeap();
         final SchemaVariable heapSV =
                 SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
@@ -197,10 +200,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
                                 selfSV, heapSV, paramsSV, true, services).term;
         final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
-        final Term wdArgs = TB.and(TB.wd(args, services));
+        final Term wdArgs =
+                TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
+                             services));
         return createTaclet(prefix + (isStatic ? "Static " : "") + tName,
                             TB.var(selfSV), TB.func(target, args),
-                            TB.and(wdArgs, pre), isStatic, services);
+                            TB.and(wdArgs, pre), isStatic || isConstructor, services);
     }
 
     @Override
