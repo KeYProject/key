@@ -400,7 +400,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	final ImmutableList<Goal> result;
 	Goal wdGoal;
-	if (WellDefinednessCheck.checkOn()) {
+	if (WellDefinednessCheck.isOn()) {
 	    //split goal into four branches
 	    result = goal.split(4);
 	    wdGoal = result.tail().tail().tail().head();

@@ -652,7 +652,7 @@ public final class SpecificationRepository {
         for (ImmutableSet<Contract> s : contracts.values()) {
             result = result.union(s);
         }
-        return WellDefinednessCheck.checkOn() ? result : removeWdChecks(result);
+        return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
     }
 
     /**
@@ -664,7 +664,7 @@ public final class SpecificationRepository {
         target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
-        final ImmutableSet<Contract> result = WellDefinednessCheck.checkOn() ?
+        final ImmutableSet<Contract> result = WellDefinednessCheck.isOn() ?
                 contracts.get(pair) : removeWdChecks(contracts.get(pair));
         return result == null ? DefaultImmutableSet.<Contract> nil() : result;
     }

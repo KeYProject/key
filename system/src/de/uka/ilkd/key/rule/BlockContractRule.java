@@ -221,7 +221,7 @@ public class BlockContractRule implements BuiltInRule {
         final GoalsConfigurator configurator =
                 new GoalsConfigurator(instantiation, contract.getLabels(), variables,
                                       application.posInOccurrence(), services);
-        if (WellDefinednessCheck.checkOn()) {
+        if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
                                      contract, contextUpdate, heaps.get(0),

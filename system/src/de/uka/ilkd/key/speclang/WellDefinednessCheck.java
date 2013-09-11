@@ -59,7 +59,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class WellDefinednessCheck implements Contract {
 
-    private static final String PROOFS = "wdProofs";
+    private static final String OPTION = "wdChecks";
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
     public static final String INV_TACLET = "wd_Invariant_";
@@ -621,15 +621,15 @@ public abstract class WellDefinednessCheck implements Contract {
     public abstract boolean isModel();
 
     /**
-     * This method checks, if well-definedness checks for jml statements are turned on or off.
+     * This method checks, if well-definedness checks are generally turned on or off.
      * @return true if on and false if off
      */
-    public final static boolean checkOn() {
+    public final static boolean isOn() {
         final String setting =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(PROOFS);
-        if (setting.equals(PROOFS + ":on")) {
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
+        if (setting.equals(OPTION + ":on")) {
             return true;
-        } else if (setting.equals(PROOFS + ":off")) {
+        } else if (setting.equals(OPTION + ":off")) {
             return false;
         } else {
             throw new RuntimeException("The setting for the wdProofs-option is not valid: "
