@@ -707,23 +707,31 @@ public class ProofTreeView extends JPanel {
 		*/
 		tree_cell.setForeground(Color.black);
                 String tooltipText = "An inner node of the proof";
+                final String notes = node.getNodeInfo().getNotes();
+                if (notes!=null) {
+                    tooltipText += ".\nNotes: "+notes;
+                }
 
                 Icon defaultIcon;
-                if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                if (notes != null) {
+                    defaultIcon = IconFactory.editFile(16);
+                } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                     defaultIcon = IconFactory.interactiveAppLogo(16);
-                    tooltipText = "An inner node (rule applied by user)";
                 } else {
                     defaultIcon = null;
                 }
                 if (isBranch && node.childrenCount() > 1) {
                     defaultIcon = getOpenIcon();
-                    tooltipText = "A branch node with all siblings hidden";
+                    tooltipText = "A branch node with all children hidden";
                 }
                 tree_cell.setIcon(defaultIcon);
 
 		tree_cell.setToolTipText(tooltipText);
 	    }
 
+	    if (node.getNodeInfo().getNotes() != null) {
+	        tree_cell.setBackgroundNonSelectionColor(Color.yellow);
+	    } else
             if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
 
@@ -803,6 +811,7 @@ public class ProofTreeView extends JPanel {
 	    this.add(prune);
 	    if (branch != path) {
 		prune.addActionListener(this);
+		prune.setIcon(IconFactory.pruneLogo(16));
 		prune.setEnabled(false);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) ||
