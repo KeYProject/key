@@ -280,8 +280,10 @@ public class BlockContractRule implements BuiltInRule {
                 TB.equals(instVars.post.result, instVars.pre.result) : TB.tt();
         Term exceptionEq = instVars.pre.exception != null ?
                 TB.equals(instVars.post.exception, instVars.pre.exception) : TB.tt();
+        Term selfEq = instVars.pre.self != null ?
+                      TB.equals(instVars.post.self, instVars.pre.self) : TB.tt();
         Term afterAssumptions = TB.and(TB.equals(instVars.post.heap, baseHeap),
-                                       TB.equals(instVars.post.self, instVars.pre.self),
+                                       selfEq,
                                        resultEq,
                                        exceptionEq);
         Iterator<Term> outAtPost = localOutsAtPost.iterator();
