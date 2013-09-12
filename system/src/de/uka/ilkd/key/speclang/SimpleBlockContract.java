@@ -159,7 +159,10 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public Terms getVariablesAsTerms() {
-        return variables.termify(TermBuilder.DF.var(this.variables.self));
+        Term selfTerm = (this.variables.self != null ?
+                         TermBuilder.DF.var(this.variables.self) :
+                         null);
+        return variables.termify(selfTerm);
     }
 
 
