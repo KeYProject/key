@@ -248,7 +248,7 @@ public class MarkerTests extends AbstractResourceTest {
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 115, 118));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.CLOSEDMARKER_ID, 121, 124));
    }
    
    private void testProofNotClosedMarker(IProject project) throws CoreException{
@@ -263,7 +263,7 @@ public class MarkerTests extends AbstractResourceTest {
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
-      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 115, 118));
+      assertTrue(testMarker(markerList.get(0), MarkerManager.NOTCLOSEDMARKER_ID, 127, 130));
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{
@@ -355,11 +355,11 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(javaFile) == 2);
       
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
-      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447));
+      if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 301, 302)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 461, 462));
       }
-      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 446, 447)){
-         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 293, 294));
+      else if(testMarker(markerList.get(0), MarkerManager.CYCLEDETECTEDMARKER_ID, 461, 462)){
+         assertTrue(testMarker(markerList.get(1), MarkerManager.CYCLEDETECTEDMARKER_ID, 301, 302));
       }
       else{
          fail();
