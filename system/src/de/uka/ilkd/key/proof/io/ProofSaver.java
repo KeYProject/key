@@ -394,7 +394,7 @@ public class ProofSaver {
    }
 
 
-    public String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
                 pos.constrainedFormula())+"\")"+
@@ -402,7 +402,7 @@ public class ProofSaver {
     }
 
 
-   public String posInTerm2Proof(PosInTerm pos) {
+   public static String posInTerm2Proof(PosInTerm pos) {
       if (pos == PosInTerm.TOP_LEVEL) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in

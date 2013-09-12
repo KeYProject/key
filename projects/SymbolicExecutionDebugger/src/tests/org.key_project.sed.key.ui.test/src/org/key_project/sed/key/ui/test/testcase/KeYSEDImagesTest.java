@@ -13,17 +13,16 @@
 
 package org.key_project.sed.key.ui.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.swt.graphics.Image;
 import org.junit.Test;
 import org.key_project.sed.key.ui.util.KeYSEDImages;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Contains tests for {@link KeYSEDImages}.
  * @author Martin Hentschel
  */
-public class KeYSEDImagesTest extends TestCase {
+public class KeYSEDImagesTest extends AbstractSetupTestCase {
     /**
      * Tests {@link KeYSEDImages#getImage(String)}
      */

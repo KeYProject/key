@@ -15,8 +15,6 @@ package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -48,6 +46,7 @@ import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.sed.key.ui.presentation.KeYDebugModelPresentation;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -56,7 +55,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * which involves the {@link KeYDebugModelPresentation}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYSourceCodeLookupTest extends TestCase {
+public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
    /**
     * {@inheritDoc}
     */

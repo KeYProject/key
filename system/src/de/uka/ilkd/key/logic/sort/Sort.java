@@ -55,7 +55,7 @@ public interface Sort extends Named {
     ImmutableSet<Sort> extendsSorts(Services services); 
 
     /**
-     * Tells whether the given sort is a reflexive, transitive supersort of this 
+     * Tells whether the given sort is a reflexive, transitive subsort of this 
      * sort.
      */
     boolean extendsTrans(Sort s);

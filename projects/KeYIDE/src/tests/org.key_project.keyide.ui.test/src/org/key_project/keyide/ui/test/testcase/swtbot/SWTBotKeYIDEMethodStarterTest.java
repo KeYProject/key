@@ -13,8 +13,6 @@
 
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
@@ -37,6 +35,7 @@ import org.key_project.keyide.ui.starter.KeYIDEMethodStarter;
 import org.key_project.keyide.ui.test.Activator;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -52,7 +51,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * </p>
  * @author Martin Hentschel, Niklas Bunzel
  */
-public class SWTBotKeYIDEMethodStarterTest extends TestCase {
+public class SWTBotKeYIDEMethodStarterTest extends AbstractSetupTestCase {
    /**
     * Tests starting of a proof via the context menu of a selected method in a JDT editor.
     */

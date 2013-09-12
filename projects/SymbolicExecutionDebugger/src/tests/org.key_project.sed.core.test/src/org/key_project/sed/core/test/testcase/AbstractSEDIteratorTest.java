@@ -29,13 +29,14 @@ import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Provides the basic methods a {@link TestCase} of an
  * {@link ISEDIterator} implementation needs.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDIteratorTest extends TestCase {
+public abstract class AbstractSEDIteratorTest extends AbstractSetupTestCase {
    /**
     * Tests one empty {@link ISEDDebugNode} only for debugging purpose.
     */
