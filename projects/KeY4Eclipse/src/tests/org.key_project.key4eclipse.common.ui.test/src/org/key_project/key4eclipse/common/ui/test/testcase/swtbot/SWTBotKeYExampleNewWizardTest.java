@@ -18,8 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -40,6 +38,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -49,7 +48,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * SWTBot tests for {@link KeYExampleNewWizard}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYExampleNewWizardTest extends TestCase {
+public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
    /**
     * Makes sure that all examples can be created.
     */

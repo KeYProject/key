@@ -1,16 +1,14 @@
 package org.key_project.key4eclipse.resources.test.testcase.junit;
 
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-public class AbstractResourceTest extends TestCase {
+public class AbstractResourceTest extends AbstractSetupTestCase {
    private boolean oldAutoBuildEnabled = true;
    
    private StrategyProperties spToRestore;
@@ -20,8 +18,7 @@ public class AbstractResourceTest extends TestCase {
    @Before
    @Override
    public void setUp() throws Exception {
-      // Make sure that default settings are defined
-      TestUtilsUtil.waitUntilWorkspaceInitialized();
+      super.setUp();
       // Store current settings
       oldAutoBuildEnabled = KeY4EclipseResourcesTestUtil.enableAutoBuild(false);
       spToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
@@ -47,6 +44,7 @@ public class AbstractResourceTest extends TestCase {
    @After
    @Override
    public void tearDown() throws Exception {
+      super.tearDown();
       // Restore old settings
       if (maxStepsToRestore >= 0) {
          ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxStepsToRestore);

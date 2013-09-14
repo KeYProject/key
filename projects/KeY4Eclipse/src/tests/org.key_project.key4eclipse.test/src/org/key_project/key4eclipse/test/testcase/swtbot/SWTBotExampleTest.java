@@ -26,6 +26,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.SwingBotJList;
 import org.key_project.swtbot.swing.bot.SwingBotJMenu;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -35,7 +36,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * Tests the example dialog in the Eclipse integration.
  * @author Martin Hentschel
  */
-public class SWTBotExampleTest extends TestCase {
+public class SWTBotExampleTest extends AbstractSetupTestCase {
     /**
      * Opens the example wizard, selects an example and loads it.
      */

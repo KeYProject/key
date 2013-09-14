@@ -284,9 +284,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                ProofOblInputEditorInput in = (ProofOblInputEditorInput) input;
                this.environment = in.getEnvironment();
                this.currentProof = environment.createProof(in.getProblem());
-               ProofUserManager.getInstance().addUser(currentProof, environment, this);
-               this.environment.getMediator().setProof(currentProof);
-               this.environment.getMediator().setStupidMode(true);
             }
             else if (input instanceof ProofEditorInput) {
                ProofEditorInput in = (ProofEditorInput) input;
@@ -296,20 +293,25 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                this.canStartSMTSolver = in.isCanStartSMTSolver();
                this.environment = in.getEnvironment();
                this.currentProof = in.getProof();
-               ProofUserManager.getInstance().addUser(currentProof, environment, this);
-               this.environment.getMediator().setProof(currentProof);
-               this.environment.getMediator().setStupidMode(true);
             }
             else if (input instanceof FileEditorInput) {
                FileEditorInput fileInput = (FileEditorInput) input;
                File file = ResourceUtil.getLocation(fileInput.getFile());
                Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
                this.environment = KeYEnvironment.load(file, null, null);
-               this.environment.getMediator().setStupidMode(true);
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
-               ProofUserManager.getInstance().addUser(currentProof, environment, this);
             }
+            else {
+               throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
+            }
+            ProofUserManager.getInstance().addUser(currentProof, environment, this);
+            this.environment.getMediator().setProof(currentProof);
+            this.environment.getMediator().setStupidMode(true);
+            if (this.getEnvironment().getMediator().getSelectedNode() == null) {
+               this.getEnvironment().getMediator().getSelectionModel().setSelectedNode(currentProof.root());
+            }
+            this.currentNode = this.getEnvironment().getMediator().getSelectedNode(); 
          }
          else {
             setCurrentNode(currentNode);
@@ -341,13 +343,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       });
       getCurrentProof().addProofTreeListener(proofTreeListener);
       sourceViewer.setEditable(false);
-      if (this.getCurrentNode() != null) {
-         setCurrentNode(currentProof.root());
-      }
-      else {
-         Node mediatorNode = environment.getMediator().getSelectedNode();
-         setCurrentNode(mediatorNode != null ? mediatorNode : getCurrentProof().root());
-      }
+      setCurrentNode(getCurrentNode());
    }
    
    /**
@@ -579,7 +575,17 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          return outlinePage;
       }
       else if (IPropertySheetPage.class.equals(adapter)) {
-         return new TabbedPropertySheetPage(this);
+         final TabbedPropertySheetPage pcp = new TabbedPropertySheetPage(this);
+         // Make sure that initial content is shown even if the focus is set to the outline view and not to the editor. 
+         getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!pcp.getControl().isDisposed()) {
+                  pcp.selectionChanged(KeYEditor.this, getSelectionProvider().getSelection());
+               }
+            }
+         });
+         return pcp;
       }
       else if (IStrategySettingsPage.class.equals(adapter)) {
          return new StrategySettingsPage(this);

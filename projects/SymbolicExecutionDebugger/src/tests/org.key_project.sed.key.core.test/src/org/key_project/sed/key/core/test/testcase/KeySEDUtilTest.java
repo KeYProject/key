@@ -15,8 +15,6 @@ package org.key_project.sed.key.core.test.testcase;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
@@ -32,6 +30,7 @@ import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.java.Position;
@@ -40,7 +39,7 @@ import de.uka.ilkd.key.java.Position;
  * Tests for {@link KeySEDUtil}.
  * @author Martin Hentschel
  */
-public class KeySEDUtilTest extends TestCase {
+public class KeySEDUtilTest extends AbstractSetupTestCase {
     /**
      * Tests {@link KeySEDUtil#searchLaunchConfigurations(IMethod, Position, Position)} and
      * {@link KeySEDUtil#searchLaunchConfigurations(org.eclipse.core.resources.IFile)}.

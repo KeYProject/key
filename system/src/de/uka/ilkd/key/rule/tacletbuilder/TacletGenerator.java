@@ -18,7 +18,6 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,13 +72,7 @@ public class TacletGenerator {
 
     private static final TacletGenerator instance = new TacletGenerator();
     private static final TermBuilder TB = TermBuilder.DF;
-    
-    /**
-     * Use this switch to decide whether to create replacement or update
-     * taclets. Update taclets use the normal heap variable and have the actual
-     * value set in an update as prefix.
-     */
-    private static final boolean MAKE_UPDATED_REPLACEMENT = true;
+
 
     private TacletGenerator() {
     }
@@ -308,11 +301,10 @@ public class TacletGenerator {
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setFind(schemaLhs);
-        Term updatedRhs = makeUpdatedRHS(limitedRhs, heaps, heapSVs, services);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
-                                              updatedRhs));
+                                              limitedRhs));
         if (ifSeq != null) {
             tacletBuilder.setIfSequent(ifSeq);
         }
@@ -343,36 +335,6 @@ public class TacletGenerator {
 
         //return
         return result;
-    }
-
-    /*
-     * Change the replacewith term to its updated version.
-     * Instead of "inv(heapSV)" write "{heap:=heapSV}inv(heap)"
-     * which makes the outcome a lot more comprehensible for the human.
-     * And smaller in size.  
-     */
-    private Term makeUpdatedRHS(Term term, List<? extends ProgramVariable> heaps, 
-            List<SchemaVariable> heapSVs, Services services) {
-        if(!MAKE_UPDATED_REPLACEMENT) {
-            return term;
-        }
-
-        Map<ParsableVariable,ProgramVariable> replace = new LinkedHashMap<ParsableVariable, ProgramVariable>();
-        Term update = null;
-        int i = 0;
-        for(ProgramVariable heap : heaps) {
-        	replace.put(heapSVs.get(i), heap);
-            final Term u = TB.elementary(services, TB.var(heap), TB.var(heapSVs.get(i)));
-            if(update == null) {
-            	update = u;
-            }else{
-            	update = TB.parallel(update, u);
-            }
-            i++;
-        }
-        final OpReplacer or = new OpReplacer(replace);
-        final Term replaced = or.replace(term);
-        return TB.apply(update, replaced, null);
     }
 
 

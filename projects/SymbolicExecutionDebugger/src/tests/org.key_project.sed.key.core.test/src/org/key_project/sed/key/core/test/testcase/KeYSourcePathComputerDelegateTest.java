@@ -44,13 +44,14 @@ import org.key_project.sed.key.core.launch.KeYSourcePathComputerDelegate;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link KeYSourcePathComputerDelegate}.
  * @author Martin Hentschel
  */
-public class KeYSourcePathComputerDelegateTest extends TestCase {
+public class KeYSourcePathComputerDelegateTest extends AbstractSetupTestCase {
    /**
     * Tests the computed {@link ISourceContainer} by a {@link KeYSourcePathComputerDelegate}
     * of an {@link IMethod} contained in an {@link IProject} without KeY specific

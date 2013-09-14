@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -25,16 +24,15 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.proof.CompoundProof;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 public class TacletSoundnessPOLoader {
 
@@ -164,7 +162,29 @@ public class TacletSoundnessPOLoader {
                 Thread thread = new Thread(new Working(),"TacletSoundnessPOLoader");
                 thread.start();
         }
-
+        
+        public void startSynchronously() {
+            for (LoaderListener listener : listeners) {
+                    listener.started();
+            }
+            try {
+                doWork();
+            } catch (ProofInputException exception) {
+                for (LoaderListener listener : listeners) {
+                    listener.stopped(exception);
+                }
+            } finally {
+                for (LoaderListener listener : listeners) {
+                    listener.stopped(
+                                    resultingProof,
+                                    isUsedOnlyForProvingTaclets() ? 
+                                    getResultingTaclets() : getResultingTacletsForOriginalProof(),
+                                    !loadAsLemmata);
+                }
+            }
+            
+        }
+        
         public ImmutableSet<Taclet> getResultingTacletsForOriginalProof() {
                 return resultingTacletsForOriginalProof;
         }
@@ -235,7 +255,6 @@ public class TacletSoundnessPOLoader {
 
 
         private void doWork() throws ProofInputException {
-
                 // Axioms can only be loaded when the taclets are loaded as lemmata.
                 ImmutableSet<Taclet> axioms = tacletLoader.loadAxioms();
 
@@ -252,8 +271,10 @@ public class TacletSoundnessPOLoader {
                         return;
                 }
 
-                resultingProof = loadAsLemmata ? createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(),
-                                tacletLoader.getTacletFile(), axioms) : null;
+                resultingProof = loadAsLemmata ? 
+                        createProof(tacletLoader.getProofEnvForTaclets(), 
+                                getResultingTaclets(),
+                                axioms, taclets) : null;
 
         }
 
@@ -302,23 +323,25 @@ public class TacletSoundnessPOLoader {
         }
 
         /**
-         * @return returns <code>true</code> if and only if the taclets should be proved sound and are not added
-         * to an already existing proof obligation.
+         * @return returns <code>true</code> if and only if the taclets should be proved sound
+         * and are not added to an already existing proof obligation. 
          */
         private boolean isUsedOnlyForProvingTaclets(){
                 return originalConfig == null;
         }
 
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
-                        ImmutableSet<Taclet> taclets,
-                        KeYUserProblemFile keyFile, ImmutableSet<Taclet> axioms) {
-                removeTaclets(proofEnvForTaclets.getInitConfig(),taclets);
+                        ImmutableSet<Taclet> tacletsToProve,
+                        ImmutableSet<Taclet> axioms, 
+                        ImmutableSet<Taclet> loadedTaclets) {
+                tacletLoader.manageAvailableTaclets(proofEnvForTaclets.getInitConfig(), 
+                        loadedTaclets, tacletsToProve);
                 ProofObligationCreator creator = new ProofObligationCreator();
-                ProofAggregate p = creator.create(taclets,
+                ProofAggregate p = creator.create(tacletsToProve,
                                 proofEnvForTaclets.getInitConfig(), axioms,
                                 listeners);
-
-                proofEnvForTaclets.registerRules(taclets,
+                
+                proofEnvForTaclets.registerRules(tacletsToProve,
                                 AxiomJustification.INSTANCE);
 
                 if(isUsedOnlyForProvingTaclets()){
@@ -327,35 +350,25 @@ public class TacletSoundnessPOLoader {
                         }
                 }
 
-                registerProofs(p, proofEnvForTaclets, keyFile);
+
+                registerProofs(p, proofEnvForTaclets);
                 return p;
         }
-
-        private void removeTaclets(InitConfig initConfig, ImmutableSet<Taclet> taclets){
-                ImmutableSet<Taclet> oldTaclets = initConfig.getTaclets();
-                ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();
-                HashMap<Taclet,TacletBuilder> map = initConfig.getTaclet2Builder();
-                for(Taclet taclet: oldTaclets){
-                        if(!taclets.contains(taclet)){
-                                newTaclets = newTaclets.add(taclet);
-                        }else{
-                                map.remove(taclet);
-                        }
-                }
-                initConfig.setTaclets(newTaclets);
-        }
+        
 
         public void registerProofs(ProofAggregate aggregate,
-                        ProofEnvironment proofEnv, ProofOblInput keyFile) {
-                if (aggregate instanceof CompoundProof) {
-                        CompoundProof cp = (CompoundProof) aggregate;
-                        for (ProofAggregate child : cp.getChildren()) {
-                                registerProofs(child, proofEnv, keyFile);
-                        }
-                } else {
-                      assert aggregate instanceof SingleProof;
-                        proofEnv.registerProof(keyFile, aggregate);
-               }
+                        ProofEnvironment proofEnv) {
+            if (aggregate instanceof CompoundProof) {
+                CompoundProof cp = (CompoundProof) aggregate;
+                for (ProofAggregate child : cp.getChildren()) {
+                    registerProofs(child, proofEnv);
+                }
+            } else {
+                assert aggregate instanceof SingleProof;
+                Proof proof = aggregate.getFirstProof();
+                ProofOblInput keyFile = tacletLoader.getTacletFile(proof);
+                proofEnv.registerProof(keyFile, aggregate);
+            }
         }
 
         public ProofAggregate getResultingProof() {
