@@ -1,4 +1,4 @@
-package org.key_project.sed.key.core.model;
+package org.key_project.keyide.ui.breakpoints;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,8 @@ import java.util.Map;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -15,25 +17,28 @@ import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaWatchpoint;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.strategy.ExceptionBreakpointNonSymbolicStopCondition;
+import de.uka.ilkd.key.strategy.JavaWatchpointNonSymbolicStopCondition;
+import de.uka.ilkd.key.strategy.LineBreakpointNonSymbolicStopCondition;
+import de.uka.ilkd.key.strategy.MethodBreakpointNonSymbolicStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExceptionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.JavaWatchpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.KeYWatchpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.MethodBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 @SuppressWarnings("restriction")
-public class KeYBreakpointManager {
-   
+public class KeYBreakpointManager implements IBreakpointListener {
    /**
     * The {@link CompoundStopCondition} that holds all BreakpointsStopCOnditons for this {@link KeYDebugTarget}.
     */
@@ -44,37 +49,28 @@ public class KeYBreakpointManager {
     */
    private Map<IBreakpoint, IStopCondition> breakpointMap;
    
+   private KeYEnvironment<?> environment;
+   
+   private Proof proof;
+   
    /**
     * Creates a new {@link KeYBreakpointManager}
     */
-   public KeYBreakpointManager(){
+   public KeYBreakpointManager(KeYEnvironment<?> environment, Proof proof){
       breakpointMap = new HashMap<IBreakpoint, IStopCondition>();
+      this.environment=environment;
+      this.proof = proof;
+      addBreakpoints();
    }
    
+   
    /**
-    * Handles the event of a {@link KeYWatchpoint} being added
-    * 
-    * @param watchpoint the {@link KeYWatchpoint} to be added
-    * @param environment the {@link SymbolicExecutionEnvironment<?>} belonging to the respective {@link KeYDebugTarget}
-    * @throws CoreException
-    * @throws ProofInputException
+    * Adds all Breakpoints to this DebugTarget. Is called only when the DebugTarget is initially created.
     */
-   public void keyWatchpointAdded(KeYWatchpoint watchpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
-      IResource resource = watchpoint.getMarker().getResource();
-      if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
-         JavaInfo javaInfo = environment.getServices().getJavaInfo();
-         String containerTypeName = KeYUtil.getType(resource).getFullyQualifiedName();
-         containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
-         if(containerKJT!=null){
-            KeYWatchpointStopCondition stopCondition = new KeYWatchpointStopCondition(
-                  watchpoint.getHitCount(), environment
-                  .getBuilder().getProof(), breakpointStopConditions,
-                  watchpoint.getCondition(), watchpoint.isEnabled(),
-                  watchpoint.isConditionEnabled(), containerKJT, watchpoint.isSuspendOnTrue());
-            breakpointStopConditions.addChildren(stopCondition);
-            breakpointMap.put(watchpoint, stopCondition);
-         }
+   private void addBreakpoints(){ 
+      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
+      for(int i = 0; i < breakpoints.length; i++){
+         breakpointAdded(breakpoints[i]);
       }
    }
 
@@ -86,7 +82,7 @@ public class KeYBreakpointManager {
     * @throws CoreException
     * @throws ProofInputException
     */
-   public void methodBreakpointAdded(JavaMethodBreakpoint methodBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
+   public void methodBreakpointAdded(JavaMethodBreakpoint methodBreakpoint) throws CoreException, ProofInputException {
       IResource resource = methodBreakpoint.getMarker().getResource();
       if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
          IMethod method = KeYUtil.getContainingMethodForMethodStart(methodBreakpoint.getCharStart(), resource);
@@ -94,16 +90,15 @@ public class KeYBreakpointManager {
          IType containerType = method.getDeclaringType();
          String containerTypeName = containerType.getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-         KeYJavaType containerKJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(containerTypeName);
+         KeYJavaType containerKJT = proof.getJavaInfo().getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
-            IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+            IProgramMethod pm = KeYUtil.getProgramMethod(method, proof.getJavaInfo());
             int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
             int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-            MethodBreakpointStopCondition stopCondition = new MethodBreakpointStopCondition(
+            MethodBreakpointNonSymbolicStopCondition stopCondition = new MethodBreakpointNonSymbolicStopCondition(
                   methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
                   methodBreakpoint.getLineNumber(),
-                  methodBreakpoint.getHitCount(), pm, environment
-                        .getBuilder().getProof(), breakpointStopConditions,
+                  methodBreakpoint.getHitCount(), pm, proof, breakpointStopConditions,
                         methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
                         methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
             breakpointStopConditions.addChildren(stopCondition);
@@ -120,7 +115,7 @@ public class KeYBreakpointManager {
     * @throws CoreException
     * @throws ProofInputException
     */
-   public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
+   public void javaWatchpointAdded(JavaWatchpoint javaWatchpoint) throws CoreException, ProofInputException {
       IResource resource = javaWatchpoint.getMarker().getResource();
       if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
          JavaInfo javaInfo = environment.getServices().getJavaInfo();
@@ -128,11 +123,11 @@ public class KeYBreakpointManager {
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
-            JavaWatchpointStopCondition stopCondition = new JavaWatchpointStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
+            JavaWatchpointNonSymbolicStopCondition stopCondition = new JavaWatchpointNonSymbolicStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
                   javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), breakpointStopConditions, javaWatchpoint.isModification(), containerKJT,
-                  environment.getBuilder().getProof());
-            breakpointStopConditions.addChildren(stopCondition);
-            breakpointMap.put(javaWatchpoint, stopCondition);
+                  proof);
+      breakpointStopConditions.addChildren(stopCondition);
+      breakpointMap.put(javaWatchpoint, stopCondition);
          }
       }
    }
@@ -145,8 +140,8 @@ public class KeYBreakpointManager {
     * @throws CoreException
     * @throws ProofInputException
     */
-   public void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException {
-      ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment.getBuilder().getProof(),breakpointStopConditions, exceptionBreakpoint.getTypeName(),
+   public void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
+      ExceptionBreakpointNonSymbolicStopCondition stopCondition = new ExceptionBreakpointNonSymbolicStopCondition(proof,breakpointStopConditions, exceptionBreakpoint.getTypeName(),
             exceptionBreakpoint.isCaught(), exceptionBreakpoint.isUncaught(), exceptionBreakpoint.isSuspendOnSubclasses(),
             exceptionBreakpoint.isEnabled(), exceptionBreakpoint.getHitCount());
       breakpointStopConditions.addChildren(stopCondition);
@@ -162,7 +157,7 @@ public class KeYBreakpointManager {
     * @throws CoreException
     * @throws ProofInputException
     */
-   public void lineBreakpointAdded(JavaLineBreakpoint lineBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException, ProofInputException {
+   public void lineBreakpointAdded(JavaLineBreakpoint lineBreakpoint) throws CoreException, ProofInputException {
       IResource resource = lineBreakpoint.getMarker().getResource();
       if (resource.getFileExtension() != null && resource.getFileExtension().equalsIgnoreCase("java")) {
          IMethod method = KeYUtil.getContainingMethod(lineBreakpoint.getLineNumber(), resource);
@@ -170,16 +165,15 @@ public class KeYBreakpointManager {
          IType containerType = method.getDeclaringType();
          String containerTypeName = containerType.getFullyQualifiedName();
          containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-         KeYJavaType containerKJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(containerTypeName);
+         KeYJavaType containerKJT = proof.getJavaInfo().getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
-            IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getProof().getJavaInfo());
+            IProgramMethod pm = KeYUtil.getProgramMethod(method, proof.getJavaInfo());
             int start = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset());
             int end = KeYUtil.getLineNumberOfMethod(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
-            LineBreakpointStopCondition stopCondition = new LineBreakpointStopCondition(
+            LineBreakpointNonSymbolicStopCondition stopCondition = new LineBreakpointNonSymbolicStopCondition(
                   resource.getLocation().toOSString(),
                   lineBreakpoint.getLineNumber(),
-                  lineBreakpoint.getHitCount(), pm, environment
-                        .getBuilder().getProof(), breakpointStopConditions,
+                  lineBreakpoint.getHitCount(), pm, proof, breakpointStopConditions,
                   lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
                   lineBreakpoint.isConditionEnabled(), start, end);
             breakpointStopConditions.addChildren(stopCondition);
@@ -195,7 +189,7 @@ public class KeYBreakpointManager {
     * @param breakpoint that is being removed
     * @param delta the associated marker delta, or null when the breakpoint is removed from the breakpoint manager without being deleted
     */
-   public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+   public void breakpointRemovedInternal(IBreakpoint breakpoint, IMarkerDelta delta) {
       if(breakpoint instanceof JavaMethodBreakpoint){
          JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
          breakpointStopConditions.removeChild(breakpointMap.get(methodBreakpoint));
@@ -216,28 +210,8 @@ public class KeYBreakpointManager {
          JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) breakpoint;
          breakpointStopConditions.removeChild(breakpointMap.get(exceptionBreakpoint));
          breakpointMap.remove(exceptionBreakpoint);
-      } else if(breakpoint instanceof KeYWatchpoint){
-         KeYWatchpoint watchpoint = (KeYWatchpoint) breakpoint;
-         breakpointStopConditions.removeChild(breakpointMap.get(watchpoint));
-         breakpointMap.remove(watchpoint);
       }
    }  
-
-   /**
-    * Handles the event of an existing {@link KeYWatchpoint} being changed
-    * 
-    * @param watchpoint the {@link KeYWatchpoint} to be changed
-    * @throws CoreException
-    * @throws ProofInputException
-    */
-   public void keyWatchpointChanged(KeYWatchpoint watchpoint) throws SLTranslationException, CoreException {
-      KeYWatchpointStopCondition stopCondition = (KeYWatchpointStopCondition) breakpointMap.get(watchpoint);
-      stopCondition.setEnabled(watchpoint.isEnabled());
-      stopCondition.setHitCount(watchpoint.getHitCount());
-      stopCondition.setConditionEnabled(watchpoint.isConditionEnabled());
-      stopCondition.setCondition(watchpoint.getCondition());
-      stopCondition.setSuspendOnTrue(watchpoint.isSuspendOnTrue());
-   }
 
    /**
     * Handles the event of an existing {@link JavaExceptionBreakpoint} being changed
@@ -247,7 +221,7 @@ public class KeYBreakpointManager {
     * @throws ProofInputException
     */
    public void exceptionBreakpointChanged(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
-      ExceptionBreakpointStopCondition stopCondition = (ExceptionBreakpointStopCondition) breakpointMap.get(exceptionBreakpoint);
+      ExceptionBreakpointNonSymbolicStopCondition stopCondition = (ExceptionBreakpointNonSymbolicStopCondition) breakpointMap.get(exceptionBreakpoint);
       stopCondition.setEnabled(exceptionBreakpoint.isEnabled());
       stopCondition.setCaught(exceptionBreakpoint.isCaught());
       stopCondition.setUncaught(exceptionBreakpoint.isUncaught());
@@ -262,8 +236,8 @@ public class KeYBreakpointManager {
     * @throws CoreException
     * @throws ProofInputException
     */
-   public void javaLineBreakpointAdded(JavaLineBreakpoint lineBreakpoint) throws CoreException, SLTranslationException {
-      LineBreakpointStopCondition stopCondition = (LineBreakpointStopCondition) breakpointMap.get(lineBreakpoint);
+   public void javaLineBreakpointChanged(JavaLineBreakpoint lineBreakpoint) throws CoreException, SLTranslationException {
+      LineBreakpointNonSymbolicStopCondition stopCondition = (LineBreakpointNonSymbolicStopCondition) breakpointMap.get(lineBreakpoint);
       stopCondition.setHitCount(lineBreakpoint.getHitCount());
       stopCondition.setEnabled(lineBreakpoint.isEnabled());
       stopCondition.setConditionEnabled(lineBreakpoint.isConditionEnabled());
@@ -278,7 +252,7 @@ public class KeYBreakpointManager {
     * @throws ProofInputException
     */
    public void javaWatchpointChanged(JavaWatchpoint javaWatchpoint) throws CoreException {
-      JavaWatchpointStopCondition stopCondition = (JavaWatchpointStopCondition) breakpointMap.get(javaWatchpoint);
+      JavaWatchpointNonSymbolicStopCondition stopCondition = (JavaWatchpointNonSymbolicStopCondition) breakpointMap.get(javaWatchpoint);
       stopCondition.setHitCount(javaWatchpoint.getHitCount());
       stopCondition.setEnabled(javaWatchpoint.isEnabled());
       stopCondition.setAccess(javaWatchpoint.isAccess());
@@ -293,7 +267,7 @@ public class KeYBreakpointManager {
     * @throws ProofInputException
     */
    public void methodBreakpointChanged(JavaMethodBreakpoint methodBreakpoint) throws CoreException, SLTranslationException {
-      MethodBreakpointStopCondition stopCondition = (MethodBreakpointStopCondition) breakpointMap.get(methodBreakpoint);
+      MethodBreakpointNonSymbolicStopCondition stopCondition = (MethodBreakpointNonSymbolicStopCondition) breakpointMap.get(methodBreakpoint);
       stopCondition.setHitCount(methodBreakpoint.getHitCount());
       stopCondition.setEnabled(methodBreakpoint.isEnabled());
       stopCondition.setConditionEnabled(methodBreakpoint.isConditionEnabled());
@@ -322,4 +296,93 @@ public class KeYBreakpointManager {
    public void setBreakpointMap(Map<IBreakpoint, IStopCondition> breakpointMap) {
       this.breakpointMap = breakpointMap;
    }
+   @Override
+   public void breakpointAdded(IBreakpoint breakpoint) {
+      try {
+         if (breakpoint instanceof JavaWatchpoint) {
+            JavaWatchpoint watchpoint = (JavaWatchpoint) breakpoint;
+            javaWatchpointAdded(watchpoint);
+         }
+         else if (breakpoint instanceof JavaExceptionBreakpoint) {
+            JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) breakpoint;
+            exceptionBreakpointAdded(exceptionBreakpoint);
+         } 
+         else if (breakpoint instanceof JavaMethodBreakpoint) {
+            JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
+            methodBreakpointAdded(methodBreakpoint);
+         }
+         else if (breakpoint instanceof JavaLineBreakpoint) {
+            JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
+            lineBreakpointAdded(lineBreakpoint);
+         }
+      }
+      catch (CoreException e) {
+         //TODO
+      }
+      catch (ProofInputException e) {
+         //TODO
+      }
+      catch(TermCreationException e){
+         //TODO
+      }
+   }
+
+   @Override
+   public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+      breakpointRemovedInternal(breakpoint, delta);
+   }
+
+   @Override
+   public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+      if(delta!=null){
+         try {
+            if (breakpoint instanceof JavaMethodBreakpoint) {
+               JavaMethodBreakpoint methodBreakpoint = (JavaMethodBreakpoint) breakpoint;
+               if (this.getBreakpointMap().containsKey(methodBreakpoint)) {
+                  this.methodBreakpointChanged(methodBreakpoint);
+               }
+               else {
+                  breakpointAdded(methodBreakpoint);
+               }
+            }
+            else if (breakpoint instanceof JavaWatchpoint) {
+               JavaWatchpoint javaWatchpoint = (JavaWatchpoint) breakpoint;
+               if (this.getBreakpointMap().containsKey(javaWatchpoint)) {
+                  this.javaWatchpointChanged(javaWatchpoint);
+               }
+               else {
+                  breakpointAdded(javaWatchpoint);
+               }
+            }
+            else if (breakpoint instanceof JavaLineBreakpoint) {
+               JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
+               if (this.getBreakpointMap().containsKey(lineBreakpoint)) {
+                  this.javaLineBreakpointChanged(lineBreakpoint);
+               }
+               else {
+                  breakpointAdded(lineBreakpoint);
+               }
+            }
+            else if (breakpoint instanceof JavaExceptionBreakpoint) {
+               JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) breakpoint;
+               if (this.getBreakpointMap().containsKey(exceptionBreakpoint)) {
+                  this.exceptionBreakpointChanged(exceptionBreakpoint);
+               }
+               else {
+                  breakpointAdded(exceptionBreakpoint);
+               }
+            }
+         }
+         catch (CoreException e) {
+            //TODO
+         }
+         catch (ProofInputException e) {
+            //TODO
+         }
+         catch (TermCreationException e) {
+            //TODO
+         }
+      }
+   }
+
 }

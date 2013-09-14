@@ -1,5 +1,6 @@
-package de.uka.ilkd.key.symbolic_execution.strategy;
+package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -13,9 +14,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.symbolic_execution.strategy.AbstractLineBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCondition {
+public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicLineBreakpointStopCondition {
 
    /**
     * flag to tell whether to stop on method entry
@@ -35,7 +38,7 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -46,7 +49,7 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
     * @param isExit flag to tell whether to stop on method exit
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public MethodBreakpointStopCondition(String classPath, int lineNumber,
+   public MethodBreakpointNonSymbolicStopCondition(String classPath, int lineNumber,
          int hitCount, IProgramMethod pm,
          Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
@@ -61,6 +64,25 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
    protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp,
          Proof proof, Node node) throws ProofInputException {
       return ((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&super.breakpointHit(startLine, endLine, path, ruleApp, proof, node);
+   } 
+   
+   @Override
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+         IGoalChooser goalChooser, long startTime, int countApplied,
+         SingleRuleApplicationInfo singleRuleApplicationInfo) { 
+      try{
+         if (singleRuleApplicationInfo != null) {
+            Goal goal = singleRuleApplicationInfo.getGoal();
+            Node node = goal.node();
+            RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
+            if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&isEnabled()&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))&&hitcountExceeded(node)){
+               return true;
+            }
+         }
+      }catch(ProofInputException e){
+         //TODO
+      }
+      return false;
    }
 
    /**
@@ -94,52 +116,6 @@ public class MethodBreakpointStopCondition extends AbstractLineBreakpointStopCon
       }
       return false;
       
-   }
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) { 
-         if(goal!=null){
-            Node node = goal.node();
-            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-            if(getVarsForCondition()!=null&&ruleApp!=null&&node!=null){
-               refreshVarMaps(ruleApp, node);
-            }
-               if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
-                  // Check if the result for the current node was already computed.
-                  Boolean value = getGoalAllowedResultPerSetNode().get(node);
-                  if (value == null) {
-                     // Get the number of executed set nodes on the current goal
-                     Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
-                     if (executedNumberOfSetNodes == null) {
-                        executedNumberOfSetNodes = Integer.valueOf(0);
-                     }
-                     // Check if limit of set nodes of the current goal is exceeded
-                     if (!(executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal())) {
-                           try {
-                              if(((isMethodCallNode(node, ruleApp)&&isEntry)||(isMethodReturnNode(node, ruleApp)&&isExit))&&isEnabled()&&(!isConditionEnabled()||conditionMet(ruleApp, proof, node))){
-                                 // Increase number of set nodes on this goal and allow rule application
-                                 if(hitcountExceeded(node)){
-                                    executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
-                                    getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                                    getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
-                                 }
-                                 }
-                           }
-                           catch (ProofInputException e) {
-                              // TODO Auto-generated catch block
-                              e.printStackTrace();
-                           }
-                        
-                        return true; 
-                     }
-                  }
-               }
-            
-         }
-      return true;
    }
    
    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp){

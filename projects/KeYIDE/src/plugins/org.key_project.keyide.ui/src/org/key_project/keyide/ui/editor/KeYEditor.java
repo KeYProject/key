@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -45,6 +46,7 @@ import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -82,6 +84,8 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    private ProofSourceViewerDecorator textViewer; // TODO: Rename, into proofDecorator. And also its getter
 
    private ProofTreeContentOutlinePage outline;
+   
+   private KeYBreakpointManager breakpointManager;
    
    /**
     * Contains the registered {@link IProofProviderListener}.
@@ -220,6 +224,7 @@ public class KeYEditor extends TextEditor implements IProofProvider {
                this.proof = environment.createProof(in.getProblem());
                this.environment.getMediator().setProof(proof);
                this.environment.getMediator().setStupidMode(true);
+               breakpointManager = new KeYBreakpointManager(environment, proof);
             }
             else if (input instanceof FileEditorInput) {
                FileEditorInput fileInput = (FileEditorInput) input;
@@ -229,7 +234,9 @@ public class KeYEditor extends TextEditor implements IProofProvider {
                this.environment.getMediator().setStupidMode(true);
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.proof = getEnvironment().getLoadedProof();
+               breakpointManager = new KeYBreakpointManager(environment, proof);
             }
+            DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
          }
          else {
             setShowNode(showNode);
@@ -278,6 +285,7 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     */
    @Override
    public void dispose() {
+      DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
       getEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
       getCurrentProof().removeProofTreeListener(proofTreeListener);
@@ -438,6 +446,8 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       }
       else if (IProofProvider.class.equals(adapter)) {
          return this;
+      } else if (KeYBreakpointManager.class.equals(adapter)){
+         return getBreakpointManager();
       }
       else {
          return super.getAdapter(adapter);
@@ -504,5 +514,19 @@ public class KeYEditor extends TextEditor implements IProofProvider {
       for (IProofProviderListener l : toInform) {
          l.currentProofsChanged(e);
       }
+   }
+
+   /**
+    * @return the breakpointManager
+    */
+   public KeYBreakpointManager getBreakpointManager() {
+      return breakpointManager;
+   }
+
+   /**
+    * @param breakpointManager the breakpointManager to set
+    */
+   public void setBreakpointManager(KeYBreakpointManager breakpointManager) {
+      this.breakpointManager = breakpointManager;
    }
 }

@@ -1,0 +1,38 @@
+package de.uka.ilkd.key.strategy;
+
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+
+/**
+ * This{@link LineBreakpointNonSymbolicStopCondition} represents a line breakpoint and is responsible to tell the debugger to stop execution when the respective
+ * breakpoint is reached.
+ * 
+ * @author Marco Drebing
+ */
+
+
+public class LineBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicLineBreakpointStopCondition {
+
+   /**
+    * Creates a new {@link LineBreakpointNonSymbolicStopCondition}.
+    * 
+    * @param classPath the path of the class the associated Breakpoint lies within
+    * @param lineNumber the line where the associated Breakpoint is located in the class
+    * @param hitCount the hitCount for this Breakpoint, given by user
+    * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
+    * @param proof the {@link Proof} that will be executed and should stop
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
+    * @param condition the condition as given by the user
+    * @param enabled flag if the Breakpoint is enabled
+    * @param conditionEnabled flag if the condition is enabled
+    * @param methodStart the line the containing method of this breakpoint starts at
+    * @param methodEnd the line the containing method of this breakpoint ends at
+    * @throws SLTranslationException if the condition could not be parsed to a valid Term
+    */
+   public LineBreakpointNonSymbolicStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+      super(classPath, lineNumber, hitCount, pm, proof, parentCondition,
+            condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType()); 
+   }
+}

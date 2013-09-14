@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.symbolic_execution.strategy;
+package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +19,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 
-public abstract class AbstractHitCountBreakpointStopCondition extends
-      AbstractBreakpointStopCondition {
+public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
+      AbstractNonSymbolicBreakpointStopCondition {
    
 
    
@@ -42,14 +43,14 @@ public abstract class AbstractHitCountBreakpointStopCondition extends
 
 
    /**
-    * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
+    * Creates a new {@link AbstractNonSymbolicHitCountBreakpointStopCondition}.
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractHitCountBreakpointStopCondition(int hitCount, Proof proof, CompoundStopCondition parentCondition, boolean enabled){
+   public AbstractNonSymbolicHitCountBreakpointStopCondition(int hitCount, Proof proof, CompoundStopCondition parentCondition, boolean enabled){
       super(proof, parentCondition, enabled);
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;

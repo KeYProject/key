@@ -78,11 +78,7 @@ public class JavaWatchpointStopCondition extends
                   executedNumberOfSetNodes = Integer.valueOf(0);
                }
                // Check if limit of set nodes of the current goal is exceeded
-               if (executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal()) {
-                  getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
-                  return false; // Limit of set nodes of this goal exceeded
-               }
-               else {
+               if (!(executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal())) {
                      if (isEnabled()) {
                         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
                         if (activeStatement != null && activeStatement instanceof Assignment) {
@@ -115,10 +111,6 @@ public class JavaWatchpointStopCondition extends
                      }
                   return true;
                }
-            }
-            else {
-               // Reuse already computed result.
-               return value.booleanValue();
             }
          }
 

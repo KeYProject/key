@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.symbolic_execution.strategy;
+package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -23,13 +23,14 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.util.ExtList;
 
-public class AbstractLineBreakpointStopCondition extends
-      AbstractConditionalBreakpointStopCondition {
+public class AbstractNonSymbolicLineBreakpointStopCondition extends
+      AbstractNonSymbolicConditionalBreakpointStopCondition {
 
    /**
-    * The path of the class this {@link LineBreakpointStopCondition} is associated with.
+    * The path of the class this {@link LineBreakpointNonSymbolicStopCondition} is associated with.
     */
    private String classPath;
    
@@ -49,14 +50,14 @@ public class AbstractLineBreakpointStopCondition extends
    private int methodEnd;
 
    /**
-    * Creates a new {@link AbstractLineBreakpointStopCondition}.
+    * Creates a new {@link AbstractNonSymbolicLineBreakpointStopCondition}.
     * 
     * @param classPath the path of the class the associated Breakpoint lies within
     * @param lineNumber the line where the associated Breakpoint is located in the class
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
+    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -65,7 +66,7 @@ public class AbstractLineBreakpointStopCondition extends
     * @param containerType the type of the element containing the breakpoint
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public AbstractLineBreakpointStopCondition(String classPath, int lineNumber,
+   public AbstractNonSymbolicLineBreakpointStopCondition(String classPath, int lineNumber,
          int hitCount, IProgramMethod pm,
          Proof proof, CompoundStopCondition parentCondition, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,

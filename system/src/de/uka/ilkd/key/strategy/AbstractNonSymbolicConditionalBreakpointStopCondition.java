@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.symbolic_execution.strategy;
+package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +22,7 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -54,11 +55,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-public abstract class AbstractConditionalBreakpointStopCondition extends
-      AbstractHitCountBreakpointStopCondition {
+public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition extends
+      AbstractNonSymbolicHitCountBreakpointStopCondition {
    
    /**
     * The condition  for this Breakpoint (set by user).
@@ -111,7 +113,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
    private IProgramMethod pm;
 
    /**
-    * Creates a new {@link AbstractConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
+    * Creates a new {@link AbstractNonSymbolicConditionalBreakpointStopCondition}. Call setCondition immediately after calling the constructor!
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
@@ -123,7 +125,7 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
+   public AbstractNonSymbolicConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
          CompoundStopCondition parentCondition,
          boolean enabled, boolean conditionEnabled,
          int methodStart, int methodEnd, KeYJavaType containerType){
@@ -137,17 +139,19 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
    }
    
    @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-         IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-      if(goal!=null){
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+         IGoalChooser goalChooser, long startTime, int countApplied,
+         SingleRuleApplicationInfo singleRuleApplicationInfo) {
+      if (singleRuleApplicationInfo != null) {
+         Goal goal = singleRuleApplicationInfo.getGoal();
          Node node = goal.node();
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
          if(getVarsForCondition()!=null&&ruleApp!=null&&node!=null){
             refreshVarMaps(ruleApp, node);
          }
       }
-      return super.isGoalAllowed(maxApplications, timeout, proof, goalChooser,
-            startTime, countApplied, goal);
+      return super.shouldStop(maxApplications, timeout, proof, goalChooser,
+            startTime, countApplied, singleRuleApplicationInfo);
    }
 
    /**

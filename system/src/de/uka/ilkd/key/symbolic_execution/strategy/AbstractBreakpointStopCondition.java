@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.SourceElement;
@@ -51,6 +52,7 @@ public abstract class AbstractBreakpointStopCondition extends
     */
    private Proof proof;
 
+   protected boolean stopAllGoals;
 
    /**
     * Creates a new {@link AbstractBreakpointStopCondition}.
@@ -77,6 +79,7 @@ public abstract class AbstractBreakpointStopCondition extends
          if(goal!=null){
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
                if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
                   // Check if the result for the current node was already computed.
                   Boolean value = getGoalAllowedResultPerSetNode().get(node);
@@ -87,17 +90,14 @@ public abstract class AbstractBreakpointStopCondition extends
                         executedNumberOfSetNodes = Integer.valueOf(0);
                      }
                      // Check if limit of set nodes of the current goal is exceeded
-                     if (executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal()) {
-                        getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
-                        return false; // Limit of set nodes of this goal exceeded
-                     }
-                     else {
-                        SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-                        if (activeStatement != null && activeStatement.getEndPosition().getLine() != -1) {
+                     if (!(executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal())) {
+                        activeStatement = NodeInfo.computeActiveStatement(ruleApp);
+                        if (activeStatement != null && activeStatement.getStartPosition().getLine() != -1) {
                            String path = activeStatement.getPositionInfo().getParentClass();
-                           int line = activeStatement.getEndPosition().getLine();
+                           int startLine = activeStatement.getStartPosition().getLine();
+                           int endLine = activeStatement.getEndPosition().getLine();
                            try{
-                              if(breakpointHit(line, path, ruleApp, proof, node)){
+                              if(breakpointHit(startLine, endLine, path, ruleApp, proof, node)){
                                  // Increase number of set nodes on this goal and allow rule application
                                  executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                                  getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
@@ -110,21 +110,55 @@ public abstract class AbstractBreakpointStopCondition extends
                         return true; 
                      }
                   }
-                  else {
-                     // Reuse already computed result.
-                     return value.booleanValue();
-                  }
                }
             
          }
       return true;
    }
 
+   @Override
+   public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+         IGoalChooser goalChooser, long startTime, int countApplied,
+         SingleRuleApplicationInfo singleRuleApplicationInfo) {
+      // TODO Auto-generated method stub
+      super.shouldStop(maxApplications, timeout, proof, goalChooser,
+            startTime, countApplied, singleRuleApplicationInfo);
+   // Check if a rule was applied
+      if (singleRuleApplicationInfo != null) {
+         // Get the node on which a rule was applied.
+         Goal goal = singleRuleApplicationInfo.getGoal();
+         Node node = goal.node();
+         RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
+         if(ruleApp != null && goal != null && node != null){
+            if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
+               // Check if the result for the current node was already computed.
+               Boolean value = getGoalAllowedResultPerSetNode().get(node);
+               if (value == null) {
+                  // Get the number of executed set nodes on the current goal
+                  Integer executedNumberOfSetNodes = getExecutedNumberOfSetNodesPerGoal().get(goal);
+                  if (executedNumberOfSetNodes == null) {
+                     executedNumberOfSetNodes = Integer.valueOf(0);
+                  }
+                  if (executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal()) {
+                     getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
+                     return true; // Limit of set nodes of this goal exceeded
+                  }
+               }
+               else {
+                  // Reuse already computed result.
+                  return value.booleanValue();
+               }
+            }
+         }
+      }
+      return false;
+   }
    
    /**
     * Determines whether the execution should stop with the given parameters
     * 
-    * @param line the line of the currently executed statement
+    * @param startLine the start line of the currently executed statement
+    * @param endLine the end line
     * @param path the path of the class of the currently executed statement
     * @param ruleApp the applied ruleapp
     * @param proof the current proof
@@ -132,7 +166,7 @@ public abstract class AbstractBreakpointStopCondition extends
     * @return true if execution should hold
     * @throws ProofInputException
     */
-   protected boolean breakpointHit(int line, String path, RuleApp ruleApp, Proof proof, Node node)throws ProofInputException {
+   protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp, Proof proof, Node node)throws ProofInputException {
       return enabled;
    }
 

@@ -113,6 +113,10 @@
             class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
             commandId="org.key_project.keyide.ui.commands.applyrule">
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
+            commandId="org.key_project.keyide.ui.commands.breakpointToggle">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -240,6 +244,22 @@
                        </with>
                     </visibleWhen>
                  </command>
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.breakpointToggle"
+                       icon="icons/breakpoints.gif"
+                       id="org.key_project.keyide.ui.commands.breakpointToggle"
+                       label="Use Breakpoints"
+                       style="toggle">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                 </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -316,6 +336,16 @@
             description="Applies a Rule"
             id="org.key_project.keyide.ui.commands.applyrule"
             name="Apply Rule">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Controls wether to suspend on breakpoints or ignore them."
+            id="org.key_project.keyide.ui.commands.breakpointToggle"
+            name="Breakpoint Toggle">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
       </command>
    </extension>
    <extension

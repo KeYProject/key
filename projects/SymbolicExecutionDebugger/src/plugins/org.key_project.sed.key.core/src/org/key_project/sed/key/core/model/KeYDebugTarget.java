@@ -33,7 +33,10 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaLineBreakpoint;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaMethodBreakpoint;
@@ -60,6 +63,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -88,7 +92,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * The {@link KeYBreakpointManager} that manages breakpoints for this target.
     */
-   private KeYBreakpointManager breakpointManager = new KeYBreakpointManager();;
+   private KeYBreakpointManager breakpointManager = new KeYBreakpointManager();
   
    /**
     * The used model identifier.
@@ -137,7 +141,17 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             }
             if(resource!=null && IResource.FILE==resource.getType()&&resource.getFileExtension().equalsIgnoreCase("java")&&!binFlag){
                if((delta.getFlags() & IResourceDelta.CONTENT)==IResourceDelta.CONTENT){
-                  openHotCodeReplaceDialog(target);
+                  ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
+                  for(IType type : unit.getAllTypes()){
+                     String typeName = type.getFullyQualifiedName();
+                     typeName = typeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
+                     KeYJavaType KJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(typeName);
+                        if(KJT==null){
+                           return false;
+                        }else{
+                           openHotCodeReplaceDialog(target);
+                        }
+                  }
                }
                return false;
             }

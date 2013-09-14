@@ -23,6 +23,8 @@ import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandle
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
 
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 // TODO: Document class StartAutoModeHandler
 public class StartAutoModeHandler extends AbstractSaveExecutionHandler {   
    /**
@@ -43,6 +45,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
                protected IStatus run(IProgressMonitor monitor) {
                   monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
                   proofProvider.getCurrentProof().getActiveStrategy(); // Make sure that the strategy is initialized correctly, otherwise the used settings are different to the one defined by the strategysettings which are shown in the UI.
+                  SymbolicExecutionUtil.configureProof(proofProvider.getCurrentProof());
                   proofProvider.getEnvironment().getUi().startAndWaitForAutoMode(proofProvider.getCurrentProof());
                   monitor.done();
                   return Status.OK_STATUS;
