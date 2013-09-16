@@ -1,10 +1,38 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule;
 
+import java.util.Collections;
+import java.util.List;
+
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ImplicitSpecTermLabel;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 
-public class ImplicitSpecTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+/**
+ * The {@link ITermLabelWorker} to define how a {@link ImplicitSpecTermLabel} is maintained.
+ *
+ * @author Michael Kirsten
+ */
+public class ImplicitSpecTermLabelInstantiator implements ITermLabelWorker {
     /**
      * The only instance of this class.
      */
@@ -18,12 +46,47 @@ public class ImplicitSpecTermLabelInstantiator extends AbstractSymbolicExecution
     }
 
     @Override
+    public List<ITermLabel> instantiateLabels(Term tacletTerm,
+                                              PosInOccurrence applicationPosInOccurrence,
+                                              Term applicationTerm,
+                                              Rule rule,
+                                              Goal goal,
+                                              Operator newTermOp,
+                                              ImmutableArray<Term> newTermSubs,
+                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                              JavaBlock newTermJavaBlock) {
+        if (tacletTerm != null
+                && tacletTerm.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                // keep ImplicitSpecTermLabel
+            return Collections.<ITermLabel>singletonList(ImplicitSpecTermLabel.INSTANCE);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public String getName() {
         return ImplicitSpecTermLabel.NAME.toString();
     }
 
-    @Override
     protected ITermLabel getTermLabel(Term applicationTerm) {
         return ImplicitSpecTermLabel.INSTANCE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateLabels(Term tacletTerm,
+                             PosInOccurrence applicationPosInOccurrence,
+                             Term termToUpdate,
+                             Rule rule,
+                             Goal goal,
+                             List<ITermLabel> newLabels) {
+        // Remove label since it is only relevant before starting the proof
+        ITermLabel termLabel = getTermLabel(termToUpdate);
+        if (termLabel != null) {
+            newLabels.remove(termLabel);
+        }
     }
 }

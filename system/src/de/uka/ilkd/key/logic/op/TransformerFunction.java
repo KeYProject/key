@@ -87,4 +87,20 @@ public class TransformerFunction extends Function {
         }
         return trans;
     }
+
+    public static TransformerFunction getTransformer(PosInOccurrence pio) {
+        boolean trans = false;
+        if ( pio.posInTerm () != null ) {
+            PIOPathIterator it = pio.iterator ();
+            Operator        op;
+
+            while ( it.next () != -1 && !trans) {
+                final Term t = it.getSubTerm ();
+                op = t.op ();
+                if (op instanceof TransformerFunction)
+                    return (TransformerFunction)op;
+            }
+        }
+        return null;
+    }
 }
