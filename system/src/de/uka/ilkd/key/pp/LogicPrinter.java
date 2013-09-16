@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -888,7 +889,7 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        if(NotationInfo.TERMLABELS_HIDDEN){
+        if(MainWindow.getInstance().toggleTerms.isSelected()){
             return;
         }
         layouter.beginC().print("<<");

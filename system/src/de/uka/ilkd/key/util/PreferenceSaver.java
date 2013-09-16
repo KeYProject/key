@@ -20,6 +20,8 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
 
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -33,6 +35,7 @@ import javax.swing.JTabbedPane;
  * <li>Position and size of windows</li>
  * <li>Selected tab in a tabbed pane</li>
  * <li>Position of split dividers in a split pane</li>
+ * <li>State of JCheckBoxMenuItem (selected or not).</li>
  * </ul>
  * 
  * Only named components (use {@link Component#setName(String)}) have their
@@ -63,7 +66,8 @@ public class PreferenceSaver {
      * {@link Saver}s knwon to the system.
      */
     private static Saver<?> SAVERS[] = {
-            new WindowSaver(), new SplitPaneSaver(), new TabbedPaneSaver()
+            new WindowSaver(), new SplitPaneSaver(), new TabbedPaneSaver(),
+        new CheckBoxMenuItemSaver()
     };
 
     /**
@@ -128,6 +132,10 @@ public class PreferenceSaver {
     private void saveChildren(Component component) throws BackingStoreException {
         if (component instanceof Container) {
             Component[] children = ((Container) component).getComponents();
+            if (component instanceof JMenu) {
+                assert children.length == 0;
+                children = ((JMenu) component).getMenuComponents();
+            }
             if (children != null) {
                 for (Component child : children) {
                     saveComponent(child);
@@ -270,4 +278,32 @@ public class PreferenceSaver {
 
     }
 
+    private static class CheckBoxMenuItemSaver implements Saver<JCheckBoxMenuItem> {
+
+        @Override
+        public void load(JCheckBoxMenuItem component, Preferences prefs) {
+            String name = component.getName();
+            assert name != null;
+            
+            boolean selected = prefs.getBoolean(name + ".selectedIndex", false);
+            component.setSelected(selected);
+        }
+
+        @Override
+        public void save(JCheckBoxMenuItem component, Preferences prefs) {
+            String name = component.getName();
+            System.out.println("xxx: " + name);
+            assert name != null;
+
+            boolean selected = component.isSelected();
+            prefs.putBoolean(name + ".selectedIndex", selected);
+        }
+
+        @Override
+        public Class<JCheckBoxMenuItem> supportedClass() {
+            return JCheckBoxMenuItem.class;
+        }
+
+    }
+    
 }

@@ -13,11 +13,8 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.pp.NotationInfo;
 
 /*
  * Toggle term labels with this MainWindowAction. If turned off,
@@ -29,13 +26,10 @@ public class TermLabelToggleAction extends MainWindowAction {
         super(mainWindow);
         setName("Hide term labels");
         setTooltip("Turn off term labels, if not needed.");
-        setSelected(NotationInfo.TERMLABELS_HIDDEN);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        NotationInfo.TERMLABELS_HIDDEN = selected;
         mainWindow.makePrettyView();
     }
 

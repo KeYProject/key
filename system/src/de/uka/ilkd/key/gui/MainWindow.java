@@ -136,7 +136,6 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.pp.NotationInfo;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -271,6 +270,8 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+    
+    public JCheckBoxMenuItem toggleTerms;
 
     /*
      * This class should only be instantiated once!
@@ -781,10 +782,13 @@ public final class MainWindow extends JFrame  {
             }});
 //        view.add(laf); // uncomment this line to include the option in the menu
 
-
+        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
-        view.add(new JCheckBoxMenuItem(new TermLabelToggleAction(this)));
+        
+        toggleTerms = new JCheckBoxMenuItem(new TermLabelToggleAction(this));
+        toggleTerms.setName("toggleTerms");
+        view.add(toggleTerms);
 
         view.addSeparator();
         {
