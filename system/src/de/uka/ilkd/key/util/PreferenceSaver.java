@@ -97,7 +97,19 @@ public class PreferenceSaver {
         assert prefs != null;
         this.prefs = prefs;
     }
-
+    
+    // JMenu.getComponents() returns an empty array.
+    // JMenu.getMenuComponents() has to be used instead.
+    private Component[] getChildren(Component component) {
+        Component[] children;
+        if (component instanceof JMenu) {
+            children = ((JMenu) component).getMenuComponents();
+        } else {
+            children = ((Container) component).getComponents();
+        }
+        return children;
+    }
+    
     /**
      * Save the properties of the argument and all its children (in depth).
      * 
@@ -131,11 +143,7 @@ public class PreferenceSaver {
 
     private void saveChildren(Component component) throws BackingStoreException {
         if (component instanceof Container) {
-            Component[] children = ((Container) component).getComponents();
-            if (component instanceof JMenu) {
-                assert children.length == 0;
-                children = ((JMenu) component).getMenuComponents();
-            }
+            Component[] children = getChildren(component);
             if (children != null) {
                 for (Component child : children) {
                     saveComponent(child);
@@ -170,7 +178,7 @@ public class PreferenceSaver {
 
     private void loadChildren(Component component) {
         if (component instanceof Container) {
-            Component[] children = ((Container) component).getComponents();
+            Component[] children = getChildren(component);
             if (children != null) {
                 for (Component child : children) {
                     load(child);
