@@ -37,7 +37,7 @@ public class SequentSearchBar extends SearchBar {
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
             new Color(255, 140, 0, 100);
     
-    private List<Pair<Integer,Object>> searchResults;
+    private final List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
     private boolean regExpSearch = false;
     private SequentView sequentView;
@@ -56,6 +56,7 @@ public class SequentSearchBar extends SearchBar {
     public void createUI(){
         super.createUI();
         JCheckBox checkBox = new JCheckBox("RegExp");
+        checkBox.setName("toggleRegExpSearch");
             checkBox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
@@ -70,6 +71,7 @@ public class SequentSearchBar extends SearchBar {
         add(checkBox);
     }
 
+    @Override
     public void searchNext() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
@@ -79,6 +81,7 @@ public class SequentSearchBar extends SearchBar {
         }
     }
 
+    @Override
     public void searchPrevious() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
@@ -103,6 +106,7 @@ public class SequentSearchBar extends SearchBar {
     /**
      * searches for the occurence of the specified string
      */
+    @Override
     public boolean search(String search) {
         clearSearchResults();
 
@@ -141,11 +145,7 @@ public class SequentSearchBar extends SearchBar {
                 sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
                 loopEnterd = true;
         }
-        if (loopEnterd) {
-            return true;
-        } else {
-            return false;
-        }
+        return loopEnterd;
     }
     
     private void setExtraHighlight(int resultIndex) {
