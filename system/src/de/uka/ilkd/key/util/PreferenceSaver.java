@@ -293,18 +293,17 @@ public class PreferenceSaver {
             String name = component.getName();
             assert name != null;
             
-            boolean selected = prefs.getBoolean(name + ".selectedIndex", false);
+            boolean selected = prefs.getBoolean(name + ".CheckBoxSelectedState", false);
             component.setSelected(selected);
         }
 
         @Override
         public void save(JCheckBoxMenuItem component, Preferences prefs) {
             String name = component.getName();
-            System.out.println("xxx: " + name);
             assert name != null;
 
             boolean selected = component.isSelected();
-            prefs.putBoolean(name + ".selectedIndex", selected);
+            prefs.putBoolean(name + ".CheckBoxSelectedState", selected);
         }
 
         @Override
