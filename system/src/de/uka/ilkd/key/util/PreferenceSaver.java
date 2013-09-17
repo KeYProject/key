@@ -293,7 +293,7 @@ public class PreferenceSaver {
             String name = component.getName();
             assert name != null;
             
-            boolean selected = prefs.getBoolean(name + ".CheckBoxSelectedState", false);
+            boolean selected = prefs.getBoolean(name + ".CheckBoxSelectedState", component.isSelected());
             component.setSelected(selected);
         }
 
