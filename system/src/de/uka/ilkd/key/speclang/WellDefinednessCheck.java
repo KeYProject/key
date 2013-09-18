@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -590,9 +591,11 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setAssignable(Term ass, Services services) {
         this.assignable = ass;
-        if (ass == TB.ff()) {
+        if (ass.equals(TB.ff()) || ass.equals(TB.FALSE(services))
+                || ass == null || ass.op() == BooleanLiteral.FALSE) {
             this.assignable = TB.empty(services);
-        } else if (ass == TB.tt()) {
+        } else if (ass.equals(TB.tt()) || ass.equals(TB.TRUE(services))
+                || ass.op() == BooleanLiteral.TRUE) {
             this.assignable = TB.allLocs(services);
         }
     }

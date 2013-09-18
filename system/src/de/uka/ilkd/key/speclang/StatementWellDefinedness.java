@@ -124,8 +124,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
                                           Term anonHeap, ImmutableSet<ProgramVariable> ps,
                                           Term leadingUpdate, Services services) {
-        return this.generateSequent(self, null, null, heap, null, anonHeap,
-                                    ps, leadingUpdate, services);
+        return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate, services);
     }
 
     @Override

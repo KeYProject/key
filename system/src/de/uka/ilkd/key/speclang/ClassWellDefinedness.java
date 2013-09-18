@@ -48,7 +48,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target,
                                 Term accessible, Term mby, Services services) {
-        super("JML class invariant in " + inv.getKJT().getName(), 0, target, inv.getOrigVars(),
+        super("JML class invariant in " + inv.getKJT().getFullName(), 0, target, inv.getOrigVars(),
               Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
