@@ -28,8 +28,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -116,7 +116,6 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
     * @param methodStart the line the containing method of this breakpoint starts at
@@ -124,10 +123,9 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
     * @param containerType the type of the element containing the breakpoint
     */
    public AbstractConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
-         CompoundStopCondition parentCondition,
          boolean enabled, boolean conditionEnabled,
          int methodStart, int methodEnd, KeYJavaType containerType){
-      super(hitCount, proof, parentCondition, enabled);
+      super(hitCount, proof,enabled);
       this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
       setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());
@@ -310,10 +308,12 @@ public abstract class AbstractConditionalBreakpointStopCondition extends
       ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
       ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
       for(KeYJavaType kjtloc: kjts){
-         ImmutableList<Field> fields = info.getAllFields((ClassDeclaration)kjtloc.getJavaType());
-         for(Field field : fields){
-            if((kjtloc.equals(containerType)||!field.isPrivate())&&!((LocationVariable) field.getProgramVariable()).isImplicit())
-               globalVars = globalVars.append((ProgramVariable) field.getProgramVariable());
+         if (kjtloc.getJavaType() instanceof TypeDeclaration) {
+            ImmutableList<Field> fields = info.getAllFields((TypeDeclaration)kjtloc.getJavaType());
+            for(Field field : fields){
+               if((kjtloc.equals(containerType)||!field.isPrivate())&&!((LocationVariable) field.getProgramVariable()).isImplicit())
+                  globalVars = globalVars.append((ProgramVariable) field.getProgramVariable());
+            }
          }
       }
       varsForCondition = varsForCondition.append(globalVars);

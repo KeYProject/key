@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 
 public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
       AbstractNonSymbolicBreakpointStopCondition {
@@ -47,11 +46,10 @@ public abstract class AbstractNonSymbolicHitCountBreakpointStopCondition extends
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractNonSymbolicHitCountBreakpointStopCondition(int hitCount, Proof proof, CompoundStopCondition parentCondition, boolean enabled){
-      super(proof, parentCondition, enabled);
+   public AbstractNonSymbolicHitCountBreakpointStopCondition(int hitCount, Proof proof, boolean enabled){
+      super(proof, enabled);
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
    }

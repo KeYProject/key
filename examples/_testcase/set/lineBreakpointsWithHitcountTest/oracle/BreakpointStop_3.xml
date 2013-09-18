@@ -9,10 +9,6 @@
                   </statement>
                </methodCall>
             </branchCondition>
-            <branchCondition name="self.callee = null" pathCondition="self.callee = null" pathConditionChanged="true" branchCondition="self.callee = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.callee = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
-               </termination>
-            </branchCondition>
          </statement>
       </statement>
    </methodCall>

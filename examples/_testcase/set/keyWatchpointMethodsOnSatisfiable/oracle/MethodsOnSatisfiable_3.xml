@@ -8,16 +8,6 @@
          </branchCondition>
          <branchCondition name="!MethodsOnSatisfiable.x_global &gt;= 0" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="true" branchCondition="!MethodsOnSatisfiable.x_global &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false">
-               <methodCall name="MethodsOnSatisfiable.main(x_3);" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false">
-                  <branchNode name="if (x_3&gt;=0) {return 42; }else  {return    -4711; }" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false">
-                     <statement name="return -4711;" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of MethodsOnSatisfiable.doSomething();&gt;" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
-                           </termination>
-                        </methodReturn>
-                     </statement>
-                  </branchNode>
-               </methodCall>
             </statement>
          </branchCondition>
       </branchNode>

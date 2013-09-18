@@ -61,7 +61,6 @@ public class ExceptionBreakpointStopCondition extends
     * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
     * 
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param exceptionName the name of the exception to watch for
     * @param caught flag to tell if caught exceptions lead to a stop
     * @param uncaught flag to tell if uncaught exceptions lead to a stop
@@ -69,8 +68,8 @@ public class ExceptionBreakpointStopCondition extends
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     */
-   public ExceptionBreakpointStopCondition(Proof proof, CompoundStopCondition parentCondition, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
-      super(hitCount, proof, parentCondition, enabled);
+   public ExceptionBreakpointStopCondition(Proof proof, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
+      super(hitCount, proof, enabled);
       this.exceptionName = exceptionName;
       exceptionNodes = new HashSet<Node>();
       exceptionParentNodes = new HashSet<Node>();

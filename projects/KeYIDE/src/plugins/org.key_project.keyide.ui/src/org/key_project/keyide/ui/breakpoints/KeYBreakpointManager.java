@@ -20,10 +20,14 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.ExceptionBreakpointNonSymbolicStopCondition;
@@ -31,10 +35,6 @@ import de.uka.ilkd.key.strategy.JavaWatchpointNonSymbolicStopCondition;
 import de.uka.ilkd.key.strategy.LineBreakpointNonSymbolicStopCondition;
 import de.uka.ilkd.key.strategy.MethodBreakpointNonSymbolicStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.ExceptionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.JavaWatchpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.MethodBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 @SuppressWarnings("restriction")
@@ -98,7 +98,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
             MethodBreakpointNonSymbolicStopCondition stopCondition = new MethodBreakpointNonSymbolicStopCondition(
                   methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
                   methodBreakpoint.getLineNumber(),
-                  methodBreakpoint.getHitCount(), pm, proof, breakpointStopConditions,
+                  methodBreakpoint.getHitCount(), pm, proof,
                         methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
                         methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
             breakpointStopConditions.addChildren(stopCondition);
@@ -124,7 +124,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
             JavaWatchpointNonSymbolicStopCondition stopCondition = new JavaWatchpointNonSymbolicStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
-                  javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), breakpointStopConditions, javaWatchpoint.isModification(), containerKJT,
+                  javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), javaWatchpoint.isModification(), containerKJT,
                   proof);
       breakpointStopConditions.addChildren(stopCondition);
       breakpointMap.put(javaWatchpoint, stopCondition);
@@ -141,7 +141,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
     * @throws ProofInputException
     */
    public void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint) throws CoreException {
-      ExceptionBreakpointNonSymbolicStopCondition stopCondition = new ExceptionBreakpointNonSymbolicStopCondition(proof,breakpointStopConditions, exceptionBreakpoint.getTypeName(),
+      ExceptionBreakpointNonSymbolicStopCondition stopCondition = new ExceptionBreakpointNonSymbolicStopCondition(proof, exceptionBreakpoint.getTypeName(),
             exceptionBreakpoint.isCaught(), exceptionBreakpoint.isUncaught(), exceptionBreakpoint.isSuspendOnSubclasses(),
             exceptionBreakpoint.isEnabled(), exceptionBreakpoint.getHitCount());
       breakpointStopConditions.addChildren(stopCondition);
@@ -173,7 +173,7 @@ public class KeYBreakpointManager implements IBreakpointListener {
             LineBreakpointNonSymbolicStopCondition stopCondition = new LineBreakpointNonSymbolicStopCondition(
                   resource.getLocation().toOSString(),
                   lineBreakpoint.getLineNumber(),
-                  lineBreakpoint.getHitCount(), pm, proof, breakpointStopConditions,
+                  lineBreakpoint.getHitCount(), pm, proof,
                   lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
                   lineBreakpoint.isConditionEnabled(), start, end);
             breakpointStopConditions.addChildren(stopCondition);
@@ -383,6 +383,23 @@ public class KeYBreakpointManager implements IBreakpointListener {
             //TODO
          }
       }
+   }
+
+
+   /**
+    * creates a new factory that should be used by others afterwards
+    * @return 
+    */
+   public static ITermProgramVariableCollectorFactory createNewFactory(final CompoundStopCondition breakpointParentStopCondition) {
+      ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
+         @Override
+         public TermProgramVariableCollector create(Services services) {
+            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
+            
+              return collector;
+         }
+      };
+      return programVariableCollectorFactory;
    }
 
 }

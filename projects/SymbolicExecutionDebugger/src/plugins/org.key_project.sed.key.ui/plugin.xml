@@ -250,10 +250,6 @@
                class="org.key_project.sed.key.ui.presentation.KeYDebugModelPresentation"
                id="org.key_project.sed.key.core">
          </debugModelPresentation>
-         <debugModelPresentation
-               class="org.key_project.sed.key.ui.presentation.KeYWatchpointModelPresentation"
-               id="org.key_project.sed.key.core">
-         </debugModelPresentation>
       </extension>
       <extension
             point="org.eclipse.ui.preferencePages">

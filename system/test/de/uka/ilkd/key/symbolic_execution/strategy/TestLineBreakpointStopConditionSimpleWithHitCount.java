@@ -51,10 +51,11 @@ public class TestLineBreakpointStopConditionSimpleWithHitCount extends AbstractS
             } 
          }
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition firstBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 16, -1, callerMain, env.getBuilder().getProof(), allBreakpoints, null, true, false, 15, 21);
-         LineBreakpointStopCondition secondBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 10, 2, callerLoop, env.getBuilder().getProof(), allBreakpoints, null, true, false, 8, 13);
-         LineBreakpointStopCondition thirdBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallee.java", 7, -1, calleeMain, env.getBuilder().getProof(), allBreakpoints, null, true, false, 6, 9);
+         LineBreakpointStopCondition firstBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 16, -1, callerMain, env.getBuilder().getProof(),null, true, false, 15, 21);
+         LineBreakpointStopCondition secondBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 10, 2, callerLoop, env.getBuilder().getProof(),null, true, false, 8, 13);
+         LineBreakpointStopCondition thirdBreakpoint = new LineBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\lineBreakpointsWithHitcountTest\\test\\BreakpointStopCallee.java", 7, -1, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9);
          allBreakpoints.addChildren(firstBreakpoint,secondBreakpoint,thirdBreakpoint);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

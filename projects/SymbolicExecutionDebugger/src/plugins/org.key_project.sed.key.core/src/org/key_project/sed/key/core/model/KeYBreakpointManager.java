@@ -69,7 +69,7 @@ public class KeYBreakpointManager {
          if(containerKJT!=null){
             KeYWatchpointStopCondition stopCondition = new KeYWatchpointStopCondition(
                   watchpoint.getHitCount(), environment
-                  .getBuilder().getProof(), breakpointStopConditions,
+                  .getBuilder().getProof(),
                   watchpoint.getCondition(), watchpoint.isEnabled(),
                   watchpoint.isConditionEnabled(), containerKJT, watchpoint.isSuspendOnTrue());
             breakpointStopConditions.addChildren(stopCondition);
@@ -103,7 +103,7 @@ public class KeYBreakpointManager {
                   methodBreakpoint.getMarker().getResource().getLocation().toOSString(),
                   methodBreakpoint.getLineNumber(),
                   methodBreakpoint.getHitCount(), pm, environment
-                        .getBuilder().getProof(), breakpointStopConditions,
+                        .getBuilder().getProof(),
                         methodBreakpoint.getCondition(), methodBreakpoint.isEnabled(),
                         methodBreakpoint.isConditionEnabled(), start, end, methodBreakpoint.isEntry(), methodBreakpoint.isExit());
             breakpointStopConditions.addChildren(stopCondition);
@@ -129,7 +129,7 @@ public class KeYBreakpointManager {
          KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
          if(containerKJT!=null){
             JavaWatchpointStopCondition stopCondition = new JavaWatchpointStopCondition(javaWatchpoint.isEnabled(),javaWatchpoint.getHitCount(),
-                  javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), breakpointStopConditions, javaWatchpoint.isModification(), containerKJT,
+                  javaWatchpoint.getFieldName(), javaWatchpoint.isAccess(), javaWatchpoint.isModification(), containerKJT,
                   environment.getBuilder().getProof());
             breakpointStopConditions.addChildren(stopCondition);
             breakpointMap.put(javaWatchpoint, stopCondition);
@@ -146,7 +146,7 @@ public class KeYBreakpointManager {
     * @throws ProofInputException
     */
    public void exceptionBreakpointAdded(JavaExceptionBreakpoint exceptionBreakpoint, SymbolicExecutionEnvironment<?> environment) throws CoreException {
-      ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment.getBuilder().getProof(),breakpointStopConditions, exceptionBreakpoint.getTypeName(),
+      ExceptionBreakpointStopCondition stopCondition = new ExceptionBreakpointStopCondition(environment.getBuilder().getProof(),exceptionBreakpoint.getTypeName(),
             exceptionBreakpoint.isCaught(), exceptionBreakpoint.isUncaught(), exceptionBreakpoint.isSuspendOnSubclasses(),
             exceptionBreakpoint.isEnabled(), exceptionBreakpoint.getHitCount());
       breakpointStopConditions.addChildren(stopCondition);
@@ -179,7 +179,7 @@ public class KeYBreakpointManager {
                   resource.getLocation().toOSString(),
                   lineBreakpoint.getLineNumber(),
                   lineBreakpoint.getHitCount(), pm, environment
-                        .getBuilder().getProof(), breakpointStopConditions,
+                        .getBuilder().getProof(),
                   lineBreakpoint.getCondition(), lineBreakpoint.isEnabled(),
                   lineBreakpoint.isConditionEnabled(), start, end);
             breakpointStopConditions.addChildren(stopCondition);

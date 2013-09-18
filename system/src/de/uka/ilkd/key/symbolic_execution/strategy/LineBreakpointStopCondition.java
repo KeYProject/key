@@ -22,7 +22,6 @@ public class LineBreakpointStopCondition extends AbstractLineBreakpointStopCondi
     * @param hitCount the hitCount for this Breakpoint, given by user
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -30,8 +29,8 @@ public class LineBreakpointStopCondition extends AbstractLineBreakpointStopCondi
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
-   public LineBreakpointStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, CompoundStopCondition parentCondition, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, pm, proof, parentCondition,
+   public LineBreakpointStopCondition(String classPath, int lineNumber, int hitCount, IProgramMethod pm, Proof proof, String condition, boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd) throws SLTranslationException {
+      super(classPath, lineNumber, hitCount, pm, proof,
             condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType()); 
    }
 }

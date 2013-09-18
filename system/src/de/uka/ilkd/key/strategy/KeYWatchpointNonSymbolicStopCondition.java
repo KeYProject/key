@@ -17,8 +17,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.AbstractConditionalBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
@@ -42,7 +41,6 @@ public class KeYWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicCo
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -53,9 +51,9 @@ public class KeYWatchpointNonSymbolicStopCondition extends AbstractNonSymbolicCo
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public KeYWatchpointNonSymbolicStopCondition(int hitCount,
-         Proof proof, CompoundStopCondition parentCondition, String condition,
+         Proof proof, String condition,
          boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
-      super(hitCount, null, proof, parentCondition, enabled, conditionEnabled, -1, -1, containerType);
+      super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
       setSuspendOnTrue(suspendOnTrue);
       this.setCondition(condition);
    }

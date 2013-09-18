@@ -42,14 +42,12 @@ public class JavaWatchpointStopCondition extends
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param fieldName the field to watch
     * @param isAcces flag to watch for accesses
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param isModification flag to watch for modifications
     * @param containerType the type of the element containing the breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     */
-   public JavaWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces,
-         CompoundStopCondition parentCondition, boolean isModification, KeYJavaType containerKJT, Proof proof) {
-      super(hitCount, proof, parentCondition, enabled);
+   public JavaWatchpointStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
+      super(hitCount, proof, enabled);
       this.containerKJT=containerKJT;
       this.isAccess = isAcces;
       this.isModification = isModification;

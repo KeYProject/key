@@ -41,7 +41,6 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -52,9 +51,9 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
     * @throws SLTranslationException if the condition could not be parsed to a valid Term
     */
    public KeYWatchpointStopCondition(int hitCount,
-         Proof proof, CompoundStopCondition parentCondition, String condition,
+         Proof proof, String condition,
          boolean enabled, boolean conditionEnabled, KeYJavaType containerType, boolean suspendOnTrue) throws SLTranslationException {
-      super(hitCount, null, proof, parentCondition, enabled, conditionEnabled, -1, -1, containerType);
+      super(hitCount, null, proof, enabled, conditionEnabled, -1, -1, containerType);
       setSuspendOnTrue(suspendOnTrue);
       this.setCondition(condition);
    }

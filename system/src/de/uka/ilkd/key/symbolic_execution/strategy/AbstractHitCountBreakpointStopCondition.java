@@ -46,11 +46,10 @@ public abstract class AbstractHitCountBreakpointStopCondition extends
     * 
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractHitCountBreakpointStopCondition(int hitCount, Proof proof, CompoundStopCondition parentCondition, boolean enabled){
-      super(proof, parentCondition, enabled);
+   public AbstractHitCountBreakpointStopCondition(int hitCount, Proof proof, boolean enabled){
+      super(proof, enabled);
       hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
    }

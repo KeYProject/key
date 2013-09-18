@@ -63,11 +63,15 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -288,7 +292,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      stopCondition.addChildren(breakpointManager.getBreakpointStopConditions());
+      CompoundStopCondition breakpointParentStopCondition = breakpointManager.getBreakpointStopConditions();
+      stopCondition.addChildren(breakpointParentStopCondition);
+      proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
       if (stepOver) {
          stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       }
@@ -300,6 +306,24 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       environment.getUi().startAutoMode(proof, goals);
    }
+
+
+   /**
+    * creates a new factory that should be used by others afterwards
+    * @return 
+    */
+   private ITermProgramVariableCollectorFactory createNewFactory(final CompoundStopCondition breakpointParentStopCondition) {
+      ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
+         @Override
+         public TermProgramVariableCollector create(Services services) {
+            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
+            
+              return collector;
+         }
+      };
+      return programVariableCollectorFactory;
+   }
+   
    
    /**
     * Checks if the given {@link Proof} uses method treatment "Contract" right now.

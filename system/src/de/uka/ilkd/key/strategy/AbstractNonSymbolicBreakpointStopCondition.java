@@ -10,13 +10,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.strategy.AbstractBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 
 public class AbstractNonSymbolicBreakpointStopCondition extends AbstractBreakpointStopCondition {
 
-   public AbstractNonSymbolicBreakpointStopCondition(Proof proof,
-         CompoundStopCondition parentCondition, boolean enabled) {
-      super(proof, parentCondition, enabled);
+   public AbstractNonSymbolicBreakpointStopCondition(Proof proof, boolean enabled) {
+      super(proof, enabled);
    }
 
    @Override

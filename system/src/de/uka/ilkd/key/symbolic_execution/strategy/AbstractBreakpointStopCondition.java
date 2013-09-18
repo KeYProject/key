@@ -14,19 +14,14 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
-import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public abstract class AbstractBreakpointStopCondition extends
@@ -36,16 +31,6 @@ public abstract class AbstractBreakpointStopCondition extends
     * The flag if the Breakpoint is enabled.
     */
    private boolean enabled;
-
-   /**
-    * The {@link ITermProgramVariableCollectorFactory} for others to use when collecting variables to dismiss.
-    */
-   private ITermProgramVariableCollectorFactory programVariableCollectorFactory;
-   
-   /**
-    * The {@link CompoundStopCondition} containing all BreakpointStopConditions relevant for the current {@link KeYEnvironment}
-    */
-   private CompoundStopCondition parentCondition;
    
    /**
     * The proof this stop condition is associated with
@@ -58,16 +43,12 @@ public abstract class AbstractBreakpointStopCondition extends
     * Creates a new {@link AbstractBreakpointStopCondition}.
     * 
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     */
-   public AbstractBreakpointStopCondition(Proof proof, CompoundStopCondition parentCondition, boolean enabled){
+   public AbstractBreakpointStopCondition(Proof proof, boolean enabled){
       super();
       this.enabled=enabled;
-      this.parentCondition=parentCondition;
       this.setProof(proof);
-      createNewFactory();
-      proof.getServices().setFactory(programVariableCollectorFactory);
    }
 
    /**
@@ -101,7 +82,7 @@ public abstract class AbstractBreakpointStopCondition extends
                                  // Increase number of set nodes on this goal and allow rule application
                                  executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                                  getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);
-                                 getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
+                                 getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
                                  }
                            }catch(ProofInputException e){
                               //TODO
@@ -128,7 +109,7 @@ public abstract class AbstractBreakpointStopCondition extends
          // Get the node on which a rule was applied.
          Goal goal = singleRuleApplicationInfo.getGoal();
          Node node = goal.node();
-         RuleApp ruleApp = singleRuleApplicationInfo.getAppliedRuleApp();
+         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
          if(ruleApp != null && goal != null && node != null){
             if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
                // Check if the result for the current node was already computed.
@@ -140,7 +121,7 @@ public abstract class AbstractBreakpointStopCondition extends
                      executedNumberOfSetNodes = Integer.valueOf(0);
                   }
                   if (executedNumberOfSetNodes.intValue() + 1 > getMaximalNumberOfSetNodesToExecutePerGoal()) {
-                     getGoalAllowedResultPerSetNode().put(node, Boolean.FALSE);
+                     getGoalAllowedResultPerSetNode().put(node, Boolean.TRUE);
                      return true; // Limit of set nodes of this goal exceeded
                   }
                }
@@ -168,20 +149,6 @@ public abstract class AbstractBreakpointStopCondition extends
     */
    protected boolean breakpointHit(int startLine, int endLine, String path, RuleApp ruleApp, Proof proof, Node node)throws ProofInputException {
       return enabled;
-   }
-
-   /**
-    * creates a new factory that should be used by others afterwards
-    */
-   private void createNewFactory() {
-      programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
-         @Override
-         public TermProgramVariableCollector create(Services services) {
-            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, parentCondition);
-            
-              return collector;
-         }
-      };
    }
    
    /**

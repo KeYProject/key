@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 
 /**
  * This{@link JavaWatchpointNonSymbolicStopCondition} represents a Java watchpoint and is responsible to tell the debugger to stop execution when the respective
@@ -43,14 +42,12 @@ public class JavaWatchpointNonSymbolicStopCondition extends
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param fieldName the field to watch
     * @param isAcces flag to watch for accesses
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param isModification flag to watch for modifications
     * @param containerType the type of the element containing the breakpoint
     * @param proof the {@link Proof} that will be executed and should stop
     */
-   public JavaWatchpointNonSymbolicStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces,
-         CompoundStopCondition parentCondition, boolean isModification, KeYJavaType containerKJT, Proof proof) {
-      super(hitCount, proof, parentCondition, enabled);
+   public JavaWatchpointNonSymbolicStopCondition(boolean enabled, int hitCount, String fieldName, boolean isAcces, boolean isModification, KeYJavaType containerKJT, Proof proof) {
+      super(hitCount, proof, enabled);
       this.containerKJT=containerKJT;
       this.isAccess = isAcces;
       this.isModification = isModification;

@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.AbstractHitCountBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -62,7 +62,6 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
     * Creates a new {@link AbstractHitCountBreakpointStopCondition}.
     * 
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param exceptionName the name of the exception to watch for
     * @param caught flag to tell if caught exceptions lead to a stop
     * @param uncaught flag to tell if uncaught exceptions lead to a stop
@@ -70,57 +69,14 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
     * @param enabled flag if the Breakpoint is enabled
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     */
-   public ExceptionBreakpointNonSymbolicStopCondition(Proof proof, CompoundStopCondition parentCondition, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
-      super(hitCount, proof, parentCondition, enabled);
+   public ExceptionBreakpointNonSymbolicStopCondition(Proof proof, String exceptionName, boolean caught, boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount){
+      super(hitCount, proof, enabled);
       this.exceptionName = exceptionName;
       exceptionNodes = new HashSet<Node>();
       exceptionParentNodes = new HashSet<Node>();
       this.caught=caught;
       this.uncaught=uncaught;
       this.suspendOnSubclasses=suspendOnSubclasses;
-   }
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isGoalAllowed(int maxApplications, 
-                                long timeout, 
-                                Proof proof, 
-                                IGoalChooser goalChooser, 
-                                long startTime, 
-                                int countApplied, 
-                                Goal goal) {
-      if (goal != null) {
-         Node node = goal.node();
-         // Check if goal is allowed
-         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-         if(activeStatement!=null&&activeStatement instanceof Throw&&isEnabled()){
-            Throw throwStatement = (Throw)activeStatement;
-            for(int i = 0; i<throwStatement.getChildCount();i++){
-               SourceElement childElement = throwStatement.getChildAt(i);
-               if(childElement instanceof LocationVariable){
-                  LocationVariable locVar = (LocationVariable)childElement;
-                  if(locVar.getKeYJavaType().getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
-                     exceptionNodes.add(node);
-                     exceptionParentNodes.add(SETParent);
-                  }else if(suspendOnSubclasses){
-                     JavaInfo info = proof.getServices().getJavaInfo();
-                     KeYJavaType kjt = locVar.getKeYJavaType();
-                     ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
-                     for(KeYJavaType kjtloc: kjts){
-                        if(kjtloc.getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
-                           exceptionNodes.add(node);
-                           exceptionParentNodes.add(SETParent);
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-      return true;
    }
 
 
@@ -169,26 +125,31 @@ public class ExceptionBreakpointNonSymbolicStopCondition extends
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
          Node parent = null;
-         for(Node parents : exceptionNodes){
-            if(isParentNode(node, parents)){
-               parent = parents;
-            }
-         }
-         if(parent!=null
-               &&!exceptionParentNodes.isEmpty()){
-            if(SymbolicExecutionUtil.isTerminationNode(node, ruleApp)&&uncaught){
-               if(hitcountExceeded(node)){
-                  exceptionNodes.remove(parent);
-                  return true;
+
+         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
+         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
+         if(activeStatement!=null&&activeStatement instanceof Throw&&isEnabled()){
+            Throw throwStatement = (Throw)activeStatement;
+            for(int i = 0; i<throwStatement.getChildCount();i++){
+               SourceElement childElement = throwStatement.getChildAt(i);
+               if(childElement instanceof LocationVariable){
+                  LocationVariable locVar = (LocationVariable)childElement;
+                  if(locVar.getKeYJavaType().getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
+                     exceptionParentNodes.add(SETParent);
+                     return true;
+                  }else if(suspendOnSubclasses){
+                     JavaInfo info = proof.getServices().getJavaInfo();
+                     KeYJavaType kjt = locVar.getKeYJavaType();
+                     ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
+                     for(KeYJavaType kjtloc: kjts){
+                        if(kjtloc.getSort().toString().equals(exceptionName)&&!exceptionParentNodes.contains(SETParent)){
+                           exceptionParentNodes.add(SETParent);
+                           return true;
+                        }
+                     }
+                  }
                }
-            } 
-            else if(!SymbolicExecutionUtil.isTerminationNode(node, ruleApp)&&caught){
-               if(hitcountExceeded(node)){
-                  exceptionNodes.remove(parent);
-                  return true;
-               }
             }
-            exceptionNodes.remove(parent);
          }
 
       }

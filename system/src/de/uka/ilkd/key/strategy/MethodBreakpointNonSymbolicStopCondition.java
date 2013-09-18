@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.strategy.AbstractLineBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymbolicLineBreakpointStopCondition {
@@ -38,7 +37,6 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -51,10 +49,10 @@ public class MethodBreakpointNonSymbolicStopCondition extends AbstractNonSymboli
     */
    public MethodBreakpointNonSymbolicStopCondition(String classPath, int lineNumber,
          int hitCount, IProgramMethod pm,
-         Proof proof, CompoundStopCondition parentCondition, String condition,
+         Proof proof, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, boolean isEntry, boolean isExit) throws SLTranslationException {
-      super(classPath, lineNumber, hitCount, pm, proof, parentCondition,
+      super(classPath, lineNumber, hitCount, pm, proof,
                condition, enabled, conditionEnabled, methodStart, methodEnd, pm.getContainerType());
       this.isEntry = isEntry;
       this.isExit = isExit;

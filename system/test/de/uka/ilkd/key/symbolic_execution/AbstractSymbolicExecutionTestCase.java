@@ -42,6 +42,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Sequent;
@@ -51,6 +52,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -1423,5 +1426,24 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
          }
       }
+   }
+   
+
+
+
+   /**
+    * creates a new factory that should be used by others afterwards
+    * @return 
+    */
+   protected ITermProgramVariableCollectorFactory createNewProgramVariableCollectorFactory(final CompoundStopCondition breakpointParentStopCondition) {
+      ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
+         @Override
+         public TermProgramVariableCollector create(Services services) {
+            TermProgramVariableCollectorKeepUpdatesForBreakpointconditions collector = new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
+            
+              return collector;
+         }
+      };
+      return programVariableCollectorFactory;
    }
 }

@@ -56,7 +56,6 @@ public class AbstractLineBreakpointStopCondition extends
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -67,11 +66,11 @@ public class AbstractLineBreakpointStopCondition extends
     */
    public AbstractLineBreakpointStopCondition(String classPath, int lineNumber,
          int hitCount, IProgramMethod pm,
-         Proof proof, CompoundStopCondition parentCondition, String condition,
+         Proof proof, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, KeYJavaType containerType)
          throws SLTranslationException {
-      super(hitCount, pm, proof, parentCondition,
+      super(hitCount, pm, proof, 
             enabled, conditionEnabled, methodStart, methodEnd,
             containerType);
       this.classPath=classPath;

@@ -36,9 +36,10 @@ public class TestKeYWatchpointMethodsOnSatisfiable extends
          JavaInfo javaInfo = env.getServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
          
-         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(-1, env.getBuilder().getProof(), allBreakpoints, "main(x_global)==42", true, true, containerType, false);
+         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(-1, env.getBuilder().getProof(),"main(x_global)==42", true, true, containerType, false);
          
          allBreakpoints.addChildren(globalVariableCondition);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

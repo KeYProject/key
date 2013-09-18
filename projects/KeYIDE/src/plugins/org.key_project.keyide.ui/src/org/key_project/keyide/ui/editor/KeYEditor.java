@@ -87,6 +87,8 @@ public class KeYEditor extends TextEditor implements IProofProvider {
    
    private KeYBreakpointManager breakpointManager;
    
+   private boolean breakpointsActivated = true;
+   
    /**
     * Contains the registered {@link IProofProviderListener}.
     */
@@ -528,5 +530,19 @@ public class KeYEditor extends TextEditor implements IProofProvider {
     */
    public void setBreakpointManager(KeYBreakpointManager breakpointManager) {
       this.breakpointManager = breakpointManager;
+   }
+
+   /**
+    * @return the breakpointsActivated
+    */
+   public boolean isBreakpointsActivated() {
+      return breakpointsActivated;
+   }
+
+   /**
+    * @param breakpointsActivated the breakpointsActivated to set
+    */
+   public void setBreakpointsActivated(boolean breakpointsActivated) {
+      this.breakpointsActivated = breakpointsActivated;
    }
 }

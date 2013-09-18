@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.util.ExtList;
 
 public class AbstractNonSymbolicLineBreakpointStopCondition extends
@@ -57,7 +56,6 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointNonSymbolicStopCondition} and all other {@link LineBreakpointNonSymbolicStopCondition} the associated {@link Proof} should use
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
@@ -68,11 +66,11 @@ public class AbstractNonSymbolicLineBreakpointStopCondition extends
     */
    public AbstractNonSymbolicLineBreakpointStopCondition(String classPath, int lineNumber,
          int hitCount, IProgramMethod pm,
-         Proof proof, CompoundStopCondition parentCondition, String condition,
+         Proof proof, String condition,
          boolean enabled, boolean conditionEnabled, int methodStart,
          int methodEnd, KeYJavaType containerType)
          throws SLTranslationException {
-      super(hitCount, pm, proof, parentCondition,
+      super(hitCount, pm, proof,
             enabled, conditionEnabled, methodStart, methodEnd,
             containerType);
       this.classPath=classPath;

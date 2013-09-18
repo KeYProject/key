@@ -55,8 +55,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.LineBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition extends
@@ -118,18 +116,16 @@ public abstract class AbstractNonSymbolicConditionalBreakpointStopCondition exte
     * @param hitCount the number of hits after which the execution should hold at this breakpoint
     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located at
     * @param proof the {@link Proof} that will be executed and should stop
-    * @param parentCondition a {@link CompoundStopCondition} containing this {@link LineBreakpointStopCondition} and all other {@link LineBreakpointStopCondition} the associated {@link Proof} should use
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
     * @param methodStart the line the containing method of this breakpoint starts at
     * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     */
-   public AbstractNonSymbolicConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof, 
-         CompoundStopCondition parentCondition,
+   public AbstractNonSymbolicConditionalBreakpointStopCondition(int hitCount, IProgramMethod pm, Proof proof,
          boolean enabled, boolean conditionEnabled,
          int methodStart, int methodEnd, KeYJavaType containerType){
-      super(hitCount, proof, parentCondition, enabled);
+      super(hitCount, proof, enabled);
       this.setPm(pm);
       paramVars= new HashSet<LocationVariable>();
       setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());

@@ -46,12 +46,13 @@ public class TestMethodBreakpointWithHitCount extends
          }
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
          //on method call and return
-         MethodBreakpointStopCondition inAndOutBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 15, -1, callerMain, env.getBuilder().getProof(), allBreakpoints, null, true, false, 15, 24,true,true);
+         MethodBreakpointStopCondition inAndOutBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 15, -1, callerMain, env.getBuilder().getProof(),null, true, false, 15, 24,true,true);
          //on method call with hitcount
-         MethodBreakpointStopCondition hitCountBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 8, 2, callerLoop, env.getBuilder().getProof(), allBreakpoints, null, true, false, 8, 13, true, false);
+         MethodBreakpointStopCondition hitCountBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 8, 2, callerLoop, env.getBuilder().getProof(),null, true, false, 8, 13, true, false);
          //on method return with hitcount
-         MethodBreakpointStopCondition thirdBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 6, 2, calleeMain, env.getBuilder().getProof(), allBreakpoints, null, true, false, 6, 9, false, true);
+         MethodBreakpointStopCondition thirdBreakpoint = new MethodBreakpointStopCondition(keyRepDirectory+"\\examples\\_testcase\\set\\methodBreakpointsWithHitcountTest\\test\\BreakpointStopCallerAndLoop.java", 6, 2, calleeMain, env.getBuilder().getProof(),null, true, false, 6, 9, false, true);
          allBreakpoints.addChildren(inAndOutBreakpoint,hitCountBreakpoint,thirdBreakpoint);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
