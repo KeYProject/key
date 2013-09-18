@@ -200,7 +200,7 @@ public class MonKeYProof extends Bean {
           // Check if the proof is still valid
           if (proof != null && !proof.isDisposed()) {
              // proof is invalid, reset this automatic proof instance
-             proof = null; 
+             removeProof(); 
              setResult(MonKeYProofResult.UNKNOWN);
              updateStatistics();
           }
