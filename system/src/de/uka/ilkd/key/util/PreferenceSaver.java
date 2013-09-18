@@ -20,7 +20,7 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.AbstractButton;
 import javax.swing.JMenu;
 
 import javax.swing.JSplitPane;
@@ -67,7 +67,7 @@ public class PreferenceSaver {
      */
     private static Saver<?> SAVERS[] = {
             new WindowSaver(), new SplitPaneSaver(), new TabbedPaneSaver(),
-        new CheckBoxMenuItemSaver()
+        new AbstractButtonSaver()
     };
 
     /**
@@ -286,29 +286,29 @@ public class PreferenceSaver {
 
     }
 
-    private static class CheckBoxMenuItemSaver implements Saver<JCheckBoxMenuItem> {
+    private static class AbstractButtonSaver implements Saver<AbstractButton> {
 
         @Override
-        public void load(JCheckBoxMenuItem component, Preferences prefs) {
+        public void load(AbstractButton component, Preferences prefs) {
             String name = component.getName();
             assert name != null;
             
-            boolean selected = prefs.getBoolean(name + ".CheckBoxSelectedState", component.isSelected());
+            boolean selected = prefs.getBoolean(name + ".AbstractButtonSelected", component.isSelected());
             component.setSelected(selected);
         }
 
         @Override
-        public void save(JCheckBoxMenuItem component, Preferences prefs) {
+        public void save(AbstractButton component, Preferences prefs) {
             String name = component.getName();
             assert name != null;
 
             boolean selected = component.isSelected();
-            prefs.putBoolean(name + ".CheckBoxSelectedState", selected);
+            prefs.putBoolean(name + ".AbstractButtonSelected", selected);
         }
 
         @Override
-        public Class<JCheckBoxMenuItem> supportedClass() {
-            return JCheckBoxMenuItem.class;
+        public Class<AbstractButton> supportedClass() {
+            return AbstractButton.class;
         }
 
     }
