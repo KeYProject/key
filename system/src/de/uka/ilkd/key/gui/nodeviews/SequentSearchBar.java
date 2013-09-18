@@ -39,8 +39,8 @@ public class SequentSearchBar extends SearchBar {
     
     private final List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
-    private boolean regExpSearch = false;
     private SequentView sequentView;
+    JCheckBox regExpCheckBox;
 
     public SequentSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
@@ -55,20 +55,17 @@ public class SequentSearchBar extends SearchBar {
     @Override
     public void createUI(){
         super.createUI();
-        JCheckBox checkBox = new JCheckBox("RegExp");
-        checkBox.setName("toggleRegExpSearch");
-            checkBox.addItemListener(new ItemListener() {
+        regExpCheckBox = new JCheckBox("RegExp", false);
+        regExpCheckBox.setName("toggleRegExpSearch");
+            regExpCheckBox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    regExpSearch = ((JCheckBox)e.getItemSelectable())
-                            .isSelected();
                     searchField.requestFocus();
                     search();
                 }
             });
-            checkBox.setSelected(regExpSearch);
-            checkBox.setToolTipText("Evaluate as regular expression");
-        add(checkBox);
+            regExpCheckBox.setToolTipText("Evaluate as regular expression");
+        add(regExpCheckBox);
     }
 
     @Override
@@ -122,7 +119,7 @@ public class SequentSearchBar extends SearchBar {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE
                     | Pattern.UNICODE_CASE;
         }
-        if (!regExpSearch) {
+        if (!regExpCheckBox.isSelected()) {
             // search for literal string instead of regExp
             searchFlag = searchFlag | Pattern.LITERAL;
         }
