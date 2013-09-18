@@ -102,4 +102,18 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     public KeYJavaType getKJT() {
         return inv.getKJT();
     }
+
+    @Override
+    public LoopWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+        assert wdc instanceof LoopWellDefinedness;
+        final LoopWellDefinedness lwd = (LoopWellDefinedness)wdc;
+        assert this.getStatement().getName().equals(lwd.getStatement().getName());
+        assert this.getStatement().getLoop().getStartPosition().getLine() ==
+                lwd.getStatement().getLoop().getStartPosition().getLine();
+        assert this.getStatement().getTarget().equals(lwd.getStatement().getTarget());
+        assert this.getStatement().getKJT().equals(lwd.getStatement().getKJT());
+
+        super.combine(lwd, services);
+        return this;
+    }
 }

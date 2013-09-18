@@ -72,6 +72,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     public static ImmutableSet<Taclet> createInvTaclet(KeYJavaType kjt, Services services) {
+        final boolean isObjType = kjt.getSort().toString().equals("java.lang.Object");
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final SchemaVariable heapSV =
@@ -88,10 +89,11 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
         final Taclet inv =
-                WellDefinednessCheck.createTaclet(prefix + kjt.getName(),
+                WellDefinednessCheck.createTaclet(prefix + (isObjType ? "" : ("_" + kjt.getName())),
                                                   var, invTerm, pre, false, services);
         final Taclet staticInv =
-                WellDefinednessCheck.createTaclet(prefix + "Static_" + kjt.getName(),
+                WellDefinednessCheck.createTaclet(prefix + "_Static" +
+                                                        (isObjType ? "" : ("_" + kjt.getName())),
                                                   var, staticInvTerm, staticPre, true, services);
         return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
     }
@@ -100,7 +102,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return this.inv;
     }
 
-    public void addInv(Term inv) {
+    public final void addInv(Term inv) {
         addEnsures(inv);
     }
 
@@ -112,6 +114,15 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public boolean isModel() {
         return false;
+    }
+
+    @Override
+    public ClassWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+        assert wdc instanceof ClassWellDefinedness;
+        final ClassWellDefinedness cwd = (ClassWellDefinedness)wdc;
+        assert this.getInvariant().getKJT().equals(cwd.getInvariant().getKJT());
+        super.combine(cwd, services);
+        return this;
     }
 
     @Override

@@ -431,8 +431,9 @@ public final class SpecificationRepository {
                     getOperationContracts(targetKJT,
                             (IProgramMethod) targetMethod).add(
                             (FunctionalOperationContract) contract));
-            registerContract(new MethodWellDefinedness(
-                    (FunctionalOperationContract) contract, services));
+            final MethodWellDefinedness mwd =
+                    new MethodWellDefinedness((FunctionalOperationContract) contract, services);
+            registerContract(mwd);
         } else if (contract instanceof DependencyContract
                 && ((DependencyContract) contract).getOrigVars().atPres
                         .isEmpty()
@@ -446,13 +447,23 @@ public final class SpecificationRepository {
             final ClassInvariant inv = new ClassInvariantImpl(invName, invName,
                     targetKJT, ((DependencyContract) contract).getVisibility(),
                     TB.tt(), contract.getOrigVars().self);
-            registerContract(new ClassWellDefinedness(inv, targetMethod, deps,
-                    mby, services));
+            ClassWellDefinedness cwd =
+                    new ClassWellDefinedness(inv, targetMethod, deps, mby, services);
+            final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(targetKJT);
+            if(!cwds.isEmpty()) {
+                assert cwds.size() == 1;
+                final ClassWellDefinedness oldCwd = cwds.iterator().next();
+                unregisterContract(oldCwd);
+                oldCwd.addInv(cwd.getInvariant().getInv(oldCwd.getOrigVars().self, services));
+                cwd = oldCwd.combine(cwd, services);
+            }
+            registerContract(cwd);
         } else if (contract instanceof DependencyContract
                 && ((DependencyContract) contract).getOrigVars().atPres
                         .isEmpty()) {
-            registerContract(new MethodWellDefinedness(
-                    (DependencyContract) contract, services));
+            final MethodWellDefinedness mwd =
+                    new MethodWellDefinedness((DependencyContract) contract, services);
+            registerContract(mwd);
         } else if (contract instanceof WellDefinednessCheck) {
             registerWdCheck((WellDefinednessCheck) contract);
         }
@@ -873,14 +884,13 @@ public final class SpecificationRepository {
         invs.put(kjt, getClassInvariants(kjt).add(inv));
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
-            registerContract(new ClassWellDefinedness(inv, target, null, null,
-                    services));
+            registerContract(new ClassWellDefinedness(inv, target, null, null, services));
         } else {
-            for (ClassWellDefinedness cwd : cwds) {
-                unregisterContract(cwd);
-                cwd.addInv(inv.getInv(cwd.getOrigVars().self, services));
-                registerContract(cwd);
-            }
+            assert cwds.size() == 1;
+            final ClassWellDefinedness cwd = cwds.iterator().next();
+            unregisterContract(cwd);
+            cwd.addInv(inv.getInv(cwd.getOrigVars().self, services));
+            registerContract(cwd);
         }
 
         // in any case, create axiom with non-static target
@@ -1378,8 +1388,7 @@ public final class SpecificationRepository {
                 reps = reps.add((RepresentsAxiom) ax);
             }
         }
-        ProgramVariable heap = services.getTypeConverter().getHeapLDT()
-                .getHeap();
+        final ProgramVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         for (RepresentsAxiom rep : reps) {
             for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
                 if (ch.isModel() && ch.getTarget().equals(rep.getTarget())) {

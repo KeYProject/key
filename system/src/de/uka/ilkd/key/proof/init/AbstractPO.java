@@ -159,19 +159,27 @@ public abstract class AbstractPO implements IPersistablePO {
     void generateWdTaclets() {
         ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
         ImmutableSet<KeYJavaType> kjts = DefaultImmutableSet.<KeYJavaType>nil();
+        KeYJavaType objectType = null;
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
-            if (!ch.getKJT().getName().equals("Object")) {
-                if (ch instanceof MethodWellDefinedness) {
-                    MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
-                    // WD(pv.m(...))
-                    res = res.add(mwd.createOperationTaclet(services));
-                }
-                kjts = kjts.add(ch.getKJT());
+            if (ch instanceof MethodWellDefinedness) {
+                MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
+                // WD(pv.m(...))
+                res = res.add(mwd.createOperationTaclet(services));
+            }
+            kjts = kjts.add(ch.getKJT());
+            if (objectType == null
+                    && ch.getKJT().getSort().toString().equals("java.lang.Object")) {
+                objectType = ch.getKJT();
             }
         }
-        for (KeYJavaType kjt: kjts) {
-            // WD(pv.<inv>)
-            res = res.union(ClassWellDefinedness.createInvTaclet(kjt, services));
+        if (objectType != null) {
+            // WD(o.<inv>)
+            res = res.union(ClassWellDefinedness.createInvTaclet(objectType, services));
+        } else {
+            for (KeYJavaType kjt: kjts) {
+                // WD(pv.<inv>)
+                res = res.union(ClassWellDefinedness.createInvTaclet(kjt, services));
+            }
         }
 
         for (Taclet t: res) {

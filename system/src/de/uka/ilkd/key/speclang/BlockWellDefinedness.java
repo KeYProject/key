@@ -101,4 +101,18 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     public KeYJavaType getKJT() {
         return block.getKJT();
     }
+
+    @Override
+    public BlockWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+        assert wdc instanceof BlockWellDefinedness;
+        final BlockWellDefinedness bwd = (BlockWellDefinedness)wdc;
+        assert this.getStatement().getName().equals(bwd.getStatement().getName());
+        assert this.getStatement().getBlock().getStartPosition().getLine() ==
+                bwd.getStatement().getBlock().getStartPosition().getLine();
+        assert this.getStatement().getMethod().equals(bwd.getStatement().getMethod());
+        assert this.getStatement().getKJT().equals(bwd.getStatement().getKJT());
+
+        super.combine(bwd, services);
+        return this;
+    }
 }

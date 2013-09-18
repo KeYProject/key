@@ -62,8 +62,8 @@ public abstract class WellDefinednessCheck implements Contract {
     private static final String OPTION = "wdChecks";
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final TermFactory TF = TermFactory.DEFAULT;
-    public static final String INV_TACLET = "wd_Invariant_";
-    public static final String OP_TACLET = "wd_Operation_";
+    public static final String INV_TACLET = "wd_Invariant";
+    public static final String OP_TACLET = "wd_Operation";
 
     static enum Type {
         CLASS_INVARIANT, CLASS_AXIOM, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
@@ -160,6 +160,12 @@ public abstract class WellDefinednessCheck implements Contract {
                                   WellDefinednessCheck check) {
         return replaceSV(t, self, null, null, null, params,
                          check.getOrigVars(), check.getHeaps());
+    }
+
+    private static Term replace(Term t, OriginalVariables newVars,
+                                WellDefinednessCheck check) {
+        return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
+                       newVars.params, check.getOrigVars(), check.getHeaps());
     }
 
     private static Term replace(Term t, Variables vars,
@@ -306,6 +312,12 @@ public abstract class WellDefinednessCheck implements Contract {
 
     private Term replace(Term t, Variables vars) {
         return replace(t, vars, this);
+    }
+
+    private Condition replace(Condition pre, OriginalVariables newVars) {
+        final Term implicit = replace(pre.implicit, newVars);
+        final Term explicit = replace(pre.explicit, newVars);
+        return new Condition(implicit, explicit);
     }
 
     private Condition replace(Condition pre, Variables vars) {
@@ -550,6 +562,10 @@ public abstract class WellDefinednessCheck implements Contract {
                                              ImmutableList<ParsableVariable> params,
                                              Services services);
 
+    final Term replace(Term t, OriginalVariables newVars) {
+        return replace(t, newVars, this);
+    }
+
     final Condition replaceSV(Condition pre, SchemaVariable self,
                               ImmutableList<ParsableVariable> params) {
         final Term implicit = replaceSV(pre.implicit, self, params);
@@ -559,6 +575,12 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setMby(Term mby) {
         this.mby = mby;
+    }
+
+    final void addRequires(Condition req) {
+        final Condition oldRequires = getRequires();
+        this.requires = new Condition(TB.andSC(req.implicit, oldRequires.implicit),
+                                      TB.andSC(req.explicit, oldRequires.explicit));
     }
 
     final void setRequires(Term req) {
@@ -579,11 +601,15 @@ public abstract class WellDefinednessCheck implements Contract {
         this.accessible = acc;
     }
 
+    final void addEnsures(Condition ens) {
+        final Condition oldEnsures = getEnsures();
+        this.ensures = new Condition(TB.andSC(ens.implicit, oldEnsures.implicit),
+                                     TB.andSC(ens.explicit, oldEnsures.explicit));
+    }
+
     final void addEnsures(Term ens) {
         final Pair<Term, Term> ensures = split(ens);
-        final Condition oldEnsures = getEnsures();
-        this.ensures = new Condition(TB.andSC(ensures.first, oldEnsures.implicit),
-                                     TB.andSC(ensures.second, oldEnsures.explicit));
+        addEnsures(new Condition(ensures.first, ensures.second));
     }
 
     final void setEnsures(Term ens) {
@@ -619,6 +645,49 @@ public abstract class WellDefinednessCheck implements Contract {
     public abstract String getBehaviour();
 
     public abstract boolean isModel();
+
+    public WellDefinednessCheck combine(WellDefinednessCheck wdc, Services services) {
+        assert this.getName().equals(wdc.getName());
+        assert this.id() == wdc.id();
+        assert this.getTarget().equals(wdc.getTarget());
+        assert this.type().equals(wdc.type());
+        assert this.isModel() == wdc.isModel();
+        assert this.getBehaviour().equals(wdc.getBehaviour());
+
+        if (this.getAccessible() != null && wdc.getAccessible() != null) {
+            final Term acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
+            setAccessible(TB.union(services, acc, this.getAccessible()));
+        } else if (wdc.getAccessible() != null) {
+            final Term acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
+            setAccessible(acc);
+        }
+        if (this.getAssignable() != null && wdc.getAssignable() != null) {
+            final Term ass = wdc.replace(wdc.getAssignable(), this.getOrigVars());
+            setAssignable(TB.union(services, ass, this.getAssignable()), services);
+        } else if (wdc.getAssignable() != null) {
+            final Term ass = wdc.replace(wdc.getAssignable(), this.getOrigVars());
+            setAssignable(ass, services);
+        }
+        final Condition ens = wdc.replace(wdc.getEnsures(), this.getOrigVars());
+        addEnsures(ens);
+        final Condition req = wdc.replace(wdc.getRequires(), this.getOrigVars());
+        addRequires(req);
+        if (this.getRepresents() != null && wdc.getRepresents() != null) {
+            final Term rep = wdc.replace(wdc.getRepresents(), this.getOrigVars());
+            this.represents = TB.andSC(rep, getRepresents());
+        } else if (wdc.getRepresents() != null) {
+            final Term rep = wdc.replace(wdc.getRepresents(), this.getOrigVars());
+            this.represents = rep;
+        }
+        if (this.hasMby() && wdc.hasMby()) {
+            final Term mby = wdc.replace(wdc.getMby(), this.getOrigVars());
+            setMby(TB.add(services, mby, this.getMby()));
+        } else if (wdc.hasMby()) {
+            final Term mby = wdc.replace(wdc.getMby(), this.getOrigVars());
+            setMby(mby);
+        }
+        return this;
+    }
 
     /**
      * This method checks, if well-definedness checks are generally turned on or off.
@@ -667,7 +736,11 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     public final WellDefinednessCheck addRepresents(Term rep) {
-        this.represents = rep;
+        if (this.represents != null && rep != null) {
+            this.represents = TB.andSC(this.represents, rep);
+        } else {
+            this.represents = rep;
+        }
         return this;
     }
 

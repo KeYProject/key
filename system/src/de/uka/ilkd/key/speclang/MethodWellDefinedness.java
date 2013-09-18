@@ -41,7 +41,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     private final Contract contract;
 
-    private final Term globalDefs;
+    private Term globalDefs;
     private final boolean model;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
@@ -203,7 +203,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final Term wdArgs =
                 TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
                              services));
-        return createTaclet(prefix + (isStatic ? "Static " : "") + tName,
+        return createTaclet(prefix + (isStatic ? " Static " : " ") + tName,
                             TB.var(selfSV), TB.func(target, args),
                             TB.and(wdArgs, pre), isStatic || isConstructor, services);
     }
@@ -230,6 +230,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     public boolean isModel() {
         return this.model;
+    }
+
+    @Override
+    public MethodWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
+        assert wdc instanceof MethodWellDefinedness;
+        final MethodWellDefinedness mwd = (MethodWellDefinedness)wdc;
+        assert this.getMethodContract().getName().equals(mwd.getMethodContract().getName());
+        assert this.getMethodContract().id() == mwd.getMethodContract().id();
+        assert this.getMethodContract().getTarget().equals(mwd.getMethodContract().getTarget());
+        assert this.getMethodContract().getKJT().equals(mwd.getMethodContract().getKJT());
+
+        super.combine(mwd, services);
+        if (this.getGlobalDefs() != null && mwd.getGlobalDefs() != null) {
+            final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+            this.globalDefs = TB.andSC(defs, this.getGlobalDefs());
+        } else if (mwd.getGlobalDefs() != null) {
+            final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+            this.globalDefs = defs;
+        }
+        return this;
     }
 
     @Override
