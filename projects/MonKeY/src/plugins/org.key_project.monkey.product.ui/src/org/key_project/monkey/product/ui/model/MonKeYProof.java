@@ -213,8 +213,8 @@ public class MonKeYProof extends Bean {
                           ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);
                           Assert.isNotNull(input);
                           Proof proof = environment.getUi().createProof(environment.getInitConfig(), input);
-                          ProofUserManager.getInstance().addUser(proof, environment, MonKeYProof.this);
                           Assert.isNotNull(proof);
+                          ProofUserManager.getInstance().addUser(proof, environment, MonKeYProof.this);
                           setResult(proof);
                       }
                       catch (Exception e) {
