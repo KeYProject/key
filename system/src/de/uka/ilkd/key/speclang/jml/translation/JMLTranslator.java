@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -73,7 +74,8 @@ final class JMLTranslator {
         INV_FOR ("\\invariant_for"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
-        
+        FRESH ("\\fresh"),
+
         // clauses
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
@@ -821,6 +823,51 @@ final class JMLTranslator {
                         TB.var(fieldLV));
 
                 return new SLExpression(locSet, services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.FRESH,
+                               new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params,
+                                ImmutableList.class, 
+                                Services.class);
+                final ImmutableList<SLExpression> list = (ImmutableList) params[0];
+                final Map<LocationVariable,Term> atPres = (Map) params[1];
+                final Services services = (Services) params[2];
+
+	        if(atPres == null || atPres.get(TB.getBaseHeap(services)) == null) {
+	            throw excManager.createException("\\fresh not allowed in this context");
+	        }
+
+	        Term t = TB.tt();
+	        final Sort objectSort = services.getJavaInfo().objectSort();
+                final TypeConverter tc = services.getTypeConverter();
+	        for(SLExpression expr: list) {
+    	            if(!expr.isTerm()) {
+	                throw excManager.createException("Expected a term, but found: " + expr);
+	            } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
+	                t = TB.and(t,
+	                           TB.equals(TB.select(services,
+	                                           tc.getBooleanLDT().targetSort(),
+	                                           atPres.get(TB.getBaseHeap(services)),
+	                                           expr.getTerm(),
+	                                           TB.func(tc.getHeapLDT().getCreated())),
+	                                 TB.FALSE(services)));
+    	            } else if(expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
+	            t = TB.and(t, TB.subset(services,
+	                                    expr.getTerm(),
+	                                    TB.freshLocs(services, atPres.get(TB.getBaseHeap(services)))));
+	            } else {
+	                throw excManager.createException("Wrong type: " + expr);
+	            }
+	        }
+	        return new SLExpression(t);
             }
         });
 
