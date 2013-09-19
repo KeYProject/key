@@ -435,10 +435,9 @@ public final class SpecificationRepository {
                     new MethodWellDefinedness((FunctionalOperationContract) contract, services);
             registerContract(mwd);
         } else if (contract instanceof DependencyContract
-                && ((DependencyContract) contract).getOrigVars().atPres
-                        .isEmpty()
-                && targetMethod.name().toString()
-                        .startsWith("java.lang.Object")) {
+                && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()
+                && targetMethod.getContainerType().equals(
+                        services.getJavaInfo().getJavaLangObject())) {
             final Term deps = contract.getAccessible(services
                     .getTypeConverter().getHeapLDT().getHeap());
             final Term mby = contract.getMby();

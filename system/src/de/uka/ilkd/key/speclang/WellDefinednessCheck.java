@@ -116,43 +116,47 @@ public abstract class WellDefinednessCheck implements Contract {
     // Internal Methods
     //-------------------------------------------------------------------------
 
-    private static Pair<Term, Term> split(Term spec) {
+    private Condition split(Term spec) {
         Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(spec);
-        ImmutableList<Term> start = p.first;
-        ImmutableList<Term> end   = p.second;
-        return new Pair<Term, Term> (TB.andSC(start), TB.andSC(end));
+        ImmutableList<Term> implicit = p.first;
+        ImmutableList<Term> explicit   = p.second;
+        return new Condition(TB.andSC(implicit), TB.andSC(explicit));
     }
 
     private static Pair<ImmutableList<Term>, ImmutableList<Term>> splitRecursively(Term spec) {
         assert spec != null;
-        ImmutableList<Term> start = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> end = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
         if(spec.arity() > 0
                 && spec.op().equals(Junctor.AND)) {
             for (Term sub: spec.subs()) {
                 if(sub.hasLabels()
-                        && sub.getLabels().contains(ImplicitSpecTermLabel.INSTANCE)) {
-                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
-                    start = start.append(p.first).append(p.second);
+                        && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                    final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
+                    implicit = implicit.append(p.first).append(p.second);
                 } else {
-                    Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
-                    start = start.append(p.first);
-                    end = end.append(p.second);
+                    final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
+                    implicit = implicit.append(p.first);
+                    explicit = explicit.append(p.second);
                 }
             }
-            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
+            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
         } else if (spec.arity() > 0
                 && spec.op().equals(Junctor.IMP)) {
             assert spec.arity() == 2;
-            Pair<ImmutableList<Term>, ImmutableList<Term>> imp1 = splitRecursively(spec.sub(0));
-            Pair<ImmutableList<Term>, ImmutableList<Term>> imp2 = splitRecursively(spec.sub(1));
+            final Pair<ImmutableList<Term>, ImmutableList<Term>> imp1 = splitRecursively(spec.sub(0));
+            final Pair<ImmutableList<Term>, ImmutableList<Term>> imp2 = splitRecursively(spec.sub(1));
             Term i1 = TB.andSC(TB.andSC(imp1.first), TB.andSC(imp1.second));
             Term i2 = TB.andSC(TB.andSC(imp2.first), TB.andSC(imp2.second));
-            end = end.append(TB.imp(i1, i2));
-            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
+            explicit = explicit.append(TB.imp(i1, i2));
+            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
         } else {
-            end = end.append(spec);
-            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (start, end);
+            if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                implicit = implicit.append(spec);
+            } else {
+                explicit = explicit.append(spec);
+            }
+            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
         }
     }
 
@@ -539,16 +543,21 @@ public abstract class WellDefinednessCheck implements Contract {
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
-        Term paramsOK = generateParamsOK(params, services);
+        final Term paramsOK = generateParamsOK(params, services);
 
         // initial value of measured_by clause
         final TermAndFunc mbyAtPreDef = generateMbyAtPreDef(self, params, services);
+
         final Term wellFormed = TB.wellFormed(TB.var(heap), services);
+
+        final Term invTerm = self != null && this instanceof ClassWellDefinedness ?
+                TB.inv(services, new Term[] {TB.var(heap)}, TB.var(self)) : TB.tt();
+
         final Term[] result;
         if (!taclet) {
             result = new Term[]
                     { wellFormed, selfNotNull, selfCreated, selfExactType,
-                    implicitPre, paramsOK, mbyAtPreDef.term };
+                    implicitPre, paramsOK, mbyAtPreDef.term, invTerm };
         } else {
             result = new Term[]
                     { wellFormed, implicitPre, paramsOK, mbyAtPreDef.term };
@@ -584,9 +593,13 @@ public abstract class WellDefinednessCheck implements Contract {
                                       TB.andSC(req.explicit, oldRequires.explicit));
     }
 
+    final void addRequires(Term req) {
+        Condition requires = split(req);
+        addRequires(requires);
+    }
+
     final void setRequires(Term req) {
-        Pair<Term, Term> requires = split(req);
-        this.requires = new Condition(requires.first, requires.second);
+        this.requires = split(req);
     }
 
     final void setAssignable(Term ass, Services services) {
@@ -611,13 +624,11 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     final void addEnsures(Term ens) {
-        final Pair<Term, Term> ensures = split(ens);
-        addEnsures(new Condition(ensures.first, ensures.second));
+        addEnsures(split(ens));
     }
 
     final void setEnsures(Term ens) {
-        Pair<Term, Term> ensures = split(ens);
-        this.ensures = new Condition(ensures.first, ensures.second);
+        this.ensures = split(ens);
     }
 
     final Type type() {
@@ -790,9 +801,12 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
         assert mod != null;
-        final Term havocUpd = TB.elementary(services, heap,
-                TB.anon(services, TB.var(heap), mod, anonHeap));
-        final Term oldUpd = TB.elementary(services, TB.var(heapAtPre), TB.var(heap));
+        final Term havocUpd = mod != TB.empty(services) ?
+                TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap))
+                : TB.skip();
+        final Term oldUpd = heapAtPre != heap ?
+                TB.elementary(services, TB.var(heapAtPre), TB.var(heap))
+                : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
     }
 

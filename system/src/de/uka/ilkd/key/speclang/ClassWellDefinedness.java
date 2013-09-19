@@ -52,7 +52,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
               Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
-        setRequires(TB.tt());
+        setRequires(inv.getOriginalInv());
         setAssignable(TB.empty(services), services);
         setEnsures(inv.getOriginalInv());
         setAccessible(accessible);
@@ -71,8 +71,8 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return super.getRest();
     }
 
-    public static ImmutableSet<Taclet> createInvTaclet(KeYJavaType kjt, Services services) {
-        final boolean isObjType = kjt.getSort().toString().equals("java.lang.Object");
+    public static ImmutableSet<Taclet> createInvTaclet(Services services) {
+        final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final SchemaVariable heapSV =
@@ -89,12 +89,10 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
         final Taclet inv =
-                WellDefinednessCheck.createTaclet(prefix + (isObjType ? "" : ("_" + kjt.getName())),
-                                                  var, invTerm, pre, false, services);
+                WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
         final Taclet staticInv =
-                WellDefinednessCheck.createTaclet(prefix + "_Static" +
-                                                        (isObjType ? "" : ("_" + kjt.getName())),
-                                                  var, staticInvTerm, staticPre, true, services);
+                WellDefinednessCheck.createTaclet(prefix + "_Static", var, staticInvTerm,
+                                                  staticPre, true, services);
         return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
     }
 
@@ -103,6 +101,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     public final void addInv(Term inv) {
+        addRequires(inv);
         addEnsures(inv);
     }
 

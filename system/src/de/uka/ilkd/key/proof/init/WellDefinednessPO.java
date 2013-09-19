@@ -35,9 +35,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
@@ -211,7 +211,16 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.<ClassAxiom>nil();
         for(ClassAxiom axiom: specRepos.getClassAxioms(kjt)) {
-            if(axiom instanceof PartialInvAxiom) {
+            if(axiom instanceof ClassAxiom && check instanceof ClassWellDefinedness) {
+                final ClassAxiom classAxiom = (ClassAxiom)axiom;
+                final ClassWellDefinedness cwd = (ClassWellDefinedness)check;
+                final String kjtName = cwd.getKJT().getFullName();
+                final String invName = "in " + cwd.getKJT().getName();
+                if (!classAxiom.getName().endsWith(invName)
+                        && !classAxiom.getName().endsWith(kjtName)) {
+                    result = result.add(classAxiom);
+                }
+            } else {
                 result = result.add(axiom);
             }
         }
@@ -234,19 +243,21 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public void readProblem() throws ProofInputException {
         register(this.vars);
         final POTerms po = check.replace(check.createPOTerms(), vars);
-        final TermAndFunc pre = check.getPre(po.pre, vars.self, vars.heap, vars.params,
-                                             false, services);
-        final Term wdPre = TB.wd(pre.term, services);
+        final TermAndFunc preCond =
+                check.getPre(po.pre, vars.self, vars.heap, vars.params, false, services);
+        final Term wdPre = TB.wd(preCond.term, services);
         final Term wdMod = TB.wd(po.mod, services);
         final Term wdRest = TB.and(TB.wd(po.rest, services));
-        register(pre.func);
-        mbyAtPre = pre.func != null ? TB.func(pre.func) : null;
+        register(preCond.func);
+        mbyAtPre = preCond.func != null ? TB.func(preCond.func) : null;
         final Term post = check.getPost(po.post, vars.result, services);
+        final Term pre = preCond.term;
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
                                               vars.anonHeap, services);
         final Term wfAnon = TB.wellFormed(vars.anonHeap, services);
-        final Term uPost = TB.apply(updates, TB.wd(post, services));
-        final Term imp = TB.imp(TB.and(pre.term, wfAnon),
+        final Term uPost = check instanceof ClassWellDefinedness ?
+                TB.tt() : TB.apply(updates, TB.wd(post, services));
+        final Term imp = TB.imp(TB.and(pre, wfAnon),
                                 TB.and(wdMod, wdRest, uPost));
         final Term poTerms = TB.and(wdPre, imp);
         assignPOTerms(poTerms);
