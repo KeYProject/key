@@ -94,24 +94,6 @@ public class TestKey extends TestSuite {
 
     };
 
-    static Class<? extends TestCase>[] setTests = new Class[] {
-       de.uka.ilkd.key.util.TestNodePreorderIterator.class,
-       de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
-       de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
-       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
-       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
-       de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
-       de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
-       de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
-       de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
-       de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
-    };
-
      
      public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
@@ -143,7 +125,6 @@ public class TestKey extends TestSuite {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
-	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
 	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;
