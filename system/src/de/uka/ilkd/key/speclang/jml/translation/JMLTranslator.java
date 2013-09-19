@@ -903,12 +903,14 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params,
                                 ImmutableList.class, 
+                                Map.class,
                                 Services.class);
                 final ImmutableList<SLExpression> list = (ImmutableList) params[0];
                 final Map<LocationVariable,Term> atPres = (Map) params[1];
                 final Services services = (Services) params[2];
+                final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
-	        if(atPres == null || atPres.get(TB.getBaseHeap(services)) == null) {
+	        if(atPres == null || atPres.get(baseHeap) == null) {
 	            throw excManager.createException("\\fresh not allowed in this context");
 	        }
 
@@ -922,14 +924,16 @@ final class JMLTranslator {
 	                t = TB.and(t,
 	                           TB.equals(TB.select(services,
 	                                           tc.getBooleanLDT().targetSort(),
-	                                           atPres.get(TB.getBaseHeap(services)),
+	                                           atPres.get(baseHeap),
 	                                           expr.getTerm(),
 	                                           TB.func(tc.getHeapLDT().getCreated())),
 	                                 TB.FALSE(services)));
+                        // add non-nullness (bug #1364)
+                        t = TB.and(t, TB.not(TB.equals(expr.getTerm(),TB.NULL(services))));
     	            } else if(expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
 	            t = TB.and(t, TB.subset(services,
 	                                    expr.getTerm(),
-	                                    TB.freshLocs(services, atPres.get(TB.getBaseHeap(services)))));
+	                                    TB.freshLocs(services, atPres.get(baseHeap))));
 	            } else {
 	                throw excManager.createException("Wrong type: " + expr);
 	            }
