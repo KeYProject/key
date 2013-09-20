@@ -284,14 +284,6 @@ public abstract class AbstractPO implements IPersistablePO {
                                 initConfig.getSettings() != null
                                 ? initConfig.getSettings()
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
-
-        // Make sure that required label works are present
-        ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
-        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
-        }
-        proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
-
         return proof;
     }
 

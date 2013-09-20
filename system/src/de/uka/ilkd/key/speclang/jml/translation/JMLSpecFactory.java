@@ -1030,6 +1030,7 @@ public class JMLSpecFactory {
 
     @SuppressWarnings("unchecked")
     public Contract createJMLDependencyContract(KeYJavaType kjt,
+    											LocationVariable targetHeap,
                                                 PositionedString originalDep)
             throws SLTranslationException {
         assert kjt != null;
@@ -1042,14 +1043,25 @@ public class JMLSpecFactory {
         Triple<IObserverFunction, Term, Term> dep =
                 JMLTranslator.translate(originalDep, kjt, selfVar, null, null,
                                         null, null, Triple.class, services);
-        return cf.dep(kjt, dep, dep.first.isStatic() ? null : selfVar);
+        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : selfVar);
     }
 
 
     public Contract createJMLDependencyContract(KeYJavaType kjt,
                                                 TextualJMLDepends textualDep)
             throws SLTranslationException {
-        return createJMLDependencyContract(kjt, textualDep.getDepends());
+    	PositionedString dep = null;
+    	LocationVariable targetHeap = null;
+    	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+    		dep = textualDep.getDepends(heap.name().toString()).head();
+    		if(dep != null) {
+    			targetHeap = heap;
+    			break;
+    		}
+    	}
+    	assert dep != null;
+    	assert targetHeap != null;
+        return createJMLDependencyContract(kjt, targetHeap, dep);
     }
 
 
