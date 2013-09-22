@@ -75,7 +75,11 @@ this to None.
   Java language specification.
 
 * If set to ban, any occurrence of a runtime exception is considered
-  an irrecoverable program failure.
+  an irrecoverable program failure. For programs which do not raise 
+  runtime exceptions, this is usually easier to prove than 'allow'.
+
+* If set to ignore, it is assumed that no runtime exception occurs.
+  Warning: Reasoning with these rules is unsound.
 </entry>
 
 <entry key="modelFields">Rules for model field representation clauses
