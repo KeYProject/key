@@ -149,12 +149,14 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                   for(IType type : unit.getAllTypes()){
                      String typeName = type.getFullyQualifiedName();
                      typeName = typeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
-                     KeYJavaType KJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(typeName);
-                        if(KJT==null){
-                           return false;
-                        }else{
-                           openHotCodeReplaceDialog(target);
-                        }
+                     if(environment!=null&&environment.getBuilder()!=null&&environment.getBuilder().getProof()!=null&&environment.getBuilder().getProof().getJavaInfo()!=null){
+                        KeYJavaType KJT = environment.getBuilder().getProof().getJavaInfo().getTypeByClassName(typeName);
+                           if(KJT==null){
+                              return false;
+                           }else{
+                              openHotCodeReplaceDialog(target);
+                           }
+                     }
                   }
                }
                return false;
