@@ -41,6 +41,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -53,7 +54,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * SWT Bot tests for {@link KeYUtil}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYUtilTest extends TestCase {
+public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link KeYUtil#getRuleDisplayName(de.uka.ilkd.key.proof.Node)}.
     */
@@ -333,7 +334,7 @@ public class SWTBotKeYUtilTest extends TestCase {
             fail("Loading general projects should not be possible.");
         }
         catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project + "\" is no Java project."));
+            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project.getName() + "\" is no Java project."));
         }
         // Load java project with multiple source directories
         final IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java");

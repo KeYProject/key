@@ -41,7 +41,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -53,8 +52,9 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
@@ -147,6 +147,14 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
+
+        // Make sure that required label works are present
+        ImmutableList<ITermLabelWorker> labelInstantiators = settings.getLabelSettings().getLabelInstantiators();
+        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
+           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+        }
+        settings.getLabelSettings().setLabelInstantiators(labelInstantiators);
+
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -219,27 +227,6 @@ public class Proof implements Named {
             BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
         this ( name, sequent, rules, builtInRules, services, settings );
         problemHeader = header;
-    }
-
-
-    /** copy constructor */
-    public Proof(Proof p) {
-        this(p.name, p.env().getInitConfig().getServices(),
-             new ProofSettings(p.settings));
-        activeStrategy =
-            StrategyFactory.create(this,
-                    p.getActiveStrategy().name().toString(),
-                    getSettings().getStrategySettings().getActiveStrategyProperties());
-
-        InitConfig ic = p.env().getInitConfig();
-        Node rootNode = new Node(this, p.root.sequent());
-        setRoot(rootNode);
-	Goal firstGoal = new Goal(rootNode,
-            new RuleAppIndex(new TacletAppIndex(ic.createTacletIndex()),
-	    new BuiltInRuleAppIndex(ic.createBuiltInRuleIndex())));
-	localMgt = new ProofCorrectnessMgt(this);
-	openGoals = openGoals.prepend(firstGoal);
-        setNamespaces(ic.namespaces());
     }
 
 

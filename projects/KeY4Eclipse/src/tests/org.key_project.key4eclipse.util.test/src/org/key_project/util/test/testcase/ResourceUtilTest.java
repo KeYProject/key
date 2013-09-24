@@ -40,6 +40,18 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class ResourceUtilTest extends TestCase {
    /**
+    * Tests {@link ResourceUtil#validateWorkspaceFileName(String)}
+    */
+   @Test
+   public void testValidateWorkspaceFileName() {
+      assertEquals(null, ResourceUtil.validateWorkspaceFileName(null));
+      assertEquals("Hello_World", ResourceUtil.validateWorkspaceFileName("Hello World"));
+      assertEquals("Hello_World_txt", ResourceUtil.validateWorkspaceFileName("Hello World.txt"));
+      assertEquals("Hello__World_txt", ResourceUtil.validateWorkspaceFileName("Hello<>World.txt"));
+      assertEquals("_Hello_World___txt_", ResourceUtil.validateWorkspaceFileName(".Hello.World...txt."));
+   }
+   
+   /**
     * Tests {@link ResourceUtil#copyIntoWorkspace(org.eclipse.core.resources.IContainer, File...)}.
     */
    @Test

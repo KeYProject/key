@@ -5,9 +5,10 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+            <loopInvariant name="
+invariant: i &gt;= 0 &amp; (i &lt;= array.length &amp; result_1 = i);
+variant: javaSubInt(array.length, i)
+mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <branchCondition name="!(    i_0 &gt;= 1
     &amp; array.length &gt;= 0
@@ -41,20 +42,20 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)" pathConditionChanged="true" branchCondition="i_0 &gt;= 0 &amp; !array = null" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
-                     <operationContract name="result = goOnNice(array, i) catch(exc)
+                     <operationContract name="result_4 = goOnNice(array, i) catch(exc_6)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+   -&gt;   !exc_6 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_6)
            = TRUE
-         |   java.lang.RuntimeException::instance(exc)
+         |   java.lang.RuntimeException::instance(exc_6)
            = TRUE))
 &amp; (   !array = null &amp; i &gt;= 0
-   -&gt;     result
+   -&gt;     result_4
         = \if (i &lt; array.length)
               \then (TRUE)
               \else (FALSE)
-      &amp; exc = null)
+      &amp; exc_6 = null)
 mod: allLocs \cup allLocs \cup allLocs
           \cup allLocs
      \cup allLocs
@@ -109,7 +110,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                     </termination>
                                  </statement>
                               </statement>
@@ -130,7 +131,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; !result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !result_4 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </branchCondition>
                         </branchCondition>
@@ -150,7 +151,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
@@ -162,20 +163,20 @@ termination: diamond" pathCondition="   array.length &gt;= 0
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
    &amp; i_0 &lt;= -1" pathConditionChanged="true" branchCondition="!i_0 &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
-                     <operationContract name="result = goOnNice(array, i) catch(exc)
+                     <operationContract name="result_5 = goOnNice(array, i) catch(exc_7)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
 post: (   i &lt; 0
-   -&gt;   !exc = null
-      &amp; (    java.lang.RuntimeException::instance(exc)
+   -&gt;   !exc_7 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_7)
            = TRUE
-         |   java.lang.RuntimeException::instance(exc)
+         |   java.lang.RuntimeException::instance(exc_7)
            = TRUE))
 &amp; (   !array = null &amp; i &gt;= 0
-   -&gt;     result
+   -&gt;     result_5
         = \if (i &lt; array.length)
               \then (TRUE)
               \else (FALSE)
-      &amp; exc = null)
+      &amp; exc_7 = null)
 mod: allLocs \cup allLocs \cup allLocs
           \cup allLocs
      \cup allLocs
@@ -235,7 +236,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
            -&gt; result_1_0 = i_0))
    &amp; i_0 &lt;= -1
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                     </termination>
                                  </statement>
                               </statement>
@@ -258,7 +259,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
            -&gt; result_1_0 = i_0))
    &amp; i_0 &lt;= -1
    &amp; (i_0 &gt;= 0 &amp; !array = null)
-   &amp; !result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY">
+   &amp; !result_5 = TRUE" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
                            </branchCondition>
                         </branchCondition>
@@ -276,7 +277,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; i_0 &lt;= -1" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </branchCondition>
                      </operationContract>
@@ -335,7 +336,7 @@ termination: diamond" pathCondition="   array.length &gt;= 0
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; result_1_0 = i_0))
-   &amp; (i_0 &gt;= 0 &amp; !array = null)" pathConditionChanged="false" terminationKind="NORMAL">
+   &amp; (i_0 &gt;= 0 &amp; !array = null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </branchCondition>

@@ -30,7 +30,6 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -107,17 +106,12 @@ public class KeYTabComposite extends Composite {
       String name = null;
       Node keyNode = null;
       KeYMediator mediator = null;
-      PosInOccurrence pio = null;
       if (node != null) {
          keyNode = node.getExecutionNode().getProofNode();
-         pio = keyNode.getAppliedRuleApp() != null ? keyNode.getAppliedRuleApp().posInOccurrence() : null;
          mediator = node.getExecutionNode().getMediator();
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
       SWTUtil.setText(nodeText, name);
-      sequentViewerDecorator.setDocumentForNode(keyNode, mediator);
-      if (pio != null) {
-         sequentViewerDecorator.setGreenBackground(pio);
-      }
+      sequentViewerDecorator.showNode(keyNode, mediator);
    }
 }

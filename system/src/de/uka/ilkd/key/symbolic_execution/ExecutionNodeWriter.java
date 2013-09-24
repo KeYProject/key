@@ -90,6 +90,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_HAS_CONDITION = "hasCondition";
 
    /**
+    * Attribute name to store {@link IExecutionTermination#isBranchVerified()}.
+    */
+   public static final String ATTRIBUTE_BRANCH_VERIFIED = "branchVerified";
+
+   /**
     * Attribute name to store {@link IExecutionVariable#getArrayIndex()}.
     */
    public static final String ATTRIBUTE_ARRAY_INDEX = "arrayIndex";
@@ -703,6 +708,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_TERMINATION_KIND, node.getTerminationKind().toString());
+      attributeValues.put(ATTRIBUTE_BRANCH_VERIFIED, node.isBranchVerified() + "");
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);

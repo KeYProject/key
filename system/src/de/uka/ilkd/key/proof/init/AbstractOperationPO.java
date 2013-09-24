@@ -44,7 +44,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -200,9 +200,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
          final ImmutableList<StatementBlock> sb = buildOperationBlocks(formalParamVars, selfVar, resultVar);
 
          // build precondition
-         final Term pre = TB.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps),
+         Term pre = TB.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps),
                                  getPre(modHeaps, selfVar, paramVars, atPreVars, services));
-
+         if(isTransactionApplicable()) {
+        	 // Need to add assumptions about the transaction depth
+        	 try {
+        		 final Term depthTerm =
+        				 services.getJavaInfo().getProgramMethodTerm(null, "getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
+        		 final Term depthValue = transactionFlag ? TB.one(services) : TB.zero(services);
+        		 pre = TB.and(pre, TB.equals(depthTerm, depthValue));
+        	 }catch(IllegalArgumentException iae) {
+        		 throw new IllegalStateException("You are trying to prove a contract that involves Java Card "+
+        	                                     "transactions, but the required Java Card API classes are not "+
+        				                         "in your project.");
+        	 }
+         }
          // build program term
          Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, services);
          // Add uninterpreted predicate

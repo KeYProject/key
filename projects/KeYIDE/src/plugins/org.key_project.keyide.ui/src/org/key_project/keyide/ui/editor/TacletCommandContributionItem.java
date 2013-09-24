@@ -27,12 +27,19 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class TacletCommandContributionItem extends CommandContributionItem {
-   // TODO: Document missing members of class TacletCommandContributionItem
-
+   /***
+    * The {@link TacletApp} to apply.
+    */
    private TacletApp app;
    
+   /**
+    * The {@link KeYMediator} to use.
+    */
    private KeYMediator mediator;
    
+   /**
+    * The {@link PosInSequent} to apply {@link TacletApp} on.
+    */
    private PosInSequent pos;
    
    /**
@@ -49,15 +56,27 @@ public class TacletCommandContributionItem extends CommandContributionItem {
       this.pos = pos;
    }
    
-   public TacletApp getTacletApp(){
+   /**
+    * Returns the {@link TacletApp} to apply.
+    * @return The {@link TacletApp} to apply.
+    */
+   public TacletApp getTacletApp() {
       return app;
    }
    
-   public KeYMediator getMediator(){
+   /**
+    * Returns the {@link KeYMediator} to use.
+    * @return The {@link KeYMediator} to use.
+    */
+   public KeYMediator getMediator() {
       return mediator;
    }
    
-   public PosInSequent getPosInSequent(){
+   /**
+    * Returns the {@link PosInSequent} to apply {@link TacletApp} on.
+    * @return The {@link PosInSequent} to apply {@link TacletApp} on.
+    */
+   public PosInSequent getPosInSequent() {
       return pos;
    }
 }

@@ -51,6 +51,11 @@ public class KeYEnvironment<U extends UserInterface> {
     * An optional {@link Proof} which was loaded by the specified proof file. 
     */
    private Proof loadedProof;
+   
+   /**
+    * Indicates that this {@link KeYEnvironment} is disposed.
+    */
+   private boolean disposed;
 
    /**
     * Constructor
@@ -226,5 +231,15 @@ public class KeYEnvironment<U extends UserInterface> {
       if (loadedProof != null) {
          loadedProof.dispose();
       }
+      disposed = true;
+   }
+   
+   /**
+    * Checks if this {@link KeYEnvironment} is disposed meaning that
+    * {@link #dispose()} was already executed at least once.
+    * @return {@code true} disposed, {@code false} not disposed and still functionable.
+    */
+   public boolean isDisposed() {
+      return disposed;
    }
 }

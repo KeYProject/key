@@ -13,25 +13,27 @@
 
 package org.key_project.key4eclipse.common.ui.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingFileStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingGlobalStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingMethodStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProjectStarter;
+import org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProofStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingFileStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingGlobalStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingMethodStarter;
 import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProjectStarter;
+import org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProofStarter;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -40,7 +42,34 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  * Tests for {@link StarterUtil}.
  * @author Martin Hentschel
  */
-public class StarterUtilTest extends TestCase {
+public class StarterUtilTest extends AbstractSetupTestCase {
+   /**
+    * Tests {@link StarterUtil#areProofStartersAvailable()}
+    */
+   @Test
+   public void testAreProofStartersAvailable() throws Exception {
+      boolean originalDisabled = StarterPreferenceUtil.isProofStarterDisabled();
+      ImmutableList<StarterDescription<IProofStarter>> starters = StarterUtil.getProofStarters();
+      try {
+         // Make sure that starters are available
+         StarterPreferenceUtil.setProofStarterDisabled(false);
+         assertTrue(StarterUtil.areProofStartersAvailable());
+         // Disable starters
+         StarterPreferenceUtil.setProofStarterDisabled(true);
+         assertFalse(StarterUtil.areProofStartersAvailable());
+         // Enable starters
+         StarterPreferenceUtil.setProofStarterDisabled(false);
+         assertTrue(StarterUtil.areProofStartersAvailable());
+         // Remove all starters
+         ObjectUtil.set(null, StarterUtil.class, "proofStarters", ImmutableSLList.nil());
+         assertFalse(StarterUtil.areProofStartersAvailable());
+      }
+      finally {
+         StarterPreferenceUtil.setProofStarterDisabled(originalDisabled);
+         ObjectUtil.set(null, StarterUtil.class, "proofStarters", starters);
+      }
+   }
+   
    /**
     * Tests {@link StarterUtil#areProjectStartersAvailable()}
     */
@@ -150,25 +179,50 @@ public class StarterUtilTest extends TestCase {
    }
    
    /**
+    * Tests {@link StarterUtil#getProofStarters()} and
+    * {@link StarterUtil#searchStarter(ImmutableList, String)}.
+    */
+   @Test
+   public void testGetProofStarters() {
+      // Get starters first time
+      ImmutableList<StarterDescription<IProofStarter>> starters = StarterUtil.getProofStarters();
+      // Make sure that first test starter is contained
+      StarterDescription<IProofStarter> firstStarter = StarterUtil.searchStarter(starters, FirstLoggingProofStarter.ID);
+      assertStarterDescription(firstStarter, FirstLoggingProofStarter.ID, FirstLoggingProofStarter.NAME, FirstLoggingProofStarter.class, FirstLoggingProofStarter.DESCRIPTION);
+      // Make sure that second test starter is contained
+      StarterDescription<IProofStarter> secondStarter = StarterUtil.searchStarter(starters, SecondLoggingProofStarter.ID);
+      assertStarterDescription(secondStarter, SecondLoggingProofStarter.ID, SecondLoggingProofStarter.NAME, SecondLoggingProofStarter.class, SecondLoggingProofStarter.DESCRIPTION);
+      // Make sure that invalid start is not contained
+      assertNull(StarterUtil.searchStarter(starters, "INVALID_STARTER_ID"));
+      // Test null search
+      assertNull(StarterUtil.searchStarter(starters, null));
+      assertNull(StarterUtil.searchStarter(null, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(null, null));
+      // Get starters again
+      ImmutableList<StarterDescription<IProofStarter>> startersAgain = StarterUtil.getProofStarters();
+      assertSame(starters, startersAgain);
+   }
+   
+   /**
     * Tests {@link StarterUtil#getProjectStarters()} and
-    * {@link StarterUtil#searchGlobalStarter(ImmutableList, String)}.
+    * {@link StarterUtil#searchStarter(ImmutableList, String)}.
     */
    @Test
    public void testGetProjectStarters() {
       // Get starters first time
       ImmutableList<StarterDescription<IProjectStarter>> starters = StarterUtil.getProjectStarters();
       // Make sure that first test starter is contained
-      StarterDescription<IProjectStarter> firstStarter = StarterUtil.searchGlobalStarter(starters, FirstLoggingProjectStarter.ID);
+      StarterDescription<IProjectStarter> firstStarter = StarterUtil.searchStarter(starters, FirstLoggingProjectStarter.ID);
       assertStarterDescription(firstStarter, FirstLoggingProjectStarter.ID, FirstLoggingProjectStarter.NAME, FirstLoggingProjectStarter.class, FirstLoggingProjectStarter.DESCRIPTION);
       // Make sure that second test starter is contained
-      StarterDescription<IProjectStarter> secondStarter = StarterUtil.searchGlobalStarter(starters, SecondLoggingProjectStarter.ID);
+      StarterDescription<IProjectStarter> secondStarter = StarterUtil.searchStarter(starters, SecondLoggingProjectStarter.ID);
       assertStarterDescription(secondStarter, SecondLoggingProjectStarter.ID, SecondLoggingProjectStarter.NAME, SecondLoggingProjectStarter.class, SecondLoggingProjectStarter.DESCRIPTION);
       // Make sure that invalid start is not contained
-      assertNull(StarterUtil.searchGlobalStarter(starters, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(starters, "INVALID_STARTER_ID"));
       // Test null search
-      assertNull(StarterUtil.searchGlobalStarter(starters, null));
-      assertNull(StarterUtil.searchGlobalStarter(null, "INVALID_STARTER_ID"));
-      assertNull(StarterUtil.searchGlobalStarter(null, null));
+      assertNull(StarterUtil.searchStarter(starters, null));
+      assertNull(StarterUtil.searchStarter(null, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(null, null));
       // Get starters again
       ImmutableList<StarterDescription<IProjectStarter>> startersAgain = StarterUtil.getProjectStarters();
       assertSame(starters, startersAgain);
@@ -176,24 +230,24 @@ public class StarterUtilTest extends TestCase {
 
    /**
     * Tests {@link StarterUtil#getFileStarters()} and
-    * {@link StarterUtil#searchGlobalStarter(ImmutableList, String)}.
+    * {@link StarterUtil#searchStarter(ImmutableList, String)}.
     */
    @Test
    public void testGetFileStarters() {
       // Get starters first time
       ImmutableList<StarterDescription<IFileStarter>> starters = StarterUtil.getFileStarters();
       // Make sure that first test starter is contained
-      StarterDescription<IFileStarter> firstStarter = StarterUtil.searchGlobalStarter(starters, FirstLoggingFileStarter.ID);
+      StarterDescription<IFileStarter> firstStarter = StarterUtil.searchStarter(starters, FirstLoggingFileStarter.ID);
       assertStarterDescription(firstStarter, FirstLoggingFileStarter.ID, FirstLoggingFileStarter.NAME, FirstLoggingFileStarter.class, FirstLoggingFileStarter.DESCRIPTION);
       // Make sure that second test starter is contained
-      StarterDescription<IFileStarter> secondStarter = StarterUtil.searchGlobalStarter(starters, SecondLoggingFileStarter.ID);
+      StarterDescription<IFileStarter> secondStarter = StarterUtil.searchStarter(starters, SecondLoggingFileStarter.ID);
       assertStarterDescription(secondStarter, SecondLoggingFileStarter.ID, SecondLoggingFileStarter.NAME, SecondLoggingFileStarter.class, SecondLoggingFileStarter.DESCRIPTION);
       // Make sure that invalid start is not contained
-      assertNull(StarterUtil.searchGlobalStarter(starters, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(starters, "INVALID_STARTER_ID"));
       // Test null search
-      assertNull(StarterUtil.searchGlobalStarter(starters, null));
-      assertNull(StarterUtil.searchGlobalStarter(null, "INVALID_STARTER_ID"));
-      assertNull(StarterUtil.searchGlobalStarter(null, null));
+      assertNull(StarterUtil.searchStarter(starters, null));
+      assertNull(StarterUtil.searchStarter(null, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(null, null));
       // Get starters again
       ImmutableList<StarterDescription<IFileStarter>> startersAgain = StarterUtil.getFileStarters();
       assertSame(starters, startersAgain);
@@ -201,24 +255,24 @@ public class StarterUtilTest extends TestCase {
 
    /**
     * Tests {@link StarterUtil#getMethodStarters()} and
-    * {@link StarterUtil#searchGlobalStarter(ImmutableList, String)}.
+    * {@link StarterUtil#searchStarter(ImmutableList, String)}.
     */
    @Test
    public void testGetMethodStarters() {
       // Get starters first time
       ImmutableList<StarterDescription<IMethodStarter>> starters = StarterUtil.getMethodStarters();
       // Make sure that first test starter is contained
-      StarterDescription<IMethodStarter> firstStarter = StarterUtil.searchGlobalStarter(starters, FirstLoggingMethodStarter.ID);
+      StarterDescription<IMethodStarter> firstStarter = StarterUtil.searchStarter(starters, FirstLoggingMethodStarter.ID);
       assertStarterDescription(firstStarter, FirstLoggingMethodStarter.ID, FirstLoggingMethodStarter.NAME, FirstLoggingMethodStarter.class, FirstLoggingMethodStarter.DESCRIPTION);
       // Make sure that second test starter is contained
-      StarterDescription<IMethodStarter> secondStarter = StarterUtil.searchGlobalStarter(starters, SecondLoggingMethodStarter.ID);
+      StarterDescription<IMethodStarter> secondStarter = StarterUtil.searchStarter(starters, SecondLoggingMethodStarter.ID);
       assertStarterDescription(secondStarter, SecondLoggingMethodStarter.ID, SecondLoggingMethodStarter.NAME, SecondLoggingMethodStarter.class, SecondLoggingMethodStarter.DESCRIPTION);
       // Make sure that invalid start is not contained
-      assertNull(StarterUtil.searchGlobalStarter(starters, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(starters, "INVALID_STARTER_ID"));
       // Test null search
-      assertNull(StarterUtil.searchGlobalStarter(starters, null));
-      assertNull(StarterUtil.searchGlobalStarter(null, "INVALID_STARTER_ID"));
-      assertNull(StarterUtil.searchGlobalStarter(null, null));
+      assertNull(StarterUtil.searchStarter(starters, null));
+      assertNull(StarterUtil.searchStarter(null, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(null, null));
       // Get starters again
       ImmutableList<StarterDescription<IMethodStarter>> startersAgain = StarterUtil.getMethodStarters();
       assertSame(starters, startersAgain);
@@ -226,24 +280,24 @@ public class StarterUtilTest extends TestCase {
 
    /**
     * Tests {@link StarterUtil#getGlobalStarters()} and
-    * {@link StarterUtil#searchGlobalStarter(ImmutableList, String)}.
+    * {@link StarterUtil#searchStarter(ImmutableList, String)}.
     */
    @Test
    public void testGetGlobalStarters() {
       // Get starters first time
       ImmutableList<StarterDescription<IGlobalStarter>> starters = StarterUtil.getGlobalStarters();
       // Make sure that first test starter is contained
-      StarterDescription<IGlobalStarter> firstStarter = StarterUtil.searchGlobalStarter(starters, FirstLoggingGlobalStarter.ID);
+      StarterDescription<IGlobalStarter> firstStarter = StarterUtil.searchStarter(starters, FirstLoggingGlobalStarter.ID);
       assertStarterDescription(firstStarter, FirstLoggingGlobalStarter.ID, FirstLoggingGlobalStarter.NAME, FirstLoggingGlobalStarter.class, FirstLoggingGlobalStarter.DESCRIPTION);
       // Make sure that second test starter is contained
-      StarterDescription<IGlobalStarter> secondStarter = StarterUtil.searchGlobalStarter(starters, SecondLoggingGlobalStarter.ID);
+      StarterDescription<IGlobalStarter> secondStarter = StarterUtil.searchStarter(starters, SecondLoggingGlobalStarter.ID);
       assertStarterDescription(secondStarter, SecondLoggingGlobalStarter.ID, SecondLoggingGlobalStarter.NAME, SecondLoggingGlobalStarter.class, SecondLoggingGlobalStarter.DESCRIPTION);
       // Make sure that invalid start is not contained
-      assertNull(StarterUtil.searchGlobalStarter(starters, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(starters, "INVALID_STARTER_ID"));
       // Test null search
-      assertNull(StarterUtil.searchGlobalStarter(starters, null));
-      assertNull(StarterUtil.searchGlobalStarter(null, "INVALID_STARTER_ID"));
-      assertNull(StarterUtil.searchGlobalStarter(null, null));
+      assertNull(StarterUtil.searchStarter(starters, null));
+      assertNull(StarterUtil.searchStarter(null, "INVALID_STARTER_ID"));
+      assertNull(StarterUtil.searchStarter(null, null));
       // Get starters again
       ImmutableList<StarterDescription<IGlobalStarter>> startersAgain = StarterUtil.getGlobalStarters();
       assertSame(starters, startersAgain);

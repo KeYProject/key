@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import recoder.java.SourceElement.Position;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -82,6 +81,7 @@ final class JMLTranslator {
         INV_FOR ("\\invariant_for"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
+        FRESH ("\\fresh"),
 
         // clauses
         ACCESSIBLE ("accessible"),
@@ -635,7 +635,15 @@ final class JMLTranslator {
                             "sequence definition must declare exactly one variable");
                 }
                 LogicVariable qv = (LogicVariable) declVars.head();
-                Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                Term tt = t.getTerm();
+                if (tt.sort() == Sort.FORMULA) {
+                    // bugfix (CS): t.getTerm() delivers a formula instead of a
+                    // boolean term; obviously the original boolean terms are
+                    // converted to formulas somewhere else; however, we need
+                    // boolean terms instead of formulas here
+                    tt = TB.convertToBoolean(t.getTerm(), services);
+                }
+                Term resultTerm = TB.seqDef(qv, a.getTerm(), b.getTerm(), tt, services);
                 final KeYJavaType seqtype =
                         services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(resultTerm, seqtype);
@@ -882,6 +890,55 @@ final class JMLTranslator {
                         TB.var(fieldLV));
 
                 return new SLExpression(locSet, services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.FRESH,
+                               new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params,
+                                ImmutableList.class, 
+                                Map.class,
+                                Services.class);
+                final ImmutableList<SLExpression> list = (ImmutableList) params[0];
+                final Map<LocationVariable,Term> atPres = (Map) params[1];
+                final Services services = (Services) params[2];
+                final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+
+	        if(atPres == null || atPres.get(baseHeap) == null) {
+	            throw excManager.createException("\\fresh not allowed in this context");
+	        }
+
+	        Term t = TB.tt();
+	        final Sort objectSort = services.getJavaInfo().objectSort();
+                final TypeConverter tc = services.getTypeConverter();
+	        for(SLExpression expr: list) {
+    	            if(!expr.isTerm()) {
+	                throw excManager.createException("Expected a term, but found: " + expr);
+	            } else if(expr.getTerm().sort().extendsTrans(objectSort)) {
+	                t = TB.and(t,
+	                           TB.equals(TB.select(services,
+	                                           tc.getBooleanLDT().targetSort(),
+	                                           atPres.get(baseHeap),
+	                                           expr.getTerm(),
+	                                           TB.func(tc.getHeapLDT().getCreated())),
+	                                 TB.FALSE(services)));
+                        // add non-nullness (bug #1364)
+                        t = TB.and(t, TB.not(TB.equals(expr.getTerm(),TB.NULL(services))));
+    	            } else if(expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
+	            t = TB.and(t, TB.subset(services,
+	                                    expr.getTerm(),
+	                                    TB.freshLocs(services, atPres.get(baseHeap))));
+	            } else {
+	                throw excManager.createException("Wrong type: " + expr);
+	            }
+	        }
+	        return new SLExpression(t);
             }
         });
 
@@ -1661,6 +1718,7 @@ final class JMLTranslator {
         final Term t = TB.func(sk);
         return new SLExpression(t);
     }
+
 
     /**
      * Get non-critical warnings.

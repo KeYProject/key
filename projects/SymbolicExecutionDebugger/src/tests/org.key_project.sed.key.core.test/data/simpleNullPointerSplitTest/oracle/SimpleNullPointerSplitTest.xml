@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_9daceeec-273f-4d28-8f32-193b2bab6547" name="main(SimpleNullPointerSplitTest)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_95493e11-39c8-4605-87ad-a248ffd1673f" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_fcf721eb-ecf3-4cef-aeca-1df9a70b6056" name="self.main(instance);" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81">
-            <sedStatement xml:id="_1d4bdb86-d6eb-4c5e-bc51-bbcf670fdf6f" name="return instance.x;" pathCondition="true" lineNumber="-1" charStart="124" charEnd="142">
-               <sedBranchCondition xml:id="_b279ad5e-feb1-4454-bb91-974de82ccf24" name="!instance = null" pathCondition="!instance = null">
-                  <sedMethodReturn xml:id="_8d8d4ddb-5125-48d7-ae1c-c8c604eec068" name="&lt;return instance.x as result of self.main(instance);&gt;" pathCondition="!instance = null" lineNumber="-1" charStart="77" charEnd="81">
-                     <sedTermination xml:id="_8af1de35-1843-4665-b073-26cc67cc4a22" name="&lt;end&gt;" pathCondition="!instance = null">
+   <sedTarget xml:id="_dd281131-3ba2-44ad-b3b5-95468b901d55" name="main(SimpleNullPointerSplitTest)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_f1dcb736-955b-4fc7-95a3-6e81e254ce2c" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_5e1c44c2-4b69-4059-911e-1b0b5a3991be" name="self.main(instance);" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81">
+            <sedStatement xml:id="_1b42fc8c-8b5f-4a0f-b62f-2daac493301b" name="return instance.x;" pathCondition="true" lineNumber="-1" charStart="124" charEnd="142">
+               <sedBranchCondition xml:id="_49a7de02-4e0a-44a6-ad67-af6fc5606059" name="!instance = null" pathCondition="!instance = null">
+                  <sedMethodReturn xml:id="_572e19d1-b114-4ae3-a2d8-2d160db172f2" name="&lt;return instance.x as result of self.main(instance);&gt;" pathCondition="!instance = null" lineNumber="-1" charStart="77" charEnd="81">
+                     <sedTermination xml:id="_b06387a6-4b3e-4a2b-a4e3-dd8747d1c9db" name="&lt;end&gt;" pathCondition="!instance = null" verified="true">
                      </sedTermination>
                   </sedMethodReturn>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_159cc717-3932-4ba7-b2b5-ff4a8d41c1ed" name="instance = null" pathCondition="instance = null">
-                  <sedExceptionalTermination xml:id="_defd8eab-c8d6-4fed-9ae8-e3efed621d8c" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="instance = null">
+               <sedBranchCondition xml:id="_aedc85b8-8285-4b50-a4b8-12dc58c66063" name="instance = null" pathCondition="instance = null">
+                  <sedExceptionalTermination xml:id="_ba1d593a-5a9c-4545-968a-389f1c9b7d31" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="instance = null" verified="true">
                   </sedExceptionalTermination>
                </sedBranchCondition>
             </sedStatement>

@@ -2,9 +2,9 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleObjectQuery.main(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
-         <operationContract name="result = magic(x) catch(exc)
+         <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: &lt;$inv&gt; &amp; !x = null
-post: result = subMagic(x) &amp; &lt;$inv&gt; &amp; exc = null
+post: result_0 = subMagic(x) &amp; &lt;$inv&gt; &amp; exc_0 = null
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
@@ -20,7 +20,7 @@ as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
                      </methodReturnValue>
                      <methodReturnValue name="-4711 {!x = null &amp; !SimpleObjectQuery.INSTANCE = x}" returnValueString="-4711" hasCondition="true" conditionString="!x = null &amp; !SimpleObjectQuery.INSTANCE = x">
                      </methodReturnValue>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>

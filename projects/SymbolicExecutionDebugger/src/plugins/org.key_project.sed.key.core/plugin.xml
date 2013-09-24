@@ -43,4 +43,10 @@
             type="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
       </propertyTester>
    </extension>
+   <extension
+         point="org.key_project.util.setupParticipants">
+      <participant
+            class="org.key_project.sed.key.core.setup.StrategyPropertiesSetupParticipant">
+      </participant>
+   </extension>
 </plugin>

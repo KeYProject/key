@@ -31,7 +31,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -50,8 +49,6 @@ import de.hentschel.visualdbc.key.ui.adapter.ProofProviderAdapterFactory;
 import de.hentschel.visualdbc.key.ui.test.Activator;
 import de.hentschel.visualdbc.key.ui.test.testCase.AbstractProofReferenceModelCreatorTest;
 import de.hentschel.visualdbc.key.ui.view.ProofDependenciesViewPart;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * SWTBot tests for {@link ProofProviderAdapterFactory} which is used to
@@ -69,16 +66,7 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
       ProofDependenciesViewPart dependenciesViewPart = null;
       LogStartProofJobListener startProofListener = new LogStartProofJobListener();
       StartProofJob.addStartProofJobListener(startProofListener);
-      String originalRuntimeExceptions = null;
       try {
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            KeYEnvironment<?> environment = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
-            environment.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create and fill project if not already available
          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("SWTBotProofProviderAdapterFactoryTest");
          IFolder src;
@@ -146,10 +134,6 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertEquals("The active editor provides no supported proof.", dependenciesView.bot().label(0).getText());
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
          // Remove listener
          StartProofJob.removeStartProofJobListener(startProofListener);
          // Close editor and view

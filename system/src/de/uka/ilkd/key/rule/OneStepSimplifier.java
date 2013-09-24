@@ -45,6 +45,7 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 public final class OneStepSimplifier implements BuiltInRule,
@@ -55,13 +56,6 @@ public final class OneStepSimplifier implements BuiltInRule,
     public final static class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
-
-    // TODO: Remove the singleton instance or make the rule
-    // state less to allow parallelization of site proofs started
-    // via a ProofStarter which is currently not possible thanks to
-    // ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger)
-    public static final OneStepSimplifier INSTANCE
-                                            = new OneStepSimplifier();
 
     private static final Name NAME = new Name("One Step Simplification");
     private static final TermBuilder TB = TermBuilder.DF;
@@ -600,7 +594,11 @@ public final class OneStepSimplifier implements BuiltInRule,
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-	refresh(e.getSource().getSelectedProof());
+       Proof proof = e.getSource().getSelectedProof(); 
+       OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
+       if (simplifierInstance == this) {
+          refresh(proof);
+       }
     }
 
     /**

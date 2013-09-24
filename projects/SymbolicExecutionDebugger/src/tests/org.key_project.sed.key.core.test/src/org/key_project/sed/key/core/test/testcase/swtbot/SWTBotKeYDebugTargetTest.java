@@ -27,12 +27,12 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.test.util.SuspendingStopCondition;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
@@ -42,6 +42,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * Tests for the functionality of a {@link KeYDebugTarget}.
@@ -1123,6 +1124,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Resume launch
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             item.contextMenu("Resume").click();
+            SuspendingStopCondition sc = new SuspendingStopCondition(true, 1, 1000);
+            ((KeYDebugTarget)target).getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sc);
             TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
@@ -1311,7 +1314,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
-    * @param useOperationContracts Use operation contracts?
+    * @param useMethodContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
@@ -1329,7 +1332,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  final boolean stepIntoInsteadOfRun,
                                  final boolean showKeYMainWindow,
                                  final boolean mergeBranchConditions,
-                                 final boolean useOperationContracts,
+                                 final boolean useMethodContracts,
                                  final boolean useLoopInvariants,
                                  final boolean nonExecutionBranchHidingSideProofs,
                                  final boolean aliasChecks) throws Exception {
@@ -1351,18 +1354,30 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
             // Configure operation contract and loop invariant usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
-            SWTBotCombo methodTreatmentCombo = symbolicSettingsView.bot().comboBox();
-            assertTrue(methodTreatmentCombo.isEnabled());
-            methodTreatmentCombo.setSelection(useOperationContracts ? SymbolicExecutionSettingsView.METHOD_TREATMENT_CONTRACT : SymbolicExecutionSettingsView.METHOD_TREATMENT_EXPAND);
-            SWTBotCombo loopInvariantCombo = symbolicSettingsView.bot().comboBox(1);
-            assertTrue(loopInvariantCombo.isEnabled());
-            loopInvariantCombo.setSelection(useLoopInvariants ? SymbolicExecutionSettingsView.LOOP_TREATMENT_INVARIANT : SymbolicExecutionSettingsView.LOOP_TREATMENT_EXPAND);
-            SWTBotCombo branchHidingCheckCombo = symbolicSettingsView.bot().comboBox(2);
-            assertTrue(branchHidingCheckCombo.isEnabled());
-            branchHidingCheckCombo.setSelection(nonExecutionBranchHidingSideProofs ? SymbolicExecutionSettingsView.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : SymbolicExecutionSettingsView.NON_EXECUTION_BRANCH_HIDING_OFF);
-            SWTBotCombo aliasCheckCombo = symbolicSettingsView.bot().comboBox(3);
-            assertTrue(aliasCheckCombo.isEnabled());
-            aliasCheckCombo.setSelection(aliasChecks ? SymbolicExecutionSettingsView.ALIAS_CHECK_IMMEDIATELY : SymbolicExecutionSettingsView.ALIAS_CHECK_NEVER);
+            if (useMethodContracts) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_EXPAND, 0));
+            }
+            if (useLoopInvariants) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_INVARIANT));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.LOOP_TREATMENT_EXPAND, 1));
+            }
+            if (nonExecutionBranchHidingSideProofs) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.NON_EXECUTION_BRANCH_HIDING_OFF));
+            }
+            if (aliasChecks) {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.ALIAS_CHECK_IMMEDIATELY));
+            }
+            else {
+               TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.ALIAS_CHECK_NEVER));
+            }
             // Get debug target TreeItem
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             // Create tree

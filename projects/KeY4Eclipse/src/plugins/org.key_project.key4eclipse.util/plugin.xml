@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.key_project.util.setupParticipants" name="Setup Participants" schema="schema/org.key_project.util.setupParticipants.exsd"/>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.key_project.util.eclipse.setup.SetupStartup">
+      </startup>
+   </extension>
+
+</plugin>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="StaticContractTest.mainNoArgs();" pathCondition="true" pathConditionChanged="false">
+      <statement name="return noArgs();" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = noArgs() catch(exc_0)
+pre: true
+post: result_0 = 42 &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <methodReturn name="&lt;return of StaticContractTest.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of StaticContractTest.mainNoArgs();&gt;" isReturnValueComputed="true">
+               <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+               </methodReturnValue>
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               </termination>
+            </methodReturn>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

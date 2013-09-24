@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -27,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTabItem;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.preference.page.TacletOptionsPreferencePage;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
@@ -37,7 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * SWTBot tests for {@link TacletOptionsPreferencePage}.
  * @author Martin Hentschel
  */
-public class SWTBotTacletOptionsPreferencePageTest extends TestCase {
+public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase {
    /**
     * Tests the shown categories and values and finally approves the made changes.
     * @throws Exception Occurred Exception.

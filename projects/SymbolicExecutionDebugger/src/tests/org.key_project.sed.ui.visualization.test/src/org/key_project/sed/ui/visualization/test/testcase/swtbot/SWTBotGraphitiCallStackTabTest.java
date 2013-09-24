@@ -17,7 +17,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.junit.Test;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotCallStackTabTest;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 /**
  * Tests the property page tab "Source" in a Symbolic Execution Tree diagram.

@@ -66,7 +66,7 @@
 &amp; !current.right.left = null
 &amp; (current = null | !current.right.left = current)
 &amp; (current.parent = null | current.right.left = null)
-&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; (current.parent = null | current.right.left = current)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>
@@ -128,7 +128,7 @@
 &amp; !(  (current = null | current.parent = null)
     &amp; (current = null | !current.right.left = current)
     &amp; (  current.parent = null
-       | current.right.left = null))" pathConditionChanged="false" terminationKind="NORMAL">
+       | current.right.left = null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
                                                       </statement>
@@ -172,7 +172,7 @@
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; current.right.left = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                          </termination>
                                                       </methodReturn>
                                                    </statement>
@@ -207,7 +207,7 @@
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.parent = null
 &amp; !current.right = null
-&amp; current.right.left = null" pathConditionChanged="false" terminationKind="NORMAL">
+&amp; current.right.left = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                          </termination>
                                                       </methodReturn>
                                                    </statement>
@@ -224,13 +224,13 @@
                   </statement>
                </branchCondition>
                <branchCondition name="current.right = null" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="true" branchCondition="current.right = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="current = null" pathCondition="current = null" pathConditionChanged="true" branchCondition="current = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="current = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="current = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>

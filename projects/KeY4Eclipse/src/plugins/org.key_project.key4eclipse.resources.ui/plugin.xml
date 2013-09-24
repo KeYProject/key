@@ -118,7 +118,7 @@
             name="KeY Proof Management">
          <enabledWhen>
             <adapt
-                  type="org.eclipse.core.resources.IResource">
+                  type="org.eclipse.core.resources.IProject">
                <test
                      forcePluginActivation="true"
                      property="org.eclipse.core.resources.projectNature"

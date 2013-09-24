@@ -14,7 +14,7 @@
                   <statement name="throw new Exception ();" pathCondition="array = null" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0"/>
-                     <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                     <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </statement>
                </branchCondition>
@@ -30,9 +30,12 @@
                         <statement name="int i = 0;" pathCondition="!array = null" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
                            <callStackEntry path="/0/0/0"/>
-                           <loopInvariant name="invariants: {heap=and(and(geq(i,Z(0(#))),leq(i,length(array_1))),equals(sum_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array_1,arr(j))))), savedHeap=null};
-modifies: {heap=false, savedHeap=null};
-variant: javaSubInt(length(array_1),i)" pathCondition="!array = null" pathConditionChanged="false" initiallyValid="true">
+                           <loopInvariant name="
+invariant: i &gt;= 0
+&amp; i &lt;= array_1.length
+&amp; sum_1 = bsum{int j;}(0, i, array_1[j]);
+variant: javaSubInt(array_1.length, i)
+mod: false" pathCondition="!array = null" pathConditionChanged="false" initiallyValid="true">
                               <callStackEntry path="/0"/>
                               <callStackEntry path="/0/0/0"/>
                               <branchCondition name="!(    i_0 &gt;= 1
@@ -84,7 +87,7 @@ variant: javaSubInt(length(array_1),i)" pathCondition="!array = null" pathCondit
          &amp; (i_0 &gt;= 1 | array.length &gt;= i_0)
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
-           -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))" pathConditionChanged="false" terminationKind="LOOP_BODY">
+           -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                        </termination>
                                     </statement>
                                  </statement>
@@ -159,7 +162,7 @@ variant: javaSubInt(length(array_1),i)" pathCondition="!array = null" pathCondit
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))
-   &amp; i_0 = 0" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+   &amp; i_0 = 0" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                              </termination>
                                           </branchCondition>
                                           <branchCondition name="!i_0 = 0" pathCondition="   array.length &gt;= 0
@@ -193,7 +196,7 @@ as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true">
          &amp; (i_0 &lt;= -1 | array.length &lt;= -1 + i_0)
        | !(   i_0 &gt;= 0 &amp; array.length &gt;= i_0
            -&gt; bsum{int j;}(0, i_0, array[j]) = sum_1_0))
-   &amp; !i_0 = 0" pathConditionChanged="false" terminationKind="NORMAL">
+   &amp; !i_0 = 0" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                 </termination>
                                              </methodReturn>
                                           </branchCondition>
