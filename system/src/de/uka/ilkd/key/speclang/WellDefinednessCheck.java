@@ -605,10 +605,10 @@ public abstract class WellDefinednessCheck implements Contract {
     final void setAssignable(Term ass, Services services) {
         this.assignable = ass;
         if (ass.equals(TB.ff()) || ass.equals(TB.FALSE(services))
-                || ass == null || ass.op() == BooleanLiteral.FALSE) {
+                || ass == null || ass.op().equals(BooleanLiteral.FALSE)) {
             this.assignable = TB.empty(services);
         } else if (ass.equals(TB.tt()) || ass.equals(TB.TRUE(services))
-                || ass.op() == BooleanLiteral.TRUE) {
+                || ass.op().equals(BooleanLiteral.TRUE)) {
             this.assignable = TB.allLocs(services);
         }
     }
@@ -801,7 +801,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
         assert mod != null;
-        final Term havocUpd = mod != TB.empty(services) ?
+        final Term havocUpd = !mod.equals(TB.empty(services)) ?
                 TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap))
                 : TB.skip();
         final Term oldUpd = heapAtPre != heap ?
