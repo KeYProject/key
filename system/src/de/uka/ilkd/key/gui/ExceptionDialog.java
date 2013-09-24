@@ -18,7 +18,6 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -53,6 +52,7 @@ import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import java.awt.Window;
 
 /**
  * Dialog to display error messages.
@@ -69,29 +69,20 @@ public class ExceptionDialog extends JDialog {
     private boolean withList = false;
     private JTextArea stTextArea;
     
-    public static void showDialog(Dialog parent, Throwable exception) {
+    public static void showDialog(Window parent, Throwable exception) {
         showDialog(parent, Arrays.asList(exception));
     }
     
-    public static void showDialog(Frame parent, List<Throwable> excList) {
+    public static void showDialog(Window parent, List<Throwable> excList) {
         if (excList.size() != 0) {
             ExceptionDialog dlg = new ExceptionDialog(parent, excList);
             dlg.setVisible(true);
             dlg.dispose();
         }
     }
-    
-    public static void showDialog(Frame parent, Throwable exception) {
-        showDialog(parent, Arrays.asList(exception));
-    }
 
-    private ExceptionDialog(Dialog parent, List<Throwable> excList) {
-        super(parent, "Parser Messages", true); 
-        init(excList);
-    }
-
-    private ExceptionDialog(Frame parent, List<Throwable> excList) {
-        super(parent, "Parser Messages", true);   
+    private ExceptionDialog(Window parent, List<Throwable> excList) {
+        super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL); 
         init(excList);
     }
 
@@ -292,14 +283,6 @@ public class ExceptionDialog extends JDialog {
 	
 	return lPanel;
     }
-
-    public static void showDialog(Dialog parent, List<Throwable> excList) {
-        if (excList.size() != 0) {
-            ExceptionDialog dlg = new ExceptionDialog(parent, excList);
-            dlg.setVisible(true);
-            dlg.dispose();
-        }
-    }
     
     private void init(List<Throwable> excList) {
         withList = (excList.size() > 1);
@@ -369,19 +352,5 @@ public class ExceptionDialog extends JDialog {
             return this;
         }
     }
-
-//    // Test purposes:
-//    public static void main(String[] args) {
-//        RuntimeException ex = new RuntimeException("Runtime");
-//        Error err = new Error("Some error");
-//        Exception lex = new Exception("With a very, very, very, very, very, very, very, very, very, \n" +
-//        		"very, very, very, very, very, very, very, very, very, very, very long message"); 
-//        ParserException pex = new ParserException("With location", new Location("file", 22, 42));
-//        List<Throwable> excs = Arrays.asList(ex, err, lex, pex);
-//        
-//        ExceptionDialog.showDialog((Frame)null, excs);
-//        
-//        ExceptionDialog.showDialog((Frame)null, new Exception("ABC"));
-//        ExceptionDialog.showDialog((Frame)null, pex);
-//    }
+    
 }
