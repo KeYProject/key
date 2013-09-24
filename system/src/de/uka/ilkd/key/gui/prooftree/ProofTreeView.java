@@ -707,23 +707,31 @@ public class ProofTreeView extends JPanel {
 		*/
 		tree_cell.setForeground(Color.black);
                 String tooltipText = "An inner node of the proof";
+                final String notes = node.getNodeInfo().getNotes();
+                if (notes!=null) {
+                    tooltipText += ".\nNotes: "+notes;
+                }
 
                 Icon defaultIcon;
-                if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                if (notes != null) {
+                    defaultIcon = IconFactory.editFile(16);
+                } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                     defaultIcon = IconFactory.interactiveAppLogo(16);
-                    tooltipText = "An inner node (rule applied by user)";
                 } else {
                     defaultIcon = null;
                 }
                 if (isBranch && node.childrenCount() > 1) {
                     defaultIcon = getOpenIcon();
-                    tooltipText = "A branch node with all siblings hidden";
+                    tooltipText = "A branch node with all children hidden";
                 }
                 tree_cell.setIcon(defaultIcon);
 
 		tree_cell.setToolTipText(tooltipText);
 	    }
 
+	    if (node.getNodeInfo().getNotes() != null) {
+	        tree_cell.setBackgroundNonSelectionColor(Color.yellow);
+	    } else
             if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
 
@@ -760,6 +768,7 @@ public class ProofTreeView extends JPanel {
 	            new JCheckBoxMenuItem("Hide Non-interactive Proofsteps");
 	private JCheckBoxMenuItem hideClosedSubtrees =
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
+	private JMenuItem notes = new JMenuItem("Edit Notes");
 	private JMenuItem search = new JMenuItem("Search");
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
@@ -797,12 +806,12 @@ public class ProofTreeView extends JPanel {
         ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
         if(!macroMenu.isEmpty()) {
             this.add(macroMenu);
-            this.add(new JSeparator());
         }
 
 	    this.add(prune);
 	    if (branch != path) {
 		prune.addActionListener(this);
+		prune.setIcon(IconFactory.pruneLogo(16));
 		prune.setEnabled(false);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) ||
@@ -824,6 +833,12 @@ public class ProofTreeView extends JPanel {
 	    }
 	    if (de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE.active())
 	        this.add(delayedCut);
+
+	    // modifying the node
+        this.add(new JSeparator());
+        this.add(notes);
+        notes.setIcon(IconFactory.editFile(20));
+        notes.addActionListener(this);
 
 	    // modifying the view
 	    this.add(new JSeparator());
@@ -998,6 +1013,22 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		showSearchPanel();
+            } else if (e.getSource() == notes) {
+                // display a dialog to attach text to the node
+                final Icon editIcon = IconFactory.editFile(20);
+                final String origNotes = invokedNode.getNodeInfo().getNotes();
+                final String newNotes = (String)JOptionPane.showInputDialog(
+                                    this,null,
+                                    "Annotate this proof node",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    editIcon,
+                                    null,
+                                    origNotes);
+                if (newNotes != null) {
+                    if (newNotes.length()==0)
+                        invokedNode.getNodeInfo().setNotes(null);
+                    else invokedNode.getNodeInfo().setNotes(newNotes);
+                }
             }
 	}
 
