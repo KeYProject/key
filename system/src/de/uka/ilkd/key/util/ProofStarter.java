@@ -117,19 +117,26 @@ public class ProofStarter {
     private StrategyProperties strategyProperties = new StrategyProperties();
 
     private ProverTaskListener ptl;
+    
+    private AutoSaver autoSaver;
 
     /**
      * creates an instance of the ProofStarter
      * @param the ProofEnvironment in which the proof shall be performed
      */
-    public ProofStarter() {}
+    public ProofStarter(boolean useAutoSaver) {
+       this(null, useAutoSaver);
+    }
 
     /**
      * creates an instance of the ProofStarter
      * @param the ProofEnvironment in which the proof shall be performed
      */
-    public ProofStarter(ProverTaskListener ptl) {
+    public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
     	this.ptl = ptl;
+      if (useAutoSaver) {
+         autoSaver = new AutoSaver();
+      }
     }
 
 
@@ -215,9 +222,10 @@ public class ProofStarter {
                 new ApplyStrategy(proof.env().getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
 
         if (ptl != null) prover.addProverTaskObserver(ptl);
-        final AutoSaver autoSaver = AutoSaver.getInstance();
-        autoSaver.setProof(proof);
-        prover.addProverTaskObserver(autoSaver);
+        if (autoSaver != null) {
+           autoSaver.setProof(proof);
+           prover.addProverTaskObserver(autoSaver);
+        }
 
         ApplyStrategy.ApplyStrategyInfo result =
                 prover.start(proof, goals, maxSteps, timeout, false);
@@ -228,7 +236,10 @@ public class ProofStarter {
         }
 
         if (ptl != null) prover.removeProverTaskObserver(ptl);
-        prover.removeProverTaskObserver(autoSaver);
+        if (autoSaver != null) {
+           prover.removeProverTaskObserver(autoSaver);
+           autoSaver.setProof(null);
+        }
 
         return result;
     }

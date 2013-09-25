@@ -50,6 +50,7 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -104,13 +105,21 @@ public class KeYMediator {
      * than the {@link Proof} before.
      */
     private OneStepSimplifier currentOneStepSimplifier;
+    
+    /**
+     * An optional used {@link AutoSaver}.
+     */
+    private AutoSaver autoSaver;
 
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
-    public KeYMediator(UserInterface ui) {
+    public KeYMediator(UserInterface ui, boolean useAutoSaver) {
 	this.ui             = ui;
+   if (useAutoSaver) {
+      autoSaver = new AutoSaver();
+   }
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -1033,4 +1042,12 @@ public class KeYMediator {
         return true;
 
     }
+
+   /**
+    * Returns the {@link AutoSaver} to use.
+    * @return The {@link AutoSaver} to use or {@code null} if no {@link AutoSaver} should be used.
+    */
+   public AutoSaver getAutoSaver() {
+      return autoSaver;
+   }
 }

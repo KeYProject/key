@@ -477,7 +477,7 @@ public final class SymbolicExecutionUtil {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
-      ProofStarter starter = new ProofStarter();
+      ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
