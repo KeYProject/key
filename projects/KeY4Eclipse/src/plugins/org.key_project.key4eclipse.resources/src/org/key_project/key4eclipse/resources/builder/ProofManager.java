@@ -935,6 +935,7 @@ public class ProofManager {
             environment.dispose();
       
          } catch(Exception e){
+            LogUtil.getLogger().logError(e);
             LogUtil.getLogger().createErrorStatus(e); // TODO: You do nothing with the created status. I guess you mean LogUtil.getLogger().logError(e); which writes the exception into the eclipse log
          }
       }
