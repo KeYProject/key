@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -135,6 +137,8 @@ public class Proof implements Named {
      */
     private boolean disposed = false;
 
+    /** list of rule app listeners */
+    private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
@@ -282,6 +286,7 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
+        ruleAppListenerList = null;
         disposed = true;
     }
 
@@ -1190,4 +1195,27 @@ public class Proof implements Named {
             return sb.toString();
         }
     }
+    
+
+   /** fires the event that a rule has been applied */
+   protected void fireRuleApplied(ProofEvent p_e) {
+      synchronized (ruleAppListenerList) {
+         Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
+         while (it.hasNext()) {
+            it.next().ruleApplied(p_e);
+         }
+      }
+   }
+
+   public void addRuleAppListener(RuleAppListener p) {
+      synchronized (ruleAppListenerList) {
+         ruleAppListenerList.add(p);
+      }
+   }
+
+   public void removeRuleAppListener(RuleAppListener p) {
+      synchronized (ruleAppListenerList) {
+         ruleAppListenerList.remove(p);
+      }
+   }
 }
