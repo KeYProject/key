@@ -152,17 +152,23 @@ class RIFLHandler extends DefaultHandler {
         // System.out.println(uri+" : "+localName+" : "+qName+" : "+printAttributes(attributes));
 
         switch (localName) {
+        case "sourcedompair":
         case "sources":
             startSources();
             break;
+        case "sinkdompair":
         case "sinks":
             startSinks();
             break;
-        case "category":
+        case "category": // TODO: different semantics in "domains" and "sinkdompair"
             setCategory(attributes);
             break;
-        case "assign":
+        case "domainassignment":
+            // TODO: now assignment directly to domain
             assignCategory(attributes);
+            break;
+        case "domains":
+            // TODO
             break;
         case "field":
             putField(attributes);
@@ -173,9 +179,22 @@ class RIFLHandler extends DefaultHandler {
         case "returnvalue":
             putReturn(attributes);
             break;
+// a lot of elements without their own semantics
+//        case "riflspec":
+//        case "attackerio":
+//        case "top":
+//        case "bottom":
+//        case "source":
+//        case "sink":
+        case "dompair": // TODO
+//        case "domainhierarchy":
+        case "flowpair": // TODO
+//        case "flowpolicy":
         default:
         }
     }
+
+// TODO: actions on closing elements?
 
     private void startSinks() {
         tmpMap = sinks2categories;
