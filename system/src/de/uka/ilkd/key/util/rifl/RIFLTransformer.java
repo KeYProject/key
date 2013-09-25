@@ -67,9 +67,14 @@ public class RIFLTransformer {
      * Entry point for the stand-alone RIFL to JML* tool.
      */
     public static void main(String[] args) {
-        final String riflFilename = args[0];
-        final String javaFilename = args[1];
-        RIFLTransformer.transform(riflFilename, javaFilename);
+        if (args.length < 2 || "--help".equals(args[0]) {
+            System.out.println("This is the RIFL to JML* transformer.");
+            System.out.println("Usage: <RIFL file> <Java sources>");
+        } else {
+            final String riflFilename = args[0];
+            final String javaFilename = args[1];
+            RIFLTransformer.transform(riflFilename, javaFilename);
+        }
     }
 
     /**
@@ -139,7 +144,7 @@ public class RIFLTransformer {
     }
 
     private static String getBaseDirPath(String origSourcePath) {
-        if (origSourcePath.endsWith("java")) {
+        if (origSourcePath.endsWith(".java")) {
             // select containing directory
             final String absPath = new File(origSourcePath).getAbsolutePath();
             origSourcePath = absPath.substring(0, absPath.lastIndexOf(File.separator));

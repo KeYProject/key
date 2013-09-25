@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.util.rifl;
 
 /**
- * Program elements which may be named as sources or sinks in RIFL.
+ * Program elements which may be named as sources or sinks in RIFL/Java.
+ * Currently fields, method parameters, and method return values can be
+ * named both sources and sinks.
  * 
  * @author bruns
  */
@@ -24,6 +26,12 @@ public abstract class SpecificationEntity {
 
         public final String name;
 
+        /**
+         * Creates a new specification element for a field.
+         * @param n name of the field
+         * @param p package name of the class where the field is declared
+         * @param c name of the class where the field is declared
+         */
         Field(String n, String p, String c) {
             super(p, c);
             name = n.intern();
@@ -57,6 +65,13 @@ public abstract class SpecificationEntity {
         public final String[] paramTypes;
         public final int position;
 
+        /**
+         * Creates a new specification element for a method parameter.
+         * @param pos the index within the sequence of parameters
+         * @param m name of the method with parameter types in parentheses
+         * @param p package name of the class where the method is declared
+         * @param c name of the class where the method is declared
+         */
         Parameter(int pos, String m, String p, String c) {
             super(p, c);
             final int i = m.indexOf('(');
@@ -65,6 +80,14 @@ public abstract class SpecificationEntity {
             position = pos;
         }
 
+        /**
+         * Creates a new specification element for a method parameter.
+         * @param pos the index within the sequence of parameters
+         * @param m name of the method
+         * @param pt names of the parameter types of the method
+         * @param p package name of the class where the method is declared
+         * @param c name of the class where the method is declared
+         */
         Parameter(int pos, String m, String[] pt, String p, String c) {
             super(p, c);
             position = pos;
@@ -110,6 +133,13 @@ public abstract class SpecificationEntity {
         public final String methodName;
         public final String[] paramTypes;
 
+        /**
+         * Creates a new specification element for a method return.
+         * @param m name of the method with parameter types in parentheses
+         * @param pt names of the parameter types of the method
+         * @param p package name of the class where the method is declared
+         * @param c name of the class where the method is declared
+         */
         ReturnValue(String m, String p, String c) {
             super(p, c);
             final int i = m.indexOf('(');
@@ -117,6 +147,13 @@ public abstract class SpecificationEntity {
             paramTypes = m.substring(i + 1, m.lastIndexOf(')')).split(",");
         }
 
+        /**
+         * Creates a new specification element for a method return.
+         * @param m name of the method
+         * @param pt names of the parameter types of the method
+         * @param p package name of the class where the method is declared
+         * @param c name of the class where the method is declared
+         */
         ReturnValue(String m, String[] pt, String p, String c) {
             super(p, c);
             methodName = m;
