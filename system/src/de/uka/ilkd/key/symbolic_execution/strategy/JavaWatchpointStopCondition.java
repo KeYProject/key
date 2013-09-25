@@ -1,11 +1,16 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
@@ -51,7 +56,7 @@ public class JavaWatchpointStopCondition extends
       this.containerKJT=containerKJT;
       this.isAccess = isAcces;
       this.isModification = isModification;
-      this.fieldName = fieldName;
+      this.fieldName = "this."+fieldName;
       this.fullFieldName = containerKJT.getSort().toString()+"::"+fieldName;
    }
 
@@ -81,11 +86,17 @@ public class JavaWatchpointStopCondition extends
                         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
                         if (activeStatement != null && activeStatement instanceof Assignment) {
                            Assignment assignment = (Assignment) activeStatement;
-                           SourceElement firstElement = assignment.getFirstElement();
-                           if(firstElement instanceof LocationVariable){
-                              LocationVariable locVar = (LocationVariable)firstElement;
-                              KeYJavaType containerType = locVar.getContainerType();
-                              if(containerType!=null&&containerType.equals(containerKJT)&&fullFieldName.equals(locVar.toString())&&isModification&&hitcountExceeded(node)){
+                           SourceElement firstElement = assignment.getChildAt(0);
+                           SourceElement realFirstElement = assignment.getFirstElement();
+                           if(firstElement instanceof FieldReference){
+                              PosInOccurrence pio = ruleApp.posInOccurrence();
+                              Term term = pio.subTerm();
+                              term = TermBuilder.DF.goBelowUpdates(term);
+                              ExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+                              ThisReference thisType = (ThisReference)realFirstElement;
+                              FieldReference fieldRef = (FieldReference)firstElement;
+                              KeYJavaType containerType = thisType.getKeYJavaType(proof.getServices(), ec);
+                              if(containerType!=null&&containerType.equals(containerKJT)&&fieldName.equals(fieldRef.toString())&&isModification&&hitcountExceeded(node)){
                                  // Increase number of set nodes on this goal and allow rule application
                                  executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                                  getExecutedNumberOfSetNodesPerGoal().put(goal, executedNumberOfSetNodes);

@@ -80,8 +80,8 @@ public class LemmataAutoModeOptions {
         public LemmataAutoModeOptions(CommandLine cl, String internalVersion) {
                 super();
                 try{
-                	if(cl.isSet(Main.JPATH_OF_RULE_FILE)){
-                		this.pathOfRuleFile = cl.getString(Main.JPATH_OF_RULE_FILE, null);
+                	if(cl.isSet(Main.JUSTIFY_RULES)){
+                		this.pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
                 	
                 	}
                 	if(cl.isSet(Main.JTIMEOUT)){
@@ -91,7 +91,7 @@ public class LemmataAutoModeOptions {
                 	if(cl.isSet(Main.JMAX_RULES)){
                 		this.maxRules =  cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES);
                 	}
-                	if(cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JPATH_OF_RULE_FILE)){
+                	if(cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JUSTIFY_RULES)){
                 		this.pathOfResult = generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
                 	}
                 	}catch(CommandLineException cle){
@@ -128,7 +128,7 @@ public class LemmataAutoModeOptions {
                 if (cl.isSet(Main.JPATH_OF_RESULT)) {
                 	pathOfResult = cl.getString(Main.JPATH_OF_RESULT, null);
                 }
-                if (cl.isSet(Main.JPATH_OF_RULE_FILE)) {
+                if (cl.isSet(Main.JUSTIFY_RULES)) {
                 	pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
                 }
                 if (cl.isSet(Main.JTIMEOUT)) {

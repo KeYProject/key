@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <statement name="noReturn();" pathCondition="true" pathConditionChanged="false">
+         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                  <value name="value {true}" typeString="int" valueString="self.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+            </value>
+         </variable>
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <callStackEntry path="/0"/>
+         <methodCall name="self.noReturn();" pathCondition="true" pathConditionChanged="false">
+            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                     <value name="value {true}" typeString="int" valueString="self.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <callStackEntry path="/0"/>
+            <statement name="this.value=0;" pathCondition="true" pathConditionChanged="false">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="self.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <callStackEntry path="/0/0/0"/>
+               <methodReturn name="&lt;return of self.noReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.noReturn();&gt;" isReturnValueComputed="true">
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <callStackEntry path="/0/0/0"/>
+                  <statement name="emptyReturn();" pathCondition="true" pathConditionChanged="false">
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                              <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <callStackEntry path="/0"/>
+                     <methodCall name="self.emptyReturn();" pathCondition="true" pathConditionChanged="false">
+                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <callStackEntry path="/0"/>
+                        <statement name="this.value++;" pathCondition="true" pathConditionChanged="false">
+                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <callStackEntry path="/0"/>
+                           <callStackEntry path="/0/0/0/0/0/0/0"/>
+                           <statement name="return ;" pathCondition="true" pathConditionChanged="false">
+                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <callStackEntry path="/0"/>
+                              <callStackEntry path="/0/0/0/0/0/0/0"/>
+                              <methodReturn name="&lt;return of self.emptyReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.emptyReturn();&gt;" isReturnValueComputed="true">
+                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <callStackEntry path="/0"/>
+                                 <callStackEntry path="/0/0/0/0/0/0/0"/>
+                                 <statement name="valueReturn();" pathCondition="true" pathConditionChanged="false">
+                                    <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                    <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <callStackEntry path="/0"/>
+                                    <methodCall name="self.valueReturn();" pathCondition="true" pathConditionChanged="false">
+                                       <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                             <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                </value>
+                                             </variable>
+                                          </value>
+                                       </variable>
+                                       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                       <callStackEntry path="/0"/>
+                                       <statement name="this.value++;" pathCondition="true" pathConditionChanged="false">
+                                          <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   </value>
+                                                </variable>
+                                             </value>
+                                          </variable>
+                                          <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                          <callStackEntry path="/0"/>
+                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                          <statement name="return this.value;" pathCondition="true" pathConditionChanged="false">
+                                             <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      </value>
+                                                   </variable>
+                                                </value>
+                                             </variable>
+                                             <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                </value>
+                                             </variable>
+                                             <callStackEntry path="/0"/>
+                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                             <methodReturn name="&lt;return of self.valueReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 2 as result of self.valueReturn();&gt;" isReturnValueComputed="true">
+                                                <methodReturnValue name="2" returnValueString="2" hasCondition="false">
+                                                </methodReturnValue>
+                                                <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                         <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                         </value>
+                                                      </variable>
+                                                   </value>
+                                                </variable>
+                                                <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   </value>
+                                                </variable>
+                                                <variable name="x_8" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="x_8 {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   </value>
+                                                </variable>
+                                                <callStackEntry path="/0"/>
+                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                <statement name="int returnedValue1 = valueReturn();" pathCondition="true" pathConditionChanged="false">
+                                                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                            <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                            </value>
+                                                         </variable>
+                                                      </value>
+                                                   </variable>
+                                                   <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      </value>
+                                                   </variable>
+                                                   <callStackEntry path="/0"/>
+                                                   <methodCall name="self.valueReturn();" pathCondition="true" pathConditionChanged="false">
+                                                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                         <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                               <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                               </value>
+                                                            </variable>
+                                                         </value>
+                                                      </variable>
+                                                      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                         </value>
+                                                      </variable>
+                                                      <callStackEntry path="/0"/>
+                                                      <statement name="this.value++;" pathCondition="true" pathConditionChanged="false">
+                                                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                            <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                               <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="value {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  </value>
+                                                               </variable>
+                                                            </value>
+                                                         </variable>
+                                                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                            </value>
+                                                         </variable>
+                                                         <callStackEntry path="/0"/>
+                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                         <statement name="return this.value;" pathCondition="true" pathConditionChanged="false">
+                                                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                               <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                     <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                     </value>
+                                                                  </variable>
+                                                               </value>
+                                                            </variable>
+                                                            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                               </value>
+                                                            </variable>
+                                                            <callStackEntry path="/0"/>
+                                                            <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                            <methodReturn name="&lt;return of self.valueReturn();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 3 as result of self.valueReturn();&gt;" isReturnValueComputed="true">
+                                                               <methodReturnValue name="3" returnValueString="3" hasCondition="false">
+                                                               </methodReturnValue>
+                                                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                        <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                        </value>
+                                                                     </variable>
+                                                                  </value>
+                                                               </variable>
+                                                               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  </value>
+                                                               </variable>
+                                                               <variable name="x_9" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="x_9 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  </value>
+                                                               </variable>
+                                                               <callStackEntry path="/0"/>
+                                                               <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                               <statement name="noReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                     <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                           <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                           </value>
+                                                                        </variable>
+                                                                     </value>
+                                                                  </variable>
+                                                                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                     </value>
+                                                                  </variable>
+                                                                  <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                     <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                     </value>
+                                                                  </variable>
+                                                                  <callStackEntry path="/0"/>
+                                                                  <methodCall name="MethodCallReturnTests.noReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                        <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </variable>
+                                                                        </value>
+                                                                     </variable>
+                                                                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                        </value>
+                                                                     </variable>
+                                                                     <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                        <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                        </value>
+                                                                     </variable>
+                                                                     <callStackEntry path="/0"/>
+                                                                     <statement name="staticValue=0;" pathCondition="true" pathConditionChanged="false">
+                                                                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                           </value>
+                                                                        </variable>
+                                                                        <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                           </value>
+                                                                        </variable>
+                                                                        <callStackEntry path="/0"/>
+                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                        <methodReturn name="&lt;return of MethodCallReturnTests.noReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallReturnTests.noReturnStatic();&gt;" isReturnValueComputed="true">
+                                                                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </variable>
+                                                                           <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </variable>
+                                                                           <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </variable>
+                                                                           <callStackEntry path="/0"/>
+                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                           <statement name="emptyReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                 <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                       <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       </value>
+                                                                                    </variable>
+                                                                                 </value>
+                                                                              </variable>
+                                                                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                 </value>
+                                                                              </variable>
+                                                                              <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                 <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                 </value>
+                                                                              </variable>
+                                                                              <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                 <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                 </value>
+                                                                              </variable>
+                                                                              <callStackEntry path="/0"/>
+                                                                              <methodCall name="MethodCallReturnTests.emptyReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                    <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                          <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          </value>
+                                                                                       </variable>
+                                                                                    </value>
+                                                                                 </variable>
+                                                                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                    </value>
+                                                                                 </variable>
+                                                                                 <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                    <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                    </value>
+                                                                                 </variable>
+                                                                                 <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                    <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                    </value>
+                                                                                 </variable>
+                                                                                 <callStackEntry path="/0"/>
+                                                                                 <statement name="staticValue++;" pathCondition="true" pathConditionChanged="false">
+                                                                                    <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                       <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       </value>
+                                                                                    </variable>
+                                                                                    <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                       <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       </value>
+                                                                                    </variable>
+                                                                                    <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                       <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                       </value>
+                                                                                    </variable>
+                                                                                    <callStackEntry path="/0"/>
+                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                    <statement name="return ;" pathCondition="true" pathConditionChanged="false">
+                                                                                       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          </value>
+                                                                                       </variable>
+                                                                                       <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                          <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          </value>
+                                                                                       </variable>
+                                                                                       <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                          <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                          </value>
+                                                                                       </variable>
+                                                                                       <callStackEntry path="/0"/>
+                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                       <methodReturn name="&lt;return of MethodCallReturnTests.emptyReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallReturnTests.emptyReturnStatic();&gt;" isReturnValueComputed="true">
+                                                                                          <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </variable>
+                                                                                          <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </variable>
+                                                                                          <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </variable>
+                                                                                          <callStackEntry path="/0"/>
+                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                          <statement name="valueReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                                             <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                      <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      </value>
+                                                                                                   </variable>
+                                                                                                </value>
+                                                                                             </variable>
+                                                                                             <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                </value>
+                                                                                             </variable>
+                                                                                             <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                </value>
+                                                                                             </variable>
+                                                                                             <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                </value>
+                                                                                             </variable>
+                                                                                             <callStackEntry path="/0"/>
+                                                                                             <methodCall name="MethodCallReturnTests.valueReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                                                <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                         <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         </value>
+                                                                                                      </variable>
+                                                                                                   </value>
+                                                                                                </variable>
+                                                                                                <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                   </value>
+                                                                                                </variable>
+                                                                                                <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                   <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                   </value>
+                                                                                                </variable>
+                                                                                                <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                   <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                   </value>
+                                                                                                </variable>
+                                                                                                <callStackEntry path="/0"/>
+                                                                                                <statement name="staticValue++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                   <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      </value>
+                                                                                                   </variable>
+                                                                                                   <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                      <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      </value>
+                                                                                                   </variable>
+                                                                                                   <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                      <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                      </value>
+                                                                                                   </variable>
+                                                                                                   <callStackEntry path="/0"/>
+                                                                                                   <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                   <statement name="return staticValue;" pathCondition="true" pathConditionChanged="false">
+                                                                                                      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         </value>
+                                                                                                      </variable>
+                                                                                                      <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                         <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         </value>
+                                                                                                      </variable>
+                                                                                                      <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                         <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                         </value>
+                                                                                                      </variable>
+                                                                                                      <callStackEntry path="/0"/>
+                                                                                                      <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                      <methodReturn name="&lt;return of MethodCallReturnTests.valueReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 2 as result of MethodCallReturnTests.valueReturnStatic();&gt;" isReturnValueComputed="true">
+                                                                                                         <methodReturnValue name="2" returnValueString="2" hasCondition="false">
+                                                                                                         </methodReturnValue>
+                                                                                                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </variable>
+                                                                                                         <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </variable>
+                                                                                                         <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </variable>
+                                                                                                         <variable name="x_22" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="x_22 {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </variable>
+                                                                                                         <callStackEntry path="/0"/>
+                                                                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                         <statement name="int returnedValue2 = valueReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                                                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                               <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                     <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     </value>
+                                                                                                                  </variable>
+                                                                                                               </value>
+                                                                                                            </variable>
+                                                                                                            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                               </value>
+                                                                                                            </variable>
+                                                                                                            <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                               <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                               </value>
+                                                                                                            </variable>
+                                                                                                            <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                               <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                               </value>
+                                                                                                            </variable>
+                                                                                                            <callStackEntry path="/0"/>
+                                                                                                            <methodCall name="MethodCallReturnTests.valueReturnStatic();" pathCondition="true" pathConditionChanged="false">
+                                                                                                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                        <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        </value>
+                                                                                                                     </variable>
+                                                                                                                  </value>
+                                                                                                               </variable>
+                                                                                                               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                  </value>
+                                                                                                               </variable>
+                                                                                                               <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                  <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                  </value>
+                                                                                                               </variable>
+                                                                                                               <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                  <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                  </value>
+                                                                                                               </variable>
+                                                                                                               <callStackEntry path="/0"/>
+                                                                                                               <statement name="staticValue++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     </value>
+                                                                                                                  </variable>
+                                                                                                                  <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                     <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     </value>
+                                                                                                                  </variable>
+                                                                                                                  <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                     <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                     </value>
+                                                                                                                  </variable>
+                                                                                                                  <callStackEntry path="/0"/>
+                                                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                  <statement name="return staticValue;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        </value>
+                                                                                                                     </variable>
+                                                                                                                     <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                        <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        </value>
+                                                                                                                     </variable>
+                                                                                                                     <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                        <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                        </value>
+                                                                                                                     </variable>
+                                                                                                                     <callStackEntry path="/0"/>
+                                                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                     <methodReturn name="&lt;return of MethodCallReturnTests.valueReturnStatic();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 3 as result of MethodCallReturnTests.valueReturnStatic();&gt;" isReturnValueComputed="true">
+                                                                                                                        <methodReturnValue name="3" returnValueString="3" hasCondition="false">
+                                                                                                                        </methodReturnValue>
+                                                                                                                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </variable>
+                                                                                                                        <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </variable>
+                                                                                                                        <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </variable>
+                                                                                                                        <variable name="x_23" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="x_23 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </variable>
+                                                                                                                        <callStackEntry path="/0"/>
+                                                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                        <statement name="return returnedValue1+returnedValue2;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                              <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                    <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                    </value>
+                                                                                                                                 </variable>
+                                                                                                                              </value>
+                                                                                                                           </variable>
+                                                                                                                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              </value>
+                                                                                                                           </variable>
+                                                                                                                           <variable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              </value>
+                                                                                                                           </variable>
+                                                                                                                           <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                              <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              </value>
+                                                                                                                           </variable>
+                                                                                                                           <variable name="returnedValue2" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                              <value name="returnedValue2 {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                              </value>
+                                                                                                                           </variable>
+                                                                                                                           <callStackEntry path="/0"/>
+                                                                                                                           <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 6 as result of self.main();&gt;" isReturnValueComputed="true">
+                                                                                                                              <methodReturnValue name="6" returnValueString="6" hasCondition="false">
+                                                                                                                              </methodReturnValue>
+                                                                                                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                       <value name="value {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                       </value>
+                                                                                                                                    </variable>
+                                                                                                                                 </value>
+                                                                                                                              </variable>
+                                                                                                                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                 </value>
+                                                                                                                              </variable>
+                                                                                                                              <variable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                 </value>
+                                                                                                                              </variable>
+                                                                                                                              <callStackEntry path="/0"/>
+                                                                                                                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                                                                                                              </termination>
+                                                                                                                           </methodReturn>
+                                                                                                                        </statement>
+                                                                                                                     </methodReturn>
+                                                                                                                  </statement>
+                                                                                                               </statement>
+                                                                                                            </methodCall>
+                                                                                                         </statement>
+                                                                                                      </methodReturn>
+                                                                                                   </statement>
+                                                                                                </statement>
+                                                                                             </methodCall>
+                                                                                          </statement>
+                                                                                       </methodReturn>
+                                                                                    </statement>
+                                                                                 </statement>
+                                                                              </methodCall>
+                                                                           </statement>
+                                                                        </methodReturn>
+                                                                     </statement>
+                                                                  </methodCall>
+                                                               </statement>
+                                                            </methodReturn>
+                                                         </statement>
+                                                      </statement>
+                                                   </methodCall>
+                                                </statement>
+                                             </methodReturn>
+                                          </statement>
+                                       </statement>
+                                    </methodCall>
+                                 </statement>
+                              </methodReturn>
+                           </statement>
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodReturn>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</start>

@@ -76,37 +76,37 @@ public final class TestBreakpointsUtil {
    }
    
    public static boolean removeBrakpoint(SWTWorkbenchBot bot, String breakpointTableName){
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-      SWTBotTree tree = bot.tree();
-      SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
-      Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
-      if(treeItemData instanceof IBreakpoint){
-         IBreakpoint breakpoint = (IBreakpoint) treeItemData;
-         try {
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+         SWTBotTree tree = bot.tree();
+         SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
+         Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
+         if(treeItemData instanceof IBreakpoint){
+            IBreakpoint breakpoint = (IBreakpoint) treeItemData;
             breakpoint.delete();
             return true;
          }
-         catch (CoreException e) {
-            return false;
-         }
+      }
+      catch (Exception e) {
+         return false;
       }
       return false;
    }
 
    public static boolean changeHitCount(SWTWorkbenchBot bot, String breakpointTableName, int newHitCount){
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-      SWTBotTree tree = bot.tree();
-      SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
-      Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
-      if(treeItemData instanceof JavaBreakpoint){
-         JavaBreakpoint breakpoint = (JavaBreakpoint) treeItemData;
-         try {
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+         SWTBotTree tree = bot.tree();
+         SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
+         Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
+         if(treeItemData instanceof JavaBreakpoint){
+            JavaBreakpoint breakpoint = (JavaBreakpoint) treeItemData;
             breakpoint.setHitCount(newHitCount);
             return true;
          }
-         catch (CoreException e) {
-            return false;
-         }
+      }
+      catch (Exception e) {
+         return false;
       }
       return false;
    }
@@ -224,19 +224,19 @@ public final class TestBreakpointsUtil {
 
    public static boolean changeEnabled(SWTWorkbenchBot bot, String breakpointTableName,
          boolean enabled) {
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-      SWTBotTree tree = bot.tree();
-      SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
-      Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
-      if(treeItemData instanceof JavaBreakpoint){
-         JavaBreakpoint breakpoint = (JavaBreakpoint) treeItemData;
-         try {
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+         SWTBotTree tree = bot.tree();
+         SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
+         Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
+         if(treeItemData instanceof JavaBreakpoint){
+            JavaBreakpoint breakpoint = (JavaBreakpoint) treeItemData;
             breakpoint.setEnabled(enabled);
             return true;
          }
-         catch (CoreException e) {
-            return false;
-         }
+      }
+      catch (Exception e) {
+         return false;
       }
       return false;
    }
@@ -284,20 +284,20 @@ public final class TestBreakpointsUtil {
 
    public static boolean changeCondition(SWTWorkbenchBot bot, String breakpointTableName,
          String condition) {
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-      SWTBotTree tree = bot.tree();
-      SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
-      Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
-      if(treeItemData instanceof JavaLineBreakpoint){
-         JavaLineBreakpoint breakpoint = (JavaLineBreakpoint) treeItemData;
-         try {
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+         SWTBotTree tree = bot.tree();
+         SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
+         Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
+         if(treeItemData instanceof JavaLineBreakpoint){
+            JavaLineBreakpoint breakpoint = (JavaLineBreakpoint) treeItemData;
             breakpoint.setConditionEnabled(true);
             breakpoint.setCondition(condition);
             return true;
          }
-         catch (CoreException e) {
-            return false;
-         }
+      }
+      catch (Exception e) {
+         return false;
       }
       return false;
    }
@@ -358,41 +358,41 @@ public final class TestBreakpointsUtil {
 
    public static boolean changeAccessAndModification(SWTWorkbenchBot bot,
          String breakpointTableName, boolean access, boolean modification) {
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-      SWTBotTree tree = bot.tree();
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+         SWTBotTree tree = bot.tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaWatchpoint){
             JavaWatchpoint breakpoint = (JavaWatchpoint) treeItemData;
-            try {
-               breakpoint.setAccess(access);
-               breakpoint.setModification(modification);
-               return true;
-            }
-            catch (CoreException e) {
-               return false;
-            }
+            breakpoint.setAccess(access);
+            breakpoint.setModification(modification);
+            return true;
          }
+      }
+      catch (Exception e) {
+         return false;
+      }
          return false;
       }
 
    public static boolean changeEntryAndExit(SWTWorkbenchBot bot,
          String breakpointTableName, boolean entry, boolean exit) {
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
-      SWTBotTree tree = bot.tree();
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+         SWTBotTree tree = bot.tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaMethodBreakpoint){
             JavaMethodBreakpoint breakpoint = (JavaMethodBreakpoint) treeItemData;
-            try {
                breakpoint.setEntry(entry);
                breakpoint.setExit(exit);
                return true;
-            }
-            catch (CoreException e) {
-               return false;
-            }
          }
+      }
+      catch (Exception e) {
+         return false;
+      }
          return false;
       }
 
@@ -466,22 +466,22 @@ public final class TestBreakpointsUtil {
 
    public static boolean changeCaughtUncaughtSubclass(SWTWorkbenchBot bot,
          String breakpointTableName, boolean caught, boolean uncaught, boolean subclass) {
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      try {
+         TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       SWTBotTree tree = bot.tree();
          SWTBotTreeItem treeItem = tree.getTreeItem(breakpointTableName);
          Object treeItemData = TestUtilsUtil.getTreeItemData(treeItem);
          if(treeItemData instanceof JavaExceptionBreakpoint){
             JavaExceptionBreakpoint exceptionBreakpoint = (JavaExceptionBreakpoint) treeItemData;
-            try {
-               exceptionBreakpoint.setSuspendOnSubclasses(subclass);
-               exceptionBreakpoint.setCaught(caught);
-               exceptionBreakpoint.setUncaught(uncaught);
-               return true;
-            }
-            catch (CoreException e) {
-               return false;
-            }
+            exceptionBreakpoint.setSuspendOnSubclasses(subclass);
+            exceptionBreakpoint.setCaught(caught);
+            exceptionBreakpoint.setUncaught(uncaught);
+            return true;
          }
+      }
+      catch (Exception e) {
+         return false;
+      }
          return false;
    }
 

@@ -14,9 +14,8 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -296,9 +295,9 @@ public class SymbolicConfigurationExtractor {
                initialLocationTerm = createLocationPredicateAndTerm(initialLocations);
                currentLocationTerm = createLocationPredicateAndTerm(currentLocations);
                // Create configuration maps which are filled lazily
-               initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-               currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
-               configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+               initialConfigurations = new LinkedHashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               currentConfigurations = new LinkedHashMap<Integer, ISymbolicConfiguration>(appliedCutsPerConfiguration.size());
+               configurationsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
             }
             finally {
                equivalentClassesProofStarter.getProof().dispose();
@@ -319,7 +318,7 @@ public class SymbolicConfigurationExtractor {
     * @return The objects to ignore.
     */
    protected Set<Term> computeInitialObjectsToIgnore() {
-      Set<Term> result = new HashSet<Term>();
+      Set<Term> result = new LinkedHashSet<Term>();
       // Add exception variable to the ignore list because it is not part of the source code.
       IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
       if (excVar instanceof ProgramVariable) {
@@ -762,7 +761,9 @@ public class SymbolicConfigurationExtractor {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
-                  updateValueObjectsToFill.add(updateTerm.sub(0));
+                  Term objectTerm = updateTerm.sub(0);
+                  objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm);
+                  updateValueObjectsToFill.add(objectTerm);
                }
             }
          }
@@ -829,7 +830,9 @@ public class SymbolicConfigurationExtractor {
             // Static fields have a null term as select argument.
          }
          else {
-            throw new ProofInputException("Unsupported operator in select argument of heap update \"" + selectArgument.op() + "\".");
+            for (int i = 0; i < selectArgument.arity(); i++) {
+               collectLocationsFromHeapUpdate(selectArgument.sub(i), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
+            }
          }
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
@@ -853,13 +856,17 @@ public class SymbolicConfigurationExtractor {
             }
          }
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
-            updateValueObjectsToFill.add(term.sub(3));
+            Term objectTerm = term.sub(3);
+            objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), objectTerm);
+            updateValueObjectsToFill.add(objectTerm);
          }
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
       else if (term.op() == heapLDT.getCreate()) {
-         updateCreatedObjectsToFill.add(term.sub(1));
+         Term newObject = term.sub(1);
+         newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject);
+         updateCreatedObjectsToFill.add(newObject);
          // Iterate over child heap modifications
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
@@ -872,7 +879,9 @@ public class SymbolicConfigurationExtractor {
          collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
       }
       else {
-         throw new ProofInputException("Unsupported operator in heap update \"" + term.op() + "\".");
+         for (int i = 0; i < term.arity(); i++) {
+            collectLocationsFromHeapUpdate(term.sub(i), locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill);
+         }
       }
    }
 
@@ -1118,7 +1127,9 @@ public class SymbolicConfigurationExtractor {
                                                                 Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent.antecedent()) {
-         result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
+         if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
+            result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
+         }
       }
       return result;
    }
@@ -1138,7 +1149,8 @@ public class SymbolicConfigurationExtractor {
          public void visit(Term visited) {
             if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited) && 
                 visited.freeVars().isEmpty() &&
-                !objectsToIgnore.contains(visited)) {
+                !objectsToIgnore.contains(visited) &&
+                !SymbolicExecutionUtil.isSkolemConstant(visited)) {
                result.add(visited);
             }
          }
@@ -1245,7 +1257,7 @@ public class SymbolicConfigurationExtractor {
       SymbolicState state = new SymbolicState(stateName);
       result.setState(state);
       // Create objects
-      Map<Term, SymbolicObject> objects = new HashMap<Term, SymbolicObject>();
+      Map<Term, SymbolicObject> objects = new LinkedHashMap<Term, SymbolicObject>();
       for (ExecutionVariableValuePair pair : pairs) {
          Term parent = pair.getParent();
          if (parent != null) {

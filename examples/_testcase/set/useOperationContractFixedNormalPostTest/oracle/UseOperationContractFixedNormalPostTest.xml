@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="UseOperationContractFixedNormalPostTest.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
-         <useOperationContract name="result = magic(x) catch(exc)
-pre: x &lt; 0 | x &gt;= 0
-post: (   x &lt; 0
-   -&gt;   !exc = null
-      &amp; java.lang.Exception::instance(exc) = TRUE)
-&amp; (x &gt;= 0 -&gt; result = 42 &amp; exc = null)
+         <operationContract name="result_0 = magic(123) catch(exc_0)
+pre: 123 &lt; 0 | 123 &gt;= 0
+post: (   123 &lt; 0
+   -&gt;   !exc_0 = null
+      &amp; (    java.lang.RuntimeException::instance(exc_0)
+           = TRUE
+         | java.lang.Exception::instance(exc_0) = TRUE))
+&amp; (123 &gt;= 0 -&gt; result_0 = 42 &amp; exc_0 = null)
 mod: allLocs \cup allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of UseOperationContractFixedNormalPostTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
                </statement>
             </statement>
-         </useOperationContract>
+         </operationContract>
       </statement>
    </methodCall>
-</startNode>
+</start>

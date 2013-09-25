@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -45,10 +44,10 @@ public class EnvironmentCreator  {
         ProofInputException {
                 File dummyFile = createDummyKeYFile(pathForDummyFile);
                 keyFile = new KeYUserProblemFile(
-                                dummyFile.getName(), dummyFile, null);
+                                dummyFile.getName(), dummyFile, null, profile);
 
-                ProblemInitializer pi = new ProblemInitializer(monitor, profile,
-                                new Services(new KeYRecoderExcHandler()),
+                ProblemInitializer pi = new ProblemInitializer(monitor, 
+                                new Services(profile, new KeYRecoderExcHandler()),
                                 false, listener );
                
                 return pi.prepare(keyFile).getProofEnv();

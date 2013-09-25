@@ -14,6 +14,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -102,11 +105,13 @@ public final class PartialInvAxiom extends ClassAxiom {
             
             //create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            final SchemaVariable heapSV =
-                    SchemaVariableFactory.createTermSV(new Name("h"),
+            final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
+            for(int j=0; j<HeapContext.getModHeaps(services, false).size(); j++) {
+                heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h"+j),
                                                        heapLDT.targetSort(),
                                                        false,
-                                                       false);
+                                                       false));
+            }
             final SchemaVariable selfSV =
                     target.isStatic()
                     ? null
@@ -120,7 +125,7 @@ public final class PartialInvAxiom extends ClassAxiom {
             
             ImmutableSet<Taclet> taclets =
                     TG.generatePartialInvTaclet(name,
-                                                heapSV,
+                                                heapSVs,
                                                 selfSV,
                                                 eqSV,
                                                 inv.getInv(selfSV, services),

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_88cfbec2-37b2-4fc2-a07b-58e54f443f01" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_4c98a07a-ca50-49d7-9456-668717082618" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_50d34970-f036-4aa5-a1cf-b1aa22c0694b" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50">
+   <sedTarget xml:id="_c1f71f7b-186d-4f69-b604-9d79bbf2d40c" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_f06aacb5-699b-4c93-9730-ddd151ddd1c5" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_e8ade6e9-9fde-4eb3-8049-82e20461b544" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50">
          </sedMethodCall>
       </sedThread>
    </sedTarget>

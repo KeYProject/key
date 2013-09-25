@@ -16,13 +16,18 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -33,6 +38,7 @@ import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletAttributes;
+import de.uka.ilkd.key.rule.Trigger;
 import de.uka.ilkd.key.rule.VariableCondition;
 
 /** 
@@ -54,12 +60,14 @@ public abstract class TacletBuilder {
     protected ImmutableList<TacletGoalTemplate> goals= ImmutableSLList.<TacletGoalTemplate>nil();
     protected ImmutableList<RuleSet> ruleSets    = ImmutableSLList.<RuleSet>nil();
     protected TacletAttributes attrs        = new TacletAttributes(); 
+    
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
     protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil(); 
     protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
     protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
 
+    
 
     private static boolean containsFreeVarSV(Term t) {
 	for (final QuantifiableVariable var : t.freeVars()) {
@@ -97,7 +105,15 @@ public abstract class TacletBuilder {
     }
 
 
-
+    
+    /** 
+     * sets the trigger 
+     */
+    public void setTrigger(Trigger trigger) {
+        attrs.setTrigger(trigger);
+    }
+    
+        
     /** 
      * returns the name of the Taclet to be built
      */
@@ -135,7 +151,7 @@ public abstract class TacletBuilder {
      */
     public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc){
 	if(goal2Choices==null){
-	    goal2Choices = new HashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
+	    goal2Choices = new LinkedHashMap<TacletGoalTemplate, ImmutableSet<Choice>>();
 	}
 	goal2Choices.put(gt, soc);
     }

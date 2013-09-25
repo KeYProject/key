@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -24,12 +25,17 @@ import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
-
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-// TODO: Document class StartAutoModeHandler
+/**
+ * This {@link IHandler} starts the auto mode of the currently active
+ * {@link IProofProvider}.
+ * @author Martin Hentschel
+ */
 public class StartAutoModeHandler extends AbstractSaveExecutionHandler {   
    /**
     * {@inheritDoc}
@@ -42,8 +48,8 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
          final KeYEditor editor = (KeYEditor)editorPart;
          final IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
          if (proofProvider != null && 
-             proofProvider.getEnvironment().getUi().isAutoModeSupported(proofProvider.getCurrentProof()) && 
-             !proofProvider.getEnvironment().getMediator().autoMode()) {
+             proofProvider.getUI().isAutoModeSupported(proofProvider.getCurrentProof()) && 
+             !proofProvider.getMediator().autoMode()) {
             new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getEnvironment()) {
                // job that starts the automode in KeY
                @Override
@@ -55,12 +61,12 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
                      KeYBreakpointManager breakpointManager = (KeYBreakpointManager) editor.getAdapter(KeYBreakpointManager.class);
                      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopConditions());
                      proof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopConditions()));
-                     SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
+                     SymbolicExecutionUtil.configureProof(proof);
+                     StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                     proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
                   }else{
                      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new CompoundStopCondition());
-                     SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
                   }
-                  SymbolicExecutionUtil.configureProof(proof);
                   proofProvider.getEnvironment().getUi().startAndWaitForAutoMode(proof);
                   monitor.done();
                   return Status.OK_STATUS;

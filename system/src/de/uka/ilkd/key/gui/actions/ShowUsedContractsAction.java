@@ -41,7 +41,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
     }
 
     private void showUsedContracts() {
-	Proof currentProof = getMediator().getProof();
+	Proof currentProof = getMediator().getSelectedProof();
 	if (currentProof == null) {
 		mainWindow
 		    .notify(
@@ -50,8 +50,8 @@ public class ShowUsedContractsAction extends MainWindowAction {
 		                    "If you wish to see the used contracts "
 		                            + "for a proof you have to load one first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
-		    .getInitConfig(), getMediator().getProof());
+            ProofManagementDialog.showInstance
+                    (getMediator().getSelectedProof().env().getInitConfig(), getMediator().getSelectedProof());
 	}
     }
 

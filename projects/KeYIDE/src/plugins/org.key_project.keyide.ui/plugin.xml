@@ -2,11 +2,38 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
+         point="org.key_project.key4eclipse.common.ui.methodStarter">
+      <starter
+            class="org.key_project.keyide.ui.starter.KeYIDEMethodStarter"
+            description="An alternative user interface for KeY directly integrated into Eclipse."
+            id="org.key_project.keyide.ui.starter.KeYIDEMethodStarter"
+            name="KeYIDE">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.fileStarter">
+      <starter
+            class="org.key_project.keyide.ui.starter.KeYIDEFileStarter"
+            description="An alternative user interface for KeY directly integrated into Eclipse."
+            id="org.key_project.keyide.ui.starter.KeYIDEFileStarter"
+            name="KeYIDE">
+      </starter>
+   </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.proofStarter">
+      <starter
+            class="org.key_project.keyide.ui.starter.KeYIDEProofStarter"
+            description="An alternative user interface for KeY directly integrated into Eclipse."
+            id="org.key_project.keyide.ui.starter.KeYIDEProofStarter"
+            name="KeYIDE">
+      </starter>
+   </extension>
+   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="org.key_project.keyide.ui.editor.KeYEditor"
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
-            default="false"
+            default="true"
             extensions="proof, key"
             icon="icons/logo16.gif"
             id="org.key_project.keyide.ui.editor"
@@ -14,73 +41,76 @@
       </editor>
    </extension>
    <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Starts the proof auto mode with the current specification."
+            id="org.key_project.keyide.ui.commands.startAutoModeCommand"
+            name="Start Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Stops the automode."
+            id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+            name="Stop Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Prunes the current prove at the selected position."
+            id="org.key_project.keyide.ui.commands.pruneProof"
+            name="Prune Proof">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Applies a Rule"
+            id="org.key_project.keyide.ui.commands.applyrule"
+            name="Apply Rule">
+      </command>
+   </extension>
+   <extension
          point="org.eclipse.ui.commandImages">
       <image
-            commandId="org.key_project.keyide.ui.commands.startProofCommand"
-            icon="icons/logo16.gif">
+            commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
+            icon="icons/start.gif">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+            icon="icons/stop.gif">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.pruneProof"
+            icon="icons/prune.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.applyrule"
+            icon="icons/interactiveAppLogo.gif">
       </image>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
-      <handler
-            class="org.key_project.keyide.ui.handlers.StartProofHandler"
-            commandId="org.key_project.keyide.ui.commands.startProofCommand">
-         <enabledWhen>
-            <or>
-               <iterate>
-                  <instanceof
-                        value="org.eclipse.jdt.core.IMethod">
-                  </instanceof>
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                     <test
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
-                     </test>
-                  </adapt>
-               </iterate>
-               <and>
-                  <with
-                        variable="activePartId">
-                     <equals
-                           value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                     </equals>
-                  </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </adapt>
-                  </with>
-                  <with
-                        variable="selection">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.jface.text.ITextSelection">
-                        </instanceof>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
-                              value="org.eclipse.jdt.core.IMethod">
-                        </test>
-                     </and>
-                  </with></and>
-            </or></enabledWhen>
-      </handler>
       <handler
             class="org.key_project.keyide.ui.handlers.StartAutoModeHandler"
             commandId="org.key_project.keyide.ui.commands.startAutoModeCommand">
          <enabledWhen>
             <with
                   variable="activeEditor">
-               <test
-                     property="org.key_project.keyide.ui.AutoModeTester.start"
-                     value="true">
-               </test>
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.proofIsNotClosed"
+                        value="true">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canStartAutomode"
+                        value="true">
+                  </test>
+               </and>
             </with>
          </enabledWhen>
       </handler>
@@ -91,7 +121,8 @@
             <with
                   variable="activeEditor">
                <test
-                     property="org.key_project.keyide.ui.AutoModeTester.stop"
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.isAutoMode"
                      value="true">
                </test>
             </with>
@@ -101,17 +132,40 @@
             class="org.key_project.keyide.ui.handlers.PruneProofHandler"
             commandId="org.key_project.keyide.ui.commands.pruneProof">
          <enabledWhen>
+            <and>
             <with
                   variable="activeMenuSelection">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.nodeSupportsPruning">
+                  </test>
+               </and>
+            </with>
+            <with
+                  variable="activeEditor">
                <test
-                     property="org.key_project.keyide.ui.PruneProofTester.isClosed">
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.canPruneProof"
+                     value="true">
                </test>
             </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
             commandId="org.key_project.keyide.ui.commands.applyrule">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <test
+                     forcePluginActivation="true"
+                     property="org.key_project.keyide.ui.canApplyRules"
+                     value="true">
+               </test>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
@@ -119,94 +173,7 @@
       </handler>
    </extension>
    <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="org.key_project.keyide.ui.commands.startProofCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+P">
-      </key>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="org.key_project.keyide.ui.menus.keymenu"
-               label="KeY"
-               mnemonic="K">
-            <command
-                  commandId="org.key_project.keyide.ui.commands.startProofCommand"
-                  icon="icons/logo16.gif"
-                  id="org.key_project.keyide.ui.commands.startProofCommand"
-                  label="Start Proof"
-                  mnemonic="P"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            allPopups="true"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <command
-               commandId="org.key_project.keyide.ui.commands.startProofCommand"
-               icon="icons/logo16.gif"
-               id="org.key_project.keyide.ui.commands.startProofCommand"
-               label="Start Proof"
-               mnemonic="P"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <or>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof
-                           value="org.eclipse.jdt.core.IMethod">
-                     </instanceof>
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </adapt>
-                  </iterate>
-                  <and>
-                     <with
-                           variable="activePartId">
-                        <equals
-                              value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                        </equals>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.eclipse.jdt.core.javanature">
-                           </test>
-                        </adapt>
-                     </with>
-                     <with
-                           variable="selection">
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.jface.text.ITextSelection">
-                           </instanceof>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.key_project.key4eclipse.starter.core.javaTextSelection.selectedElementInstanceOf"
-                                 value="org.eclipse.jdt.core.IMethod">
-                           </test>
-                        </and>
-                     </with>
-                  </and>
-               </or>
-            </visibleWhen>
-         </command>
-      </menuContribution>
       <menuContribution
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -297,7 +264,7 @@
       <menuContribution
             allPopups="false"
             class="org.key_project.keyide.ui.editor.TacletContextMenu"
-            locationURI="popup:#KeYEditorContext?after=additions">
+            locationURI="popup:#KeYEditorContext?before=group.undo">
       </menuContribution>
    </extension>
    <extension
@@ -381,10 +348,10 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ui.preferencePages.Perspectives"
+            category="org.key_project.key4eclipse.common.ui.preference.page.KeY"
             class="org.key_project.keyide.ui.preference.page.KeYIDEPreferencePage"
             id="org.key_project.keyide.ui.preference.page.VisualizationPreferencePage"
-            name="KeY preferences">
+            name="KeY Perspective">
       </page>
    </extension>
    <extension
@@ -397,22 +364,14 @@
          point="org.eclipse.ui.views">
       <category
             id="org.key_project.keyide.ui.view.category"
-            name="KeY">
+            name="KeYIDE">
       </category>
       <view
             category="org.key_project.keyide.ui.view.category"
-            class="org.key_project.keyide.ui.views.ProofTreeContentOutlinePage"
-            icon="icons/logo16.gif"
-            id="org.key_project.keyide.ui.view.outline"
-            name="Proof"
-            restorable="true">
-      </view>
-      <view
-            category="org.key_project.keyide.ui.view.category"
-            class="org.key_project.keyide.ui.views.StrategyPropertiesView"
+            class="org.key_project.keyide.ui.views.StrategySettingsView"
             icon="icons/releng_gears.gif"
-            id="org.key_project.keyide.ui.view.StrategyProperties"
-            name="Strategy Properties"
+            id="org.key_project.keyide.ui.view.StrategySettings"
+            name="Strategy Settings"
             restorable="true">
       </view>
    </extension>
@@ -432,19 +391,101 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.key_project.keyide.ui.tester.AutoModeTester"
+            class="org.key_project.keyide.ui.propertyTester.AutoModePropertyTester"
             id="org.key_project.keyide.ui.AutoModeTester"
-            namespace="org.key_project.keyide.ui.AutoModeTester"
-            properties="start, stop"
+            namespace="org.key_project.keyide.ui"
+            properties="isAutoMode, isNotAutoMode"
             type="org.eclipse.ui.IEditorPart">
       </propertyTester>
       <propertyTester
-            class="org.key_project.keyide.ui.tester.PruneProofTester"
+            class="org.key_project.keyide.ui.propertyTester.PruneProofPropertyTester"
             id="org.key_project.keyide.ui.PruneProofTester"
-            namespace="org.key_project.keyide.ui.PruneProofTester"
-            properties="isClosed"
-            type="org.eclipse.jface.viewers.StructuredSelection">
+            namespace="org.key_project.keyide.ui"
+            properties="nodeSupportsPruning"
+            type="org.eclipse.jface.viewers.IStructuredSelection">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.CanFunctionPropertyTester"
+            id="org.key_project.keyide.ui.CanFunctionPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="canStartAutomode, canApplyRules, canPruneProof, canStartSMTSolver"
+            type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.ProofPropertyTester"
+            id="org.key_project.keyide.ui.ProofPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="proofIsNotClosed"
+            type="org.eclipse.ui.IEditorPart">
       </propertyTester>
    </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+         <propertyContributor
+               contributorId="org.key_project.keyide.ui.KeYPropertyContributor">
+            <propertyCategory
+                  category="KeY">
+            </propertyCategory>
+         </propertyContributor>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+         <propertyTabs
+               contributorId="org.key_project.keyide.ui.KeYPropertyContributor">
+            <propertyTab
+                  category="KeY"
+                  id="org.key_project.keyide.ui.termPropertyTab"
+                  label="Term">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.keyide.ui.termPropertyTab"
+                  category="KeY"
+                  id="org.key_project.keyide.ui.nodePropertyTab"
+                  label="Node">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.keyide.ui.nodePropertyTab"
+                  category="KeY"
+                  id="org.key_project.keyide.ui.proofPropertyTab"
+                  label="Proof">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.keyide.ui.proofPropertyTab"
+                  category="KeY"
+                  id="org.key_project.keyide.ui.tacletPropertyTab"
+                  label="Taclet">
+            </propertyTab>
+         </propertyTabs>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertySections">
+         <propertySections
+               contributorId="org.key_project.keyide.ui.KeYPropertyContributor">
+            <propertySection
+                  class="org.key_project.keyide.ui.property.NodePropertySection"
+                  filter="org.key_project.keyide.ui.property.NodePropertyFilter"
+                  id="org.key_project.keyide.ui.property.NodePropertySection"
+                  tab="org.key_project.keyide.ui.nodePropertyTab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.keyide.ui.property.ProofPropertySection"
+                  filter="org.key_project.keyide.ui.property.ProofPropertyFilter"
+                  id="org.key_project.keyide.ui.property.ProofPropertySection"
+                  tab="org.key_project.keyide.ui.proofPropertyTab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.keyide.ui.property.TermPropertySection"
+                  filter="org.key_project.keyide.ui.property.TermPropertyFilter"
+                  id="org.key_project.keyide.ui.property.TermPropertySection"
+                  tab="org.key_project.keyide.ui.termPropertyTab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.keyide.ui.property.TacletPropertySection"
+                  filter="org.key_project.keyide.ui.property.TacletPropertyFilter"
+                  id="org.key_project.keyide.ui.property.TacletPropertySection"
+                  tab="org.key_project.keyide.ui.tacletPropertyTab">
+            </propertySection>
+         </propertySections>
+      </extension>  
 
 </plugin>

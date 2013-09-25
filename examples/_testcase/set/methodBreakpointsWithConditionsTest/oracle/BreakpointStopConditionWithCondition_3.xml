@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
-      <statement name="z=3;" pathCondition="true" pathConditionChanged="false">
-         <loopNode name="while ( z&gt;=0 ) {   z--; }" pathCondition="true" pathConditionChanged="false">
-            <loopCondition name="z&gt;=0" pathCondition="true" pathConditionChanged="false">
-               <statement name="z--;" pathCondition="true" pathConditionChanged="false">
-                  <loopCondition name="z&gt;=0" pathCondition="true" pathConditionChanged="false">
-                     <statement name="z--;" pathCondition="true" pathConditionChanged="false">
-                        <loopCondition name="z&gt;=0" pathCondition="true" pathConditionChanged="false">
-                           <statement name="z--;" pathCondition="true" pathConditionChanged="false">
-                              <loopCondition name="z&gt;=0" pathCondition="true" pathConditionChanged="false">
-                                 <statement name="z--;" pathCondition="true" pathConditionChanged="false">
-                                    <loopCondition name="z&gt;=0" pathCondition="true" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
-                                          </termination>
-                                       </methodReturn>
+      <statement name="this.z=3;" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="while ( this.z&gt;=0 ) {   this.z--; }" pathCondition="true" pathConditionChanged="false">
+            <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
+               <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
+                  <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
+                     <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
+                        <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
+                           <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
+                              <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
+                                 <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
+                                    <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
+                                       <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                                          <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                             </termination>
+                                          </methodReturn>
+                                       </branchCondition>
                                     </loopCondition>
                                  </statement>
                               </loopCondition>
@@ -25,7 +27,7 @@
                   </loopCondition>
                </statement>
             </loopCondition>
-         </loopNode>
+         </loopStatement>
       </statement>
    </methodCall>
-</startNode>
+</start>

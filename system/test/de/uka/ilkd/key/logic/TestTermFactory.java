@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -311,6 +310,7 @@ public class TestTermFactory extends TestCase {
 	assertTrue(exc instanceof TermCreationException);
     }
 
+    
     /**
      * Tests the caching of {@link Term}s with and without {@link JavaBlock}s.
      */

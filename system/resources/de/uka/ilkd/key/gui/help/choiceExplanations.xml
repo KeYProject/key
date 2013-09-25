@@ -75,7 +75,11 @@ this to None.
   Java language specification.
 
 * If set to ban, any occurrence of a runtime exception is considered
-  an irrecoverable program failure.
+  an irrecoverable program failure. For programs which do not raise 
+  runtime exceptions, this is usually easier to prove than 'allow'.
+
+* If set to ignore, it is assumed that no runtime exception occurs.
+  Warning: Reasoning with these rules is unsound.
 </entry>
 
 <entry key="modelFields">Rules for model field representation clauses
@@ -119,5 +123,14 @@ This option is experimental. Depending of your understanding of 'less common', y
 
 Not to be confused with intRules, which controls the semantics of the Java type int.
 </entry>
+
+<entry key="optimisedSelectRules">
+The optimised select rules can be turned off by setting this option to off.
+
+The non-optimised rules use in-place rewriting for the evaluation of select terms. This may lead to heap terms growing exponentially in the number of anons/stores to be evaluated. However, in some rare cases the usage of the non-optimised rules may lead to more human-readable sequents.
+
+The optimised rules pull out select-terms before they evaluate them. Because other occurences of the same select-term are replaced by the skolem constant introduced by the pullout-rule (application of equalities), each select term has to be evaluated only once. Intelligent hiding of no longer needed auxiliary equations holds the sequent human-readable and increases performance. The result of the evaluation of a select term is stored such that it can be reapplied immediately if the same select term occurs again.
+</entry>
+
 </properties>
 

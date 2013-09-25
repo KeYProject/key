@@ -38,7 +38,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
@@ -273,15 +275,16 @@ public abstract class AbstractPO implements IPersistablePO {
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath());
-        return new Proof(proofName,
-                         poTerm,
-                         header,
-                         initConfig.createTacletIndex(),
-                         initConfig.createBuiltInRuleIndex(),
-                         initConfig.getServices(),
-                         initConfig.getSettings() != null
-                         ? initConfig.getSettings()
-                         : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+        Proof proof = new Proof(proofName,
+                                poTerm,
+                                header,
+                                initConfig.createTacletIndex(),
+                                initConfig.createBuiltInRuleIndex(),
+                                initConfig.getServices(),
+                                initConfig.getSettings() != null
+                                ? initConfig.getSettings()
+                                : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+        return proof;
     }
 
 

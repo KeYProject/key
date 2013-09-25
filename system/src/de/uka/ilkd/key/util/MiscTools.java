@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 
 package de.uka.ilkd.key.util;
 
@@ -43,14 +42,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 
 /**
@@ -520,22 +516,34 @@ public final class MiscTools {
     }
     
     /**
-     * Searches the {@link OneStepSimplifier} which is used in the
-     * {@link ProofEnvironment} of the current proof which is not in general
-     * {@link OneStepSimplifier#INSTANCE}. For instance uses the
-     * symbolic execution tree extraction its own instances of
-     * {@link OneStepSimplifier} in site proofs for parallelization.
-     * @return The found {@link OneStepSimplifier}.
+     * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
+     * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
-       RuleCollection rc = proof.env().getInitConfig().getProfile().getStandardRules();
-       return (OneStepSimplifier)JavaUtil.search(rc.getStandardBuiltInRules(), new IFilter<BuiltInRule>() {
-         @Override
-         public boolean select(BuiltInRule element) {
-            return element instanceof OneStepSimplifier;
-         }
-       });
+       if (proof != null && !proof.isDisposed()) {
+          Profile profile = proof.env().getInitConfig().getProfile();
+          return findOneStepSimplifier(profile);
+       }
+       else {
+          return null;
+       }
     }
+    
+    /**
+     * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
+     * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
+     */
+    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
+       if (profile instanceof JavaProfile) {
+          return ((JavaProfile) profile).getOneStepSimpilifier();
+       }
+       else {
+          return null;
+       }
+    }
+
     //-------------------------------------------------------------------------
     //inner classes
     //-------------------------------------------------------------------------

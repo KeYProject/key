@@ -28,6 +28,8 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class FocusProjection implements ProjectionToTerm {
 
+    public static final ProjectionToTerm INSTANCE = create(0);
+
     private final int stepsUpwards;
     
     private FocusProjection(int stepsUpwards) {
@@ -39,11 +41,12 @@ public class FocusProjection implements ProjectionToTerm {
         return new FocusProjection ( stepsUpwards );
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;
-        while ( n-- > 0 ) {
+        while ( n-- > 0 && !pos.isTopLevel() ) {
             pos = pos.up ();
         }
         

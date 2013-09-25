@@ -58,14 +58,20 @@ public final class KeYSEDImages {
      * @return The {@link Image} or {@code null} if it was not possible to get it.
      */
     public static Image getImage(String key) {
-        Image image = Activator.getDefault().getImageRegistry().get(key);
-        if (image == null) {
-            image = createImage(key);
-            if (image != null) {
-                Activator.getDefault().getImageRegistry().put(key, image);
-            }
-        }
-        return image;
+       ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();  
+       Image image = imageRegistry.get(key);
+       if (image == null) {
+           synchronized (imageRegistry) { // Make sure that the image is created only once
+              image = imageRegistry.get(key); // Make sure that the image is still not available
+              if (image == null) { 
+                 image = createImage(key);
+                 if (image != null) {
+                    imageRegistry.put(key, image);
+                 }
+              }
+           }
+       }
+       return image;
     }
 
     /**

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
@@ -161,10 +162,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             
     }
     
-    static public class ProveUserDefinedTaclets extends LemmaGenerationAction{
-
+    static public class ProveUserDefinedTaclets extends LemmaGenerationAction {
 
         private static final long serialVersionUID = 1L;
+        private FileChooser chooser;
 
         public ProveUserDefinedTaclets(MainWindow mainWindow) {
                 super(mainWindow);
@@ -172,7 +173,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected void loadTaclets() {
-                FileChooser chooser = new FileChooser();
+                if(chooser == null) {
+                    chooser = new FileChooser();
+                }
 
                 boolean loaded = chooser.showAsDialog();
 
@@ -184,19 +187,19 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final File fileForDefinitions = chooser.getFileForDefinitions();
                 final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
+                Profile profile = mainWindow.getMediator().getProfile();
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
-                                mainWindow.getMediator().getProfile(), new Services(
+                                new Services(profile,
                                                 new KeYRecoderExcHandler()),
                                 false, mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
                                                       problemInitializer,
-                                                      mainWindow.getMediator().getProfile(),
+                                                      profile,
                                                       fileForDefinitions ,
                                                       fileForLemmata,
-                                                      filesForAxioms,
-                                                      null);
+                                                      filesForAxioms);
                
                 
                 
@@ -264,14 +267,13 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
-                                proof.env().getInitConfig().getProfile(), new Services(
+                                new Services(proof.getServices().getProfile(),
                                                 new KeYRecoderExcHandler()),
                                 false, mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
                                                       problemInitializer,
-                                                      mainWindow.getMediator().getProfile(),
                                                       fileForDefinitions ,
                                                       fileForLemmata,
                                                       filesForAxioms,

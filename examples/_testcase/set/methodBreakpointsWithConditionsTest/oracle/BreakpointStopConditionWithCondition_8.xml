@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleConditionExample.somethingMain();" pathCondition="true" pathConditionChanged="false">
       <statement name="int a = 2;" pathCondition="true" pathConditionChanged="false">
          <statement name="int b = 3;" pathCondition="true" pathConditionChanged="false">
@@ -8,7 +8,7 @@
                   <statement name="return a_1+b_1;" pathCondition="true" pathConditionChanged="false">
                      <methodReturn name="&lt;return of SimpleConditionExample.something(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                         <methodReturn name="&lt;return of SimpleConditionExample.somethingMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </methodReturn>
@@ -18,4 +18,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

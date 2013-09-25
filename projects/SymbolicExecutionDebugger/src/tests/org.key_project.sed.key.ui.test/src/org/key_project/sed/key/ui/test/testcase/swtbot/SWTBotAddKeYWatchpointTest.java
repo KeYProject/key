@@ -30,12 +30,6 @@ import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-/**
- * Makes sure that the hierarchy of symbolic execution trees is correctly shown
- * in the debug view of the Eclipse debug API.
- * 
- * @author Martin Hentschel
- */
 public class SWTBotAddKeYWatchpointTest extends TestCase {
 
    private static boolean projectExists = false;
@@ -46,7 +40,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
             .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       SWTBotShell addWatchpointShell = bot.activeShell();
@@ -64,7 +58,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
             .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       bot.text(0).setText("invalidType");
@@ -83,7 +77,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
             .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       bot.text(0).setText("EmptyTestClass");
@@ -102,7 +96,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot
             .toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       bot.text(0).setText("EmptyTestClass");
@@ -122,7 +116,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       bot.text(0).setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
@@ -144,7 +138,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       IPath classPath = new Path(ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toString() + "/SWTBotAddKeYWatchpointTest/src/EmptyTestClass.java");
       IFile classFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(classPath);
       TestUtilsUtil.openEditor(classFile);
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       SWTBotShell addWatchpointShell = bot.activeShell();
       assertEquals("EmptyTestClass", bot.text().getText());
@@ -169,7 +163,7 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       SWTBotShell addWatchpointShell = bot.activeShell();
       TestUtilsUtil.clickDirectly(bot, "Browse");
@@ -202,14 +196,14 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       assertFalse(bot.tree().hasItems());
       TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Add a KeY Watchpoint."));
       bot.text().setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("anyNonEmptyCondition");
       TestUtilsUtil.clickDirectly(bot, "OK");
-      TestUtilsUtil.openView(bot, "Debug", "Breakpoints");
+      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
       assertTrue(bot.tree().hasItems());
       assertEquals(1, bot.tree().getAllItems().length);
       // close all shells

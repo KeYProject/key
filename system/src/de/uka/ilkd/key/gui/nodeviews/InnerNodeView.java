@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -22,10 +22,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -61,36 +57,29 @@ import javax.swing.border.MatteBorder;
 import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
-    
-    private InitialPositionTable posTable;
-    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
-    public final JTextArea tacletInfo;
-    
-    public InnerNodeView(Node node, KeYMediator mediator) {
 
+    private static final long serialVersionUID = 7273583340974979640L;
+    private InitialPositionTable posTable;
+    public final JTextArea tacletInfo;
+    Node node;
+
+    public InnerNodeView(Node node, KeYMediator mediator, MainWindow mainWindow) {
+        super(mainWindow);
+        this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(null),
+        printer = new LogicPrinter(new ProgramPrinter(),
                 mediator.getNotationInfo(),
                 mediator.getServices());
-        printer.printSequent(null, filter);
-        setText(printer.toString());
         setSelectionColor(new Color(10,180,50));
-        
+
         tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(
                 new MatteBorder(3,0,0,0,Color.black),
                 new EmptyBorder(new Insets(4,0,0,0))));
-        
-        posTable = printer.getInitialPositionTable();
-        Config.DEFAULT.addConfigChangeListener(configChangeListener);
-        updateUI();
 
-        RuleApp app = node.getAppliedRuleApp();
-        if (app != null) {
-            highlightRuleAppPosition(app);
-        }
-        
+        updateUI();
+        printSequent();
     }
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
@@ -230,7 +219,7 @@ public class InnerNodeView extends SequentView {
 
 //                  s = s + "\n\nApplication justified by: ";
 //                  s = s + mediator.getSelectedProof().env().getJustifInfo()
-//                                      .getJustification(app, mediator.getServices())+"\n";            
+//                                      .getJustification(app, mediator.getServices())+"\n";
         } else {
             // Is this case possible?
             s += "No rule was applied on this node.";
@@ -238,38 +227,6 @@ public class InnerNodeView extends SequentView {
         return s;
     }
 
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        Config.DEFAULT.addConfigChangeListener(configChangeListener);
-    }
-
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-        unregisterListener();
-    }
-
-    public void unregisterListener() {
-        if (configChangeListener != null) {
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        }
-    }
-
-    @Override
-    protected void finalize() {
-        try {
-            unregisterListener();
-        } catch (Throwable e) {
-            MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-        } finally {
-            try {
-                super.finalize();
-            } catch (Throwable e) {
-                MainWindow.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-            }
-        }
-    }
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
             new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
@@ -278,7 +235,7 @@ public class InnerNodeView extends SequentView {
     private void highlightRuleAppPosition(RuleApp app) {
         try {
             // Set the find highlight first and then the if highlights
-            // This seems to make cause the find one to be painted 
+            // This seems to make cause the find one to be painted
             // over the if one.
 
             final Range r;
@@ -353,5 +310,18 @@ public class InnerNodeView extends SequentView {
     public String getTitle() {
         return "Inner Node";
     }
-    
+
+    public synchronized void printSequent() {
+
+        setLineWidth(computeLineWidth());
+        printer.update(filter, getLineWidth());
+        setText(printer.toString());
+        posTable = printer.getInitialPositionTable();
+
+        RuleApp app = node.getAppliedRuleApp();
+        if (app != null) {
+            highlightRuleAppPosition(app);
+        }
+    }
+
 }

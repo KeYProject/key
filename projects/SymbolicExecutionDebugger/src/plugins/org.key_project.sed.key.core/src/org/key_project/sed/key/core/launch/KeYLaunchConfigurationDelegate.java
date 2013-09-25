@@ -59,6 +59,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -103,14 +104,11 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              // Make sure that the location is contained in a Java project
              IProject project = method.getResource().getProject();
              Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-             // Get source paths from class path
-             List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
              // Get KeY project settings
              bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
              classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
              // Get local file for the eclipse resource
-             location = sourcePaths.get(0);
+             location = KeYUtil.getSourceLocation(project);
              Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
           }
           else {
@@ -223,7 +221,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       DefaultProblemLoader loader = ui.load(settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath()); 
+       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath()); 
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();

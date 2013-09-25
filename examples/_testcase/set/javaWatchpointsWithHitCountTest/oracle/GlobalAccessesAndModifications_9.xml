@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
-      <loopNode name="for ( int i = 0; i&lt;2; i++ ) {doAccessesAndModifications(); }" pathCondition="true" pathConditionChanged="false">
+      <loopStatement name="for ( int i = 0; i&lt;2; i++ ) {doAccessesAndModifications(); }" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
                <statement name="doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="self.doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
-                     <statement name="modification=5;" pathCondition="true" pathConditionChanged="false">
-                        <statement name="int x = access;" pathCondition="true" pathConditionChanged="false">
-                           <statement name="x_1=someAccessMethod(access);" pathCondition="true" pathConditionChanged="false">
+                     <statement name="this.modification=5;" pathCondition="true" pathConditionChanged="false">
+                        <statement name="int x = this.access;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="x_1=someAccessMethod(this.access);" pathCondition="true" pathConditionChanged="false">
                               <methodCall name="self.someAccessMethod(access);" pathCondition="true" pathConditionChanged="false">
                                  <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
                                     <methodReturn name="&lt;return of self.someAccessMethod(access);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                       <statement name="x_1=someInternalAccessMethod(access).doNothing();" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="x_1=someInternalAccessMethod(this.access).doNothing();" pathCondition="true" pathConditionChanged="false">
                                           <methodCall name="self.someInternalAccessMethod(x_3);" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return new GlobalAccessesAndModifications ();" pathCondition="true" pathConditionChanged="false">
                                                 <methodCall name="GlobalAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
@@ -21,17 +21,17 @@
                                                          <methodCall name="g.doNothing();" pathCondition="true" pathConditionChanged="false">
                                                             <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
                                                                <methodReturn name="&lt;return of g.doNothing();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                  <statement name="accessAndModification=accessAndModification;" pathCondition="true" pathConditionChanged="false">
-                                                                     <statement name="accessAndModification=someAccessMethod(accessAndModification);" pathCondition="true" pathConditionChanged="false">
+                                                                  <statement name="this.accessAndModification=this.accessAndModification;" pathCondition="true" pathConditionChanged="false">
+                                                                     <statement name="this.accessAndModification=someAccessMethod(this.accessAndModification);" pathCondition="true" pathConditionChanged="false">
                                                                         <methodCall name="self.someAccessMethod(access_1);" pathCondition="true" pathConditionChanged="false">
                                                                            <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
                                                                               <methodReturn name="&lt;return of self.someAccessMethod(access_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                 <statement name="accessAndModification=someInternalAccessMethod(accessAndModification).doNothing();" pathCondition="true" pathConditionChanged="false">
-                                                                                    <methodCall name="self.someInternalAccessMethod(x_6);" pathCondition="true" pathConditionChanged="false">
+                                                                                 <statement name="this.accessAndModification=someInternalAccessMethod(this.accessAndModification).doNothing();" pathCondition="true" pathConditionChanged="false">
+                                                                                    <methodCall name="self.someInternalAccessMethod(x_9);" pathCondition="true" pathConditionChanged="false">
                                                                                        <statement name="return new GlobalAccessesAndModifications ();" pathCondition="true" pathConditionChanged="false">
                                                                                           <methodCall name="GlobalAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
                                                                                              <methodReturn name="&lt;return of GlobalAccessesAndModifications();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                <methodReturn name="&lt;return of self.someInternalAccessMethod(x_6);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                <methodReturn name="&lt;return of self.someInternalAccessMethod(x_9);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                                                                    <methodCall name="g_6.doNothing();" pathCondition="true" pathConditionChanged="false">
                                                                                                       <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
                                                                                                          <methodReturn name="&lt;return of g_6.doNothing();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
@@ -40,22 +40,22 @@
                                                                                                                   <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
                                                                                                                      <statement name="doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
                                                                                                                         <methodCall name="self.doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
-                                                                                                                           <statement name="modification=5;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                              <statement name="int x = access;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                 <statement name="x_10=someAccessMethod(access);" pathCondition="true" pathConditionChanged="false">
+                                                                                                                           <statement name="this.modification=5;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                              <statement name="int x = this.access;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                 <statement name="x_13=someAccessMethod(this.access);" pathCondition="true" pathConditionChanged="false">
                                                                                                                                     <methodCall name="self.someAccessMethod(access_2);" pathCondition="true" pathConditionChanged="false">
                                                                                                                                        <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                           <methodReturn name="&lt;return of self.someAccessMethod(access_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                                             <statement name="x_10=someInternalAccessMethod(access).doNothing();" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                                <methodCall name="self.someInternalAccessMethod(x_12);" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                             <statement name="x_13=someInternalAccessMethod(this.access).doNothing();" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                <methodCall name="self.someInternalAccessMethod(x_15);" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                    <statement name="return new GlobalAccessesAndModifications ();" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                       <methodCall name="GlobalAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                          <methodReturn name="&lt;return of GlobalAccessesAndModifications();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                                                            <methodReturn name="&lt;return of self.someInternalAccessMethod(x_12);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                                                                            <methodReturn name="&lt;return of self.someInternalAccessMethod(x_15);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
                                                                                                                                                                <methodCall name="g_12.doNothing();" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                   <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                      <methodReturn name="&lt;return of g_12.doNothing();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                                                                        <statement name="accessAndModification=accessAndModification;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                                                                        <statement name="this.accessAndModification=this.accessAndModification;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                         </statement>
                                                                                                                                                                      </methodReturn>
                                                                                                                                                                   </statement>
@@ -110,6 +110,6 @@
                </statement>
             </loopCondition>
          </statement>
-      </loopNode>
+      </loopStatement>
    </methodCall>
-</startNode>
+</start>

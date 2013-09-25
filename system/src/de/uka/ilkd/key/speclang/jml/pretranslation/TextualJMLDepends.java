@@ -14,7 +14,13 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -24,19 +30,25 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public final class TextualJMLDepends extends TextualJMLConstruct {
     
-    private final PositionedString depends;
-    
+    private Map<String, ImmutableList<PositionedString>> depends = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
     
     public TextualJMLDepends(ImmutableList<String> mods,
 	                     PositionedString depends) {
         super(mods);
         assert depends != null;
-        this.depends = depends;
+        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
+            this.depends.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+        }
+        addGeneric(this.depends, depends);
     }
     
+    public ImmutableList<PositionedString> getDepends() {
+        return depends.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
     
-    public PositionedString getDepends() {
-        return depends;
+    public ImmutableList<PositionedString> getDepends(String hName) {
+        return depends.get(hName);
     }
     
     @Override

@@ -57,6 +57,12 @@ public interface IPersistablePO extends ProofOblInput {
    public static final String PROPERTY_NAME = "name";
 
    /**
+    * The key used to store the file name under which a PO is loaded. This key
+    * is set during loading by the loader and needs not be saved.
+    */
+   public static final String PROPERTY_FILENAME = "#key.filename";
+
+   /**
     * This method is called by a {@link ProofSaver} to store the proof
     * specific settings in the given {@link Properties}. The stored settings
     * have to contain all information required to instantiate the proof

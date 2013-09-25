@@ -31,6 +31,8 @@ import de.uka.ilkd.key.proof.Goal;
  */
 public class AntecTaclet extends FindTaclet{
 
+    private final boolean ignoreTopLevelUpdates;
+
      /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.  
@@ -50,20 +52,23 @@ public class AntecTaclet extends FindTaclet{
 		     ImmutableList<RuleSet> heuristics,
 		     TacletAttributes attrs,
 		     Term find,
+                     boolean ignoreTopLevelUpdates,
 		     ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, heuristics, attrs, 
 	      find, prefixMap, choices);
+        this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
 	cacheMatchInfo();
     }
 
    
     /** this method is used to determine if top level updates are
-     * allowed to be ignored. This is the case if we have an Antec or
+     * allowed to be ignored. This may be the case if we have an Antec or
      * SuccTaclet but not for a RewriteTaclet
      * @return true if top level updates shall be ignored 
      */
+    @Override
     protected boolean ignoreTopLevelUpdates() {
-	return true;
+	return ignoreTopLevelUpdates;
     }
 
 

@@ -15,7 +15,6 @@ package org.key_project.util.test.util;
 
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -99,6 +98,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -109,6 +109,7 @@ import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -140,8 +141,13 @@ public class TestUtilsUtil {
     * Closes the welcome view if it is opened. Otherwise nothing is done.
     */
    public static void closeWelcomeView() {
-      IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager(); 
-      introManager.closeIntro(introManager.getIntro());
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            IIntroManager introManager = PlatformUI.getWorkbench().getIntroManager();
+            introManager.closeIntro(introManager.getIntro());
+         }
+      });
    }
    
    /**
@@ -1030,20 +1036,6 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Waits until the given {@link Thread}s have terminated.
-    * @param threads The {@link Thread}s to wait for.
-    */
-   public static void waitForThreads(Thread[] threads) {
-      if (threads != null) {
-         for (Thread thread : threads) {
-            while (thread.isAlive()) {
-               sleep(100);
-            }
-         }
-      }
-   }
-
-   /**
     * Returns the active perspective of the active {@link IWorkbenchPage}.
     * @return The active perspective.
     */
@@ -1450,34 +1442,49 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Blocks the current thread until a auto mode is started.
+    * Blocks the current thread until the auto mode has started.
     * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static void waitUntilAutoMode(UserInterface ui) {
-      while (!ui.getMediator().autoMode()) {
-         sleep(10);
-      }
+   public static void waitUntilAutoMode(SWTBot bot, UserInterface ui) {
+      final KeYMediator mediator = ui.getMediator(); 
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return mediator.autoMode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Mediator \"" + mediator + "\" is not in automode.";
+         }
+      });
    }
-   
+
    /**
-    * Opens the view available under the given path in the "Show View" dialog.
-    * @param bot The {@link SWTWorkbenchBot} to use.
-    * @param pathInOpenViewDialog The path to the view in the "Show View" dialog.
-    * @return The opened {@link SWTBotView}.
+    * Blocks the current thread while the auto mode is running.
+    * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static SWTBotView openView(SWTWorkbenchBot bot, String... pathInOpenViewDialog) {
-      assertNotNull(pathInOpenViewDialog);
-      assertTrue(pathInOpenViewDialog.length >= 1);
-      // Open view
-      bot.menu("Window").menu("Show View").menu("Other...").click();
-      SWTBotShell shell = bot.shell("Show View");
-      TestUtilsUtil.selectInTree(shell.bot().tree(), pathInOpenViewDialog);
-      shell.bot().button("OK").click();
-      // Find opened view
-      SWTBotView viewBot = bot.viewByTitle(pathInOpenViewDialog[pathInOpenViewDialog.length - 1]);
-      viewBot.show();
-      viewBot.setFocus();
-      return viewBot;
+   public static void waitWhileAutoMode(SWTBot bot, UserInterface ui) {
+      final KeYMediator mediator = ui.getMediator(); 
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return !mediator.autoMode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Mediator \"" + mediator + "\" is still in automode.";
+         }
+      });
    }
 
    /**
@@ -1492,5 +1499,31 @@ public class TestUtilsUtil {
             WorkbenchUtil.closeView(view);
          }
       });
+   }
+
+   /**
+    * Searches an {@link IViewPart} with the given ID in the active {@link IWorkbenchPage}.
+    * @param viewId The view ID to search.
+    * @return The found {@link IViewPart} or {@code null} if no one was found.
+    */
+   public static IViewPart findView(final String viewId) {
+      IRunnableWithResult<IViewPart> run = new AbstractRunnableWithResult<IViewPart>() {
+         @Override
+         public void run() {
+            setResult(WorkbenchUtil.findView(viewId));
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
+   }
+
+   /**
+    * Blocks the current thread until the workspace is initialized
+    * by the {@link SetupStartup}.
+    */
+   public static void waitUntilWorkspaceInitialized() {
+      while (!SetupStartup.isSetupDone()) {
+         sleep(500);
+      }
    }
 }

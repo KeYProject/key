@@ -32,6 +32,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.MiscTools;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
@@ -98,7 +99,10 @@ public class RuleTreeModel extends DefaultTreeModel {
             insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
         }
         ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
-        set = set.union(OneStepSimplifier.INSTANCE.getCapturedTaclets());
+        OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
+        if (simplifier != null) {
+           set = set.union(simplifier.getCapturedTaclets());
+        }
 
         for (final NoPosTacletApp app : sort(set)) {
             RuleJustification just = mgt().getJustification(app);

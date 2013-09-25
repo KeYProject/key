@@ -13,53 +13,47 @@
 
 package org.key_project.sed.key.core.util;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ISourceRange;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
-import org.key_project.sed.key.core.model.KeYBranchNode;
+import org.key_project.sed.key.core.model.KeYBranchStatement;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
-import org.key_project.sed.key.core.model.KeYLoopNode;
+import org.key_project.sed.key.core.model.KeYLoopInvariant;
+import org.key_project.sed.key.core.model.KeYLoopStatement;
 import org.key_project.sed.key.core.model.KeYMethodCall;
+import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
-import org.key_project.sed.key.core.model.KeYUseLoopInvariant;
-import org.key_project.sed.key.core.model.KeYUseOperationContract;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
@@ -143,14 +137,14 @@ public final class KeYModelUtil {
       if (executionNode instanceof IExecutionBranchCondition) {
          result = new KeYBranchCondition(target, parent, thread, (IExecutionBranchCondition)executionNode);
       }
-      else if (executionNode instanceof IExecutionBranchNode) {
-         result = new KeYBranchNode(target, parent, thread, (IExecutionBranchNode)executionNode);
+      else if (executionNode instanceof IExecutionBranchStatement) {
+         result = new KeYBranchStatement(target, parent, thread, (IExecutionBranchStatement)executionNode);
       }
       else if (executionNode instanceof IExecutionLoopCondition) {
          result = new KeYLoopCondition(target, parent, thread, (IExecutionLoopCondition)executionNode);
       }
-      else if (executionNode instanceof IExecutionLoopNode) {
-         result = new KeYLoopNode(target, parent, thread, (IExecutionLoopNode)executionNode);
+      else if (executionNode instanceof IExecutionLoopStatement) {
+         result = new KeYLoopStatement(target, parent, thread, (IExecutionLoopStatement)executionNode);
       }
       else if (executionNode instanceof IExecutionMethodCall) {
          result = new KeYMethodCall(target, parent, thread, (IExecutionMethodCall)executionNode);
@@ -161,11 +155,11 @@ public final class KeYModelUtil {
       else if (executionNode instanceof IExecutionStatement) {
          result = new KeYStatement(target, parent, thread, (IExecutionStatement)executionNode);
       }
-      else if (executionNode instanceof IExecutionUseOperationContract) {
-         result = new KeYUseOperationContract(target, parent, thread, (IExecutionUseOperationContract)executionNode);
+      else if (executionNode instanceof IExecutionOperationContract) {
+         result = new KeYMethodContract(target, parent, thread, (IExecutionOperationContract)executionNode);
       }
-      else if (executionNode instanceof IExecutionUseLoopInvariant) {
-         result = new KeYUseLoopInvariant(target, parent, thread, (IExecutionUseLoopInvariant)executionNode);
+      else if (executionNode instanceof IExecutionLoopInvariant) {
+         result = new KeYLoopInvariant(target, parent, thread, (IExecutionLoopInvariant)executionNode);
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
@@ -261,36 +255,6 @@ public final class KeYModelUtil {
             if (element instanceof ICompilationUnit) {
                result = (ICompilationUnit)element;
             }
-         }
-      }
-      return result;
-   }
-   
-   /**
-    * Searches the {@link IMethod} as JDT representation which ends
-    * at the given index.
-    * @param cu The {@link ICompilationUnit} to search in.
-    * @param endIndex The index in the file at that the required method ends.
-    * @return The found {@link IMethod} or {@code null} if the JDT representation is not available.
-    * @throws JavaModelException Occurred Exception.
-    * @throws IOException Occurred Exception.
-    */
-   public static IMethod findJDTMethod(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
-      IMethod result = null;
-      if (cu != null) {
-         IType[] types = cu.getAllTypes();
-         int i = 0;
-         while (result == null && i < types.length) {
-            IMethod[] methods = types[i].getMethods();
-            int j = 0;
-            while (result == null && j < methods.length) {
-               ISourceRange methodRange = methods[j].getSourceRange();
-               if (endIndex == methodRange.getOffset() + methodRange.getLength()) {
-                  result = methods[j];
-               }
-               j++;
-            }
-            i++;
          }
       }
       return result;

@@ -1,11 +1,29 @@
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -21,6 +39,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -32,7 +52,26 @@ import javax.swing.text.Highlighter;
  */
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
+
+    private final MainWindow mainWindow;
     
+    /* 
+     * The current line width. Static declaration for this prevents constructors from
+     * using lineWidth 0.
+     */
+    private static int lineWidth;
+    
+    public static void setLineWidth(int i) {
+        if (i != 0) {
+            lineWidth = i;
+        }
+    }
+    
+    public static int getLineWidth() {
+        return lineWidth;
+    }
+    
+    private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
     LogicPrinter printer;
     public boolean refreshHighlightning = true;
@@ -54,18 +93,16 @@ public abstract class SequentView extends JTextArea
      * Store highlights in a HashMap in order to prevent duplicate highlights.
      */
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
-            new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
+            new LinkedHashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
 
-    SequentView() {
+    SequentView(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
 
+        configChangeListener = new ConfigChangeAdapter(this);
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
         setEditable(false);
         setBackground(new Color(249, 249, 249));
-        Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
-        if (myFont != null) {
-            setFont(myFont);
-        } else {
-            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
-        }
+        setFont();
         addKeyListener(this);
         addMouseMotionListener(this);
         addMouseListener(this);
@@ -77,6 +114,54 @@ public abstract class SequentView extends JTextArea
         dndHighlight = getColorHighlight(CurrentGoalView.DND_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
 
+        // add a SeqViewChangeListener to this component
+        SeqViewChangeListener changeListener = new SeqViewChangeListener(this);
+        addComponentListener(changeListener);
+        addPropertyChangeListener("font", changeListener);
+        addHierarchyBoundsListener(changeListener);
+    }
+    
+    public void setFont() {
+        Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+        if (myFont != null) {
+            setFont(myFont);
+        } else {
+            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
+        }
+    }
+    
+    public void unregisterListener() {
+        if (configChangeListener != null) {
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        }
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+        updateUI();
+    }
+
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        unregisterListener();
+    }
+    
+    @Override
+    protected void finalize() {
+        try {
+            unregisterListener();
+        } catch (Throwable e) {
+            mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
+        } finally {
+            try {
+                super.finalize();
+            } catch (Throwable e) {
+                mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
+            }
+        }
     }
 
     public void removeHighlight(Object highlight) {
@@ -178,13 +263,16 @@ public abstract class SequentView extends JTextArea
                             tOpClassString.lastIndexOf('.') + 1);
                     // What is the purpose of displaying the java hashcode here?
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
+
+                    Sequent seq = mainWindow.getMediator().getSelectedNode().sequent();
+                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
                 }
             }
 
             if (info == null) {
-                MainWindow.getInstance().setStandardStatusLine();
+                mainWindow.setStandardStatusLine();
             } else {
-                MainWindow.getInstance().setStatusLine(info);
+                mainWindow.setStatusLine(info);
             }
 
         }
@@ -351,8 +439,28 @@ public abstract class SequentView extends JTextArea
     public void keyReleased(KeyEvent e) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
             showTermInfo = false;
-            MainWindow.getInstance().setStandardStatusLine();
+            mainWindow.setStandardStatusLine();
         }
     }
+    
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        setFont();
+    }
+    
+    /**
+     * computes the line width
+     */
+    public int computeLineWidth() {
+        // assumes we have a uniform font width
+        int maxChars = (int) 
+            (getVisibleRect().getWidth()/getFontMetrics(getFont()).charWidth('W'));
+        
+        if (maxChars > 1) maxChars-=1;
+        return maxChars;
+    }
+    
+    public abstract void printSequent();
 
 }

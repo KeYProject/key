@@ -15,6 +15,27 @@
 #
 
 
+# Comprehension Tests
+provable: ./heap/comprehensions/sum0.key
+provable: ./heap/comprehensions/sum1.key
+provable: ./heap/comprehensions/sum2.key
+provable: ./heap/comprehensions/sum3.key
+provable: ./heap/comprehensions/segsum.key
+provable: ./heap/comprehensions/bsumSplit.key
+provable: ./heap/comprehensions/bprodSplit.key
+notprovable: ./heap/comprehensions/bsumSplitInvalid.key
+
+# Performance tests
+provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key
+provable: ./performance-test/key-files/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key
+provable: ./performance-test/key-files/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key
+
 # Tests for rule application restrictions
 provable: ./heap/polarity_tests/wellformed1.key
 notprovable: ./heap/polarity_tests/wellformed2.key
@@ -44,6 +65,7 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
 # Other tests:
+provable: ./heap/fm12_01_LCP/lcp.key
 provable: ./heap/information_flow/ArrayList_contains.key
 provable: ./heap/information_flow/ArrayList_get.key
 provable: ./heap/information_flow/ArrayList_size.key
@@ -154,7 +176,6 @@ provable: ./heap/SmansEtAl/Iterator_next.key
 provable: ./heap/SmansEtAl/Stack_footprint.key
 provable: ./heap/SmansEtAl/Stack_inv.key
 provable: ./heap/SmansEtAl/Stack_push.key
-provable: ./heap/SmansEtAl/Stack_size_dep.key
 provable: ./heap/SmansEtAl/Stack_size.key
 provable: ./heap/SmansEtAl/Stack_Stack.key
 provable: ./heap/SmansEtAl/Stack_switchContents.key
@@ -258,6 +279,8 @@ provable: ./standard_key/java_dl/attributes.key
 provable: ./standard_key/java_dl/break.key
 provable: ./standard_key/java_dl/char.key
 provable: ./standard_key/java_dl/compileTimeConstants.key
+provable: ./standard_key/java_dl/constructorException/test.key
+notprovable: ./standard_key/java_dl/constructorException/regressionTestBug1333.key
 provable: ./standard_key/java_dl/continue1.key
 provable: ./standard_key/java_dl/continue2.key
 provable: ./standard_key/java_dl/complexAssignment.key
@@ -270,7 +293,10 @@ provable: ./standard_key/java_dl/exceptions3.key
 provable: ./standard_key/java_dl/exchange.key
 provable: ./standard_key/java_dl/if.key
 provable: ./standard_key/java_dl/incrementcounter.key
-provable: ./standard_key/java_dl/innerClasses/inner.key
+# commented out - in the current handling of this references (from branch mostThisRef)
+# inner classes do not work. According to Richard, there is a bug in handling inner classes
+# that needs a non-trivial fix.
+# provable: ./standard_key/java_dl/innerClasses/inner.key
 provable: ./standard_key/java_dl/iteratedAssignment.key
 provable: ./standard_key/java_dl/java5/vararg.key
 provable: ./standard_key/java_dl/java5/for_Array.key
@@ -280,6 +306,8 @@ provable: ./standard_key/java_dl/jml-bigint/cast.key
 # commented out as proof gets too long
 # requires further investigations
 #provable: ./standard_key/java_dl/jml-information-flow.key
+notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
+notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
 provable: ./standard_key/java_dl/methodCall1.key
 provable: ./standard_key/java_dl/methodCall1box.key
@@ -295,9 +323,7 @@ provable: ./standard_key/java_dl/simpleAssignment.key
 provable: ./standard_key/java_dl/simpleAssignment2.key
 provable: ./standard_key/java_dl/splittingWithQueries.key
 provable: ./standard_key/java_dl/strassen/strassen.key
-# commented out as proof gets too long
-# requires further investigations
-#provable: ./standard_key/java_dl/symmArray.key
+provable: ./standard_key/java_dl/symmArray.key
 provable: ./standard_key/java_dl/testcontext.key
 provable: ./standard_key/polySimp/simplify0.key
 provable: ./standard_key/polySimp/simplify1.key
@@ -339,6 +365,8 @@ provable: ./standard_key/pred_log/mv2.key
 provable: ./standard_key/pred_log/quantifiers.key
 provable: ./standard_key/pred_log/simpleEps.key
 provable: ./standard_key/pred_log/steam1.key
+provable: ./standard_key/pred_log/tptp/PUZ/PUZ001p1.key
+provable: ./standard_key/pred_log/tptp/PUZ/PUZ001p1-eq.key
 provable: ./standard_key/pred_log/tptp/PUZ/PUZ031p1.key
 provable: ./standard_key/pred_log/tptp/SET/SET027p3.key
 provable: ./standard_key/pred_log/tptp/SET/SET043p1.key

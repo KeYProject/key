@@ -110,7 +110,7 @@ public final class CharListLDT extends LDT {
 	} catch (NumberFormatException ex) {
 	    throw new ConvertException(result + " is not of type char");
 	}
-	return new Character(charVal).toString();
+	return ""+charVal;
     }
     
 

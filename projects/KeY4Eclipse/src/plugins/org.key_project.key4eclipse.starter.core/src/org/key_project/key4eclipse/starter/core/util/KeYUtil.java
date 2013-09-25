@@ -42,6 +42,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -78,6 +79,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -227,15 +229,11 @@ public final class KeYUtil {
             else {
                 // Make sure that the location is contained in a Java project
                 IProject project = locationToLoad.getProject();
-                Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + project + "\" is no Java project.");
-                // Get source paths from class path
-                List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-                Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+                // Get local file for the eclipse resource
+                location = getSourceLocation(project);
                 // Get KeY project settings
                 bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                 classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-                // Get local file for the eclipse resource
-                location = sourcePaths.get(0);
             }
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
             IRunnableWithException run = new AbstractRunnableWithException() {
@@ -250,7 +248,7 @@ public final class KeYUtil {
                         InitConfig alreadyLoadedConfig = getInitConfig(location); 
                         if (alreadyLoadedConfig != null) {
                             // Open proof management dialog
-                            ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), alreadyLoadedConfig);
+                            ProofManagementDialog.showInstance(alreadyLoadedConfig);
                         }
                         else {
                             // Load local file
@@ -332,6 +330,32 @@ public final class KeYUtil {
     }
     
     /**
+     * Returns the source location of the given {@link IProject}.
+     * @param project The {@link IProject} to get its source location.
+     * @return The source location.
+     * @throws JavaModelException Occurred Exception if {@link IProject} is not supported.
+     */
+    public static File getSourceLocation(IProject project) throws JavaModelException {
+       if (project != null) {
+          if (JDTUtil.isJavaProject(project)) {
+             List<File> sourcePaths = JDTUtil.getSourceLocations(project);
+             if (1 == sourcePaths.size()) {
+                return sourcePaths.get(0);
+             }
+             else {
+                throw new JavaModelException(new CoreException(LogUtil.getLogger().createErrorStatus("Multiple source paths are not supported.")));
+             }
+          }
+          else {
+             throw new JavaModelException(new CoreException(LogUtil.getLogger().createErrorStatus("The project \"" + project.getName() + "\" is no Java project.")));
+          }
+       }
+       else {
+          throw new JavaModelException(new CoreException(LogUtil.getLogger().createErrorStatus("Project not defined.")));
+       }
+    }
+    
+    /**
      * Starts a proof for the given {@link IMethod}.
      * @param method The {@link IMethod} to start proof for.
      * @throws Exception Occurred Exception.
@@ -342,15 +366,11 @@ public final class KeYUtil {
             Assert.isNotNull(method.getResource(), "Method \"" + method + "\" is not part of a workspace resource.");
             // Make sure that the location is contained in a Java project
             IProject project = method.getResource().getProject();
-            Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-            // Get source paths from class path
-            List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-            Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+            // Get local file for the eclipse resource
+            final File location = getSourceLocation(project);
             // Get KeY project settings
             final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
             final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-            // Get local file for the eclipse resource
-            final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
             // Open main window to avoid repaint bugs
             openMainWindow();
@@ -362,12 +382,12 @@ public final class KeYUtil {
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
                         // Load location
-                        InitConfig initConfig = internalLoad(location, classPaths, bootClassPath, true);
+                        InitConfig initConfig = internalLoad(null, location, classPaths, bootClassPath, true);
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                         // Start proof by showing the proof management dialog
-                        ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), initConfig, pm.getContainerType(), pm);
+                        ProofManagementDialog.showInstance(initConfig, pm.getContainerType(), pm);
                     }
                     catch (Exception e) {
                         setException(e);
@@ -383,6 +403,7 @@ public final class KeYUtil {
     
     /**
      * Loads the given location in KeY and returns the opened {@link InitConfig}.
+     * @param profile The {@link Profile} to use.
      * @param location The location to load.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
@@ -390,7 +411,8 @@ public final class KeYUtil {
      * @return The opened {@link InitConfig}.
      * @throws Exception Occurred Exception.
      */
-    private static InitConfig internalLoad(final File location,
+    private static InitConfig internalLoad(final Profile profile,
+                                           final File location,
                                            final List<File> classPaths,
                                            final File bootClassPath,
                                            final boolean showKeYMainWindow) throws Exception {
@@ -409,7 +431,7 @@ public final class KeYUtil {
                     InitConfig initConfig = getInitConfig(location);
                     if (initConfig == null) {
                         // Load local file
-                        DefaultProblemLoader loader = main.getUserInterface().load(location, classPaths, bootClassPath);
+                        DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
                         initConfig = loader.getInitConfig();
                     }
                     setResult(initConfig);
@@ -1334,6 +1356,40 @@ public final class KeYUtil {
       }
       catch (IOException e) {
          throw new CoreException(LogUtil.getLogger().createErrorStatus(e.getMessage(), e));
+      }
+   }
+   
+   /**
+    * Returns for the given {@link SourceLocation} of a method in the given {@link IFile}
+    * the {@link SourceLocation} of the method name if available or the initial location otherwise.
+    * @param file The {@link IFile} which contains the method location.
+    * @param methodLocation The location of the method in the given {@link IFile}.
+    * @return The location of the method name or the initial location if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   public static SourceLocation updateToMethodNameLocation(IFile file, SourceLocation methodLocation) throws CoreException {
+      try {
+         if (file != null && methodLocation.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = null;
+            IJavaElement element = JavaCore.create(file);
+            if (element instanceof ICompilationUnit) {
+               compilationUnit = (ICompilationUnit)element;
+            }
+            if (compilationUnit != null) {
+               IMethod method = JDTUtil.findJDTMethod(compilationUnit, methodLocation.getCharEnd());
+               if (method != null) {
+                  ISourceRange range = method.getNameRange();
+                  Position cursorStartPosition = getCursorPositionForOffset(element, range.getOffset()); 
+                  methodLocation = new SourceLocation(cursorStartPosition != null ? cursorStartPosition.getLine() : -1, 
+                                                      range.getOffset(), 
+                                                      range.getOffset() + range.getLength());
+               }
+            }
+         }
+         return methodLocation;
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
 }

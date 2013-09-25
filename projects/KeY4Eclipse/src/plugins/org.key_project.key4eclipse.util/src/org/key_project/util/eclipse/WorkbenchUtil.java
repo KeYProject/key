@@ -43,6 +43,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.services.IEvaluationService;
@@ -446,5 +447,23 @@ public final class WorkbenchUtil {
             }
          });
       }
+   }
+
+   /**
+    * Updates the toolbars (action bars) of all {@link IWorkbenchWindow}s.
+    */
+   public static void updateToolBars() {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+            for (IWorkbenchWindow window : windows) {
+               if (window instanceof WorkbenchWindow) {
+                  ((WorkbenchWindow)window).updateActionBars();
+                  ((WorkbenchWindow)window).updateActionSets();
+               }
+            }
+         }
+      });
    }
 }

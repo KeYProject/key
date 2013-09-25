@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleLinkedOjbectsDeletion.compute(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="x.value=1;" pathCondition="true" pathConditionChanged="false">
          <statement name="x.next.value=2;" pathCondition="true" pathConditionChanged="false">
@@ -7,7 +7,7 @@
                <statement name="x.next=x.next.next;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return x.value+x.next.value;" pathCondition="true" pathConditionChanged="false">
                      <methodReturn name="&lt;return of SimpleLinkedOjbectsDeletion.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
@@ -16,4 +16,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

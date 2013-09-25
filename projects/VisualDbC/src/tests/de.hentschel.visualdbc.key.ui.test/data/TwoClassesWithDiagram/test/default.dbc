@@ -4,13 +4,13 @@
   <proofs target="//@types.1/@methods.0/@operationContracts.0" obligation="ContractPO"/>
   <types xsi:type="dbcmodel:DbcClass" name="First">
     <methods signature="firstMagic()" static="true" returnType="int">
-      <operationContracts name="First[First::firstMagic()].JML operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="(exc = null -> result = 42) &amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="First[First::firstMagic()].JML operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="(exc = null -> result = 42)&#xA;&amp; (   !exc = null&#xA;   -> java.lang.RuntimeException::instance(exc) = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
     <constructors signature="First()" visibility="default"/>
   </types>
   <types xsi:type="dbcmodel:DbcClass" name="Second">
     <methods signature="secondMagic()" static="true" returnType="int">
-      <operationContracts name="Second[Second::secondMagic()].JML operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="(exc = null -> result = javaUnaryMinusInt(42))&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+      <operationContracts name="Second[Second::secondMagic()].JML operation contract.0" proofObligations="//@proofObligations.0" pre="true" post="(exc = null -> result = javaUnaryMinusInt(42))&#xA;&amp; (   !exc = null&#xA;   -> java.lang.RuntimeException::instance(exc) = TRUE)" modifies="mod[heap]: allLocs" termination="diamond"/>
     </methods>
     <constructors signature="Second()" visibility="default"/>
   </types>

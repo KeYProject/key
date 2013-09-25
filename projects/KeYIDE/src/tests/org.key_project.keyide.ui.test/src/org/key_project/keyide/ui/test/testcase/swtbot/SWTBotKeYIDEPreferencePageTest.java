@@ -1,6 +1,17 @@
-package org.key_project.keyide.ui.test.testcase.swtbot;
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 
-import junit.framework.TestCase;
+package org.key_project.keyide.ui.test.testcase.swtbot;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -10,13 +21,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
 import org.key_project.keyide.ui.preference.page.KeYIDEPreferencePage;
 import org.key_project.keyide.ui.util.KeYIDEPreferences;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * SWTBot tests for {@link KeYIDEPreferencePage}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYIDEPreferencePageTest extends TestCase {
+public class SWTBotKeYIDEPreferencePageTest extends AbstractSetupTestCase {
    /**
     * Tests the perspective is always changed functionality by changing the value under "Window->Preferences->General->Perspectives->KeY Preferences"
     * @throws InterruptedException 
@@ -71,7 +83,7 @@ public class SWTBotKeYIDEPreferencePageTest extends TestCase {
       try {
          // Close welcome view if available
          TestUtilsUtil.closeWelcomeView(bot);
-         SWTBotShell preferencePage = TestUtilsUtil.openPreferencePage(bot, "General", "Perspectives", "KeY preferences");
+         SWTBotShell preferencePage = TestUtilsUtil.openPreferencePage(bot, "KeY", "KeY Perspective");
          TestUtilsUtil.clickDirectly(preferencePage.bot().radio(radioButton));
          preferencePage.bot().button("OK").click();
          // tests if KeY Preference is set

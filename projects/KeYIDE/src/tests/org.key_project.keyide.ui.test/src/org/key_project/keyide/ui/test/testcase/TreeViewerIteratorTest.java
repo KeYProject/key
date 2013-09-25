@@ -15,8 +15,6 @@ package org.key_project.keyide.ui.test.testcase;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -33,6 +31,7 @@ import org.key_project.keyide.ui.test.util.TreeViewerIterator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -46,7 +45,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 // TODO: Tests LazyProofTreeContentProvider#getIndexOf(Object, Object) on each possible parent child combinations (visible structure not proof tree structure!)
 
 // TODO Document class TreeViewerIteratorTest
-public class TreeViewerIteratorTest extends TestCase {
+public class TreeViewerIteratorTest extends AbstractSetupTestCase {
    /**
     * Creates a proof and the viewer of the proof for the tests.
     * @throws Exception

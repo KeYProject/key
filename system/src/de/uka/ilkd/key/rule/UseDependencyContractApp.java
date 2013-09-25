@@ -27,10 +27,12 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     private final PosInOccurrence step;
+    private List<LocationVariable> heapContext;
 	
 	public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio) {
 	    this(builtInRule, pio, null, null);
@@ -65,7 +67,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 		assert this.step == null;
 		final List<PosInOccurrence> steps = 
 				UseDependencyContractRule.
-				 getSteps(this.posInOccurrence(), seq, services);                
+				 getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);                
 		PosInOccurrence l_step = 
 				UseDependencyContractRule.findStepInIfInsts(steps, this, services);
 		assert l_step != null;/* 
@@ -99,7 +101,10 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 	public UseDependencyContractApp tryToInstantiate(Goal goal) {
-    	if (complete()) {
+		if(heapContext == null){
+			heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false);
+        }
+		if (complete()) {
     		return this;
     	}
     	UseDependencyContractApp app = this;
@@ -125,7 +130,10 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     		selfTerm = null;
     		kjt = target.getContainerType();
     	} else {
-    		selfTerm = focus.sub(1);
+    		if(getHeapContext() == null) {
+                 heapContext = HeapContext.getModHeaps(services, false);
+    	    }
+    		selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
     		kjt = services.getJavaInfo().getKeYJavaType(
     		        selfTerm.sort());
     	}
@@ -133,15 +141,18 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     	                services, kjt, target);
 
     	if (contracts.size() > 0) {
-    		return setContract(contracts.iterator().next());
+    		UseDependencyContractApp r = setContract(contracts.iterator().next());
+    		if(r.getHeapContext() == null) {
+    		     r.heapContext = HeapContext.getModHeaps(services, false);
+    		}
+    		return r;
     	}
 	    return this;
     }
 
     @Override
     public List<LocationVariable> getHeapContext() {
-      // TODO
-      return null;
+      return heapContext;
     }
 
     @Override

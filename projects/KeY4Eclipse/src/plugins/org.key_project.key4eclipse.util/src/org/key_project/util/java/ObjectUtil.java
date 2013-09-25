@@ -135,9 +135,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, Object value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -193,9 +190,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, boolean value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -251,9 +245,6 @@ public final class ObjectUtil {
     * @throws IllegalAccessException Occurred Exception.
     */
    public static void set(Object obj, Field field, int value) throws IllegalArgumentException, IllegalAccessException {
-      if (obj == null) {
-         throw new IllegalArgumentException("Object is undefined (null).");
-      }
       if (field == null) {
          throw new IllegalArgumentException("Field is undefined (null).");
       }
@@ -453,5 +444,32 @@ public final class ObjectUtil {
     */
    public static Class<?> getClass(Object obj) {
       return obj != null ? obj.getClass() : null;
+   }
+
+   /**
+    * Waits until the given {@link Thread}s have terminated.
+    * @param threads The {@link Thread}s to wait for.
+    */
+   public static void waitForThreads(Thread[] threads) {
+      if (threads != null) {
+         for (Thread thread : threads) {
+            while (thread.isAlive()) {
+               sleep(100);
+            }
+         }
+      }
+   }
+   
+   /**
+    * Sleeps the current {@link Thread} for the given time.
+    * @param time The time to sleep.
+    */
+   public static void sleep(int time) {
+      try {
+         Thread.sleep(time);
+      }
+      catch (InterruptedException e) {
+         // Nothing to do.
+      }
    }
 }

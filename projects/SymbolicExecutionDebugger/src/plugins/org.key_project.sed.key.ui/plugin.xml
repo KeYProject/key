@@ -70,6 +70,7 @@
                       <adapt
                             type="org.eclipse.core.resources.IResource">
                          <test
+                               forcePluginActivation="true"
                                property="org.eclipse.core.resources.projectNature"
                                value="org.eclipse.jdt.core.javanature">
                          </test>
@@ -133,12 +134,6 @@
             id="org.key_project.sed.key.ui.addWatchpointCommand"
             name="Add Watchpoint">
       </command>
-      <command
-            categoryId="org.eclipse.debug.ui.category.run"
-            description="Opens a dialog to edit the condition of a Watchpoint."
-            id="org.key_project.sed.key.ui.editWatchpointConditionCommand"
-            name="Edit Watchpoint condition">
-      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -159,8 +154,8 @@
                icon="icons/watchpoint.gif">
          </image>
          <image
-               commandId="org.key_project.sed.key.ui.editWatchpointConditionCommand"
-               icon="icons/watchpoint.gif">
+               commandId="org.key_project.sed.key.ui.openProofCommand"
+               icon="icons/logo16.gif">
          </image>
       </extension>
       <extension
@@ -222,6 +217,38 @@
                class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
                commandId="org.key_project.sed.key.ui.addWatchpointCommand">
          </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.OpenProofHandler"
+               commandId="org.key_project.sed.key.ui.openProofCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.ILaunch">
+                        </instanceof>
+                        <test
+                              args="notTerminated, notKeYMainWindow"
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.model.IDebugElement">
+                        </instanceof>
+                        <test
+                              args="notTerminated, notKeYMainWindow"
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
       </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -242,6 +269,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+C">
+      </key>
+      <key
+            commandId="org.key_project.sed.key.ui.openProofCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+M3+P">
       </key>
    </extension>
       <extension
@@ -395,6 +428,48 @@
                                  args="notTerminated"
                                  forcePluginActivation="true"
                                  property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.key_project.sed.key.ui.openProofCommand"
+                  icon="icons/logo16.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.ILaunch">
+                           </instanceof>
+                           <test
+                                 args="notTerminated"
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.key4eclipse.common.ui.proofStarterAvailable">
+                           </test>
+                        </and>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.model.IDebugElement">
+                           </instanceof>
+                           <test
+                                 args="notTerminated"
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.key4eclipse.common.ui.proofStarterAvailable">
                            </test>
                         </and>
                      </or>

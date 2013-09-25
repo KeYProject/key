@@ -20,8 +20,11 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.keyide.ui.Activator;
+import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.util.eclipse.BundleUtil;
+
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * <p>
@@ -34,10 +37,24 @@ import org.key_project.util.eclipse.BundleUtil;
  * @author Martin Hentschel, Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public final class KeYImages {
-   // TODO: Document constants of KeYImages
+   /**
+    * The key of a {@link BranchFolder} image.
+    */
    public static final String FOLDER = "org.key_project.keyide.ui.images.folder";
+   
+   /**
+    * The key of a proved {@link BranchFolder} image.
+    */
    public static final String FOLDER_PROVED = "org.key_project.keyide.ui.images.folderProved";
+   
+   /**
+    * The key of a {@link Node} image.
+    */
    public static final String NODE = "org.key_project.keyide.ui.images.node";
+   
+   /**
+    * The key of a proved {@link Node} image.
+    */
    public static final String NODE_PROVED = "org.key_project.keyide.ui.images.nodeProved";
 
    /**
@@ -54,14 +71,20 @@ public final class KeYImages {
     * @return The {@link Image} or {@code null} if it was not possible to get it.
     */
    public static Image getImage(String key) {
-       Image image = Activator.getDefault().getImageRegistry().get(key);
-       if (image == null) {
-           image = createImage(key);
-           if (image != null) {
-               Activator.getDefault().getImageRegistry().put(key, image);
-           }
-       }
-       return image;
+      ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();  
+      Image image = imageRegistry.get(key);
+      if (image == null) {
+          synchronized (imageRegistry) { // Make sure that the image is created only once
+             image = imageRegistry.get(key); // Make sure that the image is still not available
+             if (image == null) { 
+                image = createImage(key);
+                if (image != null) {
+                   imageRegistry.put(key, image);
+                }
+             }
+          }
+      }
+      return image;
    }
 
    

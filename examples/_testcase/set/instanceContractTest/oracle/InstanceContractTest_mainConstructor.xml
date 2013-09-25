@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.mainConstructor();" pathCondition="true" pathConditionChanged="false">
+      <statement name="IntWrapper w = new IntWrapper (42);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="self_0 = new IntWrapper(42) catch(exc_0)
+pre: true
+post: self_0.value = 42 &amp; self_0.&lt;inv&gt; &amp; exc_0 = null
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <statement name="return w.value;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.mainConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of self.mainConstructor();&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="42" returnValueString="42" hasCondition="false">
+                  </methodReturnValue>
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </operationContract>
+      </statement>
+   </methodCall>
+</start>

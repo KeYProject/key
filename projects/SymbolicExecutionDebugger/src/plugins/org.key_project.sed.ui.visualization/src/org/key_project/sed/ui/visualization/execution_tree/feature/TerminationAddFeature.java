@@ -45,6 +45,12 @@ public class TerminationAddFeature extends AbstractDebugNodeAddFeature {
     */
    @Override
    protected String getImageId(ISEDDebugNode node) {
-      return IExecutionTreeImageConstants.IMG_TERMINATION;
+      ISEDTermination terminationNode = (ISEDTermination)node;
+      if (terminationNode.isVerified()) {
+         return IExecutionTreeImageConstants.IMG_TERMINATION;
+      }
+      else {
+         return IExecutionTreeImageConstants.IMG_TERMINATION_NOT_VERIFIED;
+      }
    }
 }

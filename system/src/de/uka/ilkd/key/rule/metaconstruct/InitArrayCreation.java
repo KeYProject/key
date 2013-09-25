@@ -25,16 +25,12 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -70,14 +66,12 @@ public class InitArrayCreation extends InitArray {
      */
     private If checkNegativeDimension(Expression cond,
 				      Services services) {
-	final Then then = new Then
-	    (new Throw(new New(new Expression[0],
-			       new TypeRef
-			       (services.getJavaInfo().getKeYJavaType
-				    ("java.lang.NegativeArraySizeException")),
-			       null)));
+	final New exception = KeYJavaASTFactory.newOperator(services
+		.getJavaInfo().getKeYJavaType(
+			"java.lang.NegativeArraySizeException"));
 
-	return new If(cond, then);
+	return KeYJavaASTFactory.ifThen(cond,
+		KeYJavaASTFactory.throwClause(exception));
     }
 
 
@@ -119,13 +113,13 @@ public class InitArrayCreation extends InitArray {
 	    get(0).getProgramVariable();
 
 	    bodyStmnts.add(argDecl);
-	    final LessThan negativeDimension = new LessThan(pvars[i],
-							    new IntLiteral(0));
+	    final LessThan negativeDimension = KeYJavaASTFactory
+		    .lessThanZeroOperator(pvars[i]);
 	    if (i == 0) {
 		checkDimensions = negativeDimension;
 	    } else {
-		checkDimensions = new LogicalOr(checkDimensions,
-						negativeDimension);
+		checkDimensions = KeYJavaASTFactory.logicalOrOperator(
+			checkDimensions, negativeDimension);
 	    }
 	}
 
@@ -145,12 +139,8 @@ public class InitArrayCreation extends InitArray {
 					 ProgramVariable[] dimensions,
 					 Services services) {
 	assert dimensions.length > 0;
-	bodyStmnts.add
-	    (assign(resultVar,
-		    new MethodReference
-		    (new ImmutableArray<Expression>(dimensions[0]),
-		     new ProgramElementName(createArrayName),
-		     new TypeRef(arrayType))));
+	bodyStmnts.add(KeYJavaASTFactory.assign(resultVar,
+		KeYJavaASTFactory.methodCall(arrayType, createArrayName, dimensions[0])));
 
 	if (dimensions.length > 1) {
 	    Expression[] baseDim = new Expression[dimensions.length-1];
@@ -160,11 +150,8 @@ public class InitArrayCreation extends InitArray {
 		.getKeYJavaType(PrimitiveType.JAVA_INT);
 	    final ProgramElementName name 
 	    	= varNamer.getTemporaryNameProposal("i");
-    	    final ProgramVariable var = new LocationVariable(name, intType);
-	    final LocalVariableDeclaration forInit =
-		KeYJavaASTFactory.declare(var,
-					  new IntLiteral(0),
-					  intType);
+	    final LocalVariableDeclaration forInit = KeYJavaASTFactory.declare(
+		    name, KeYJavaASTFactory.zeroLiteral(), intType);
 
 	    final ProgramVariable pv = (ProgramVariable)forInit.getVariables().
 	    get(0).getProgramVariable();
@@ -179,17 +166,14 @@ public class InitArrayCreation extends InitArray {
                 baseTypeRef = at.getBaseType();                  
             }
 
-	    final For forLoop = 
-		new For(new LoopInitializer[]{forInit},
-			new LessThan(pv, dimensions[0]),
-			new Expression[]{new PostIncrement(pv)},			
-			assign(new ArrayReference
-			       ((ReferencePrefix)resultVar, new Expression[]{pv}),
-			       new NewArray(baseDim, 
-				       	    baseTypeRef, 
-				       	    baseType, 
-				       	    null, 
-				       	    dimensions.length - 1)));
+	    final For forLoop = KeYJavaASTFactory.forLoop(KeYJavaASTFactory
+		    .loopInit(forInit), KeYJavaASTFactory.lessThanGuard(pv,
+		    dimensions[0]), KeYJavaASTFactory
+		    .postIncrementForUpdates(pv), KeYJavaASTFactory.assign(
+		    KeYJavaASTFactory.arrayFieldAccess(
+			    (ReferencePrefix) resultVar, pv), KeYJavaASTFactory
+			    .newArray(baseTypeRef, dimensions.length - 1,
+				    baseDim, baseType)));
 
 	    bodyStmnts.add(forLoop);
 	}
@@ -213,8 +197,7 @@ public class InitArrayCreation extends InitArray {
 	createNDimensionalArray(bodyStmnts, newObject, arrayType, 
 				dimensions, services);
 
- 	return new StatementBlock(bodyStmnts.toArray
-				  (new Statement[bodyStmnts.size()]));
+	return KeYJavaASTFactory.block(bodyStmnts);
     }
     
 
@@ -252,9 +235,7 @@ public class InitArrayCreation extends InitArray {
         }
         // XXX known issue: multi-dimensional array new declarations are displayed improperly
         assert baseTypeRef != null;
-        na = new NewArray(size,
-			      baseTypeRef,
-			      kjt, init, dimension);
+	    na = KeYJavaASTFactory.newArray(baseTypeRef, dimension, init, kjt);
 	} else {
 	    return pe;
 	}
@@ -265,12 +246,13 @@ public class InitArrayCreation extends InitArray {
 	final Statement[] body = new Statement[2*arrayLength+1];
 	final ProgramVariable[] vars = evaluateInitializers ( body, na, services );
 
-	body[arrayLength] = 
-	    assign ( array, createArrayCreation ( na ));
+	body[arrayLength] = KeYJavaASTFactory.assign(array,
+		createArrayCreation(na));
 	
-	createArrayAssignments(arrayLength + 1, body, vars,  array, na);
+	createArrayAssignments(arrayLength + 1, body, vars,
+		(ReferencePrefix) array, na);
 
-	return new StatementBlock ( body );
+	return KeYJavaASTFactory.block(body);
     }
     
 

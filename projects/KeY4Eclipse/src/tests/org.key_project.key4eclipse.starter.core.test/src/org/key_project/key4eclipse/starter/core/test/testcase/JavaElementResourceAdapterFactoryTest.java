@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.starter.core.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -26,13 +24,14 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.adapter.JavaElementResourceAdapterFactory;
 import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link JavaElementResourceAdapterFactory}.
  * @author Martin Hentschel
  */
-public class JavaElementResourceAdapterFactoryTest extends TestCase {
+public class JavaElementResourceAdapterFactoryTest extends AbstractSetupTestCase {
     /**
      * Tries to convert an {@link IMethod} into an {@link IResource}
      * via the adapter concept ({@link IMethod#getAdapter(Class)}).

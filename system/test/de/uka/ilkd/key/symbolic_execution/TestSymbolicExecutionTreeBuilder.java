@@ -15,9 +15,9 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
@@ -38,6 +38,765 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainVoidMethod() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainVoidMethod", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainVoidMethod.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainNoArgs() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainNoArgs", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainNoArgs.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainResult() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainResult", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainResult.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainResultNotSpecified() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainResultNotSpecified", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainResultNotSpecified.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptinalVoid() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptinalVoid", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinalVoid.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptinalUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptinalUnused", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinalUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptinal() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptinal", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptinal.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainBooleanResultUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainBooleanResultUnused", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainBooleanResultUnspecifiedUnused", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainBooleanResultUnspecifiedUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainExceptionalConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainExceptionalConstructor", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainExceptionalConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainConstructor", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/instanceContractTest
+    */
+   public void testInstanceContractTest_mainOnObject() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/instanceContractTest/test/InstanceContractTest.java", 
+                "InstanceContractTest", 
+                "mainOnObject", 
+                null,
+                "examples/_testcase/set/instanceContractTest/oracle/InstanceContractTest_mainOnObject.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainVoidMethod() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainVoidMethod", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainVoidMethod.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainNoArgs() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainNoArgs", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainNoArgs.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainResult() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainResult", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainResult.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainResultNotSpecified() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainResultNotSpecified", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainResultNotSpecified.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptinalVoid() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptinalVoid", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptinalVoid.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptinalUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptinalUnused", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptinalUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptinal() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptinal", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptinal.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainBooleanResultUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainBooleanResultUnused", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainBooleanResultUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainBooleanResultUnspecifiedUnused() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainBooleanResultUnspecifiedUnused", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainBooleanResultUnspecifiedUnused.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainExceptionalConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainExceptionalConstructor", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainExceptionalConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainConstructor", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainConstructor.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticContractTest
+    */
+   public void testStaticContractTest_mainOnObject() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticContractTest/test/StaticContractTest.java", 
+                "StaticContractTest", 
+                "mainOnObject", 
+                null,
+                "examples/_testcase/set/staticContractTest/oracle/StaticContractTest_mainOnObject.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notLoop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notLoop(int)].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notLoop.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_loop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::loop(int)].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_loop.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notMagic() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notMagic()].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notMagic.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_magic() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::magic()].JML operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_magic.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_notMagicException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::notMagicException()].JML exceptional_behavior operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_notMagicException.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verifiedTest
+    */
+   public void testVerifiedTest_magicException() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/verifiedTest/test/VerifiedTest.java", 
+                "VerifiedTest[VerifiedTest::magicException()].JML exceptional_behavior operation contract.0", 
+                "examples/_testcase/set/verifiedTest/oracle/VerifiedTest_magicException.xml",
+                false,
+                false,
+                false,
+                ALL_IN_ONE_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/methodCallReturnTests
+    */
+   public void testMethodCallReturnTests() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/methodCallReturnTests/test/MethodCallReturnTests.java", 
+                "MethodCallReturnTests", 
+                "main", 
+                null,
+                "examples/_testcase/set/methodCallReturnTests/oracle/MethodCallReturnTests.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArrayAverage
+    */
+   public void testUseLoopInvariantArrayAverage() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantArrayAverage/test/ArrayAverage.java", 
+                "ArrayAverage", 
+                "average", 
+                null,
+                "examples/_testcase/set/useLoopInvariantArrayAverage/oracle/ArrayAverage.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor
+    */
+   public void testUseOperationContractStatementsInImpliciteConstructor() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/test/UseOperationContractStatementsInImpliciteConstructor.java", 
+                "UseOperationContractStatementsInImpliciteConstructor", 
+                "average", 
+                null,
+                "examples/_testcase/set/useOperationContractStatementsInImpliciteConstructor/oracle/UseOperationContractStatementsInImpliciteConstructor.xml",
+                true,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantLoopSplittingCondition
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testUseLoopInvariantLoopSplittingCondition() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantLoopSplittingCondition/test/LoopSplittingCondition.java", 
+                "LoopSplittingCondition", 
+                "main", 
+                null,
+                "examples/_testcase/set/useLoopInvariantLoopSplittingCondition/oracle/LoopSplittingCondition.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantTwoLoops
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testUseLoopInvariantTwoLoops() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantTwoLoops/test/TwoLoops.java", 
+                "TwoLoops", 
+                "main", 
+                null,
+                "examples/_testcase/set/useLoopInvariantTwoLoops/oracle/TwoLoops.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented
+    * </p>
+    * <p>
+    * Tests the handling of method returns in different modalities.
+    * </p>
+    */
+   public void testLoopInvariantMethodReturnInDifferentModalities() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/test/WhileWithMethodCallAsConditionFullImplemented.java", 
+                "WhileWithMethodCallAsConditionFullImplemented", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionFullImplemented/oracle/WhileWithMethodCallAsConditionFullImplemented.xml",
+                false,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
    /**
     * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantLoopBodyBranchClosed
@@ -60,6 +819,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -85,6 +845,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -107,6 +868,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -135,6 +897,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -160,6 +923,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -185,6 +949,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -210,6 +975,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -235,6 +1001,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -260,6 +1027,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false);
    }
    
@@ -285,6 +1053,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -310,6 +1079,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 true,
+                false,
                 false);
    }
    
@@ -335,6 +1105,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -360,6 +1131,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -385,6 +1157,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -410,6 +1183,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -435,6 +1209,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -460,6 +1235,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -485,6 +1261,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 true,
+                false,
                 false);
    }
    
@@ -505,6 +1282,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 false,
+                false,
                 false);
    }
    
@@ -524,6 +1302,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -546,15 +1325,16 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                                                                                false,
                                                                                false,
                                                                                false,
+                                                                               false,
                                                                                false);
       try {
          // Find both statements "mid = y;".
-         IExecutionStartNode startNode = env.getBuilder().getStartNode();
+         IExecutionStart startNode = env.getBuilder().getStartNode();
          IExecutionMethodCall methodCall = (IExecutionMethodCall)startNode.getChildren()[0];
          IExecutionStatement intMidZ = (IExecutionStatement)methodCall.getChildren()[0];
-         IExecutionBranchNode ifYZ = (IExecutionBranchNode)intMidZ.getChildren()[0];
+         IExecutionBranchStatement ifYZ = (IExecutionBranchStatement)intMidZ.getChildren()[0];
          IExecutionBranchCondition notXY = (IExecutionBranchCondition)ifYZ.getChildren()[0];
-         IExecutionBranchNode ifXZ = (IExecutionBranchNode)notXY.getChildren()[0];
+         IExecutionBranchStatement ifXZ = (IExecutionBranchStatement)notXY.getChildren()[0];
          IExecutionBranchCondition not1X = (IExecutionBranchCondition)ifXZ.getChildren()[0];
          IExecutionStatement midThenBranch = (IExecutionStatement)not1X.getChildren()[0];
          IExecutionBranchCondition not1Y = (IExecutionBranchCondition)ifYZ.getChildren()[1];
@@ -598,6 +1378,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -615,6 +1396,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -638,6 +1420,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -657,6 +1440,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -678,6 +1462,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 false,
+                false,
                 false);
    }
    
@@ -697,6 +1482,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -718,6 +1504,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 false,
+                false,
                 false);
    }
    
@@ -737,6 +1524,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -758,6 +1546,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 false,
+                false,
                 false);
    }
    
@@ -777,6 +1566,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -798,6 +1588,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 false,
+                false,
                 false);
    }
    
@@ -817,6 +1608,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 false,
                 true,
+                false,
                 false,
                 false);
    }
@@ -838,6 +1630,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 false,
+                false,
                 false);
    }
    
@@ -855,6 +1648,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -878,6 +1672,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -895,6 +1690,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -918,6 +1714,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -936,6 +1733,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
                 true,
+                false,
                 false,
                 false,
                 false);
@@ -958,6 +1756,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -975,6 +1774,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -998,6 +1798,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1015,6 +1816,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1038,6 +1840,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
+                          false,
                           false);
    }
    
@@ -1055,6 +1858,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -1078,6 +1882,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
+                          false,
                           false);
    }
    
@@ -1095,6 +1900,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -1118,6 +1924,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1135,6 +1942,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1158,6 +1966,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1175,6 +1984,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1198,6 +2008,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1215,6 +2026,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1238,6 +2050,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1255,6 +2068,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1278,6 +2092,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1295,6 +2110,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1318,6 +2134,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1335,6 +2152,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1358,6 +2176,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1375,6 +2194,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1398,6 +2218,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1415,6 +2236,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1438,6 +2260,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1455,6 +2278,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1478,6 +2302,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1495,6 +2320,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 true,
                 true,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1518,6 +2344,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1538,6 +2365,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1555,6 +2383,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1584,6 +2413,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                           false,
                           false,
                           false,
+                          false,
                           false);
    }
    
@@ -1601,6 +2431,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1624,6 +2455,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1641,6 +2473,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1664,6 +2497,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1681,6 +2515,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1704,6 +2539,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1721,6 +2557,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1744,6 +2581,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1761,6 +2599,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1784,6 +2623,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1801,6 +2641,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
                 false,
                 false,
                 false,

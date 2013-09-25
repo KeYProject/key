@@ -35,6 +35,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.debug.core.breakpoints.JavaExceptionBreakpoint;
@@ -51,6 +52,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
@@ -216,9 +218,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       Assert.isNotNull(launchSettings);
       this.launchSettings = launchSettings; 
       this.environment = environment;
+      Proof proof = environment.getProof();
+      ProofUserManager.getInstance().addUser(proof, environment, this);
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
-      Proof proof = environment.getBuilder().getProof();
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
       thread = new KeYThread(this, environment.getBuilder().getStartNode());
       registerDebugNode(thread);
@@ -226,9 +229,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false, false);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
       addBreakpoints();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
+
    }
 
    /**
@@ -289,7 +293,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof), isLoopTreatmentInvariant(proof), isAliasChecks(proof));
+      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
@@ -305,7 +309,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       }
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       environment.getUi().startAutoMode(proof, goals);
    }
 
@@ -352,10 +355,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param proof The {@link Proof} to check.
     * @return {@code true} alias checks immediately, {@code false} alias checks never.
     */
-   protected boolean isAliasChecks(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
-   }
+   //TODO:???
+//   protected boolean isAliasChecks(Proof proof) {
+//      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+//      return SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
+//   }
    
    /**
     * {@inheritDoc}
@@ -364,7 +368,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public boolean canSuspend() {
       return super.canSuspend() && 
              environment.getBuilder().getMediator().autoMode() && // Only if the auto mode is in progress
-             environment.getBuilder().getMediator().getProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
+             environment.getBuilder().getMediator().getSelectedProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
    }
    
    /**
@@ -421,7 +425,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             environment.getUi().waitWhileAutoMode();
          }
          // Remove proof from user interface
-         environment.getUi().removeProof(environment.getProof());
+         ProofUserManager.getInstance().removeUserAndDispose(environment.getProof(), this);
          // Clear cache
          environment.getBuilder().dispose();
          environment = null;
@@ -586,6 +590,14 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       return environment != null ? environment.getProof() : null;
    }
    
+   /**
+    * Returns the used {@link SymbolicExecutionEnvironment}.
+    * @return The used {@link SymbolicExecutionEnvironment}.
+    */
+   public SymbolicExecutionEnvironment<?> getEnvironment() {
+      return environment;
+   }
+
    /**
     * Returns the {@link IMethod} which is debugged.
     * @return The debugged {@link IMethod}.

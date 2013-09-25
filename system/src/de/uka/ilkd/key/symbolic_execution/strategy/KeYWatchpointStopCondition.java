@@ -44,8 +44,6 @@ public class KeYWatchpointStopCondition extends AbstractConditionalBreakpointSto
     * @param condition the condition as given by the user
     * @param enabled flag if the Breakpoint is enabled
     * @param conditionEnabled flag if the condition is enabled
-    * @param methodStart the line the containing method of this breakpoint starts at
-    * @param methodEnd the line the containing method of this breakpoint ends at
     * @param containerType the type of the element containing the breakpoint
     * @param suspendOnTrue the flag if the condition needs to evaluate to true or just be satisfiable
     * @throws SLTranslationException if the condition could not be parsed to a valid Term

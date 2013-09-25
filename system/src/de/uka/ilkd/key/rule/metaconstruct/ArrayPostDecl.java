@@ -15,14 +15,15 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -55,20 +56,14 @@ public class ArrayPostDecl extends ProgramTransformer {
 	    "ArrayPostDecl metaconsstruct can only treat single variable declarations");*/
 	final VariableSpecification var = 
 	    declaration.getVariables().get(0);
-	
-	final TypeReference newTypeReference = 
-	    new TypeRef(originalTypeReference.getProgramElementName(),
-			originalTypeReference.getDimensions() + var.getDimensions(),
-			originalTypeReference.getReferencePrefix(),
-			var.getProgramVariable().getKeYJavaType());
 
-	final VariableSpecification newVar = new VariableSpecification
-	    (var.getProgramVariable(), 0, var.getInitializer(), var.getType());
-
-	return new LocalVariableDeclaration(modifiers, 
-					    newTypeReference, 
-					    newVar);
-
+	final IProgramVariable variable = var.getProgramVariable();
+	return KeYJavaASTFactory.declare(modifiers, variable,
+		var.getInitializer(),
+		originalTypeReference.getProgramElementName(),
+		originalTypeReference.getDimensions() + var.getDimensions(),
+		originalTypeReference.getReferencePrefix(),
+		variable.getKeYJavaType());
     }
 
 }

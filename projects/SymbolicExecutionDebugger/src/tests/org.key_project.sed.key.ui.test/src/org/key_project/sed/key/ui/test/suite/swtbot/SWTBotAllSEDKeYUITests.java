@@ -23,6 +23,7 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiMainTabTest
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYSourceCodeLookupTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -37,7 +38,8 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
    SWTBotKeYSourceCodeLookupTest.class,
    SWTBotKeYTabTest.class,
    SWTBotMainTabTest.class,
-   SWTBotAddKeYWatchpointTest.class
+   SWTBotAddKeYWatchpointTest.class,
+   SWTBotOpenProofTest.class
 })
 public class SWTBotAllSEDKeYUITests {
 }

@@ -1,11 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.common.ui.test.testcase.swtbot;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -27,6 +38,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -36,7 +48,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * SWTBot tests for {@link KeYExampleNewWizard}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYExampleNewWizardTest extends TestCase {
+public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
    /**
     * Makes sure that all examples can be created.
     */

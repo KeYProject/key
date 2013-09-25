@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleConditionExample.somethingLocalMain();" pathCondition="true" pathConditionChanged="false">
       <statement name="int y = 42;" pathCondition="true" pathConditionChanged="false">
          <statement name="int x = somethingLocal(y);" pathCondition="true" pathConditionChanged="false">
@@ -13,12 +13,14 @@
                                  <statement name="int y = x_4*x_4;" pathCondition="true" pathConditionChanged="false">
                                     <statement name="x_4++;" pathCondition="true" pathConditionChanged="false">
                                        <statement name="return y_2;" pathCondition="true" pathConditionChanged="false">
-                                          <statement name="return y;" pathCondition="true" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of SimpleConditionExample.somethingLocalMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
-                                                </termination>
-                                             </methodReturn>
-                                          </statement>
+                                          <methodReturn name="&lt;return of SimpleConditionExample.somethingLocal(x_4);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <statement name="return y;" pathCondition="true" pathConditionChanged="false">
+                                                <methodReturn name="&lt;return of SimpleConditionExample.somethingLocalMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                                   </termination>
+                                                </methodReturn>
+                                             </statement>
+                                          </methodReturn>
                                        </statement>
                                     </statement>
                                  </statement>
@@ -32,4 +34,4 @@
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

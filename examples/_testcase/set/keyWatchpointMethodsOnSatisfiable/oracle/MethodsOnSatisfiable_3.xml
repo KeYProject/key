@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MethodsOnSatisfiable.doSomething();" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (x_global&gt;=0) {main(x_global); }else  {main(x_global); }" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x_global&gt;=0) {main(x_global); }else  {main(x_global); }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!MethodsOnSatisfiable.x_global &lt;= -1" pathCondition="!MethodsOnSatisfiable.x_global &lt;= -1" pathConditionChanged="true" branchCondition="!MethodsOnSatisfiable.x_global &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="!MethodsOnSatisfiable.x_global &lt;= -1" pathConditionChanged="false">
             </statement>
@@ -10,6 +10,6 @@
             <statement name="main(x_global);" pathCondition="!MethodsOnSatisfiable.x_global &gt;= 0" pathConditionChanged="false">
             </statement>
          </branchCondition>
-      </branchNode>
+      </branchStatement>
    </methodCall>
-</startNode>
+</start>

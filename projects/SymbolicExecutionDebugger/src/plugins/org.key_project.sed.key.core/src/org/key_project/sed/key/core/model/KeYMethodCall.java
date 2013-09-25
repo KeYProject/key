@@ -26,6 +26,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -199,7 +200,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
          if (location.getCharEnd() >= 0) {
             ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(this);
             if (compilationUnit != null) {
-               IMethod method = KeYModelUtil.findJDTMethod(compilationUnit, location.getCharEnd());
+               IMethod method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
                if (method != null) {
                   ISourceRange range = method.getNameRange();
                   location = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());

@@ -11,7 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -54,6 +53,9 @@ public class NodeInfo {
 
     /** has the rule app of the node been applied interactively? */
     private boolean interactiveApplication = false;
+
+    /** User-provided plain-text annotations to the node. */
+    private String notes;
 
 
     public NodeInfo(Node node) {
@@ -296,5 +298,15 @@ public class NodeInfo {
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
+    }
+
+    /** Add user-provided plain-text annotations. */
+    public void setNotes (String newNotes) {
+        notes = newNotes;
+    }
+
+    /** Get user-provided plain-text annotations. */
+    public String getNotes() {
+        return notes;
     }
 }

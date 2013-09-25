@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
-      <statement name="ClassCastInherit castInto = (ClassCastInherit)castable;" pathCondition="true" pathConditionChanged="false">
+      <statement name="ClassCastInherit castInto = (ClassCastInherit)this.castable;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="  self.castable = null
 | ClassCastInherit::instance(self.castable) = TRUE" pathCondition="  self.castable = null
 | ClassCastInherit::instance(self.castable) = TRUE" pathConditionChanged="true" branchCondition="  self.castable = null
 | ClassCastInherit::instance(self.castable) = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchNode name="if (x&gt;0) {try {return next.x;   }catch (NullPointerException e) {return x;   } }" pathCondition="  self.castable = null
+            <branchStatement name="if (this.x&gt;0) {try {return this.next.x;   }catch (NullPointerException e) {return this.x;   } }" pathCondition="  self.castable = null
 | ClassCastInherit::instance(self.castable) = TRUE" pathConditionChanged="false">
-               <branchCondition name="!self.x &lt;= 0" pathCondition="  (  self.castable = null
-   | ClassCastInherit::instance(self.castable) = TRUE)
-&amp; self.x &gt;= 1" pathConditionChanged="true" branchCondition="!self.x &lt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return next.x;" pathCondition="  (  self.castable = null
-   | ClassCastInherit::instance(self.castable) = TRUE)
-&amp; self.x &gt;= 1" pathConditionChanged="false">
+               <branchCondition name="!self.x &lt;= 0" pathCondition="  self.x &gt;= 1
+&amp; (  self.castable = null
+   | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="true" branchCondition="!self.x &lt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return this.next.x;" pathCondition="  self.x &gt;= 1
+&amp; (  self.castable = null
+   | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="false">
                   </statement>
                </branchCondition>
-            </branchNode>
+            </branchStatement>
          </branchCondition>
          <branchCondition name="!(  self.castable = null
   | ClassCastInherit::instance(self.castable) = TRUE)" pathCondition="!(  self.castable = null
   | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="true" branchCondition="!(  self.castable = null
   | ClassCastInherit::instance(self.castable) = TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <termination name="&lt;uncaught java.lang.ClassCastException&gt;" pathCondition="!(  self.castable = null
-  | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+  | ClassCastInherit::instance(self.castable) = TRUE)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </branchCondition>
       </statement>
    </methodCall>
-</startNode>
+</start>

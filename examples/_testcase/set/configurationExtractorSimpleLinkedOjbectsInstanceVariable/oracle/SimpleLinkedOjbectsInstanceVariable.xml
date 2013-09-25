@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="this.value=1;" pathCondition="true" pathConditionChanged="false">
          <statement name="this.next.value=2;" pathCondition="true" pathConditionChanged="false">
@@ -8,22 +8,22 @@
                   <branchCondition name="!self.next.next = null" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="true" branchCondition="!self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return this.value+this.next.value+this.next.next.value;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false" isReturnValueComputed="false">
-                           <termination name="&lt;end&gt;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false" terminationKind="NORMAL">
+                           <termination name="&lt;end&gt;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
                      </statement>
                   </branchCondition>
                   <branchCondition name="self.next.next = null" pathCondition="!self.next = null &amp; self.next.next = null" pathConditionChanged="true" branchCondition="self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!self.next = null &amp; self.next.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!self.next = null &amp; self.next.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </branchCondition>
                </statement>
             </branchCondition>
             <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                </termination>
             </branchCondition>
          </statement>
       </statement>
    </methodCall>
-</startNode>
+</start>

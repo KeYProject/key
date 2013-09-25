@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design
+// This file is part of KeY - Integrated Deductive Software Design 
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is protected by the GNU General 
 // Public License. See LICENSE.TXT for details.
-//
-
+// 
 
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -310,14 +310,23 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final PosInOccurrence pio = getPosInOccurrence ( p_goal );
         if ( !strategy.isApprovedApp(app, pio, p_goal) ) return null;
 
+        Services services = p_goal.proof().getServices();
         if ( pio != null ) {
-            app = app.setPosInOccurrence ( pio, p_goal.proof().getServices() );
+            app = app.setPosInOccurrence ( pio, services );
             if ( app == null ) return null;
         }
 
         if ( !app.complete() )
-            app = app.tryToInstantiate ( p_goal.proof().getServices() );
+            app = app.tryToInstantiate ( services );
 
+        Taclet taclet = app == null ? null : app.taclet();
+        if (taclet instanceof RewriteTaclet) {
+            RewriteTaclet rwtaclet = (RewriteTaclet) taclet;
+            MatchConditions check = 
+                    rwtaclet.checkPrefix(pio, MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            assert check != null : "A taclet with illegal prefix is chosen: " + taclet.name();
+        }
+        
         return app;
     }
 
@@ -621,10 +630,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         public Node cacheKey = null;
 
         public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>
-            antecCache = new HashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
+            antecCache = new LinkedHashMap<Long, ImmutableList<IfFormulaInstantiation>> ();
         public final HashMap<Long, ImmutableList<IfFormulaInstantiation>>  succCache  =
-            new HashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
-
+            new LinkedHashMap<Long, ImmutableList<IfFormulaInstantiation>>  ();
         public void reset(Node n){
             cacheKey = n;
             antecCache.clear ();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MethodCallOnObject.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="MethodCallOnObject();" pathCondition="true" pathConditionChanged="false">
@@ -13,7 +13,7 @@
                            <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
                               <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                               </methodReturnValue>
-                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
+                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </methodReturn>
@@ -24,4 +24,4 @@
          </methodCall>
       </statement>
    </methodCall>
-</startNode>
+</start>

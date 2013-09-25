@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +174,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       try {
          List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
          // Group values of the branches
-         Map<Term, List<Goal>> valueMap = new HashMap<Term, List<Goal>>();
+         Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
          List<Goal> unknownValues = new LinkedList<Goal>();
          groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
          // Instantiate child values
@@ -246,6 +246,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          // Extract value
          Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
          assert value != null;
+         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value);
          // Compute unknown flag if required
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {

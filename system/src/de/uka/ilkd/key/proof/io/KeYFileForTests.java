@@ -24,6 +24,7 @@ import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
@@ -37,8 +38,8 @@ public class KeYFileForTests extends KeYFile {
     /** creates a new representation for a given file by indicating a name
      * and a file representing the physical source of the .key file.
      */
-    public KeYFileForTests(String name, File file) {
-	super(name, file, null);
+    public KeYFileForTests(String name, File file, Profile profile) {
+	super(name, file, null, profile);
     }
 
     /** reads the whole .key file and modifies the initial configuration
