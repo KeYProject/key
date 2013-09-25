@@ -663,7 +663,7 @@ public class ProofManager {
    private void createProof(ProofElement pe) throws ProofInputException{
          Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
          
-         ProofStarter ps = new ProofStarter();
+         ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
          
          ps.start();
