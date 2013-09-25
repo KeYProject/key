@@ -118,7 +118,6 @@ public class KeYMediator {
 	keySelectionModel   = new KeYSelectionModel();
 	interactiveProver   = new InteractiveProver(this);
 
-	addRuleAppListener(proofListener);
 	addAutoModeListener(proofListener);
 
 	defaultExceptionHandler = new KeYRecoderExcHandler();
@@ -308,13 +307,14 @@ public class KeYMediator {
       Proof oldProof = getSelectedProof();
       if (oldProof != null) {
          oldProof.removeProofTreeListener(proofTreeListener);
+         oldProof.removeRuleAppListener(proofListener);
       }
       if (newProof != null) {
          notationInfo.setAbbrevMap(newProof.abbreviations());
       }
       if (newProof != null) {
          newProof.addProofTreeListener(proofTreeListener);
-         newProof.mgt().setMediator(this);
+         newProof.addRuleAppListener(proofListener);
       }
       
       // moved from layout main here; but does not actually belong here at all;
@@ -575,14 +575,6 @@ public class KeYMediator {
      */
     public void removeGUIListener(GUIListener listener) {
 	listenerList.remove(GUIListener.class, listener);
-    }
-
-    public void addRuleAppListener(RuleAppListener listener) {
-	Goal.addRuleAppListener(listener);
-    }
-
-    public void removeRuleAppListener(RuleAppListener listener) {
-	Goal.removeRuleAppListener(listener);
     }
 
     public void addAutoModeListener(AutoModeListener listener) {
