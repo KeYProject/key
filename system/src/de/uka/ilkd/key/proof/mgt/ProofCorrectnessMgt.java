@@ -22,7 +22,6 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -44,7 +43,6 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofTreeListener proofTreeListener
 	= new DefaultMgtProofTreeListener();
 
-    private KeYMediator mediator;
     private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
     
@@ -57,6 +55,7 @@ public final class ProofCorrectnessMgt {
 	this.proof = p;
         this.specRepos = p.getServices().getSpecificationRepository();
 	proof.addProofTreeListener(proofTreeListener);
+	proof.addRuleAppListener(proofListener);
     }
     
 
@@ -276,25 +275,9 @@ public final class ProofCorrectnessMgt {
         }
 	return result;
     }
-
-    
-    public void setMediator(KeYMediator p_mediator) {
-	if(mediator != null) {
-	    mediator.removeRuleAppListener(proofListener);
-	}
-
-	mediator = p_mediator;
-
-	if(mediator != null) {
-	    mediator.addRuleAppListener(proofListener);
-	}
-    }
-    
     
     public void removeProofListener(){
-        if(mediator != null) {
-          mediator.removeRuleAppListener(proofListener);
-        }
+       proof.removeRuleAppListener(proofListener);
     }
 
         
@@ -302,11 +285,10 @@ public final class ProofCorrectnessMgt {
 	return proofStatus;
     }
     
-    
-    public void finalize() {
-        if(mediator != null) {
-            mediator.removeRuleAppListener(proofListener);
-        }
+    @Override
+    protected void finalize() throws Throwable {
+       removeProofListener();
+       super.finalize();
     }
 
     
@@ -317,12 +299,9 @@ public final class ProofCorrectnessMgt {
     
     private class DefaultMgtProofListener implements RuleAppListener {
 	public void ruleApplied(ProofEvent e) {
-	    if(proof == e.getSource()) {
-                //%% actually I only want to listen to events of one proof
 		ProofCorrectnessMgt.this.ruleApplied
 		    (e.getRuleAppInfo().getRuleApp());
 	    }
-	}
     }
 
     

@@ -112,7 +112,7 @@ public class TestVariableNamer extends TestCase {
 	TacletIndex tacletIndex = new TacletIndex();
 	BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
-						     builtInRuleAppIndex);
+						     builtInRuleAppIndex, proof.getServices());
 
 	return new Goal(node, ruleAppIndex);
     }

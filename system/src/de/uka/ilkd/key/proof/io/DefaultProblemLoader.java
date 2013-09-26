@@ -285,6 +285,7 @@ public class DefaultProblemLoader {
          // Load proof obligation settings
          Properties properties = new Properties();
          properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+         properties.put(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
          String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
          if (poClass == null || poClass.isEmpty()) {
             throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
