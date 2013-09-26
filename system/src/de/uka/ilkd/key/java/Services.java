@@ -93,7 +93,9 @@ public class Services{
     
     private final Profile profile;
     
-    /**
+    private ServiceCaches caches;
+
+   /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
@@ -101,6 +103,7 @@ public class Services{
        assert profile != null;
        this.profile = profile;
        this.counters = new LinkedHashMap<String, Counter>();
+       this.caches = new ServiceCaches();
 	cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
 	if(exceptionHandler == null){
@@ -120,11 +123,13 @@ public class Services{
     
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, 
-		     KeYRecoderMapping rec2key, HashMap<String, Counter> counters) {
+		     KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
    assert profile != null;
    assert counters != null;
+   assert caches != null;
    this.profile = profile;
    this.counters = counters;
+   this.caches = caches;
 	cee = new ConstantExpressionEvaluator(this);
 	typeconverter = new TypeConverter(this);
 	//	exceptionHandler = new KeYRecoderExcHandler();
@@ -204,25 +209,28 @@ public class Services{
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)
+     * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
-    public Services copy() {
-       return copy(getProfile());
+    public Services copy(boolean shareCaches) {
+       return copy(getProfile(), shareCaches);
     }
 
     /**
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced.
      * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
+     * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
-    public Services copy(Profile profile) {
+    public Services copy(Profile profile, boolean shareCaches) {
 	Debug.assertTrue
 	    (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
 	       instanceof SchemaCrossReferenceServiceConfiguration),
 	     "services: tried to copy schema cross reference service config.");
+	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
 	Services s = new Services
 	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-	     getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters());
+	     getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
         s.specRepos = specRepos;
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setExceptionHandler(getExceptionHandler());
@@ -261,9 +269,10 @@ public class Services{
     }
     
     
-    public Services copyProofSpecific(Proof p_proof) {
+    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
+        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters());
+                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
@@ -311,7 +320,19 @@ public class Services{
 	return proof;
     }
 
+    /**
+     * Returns the sued {@link Profile}.
+     * @return The used {@link Profile}.
+     */
     public Profile getProfile() {
         return profile;
+    }
+    
+    /**
+     * Returns the used {@link ServiceCaches}.
+     * @return The used {@link ServiceCaches}.
+     */
+    public ServiceCaches getCaches() {
+        return caches;
     }
 }

@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
@@ -75,19 +77,22 @@ public class TacletAppIndex  {
      * for the sequent <code>seq</code> */
     private Sequent                   seq;
 
-    public TacletAppIndex(TacletIndex tacletIndex) {
+    private Map<CacheKey, TermTacletAppIndex> cache;
+    
+    public TacletAppIndex(TacletIndex tacletIndex, Services services) {
         this ( tacletIndex,
                null, null, null, null, TacletFilter.TRUE,
-               new TermTacletAppIndexCacheSet () );
+               new TermTacletAppIndexCacheSet (services.getCaches().getTermTacletAppIndexCache()), services.getCaches().getTermTacletAppIndexCache() );
     }
 
-    private TacletAppIndex ( TacletIndex               tacletIndex,
-                             SemisequentTacletAppIndex antecIndex,
-                             SemisequentTacletAppIndex succIndex,
-                             Goal                      goal,
-                             Sequent                   seq,
-                             RuleFilter                ruleFilter,
-                             TermTacletAppIndexCacheSet indexCaches ) {
+    private TacletAppIndex ( TacletIndex                       tacletIndex,
+                             SemisequentTacletAppIndex         antecIndex,
+                             SemisequentTacletAppIndex         succIndex,
+                             Goal                              goal,
+                             Sequent                           seq,
+                             RuleFilter                        ruleFilter,
+                             TermTacletAppIndexCacheSet        indexCaches,
+                             Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
         this.antecIndex  = antecIndex;
         this.succIndex   = succIndex;
@@ -95,6 +100,7 @@ public class TacletAppIndex  {
         this.seq         = seq;
         this.ruleFilter  = ruleFilter;
         this.indexCaches = indexCaches;
+        this.cache       = cache;
     }
 
     public void setNewRuleListener ( NewRuleListener p_newRuleListener ) {
@@ -122,7 +128,7 @@ public class TacletAppIndex  {
     TacletAppIndex copyWithTacletIndex(TacletIndex p_tacletIndex) {
         return new TacletAppIndex ( p_tacletIndex, antecIndex, succIndex,
                                     getGoal (), getSequent (), ruleFilter,
-                                    indexCaches );
+                                    indexCaches, cache );
     }
 
     /**
@@ -152,7 +158,7 @@ public class TacletAppIndex  {
     }
 
     private void createNewIndexCache() {
-        indexCaches = new TermTacletAppIndexCacheSet ();
+        indexCaches = new TermTacletAppIndexCacheSet (cache);
         if ( antecIndex != null ) antecIndex.setIndexCache ( indexCaches );
         if ( succIndex != null ) succIndex.setIndexCache ( indexCaches );
     }
