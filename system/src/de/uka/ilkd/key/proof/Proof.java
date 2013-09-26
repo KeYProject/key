@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -134,12 +136,14 @@ public class Proof implements Named {
      */
     private boolean disposed = false;
 
+    /** list of rule app listeners */
+    private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
-	this.services = services.copyProofSpecific(this);
+	this.services = services.copyProofSpecific(this, false);
         settingsListener =
                 new SettingsListener () {
                     @Override
@@ -205,8 +209,8 @@ public class Proof implements Named {
         setRoot(rootNode);
 
 	Goal firstGoal = new Goal(rootNode,
-                                  new RuleAppIndex(new TacletAppIndex(rules),
-						   new BuiltInRuleAppIndex(builtInRules)));
+                                  new RuleAppIndex(new TacletAppIndex(rules, services),
+						   new BuiltInRuleAppIndex(builtInRules), services));
 	openGoals = openGoals.prepend(firstGoal);
 
 	if (closed())
@@ -275,6 +279,7 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
+        ruleAppListenerList = null;
         disposed = true;
     }
 
@@ -1183,4 +1188,27 @@ public class Proof implements Named {
             return sb.toString();
         }
     }
+    
+
+   /** fires the event that a rule has been applied */
+   protected void fireRuleApplied(ProofEvent p_e) {
+      synchronized (ruleAppListenerList) {
+         Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
+         while (it.hasNext()) {
+            it.next().ruleApplied(p_e);
+         }
+      }
+   }
+
+   public void addRuleAppListener(RuleAppListener p) {
+      synchronized (ruleAppListenerList) {
+         ruleAppListenerList.add(p);
+      }
+   }
+
+   public void removeRuleAppListener(RuleAppListener p) {
+      synchronized (ruleAppListenerList) {
+         ruleAppListenerList.remove(p);
+      }
+   }
 }

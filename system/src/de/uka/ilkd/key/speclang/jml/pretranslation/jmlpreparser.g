@@ -1029,7 +1029,7 @@ depends_clause[ImmutableList<String> mods]
     accessible_keyword ps=expression
     {
     	TextualJMLDepends d
-    		= new TextualJMLDepends(mods, ps.prepend("depends "));
+    		= new TextualJMLDepends(mods, flipHeaps("depends", ps, false));
 	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(d);
     }
 ;

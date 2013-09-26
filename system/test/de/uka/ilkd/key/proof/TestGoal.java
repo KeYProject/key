@@ -52,9 +52,7 @@ public class TestGoal extends TestCase {
 
                 Node root = new Node(proof, seq);
                 proof.setRoot(root);
-                Goal g = new Goal(root, new RuleAppIndex(new TacletAppIndex(
-                                new TacletIndex()), new BuiltInRuleAppIndex(
-                                new BuiltInRuleIndex())));
+                Goal g = new Goal(root, new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(
                                 TacletForTests.getRules().lookup("imp_right"));
@@ -106,9 +104,11 @@ public class TestGoal extends TestCase {
                                 root,
                                 new RuleAppIndex(
                                                 new TacletAppIndex(
-                                                                new TacletIndex()),
+                                                                new TacletIndex(),
+                                                                proof.getServices()),
                                                 new BuiltInRuleAppIndex(
-                                                                new BuiltInRuleIndex())));
+                                                                new BuiltInRuleIndex()),
+                                                proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(
                                 TacletForTests.getRules().lookup("imp_right"));

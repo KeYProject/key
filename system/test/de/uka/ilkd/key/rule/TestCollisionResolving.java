@@ -73,7 +73,7 @@ public class TestCollisionResolving extends TestCase {
 	TacletIndex tacletIndex = new TacletIndex();
 	BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
-						     builtInRuleAppIndex);
+						     builtInRuleAppIndex, proof.getServices());
 	goal = new Goal(node, ruleAppIndex);
     }
 

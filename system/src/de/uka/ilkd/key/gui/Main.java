@@ -404,7 +404,7 @@ public final class Main {
             });
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, verbosity);
+            ui = new ConsoleUserInterface(batch, true, verbosity);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
