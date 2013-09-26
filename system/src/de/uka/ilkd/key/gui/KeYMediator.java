@@ -290,7 +290,9 @@ public class KeYMediator {
                                                         (proof.openGoals().size()+" open goals remain."));
                                 }
                         });
-        TermTacletAppIndexCacheSet.clearCache();
+        if (!proof.isDisposed()) {
+           proof.getServices().getCaches().getTermTacletAppIndexCache().clear();
+        }
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
     }
