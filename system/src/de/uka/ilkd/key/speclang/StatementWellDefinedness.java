@@ -117,7 +117,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Variables vars =
                 new Variables(self, result, exception, atPres, params, heap, anonHeap);
         final POTerms po = replace(this.createPOTerms(), vars);
-        final SequentTerms seqTerms = createSeqTerms(po, vars, leadingUpdate, services);
+        final Term update = replace(leadingUpdate, vars);
+        final SequentTerms seqTerms = createSeqTerms(po, vars, update, services);
         return generateSequent(seqTerms, services);
     }
 
