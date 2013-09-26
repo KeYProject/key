@@ -47,27 +47,32 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    @Override
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
-      IResourceDelta delta = getDelta(project);
-      if (delta != null && KeYProjectProperties.isEnableBuildProofs(project)) {
-         ProofManager proofManager = null;
-         try {
+      ProofManager proofManager = null;
+      try{
+         if(kind == IncrementalProjectBuilder.FULL_BUILD){
             proofManager = new ProofManager(project);
-            
-            if (!KeYProjectProperties.isEnableBuildProofsEfficient(project)) {
-               proofManager.runProofs(monitor);
-            }
-            else {
-               LinkedList<IFile> changedJavaFiles = collectChangedJavaFiles(delta);
-               proofManager.runProofs(changedJavaFiles, monitor);
+            proofManager.runProofs(monitor);
+         }
+         else if(kind == IncrementalProjectBuilder.INCREMENTAL_BUILD){
+            IResourceDelta delta = getDelta(project);
+            if (delta != null && KeYProjectProperties.isEnableBuildProofs(project)) {
+               proofManager = new ProofManager(project);
+               if (!KeYProjectProperties.isEnableBuildProofsEfficient(project)) {
+                  proofManager.runProofs(monitor);
+               }
+               else {
+                  LinkedList<IFile> changedJavaFiles = collectChangedJavaFiles(delta);
+                  proofManager.runProofs(changedJavaFiles, monitor);
+               }
             }
          }
-         catch (Exception e){
-           LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing, you should throw a CoreException: throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
-         }
-         finally {
-            if (proofManager != null) {
-               proofManager.dispose();
-            }
+      }
+      catch (Exception e){
+        throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+      }
+      finally {
+         if (proofManager != null) {
+            proofManager.dispose();
          }
       }
       return null;
@@ -82,12 +87,13 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       IProject project = getProject();
       ProofManager proofManager = null;
       try {
+         //TODO: run rauswerfen
          proofManager = new ProofManager(project);
          proofManager.clean(monitor);
          super.clean(monitor);
       }
       catch (Exception e) {
-         LogUtil.getLogger().createErrorStatus(e); // TODO: Does nothing, you should throw a CoreException: throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
       finally {
          if (proofManager != null) {

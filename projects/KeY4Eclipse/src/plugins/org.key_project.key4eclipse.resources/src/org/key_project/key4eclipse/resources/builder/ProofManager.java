@@ -675,13 +675,13 @@ public class ProofManager {
          pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
    }
    
-   
    /**
     * Loads the {@link Proof} of the given {@link ProofElement} and runs the AutoMode.
     * @param ProofElement - the given {@link ProofElement}
     */
    private void loadProof(ProofElement pe){
       try{
+         
          File file = pe.getProofFile().getLocation().toFile();
          KeYEnvironment<CustomConsoleUserInterface> loadEnv = KeYEnvironment.load(file, null, null);
          Proof proof = loadEnv.getLoadedProof();

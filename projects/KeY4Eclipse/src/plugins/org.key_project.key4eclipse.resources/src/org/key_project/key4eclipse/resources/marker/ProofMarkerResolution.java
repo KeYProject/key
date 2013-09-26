@@ -40,15 +40,14 @@ public class ProofMarkerResolution implements IMarkerResolution2{
     * Initializes the global variables depending on the given {@link IMarker#getType()}.
     * @param markerType - the given {@link IMarker#getType()}
     */
-   public ProofMarkerResolution(String markerType, boolean openInKeY) {
-      this.openInKeY = openInKeY;
+   public ProofMarkerResolution(String markerType) {
       if(markerType.equals(MarkerManager.CLOSEDMARKER_ID)){
-         description = (openInKeY ? "Open proof in KeY" : "Open proof");
+         description = "Open proof";
       }
       else if(markerType.equals(MarkerManager.NOTCLOSEDMARKER_ID)){
-         description = (openInKeY ? "Open proof in KeY to close it manually" : "Open proof to close it manually");
+         description = "Open proof to close it manually";
       }
-      this.label = (openInKeY ? "Open proof in KeY" : "Open proof");
+      this.label = "Open proof";
    }
    
    /**
