@@ -212,7 +212,7 @@ public class RIFLTransformer {
              }
         };
         final Thread riflReader = new Thread(r,"RIFLReader");
-        riflReader.run();
+        riflReader.start();
 
         // step 2: parse Java source
         final String javaRoot = getBaseDirPath(source);
@@ -231,7 +231,7 @@ public class RIFLTransformer {
             }
         };
         final Thread javaReader = new Thread(t,"JavaReader");
-        javaReader.run();
+        javaReader.start();
 
         // synchronize
         while (riflReader.isAlive() || javaReader.isAlive()) {}
