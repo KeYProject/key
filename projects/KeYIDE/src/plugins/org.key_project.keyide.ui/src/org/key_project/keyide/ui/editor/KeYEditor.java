@@ -249,12 +249,11 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
-      DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
-      getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-      getEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
-      getCurrentProof().removeProofTreeListener(proofTreeListener);
       if (viewerDecorator != null) {
          viewerDecorator.dispose();
+      }
+      if(breakpointManager!=null){
+         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       }
       if (getUI() != null) {
          getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
@@ -689,7 +688,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
-<<<<<<< HEAD
     * @return the breakpointManager
     */
    public KeYBreakpointManager getBreakpointManager() {

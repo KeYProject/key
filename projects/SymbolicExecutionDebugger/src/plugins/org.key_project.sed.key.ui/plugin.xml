@@ -130,6 +130,12 @@
       </command>
       <command
             categoryId="org.eclipse.debug.ui.category.run"
+            description="Opens KeY&apos;s proof from which the symbolic execution tree was extracted."
+            id="org.key_project.sed.key.ui.openProofCommand"
+            name="Open Proof">
+      </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
             description="Add a KeY Watchpoint."
             id="org.key_project.sed.key.ui.addWatchpointCommand"
             name="Add Watchpoint">

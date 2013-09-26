@@ -329,38 +329,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       return programVariableCollectorFactory;
    }
    
-   
-   /**
-    * Checks if the given {@link Proof} uses method treatment "Contract" right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} Contract, {@code false} Expand
-    */
-   protected boolean isMethodTreatmentContract(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return StrategyProperties.METHOD_CONTRACT.equals(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
-   }
-   
-   /**
-    * Checks if the given {@link Proof} uses loop treatment "Invariant" right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} Invariant, {@code false} Expand
-    */
-   protected boolean isLoopTreatmentInvariant(Proof proof) {
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      return StrategyProperties.LOOP_INVARIANT.equals(sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
-   }
-
-   /**
-    * Checks if the given {@link Proof} uses alias checks right now.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} alias checks immediately, {@code false} alias checks never.
-    */
-   //TODO:???
-//   protected boolean isAliasChecks(Proof proof) {
-//      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-//      return SymbolicExecutionStrategy.ALIAS_CHECK_IMMEDIATELY.equals(sp.getProperty(SymbolicExecutionStrategy.ALIAS_CHECK_OPTIONS_KEY));
-//   }
-   
    /**
     * {@inheritDoc}
     */
