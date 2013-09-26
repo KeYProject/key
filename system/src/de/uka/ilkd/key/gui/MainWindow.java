@@ -282,7 +282,7 @@ public final class MainWindow extends JFrame  {
         proofListener = new MainProofListener(this);
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
-        setMediator(new KeYMediator(userInterface));
+        setMediator(new KeYMediator(userInterface, true));
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
