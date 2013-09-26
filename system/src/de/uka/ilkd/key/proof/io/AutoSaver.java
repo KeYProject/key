@@ -110,7 +110,7 @@ public class AutoSaver implements ProverTaskListener {
                 }
             }
         };
-        (new Thread(null,r,"ProofAutosaver")).run(); // TODO: Should this be done in the same thread or start a new thread via start()
+        (new Thread(null,r,"ProofAutosaver")).start(); 
     }
 
 }
