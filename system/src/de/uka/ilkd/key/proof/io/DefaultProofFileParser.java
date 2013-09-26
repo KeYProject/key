@@ -67,8 +67,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
  */
 public class DefaultProofFileParser implements IProofFileParser {
 
-    private static final String RULE = " rule: ";
-    private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof. Line ";
+    private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
 
     private final DefaultProblemLoader loader;
@@ -273,7 +272,9 @@ public class DefaultProofFileParser implements IProofFileParser {
               currNode = null;
            } catch(Exception e) {
                skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'n' :
@@ -289,7 +290,9 @@ public class DefaultProofFileParser implements IProofFileParser {
                // silently continue; status will be reported via polling
            } catch (BuiltInConstructionException e) {
                skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+linenr+RULE+currTacletName+NOT_APPLICABLE,e);
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
@@ -303,7 +306,9 @@ public class DefaultProofFileParser implements IProofFileParser {
 //        System.out.println("formula: " + currIfInstFormula);
 //        System.out.println("term: " + currIfInstPosInTerm);
                skipBranch = 1;
-               reportError(ERROR_LOADING_PROOF_LINE+linenr +RULE+currTacletName+NOT_APPLICABLE,e);
+               reportError(ERROR_LOADING_PROOF_LINE+"Line "+linenr+
+                   ", goal "+currGoal.node().serialNr()+
+                   ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        }

@@ -200,7 +200,7 @@ public class MonKeYProof extends Bean {
           // Check if the proof is still valid
           if (proof != null && !proof.isDisposed()) {
              // proof is invalid, reset this automatic proof instance
-             proof = null; 
+             removeProof(); 
              setResult(MonKeYProofResult.UNKNOWN);
              updateStatistics();
           }
@@ -213,8 +213,8 @@ public class MonKeYProof extends Bean {
                           ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);
                           Assert.isNotNull(input);
                           Proof proof = environment.getUi().createProof(environment.getInitConfig(), input);
-                          ProofUserManager.getInstance().addUser(proof, environment, MonKeYProof.this);
                           Assert.isNotNull(proof);
+                          ProofUserManager.getInstance().addUser(proof, environment, MonKeYProof.this);
                           setResult(proof);
                       }
                       catch (Exception e) {

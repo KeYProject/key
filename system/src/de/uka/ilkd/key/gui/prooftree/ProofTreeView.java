@@ -14,28 +14,61 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.KeYSelectionEvent;
+import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -46,7 +79,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
-import java.awt.BorderLayout;
 
 public class ProofTreeView extends JPanel {
 
@@ -247,14 +279,12 @@ public class ProofTreeView extends JPanel {
     private void register() {
 	mediator.addKeYSelectionListener(proofListener);
 	mediator.addAutoModeListener(proofListener);
-	mediator.addRuleAppListener(proofListener);
 	mediator.addGUIListener(guiListener);
     }
 
     private void unregister() {
 	mediator.removeKeYSelectionListener(proofListener);
 	mediator.removeAutoModeListener(proofListener);
-	mediator.removeRuleAppListener(proofListener);
 	mediator.removeGUIListener(guiListener);
     }
 
@@ -282,7 +312,13 @@ public class ProofTreeView extends JPanel {
             delegateModel.removeTreeModelListener(proofTreeSearchPanel);
 	}
 
+	if (proof != null) {
+	   proof.removeRuleAppListener(proofListener);
+	}
 	proof = p;
+   if (proof != null) {
+      proof.addRuleAppListener(proofListener);
+   }
 
         if (proof !=null) {
 	    delegateModel = models.get(p);
@@ -560,9 +596,7 @@ public class ProofTreeView extends JPanel {
 
        	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    if (proof == e.getSource()) {
-	        addModifiedNode(e.getRuleAppInfo().getOriginalNode());
-	    }
+      addModifiedNode(e.getRuleAppInfo().getOriginalNode());
 	}
 
 
@@ -707,23 +741,31 @@ public class ProofTreeView extends JPanel {
 		*/
 		tree_cell.setForeground(Color.black);
                 String tooltipText = "An inner node of the proof";
+                final String notes = node.getNodeInfo().getNotes();
+                if (notes!=null) {
+                    tooltipText += ".\nNotes: "+notes;
+                }
 
                 Icon defaultIcon;
-                if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                if (notes != null) {
+                    defaultIcon = IconFactory.editFile(16);
+                } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                     defaultIcon = IconFactory.interactiveAppLogo(16);
-                    tooltipText = "An inner node (rule applied by user)";
                 } else {
                     defaultIcon = null;
                 }
                 if (isBranch && node.childrenCount() > 1) {
                     defaultIcon = getOpenIcon();
-                    tooltipText = "A branch node with all siblings hidden";
+                    tooltipText = "A branch node with all children hidden";
                 }
                 tree_cell.setIcon(defaultIcon);
 
 		tree_cell.setToolTipText(tooltipText);
 	    }
 
+	    if (node.getNodeInfo().getNotes() != null) {
+	        tree_cell.setBackgroundNonSelectionColor(Color.yellow);
+	    } else
             if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
 
@@ -760,6 +802,7 @@ public class ProofTreeView extends JPanel {
 	            new JCheckBoxMenuItem("Hide Non-interactive Proofsteps");
 	private JCheckBoxMenuItem hideClosedSubtrees =
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
+	private JMenuItem notes = new JMenuItem("Edit Notes");
 	private JMenuItem search = new JMenuItem("Search");
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
 	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
@@ -797,12 +840,12 @@ public class ProofTreeView extends JPanel {
         ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
         if(!macroMenu.isEmpty()) {
             this.add(macroMenu);
-            this.add(new JSeparator());
         }
 
 	    this.add(prune);
 	    if (branch != path) {
 		prune.addActionListener(this);
+		prune.setIcon(IconFactory.pruneLogo(16));
 		prune.setEnabled(false);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) ||
@@ -824,6 +867,12 @@ public class ProofTreeView extends JPanel {
 	    }
 	    if (de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE.active())
 	        this.add(delayedCut);
+
+	    // modifying the node
+        this.add(new JSeparator());
+        this.add(notes);
+        notes.setIcon(IconFactory.editFile(20));
+        notes.addActionListener(this);
 
 	    // modifying the view
 	    this.add(new JSeparator());
@@ -998,6 +1047,22 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		showSearchPanel();
+            } else if (e.getSource() == notes) {
+                // display a dialog to attach text to the node
+                final Icon editIcon = IconFactory.editFile(20);
+                final String origNotes = invokedNode.getNodeInfo().getNotes();
+                final String newNotes = (String)JOptionPane.showInputDialog(
+                                    this,null,
+                                    "Annotate this proof node",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    editIcon,
+                                    null,
+                                    origNotes);
+                if (newNotes != null) {
+                    if (newNotes.length()==0)
+                        invokedNode.getNodeInfo().setNotes(null);
+                    else invokedNode.getNodeInfo().setNotes(newNotes);
+                }
             }
 	}
 

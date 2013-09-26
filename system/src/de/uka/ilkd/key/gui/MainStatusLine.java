@@ -14,6 +14,8 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.util.TipOfTheDay;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -25,7 +27,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 class MainStatusLine extends JPanel {
-    private static final String DEFAULT_STATUSLINE = "Integrated Deductive Software Design: Ready  (Hint: Press STRG+F to search in sequents.)";
+    private static final String DEFAULT_STATUSLINE = "Integrated Deductive Software Design: Ready";
     private static final long serialVersionUID = -4324361226332870737L;
     private JLabel       text;
     private JPanel       progressPanel;
@@ -92,7 +94,8 @@ class MainStatusLine extends JPanel {
      */
     public void reset () {
 	setProgressPanelVisible ( false );
-	setStatusText (DEFAULT_STATUSLINE );
+	setStatusText (DEFAULT_STATUSLINE 
+            + "  (Hint: "+TipOfTheDay.get()+")");
     }
 
     /**

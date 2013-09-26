@@ -62,7 +62,8 @@ public final class Main {
     private static final String EXAMPLES = "--examples";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+//    deprecated
+//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
@@ -403,7 +404,7 @@ public final class Main {
             });
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, verbosity);
+            ui = new ConsoleUserInterface(batch, true, verbosity);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
