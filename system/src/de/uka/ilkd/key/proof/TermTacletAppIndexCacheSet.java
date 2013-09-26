@@ -20,7 +20,16 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.LRUCache;
@@ -54,23 +63,11 @@ import de.uka.ilkd.key.util.LRUCache;
  * <code>ITermTacletAppIndexCache.descend</code>.
  */
 public class TermTacletAppIndexCacheSet {
-    
-    /** max. entries in the backend <code>LRUCache</code> */
-    private final static int MAX_INDEX_ENTRIES = 5000;
-
     /**
      * max. instances of <code>ITermTacletAppIndexCache</code> that are kept
      * in this set (e.g., for different prefixes of quantified variables)
      */
     private final static int MAX_CACHE_ENTRIES = 100;
-   
-    /**
-     * we use the same backend <code>LRUCache</code> for all actual caches.
-     * This ensures that the total memory consumption of the caches is bounded
-     * (well, almost), and that different proofs and different areas within one
-     * proof compete for cache space
-     */
-    private final static Map cacheBackend = new LRUCache ( MAX_INDEX_ENTRIES );//chrisg made public
     
     /**
      * dummy cache that is not caching at all, and from which no other cache is
@@ -91,17 +88,14 @@ public class TermTacletAppIndexCacheSet {
      * the toplevel caches for the antecedent and the succedent. These are the
      * starting points when determining the cache for an arbitrary position
      */
-    private final ITermTacletAppIndexCache antecCache =
-        new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil() );
-    private final ITermTacletAppIndexCache succCache =
-        new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil() );
+    private final ITermTacletAppIndexCache antecCache;
+    private final ITermTacletAppIndexCache succCache;
     
     /**
      * cache for locations that are not below updates, programs or in the scope
      * of binders
      */
-    private final ITermTacletAppIndexCache topLevelCacheEmptyPrefix =
-        new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil() );
+    private final ITermTacletAppIndexCache topLevelCacheEmptyPrefix;
     
     /**
      * caches for locations that are not below updates or programs, but in the
@@ -121,8 +115,7 @@ public class TermTacletAppIndexCacheSet {
      * cache for locations that are below programs, but not in the scope of
      * binders
      */
-    private final ITermTacletAppIndexCache belowProgCacheEmptyPrefix =
-        new BelowProgCache ( ImmutableSLList.<QuantifiableVariable>nil() );
+    private final ITermTacletAppIndexCache belowProgCacheEmptyPrefix;
 
     /**
      * caches for locations that are both below programs and in the scope of
@@ -131,6 +124,17 @@ public class TermTacletAppIndexCacheSet {
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches = new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> ( MAX_CACHE_ENTRIES );
 
+    private Map<CacheKey, TermTacletAppIndex> cache;
+    
+    public TermTacletAppIndexCacheSet(Map<CacheKey, TermTacletAppIndex> cache) {
+       assert cache != null;
+       this.cache = cache;
+       antecCache = new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil(), cache );
+       succCache = new TopLevelCache  (ImmutableSLList.<QuantifiableVariable>nil(), cache );
+       topLevelCacheEmptyPrefix = new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil(), cache );
+       belowProgCacheEmptyPrefix = new BelowProgCache ( ImmutableSLList.<QuantifiableVariable>nil(), cache );
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     
     /**
@@ -162,10 +166,6 @@ public class TermTacletAppIndexCacheSet {
     public boolean isRelevantTaclet (Taclet t) {
         return t instanceof FindTaclet;
     }
-
-    public static void clearCache(){
-        cacheBackend.clear();
-    }
     ////////////////////////////////////////////////////////////////////////////
     
     /**
@@ -179,7 +179,7 @@ public class TermTacletAppIndexCacheSet {
         ITermTacletAppIndexCache res =
             topLevelCaches.get ( prefix );
         if ( res == null ) {
-            res = new TopLevelCache ( prefix );
+            res = new TopLevelCache ( prefix, cache );
             topLevelCaches.put ( prefix, res );
         }
         return res;
@@ -195,7 +195,7 @@ public class TermTacletAppIndexCacheSet {
         ITermTacletAppIndexCache res =
             belowProgCaches.get ( prefix );
         if ( res == null ) {
-            res = new BelowProgCache ( prefix );
+            res = new BelowProgCache ( prefix, cache );
             belowProgCaches.put ( prefix, res );
         }
         return res;
@@ -241,8 +241,8 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
     
     private class TopLevelCache extends PrefixTermTacletAppIndexCacheImpl {
-        public TopLevelCache(ImmutableList<QuantifiableVariable> prefix) {
-            super ( prefix, cacheBackend );
+        public TopLevelCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
+            super ( prefix, cache );
         }
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
@@ -292,8 +292,8 @@ public class TermTacletAppIndexCacheSet {
     ////////////////////////////////////////////////////////////////////////////
     
     private class BelowProgCache extends PrefixTermTacletAppIndexCacheImpl {
-        public BelowProgCache(ImmutableList<QuantifiableVariable> prefix) {
-            super ( prefix, cacheBackend );
+        public BelowProgCache(ImmutableList<QuantifiableVariable> prefix, Map<CacheKey, TermTacletAppIndex> cache) {
+            super ( prefix, cache );
         }
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {

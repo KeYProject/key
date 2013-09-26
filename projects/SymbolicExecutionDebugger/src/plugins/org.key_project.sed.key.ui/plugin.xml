@@ -220,10 +220,6 @@
             </enabledWhen>
          </handler>
          <handler
-               class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
-               commandId="org.key_project.sed.key.ui.addWatchpointCommand">
-         </handler>
-         <handler
                class="org.key_project.sed.key.ui.command.OpenProofHandler"
                commandId="org.key_project.sed.key.ui.openProofCommand">
             <enabledWhen>
@@ -254,6 +250,10 @@
                   </or>
                </iterate>
             </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.sed.key.ui.command.AddWatchpointHandler"
+               commandId="org.key_project.sed.key.ui.addWatchpointCommand">
          </handler>
       </extension>
    <extension

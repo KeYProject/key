@@ -245,7 +245,7 @@ public final class SymbolicExecutionUtil {
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(source.getServices().copy(profile));
+      InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -477,7 +477,7 @@ public final class SymbolicExecutionUtil {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
-      ProofStarter starter = new ProofStarter();
+      ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);

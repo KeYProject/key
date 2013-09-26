@@ -143,7 +143,7 @@ public class Proof implements Named {
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
-	this.services = services.copyProofSpecific(this);
+	this.services = services.copyProofSpecific(this, false);
         settingsListener =
                 new SettingsListener () {
                     @Override
@@ -209,8 +209,8 @@ public class Proof implements Named {
         setRoot(rootNode);
 
 	Goal firstGoal = new Goal(rootNode,
-                                  new RuleAppIndex(new TacletAppIndex(rules),
-						   new BuiltInRuleAppIndex(builtInRules)));
+                                  new RuleAppIndex(new TacletAppIndex(rules, services),
+						   new BuiltInRuleAppIndex(builtInRules), services));
 	openGoals = openGoals.prepend(firstGoal);
 
 	if (closed())

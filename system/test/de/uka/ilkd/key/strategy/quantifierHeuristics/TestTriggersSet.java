@@ -192,8 +192,8 @@ public class TestTriggersSet extends TestCase {
 		
 		proof = new Proof(TacletForTests.services());
 		g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
-				new RuleAppIndex(new TacletAppIndex(new TacletIndex()),
-						new BuiltInRuleAppIndex(new BuiltInRuleIndex())));
+				new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()),
+						new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
 		proof.setRoot(g.node());
 		proof.add(g);
 
