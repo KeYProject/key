@@ -75,6 +75,9 @@ public class TransformerFunction extends Function {
 
     public static boolean inTransformer(PosInOccurrence pio) {
         boolean trans = false;
+        if (pio == null) {
+            return false;
+        }
         if ( pio.posInTerm () != null ) {
             PIOPathIterator it = pio.iterator ();
             Operator        op;
