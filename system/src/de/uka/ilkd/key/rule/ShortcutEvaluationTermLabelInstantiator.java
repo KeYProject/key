@@ -71,7 +71,7 @@ public class ShortcutEvaluationTermLabelInstantiator implements ITermLabelWorker
             if (TransformerFunction.inTransformer(applicationPosInOccurrence)
                     && (t.name().equals(new Name("wd"))
                             || t.name().equals(new Name("WD")))) {
-             // keep ShortcutEvaluationTermLabel
+                // keep ShortcutEvaluationTermLabel
                 return Collections.<ITermLabel>singletonList(ShortcutEvaluationTermLabel.INSTANCE);
             }
         }

@@ -57,7 +57,7 @@ public class ImplicitSpecTermLabelInstantiator implements ITermLabelWorker {
                                               JavaBlock newTermJavaBlock) {
         if (tacletTerm != null
                 && tacletTerm.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
-                // keep ImplicitSpecTermLabel
+                // Keep ImplicitSpecTermLabel
             return Collections.<ITermLabel>singletonList(ImplicitSpecTermLabel.INSTANCE);
         } else {
             return null;
@@ -83,10 +83,6 @@ public class ImplicitSpecTermLabelInstantiator implements ITermLabelWorker {
                              Rule rule,
                              Goal goal,
                              List<ITermLabel> newLabels) {
-        // Remove label since it is only relevant before starting the proof
-        ITermLabel termLabel = getTermLabel(termToUpdate);
-        if (termLabel != null) {
-            newLabels.remove(termLabel);
-        }
+        // Keep ImplicitSpecTermLabel
     }
 }
