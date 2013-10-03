@@ -185,6 +185,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public Taclet createOperationTaclet(Services services) {
         final String prefix = WellDefinednessCheck.OP_TACLET;
+        final String bhv = getBehaviour().equals("") ? "" : (" " + getBehaviour());
+        final String id = " " + id();
         final IObserverFunction target = getTarget();
         final String tName = target.name().toString();
         final boolean isStatic = target.isStatic();
@@ -203,7 +205,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final Term wdArgs =
                 TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
                              services));
-        return createTaclet(prefix + (isStatic ? " Static " : " ") + tName,
+        return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + bhv + id,
                             TB.var(selfSV), TB.func(target, args),
                             TB.and(wdArgs, pre), isStatic || isConstructor, services);
     }
@@ -213,15 +215,15 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         if (getMethodContract().getName().contains("normal_behavior")) {
             return "";
         } else if (getMethodContract().getName().contains("exceptional_behavior")) {
-            return " (exc)";
+            return "exc";
         } else if (getMethodContract().getName().contains("model_behavior")) {
-            return " (model)";
+            return "model";
         } else if (getMethodContract().getName().contains("break_behavior")) {
-            return " (break)";
+            return "break";
         } else if (getMethodContract().getName().contains("continue_behavior")) {
-            return " (cont)";
+            return "cont";
         } else if (getMethodContract().getName().contains("return_behavior")) {
-            return " (return)";
+            return "return";
         } else {
             return "";
         }

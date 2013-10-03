@@ -930,7 +930,7 @@ public abstract class WellDefinednessCheck implements Contract {
                (isModel() ? "model " : "") +
                typeString() +
                (type() != Type.CLASS_INVARIANT ? (" " + id) : "") +
-               getBehaviour();
+               (getBehaviour().equals("") ? "" : " (" + getBehaviour() + ")");
     }
 
     @Override
