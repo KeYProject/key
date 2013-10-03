@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
@@ -157,17 +158,26 @@ public abstract class AbstractPO implements IPersistablePO {
      * WD(pv.<inv>) or WD(pv.m(...)).
      */
     void generateWdTaclets() {
-        ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
                 // WD(pv.m(...))
-                res = res.add(mwd.createOperationTaclet(services));
+                RewriteTaclet mwdTaclet = mwd.createOperationTaclet(services);
+                if (res.contains(mwdTaclet)) {
+                    for(RewriteTaclet t: res) {
+                        if (t.name().equals(mwdTaclet.name())) {
+                            res = res.remove(t);
+                            mwdTaclet = mwd.combineTaclets(t, mwdTaclet, services);
+                        }
+                    }
+                }
+                res = res.add(mwdTaclet);
             }
         }
         // WD(pv.<inv>)
         res = res.union(ClassWellDefinedness.createInvTaclet(services));
-        for (Taclet t: res) {
+        for (RewriteTaclet t: res) {
             register(t);
         }
     }

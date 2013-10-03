@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
 /**
@@ -71,7 +72,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return super.getRest();
     }
 
-    public static ImmutableSet<Taclet> createInvTaclet(Services services) {
+    public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -88,12 +89,12 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term wellFormed = TB.wellFormed(TB.var(heapSV), services);
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
-        final Taclet inv =
+        final RewriteTaclet inv =
                 WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
-        final Taclet staticInv =
+        final RewriteTaclet staticInv =
                 WellDefinednessCheck.createTaclet(prefix + "_Static", var, staticInvTerm,
                                                   staticPre, true, services);
-        return DefaultImmutableSet.<Taclet>nil().add(inv).add(staticInv);
+        return DefaultImmutableSet.<RewriteTaclet>nil().add(inv).add(staticInv);
     }
 
     public ClassInvariant getInvariant() {

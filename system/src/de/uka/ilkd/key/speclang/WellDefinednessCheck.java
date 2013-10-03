@@ -37,14 +37,15 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TransformerFunction;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
@@ -115,13 +116,6 @@ public abstract class WellDefinednessCheck implements Contract {
     //-------------------------------------------------------------------------
     // Internal Methods
     //-------------------------------------------------------------------------
-
-    private Condition split(Term spec) {
-        Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(spec);
-        ImmutableList<Term> implicit = p.first;
-        ImmutableList<Term> explicit   = p.second;
-        return new Condition(TB.andSC(implicit), TB.andSC(explicit));
-    }
 
     private static Pair<ImmutableList<Term>, ImmutableList<Term>> splitRecursively(Term spec) {
         assert spec != null;
@@ -315,8 +309,11 @@ public abstract class WellDefinednessCheck implements Contract {
         return result;
     }
 
-    public final Term replace(Term t, Variables vars) {
-        return replace(t, vars, this);
+    private Condition split(Term spec) {
+        Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(spec);
+        ImmutableList<Term> implicit = p.first;
+        ImmutableList<Term> explicit   = p.second;
+        return new Condition(TB.andSC(implicit), TB.andSC(explicit));
     }
 
     private Condition replace(Condition pre, OriginalVariables newVars) {
@@ -568,12 +565,60 @@ public abstract class WellDefinednessCheck implements Contract {
         return new TermListAndFunc(resList, mbyAtPreDef.func);
     }
 
+    final static RewriteTaclet createTaclet(String name,
+                                            Term find1,
+                                            Term find2,
+                                            Term goal1,
+                                            Term goal2,
+                                            Services services) {
+        assert find1.op().name().equals(TransformerFunction.wdAny(services).name());
+        assert find2.op().name().equals(TransformerFunction.wdAny(services).name());
+        assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
+        assert find1.sub(0).arity() == find2.sub(0).arity();
+
+        Map<ParsableVariable, ParsableVariable> map =
+                new LinkedHashMap<ParsableVariable, ParsableVariable>();
+        int i = 0;
+        for (Term sub: find1.sub(0).subs()) {
+            map.put((ParsableVariable)find2.sub(0).sub(i).op(), (ParsableVariable)sub.op());
+            i++;
+        }
+        final OpReplacer or = new OpReplacer(map);
+        final Term goal = TB.or(goal1, or.replace(goal2));
+        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        tb.setFind(find1);
+        tb.setName(MiscTools.toValidTacletName(name));
+        tb.addRuleSet(new RuleSet(new Name("simplify")));
+        tb.addGoalTerm(goal);
+        return (RewriteTaclet) tb.getTaclet();
+    }
+
+    final static RewriteTaclet createTaclet(String name,
+                                            Term callee,
+                                            Term callTerm,
+                                            Term pre,
+                                            boolean isStatic,
+                                            Services services) {
+        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        final Term notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL(services)));
+        final Term created = isStatic ? TB.tt() : TB.created(services, callee);
+        tb.setFind(TB.wd(callTerm, services));
+        tb.setName(MiscTools.toValidTacletName(name));
+        tb.addRuleSet(new RuleSet(new Name("simplify")));
+        tb.addGoalTerm(TB.andSC(notNull, created, pre));
+        return (RewriteTaclet) tb.getTaclet();
+    }
+
     abstract TermAndFunc generateMbyAtPreDef(ParsableVariable self,
                                              ImmutableList<ParsableVariable> params,
                                              Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars, this);
+    }
+
+    final Term replace(Term t, Variables vars) {
+        return replace(t, vars, this);
     }
 
     final Condition replaceSV(Condition pre, SchemaVariable self,
@@ -718,24 +763,6 @@ public abstract class WellDefinednessCheck implements Contract {
             throw new RuntimeException("The setting for the wdProofs-option is not valid: "
                     + setting);
         }
-    }
-
-    public final static Taclet createTaclet(String name,
-                                            Term callee,
-                                            Term callTerm,
-                                            Term pre,
-                                            boolean isStatic,
-                                            Services services) {
-        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        final Term notNull = isStatic ?
-                TB.tt() : TB.not(TB.equals(callee, TB.NULL(services)));
-        final Term created = isStatic ?
-                TB.tt() : TB.created(services, callee);
-        tb.setFind(TB.wd(callTerm, services));
-        tb.setName(MiscTools.toValidTacletName(name));
-        tb.addRuleSet(new RuleSet(new Name("simplify")));
-        tb.addGoalTerm(TB.andSC(notNull, created, pre));
-        return tb.getTaclet();
     }
 
     /** collects terms for precondition,

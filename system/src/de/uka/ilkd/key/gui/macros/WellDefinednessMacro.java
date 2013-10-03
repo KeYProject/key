@@ -95,8 +95,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(name.startsWith(WD_PREFIX)
-                    && !name.startsWith(WellDefinednessCheck.OP_TACLET)) {
+            if(name.startsWith(WD_PREFIX)) {
                 return LongRuleAppCost.ZERO_COST;
             } else {
                 return TopRuleAppCost.INSTANCE;

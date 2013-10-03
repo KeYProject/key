@@ -28,7 +28,8 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 /**
  * A contract for checking the well-definedness of a specification for a method or model field.
@@ -183,10 +184,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return this.contract;
     }
 
-    public Taclet createOperationTaclet(Services services) {
+    public RewriteTaclet createOperationTaclet(Services services) {
         final String prefix = WellDefinednessCheck.OP_TACLET;
-        final String bhv = getBehaviour().equals("") ? "" : (" " + getBehaviour());
-        final String id = " " + id();
         final IObserverFunction target = getTarget();
         final String tName = target.name().toString();
         final boolean isStatic = target.isStatic();
@@ -198,16 +197,28 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final SchemaVariable selfSV =
                 SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
-
+        String ps = "";
+        for (ParsableVariable pv: paramsSV) {
+            ps = ps + " " + pv.sort();
+        }
         final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
                                 selfSV, heapSV, paramsSV, true, services).term;
         final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
         final Term wdArgs =
                 TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
                              services));
-        return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + bhv + id,
+        return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                             TB.var(selfSV), TB.func(target, args),
                             TB.and(wdArgs, pre), isStatic || isConstructor, services);
+    }
+
+    public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, Services services) {
+        assert t1.goalTemplates().size() == 1;
+        assert t2.goalTemplates().size() == 1;
+        final RewriteTacletGoalTemplate g1 = (RewriteTacletGoalTemplate)t1.goalTemplates().head();
+        final RewriteTacletGoalTemplate g2 = (RewriteTacletGoalTemplate)t2.goalTemplates().head();
+        return createTaclet(t1.name().toString(), t1.find(), t2.find(),
+                            g1.replaceWith(), g2.replaceWith(), services);
     }
 
     @Override
