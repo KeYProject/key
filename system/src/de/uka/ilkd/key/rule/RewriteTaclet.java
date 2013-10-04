@@ -261,7 +261,7 @@ public final class RewriteTaclet extends FindTaclet {
 
 	with = syntacticalReplace(with, services, mc, posOfFind);
 	with = TermBuilder.DF.label(with, term.getLabels());
-
+	// FIXME: Labeling should be done by somehow using {@link label.ITermLabelWorker}
 
 	if(!with.sort().extendsTrans(maxSort)) {
 	    with = TermBuilder.DF.cast(services, maxSort, with);
@@ -280,13 +280,13 @@ public final class RewriteTaclet extends FindTaclet {
 	IntIterator it = posOfFind.posInTerm().iterator();
 	Term rwTemplate=gt.replaceWith();
 
-	Term formula = replace(term, 
-		       	       rwTemplate, 
-		       	       posOfFind,
-		       	       it, 
-		       	       services, 
-		       	       matchCond, 
-		       	       term.sort());
+	Term formula = replace(term,
+	                       rwTemplate,
+	                       posOfFind,
+	                       it,
+	                       services,
+	                       matchCond,
+	                       term.sort());
 	if(term == formula) {
 	    return posOfFind.constrainedFormula();
 	} else {
@@ -303,9 +303,9 @@ public final class RewriteTaclet extends FindTaclet {
 	assert app.complete();
 	RewriteTacletGoalTemplate gt 
 		= (RewriteTacletGoalTemplate) goalTemplates().head();
-	return applyReplacewithHelper(gt, 
-				      app.posInOccurrence(), 
-				      services, 
+	return applyReplacewithHelper(gt,
+				      app.posInOccurrence(),
+				      services,
 				      app.matchConditions());
     }
 
@@ -325,11 +325,11 @@ public final class RewriteTaclet extends FindTaclet {
 				    Services           services,
 				    MatchConditions    matchCond) {
 	if ( gt instanceof RewriteTacletGoalTemplate ) {
-            SequentFormula cf 
-            	= applyReplacewithHelper((RewriteTacletGoalTemplate)gt, 
-        	    			         posOfFind, 
-        	    			         services, 
-        	    			         matchCond);
+            SequentFormula cf
+                = applyReplacewithHelper((RewriteTacletGoalTemplate)gt,
+                                         posOfFind,
+                                         services,
+                                         matchCond);
 
             goal.changeFormula ( cf, posOfFind );
 	} else {
