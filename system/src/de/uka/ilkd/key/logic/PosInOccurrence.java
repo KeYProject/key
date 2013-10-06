@@ -67,7 +67,7 @@ public final class PosInOccurrence {
         } else if (constrainedFormula() != null) {
             return constrainedFormula().hashCode() * 13;
         } else if (posInTerm() != null) {
-            return constrainedFormula().hashCode() * 13;
+            return posInTerm().hashCode();
         } else {
             return 0;
         }

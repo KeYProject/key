@@ -260,7 +260,7 @@ public final class RewriteTaclet extends FindTaclet {
 	}
 
 	with = syntacticalReplace(with, services, mc, posOfFind);
-	with = TermBuilder.DF.label(with, term.getLabels());
+	//with = TermBuilder.DF.label(with, term.getLabels());
 	// FIXME: Labeling should be done by somehow using {@link label.ITermLabelWorker}
 
 	if(!with.sort().extendsTrans(maxSort)) {
