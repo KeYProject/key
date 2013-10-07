@@ -54,7 +54,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     SequentFormula generateSequent(SequentTerms seq, Services services) {
-        // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(ppost)))
+        // wd(pre) & (pre & wf(anon) -> wd(mod) & {anon^mod}(wd(post)))
         final Term imp = TB.imp(TB.and(seq.pre, seq.wfAnon),
                                 TB.and(seq.wdMod, seq.anonWdPost));
         final Term wdPre = TB.wd(seq.pre, services);

@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * A contract for checking the well-definedness of a specification for a class invariant.
@@ -54,7 +53,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         assert inv != null;
         this.inv = inv;
         setRequires(inv.getOriginalInv());
-        setAssignable(TB.empty(services), services);
+        setAssignable(TB.ff(), services);
         setEnsures(inv.getOriginalInv());
         setAccessible(accessible);
         setMby(mby);

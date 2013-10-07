@@ -651,10 +651,20 @@ public abstract class WellDefinednessCheck implements Contract {
         this.assignable = ass;
         if (ass.equals(TB.ff()) || ass.equals(TB.FALSE(services))
                 || ass == null || ass.op().equals(BooleanLiteral.FALSE)) {
-            this.assignable = TB.empty(services);
+            this.assignable = TB.ff();
         } else if (ass.equals(TB.tt()) || ass.equals(TB.TRUE(services))
                 || ass.op().equals(BooleanLiteral.TRUE)) {
             this.assignable = TB.allLocs(services);
+        }
+    }
+
+    final void combineAssignable(Term ass1, Term ass2, Services services) {
+        if (ass1 == null || ass1.equals(TB.ff())) {
+            setAssignable(ass2, services);
+        } else if(ass2 == null || ass2.equals(TB.ff())) {
+            setAssignable(ass1, services);
+        } else {
+            setAssignable(TB.union(services, ass1, ass2), services);
         }
     }
 
@@ -722,7 +732,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         if (this.getAssignable() != null && wdc.getAssignable() != null) {
             final Term ass = wdc.replace(wdc.getAssignable(), this.getOrigVars());
-            setAssignable(TB.union(services, ass, this.getAssignable()), services);
+            combineAssignable(ass, this.getAssignable(), services);
         } else if (wdc.getAssignable() != null) {
             final Term ass = wdc.replace(wdc.getAssignable(), this.getOrigVars());
             setAssignable(ass, services);
@@ -828,7 +838,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
         assert mod != null;
-        final Term havocUpd = !mod.equals(TB.empty(services)) ?
+        final Term havocUpd = !mod.equals(TB.ff()) ?
                 TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap))
                 : TB.skip();
         final Term oldUpd = heapAtPre != heap ?

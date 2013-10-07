@@ -86,7 +86,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
-        setAssignable(TB.empty(services), services);
+        setAssignable(TB.ff(), services);
         setAccessible(contract.getAccessible(h),
                       hPre != null ? contract.getAccessible(hPre) : null,
                       services);
@@ -207,6 +207,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final Term wdArgs =
                 TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
                              services));
+        // Add filter for contracts throwing exceptions
         return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                             TB.var(selfSV), TB.func(target, args),
                             TB.and(wdArgs, pre), isStatic || isConstructor, services);
