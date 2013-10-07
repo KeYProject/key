@@ -1,11 +1,16 @@
 package de.uka.ilkd.key.symbolic_execution.profile;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelInstantiator;
+import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
@@ -42,6 +47,28 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * Constructor.
     */
    public SymbolicExecutionJavaProfile() {
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ImmutableList<ITermLabelWorker> computeLabelInstantiators() {
+      ImmutableList<ITermLabelWorker> result = super.computeLabelInstantiators();
+      result = result.prepend(getSymbolicExecutionLabelInstantiators());
+      return result;
+   }
+   
+   /**
+    * Returns the special {@link ITermLabelWorker} used for symbolic execution-
+    * @return The special {@link ITermLabelWorker} used for symbolic execution-
+    */
+   public static ImmutableList<ITermLabelWorker> getSymbolicExecutionLabelInstantiators() {
+      ImmutableList<ITermLabelWorker> result = ImmutableSLList.nil();
+      result = result.prepend(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+      result = result.prepend(LoopBodyTermLabelInstantiator.INSTANCE);
+      result = result.prepend(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
+      return result;
    }
    
    /**
