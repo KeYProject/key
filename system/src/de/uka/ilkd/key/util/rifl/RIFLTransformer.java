@@ -67,7 +67,7 @@ public class RIFLTransformer {
      * Entry point for the stand-alone RIFL to JML* tool.
      */
     public static void main(String[] args) {
-        if (args.length < 2 || "--help".equals(args[0]) {
+        if (args.length < 2 || "--help".equals(args[0])) {
             System.out.println("This is the RIFL to JML* transformer.");
             System.out.println("Usage: <RIFL file> <Java sources>");
         } else {

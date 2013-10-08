@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.uti.rifl;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -35,8 +37,7 @@ public class SecurityLattice {
      * @param name name of the new domain (must not be "top" or "bottom")
      * @return the new domain
      */
-    SecurityDomain addDomain(String name) 
-        throws IllegalArgumentException {
+    SecurityDomain addDomain(String name) {
         if (TOP.equals(name) || BOTTOM.equals(name))
             throw new IllegalArgumentException("Cannot create domain with reserved name "+name);
         SecurityDomain d = new SecurityDomain(name);
@@ -50,8 +51,7 @@ public class SecurityLattice {
      * Refine the lattice by declaring a sub-domain relation between two domains.
      * This checks whether the domains are already in the lattice and that the lattice is still acyclic.
      */
-    void putSubDomain(SecurityDomain sup, SecurityDomain sub) 
-	throws IllegalArgumentException {
+    void putSubDomain(SecurityDomain sup, SecurityDomain sub) {
         if (sup == top || sub == bottom) return; // safely ignore this
         if ( ! hash.contains(sup))
             throw new IllegalArgumentException("Security domain "+sup+" must be added to the lattice first.");
@@ -97,7 +97,7 @@ public class SecurityLattice {
         /**
          * Returns whether this domain is strictly lower in the hierarchy than the other one.
          */
-        public boolean isSubDomain(Security Domain other) {
+        public boolean isSubDomain(SecurityDomain other) {
             if (other == this) return false;
             for (SecurityDomain sup: superDomains) {
                 if (sup == other || sup.isSubDomain(other)) return true;
