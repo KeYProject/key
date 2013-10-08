@@ -336,6 +336,20 @@ public abstract class Notation {
 	}
     }
     
+    /**
+     * The standard concrete syntax for select.
+     */
+    public static final class StoreNotation extends Notation {
+        public StoreNotation() {
+            super(140);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printStore(t);
+        }
+    }
+    
+    
     
     /**
      * The standard concrete syntax for length.

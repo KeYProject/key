@@ -271,6 +271,7 @@ public final class NotationInfo {
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());

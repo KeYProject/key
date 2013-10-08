@@ -890,7 +890,7 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        layouter.beginC().print("<<");
+        layouter.beginC().print("\u00ab"); //  ("<<");
         boolean afterFirst = false;
         for (ITermLabel l : t.getLabels()) {
             if (afterFirst) {
@@ -911,7 +911,7 @@ public final class LogicPrinter {
                layouter.end().print(")");
             }
         }
-        layouter.end().print(">>");
+        layouter.end().print("\u00bb"); // (">>");
     }
 
     /**
@@ -1029,6 +1029,92 @@ public final class LogicPrinter {
         maybeParens(t.sub(0), ass);
     }
     
+    public void printStore(Term t) throws IOException {
+        assert t.boundVars().isEmpty();            
+        assert t.arity() == 4;
+        
+        final HeapLDT heapLDT = services == null 
+                ? null 
+                : services.getTypeConverter().getHeapLDT();
+        
+        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+            startTerm(4);
+            
+            final Term heapTerm = t.sub(0);
+            final Term objectTerm = t.sub(1);
+            final Term fieldTerm  = t.sub(2);
+            final Term valueTerm  = t.sub(3);
+            
+            markStartSub();
+            printTerm(heapTerm);
+            markEndSub();
+            
+            layouter.print("["); // ("\u27E6");
+
+            if(objectTerm.equals(TermBuilder.DF.NULL(services))
+                    && fieldTerm.op() instanceof Function
+                    && ((Function)fieldTerm.op()).isUnique()) {
+
+                String className = heapLDT.getClassName((Function)fieldTerm.op());
+
+                if(className == null) {
+                    markStartSub();
+                    printTerm(objectTerm);
+                    markEndSub();
+                } else {
+                    markStartSub();
+                    // "null" not printed
+                    markEndSub();
+                    layouter.print(className);
+                }
+
+                layouter.print(".");
+
+                markStartSub();
+                startTerm(0);                    
+                printTerm(fieldTerm);
+                markEndSub();                    
+            } else if(fieldTerm.arity() == 0) {
+                markStartSub();
+                printTerm(objectTerm);
+                markEndSub();
+
+                layouter.print(".");
+
+                markStartSub();
+                startTerm(0);                    
+                printTerm(fieldTerm);
+                markEndSub();                    
+            } else if(fieldTerm.op() == heapLDT.getArr()) {
+                markStartSub();
+                printTerm(objectTerm);
+                markEndSub();
+
+                layouter.print("[");
+
+                markStartSub();
+                startTerm(1);
+                markStartSub();
+                printTerm(fieldTerm.sub(0));
+                markEndSub();
+                markEndSub();
+
+                layouter.print("]");
+            } else {
+                printFunctionTerm(t.op().name().toString(), t);
+            }
+            
+            layouter.print(" := ");
+            markStartSub();
+            printTerm(valueTerm);
+            markEndSub();
+
+            layouter.print("]"); //("\u27e7");
+
+        } else {
+            printFunctionTerm(t.op().name().toString(), t);
+        }
+    }
     
     public void printSelect(Term t) throws IOException {
         assert t.boundVars().isEmpty();            
@@ -1053,8 +1139,8 @@ public final class LogicPrinter {
                 layouter.print("[");
             } else {
                 markStartSub();
-            //heap not printed
-            markEndSub();
+                //heap not printed
+                markEndSub();
             }
 
             if(objectTerm.equals(TermBuilder.DF.NULL(services))
