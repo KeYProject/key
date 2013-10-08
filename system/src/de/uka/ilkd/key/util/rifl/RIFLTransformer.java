@@ -196,15 +196,13 @@ public class RIFLTransformer {
     private void doTransform(final String riflFilename, String source, String savePath)
             throws IOException, SAXException, ParserException {
 
-        // step 1: parse RIFL file
+        // step 1a: parse RIFL file
         final Runnable r = new Runnable () {
              public void run() {
                  System.out.println("[RIFL] start RIFL reader"); // XXX
                  try {
                      sc = readRIFL(riflFilename);
-                 } catch (IOException e) {
-                     threadExc = e;
-                 } catch (SAXException e) {
+                 } catch (Exception e) {
                      threadExc = e;
                  } finally {
                      System.out.println("[RIFL] finished RIFL reader"); // XXX
@@ -214,16 +212,14 @@ public class RIFLTransformer {
         final Thread riflReader = new Thread(r,"RIFLReader");
         riflReader.start();
 
-        // step 2: parse Java source
+        // step 1b: parse Java source
         final String javaRoot = getBaseDirPath(source);
         final Runnable t = new Runnable() {
             public void run() {
                 System.out.println("[RIFL] start Java reader"); // XXX
                 try {
                     readJava(javaRoot);
-                } catch (IOException e) {
-                    threadExc = e;
-                } catch (ParserException e) {
+                } catch (Exception e) {
                     threadExc = e;
                 } finally {
                     System.out.println("[RIFL] finished Java reader"); // XXX
@@ -236,18 +232,16 @@ public class RIFLTransformer {
         // synchronize
         while (riflReader.isAlive() || javaReader.isAlive()) {}
         // promote exceptions
-        if (threadExc instanceof IOException) throw (IOException) threadExc;
-        if (threadExc instanceof ParserException) throw (ParserException) threadExc;
-        if (threadExc instanceof SAXException) throw (SAXException) threadExc;
+        if (threadExc != null) throw threadExc;
 
 
-        // step 3: inject specifications
+        // step 2: inject specifications
         for (final CompilationUnit cu : javaCUs.keySet()) {
             final SpecificationInjector si = new SpecificationInjector(sc,JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
         }
 
-        // step 4: write modified Java files
+        // step 3: write modified Java files
         ensureTargetDirExists(savePath);
         for (final Pair<CompilationUnit,String> javaUnit: javaCUs) {
             // TODO: javaCus contains absolute path, strip it

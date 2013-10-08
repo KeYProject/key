@@ -46,8 +46,8 @@ public class SpecificationInjector extends SourceVisitor {
         private static final String DEFAULT_KEY = "";
         private static final String RESULT = "\\result";
         private static final String RESPECTS = "separates";
-        private static final String JML_END = "@*/";
-        private static final String JML_START = "/*@ ";
+        private static final String JML_END = "@*/\n";
+        private static final String JML_START = "\n/*@ ";
 
         private final String indentation;
         private final Map<String, List<String>> respects = new HashMap<String, List<String>>();
