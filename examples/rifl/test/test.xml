@@ -1,0 +1,5 @@
+<sources>
+  <field name="x" class="Test" />
+  <returnvalue methodname="foo()" class="Test" />
+  <returnvalue methodname="getFoo()" class="Foo" />
+</sources>
