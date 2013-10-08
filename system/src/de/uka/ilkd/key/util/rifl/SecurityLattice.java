@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.uti.rifl;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -38,9 +36,9 @@ public class SecurityLattice {
      * @return the new domain
      */
     SecurityDomain addDomain(String name) {
-        if (TOP.equals(name) || BOTTOM.equals(name))
-            throw new IllegalArgumentException("Cannot create domain with reserved name "+name);
-        SecurityDomain d = new SecurityDomain(name);
+        SecurityDomain d = new SecurityDomain(name.intern());
+        if (hash.contains(d))
+            throw new IllegalArgumentException("Domain already in lattice (names must be unique)");
         d.putSubDomain(bottom);
         top.putSubDomain(d);
         hash.add(d);
@@ -69,13 +67,13 @@ public class SecurityLattice {
     public final class SecurityDomain {
 
         private final String name;
-        private List<SecurityDomain> superDomains;
-        private List<SecurityDomain> subDomains;
+        private Set<SecurityDomain> superDomains;
+        private Set<SecurityDomain> subDomains;
 
         private SecurityDomain(String name) {
             this.name = name;
-            superDomains = new ArrayList<SecurityDomain>();
-            subDomains = new ArrayList<SecurityDomain>();
+            superDomains = new HashSet<SecurityDomain>();
+            subDomains = new HashSet<SecurityDomain>();
         }
 
         private void putSubDomain(SecurityDomain sub) {
@@ -107,5 +105,9 @@ public class SecurityLattice {
 
         @Override
         public String toString () { return name; }
+
+        // ensures unique names
+        @Override
+        public int hashCode () { return name.hashCode(); }
     }
 }
