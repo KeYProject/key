@@ -186,12 +186,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     public RewriteTaclet createOperationTaclet(Services services) {
-        final String prefix = WellDefinednessCheck.OP_TACLET;
+        final String prefix;
         final IObserverFunction target = getTarget();
         final String tName = target.name().toString();
         final boolean isStatic = target.isStatic();
-        final boolean isConstructor =
-                target instanceof IProgramMethod && ((IProgramMethod)target).isConstructor();
         final LocationVariable heap = getHeap();
         final SchemaVariable heapSV =
                 SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
@@ -202,15 +200,24 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         for (ParsableVariable pv: paramsSV) {
             ps = ps + " " + pv.sort();
         }
-        final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
-                                selfSV, heapSV, paramsSV, true, services).term;
         final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
-        final Term wdArgs =
-                TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
-                             services));
-        return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
-                            TB.var(selfSV), TB.func(target, args),
-                            TB.and(wdArgs, pre), isStatic || isConstructor, services);
+        if (isNormal() /*&& isPure() TODO: Necessary?*/) {
+            prefix = WellDefinednessCheck.OP_TACLET;
+            final boolean isConstructor =
+                    target instanceof IProgramMethod && ((IProgramMethod)target).isConstructor();
+            final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV),
+                                    selfSV, heapSV, paramsSV, true, services).term;
+            final Term wdArgs =
+                    TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
+                                 services));
+            return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
+                                TB.var(selfSV), TB.func(target, args),
+                                TB.and(wdArgs, pre), isStatic || isConstructor, services);
+        } else {
+            prefix = WellDefinednessCheck.OP_EXC_TACLET;
+            return createExcTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
+                                   TB.func(target, args), services);
+        }
     }
 
     public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, Services services) {

@@ -66,6 +66,7 @@ public abstract class WellDefinednessCheck implements Contract {
     protected static final TermFactory TF = TermFactory.DEFAULT;
     public static final String INV_TACLET = "wd_Invariant";
     public static final String OP_TACLET = "wd_Operation";
+    public static final String OP_EXC_TACLET = "wd_Exc_Operation";
 
     static enum Type {
         CLASS_INVARIANT, CLASS_AXIOM, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
@@ -606,6 +607,17 @@ public abstract class WellDefinednessCheck implements Contract {
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
         tb.addGoalTerm(TB.andSC(notNull, created, pre));
+        return (RewriteTaclet) tb.getTaclet();
+    }
+
+    final static RewriteTaclet createExcTaclet(String name,
+                                               Term callTerm,
+                                               Services services) {
+        final RewriteTacletBuilder tb = new RewriteTacletBuilder();
+        tb.setFind(TB.wd(callTerm, services));
+        tb.setName(MiscTools.toValidTacletName(name));
+        tb.addRuleSet(new RuleSet(new Name("simplify")));
+        tb.addGoalTerm(TB.ff());
         return (RewriteTaclet) tb.getTaclet();
     }
 

@@ -160,9 +160,7 @@ public abstract class AbstractPO implements IPersistablePO {
     void generateWdTaclets() {
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
-            if (ch instanceof MethodWellDefinedness
-                    //&& ((MethodWellDefinedness) ch).isPure() TODO: Necessary?
-                    && ((MethodWellDefinedness) ch).isNormal()) {
+            if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
                 // WD(pv.m(...))
                 RewriteTaclet mwdTaclet = mwd.createOperationTaclet(services);
