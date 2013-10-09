@@ -49,7 +49,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public int hashCode() {
-            return 3976 * (inPackage + inClass).hashCode() + name.hashCode();
+            return 3977 * (inPackage + inClass).hashCode() + name.hashCode();
         }
 
         @Override
@@ -108,7 +108,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public int hashCode() {
-            return 3668 * (inPackage + inClass).hashCode() + 46
+            return 3661 * (inPackage + inClass).hashCode() + 37
                     * (methodName.hashCode() + paramTypes.hashCode())
                     + position;
         }
@@ -123,7 +123,8 @@ public abstract class SpecificationEntity {
                 sb.append(p);
                 sb.append(',');
             }
-            sb.deleteCharAt(sb.length());
+            sb.deleteCharAt(sb.length()-1);
+            sb.append(')');
             return sb.toString();
         }
     }
@@ -173,7 +174,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public int hashCode() {
-            return 3722 * (inPackage + inClass).hashCode() + 76
+            return 3721 * (inPackage + inClass).hashCode() + 79
                     * methodName.hashCode() + paramTypes.hashCode();
         }
 
@@ -187,7 +188,8 @@ public abstract class SpecificationEntity {
                 sb.append(p);
                 sb.append(',');
             }
-            sb.deleteCharAt(sb.length());
+            sb.deleteCharAt(sb.length()-1);
+            sb.append(')');
             return sb.toString();
         }
     }

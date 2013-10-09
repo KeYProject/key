@@ -202,6 +202,8 @@ public class RIFLTransformer {
                  System.out.println("[RIFL] start RIFL reader"); // XXX
                  try {
                      sc = readRIFL(riflFilename);
+                     // debug
+                     System.out.println(sc);
                  } catch (Exception e) {
                      threadExc = e;
                  } finally {
@@ -232,7 +234,10 @@ public class RIFLTransformer {
         // synchronize
         while (riflReader.isAlive() || javaReader.isAlive()) {}
         // promote exceptions
-        if (threadExc != null) throw threadExc;
+        if (threadExc instanceof RuntimeException) throw (RuntimeException)threadExc;
+        if (threadExc instanceof IOException) throw (IOException)threadExc;
+        if (threadExc instanceof SAXException) throw (SAXException)threadExc;
+        if (threadExc instanceof ParserException) throw (ParserException)threadExc;
 
 
         // step 2: inject specifications

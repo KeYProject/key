@@ -64,6 +64,12 @@ public class SecurityLattice {
     public SecurityDomain bottom() { return bottom; }
     public boolean contains(SecurityDomain d) { return hash.contains(d); }
 
+
+    /**
+     * The kind of elements to the security lattice.
+     * Keeps track of <i>direct</i> super- and sub-elements.
+     * Instances are mutable, but only by the lattice owning it.
+     */
     public final class SecurityDomain {
 
         private final String name;
@@ -84,6 +90,7 @@ public class SecurityLattice {
         /**
          * Returns whether this domain is strictly higher in the hierarchy than the other one.
          */
+        // TODO: do we really want strict super-elemets??
         public boolean isSuperDomain(SecurityDomain other) {
             if (other == this) return false;
             for (SecurityDomain sub: subDomains) {

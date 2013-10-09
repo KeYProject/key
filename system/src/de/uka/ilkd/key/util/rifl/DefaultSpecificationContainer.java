@@ -17,9 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.util.rifl.SpecificationEntity.Field;
-import de.uka.ilkd.key.util.rifl.SpecificationEntity.Parameter;
-import de.uka.ilkd.key.util.rifl.SpecificationEntity.ReturnValue;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
 
 /**
  * Default implementation of {@link SpecificationContainer}.
@@ -34,6 +32,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 
     public DefaultSpecificationContainer(
             Map<SpecificationEntity, String> domainAssignments) {
+        // TODO: this copying is ugly and inefficient
         for (final Entry<SpecificationEntity, String> e : domainAssignments
                 .entrySet()) {
             if (e.getKey() instanceof Field)
@@ -43,6 +42,13 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
             else if (e.getKey() instanceof ReturnValue)
                 return2domain.put((ReturnValue) e.getKey(), e.getValue());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Fields: " + field2domain
+            + "\nParameters: " + param2domain
+            + "\nReturns: " + return2domain;
     }
 
     private String[] extractParamTypes(

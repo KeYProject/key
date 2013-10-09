@@ -43,11 +43,11 @@ public class SpecificationInjector extends SourceVisitor {
     private static class JMLFactory {
 
         private static final String DEFAULT_INDENTATION = "  ";
-        private static final String DEFAULT_KEY = "";
+        private static final String DEFAULT_KEY = "low";
         private static final String RESULT = "\\result";
         private static final String RESPECTS = "separates";
         private static final String JML_END = "@*/\n";
-        private static final String JML_START = "\n/*@ ";
+        private static final String JML_START = "\n"+DEFAULT_INDENTATION+"/*@ ";
 
         private final String indentation;
         private final Map<String, List<String>> respects = new HashMap<String, List<String>>();
