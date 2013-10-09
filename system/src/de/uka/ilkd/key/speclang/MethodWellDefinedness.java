@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 
 /**
  * A contract for checking the well-definedness of a specification for a method or model field.
@@ -207,7 +208,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final Term wdArgs =
                 TB.and(TB.wd(getArgs(selfSV, heapSV, isStatic || isConstructor, paramsSV),
                              services));
-        // Add filter for contracts throwing exceptions
         return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                             TB.var(selfSV), TB.func(target, args),
                             TB.and(wdArgs, pre), isStatic || isConstructor, services);
@@ -239,6 +239,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Used to determine if the contract of this method has normal behaviour or is a model field
+     * or contract and can thus be invoked in a specification for pure methods.
+     * @return true for either normal or model behaviour
+     */
+    public boolean isNormal() {
+        return getMethodContract().getName().contains("normal_behavior")
+                || isModel();
+    }
+
+    /**
+     * Tells whether the method is pure (including model fields and model methods in this case) or not.
+     * @return true for pure and model methods (and fields)
+     */
+    public boolean isPure() {
+        return (getTarget() instanceof IProgramMethod
+                && JMLInfoExtractor.isPure((IProgramMethod)getTarget()))
+                || isModel();
     }
 
     @Override
