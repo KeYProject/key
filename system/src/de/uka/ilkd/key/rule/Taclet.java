@@ -14,8 +14,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -25,8 +23,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.LabelSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -54,9 +50,9 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.label.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
@@ -862,35 +858,13 @@ public abstract class Taclet implements Rule, Named {
 	                                  mc.getInstantiations(),
 	                                  new TermLabelWorkerManagement(
 	                                          applicationPosInOccurrence, this,
-	                                          getLabelInstantiators(services)));
+	                                          TermLabelWorkerManagement
+	                                          .getLabelInstantiators(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
     }
     
-    /**
-     * Returns the {@link ITermLabelWorker} to use.
-     * @param services The {@link Services} to extract {@link ITermLabelWorker} from.
-     * @return The {@link ITermLabelWorker} to use or {@code null} if no {@link ITermLabelWorker} are available.
-     */
-    protected ImmutableList<ITermLabelWorker> getLabelInstantiators(Services services) {
-       ImmutableList<ITermLabelWorker> result = null;
-       if (services != null) {
-          Proof proof = services.getProof();
-          if (proof != null) {
-             ProofSettings settings = proof.getSettings();
-             if (settings != null) {
-                LabelSettings labelSettings = settings.getLabelSettings();
-                if (labelSettings != null) {
-                   result = labelSettings.getLabelInstantiators();
-                }
-             }
-          }
-       }
-       return result;
-    }
-    
-
     /**
      * adds SequentFormula to antecedent or succedent depending on
      * position information or the boolean antec 

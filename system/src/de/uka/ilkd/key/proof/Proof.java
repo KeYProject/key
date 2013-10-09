@@ -50,13 +50,10 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.ShortcutEvaluationTermLabelInstantiator;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
@@ -152,19 +149,6 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
-
-        // Make sure that required label works are present
-        ImmutableList<ITermLabelWorker> labelInstantiators =
-                settings.getLabelSettings().getLabelInstantiators();
-        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators =
-                   labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
-        }
-        if (!labelInstantiators.contains(ShortcutEvaluationTermLabelInstantiator.INSTANCE)) {
-            labelInstantiators =
-                    labelInstantiators.append(ShortcutEvaluationTermLabelInstantiator.INSTANCE);
-        }
-        settings.getLabelSettings().setLabelInstantiators(labelInstantiators);
 
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
