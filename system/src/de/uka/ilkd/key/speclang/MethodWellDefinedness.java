@@ -232,7 +232,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     public String getBehaviour() {
         if (getMethodContract().getName().contains("normal_behavior")) {
-            return "";
+            return "normal";
         } else if (getMethodContract().getName().contains("exceptional_behavior")) {
             return "exc";
         } else if (getMethodContract().getName().contains("model_behavior")) {
@@ -254,8 +254,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return true for either normal or model behaviour
      */
     public boolean isNormal() {
-        return getMethodContract().getName().contains("normal_behavior")
-                || isModel();
+        return getBehaviour().equals("normal") || isModel();
     }
 
     /**
@@ -263,9 +262,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return true for pure and model methods (and fields)
      */
     public boolean isPure() {
-        return (getTarget() instanceof IProgramMethod
-                && JMLInfoExtractor.isPure((IProgramMethod)getTarget()))
-                || isModel();
+        IObserverFunction target = getTarget();
+        if (target instanceof IProgramMethod) {
+            IProgramMethod pm = (IProgramMethod)target;
+            return JMLInfoExtractor.isPure(pm) || isModel();
+        } else {
+            return isModel();
+        }
     }
 
     @Override
