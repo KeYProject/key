@@ -6,7 +6,6 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import javax.swing.JMenu;
 
 /**
