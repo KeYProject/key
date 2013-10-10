@@ -117,19 +117,26 @@ public class ProofStarter {
     private StrategyProperties strategyProperties = new StrategyProperties();
 
     private ProverTaskListener ptl;
+    
+    private AutoSaver autoSaver;
 
     /**
      * creates an instance of the ProofStarter
      * @param the ProofEnvironment in which the proof shall be performed
      */
-    public ProofStarter() {}
+    public ProofStarter(boolean useAutoSaver) {
+       this(null, useAutoSaver);
+    }
 
     /**
      * creates an instance of the ProofStarter
      * @param the ProofEnvironment in which the proof shall be performed
      */
-    public ProofStarter(ProverTaskListener ptl) {
+    public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
     	this.ptl = ptl;
+      if (useAutoSaver) {
+         autoSaver = new AutoSaver();
+      }
     }
 
 
@@ -197,40 +204,58 @@ public class ProofStarter {
     * @return the proof after the attempt terminated
     */
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
+        try {
+           proof.setRuleAppIndexToAutoMode();
+           
+           final Profile profile = proof.env().getInitConfig().getProfile();
+           proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
 
-        final Profile profile = proof.env().getInitConfig().getProfile();
-        proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
-
-//        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
-        if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
-           OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
-           if (simplifier != null) {
-              simplifier.refresh(proof);
+           if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
+              OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
+              if (simplifier != null) {
+                 simplifier.refresh(proof);
+              }
            }
+
+           profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+
+           ApplyStrategy prover = new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+           if (ptl != null) {
+              prover.addProverTaskObserver(ptl);
+           }
+           if (autoSaver != null) {
+              autoSaver.setProof(proof);
+              prover.addProverTaskObserver(autoSaver);
+           }
+
+           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
+           boolean retreatMode = strategyProperties.getProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY).equals(StrategyProperties.RETREAT_MODE_RETREAT);
+           ApplyStrategy.ApplyStrategyInfo result;
+           if (retreatMode) {
+              result = prover.startRetreat(proof, goals, maxSteps, timeout, stopMode);
+           } 
+           else {
+              result = prover.start(proof, goals, maxSteps, timeout, stopMode);
+           }
+           
+           if (result.isError()) {
+               throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
+                       result.getException());
+           }
+
+           if (ptl != null) {
+              prover.removeProverTaskObserver(ptl);
+           }
+           if (autoSaver != null) {
+              prover.removeProverTaskObserver(autoSaver);
+              autoSaver.setProof(null);
+           }
+
+           return result;
         }
-
-        profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
-
-        ApplyStrategy prover =
-                new ApplyStrategy(proof.env().getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
-
-        if (ptl != null) prover.addProverTaskObserver(ptl);
-        final AutoSaver autoSaver = AutoSaver.getInstance();
-        autoSaver.setProof(proof);
-        prover.addProverTaskObserver(autoSaver);
-
-        ApplyStrategy.ApplyStrategyInfo result =
-                prover.start(proof, goals, maxSteps, timeout, false);
-
-        if (result.isError()) {
-            throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
-                    result.getException());
+        finally {
+           proof.setRuleAppIndexToInteractiveMode();
         }
-
-        if (ptl != null) prover.removeProverTaskObserver(ptl);
-        prover.removeProverTaskObserver(autoSaver);
-
-        return result;
     }
 
     public void init(ProofAggregate proofAggregate) {

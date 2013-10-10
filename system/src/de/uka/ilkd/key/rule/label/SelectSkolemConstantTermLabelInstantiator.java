@@ -30,7 +30,6 @@ import de.uka.ilkd.key.rule.Rule;
 /**
  * The {@link ITermLabelWorker} used during prove to define how a
  * {@link AuxiliaryTermLabel} is maintained.
- * <p/>
  * @author Christoph Scheben
  */
 public final class SelectSkolemConstantTermLabelInstantiator implements ITermLabelWorker {

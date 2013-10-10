@@ -63,15 +63,17 @@ public final class RuleAppIndex  {
                
 
     public RuleAppIndex(TacletAppIndex      p_tacletAppIndex, 
-			BuiltInRuleAppIndex p_builtInRuleAppIndex) {
-	this ( p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex );
+			BuiltInRuleAppIndex p_builtInRuleAppIndex,
+			Services            services) {
+	this ( p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex, services );
     }
 
     public RuleAppIndex ( TacletIndex         p_tacletIndex,
-			  BuiltInRuleAppIndex p_builtInRuleAppIndex ) {
+			  BuiltInRuleAppIndex p_builtInRuleAppIndex,
+			  Services            services) {
 	tacletIndex               = p_tacletIndex;
-	automatedTacletAppIndex   = new TacletAppIndex ( tacletIndex );
-	interactiveTacletAppIndex = new TacletAppIndex ( tacletIndex );
+	automatedTacletAppIndex   = new TacletAppIndex ( tacletIndex, services );
+	interactiveTacletAppIndex = new TacletAppIndex ( tacletIndex, services );
 	builtInRuleAppIndex       = p_builtInRuleAppIndex;
 	// default to false to keep compatibility with old code
 	autoMode                  = false;

@@ -387,7 +387,7 @@ public class InitConfig {
      */
     @SuppressWarnings("unchecked")
     public InitConfig deepCopy() {
-        InitConfig ic = new InitConfig(services.copy());
+        InitConfig ic = new InitConfig(services.copy(false));
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(

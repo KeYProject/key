@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
@@ -31,8 +32,8 @@ import de.uka.ilkd.key.util.Debug;
 public final class ElementaryUpdate extends AbstractSortedOperator {
     
     private static final WeakHashMap<UpdateableOperator, 
-                                     ElementaryUpdate> instances 
-    	= new WeakHashMap<UpdateableOperator, ElementaryUpdate>();
+                                     WeakReference<ElementaryUpdate>> instances 
+    	= new WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>>();
     
     
     private final UpdateableOperator lhs;
@@ -52,12 +53,12 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
      * Returns the elementary update operator for the passed left hand side.
      */
     public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
-	ElementaryUpdate result = instances.get(lhs);
-	if(result == null) {
-	    result = new ElementaryUpdate(lhs);
+	WeakReference<ElementaryUpdate> result = instances.get(lhs);
+	if(result == null || result.get() == null) {
+	    result = new WeakReference<ElementaryUpdate>(new ElementaryUpdate(lhs));
 	    instances.put(lhs, result);
 	}
-	return result;
+	return result.get();
     }
     
     

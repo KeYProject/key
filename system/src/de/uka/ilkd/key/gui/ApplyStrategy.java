@@ -650,13 +650,13 @@ public class ApplyStrategy {
         assert proof != null;
 
         ProofListener pl = new ProofListener();
-        Goal.addRuleAppListener( pl );
+        proof.addRuleAppListener( pl );
         ApplyStrategyInfo result = null;
         try {
             result = doWork(goalChooser, stopCondition);
         } finally {
             proof.removeProofTreeListener(treeListener);
-            Goal.removeRuleAppListener(pl);
+            proof.removeRuleAppListener(pl);
             setAutoModeActive(false);
         }
         return result;
@@ -717,7 +717,7 @@ public class ApplyStrategy {
 
         /** invoked when a rule has been applied */
         public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive() || e.getSource() != proof) return;
+            if (!isAutoModeActive()) return;
             RuleAppInfo rai = e.getRuleAppInfo ();
             if ( rai == null )
                 return;

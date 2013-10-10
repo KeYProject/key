@@ -21,22 +21,22 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
-import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 
 /**
  * <p>
@@ -132,7 +132,23 @@ public final class TermLabelWorkerManagement {
     * @return The {@link ITermLabelWorker}s contained in the {@link Proof} of the given {@link Services}.
     */
    public static ImmutableList<ITermLabelWorker> getLabelInstantiators(Services services) {
-      return services.getProof().getSettings().getLabelSettings().getLabelInstantiators();
+      ImmutableList<ITermLabelWorker> result = null;
+      if (services != null) {
+         Proof proof = services.getProof();
+         if (proof != null) {
+            ProofEnvironment env = proof.env();
+            if (env != null) {
+               InitConfig initConfig = env.getInitConfig();
+               if (initConfig != null) {
+                  Profile profile = initConfig.getProfile();
+                  if (profile != null) {
+                     result = profile.getLabelInstantiators();
+                  }
+               }
+            }
+         }
+      }
+      return result;
    }
    
    /**
@@ -168,34 +184,6 @@ public final class TermLabelWorkerManagement {
          }
       }
       return new ImmutableArray<ITermLabel>(instantiatedLabels);
-   }
-
-   /**
-    * <p>
-    * Returns the {@link ITermLabelWorker} with the given name if available.
-    * </p>
-    * <p>
-    * This method has to be extended to support new {@link ITermLabelWorker}s.
-    * </p>
-    * @param name The name of the requested {@link ITermLabelWorker}.
-    * @return The {@link ITermLabelWorker} or {@code null} if not available.
-    */
-   public static ITermLabelWorker getInstantiator(String name) {
-      if (SymbolicExecutionTermLabel.NAME.toString().equals(name)) {
-         return SymbolicExecutionTermLabelInstantiator.INSTANCE;
-      }
-      else if (LoopBodyTermLabel.NAME.toString().equals(name)) {
-         return LoopBodyTermLabelInstantiator.INSTANCE;
-      }
-      else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
-         return LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE;
-      }
-      else if(SelectSkolemConstantTermLabel.NAME.toString().equals(name)) {
-         return SelectSkolemConstantTermLabelInstantiator.INSTANCE;
-      }
-      else {
-         return null;
-      }
    }
 
    /**

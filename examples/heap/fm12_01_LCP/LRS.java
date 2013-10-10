@@ -20,49 +20,55 @@
 public class LRS {
 
 
-    private int solStart = 0;
-    private int solLength = 0;
-    private final int[] a;
+    private int s = 0;
+    private int t = 0;
+    private int l = 0;
+    private final SuffixArray sa;
+
+    LRS (SuffixArray arr) { sa = arr; }
 
 
     /*@ normal_behavior
-      @ requires a.length >= 2;
-      @ requires (\exists int i,j; 0 <= i && i < j && j < a.length; a[i] == a[j]);
-      @ requires solStart == 0 && solLength == 0;
-      @ ensures (\exists int i; 0 <= i && i < a.length && i != solStart;
-      @         (\forall int j; 0 <= j && j < solLength; 
-      @              a[solStart+j] == a[i+j]))
-      @         // there is a repeated substring
-      @         || solLength == 0; // or not
-      @ ensures !(\exists int i,k; 0 <= i && i < k && k < a.length;
-      @           (\forall int j; 0 <= j && j < solLength+1; a[k+j] == a[i+j]));
-      @         // and it is maximal
+      @ requires \invariant_for(sa);
+      @ requires sa.a.length >= 2;
+      @ ensures 0 <= s && s < sa.a.length;
+      @ ensures 0 <= t && t < sa.a.length;
+      @ ensures 0 <= l && l < sa.a.length;
+      @ ensures s+l <= sa.a.length && t+l <= sa.a.length;
+      @ ensures (\forall int j; 0 <= j && j < l; sa.a[s+j] == sa.a[t+j]);
+      @ ensures s != t || l == 0;
+      @ ensures !(\exists int i,k; 0 <= i && i < k && k < sa.a.length-l;
+      @            (\forall int j; 0 <= j && j <= l; sa.a[k+j] == sa.a[i+j]));
+      @         // there is no LRS of length l+1
       @*/
     public void doLRS() {
-        SuffixArray sa = new SuffixArray(a);
+        int s = 0; int t = 0; int l = 0;
 
-        /*@ maintaining \invariant_for(sa);
-          @ maintaining 0 <= solStart && solStart < a.length;
-          @ maintaining 0 <= solLength && solLength < a.length;
-          @ maintaining solStart+solLength-1 < a.length;
-          @ maintaining 0 < l && l <= a.length;
-          @ maintaining (\forall int i; sa.suffixes[i]+1 == solStart;
-          @                 (\forall int j; 0 <= j && j < solLength; 
-          @                     a[solStart+j] == a[sa.suffixes[i]+j]))
-          @             || solLength == 0;
-          @ maintaining !(\exists int i,k; 0 <= i && i< k && k < l;
-          @                 (\forall int j; 0 <= j && j < solLength+1; 
-          @                      a[sa.suffixes[k]+j] == a[sa.suffixes[i]+j]));
-          @ decreasing a.length-l;
-          @ assignable solStart,solLength;
+        /*@ maintaining sa != null && \invariant_for(sa);
+          @ maintaining 0 <= s && s < sa.a.length;
+          @ maintaining 0 <= t && t < sa.a.length;
+          @ maintaining 0 <= l && l < sa.a.length;
+          @ maintaining s+l <= sa.a.length && t+l <= sa.a.length;
+          @ maintaining s != t || l == 0;
+          @ maintaining 0 < x && x <= sa.a.length;
+          @ maintaining (\forall int j; 0 <= j && j <l; sa.a[s+j] == sa.a[t+j]);
+          @ maintaining !(\exists int w; 0 < w && w < x
+          @               && sa.suffixes[w-1] < sa.a.length-l
+          @               && sa.suffixes[w]   < sa.a.length-l;
+          @               (\forall int j; 0 <= j && j <= l;
+          @                sa.a[sa.suffixes[w-1]+j] == sa.a[sa.suffixes[w]+j]));
+          @ decreasing sa.a.length-x;
+          @ assignable \strictly_nothing;
           @*/
-        for (int l=1; l < a.length; l++) {
-            int length = sa.lcp(l);
-            if (length > solLength) {
-                solStart = sa.suffixes[l];
-                solLength = length;
-            }
-        }
+        for (int x=1; x < sa.a.length; x++) {
+            int length = LCP.lcp(sa.a,sa.suffixes[x], 
+                                      sa.suffixes[x-1]);
+            if (length > l) {
+                s = sa.suffixes[x];
+                t = sa.suffixes[x-1];
+                l = length;
+        }   }
+        this.s = s; this.t = t; this.l = l;
     }
 
 }

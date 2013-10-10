@@ -97,10 +97,10 @@ public final class KeYImages {
        // Compute path to image in bundle.
        String path = null;
        if (FOLDER.equals(key)) {
-          path = "icons/folder.png";
+          path = "icons/folder16.gif";
        }
        else if (FOLDER_PROVED.equals(key)) {
-          path = "icons/folderproved.png";
+          path = "icons/folderproved16.gif";
        }
        else if (NODE.equals(key)) {
           path = "icons/ekey-mono16.gif";
