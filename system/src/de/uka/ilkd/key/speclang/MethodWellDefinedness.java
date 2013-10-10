@@ -249,8 +249,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     /**
-     * Used to determine if the contract of this method has normal behaviour or is a model field
-     * or contract and can thus be invoked in a specification for pure methods.
+     * Used to determine if the contract of this method has normal behaviour or is a model
+     * field/contract and can thus not throw any exception.
      * @return true for either normal or model behaviour
      */
     public boolean isNormal() {
@@ -258,16 +258,16 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     /**
-     * Tells whether the method is pure (including model fields and model methods in this case) or not.
-     * @return true for pure and model methods (and fields)
+     * Tells whether the method is pure or not.
+     * @return true for pure methods and pure (model) fields
      */
     public boolean isPure() {
         IObserverFunction target = getTarget();
         if (target instanceof IProgramMethod) {
             IProgramMethod pm = (IProgramMethod)target;
-            return JMLInfoExtractor.isPure(pm) || isModel();
+            return JMLInfoExtractor.isPure(pm);
         } else {
-            return isModel();
+            return false;
         }
     }
 
