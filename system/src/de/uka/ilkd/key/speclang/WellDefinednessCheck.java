@@ -661,19 +661,19 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setAssignable(Term ass, Services services) {
         this.assignable = ass;
-        if (ass.equals(TB.ff()) || ass.equals(TB.FALSE(services))
-                || ass == null || ass.op().equals(BooleanLiteral.FALSE)) {
-            this.assignable = TB.ff();
-        } else if (ass.equals(TB.tt()) || ass.equals(TB.TRUE(services))
+        if (ass == TB.strictlyNothing() || ass.equals(TB.FALSE(services))
+                || ass == null || ass.op() == BooleanLiteral.FALSE) {
+            this.assignable = TB.strictlyNothing();
+        } else if (ass == TB.tt() || ass.equals(TB.TRUE(services))
                 || ass.op().equals(BooleanLiteral.TRUE)) {
             this.assignable = TB.allLocs(services);
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, Services services) {
-        if (ass1 == null || ass1.equals(TB.ff())) {
+        if (ass1 == null || ass1 == TB.strictlyNothing()) {
             setAssignable(ass2, services);
-        } else if(ass2 == null || ass2.equals(TB.ff())) {
+        } else if(ass2 == null || ass2 == TB.strictlyNothing()) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(services, ass1, ass2), services);
@@ -850,9 +850,9 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
         assert mod != null;
-        final Term havocUpd = !mod.equals(TB.ff()) ?
-                TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap))
-                : TB.skip();
+        final Term havocUpd = mod == TB.strictlyNothing() ?
+                TB.skip()
+                : TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap));
         final Term oldUpd = heapAtPre != heap ?
                 TB.elementary(services, TB.var(heapAtPre), TB.var(heap))
                 : TB.skip();
