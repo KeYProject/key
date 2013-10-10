@@ -16,7 +16,7 @@ import javax.swing.JMenu;
 public class TermLabelMenu extends JMenu {
 
     public TermLabelMenu(final KeYMediator mediator) {
-        
+
         this.setText("Term Labels");
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
@@ -31,8 +31,10 @@ public class TermLabelMenu extends JMenu {
                 ImmutableList<ITermLabelWorker> termLabelWorkerList
                         = mediator.getSelectedProof().env().getInitConfig().getProfile().getLabelInstantiators();
                 for (ITermLabelWorker worker : termLabelWorkerList) {
-                    for(ITermLabel termLabel: ((SelectSkolemConstantTermLabelInstantiator)worker).iTermLabelList){
-                        add(termLabel.name().toString());
+                    if (worker != null && worker.getSupportedTermLabels() != null) {
+                        for (ITermLabel termLabel : worker.getSupportedTermLabels()) {
+                            add(termLabel.name().toString());
+                        }
                     }
                 }
             }

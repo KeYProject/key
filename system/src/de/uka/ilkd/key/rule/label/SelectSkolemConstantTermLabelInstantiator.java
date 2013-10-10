@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public final class SelectSkolemConstantTermLabelInstantiator implements ITermLabelWorker {
     
-    public List<ITermLabel> iTermLabelList;
+    private List<ITermLabel> iTermLabelList;
 
     /**
      * The only instance of this class.
@@ -95,5 +95,10 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
                              List<ITermLabel> newLabels) {
         // since we'd like to keep the SelectSkolemConstantTermLabel, there is
         // nothing to do here
+    }
+
+    @Override
+    public List<ITermLabel> getSupportedTermLabels() {
+        return iTermLabelList;
     }
 }

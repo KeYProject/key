@@ -99,4 +99,6 @@ public interface ITermLabelWorker {
     * @return The unique name of this {@link ITermLabelWorker}.
     */
    public String getName();
+   
+   public List<ITermLabel> getSupportedTermLabels();
 }
