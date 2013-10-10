@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.actions.TermLabelMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -819,6 +820,9 @@ public final class MainWindow extends JFrame  {
 	proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
+        
+        proof.addSeparator();
+        proof.add(new TermLabelMenu(getMediator()));
 
         return proof;
     }

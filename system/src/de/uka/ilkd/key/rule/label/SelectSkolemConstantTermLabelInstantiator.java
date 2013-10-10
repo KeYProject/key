@@ -34,6 +34,8 @@ import de.uka.ilkd.key.rule.Rule;
  * @author Christoph Scheben
  */
 public final class SelectSkolemConstantTermLabelInstantiator implements ITermLabelWorker {
+    
+    public List<ITermLabel> iTermLabelList;
 
     /**
      * The only instance of this class.
@@ -72,14 +74,14 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
             tacletTerm.arity() == 0 && // tacletTerm is a constant
             tacletTerm.containsLabel(SelectSkolemConstantTermLabel.INSTANCE)) {
             // keep SelectSkolemConstantTermLabel
-            return Collections.<ITermLabel>singletonList(SelectSkolemConstantTermLabel.INSTANCE);
-
+            iTermLabelList = Collections.<ITermLabel>singletonList(SelectSkolemConstantTermLabel.INSTANCE);
         } else {
             // in all other cases the tacletTerm cannot contain the
             // SelectSkolemConstantTermLabel, because it is attached only
             // to constants
-            return null;
+            iTermLabelList = null;
         }
+        return iTermLabelList;
     }
 
     /**
