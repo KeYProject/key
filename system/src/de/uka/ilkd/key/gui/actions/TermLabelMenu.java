@@ -29,7 +29,7 @@ public class TermLabelMenu extends JMenu {
             public void selectedProofChanged(KeYSelectionEvent e) {
                 removeAll();
                 ImmutableList<ITermLabelWorker> termLabelWorkerList
-                        = mediator.getSelectedProof().getSettings().getLabelSettings().getLabelInstantiators();
+                        = mediator.getSelectedProof().env().getInitConfig().getProfile().getLabelInstantiators();
                 for (ITermLabelWorker worker : termLabelWorkerList) {
                     for(ITermLabel termLabel: ((SelectSkolemConstantTermLabelInstantiator)worker).iTermLabelList){
                         add(termLabel.name().toString());
