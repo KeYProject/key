@@ -189,7 +189,9 @@ public class SpecificationInjector extends SourceVisitor {
         final JMLFactory factory = new JMLFactory();
 
         // add return value
-        factory.addResultToRespects(sc.returnValue(md));
+        final String returnDomain = sc.returnValue(md);
+        System.out.println(".... return domain: "+returnDomain); // XXX
+        factory.addResultToRespects(returnDomain);
 
         // add parameters
         for (int i = 0; i < md.getParameterDeclarationCount(); i++) {

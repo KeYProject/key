@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.uti.rifl;
+package de.uka.ilkd.key.util.rifl;
 
 import java.util.Set;
 import java.util.HashSet;

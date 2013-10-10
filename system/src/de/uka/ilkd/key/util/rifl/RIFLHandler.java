@@ -28,7 +28,7 @@ import static de.uka.ilkd.key.util.MiscTools.apply;
  * XML content handler for the RIFL language. Produces a RIFL
  * {@link SpecificationContainer}. May throw obscure exceptions on
  * non-wellformed XML documents.
- * RIFL syntax is not yet finalized; we use the proposal by M. Perner.
+ * Refer to the RIFL 1.0 Language definition by Ereth, Mantel, and Perner.
  * 
  * @author bruns
  */
@@ -94,15 +94,15 @@ class RIFLHandler extends DefaultHandler {
 
     private String category = DEFAULT_CATEGORY;
 
-    // XXX follows format suggested by Matthias Perner et al.
 
     public RIFLHandler() {
         categories2domains.put(DEFAULT_CATEGORY, DEFAULT_DOMAIN);
     }
 
     private void assignCategory(Attributes attributes) {
-        categories2domains.put(attributes.getValue(0).intern(), attributes
-                .getValue(1).intern());
+        final String category = attributes.getValue(0).intern();
+        final String domain = attributes.getValue(1).intern();
+        categories2domains.put(category, domain);
     }
 
     @Override
@@ -119,16 +119,19 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void putField(Attributes attributes) {
-        final SpecificationEntity se = new Field(attributes.getValue(0),
-                attributes.getValue(2), attributes.getValue(1));
+        final String field = attributes.getValue(0);
+        final String clazz = attributes.getValue(1);
+        final String packg = attributes.getValue(2);
+        final SpecificationEntity se = new Field(field,packg,clazz);
         tmpMap.put(se, category);
     }
 
     private void putParam(Attributes attributes) {
         final int pos = Integer.parseInt(attributes.getValue(0));
-        final SpecificationEntity se = new Parameter(pos,
-                attributes.getValue(1), attributes.getValue(3),
-                attributes.getValue(2));
+        final String packg = attributes.getValue(3);
+        final String clazz = attributes.getValue(2);
+        final String method = attributes.getValue(1);
+        final SpecificationEntity se = new Parameter(pos,method,packg,clazz);
         tmpMap.put(se, category);
     }
 

@@ -1,6 +1,6 @@
-class Foo extends String {
+class Foo {
 
-    public static String getFoo() {
+    public static String getFoo( int z ) {
         return "foo";
     }
 }

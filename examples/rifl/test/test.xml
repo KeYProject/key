@@ -1,5 +1,6 @@
 <sources>
-  <field name="x" class="Test" />
-  <returnvalue methodname="foo()" class="Test" />
-  <returnvalue methodname="getFoo()" class="Foo" />
+  <field name="x" class="Test" package="" />
+  <returnvalue methodname="foo()" class="Test"  package=""/>
+  <returnvalue methodname="getFoo(int)" class="Foo" package="" />
+  <parameter position="0" methodname="getFoo(int)" class="Foo" package="" />
 </sources>
