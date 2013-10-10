@@ -33,8 +33,6 @@ import de.uka.ilkd.key.rule.Rule;
  * @author Christoph Scheben
  */
 public final class SelectSkolemConstantTermLabelInstantiator implements ITermLabelWorker {
-    
-    private List<ITermLabel> iTermLabelList;
 
     /**
      * The only instance of this class.
@@ -69,6 +67,7 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
                                               ImmutableArray<Term> newTermSubs,
                                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                               JavaBlock newTermJavaBlock) {
+        List<ITermLabel> iTermLabelList;
         if (tacletTerm != null &&
             tacletTerm.arity() == 0 && // tacletTerm is a constant
             tacletTerm.containsLabel(SelectSkolemConstantTermLabel.INSTANCE)) {
@@ -96,9 +95,5 @@ public final class SelectSkolemConstantTermLabelInstantiator implements ITermLab
         // since we'd like to keep the SelectSkolemConstantTermLabel, there is
         // nothing to do here
     }
-
-    @Override
-    public List<ITermLabel> getSupportedTermLabels() {
-        return iTermLabelList;
-    }
+    
 }

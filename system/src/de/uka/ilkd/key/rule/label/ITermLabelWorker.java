@@ -100,5 +100,4 @@ public interface ITermLabelWorker {
     */
    public String getName();
    
-   public List<ITermLabel> getSupportedTermLabels();
 }

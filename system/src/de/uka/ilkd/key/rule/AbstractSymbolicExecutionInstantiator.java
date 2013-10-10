@@ -36,8 +36,6 @@ import de.uka.ilkd.key.proof.Goal;
  */
 public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabelWorker {
     
-    private List<ITermLabel> instantiatedLabels;
-    
    /**
     * {@inheritDoc}
     */
@@ -51,7 +49,7 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
                                              ImmutableArray<Term> newTermSubs,
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                              JavaBlock newTermJavaBlock) {
-      instantiatedLabels = new LinkedList<ITermLabel>();
+      List<ITermLabel> instantiatedLabels = new LinkedList<ITermLabel>();
       if (checkOperator(newTermOp)) {
          if (applicationTerm != null) {
             applicationTerm = TermBuilder.DF.goBelowUpdates(applicationTerm);
@@ -91,10 +89,6 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
             newLabels.remove(termLabel);
          }
       }
-   }
-   
-   public List<ITermLabel> getSupportedTermLabels(){
-       return instantiatedLabels;
    }
 
    /**
