@@ -14,13 +14,16 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
@@ -32,6 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * <li> the rule base to be used </li>
  * <li> the available strategies </li>
  * <li> the goal selection strategy </li>
+ * <li> the way how term labels are maintained </li>
  * </ul>
  *
  * Currently this is only rudimentary: possible extensions are
@@ -44,7 +48,10 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * etc.
  * </p>
  * <p>
- * Each {@link Profile} has a unique name {@link #name()}. It is recommended
+ * Each {@link Profile} has a unique name {@link #name()}.
+ * </p> 
+ * <p>
+ * It is recommended
  * to have only one instance of each {@link Profile}. The default instances
  * for usage in the {@link Thread} of the user interface
  * are available via {@link JavaProfile#getDefaultInstance()} and
@@ -55,8 +62,8 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * because some rules might have a state (at the moment this is only the {@link OneStepSimplifier}).
  * </p>
  * <p>
- * The default {@link Profile} which is used if no profile is programmatically
- * or via a custom problem file defined is {@link AbstractProfile#getDefaultProfile()}.
+ * The default {@link Profile} which is used if no profile is programatically
+ * (or via a custom problem file) defined is {@link AbstractProfile#getDefaultProfile()}.
  * It can be changed via {@link AbstractProfile#setDefaultProfile(Profile)}.
  * </p>
  */
@@ -129,4 +136,16 @@ public interface Profile {
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
+    
+    /**
+     * <p>
+     * Returns the {@link ITermLabelWorker}s to use when a rule on a {@link Proof} of this {@link Profile} is applied.
+     * </p>
+     * <p>
+     * For more information about {@link ITermLabel} read its documentation.
+     * </p>
+     * @return The {@link ITermLabelWorker}s to use when a rule is applied.
+     * @see ITermLabel
+     */
+    ImmutableList<ITermLabelWorker> getLabelInstantiators();
 }
