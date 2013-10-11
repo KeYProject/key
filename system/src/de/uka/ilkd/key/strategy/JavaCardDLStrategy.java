@@ -637,10 +637,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "hide_auxiliary_eq",
                       // hide auxiliary equation after the skolem constatns have
                       // been replaced by it's computed value
-                      add( applyTF("auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
-                           applyTF( "leftHandSide", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
+                      add( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                           applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
                                                                      not( ff.ifThenElse ) ) ) ),
                            longConst(-5400) ) );
+        bindRuleSet ( d, "hide_auxiliary_eq_const",
+                      // hide auxiliary equation after the skolem constatns have
+                      // been replaced by it's computed value
+                      add( applyTF("auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                           longConst(-500) ) );
     }
 
     private void setUpStringNormalisation (RuleSetDispatchFeature d, Services services) {
