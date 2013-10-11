@@ -95,7 +95,7 @@ endif
 ifeq ($(JAVAC),ajc)
   OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.6 -target 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+  OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 endif
 
 JAVACC_MAIN=javacc
@@ -150,10 +150,10 @@ doc: argfile
 ## didn't want to use perl ;)
 	@find $(SRC) -name '*.java' | xargs grep -h "^package\|^overview" |\
 	cut -d" " -f2 | cut -d";" -f1 | sort | uniq | grep "^de.uka" | \
-	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.6 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
+	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
 	-sourcepath $(GENERATED_SRC_PATH):$(SRC):$(TEST) -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
-	-link http://download.oracle.com/javase/6/docs/api/ \
+	-link http://docs.oracle.com/javase/7/docs/api/ \
 	-link http://www.antlr2.org/javadoc/ \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
