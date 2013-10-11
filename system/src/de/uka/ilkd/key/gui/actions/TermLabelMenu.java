@@ -4,8 +4,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import javax.swing.JMenu;
 
 /**
@@ -27,14 +25,10 @@ public class TermLabelMenu extends JMenu {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 removeAll();
-                ImmutableList<ITermLabelWorker> termLabelWorkerList
-                        = mediator.getSelectedProof().env().getInitConfig().getProfile().getLabelInstantiators();
-                for (ITermLabelWorker worker : termLabelWorkerList) {
-                    if (worker != null && worker.getSupportedTermLabels() != null) {
-                        for (ITermLabel termLabel : worker.getSupportedTermLabels()) {
-                            add(termLabel.name().toString());
-                        }
-                    }
+                ImmutableList<String> termLabelNames
+                        = mediator.getSelectedProof().env().getInitConfig().getProfile().getSupportedLabelNames();
+                for (String name : termLabelNames) {
+                    add(name);
                 }
             }
         });

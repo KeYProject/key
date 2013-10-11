@@ -171,4 +171,14 @@ public class JavaProfile extends AbstractProfile {
         }
        return defaultInstance;
     }
+
+    @Override
+    public ImmutableList<String> getSupportedLabelNames() {
+        ImmutableList<String> ret = ImmutableSLList.nil();
+        ImmutableList<ITermLabelWorker> workers = computeLabelInstantiators();
+        for(ITermLabelWorker worker: workers){
+            ret = ret.prepend(worker.getName());
+        }
+        return ret;
+    }
 }
