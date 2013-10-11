@@ -109,7 +109,7 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.BaseHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
@@ -604,7 +604,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       // pull out select only if it can be simplified
                       // (the heap term may not be the base heap or an anon heap
                       // function symbol)
-                      add( applyTF( "h", not( or( BaseHeapTermFeature.create(heapLDT),
+                      add( applyTF( "h", not( or( PrimitiveHeapTermFeature.create(heapLDT),
                                                   AnonHeapTermFeature.INSTANCE ) ) ),
                            ifZero( applyTF(FocusFormulaProjection.INSTANCE, ff.update),
                                    longConst(-4200),
