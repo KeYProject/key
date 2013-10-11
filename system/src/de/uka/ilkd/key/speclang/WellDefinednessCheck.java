@@ -661,19 +661,19 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final void setAssignable(Term ass, Services services) {
         this.assignable = ass;
-        if (ass == TB.strictlyNothing() || ass.equals(TB.FALSE(services))
+        if (TB.strictlyNothing().equals(ass) || TB.FALSE(services).equals(ass)
                 || ass == null || ass.op() == BooleanLiteral.FALSE) {
             this.assignable = TB.strictlyNothing();
-        } else if (ass == TB.tt() || ass.equals(TB.TRUE(services))
+        } else if (TB.tt().equals(ass) || TB.TRUE(services).equals(ass)
                 || ass.op().equals(BooleanLiteral.TRUE)) {
             this.assignable = TB.allLocs(services);
         }
     }
 
     final void combineAssignable(Term ass1, Term ass2, Services services) {
-        if (ass1 == null || ass1 == TB.strictlyNothing()) {
+        if (ass1 == null || TB.strictlyNothing().equals(ass1)) {
             setAssignable(ass2, services);
-        } else if(ass2 == null || ass2 == TB.strictlyNothing()) {
+        } else if(ass2 == null || TB.strictlyNothing().equals(ass2)) {
             setAssignable(ass1, services);
         } else {
             setAssignable(TB.union(services, ass1, ass2), services);
@@ -850,7 +850,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                  ProgramVariable heapAtPre,
                                  Term anonHeap, Services services) {
         assert mod != null;
-        final Term havocUpd = mod == TB.strictlyNothing() ?
+        final Term havocUpd = TB.strictlyNothing().equals(mod) ?
                 TB.skip()
                 : TB.elementary(services, heap, TB.anon(services, TB.var(heap), mod, anonHeap));
         final Term oldUpd = heapAtPre != heap ?
