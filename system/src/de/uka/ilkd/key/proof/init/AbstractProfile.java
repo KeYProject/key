@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
@@ -48,6 +49,8 @@ public abstract class AbstractProfile implements Profile {
 
     private GoalChooserBuilder prototype;
 
+    private final ImmutableList<ITermLabelWorker> labelInstantiators;
+    
     protected AbstractProfile(String standardRuleFilename,
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
         standardRules = new RuleCollection(RuleSource
@@ -58,10 +61,16 @@ public abstract class AbstractProfile implements Profile {
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-
+        this.labelInstantiators = computeLabelInstantiators();
     }
 
-    private static
+   /**
+    * Computes the {@link ITermLabelWorker} to use in this {@link Profile}.
+    * @return The {@link ITermLabelWorker} to use in this {@link Profile}.
+    */
+   protected abstract ImmutableList<ITermLabelWorker> computeLabelInstantiators();
+
+   private static
         ImmutableSet<String> extractNames(ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
         ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
@@ -245,5 +254,13 @@ public abstract class AbstractProfile implements Profile {
    public static void setDefaultProfile(Profile defaultProfile) {
       assert defaultProfile != null;
       AbstractProfile.defaultProfile = defaultProfile;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<ITermLabelWorker> getLabelInstantiators() {
+      return labelInstantiators;
    }
 }

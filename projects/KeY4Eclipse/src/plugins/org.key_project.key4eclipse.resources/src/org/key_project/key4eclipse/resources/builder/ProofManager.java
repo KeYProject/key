@@ -333,7 +333,7 @@ public class ProofManager {
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
-      InitConfig initConfig = new InitConfig(environment.getServices().copy(profile));
+      InitConfig initConfig = new InitConfig(environment.getServices().copy(profile, false));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
       initConfig.setSettings(sourceInitConfig.getSettings());
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
@@ -663,7 +663,7 @@ public class ProofManager {
    private void createProof(ProofElement pe) throws ProofInputException{
          Proof proof = pe.getKeYEnvironment().createProof(pe.getProofObl());
          
-         ProofStarter ps = new ProofStarter();
+         ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
          
          ps.start();

@@ -54,8 +54,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
-import de.uka.ilkd.key.rule.label.SelectSkolemConstantTermLabelInstantiator;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
@@ -143,7 +141,7 @@ public class Proof implements Named {
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
-	this.services = services.copyProofSpecific(this);
+	this.services = services.copyProofSpecific(this, false);
         settingsListener =
                 new SettingsListener () {
                     @Override
@@ -151,14 +149,6 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
-
-        // Make sure that required label works are present
-        ImmutableList<ITermLabelWorker> labelInstantiators = settings.getLabelSettings().getLabelInstantiators();
-        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
-        }
-        settings.getLabelSettings().setLabelInstantiators(labelInstantiators);
-
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -209,8 +199,8 @@ public class Proof implements Named {
         setRoot(rootNode);
 
 	Goal firstGoal = new Goal(rootNode,
-                                  new RuleAppIndex(new TacletAppIndex(rules),
-						   new BuiltInRuleAppIndex(builtInRules)));
+                                  new RuleAppIndex(new TacletAppIndex(rules, services),
+						   new BuiltInRuleAppIndex(builtInRules), services));
 	openGoals = openGoals.prepend(firstGoal);
 
 	if (closed())
