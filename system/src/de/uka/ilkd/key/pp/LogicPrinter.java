@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -78,6 +79,8 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -136,7 +139,11 @@ public final class LogicPrinter {
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
-
+    
+    /* 
+     * List of term labels that will not be printed out. 
+     */
+    public static final Set<String> hiddenTermLabels = new HashSet();
     
     public static String quickPrintTerm(Term t, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -889,12 +896,24 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        if(MainWindow.getInstance().termLabelMenu.hideAllTermLabels.isSelected()){
+        if (MainWindow.getInstance().termLabelMenu.hideAllTermLabels.isSelected()) {
             return;
         }
+
+        List<ITermLabel> termLabelList = new LinkedList();
+        for (ITermLabel l : t.getLabels()) {
+            if (!hiddenTermLabels.contains(l.name().toString())) {
+                termLabelList.add(l);
+            }
+        }
+
+        if (termLabelList.isEmpty()) {
+            return;
+        }
+        
         layouter.beginC().print("<<");
         boolean afterFirst = false;
-        for (ITermLabel l : t.getLabels()) {
+        for (ITermLabel l : termLabelList) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }

@@ -286,6 +286,7 @@ public final class MainWindow extends JFrame  {
         guiListener = new MainGUIListener();
         userInterface = new WindowUserInterface(this);
         setMediator(new KeYMediator(userInterface, true));
+        termLabelMenu = new TermLabelMenu(getMediator(), this);
         initNotification();
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
@@ -816,7 +817,6 @@ public final class MainWindow extends JFrame  {
         proof.add(new ShowKnownTypesAction(this));
         
         proof.addSeparator();
-        termLabelMenu = new TermLabelMenu(getMediator(), this);
         proof.add(termLabelMenu);
 
         return proof;

@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -39,17 +40,26 @@ public class TermLabelMenu extends JMenu {
                 stringNames.add(name.toString());
             }
             Collections.sort(stringNames);
-            for (String name : stringNames) {
+            for (final String name : stringNames) {
                 MainWindowAction mainWindowAction = new MainWindowAction(mainWindow) {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
+                        if (isEnabled()) {
+                            LogicPrinter.hiddenTermLabels.add(name);
+                            System.out.println("add: " + name);
+                        } else {
+                            LogicPrinter.hiddenTermLabels.remove(name);
+                            System.out.println("remove: " + name);
+
+                        }
                         mainWindow.makePrettyView();
                     }
                 };
                 mainWindowAction.setName(name);
                 JCheckBoxMenuItem checkBox = new JCheckBoxMenuItem(mainWindowAction);
-                checkBox.setName("ITermLabel_" + name);
-                checkBox.setState(true);
+                checkBox.setName(name);
+                checkBox.setSelected(true);
+//                LogicPrinter.hiddenTermLabels.add(name);
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 add(checkBox);
                 checkBoxList.add(checkBox);
@@ -64,7 +74,7 @@ public class TermLabelMenu extends JMenu {
         this.mainWindow = mainWindow;
         this.mediator = mediator;
 
-        hideAllTermLabels = new JCheckBoxMenuItem(new TermLabelToggleAction(mainWindow));
+        hideAllTermLabels = new TermLabelToggleAction(mainWindow);
         hideAllTermLabels.setName("toggleTerms");
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
@@ -81,18 +91,17 @@ public class TermLabelMenu extends JMenu {
         rebuildMenu();
     }
 
-    private class TermLabelToggleAction extends MainWindowAction {
+    private class TermLabelToggleAction extends KeYMenuCheckBox {
 
         public TermLabelToggleAction(MainWindow mainWindow) {
-            super(mainWindow);
-            setName("Hide all term labels");
+            super(mainWindow, "Hide all term labels");
             setTooltip("Turn off term labels, if not needed.");
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void checkBoxToggled() {
             for (JCheckBoxMenuItem checkBox : checkBoxList) {
-                checkBox.setEnabled(!hideAllTermLabels.isSelected());
+                checkBox.setEnabled(isSelected());
             }
             mainWindow.makePrettyView();
         }
