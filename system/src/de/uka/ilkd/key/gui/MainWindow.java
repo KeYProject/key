@@ -100,7 +100,6 @@ import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.TermLabelToggleAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
 import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
 import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;

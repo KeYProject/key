@@ -32,7 +32,8 @@ public class TermLabelMenu extends JMenu {
         if (mediator.getSelectedProof() != null) {
             addSeparator();
             ImmutableList<Name> termLabelNames
-                    = mediator.getSelectedProof().env().getInitConfig().getProfile().getSupportedLabelNames();
+                    = mediator.getSelectedProof().env().
+                    getInitConfig().getProfile().getSupportedLabelNames();
             List<String> stringNames = new LinkedList();
             for (Name name : termLabelNames) {
                 stringNames.add(name.toString());
@@ -78,6 +79,24 @@ public class TermLabelMenu extends JMenu {
         });
 
         rebuildMenu();
+    }
+
+    private class TermLabelToggleAction extends MainWindowAction {
+
+        public TermLabelToggleAction(MainWindow mainWindow) {
+            super(mainWindow);
+            setName("Hide all term labels");
+            setTooltip("Turn off term labels, if not needed.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (JCheckBoxMenuItem checkBox : checkBoxList) {
+                checkBox.setEnabled(!hideAllTermLabels.isSelected());
+            }
+            mainWindow.makePrettyView();
+        }
+
     }
 
 }
