@@ -194,7 +194,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return TermFactory.DEFAULT.createTerm(op,
                               subTerms,
                               t.boundVars(),
-                              t.javaBlock());
+                              t.javaBlock(),
+                              t.getLabels());
     }
     }
 

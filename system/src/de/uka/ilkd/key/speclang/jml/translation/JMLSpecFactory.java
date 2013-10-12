@@ -391,10 +391,7 @@ public class JMLSpecFactory {
                                             excVar, atPres,
                                             Term.class, services);
             Term translatedFormula = TB.convertToFormula(translated,services);
-            if (array[i].hasLabels()) {
-                translatedFormula = TB.label(translatedFormula, array[i].getLabels());
-            }
-            result = TB.and(translatedFormula, result);
+            result = TB.andSC(translatedFormula, result);
         }
         return result;
     }
@@ -412,7 +409,7 @@ public class JMLSpecFactory {
                                             selfVar,
                                             paramVars, null, null, null,
                                             Term.class, services);
-            result = TB.or(result, TB.convertToFormula(translated,services));
+            result = TB.orSC(result, TB.convertToFormula(translated,services));
         }
         return result;
     }
@@ -861,9 +858,6 @@ public class JMLSpecFactory {
         Term inv = TB.convertToFormula(JMLTranslator.translate(originalInv, kjt, selfVar, null, null,
                                                                null, null, Term.class, services),
                                        services);
-        if (originalInv.hasLabels()) {
-            inv = TB.label(inv, originalInv.getLabels());
-        }
 
         //create invariant
         String name = getDefaultInvName(null, kjt);
@@ -1287,7 +1281,7 @@ public class JMLSpecFactory {
                                                 selfVar, paramVars, null,
                                                 null, atPres,
                                                 Term.class, services);
-                invariant = TB.and(invariant, TB.convertToFormula(translated,services));
+                invariant = TB.andSC(invariant, TB.convertToFormula(translated,services));
             }
           }
           invariants.put(heap, invariant);

@@ -192,16 +192,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     typeConverter.
                     isReferenceType(((ArrayType)varType).getBaseType().getKeYJavaType())) {
                 final PositionedString arrayElementsNonNull
-                = new PositionedLabeledString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
+                = new PositionedString("(\\forall int i; 0 <= i && i < " + varName + ".length;"
                                               + varName + "[i]" + " != null)",
                                               fileName,
-                                              pos,
-                                              ImplicitSpecTermLabel.INSTANCE);
+                                              pos).label(ImplicitSpecTermLabel.INSTANCE);
                 result = result.add(arrayElementsNonNull);
             }
             PositionedString ps
-            = new PositionedLabeledString(varName + " != null", fileName, pos,
-                                          ImplicitSpecTermLabel.INSTANCE);
+            = new PositionedString(varName + " != null", fileName, pos)
+                                .label(ImplicitSpecTermLabel.INSTANCE);
             result = result.add(ps);
         }
         return result;
@@ -438,20 +437,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use the internal symbol
                 final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedLabeledString(invString,
-                                                                     ImplicitSpecTermLabel.INSTANCE));
+                    specCase.addRequires(new PositionedString(invString)
+                                 .label(ImplicitSpecTermLabel.INSTANCE));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    specCase.addRequires(new PositionedLabeledString(""+pm.getName()+".\\inv",
-                                                                     ImplicitSpecTermLabel.INSTANCE));
+                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv")
+                                                .label(ImplicitSpecTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(new PositionedLabeledString("ensures "+invString,
-                                                                    ImplicitSpecTermLabel.INSTANCE));
+                    specCase.addEnsures(new PositionedString("ensures "+invString)
+                                           .label(ImplicitSpecTermLabel.INSTANCE));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
-                    specCase.addSignals(new PositionedLabeledString("signals (Exception e) "+invString,
-                                                                    ImplicitSpecTermLabel.INSTANCE));
+                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString)
+                                                         .label(ImplicitSpecTermLabel.INSTANCE));
                 }
             }
 

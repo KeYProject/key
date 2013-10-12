@@ -486,6 +486,16 @@ public final class SpecificationRepository {
                     tp2,
                     operationContracts.get(tp2).remove(
                             (FunctionalOperationContract) contract));
+            if (!getWdChecks(contract.getKJT(), contract.getTarget()).isEmpty()) {
+                ImmutableSet<WellDefinednessCheck> wdcs =
+                        getWdChecks(contract.getKJT(), contract.getTarget());
+                for(WellDefinednessCheck wdc: wdcs) {
+                    if (wdc instanceof MethodWellDefinedness
+                            && ((MethodWellDefinedness) wdc).getMethodContract().equals(contract)) {
+                        unregisterWdCheck(wdc);
+                    }
+                }
+            }
         }
         if (contract instanceof WellDefinednessCheck) {
             unregisterWdCheck((WellDefinednessCheck) contract);
@@ -886,9 +896,11 @@ public final class SpecificationRepository {
             registerContract(new ClassWellDefinedness(inv, target, null, null, services));
         } else {
             assert cwds.size() == 1;
-            final ClassWellDefinedness cwd = cwds.iterator().next();
+            ClassWellDefinedness cwd = cwds.iterator().next();
             unregisterContract(cwd);
-            cwd.addInv(inv.getInv(cwd.getOrigVars().self, services));
+            cwd = cwd.combine(new ClassWellDefinedness(inv, cwd.getTarget(),
+                                                       null, null, services),
+                              services);
             registerContract(cwd);
         }
 

@@ -99,14 +99,29 @@ public final class TermFactory {
 	    		   JavaBlock javaBlock) {
 
     	return createTerm(op, subs, boundVars, javaBlock, null);
-    } 
-    
-    
+    }
+
+
     public Term createTerm(Operator op,
-	    		   Term[] subs, 
+                           Term[] subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ITermLabel label) {
+        return createTerm(op, new ImmutableArray<Term>(subs), boundVars,
+                          javaBlock, new ImmutableArray<ITermLabel>(label));
+    }
+
+
+    public Term createTerm(Operator op,
+                           Term[] subs,
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
 	    		   JavaBlock javaBlock) {
-	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock);
+	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock, null);
+    }
+
+
+    public Term createTerm(Operator op, Term[] subs, ITermLabel label) {
+        return createTerm(op, subs, null, null, label);
     }
     
     

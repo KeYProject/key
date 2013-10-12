@@ -21,7 +21,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.speclang.PositionedLabeledString;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 
@@ -74,7 +73,7 @@ public abstract class TextualJMLConstruct {
           }
         }
         if (ps.hasLabels()) {
-            ps = new PositionedLabeledString(t, ps.fileName, ps.pos, ps.getLabels());
+            ps = new PositionedString(t, ps.fileName, ps.pos).label(ps.getLabels());
         } else {
             ps = new PositionedString(t, ps.fileName, ps.pos);
         }
