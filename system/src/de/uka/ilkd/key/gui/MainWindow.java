@@ -295,7 +295,6 @@ public final class MainWindow extends JFrame  {
         setVisible(true);
     }
 
-
     public static MainWindow getInstance() {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
