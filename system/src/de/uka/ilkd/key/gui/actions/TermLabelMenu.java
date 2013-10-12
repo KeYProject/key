@@ -4,10 +4,13 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
 /**
@@ -37,7 +40,17 @@ public class TermLabelMenu extends JMenu {
                 }
                 Collections.sort(stringNames);
                 for (String name : stringNames) {
-                    add(name);
+                    MainWindowAction mainWindowAction = new MainWindowAction(MainWindow.getInstance()) {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            mainWindow.makePrettyView();
+                        }
+                    };
+                    mainWindowAction.setName(name);
+                    JCheckBoxMenuItem checkBox = new JCheckBoxMenuItem(mainWindowAction);
+                    checkBox.setName("ITermLabel_" + name);
+                    checkBox.setState(true);
+                    add(checkBox);
                 }
             }
         });
