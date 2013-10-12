@@ -675,7 +675,12 @@ public class TermBuilder {
     }
 
     public Term andSC(Term t1, Term t2) {
-        return shortcut(and(t1, t2));
+        if(t1.op() == Junctor.TRUE || t1.op() == Junctor.FALSE
+                || t2.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+            return and(t1, t2);
+        } else {
+            return shortcut(and(t1, t2));
+        }
     }
 
     public Term and(Term ... subTerms) {
@@ -688,6 +693,9 @@ public class TermBuilder {
 
     public Term andSC(Term ... subTerms) {
         Term result = tt();
+        if (subTerms.length == 1) {
+            return and(subTerms);
+        }
         for(Term sub : subTerms) {
             result = andSC(result, sub);
         }
@@ -704,8 +712,13 @@ public class TermBuilder {
 
     public Term andSC(Iterable<Term> subTerms) {
         Term result = tt();
+        int i = 0;
         for(Term sub : subTerms) {
             result = andSC(result, sub);
+            i++;
+        }
+        if (i == 1) {
+            return and(subTerms);
         }
         return result;
     }
@@ -723,7 +736,12 @@ public class TermBuilder {
     }
 
     public Term orSC(Term t1, Term t2) {
-        return shortcut(or(t1, t2));
+        if(t1.op() == Junctor.TRUE || t1.op() == Junctor.FALSE
+                || t2.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+            return or(t1, t2);
+        } else {
+            return shortcut(or(t1, t2));
+        }
     }
 
     public Term or(Term... subTerms) {
@@ -736,6 +754,9 @@ public class TermBuilder {
 
     public Term orSC(Term... subTerms) {
         Term result = ff();
+        if (subTerms.length == 1) {
+            return or(subTerms);
+        }
         for(Term sub : subTerms) {
             result = orSC(result, sub);
         }
@@ -752,8 +773,13 @@ public class TermBuilder {
 
     public Term orSC(Iterable<Term> subTerms) {
         Term result = ff();
+        int i = 0;
         for(Term sub : subTerms) {
             result = orSC(result, sub);
+            i++;
+        }
+        if (i == 1) {
+            return or(subTerms);
         }
         return result;
     }

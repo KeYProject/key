@@ -1628,6 +1628,15 @@ final class JMLTranslator {
         } catch (antlr.ANTLRException e) {
             throw parser.getExceptionManager().convertException(e);
         }
+        if (resultClass.equals(Term.class)) {
+            if (expr.hasLabels()) {
+                T o = castToReturnType(result, resultClass);
+                assert o instanceof Term;
+                Term t = (Term)o;
+                t = TB.label((Term)castToReturnType(result, resultClass), expr.getLabels());
+                return castToReturnType(t, resultClass);
+            }
+        }
         return castToReturnType(result, resultClass);
     }
 

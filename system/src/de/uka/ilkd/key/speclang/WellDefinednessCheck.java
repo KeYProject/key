@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ImplicitSpecTermLabel;
+import de.uka.ilkd.key.logic.label.ShortcutEvaluationTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -123,7 +124,10 @@ public abstract class WellDefinednessCheck implements Contract {
         ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
         ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
         if(spec.arity() > 0
-                && spec.op().equals(Junctor.AND)) {
+                && spec.op().equals(Junctor.AND)
+                && spec.hasLabels()
+                && spec.containsLabel(ShortcutEvaluationTermLabel.INSTANCE)) {
+            assert spec.arity() == 2;
             for (Term sub: spec.subs()) {
                 if(sub.hasLabels()
                         && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
@@ -272,7 +276,8 @@ public abstract class WellDefinednessCheck implements Contract {
                 new LinkedHashMap<ProgramVariable, ProgramVariable>();
         //self
         if(selfVar != null && vars.self != null) {
-            assert selfVar.sort().extendsTrans(vars.self.sort());
+            assert vars.self.sort().extendsTrans(selfVar.sort())
+                || selfVar.sort().extendsTrans(vars.self.sort());
             result.put(vars.self, selfVar);
         }
         //parameters

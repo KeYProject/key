@@ -79,7 +79,7 @@ public class ContractFactory {
     Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
     for(LocationVariable h : foci.originalPosts.keySet()) {
        if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
-          newPosts.put(h, tb.and(foci.originalPosts.get(h), addedPost));
+          newPosts.put(h, tb.andSC(addedPost, foci.originalPosts.get(h)));
        }else{
           newPosts.put(h, foci.originalPosts.get(h));
        }

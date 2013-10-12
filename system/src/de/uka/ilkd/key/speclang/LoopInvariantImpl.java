@@ -48,7 +48,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final Term originalSelfTerm;
     private final Map<LocationVariable,Term> originalAtPres;
     
-    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
