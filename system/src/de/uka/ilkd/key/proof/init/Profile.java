@@ -152,5 +152,5 @@ public interface Profile {
     /*
     Get names of supported ITermLabels.
     */
-    ImmutableList<String> getSupportedLabelNames();
+    ImmutableList<Name> getSupportedLabelNames();
 }

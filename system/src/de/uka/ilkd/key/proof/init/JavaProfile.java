@@ -17,6 +17,9 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -173,12 +176,10 @@ public class JavaProfile extends AbstractProfile {
     }
 
     @Override
-    public ImmutableList<String> getSupportedLabelNames() {
-        ImmutableList<String> ret = ImmutableSLList.nil();
-        ImmutableList<ITermLabelWorker> workers = computeLabelInstantiators();
-        for(ITermLabelWorker worker: workers){
-            ret = ret.prepend(worker.getName());
-        }
+    public ImmutableList<Name> getSupportedLabelNames() {
+        ImmutableList<Name> ret = ImmutableSLList.nil();
+        ret = ret.prepend(AnonHeapTermLabel.NAME);
+        ret = ret.prepend(SelectSkolemConstantTermLabel.NAME);
         return ret;
     }
 }

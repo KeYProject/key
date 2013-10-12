@@ -4,6 +4,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.logic.Name;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.JMenu;
 
 /**
@@ -25,9 +29,14 @@ public class TermLabelMenu extends JMenu {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 removeAll();
-                ImmutableList<String> termLabelNames
+                ImmutableList<Name> termLabelNames
                         = mediator.getSelectedProof().env().getInitConfig().getProfile().getSupportedLabelNames();
-                for (String name : termLabelNames) {
+                List<String> stringNames = new LinkedList();
+                for (Name name : termLabelNames) {
+                    stringNames.add(name.toString());
+                }
+                Collections.sort(stringNames);
+                for (String name : stringNames) {
                     add(name);
                 }
             }

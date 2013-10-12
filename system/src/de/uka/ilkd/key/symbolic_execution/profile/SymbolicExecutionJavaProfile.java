@@ -4,6 +4,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
+import de.uka.ilkd.key.logic.label.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.label.LoopInvariantNormalBehaviorTermLabel;
+import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -117,4 +122,14 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
        }
       return defaultInstance;
    }
+   
+   @Override
+   public ImmutableList<Name> getSupportedLabelNames() {
+        ImmutableList<Name> ret = super.getSupportedLabelNames();
+        ret = ret.prepend(LoopBodyTermLabel.NAME);
+        ret = ret.prepend(LoopInvariantNormalBehaviorTermLabel.NAME);
+        ret = ret.prepend(SymbolicExecutionTermLabel.NAME);
+        return ret;
+    }
+   
 }
