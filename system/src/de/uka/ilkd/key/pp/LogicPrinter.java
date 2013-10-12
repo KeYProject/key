@@ -889,7 +889,7 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        if(MainWindow.getInstance().toggleTerms.isSelected()){
+        if(MainWindow.getInstance().termLabelMenu.toggleTerms.isSelected()){
             return;
         }
         layouter.beginC().print("<<");

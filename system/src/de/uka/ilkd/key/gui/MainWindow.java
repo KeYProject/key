@@ -272,7 +272,7 @@ public final class MainWindow extends JFrame  {
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
     
-    public JCheckBoxMenuItem toggleTerms;
+    public TermLabelMenu termLabelMenu;
 
     /*
      * This class should only be instantiated once!
@@ -786,10 +786,6 @@ public final class MainWindow extends JFrame  {
         
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
-        
-        toggleTerms = new JCheckBoxMenuItem(new TermLabelToggleAction(this));
-        toggleTerms.setName("toggleTerms");
-        view.add(toggleTerms);
 
         view.addSeparator();
         {
@@ -822,7 +818,8 @@ public final class MainWindow extends JFrame  {
         proof.add(new ShowKnownTypesAction(this));
         
         proof.addSeparator();
-        proof.add(new TermLabelMenu(getMediator()));
+        termLabelMenu = new TermLabelMenu(getMediator(), this);
+        proof.add(termLabelMenu);
 
         return proof;
     }

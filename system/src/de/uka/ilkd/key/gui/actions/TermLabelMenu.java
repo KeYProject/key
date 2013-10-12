@@ -19,9 +19,13 @@ import javax.swing.JMenu;
  */
 public class TermLabelMenu extends JMenu {
 
-    public TermLabelMenu(final KeYMediator mediator) {
+    public JCheckBoxMenuItem toggleTerms;
+
+    public TermLabelMenu(final KeYMediator mediator, final MainWindow mainWindow) {
 
         this.setText("Term Labels");
+        toggleTerms = new JCheckBoxMenuItem(new TermLabelToggleAction(mainWindow));
+        toggleTerms.setName("toggleTerms");
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
 
@@ -32,6 +36,10 @@ public class TermLabelMenu extends JMenu {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 removeAll();
+
+                add(toggleTerms);
+                addSeparator();
+
                 ImmutableList<Name> termLabelNames
                         = mediator.getSelectedProof().env().getInitConfig().getProfile().getSupportedLabelNames();
                 List<String> stringNames = new LinkedList();
@@ -40,7 +48,7 @@ public class TermLabelMenu extends JMenu {
                 }
                 Collections.sort(stringNames);
                 for (String name : stringNames) {
-                    MainWindowAction mainWindowAction = new MainWindowAction(MainWindow.getInstance()) {
+                    MainWindowAction mainWindowAction = new MainWindowAction(mainWindow) {
                         @Override
                         public void actionPerformed(ActionEvent ae) {
                             mainWindow.makePrettyView();
