@@ -41,25 +41,20 @@ public class TermLabelMenu extends JMenu {
             }
             Collections.sort(stringNames);
             for (final String name : stringNames) {
-                MainWindowAction mainWindowAction = new MainWindowAction(mainWindow) {
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        if (isEnabled()) {
-                            LogicPrinter.hiddenTermLabels.add(name);
-                            System.out.println("add: " + name);
-                        } else {
-                            LogicPrinter.hiddenTermLabels.remove(name);
-                            System.out.println("remove: " + name);
 
+                KeYMenuCheckBox checkBox = new KeYMenuCheckBox(mainWindow, name) {
+                    @Override
+                    public void checkBoxToggled() {
+                        if (isSelected()) {
+                            LogicPrinter.hiddenTermLabels.remove(name);
+                        } else {
+                            LogicPrinter.hiddenTermLabels.add(name);
                         }
                         mainWindow.makePrettyView();
                     }
                 };
-                mainWindowAction.setName(name);
-                JCheckBoxMenuItem checkBox = new JCheckBoxMenuItem(mainWindowAction);
                 checkBox.setName(name);
                 checkBox.setSelected(true);
-//                LogicPrinter.hiddenTermLabels.add(name);
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 add(checkBox);
                 checkBoxList.add(checkBox);
@@ -101,7 +96,7 @@ public class TermLabelMenu extends JMenu {
         @Override
         public void checkBoxToggled() {
             for (JCheckBoxMenuItem checkBox : checkBoxList) {
-                checkBox.setEnabled(isSelected());
+                checkBox.setEnabled(!isSelected());
             }
             mainWindow.makePrettyView();
         }
