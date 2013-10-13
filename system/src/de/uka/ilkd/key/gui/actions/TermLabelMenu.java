@@ -7,7 +7,6 @@ import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class TermLabelMenu extends JMenu {
                     }
                 };
                 checkBox.setName(name);
-                checkBox.setSelected(true);
+                checkBox.setSelected(!LogicPrinter.hiddenTermLabels.contains(name));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 add(checkBox);
                 checkBoxList.add(checkBox);
