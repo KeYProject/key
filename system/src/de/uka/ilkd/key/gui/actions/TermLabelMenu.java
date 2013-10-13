@@ -99,7 +99,5 @@ public class TermLabelMenu extends JMenu {
             }
             mainWindow.makePrettyView();
         }
-
     }
-
 }
