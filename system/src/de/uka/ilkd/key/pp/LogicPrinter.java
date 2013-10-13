@@ -26,7 +26,6 @@ import java.util.HashSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -101,7 +100,7 @@ import java.util.List;
  *
  *
  */
-public final class LogicPrinter {
+public class LogicPrinter {
 
     /**
      * The default and minimal value o fthe
@@ -141,9 +140,17 @@ public final class LogicPrinter {
             QuantifiableVariablePrintMode.NORMAL;
     
     /* 
-     * List of term labels that will not be printed out. 
+     * List of term labels that will not be printed out.
+     * It doesn't have an influence in case hideAllTermLabels() returns true.
      */
     public static final Set<String> hiddenTermLabels = new HashSet();
+
+    /*
+     This function can be overridden by other LogicPrinters, otherwise it just returns false.
+     */
+    public boolean hideAllTermLabels() {
+        return false;
+    }
     
     public static String quickPrintTerm(Term t, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -896,7 +903,7 @@ public final class LogicPrinter {
     }
 
     public void printLabels(Term t) throws IOException {
-        if (MainWindow.getInstance().termLabelMenu.hideAllTermLabels.isSelected()) {
+        if (hideAllTermLabels()) {
             return;
         }
 

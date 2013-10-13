@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.GUILogicPrinter;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
@@ -24,7 +25,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -73,7 +73,7 @@ public abstract class SequentView extends JTextArea
     
     private ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    LogicPrinter printer;
+    GUILogicPrinter printer;
     public boolean refreshHighlightning = true;
     private boolean showTermInfo = false;
     

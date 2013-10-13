@@ -5,8 +5,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 /**
- *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * This class can be used for adding Checkboxes to the menu.
  */
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
@@ -17,7 +17,7 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
         mainWindowAction = new MainWindowAction(mainWindow) {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                checkBoxToggled();
+                handleClickEvent();
             }
         };
         mainWindowAction.setName(label);
@@ -40,5 +40,5 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
         setSelected(b);
     }
 
-    public abstract void checkBoxToggled();
+    public abstract void handleClickEvent();
 }

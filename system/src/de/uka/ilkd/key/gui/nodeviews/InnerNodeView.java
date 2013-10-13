@@ -20,6 +20,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.GUILogicPrinter;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -35,7 +36,6 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
@@ -67,7 +67,7 @@ public class InnerNodeView extends SequentView {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(),
+        printer = new GUILogicPrinter(new ProgramPrinter(),
                 mediator.getNotationInfo(),
                 mediator.getServices());
         setSelectionColor(new Color(10,180,50));
@@ -193,7 +193,7 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                LogicPrinter tacPrinter = new LogicPrinter(new ProgramPrinter(null),
+                GUILogicPrinter tacPrinter = new GUILogicPrinter(new ProgramPrinter(null),
                         mediator.getNotationInfo(),
                         mediator.getServices(),
                         true);

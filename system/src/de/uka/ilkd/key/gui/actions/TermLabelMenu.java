@@ -43,7 +43,7 @@ public class TermLabelMenu extends JMenu {
 
                 KeYMenuCheckBox checkBox = new KeYMenuCheckBox(mainWindow, name) {
                     @Override
-                    public void checkBoxToggled() {
+                    public void handleClickEvent() {
                         if (isSelected()) {
                             LogicPrinter.hiddenTermLabels.remove(name);
                         } else {
@@ -93,7 +93,7 @@ public class TermLabelMenu extends JMenu {
         }
 
         @Override
-        public void checkBoxToggled() {
+        public void handleClickEvent() {
             for (JCheckBoxMenuItem checkBox : checkBoxList) {
                 checkBox.setEnabled(!isSelected());
             }
