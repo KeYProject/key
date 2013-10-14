@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.label.LabelFactory;
+import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * <p>
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.logic.label.LabelFactory;
  * <ol>
  *    <li>Create a subclass of {@link ITermLabel}.</li>
  *    <li>Modify {@link LabelFactory#createLabel(String, java.util.List)} to ensure that instances of the new {@link ITermLabel} sub class are created when a {@link String} is parsed into a {@link Term}.</li>
+ *    <li>Make sure that {@link Profile}s in which the {@link ITermLabel} will be used returns its name via {@link Profile#getSupportedLabelNames()}. This method is used by the user interface to list all possible term label names.</li>
  *    <li>If required implement an {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} which maintains the new term labels during proof. Ensure that this {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instance is registered in {@link de.uka.ilkd.key.proof.init.Profile#getLabelInstantiators()}.
  *        Typically this is achieved by adding the new {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instance in
  *        {@link de.uka.ilkd.key.proof.init.AbstractProfile#computeLabelInstantiators()}.</li>
