@@ -1485,7 +1485,9 @@ public class TermBuilder {
     }
 
     public Term wd(Term t, Services services) {
-        if (t.sort().equals(Sort.FORMULA)) {
+        if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
+            return tt();
+        } else if (t.sort().equals(Sort.FORMULA)) {
             return func(TransformerFunction.wdFormula(services), t);
         } else {
             return func(TransformerFunction.wdAny(services), t);

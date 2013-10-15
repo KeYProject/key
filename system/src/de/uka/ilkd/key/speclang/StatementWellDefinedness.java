@@ -135,7 +135,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public final Term getGlobalDefs() {
-        throw new UnsupportedOperationException("Not applicable for well-definedness of statements.");
+        return null;
     }
 
     @Override

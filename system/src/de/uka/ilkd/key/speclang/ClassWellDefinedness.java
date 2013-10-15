@@ -162,6 +162,6 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public Term getGlobalDefs() {
-        throw new UnsupportedOperationException("Not applicable for well-definedness of invariants.");
+        return null;
     }
 }

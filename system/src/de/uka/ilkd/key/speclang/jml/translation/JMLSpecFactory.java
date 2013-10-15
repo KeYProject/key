@@ -682,7 +682,9 @@ public class JMLSpecFactory {
               Term post2 = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
                         ? TB.and(TB.convertToFormula(clauses.signals,services),
                                  TB.convertToFormula(clauses.signalsOnly,services))
-                        : TB.imp(TB.not(excNull),TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services))));
+                        : TB.imp(TB.not(excNull),
+                                 TB.and(TB.convertToFormula(clauses.signals,services),
+                                        TB.convertToFormula(clauses.signalsOnly,services))));
               result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ?
                                TB.and(post1, post2) : post1);
             }else{

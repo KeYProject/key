@@ -70,7 +70,7 @@ public abstract class WellDefinednessCheck implements Contract {
     public static final String OP_EXC_TACLET = "wd_Exc_Operation";
 
     static enum Type {
-        CLASS_INVARIANT, CLASS_AXIOM, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
+        CLASS_INVARIANT, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT;
     }
 
     private final String name;
@@ -119,44 +119,62 @@ public abstract class WellDefinednessCheck implements Contract {
     // Internal Methods
     //-------------------------------------------------------------------------
 
-    private static Pair<ImmutableList<Term>, ImmutableList<Term>> splitRecursively(Term spec) {
+    private Pair<ImmutableList<Term>, ImmutableList<Term>> splitRecursively(Term spec) {
         assert spec != null;
         ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
         ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
-        if(spec.arity() > 0
-                && spec.op().equals(Junctor.AND)
-                && spec.hasLabels()
-                && spec.containsLabel(ShortcutEvaluationTermLabel.INSTANCE)) {
+        if (spec.arity() > 0
+                && spec.op().equals(Junctor.AND)) {
             assert spec.arity() == 2;
-            for (Term sub: spec.subs()) {
-                if(sub.hasLabels()
-                        && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
-                    final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
-                    implicit = implicit.append(p.first).append(p.second);
+            if (spec.hasLabels() && spec.containsLabel(ShortcutEvaluationTermLabel.INSTANCE)) {
+                for (Term sub: spec.subs()) {
+                    if(sub.hasLabels()
+                            && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
+                        implicit = implicit.append(p.first).append(p.second);
+                    } else {
+                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
+                        implicit = implicit.append(p.first);
+                        explicit = explicit.append(p.second);
+                    }
+                }
+            } else {
+                final Condition c1 = split(spec.sub(0));
+                final Condition c2 = split(spec.sub(1));
+                final Term a1 = TB.andSC(c1.implicit, c1.explicit);
+                final Term a2 = TB.andSC(c2.implicit, c2.explicit);
+                final Term a;
+                if (a2.hasLabels() && a2.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                    a = TB.and(a2, a1);
                 } else {
-                    final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
-                    implicit = implicit.append(p.first);
-                    explicit = explicit.append(p.second);
+                    a = TB.and(a1, a2);
+                }
+                if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                    implicit = implicit.append(a);
+                } else {
+                    explicit = explicit.append(a);
                 }
             }
-            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
         } else if (spec.arity() > 0
                 && spec.op().equals(Junctor.IMP)) {
             assert spec.arity() == 2;
-            final Pair<ImmutableList<Term>, ImmutableList<Term>> imp1 = splitRecursively(spec.sub(0));
-            final Pair<ImmutableList<Term>, ImmutableList<Term>> imp2 = splitRecursively(spec.sub(1));
-            Term i1 = TB.andSC(TB.andSC(imp1.first), TB.andSC(imp1.second));
-            Term i2 = TB.andSC(TB.andSC(imp2.first), TB.andSC(imp2.second));
-            explicit = explicit.append(TB.imp(i1, i2));
-            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
+            final Condition c1 = split(spec.sub(0));
+            final Condition c2 = split(spec.sub(1));
+            final Term i1 = TB.andSC(c1.implicit, c1.explicit);
+            final Term i2 = TB.andSC(c2.implicit, c2.explicit);
+            if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
+                implicit = implicit.append(TB.imp(i1, i2));
+            } else {
+                explicit = explicit.append(TB.imp(i1, i2));
+            }
         } else {
             if (spec.hasLabels() && spec.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
                 implicit = implicit.append(spec);
             } else {
                 explicit = explicit.append(spec);
             }
-            return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
         }
+        return new Pair<ImmutableList<Term>, ImmutableList<Term>> (implicit, explicit);
     }
 
     private static Term replaceSV(Term t, SchemaVariable self,
@@ -387,9 +405,15 @@ public abstract class WellDefinednessCheck implements Contract {
             sig.append(origVars.exception);
             sig.append(")");
         }
+        final String mby = hasMby() ? LogicPrinter.quickPrintTerm(this.mby, services) : null;
+
         String mods = "";
-        if (getAssignable(null) != null) {
-            String printMods = LogicPrinter.quickPrintTerm(getAssignable(null), services);
+        if (getAssignable() != null && !type().equals(Type.CLASS_INVARIANT) && !isModel()) {
+            String printMods =
+                    LogicPrinter.quickPrintTerm(getAssignable(null).equals(TB.strictlyNothing()) ?
+                                                    TB.empty(services) :
+                                                        this.getAssignable(null),
+                                                services);
             mods = mods
                     + (includeHtmlMarkup ? "<br><b>" : "\n")
                     + "mod"
@@ -397,44 +421,85 @@ public abstract class WellDefinednessCheck implements Contract {
                     + (includeHtmlMarkup ?
                             LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
         }
+        if (getAssignable().equals(TB.strictlyNothing())
+                && !type().equals(Type.CLASS_INVARIANT) && !isModel()) {
+            mods = mods +
+                    (includeHtmlMarkup ? "<b>" : "") +
+                    ", creates no new objects" +
+                    (includeHtmlMarkup ? "</b>" : "");
+        }
+        String globalUpdates = "";
+        if (getGlobalDefs() != null){
+            final String printUpdates = LogicPrinter.quickPrintTerm(getGlobalDefs(), services);
+            globalUpdates = (includeHtmlMarkup? "<br><b>": "\n")
+                    + "defs" + (includeHtmlMarkup? "</b> " : ": ")
+                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates,false) : printUpdates.trim());
+        }
         String pres = "";
         if (getRequires(null) != null) {
             String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
             pres = pres
                     + (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + "pre"
+                    + ((!type().equals(Type.CLASS_INVARIANT)
+                            && !type().equals(Type.LOOP_INVARIANT)) ? "pre" : "inv")
                     + (includeHtmlMarkup ? "</b> " : ": ")
                     + (includeHtmlMarkup ?
                             LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
         }
+        String deps = "";
+        if(getAccessible() != null) {
+            String printDeps = LogicPrinter.quickPrintTerm(getAccessible(), services);
+            deps = deps
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "dep"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printDeps, false) : printDeps.trim());
+        }
+        String reps = "";
+        if(getRepresents() != null) {
+            String printReps = LogicPrinter.quickPrintTerm(getRepresents(), services);
+            reps = reps
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "rep"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printReps, false) : printReps.trim());
+        }
         String posts = "";
-        for (LocationVariable h : getHeaps()) {
-            if (getEnsures() != null) {
-                String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
-                posts = posts
-                        + (includeHtmlMarkup ? "<br><b>" : "\n")
-                        + "post"
-                        + (h == getHeap() ? "" : "[" + h + "]")
-                        + (includeHtmlMarkup ? "</b> " : ": ")
-                        + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
-                                : printPosts.trim());
-            }
+        if (getEnsures(null) != null && !type().equals(Type.CLASS_INVARIANT)
+                && !type().equals(Type.LOOP_INVARIANT) && !isModel()) {
+            String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
+            posts = posts
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "post"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
+                            : printPosts.trim());
         }
         if (includeHtmlMarkup) {
             return "<html>"
                     + "<i>"
                     + LogicPrinter.escapeHTML(sig.toString(), false)
                     + "</i>"
+                    + globalUpdates
                     + pres
+                    + deps
+                    + reps
                     + posts
                     + mods
+                    + (hasMby() ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
                     + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") +
                     "</html>";
         } else {
             return sig.toString()
+                    + globalUpdates
                     + pres
+                    + deps
+                    + reps
                     + posts
                     + mods
+                    + (hasMby() ? "\nmeasured-by: "+ mby : "")
                     + (transactionApplicableContract() ? "\ntransaction applicable:" : "");
         }
     }
@@ -689,6 +754,18 @@ public abstract class WellDefinednessCheck implements Contract {
         this.accessible = acc;
     }
 
+    final void combineAccessible(Term acc, Term accPre, Services services) {
+        if (acc == null && accPre == null) {
+            setAccessible(null);
+        } else if (accPre == null || accPre.equals(acc)) {
+            setAccessible(acc);
+        } else if (acc == null) {
+            setAccessible(accPre);
+        } else {
+            setAccessible(TB.union(services, acc, accPre));
+        }
+    }
+
     final void addEnsures(Condition ens) {
         final Condition oldEnsures = getEnsures();
         this.ensures = new Condition(TB.andSC(ens.implicit, oldEnsures.implicit),
@@ -696,7 +773,8 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     final void addEnsures(Term ens) {
-        addEnsures(split(ens));
+        Condition ensures = split(ens);
+        addEnsures(ensures);
     }
 
     final void setEnsures(Term ens) {
@@ -742,7 +820,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
         if (this.getAccessible() != null && wdc.getAccessible() != null) {
             final Term acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
-            setAccessible(TB.union(services, acc, this.getAccessible()));
+            combineAccessible(acc, this.getAccessible(), services);
         } else if (wdc.getAccessible() != null) {
             final Term acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
             setAccessible(acc);

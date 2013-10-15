@@ -68,8 +68,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
-        setAssignable(contract.getAssignable(h), services);
-        setAccessible(contract.getAccessible(h),
+        setAssignable(contract.hasModifiesClause(h) ? contract.getAssignable(h) : TB.strictlyNothing(),
+                      services);
+        combineAccessible(contract.getAccessible(h),
                       hPre != null ? contract.getAccessible(hPre) : null,
                       services);
         setEnsures(contract.getEnsures(h));
@@ -88,7 +89,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
         setRequires(contract.getRequires(h));
         setAssignable(TB.strictlyNothing(), services);
-        setAccessible(contract.getAccessible(h),
+        combineAccessible(contract.getAccessible(h),
                       hPre != null ? contract.getAccessible(hPre) : null,
                       services);
         setEnsures(TB.tt());
@@ -124,18 +125,6 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                     pv.name(), pv.getKeYJavaType().getSort()));
         }
         return paramsSV;
-    }
-
-    private void setAccessible(Term acc, Term accPre, Services services) {
-        if (acc == null && accPre == null) {
-            setAccessible(null);
-        } else if (accPre == null) {
-            setAccessible(acc);
-        } else if (acc == null) {
-            setAccessible(accPre);
-        } else {
-            setAccessible(TB.union(services, acc, accPre));
-        }
     }
 
     @Override

@@ -49,7 +49,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         final LocationVariable h = getHeap();
         this.block = block;
         setRequires(block.getRequires(h));
-        setAssignable(block.getAssignable(h), services);
+        setAssignable(block.hasModifiesClause(h) ? block.getAssignable(h) : TB.strictlyNothing(),
+                      services);
         setEnsures(block.getEnsures(h));
     }
 

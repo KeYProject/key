@@ -211,9 +211,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
     //public interface
     //-------------------------------------------------------------------------
 
-    // TODO: We might have to change this structure to represent specification elements more
-    // accurately for well-definedness checks (not sure yet)
-
     @Override
     public ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
             throws SLTranslationException {
