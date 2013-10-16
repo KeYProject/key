@@ -527,7 +527,7 @@ public final class SpecificationRepository {
                     final FunctionalOperationContract iniContr = cf.func(pm,
                             inv);
                     addContractNoInheritance(iniContr);
-                    assert getContracts(kjt, pm).size() == 1 + oldContracts
+                    assert getContracts(kjt, pm).size() == 2 + oldContracts
                             .size();
                 } else {
                     for (FunctionalOperationContract c : oldFuncContracts) {
@@ -1401,13 +1401,19 @@ public final class SpecificationRepository {
         }
         final ProgramVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         for (RepresentsAxiom rep : reps) {
+            boolean dep = false;
             for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
                 if (ch.isModel() && ch.getTarget().equals(rep.getTarget())) {
+                    dep = true;
                     unregisterContract(ch);
                     Term represents = rep.getAxiom(heap, ch.getOrigVars().self, services);
                     WellDefinednessCheck newCh = ch.addRepresents(represents);
                     registerContract(newCh);
                 }
+            }
+            if (!dep) {
+                MethodWellDefinedness mwd = new MethodWellDefinedness(rep, services);
+                registerContract(mwd);
             }
         }
     }

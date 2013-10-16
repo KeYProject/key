@@ -626,10 +626,10 @@ public abstract class WellDefinednessCheck implements Contract {
         if (!taclet) {
             result = new Term[]
                     { wellFormed, selfNotNull, selfCreated, selfExactType,
-                    implicitPre, paramsOK, mbyAtPreDef.term, invTerm };
+                      paramsOK, implicitPre, mbyAtPreDef.term, invTerm };
         } else {
             result = new Term[]
-                    { wellFormed, implicitPre, paramsOK, mbyAtPreDef.term };
+                    { wellFormed, paramsOK, implicitPre, mbyAtPreDef.term };
         }
         for (Term t: result) {
             resList = resList.append(t);
@@ -883,6 +883,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     public final WellDefinednessCheck addRepresents(Term rep) {
+        assert rep != null;
         if (this.represents != null && rep != null) {
             this.represents = TB.andSC(this.represents, rep);
         } else {

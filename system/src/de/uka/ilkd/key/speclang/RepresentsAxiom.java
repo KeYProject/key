@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
+import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -236,5 +237,10 @@ public final class RepresentsAxiom extends ClassAxiom {
         Term newRep = TB.and(originalRep, ax.originalRep);
         return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newRep,
                                    originalSelfVar, originalParamVars, atPreVars);
+    }
+
+    public OriginalVariables getOrigVars() {
+        return new OriginalVariables(originalSelfVar, null, null,
+                                     atPreVars, originalParamVars);
     }
 }

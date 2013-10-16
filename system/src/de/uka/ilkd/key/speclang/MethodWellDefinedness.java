@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -97,6 +100,42 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setEnsures(TB.tt());
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
+    }
+
+    public MethodWellDefinedness(RepresentsAxiom rep, Services services) {
+        super(ContractFactory.generateContractTypeName("represents", rep.getKJT(), rep.getTarget(),
+                rep.getTarget().getContainerType()), 0, rep.getTarget(),
+              rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
+        pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
+                 rep.getOrigVars().self == null ?
+                         TB.tt() : TB.inv(services, TB.var(rep.getOrigVars().self)));
+        Map<ProgramVariable,Term> deps = new LinkedHashMap<ProgramVariable, Term>();
+        for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+            deps.put(heap, TB.allLocs(services));
+        }
+        this.contract =
+                new DependencyContractImpl("represents",
+                                           ContractFactory.generateContractName(
+                                                   "represents", rep.getKJT(), rep.getTarget(),
+                                                   rep.getTarget().getContainerType(), 0),
+                                           rep.getKJT(), rep.getTarget(),
+                                           rep.getTarget().getContainerType(), pres, null, deps,
+                                           rep.getOrigVars().self, rep.getOrigVars().params,
+                                           rep.getOrigVars().atPres, null, 0);
+        this.model = true;
+        final LocationVariable h = getHeap();
+        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
+
+        setRequires(contract.getRequires(h));
+        setAssignable(TB.strictlyNothing(), services);
+        combineAccessible(contract.getAccessible(h),
+                          hPre != null ? contract.getAccessible(hPre) : null,
+                          services);
+        setEnsures(TB.tt());
+        setMby(contract.getMby());
+        this.globalDefs = contract.getGlobalDefs();
+        addRepresents(rep.getAxiom(getHeap(), rep.getOrigVars().self, services));
     }
 
     //-------------------------------------------------------------------------
@@ -191,7 +230,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public RewriteTaclet createOperationTaclet(Services services) {
         final String prefix;
         final IObserverFunction target = getTarget();
-        final String tName = target.name().toString();
+        final String methodName = target.name().toString();
+        final String tName =
+                getKJT().getJavaType().getFullName() + " " +
+                methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
         final boolean isStatic = target.isStatic();
         final LocationVariable heap = getHeap();
         final SchemaVariable heapSV =
