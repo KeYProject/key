@@ -406,9 +406,11 @@ public abstract class WellDefinednessCheck implements Contract {
             sig.append(")");
         }
         final String mby = hasMby() ? LogicPrinter.quickPrintTerm(this.mby, services) : null;
-
         String mods = "";
-        if (getAssignable() != null && !type().equals(Type.CLASS_INVARIANT) && !isModel()) {
+        final boolean isInv = type().equals(Type.CLASS_INVARIANT);
+        final boolean isLoop = type().equals(Type.LOOP_INVARIANT);
+        final boolean showSig = !isInv && !isModel();
+        if (getAssignable() != null && showSig) {
             String printMods =
                     LogicPrinter.quickPrintTerm(getAssignable(null).equals(TB.strictlyNothing()) ?
                                                     TB.empty(services) :
@@ -421,8 +423,7 @@ public abstract class WellDefinednessCheck implements Contract {
                     + (includeHtmlMarkup ?
                             LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
         }
-        if (getAssignable().equals(TB.strictlyNothing())
-                && !type().equals(Type.CLASS_INVARIANT) && !isModel()) {
+        if (getAssignable().equals(TB.strictlyNothing()) && showSig) {
             mods = mods +
                     (includeHtmlMarkup ? "<b>" : "") +
                     ", creates no new objects" +
@@ -440,8 +441,7 @@ public abstract class WellDefinednessCheck implements Contract {
             String printPres = LogicPrinter.quickPrintTerm(getRequires(null), services);
             pres = pres
                     + (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + ((!type().equals(Type.CLASS_INVARIANT)
-                            && !type().equals(Type.LOOP_INVARIANT)) ? "pre" : "inv")
+                    + ((!isInv && !isLoop) ? "pre" : "inv")
                     + (includeHtmlMarkup ? "</b> " : ": ")
                     + (includeHtmlMarkup ?
                             LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
@@ -467,8 +467,7 @@ public abstract class WellDefinednessCheck implements Contract {
                             LogicPrinter.escapeHTML(printReps, false) : printReps.trim());
         }
         String posts = "";
-        if (getEnsures(null) != null && !type().equals(Type.CLASS_INVARIANT)
-                && !type().equals(Type.LOOP_INVARIANT) && !isModel()) {
+        if (getEnsures(null) != null && showSig && !isLoop) {
             String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
             posts = posts
                     + (includeHtmlMarkup ? "<br><b>" : "\n")
@@ -479,9 +478,11 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         if (includeHtmlMarkup) {
             return "<html>"
-                    + "<i>"
-                    + LogicPrinter.escapeHTML(sig.toString(), false)
-                    + "</i>"
+                    + (showSig ?
+                            ("<i>"
+                                    + LogicPrinter.escapeHTML(sig.toString(), false)
+                                    + "</i>")
+                             : "")
                     + globalUpdates
                     + pres
                     + deps
@@ -492,7 +493,7 @@ public abstract class WellDefinednessCheck implements Contract {
                     + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") +
                     "</html>";
         } else {
-            return sig.toString()
+            return (showSig ? sig.toString() : "")
                     + globalUpdates
                     + pres
                     + deps
