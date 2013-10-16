@@ -20,9 +20,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -117,6 +119,18 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return args;
     }
 
+    private static boolean findExcNull(Term t, ProgramVariable exc, Services services) {
+        assert t != null;
+        if (t.op().equals(Junctor.AND)) {
+            assert t.arity() == 2;
+            return findExcNull(t.sub(0), exc, services) || findExcNull(t.sub(1), exc, services);
+        } else if (t.op().equals(Equality.EQUALS)) {
+            assert t.arity() == 2;
+            return t.sub(1).equals(TB.NULL(services)) && t.sub(0).op().equals(exc);
+        }
+        return false;
+    }
+
     private ImmutableList<ParsableVariable> paramsSV() {
         ImmutableList<ParsableVariable> paramsSV =
                 ImmutableSLList.<ParsableVariable>nil();
@@ -190,7 +204,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             ps = ps + " " + pv.sort();
         }
         final Term[] args = getArgs(selfSV, heapSV, isStatic, paramsSV);
-        if (isNormal() /*&& isPure() TODO: Necessary?*/) {
+        if (isNormal(services)) {
             prefix = WellDefinednessCheck.OP_TACLET;
             final boolean isConstructor =
                     target instanceof IProgramMethod && ((IProgramMethod)target).isConstructor();
@@ -212,10 +226,19 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, Services services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;
-        final RewriteTacletGoalTemplate g1 = (RewriteTacletGoalTemplate)t1.goalTemplates().head();
-        final RewriteTacletGoalTemplate g2 = (RewriteTacletGoalTemplate)t2.goalTemplates().head();
-        return createTaclet(t1.name().toString(), t1.find(), t2.find(),
-                            g1.replaceWith(), g2.replaceWith(), services);
+        final Term rw1 = ((RewriteTacletGoalTemplate)t1.goalTemplates().head()).replaceWith();
+        final Term rw2 = ((RewriteTacletGoalTemplate)t2.goalTemplates().head()).replaceWith();
+        final String n1 = t1.name().toString();
+        final String n2 = t2.name().toString();
+        final String n;
+        if (n1.equals(n2)) {
+            n = n1;
+        } else if (n1.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
+            n = n2;
+        } else {
+            n = n1;
+        }
+        return createTaclet(n, t1.find(), t2.find(), rw1, rw2, services);
     }
 
     @Override
@@ -240,10 +263,16 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Used to determine if the contract of this method has normal behaviour or is a model
      * field/contract and can thus not throw any exception.
-     * @return true for either normal or model behaviour
+     * @return true for either normal behaviour or model fields
      */
-    public boolean isNormal() {
-        return getBehaviour().equals("normal") || isModel();
+    public boolean isNormal(Services services) {
+        if (isModel()) {
+            return true;
+        }
+        final Term post = getEnsures().implicit.equals(TB.tt()) ?
+                getEnsures().explicit : getEnsures().implicit;
+        final ProgramVariable exc = getOrigVars().exception;
+        return findExcNull(post, exc, services);
     }
 
     /**

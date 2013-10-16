@@ -119,7 +119,7 @@ public abstract class WellDefinednessCheck implements Contract {
     // Internal Methods
     //-------------------------------------------------------------------------
 
-    private Pair<ImmutableList<Term>, ImmutableList<Term>> splitRecursively(Term spec) {
+    private static Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
         assert spec != null;
         ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
         ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
@@ -130,10 +130,10 @@ public abstract class WellDefinednessCheck implements Contract {
                 for (Term sub: spec.subs()) {
                     if(sub.hasLabels()
                             && sub.containsLabel(ImplicitSpecTermLabel.INSTANCE)) {
-                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
+                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                         implicit = implicit.append(p.first).append(p.second);
                     } else {
-                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(sub);
+                        final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                         implicit = implicit.append(p.first);
                         explicit = explicit.append(p.second);
                     }
@@ -333,8 +333,8 @@ public abstract class WellDefinednessCheck implements Contract {
         return result;
     }
 
-    private Condition split(Term spec) {
-        Pair<ImmutableList<Term>, ImmutableList<Term>> p = splitRecursively(spec);
+    private static Condition split(Term spec) {
+        Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(spec);
         ImmutableList<Term> implicit = p.first;
         ImmutableList<Term> explicit   = p.second;
         return new Condition(TB.andSC(implicit), TB.andSC(explicit));
@@ -656,7 +656,7 @@ public abstract class WellDefinednessCheck implements Contract {
             i++;
         }
         final OpReplacer or = new OpReplacer(map);
-        final Term goal = TB.or(goal1, or.replace(goal2));
+        final Term goal = TB.orSC(goal1, or.replace(goal2));
         final RewriteTacletBuilder tb = new RewriteTacletBuilder();
         tb.setFind(find1);
         tb.setName(MiscTools.toValidTacletName(name));
@@ -1161,7 +1161,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
-    private final class TermListAndFunc {
+    private final static class TermListAndFunc {
         private final ImmutableList<Term> terms;
         private final Function func;
 
@@ -1171,9 +1171,9 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    final class Condition {
-        private final Term implicit;
-        private final Term explicit;
+    final static class Condition {
+        final Term implicit;
+        final Term explicit;
 
         Condition(Term implicit, Term explicit) {
             this.implicit = implicit;
@@ -1181,7 +1181,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    public final class TermAndFunc {
+    public final static class TermAndFunc {
         public final Term term;
         public final Function func;
 
@@ -1191,7 +1191,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
     }
 
-    public final class POTerms {
+    public final static class POTerms {
         public final Condition pre;
         public final Term mod;
         public final ImmutableList<Term> rest;

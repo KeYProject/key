@@ -159,20 +159,33 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     void generateWdTaclets() {
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
+        ImmutableSet<String> names = DefaultImmutableSet.<String>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
                 // WD(pv.m(...))
                 RewriteTaclet mwdTaclet = mwd.createOperationTaclet(services);
-                if (res.contains(mwdTaclet)) {
+                String tName = mwdTaclet.name().toString();
+                final String prefix;
+                if (tName.startsWith(WellDefinednessCheck.OP_TACLET)) {
+                    prefix = WellDefinednessCheck.OP_TACLET;
+                } else if (tName.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
+                    prefix = WellDefinednessCheck.OP_EXC_TACLET;
+                } else {
+                    prefix = "";
+                }
+                tName = tName.replace(prefix, "");
+                if (names.contains(tName)) {
                     for(RewriteTaclet t: res) {
-                        if (t.name().equals(mwdTaclet.name())) {
+                        if (t.find().toString().equals(mwdTaclet.find().toString())) {
                             res = res.remove(t);
+                            names = names.remove(tName);
                             mwdTaclet = mwd.combineTaclets(t, mwdTaclet, services);
                         }
                     }
                 }
                 res = res.add(mwdTaclet);
+                names = names.add(tName);
             }
         }
         // WD(pv.<inv>)
