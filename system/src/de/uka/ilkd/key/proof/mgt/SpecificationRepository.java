@@ -458,8 +458,7 @@ public final class SpecificationRepository {
             }
             registerContract(cwd);
         } else if (contract instanceof DependencyContract
-                && ((DependencyContract) contract).getOrigVars().atPres
-                        .isEmpty()) {
+                && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()) {
             final MethodWellDefinedness mwd =
                     new MethodWellDefinedness((DependencyContract) contract, services);
             registerContract(mwd);

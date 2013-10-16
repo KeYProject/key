@@ -1060,11 +1060,19 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final String getDisplayName() {
-        return "Well-Definedness of JML " +
-               (isModel() ? "model " : "") +
-               typeString() +
-               (type() != Type.CLASS_INVARIANT ? (" " + id) : "") +
-               (getBehaviour().equals("") ? "" : " (" + getBehaviour() + ")");
+        String displayName = "Well-Definedness of JML ";
+        if (isModel()) {
+            displayName = displayName + "model field";
+        } else {
+            displayName = displayName + typeString();
+        }
+        if(!isModel() && !type().equals(Type.CLASS_INVARIANT)) {
+            displayName = displayName + " " + id;
+        }
+        if(!getBehaviour().equals("")) {
+            displayName = displayName + " (" + getBehaviour() + ")";
+        }
+        return displayName;
     }
 
     @Override

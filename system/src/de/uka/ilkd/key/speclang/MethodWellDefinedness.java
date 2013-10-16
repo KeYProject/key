@@ -84,7 +84,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     public MethodWellDefinedness(DependencyContract contract, Services services) {
-        super(contract.getTypeName(), contract.id(), contract.getTarget(),
+        super(ContractFactory.generateContractTypeName("JML model field", contract.getKJT(),
+                                                       contract.getTarget(),
+                                                       contract.getTarget().getContainerType()),
+                                                       contract.id(), contract.getTarget(),
               contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
@@ -103,7 +106,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     public MethodWellDefinedness(RepresentsAxiom rep, Services services) {
-        super(ContractFactory.generateContractTypeName("represents", rep.getKJT(), rep.getTarget(),
+        super(ContractFactory.generateContractTypeName("JML model field", rep.getKJT(), rep.getTarget(),
                 rep.getTarget().getContainerType()), 0, rep.getTarget(),
               rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
@@ -115,9 +118,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             deps.put(heap, TB.allLocs(services));
         }
         this.contract =
-                new DependencyContractImpl("represents",
+                new DependencyContractImpl("JML model field",
                                            ContractFactory.generateContractName(
-                                                   "represents", rep.getKJT(), rep.getTarget(),
+                                                   "JML model field", rep.getKJT(), rep.getTarget(),
                                                    rep.getTarget().getContainerType(), 0),
                                            rep.getKJT(), rep.getTarget(),
                                            rep.getTarget().getContainerType(), pres, null, deps,
@@ -406,7 +409,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public String getTypeName() {
-        return "Well-Definedness of " + (isModel() ? "model " : "") + contract.getTypeName();
+        return "Well-Definedness of " + (isModel() ? "JML model field" : contract.getTypeName());
     }
 
     @Override
