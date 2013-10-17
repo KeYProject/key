@@ -700,7 +700,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return replace(t, newVars, this);
     }
 
-    final Term replace(Term t, Variables vars) {
+    public final Term replace(Term t, Variables vars) {
         return replace(t, vars, this);
     }
 

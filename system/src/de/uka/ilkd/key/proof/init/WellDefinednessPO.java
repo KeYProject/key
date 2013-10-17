@@ -146,8 +146,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                                                                ImmutableList<ProgramVariable>
                                                                           origParams,
                                                                Services services) {
-        final ImmutableList<ProgramVariable> params =
-                TB.paramVars(services, target, true);
+        final ImmutableList<ProgramVariable> params = TB.paramVars(services, target, true);
         return addGhostParams(params, origParams);
     }
 
@@ -249,7 +248,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term wdMod = TB.wd(po.mod, services);
         final Term wdRest = TB.and(TB.wd(po.rest, services));
         register(preCond.func);
-        mbyAtPre = preCond.func != null ? TB.func(preCond.func) : null;
+        mbyAtPre = preCond.func != null ? check.replace(TB.func(preCond.func), vars) : null;
         final Term post = check.getPost(po.post, vars.result, services);
         final Term pre = preCond.term;
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,

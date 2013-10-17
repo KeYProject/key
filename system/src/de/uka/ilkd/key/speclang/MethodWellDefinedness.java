@@ -191,20 +191,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             final Function mbyAtPreFunc =
                     new Function(new Name(TB.newName(services, "mbyAtPre")),
                                  services.getTypeConverter().getIntegerLDT().targetSort());
-            OriginalVariables origVars = getOrigVars();
+            final OriginalVariables origVars = getOrigVars();
             final Term mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby;
-            if (params != null && self != null && !params.isEmpty()
-                    && (params.iterator().next() instanceof ProgramVariable)
-                    && (self instanceof ProgramVariable)) {
-                ImmutableList<ProgramVariable> parameters =
-                        ImmutableSLList.<ProgramVariable>nil();
+            if (params != null && self != null) {
+                ImmutableList<Term> parameters = ImmutableSLList.<Term>nil();
                 for (ParsableVariable pv: params) {
-                    parameters = parameters.append((ProgramVariable)pv);
+                    parameters = parameters.append(TB.var(pv));
                 }
-                mby = contract.getMby((ProgramVariable)self, parameters, services);
+                Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
+                for (LocationVariable var: origVars.atPres.keySet()) {
+                    atPres.put(var, origVars.atPres.get(var) == null ?
+                                        null : TB.var(origVars.atPres.get(var)));
+                }
+                Map<LocationVariable,Term> heaps = new LinkedHashMap<LocationVariable, Term>();
+                LocationVariable heap = getHeap();
+                heaps.put(heap, TB.var(heap));
+                mby = contract.getMby(heaps, TB.var(self), parameters, atPres, services);
             } else {
-                mby = contract.getMby(origVars.self, origVars.params, services);
+                assert false;
+                mby = TB.zero(services);
             }
             final Term mbyAtPreDef = TB.equals(mbyAtPre, mby);
             return new TermAndFunc(mbyAtPreDef, mbyAtPreFunc);
