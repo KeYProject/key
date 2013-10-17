@@ -64,8 +64,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
-        super(contract.getTypeName(), contract.id(), contract.getTarget(),
-              contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        super(contract.getTypeName(), contract.id(), contract.getTarget(), contract.getOrigVars(),
+              Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         this.model = false;
@@ -87,8 +87,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         super(ContractFactory.generateContractTypeName("JML model field", contract.getKJT(),
                                                        contract.getTarget(),
                                                        contract.getTarget().getContainerType()),
-                                                       contract.id(), contract.getTarget(),
-              contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
+              contract.id(), contract.getTarget(), contract.getOrigVars(),
+              Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         this.model = true;
@@ -106,9 +106,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     public MethodWellDefinedness(RepresentsAxiom rep, Services services) {
-        super(ContractFactory.generateContractTypeName("JML model field", rep.getKJT(), rep.getTarget(),
-                rep.getTarget().getContainerType()), 0, rep.getTarget(),
-              rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        super(ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
+                                                       rep.getTarget(),
+                                                       rep.getTarget().getContainerType()),
+              0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
         Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                  rep.getOrigVars().self == null ?
@@ -321,7 +322,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness combine(WellDefinednessCheck wdc, Services services) {
         assert wdc instanceof MethodWellDefinedness;
         final MethodWellDefinedness mwd = (MethodWellDefinedness)wdc;
-        assert this.getMethodContract().getName().equals(mwd.getMethodContract().getName());
+        assert getMethodContract() instanceof FunctionalOperationContract ?
+                getMethodContract().getName().equals(mwd.getMethodContract().getName()) : true;
         assert this.getMethodContract().id() == mwd.getMethodContract().id();
         assert this.getMethodContract().getTarget().equals(mwd.getMethodContract().getTarget());
         assert this.getMethodContract().getKJT().equals(mwd.getMethodContract().getKJT());

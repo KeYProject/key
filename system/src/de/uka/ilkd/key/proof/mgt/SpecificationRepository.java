@@ -459,8 +459,16 @@ public final class SpecificationRepository {
             registerContract(cwd);
         } else if (contract instanceof DependencyContract
                 && ((DependencyContract) contract).getOrigVars().atPres.isEmpty()) {
-            final MethodWellDefinedness mwd =
+            MethodWellDefinedness mwd =
                     new MethodWellDefinedness((DependencyContract) contract, services);
+            final ImmutableSet<MethodWellDefinedness> mwds =
+                    getWdMethodChecks(targetKJT, targetMethod);
+            if(!mwds.isEmpty()) {
+                assert mwds.size() == 1;
+                final MethodWellDefinedness oldMwd = mwds.iterator().next();
+                unregisterContract(oldMwd);
+                mwd = mwd.combine(oldMwd, services);
+            }
             registerContract(mwd);
         } else if (contract instanceof WellDefinednessCheck) {
             registerWdCheck((WellDefinednessCheck) contract);
@@ -641,6 +649,20 @@ public final class SpecificationRepository {
                 .<MethodWellDefinedness> nil();
         for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
             if (ch.getKJT().equals(kjt)) {
+                result = result.add(ch);
+            }
+        }
+        return result;
+    }
+
+    private ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt,
+                                                                  IObserverFunction target) {
+        assert kjt != null;
+        assert target != null;
+        ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet
+                .<MethodWellDefinedness> nil();
+        for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
+            if (ch.getKJT().equals(kjt) && ch.getTarget().equals(target)) {
                 result = result.add(ch);
             }
         }
