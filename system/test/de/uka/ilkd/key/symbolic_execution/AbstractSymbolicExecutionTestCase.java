@@ -914,7 +914,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(), (FunctionalOperationContract)contract, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -963,7 +962,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, precondition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
@@ -1052,7 +1050,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName, pm, precondition, startPosition, endPosition, true, true);
       Proof proof = environment.createProof(input);
       assertNotNull(proof);
-      SymbolicExecutionUtil.configureProof(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning

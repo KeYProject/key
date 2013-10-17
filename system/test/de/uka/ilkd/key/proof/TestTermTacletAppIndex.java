@@ -15,9 +15,12 @@
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
 
+import java.util.Map;
+
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -28,11 +31,13 @@ import de.uka.ilkd.key.proof.NullNewRuleListener;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.LRUCache;
 
 
 public class TestTermTacletAppIndex extends TestCase{   
@@ -85,12 +90,13 @@ public class TestTermTacletAppIndex extends TestCase{
 	noCache = null;	
     }
 
+    private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<CacheKey, TermTacletAppIndex> ( ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES ); 
 
     private TermTacletAppIndexCacheSet realCache =
-        new TermTacletAppIndexCacheSet ();
+        new TermTacletAppIndexCacheSet (termTacletAppIndexCache);
 
     private TermTacletAppIndexCacheSet noCache =
-        new TermTacletAppIndexCacheSet () {
+        new TermTacletAppIndexCacheSet (termTacletAppIndexCache) {
             public ITermTacletAppIndexCache getAntecCache() {
                 return getNoCache ();
             }
