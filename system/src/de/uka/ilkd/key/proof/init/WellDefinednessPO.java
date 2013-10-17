@@ -281,6 +281,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return check;
     }
 
+    @Override
     public Term getMbyAtPre() {
         return this.mbyAtPre;
     }

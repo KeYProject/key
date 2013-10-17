@@ -21,9 +21,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -60,10 +60,8 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    TermAndFunc generateMbyAtPreDef(ParsableVariable self,
-                                    ImmutableList<ParsableVariable> params,
-                                    Services services) {
-        return new TermAndFunc(TB.tt(), null);
+    Function generateMbyAtPreDef(Services services) {
+        return null;
     }
 
     @Override

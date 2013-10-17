@@ -615,7 +615,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params, services);
 
         // initial value of measured_by clause
-        final TermAndFunc mbyAtPreDef = generateMbyAtPreDef(self, params, services);
+        final Function mbyAtPre = generateMbyAtPreDef(services);
 
         final Term wellFormed = TB.wellFormed(TB.var(heap), services);
 
@@ -626,15 +626,15 @@ public abstract class WellDefinednessCheck implements Contract {
         if (!taclet) {
             result = new Term[]
                     { wellFormed, selfNotNull, selfCreated, selfExactType,
-                      paramsOK, implicitPre, mbyAtPreDef.term, invTerm };
+                      paramsOK, implicitPre, invTerm };
         } else {
             result = new Term[]
-                    { wellFormed, paramsOK, implicitPre, mbyAtPreDef.term };
+                    { wellFormed, paramsOK, implicitPre };
         }
         for (Term t: result) {
             resList = resList.append(t);
         }
-        return new TermListAndFunc(resList, mbyAtPreDef.func);
+        return new TermListAndFunc(resList, mbyAtPre);
     }
 
     final static RewriteTaclet createTaclet(String name,
@@ -692,9 +692,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return (RewriteTaclet) tb.getTaclet();
     }
 
-    abstract TermAndFunc generateMbyAtPreDef(ParsableVariable self,
-                                             ImmutableList<ParsableVariable> params,
-                                             Services services);
+    abstract Function generateMbyAtPreDef(Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars, this);

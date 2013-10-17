@@ -22,9 +22,9 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
@@ -71,10 +71,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    final TermAndFunc generateMbyAtPreDef(ParsableVariable self,
-                                          ImmutableList<ParsableVariable> params,
-                                          Services services) {
-        return new TermAndFunc(TB.tt(), null);
+    final Function generateMbyAtPreDef(Services services) {
+        return null;
     }
 
     @Override

@@ -184,39 +184,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    TermAndFunc generateMbyAtPreDef(ParsableVariable self,
-                                    ImmutableList<ParsableVariable> params,
-                                    Services services) {
-        if (hasMby()) {
-            final Function mbyAtPreFunc =
-                    new Function(new Name(TB.newName(services, "mbyAtPre")),
-                                 services.getTypeConverter().getIntegerLDT().targetSort());
-            final OriginalVariables origVars = getOrigVars();
-            final Term mbyAtPre = TB.func(mbyAtPreFunc);
-            final Term mby;
-            if (params != null && self != null) {
-                ImmutableList<Term> parameters = ImmutableSLList.<Term>nil();
-                for (ParsableVariable pv: params) {
-                    parameters = parameters.append(TB.var(pv));
-                }
-                Map<LocationVariable, Term> atPres = new LinkedHashMap<LocationVariable, Term>();
-                for (LocationVariable var: origVars.atPres.keySet()) {
-                    atPres.put(var, origVars.atPres.get(var) == null ?
-                                        null : TB.var(origVars.atPres.get(var)));
-                }
-                Map<LocationVariable,Term> heaps = new LinkedHashMap<LocationVariable, Term>();
-                LocationVariable heap = getHeap();
-                heaps.put(heap, TB.var(heap));
-                mby = contract.getMby(heaps, TB.var(self), parameters, atPres, services);
-            } else {
-                assert false;
-                mby = TB.zero(services);
-            }
-            final Term mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            return new TermAndFunc(mbyAtPreDef, mbyAtPreFunc);
-        } else {
-            return new TermAndFunc(TB.tt(), null);
-        }
+    Function generateMbyAtPreDef(Services services) {
+        return hasMby() ?
+                new Function(new Name(TB.newName(services, "mbyAtPre")),
+                             services.getTypeConverter().getIntegerLDT().targetSort()) :
+                null;
     }
 
     ImmutableList<Term> getRest() {
