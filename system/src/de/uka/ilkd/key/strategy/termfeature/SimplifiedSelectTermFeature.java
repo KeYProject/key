@@ -24,9 +24,11 @@ import java.util.Iterator;
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
 
     private final HeapLDT heapLDT;
+    private final PrimitiveHeapTermFeature primitiveHeapTermFeature;
 
     private SimplifiedSelectTermFeature(HeapLDT heapLDT) {
         this.heapLDT = heapLDT;
+        this.primitiveHeapTermFeature = PrimitiveHeapTermFeature.create(heapLDT);
     }
 
     public static TermFeature create(HeapLDT heapLDT) {
@@ -40,7 +42,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                     !isSelectOp ||
                     // or the heap term of the select operator is the base heap
                     // or another primitive heap variable
-                    isPrimitiveHeapVariable(t.sub(0).op()) ||
+                    primitiveHeapTermFeature.filter(t.sub(0)) ||
                     // or the heap term of the select operator is an anon heap symbol
                     // (for instance an anonHeap function)
                     (   t.sub(0).op() instanceof Function &&
@@ -48,14 +50,5 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                         t.sub(0).hasLabels() &&
                         t.sub(0).containsLabel(AnonHeapTermLabel.INSTANCE));
 
-    }
-
-    private boolean isPrimitiveHeapVariable(Operator op) {
-        boolean isPrimitive = false;
-        Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();
-        while(!isPrimitive && it.hasNext()) {
-            isPrimitive = (it.next() == op);
-        }
-        return isPrimitive;
     }
 }

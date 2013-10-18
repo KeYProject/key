@@ -14,9 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.label.LabelFactory;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.label.ITermLabelWorker;
 
 /**
  * <p>
@@ -40,7 +37,7 @@ import de.uka.ilkd.key.rule.label.ITermLabelWorker;
  * This means also that it is recommended that parameters of {@link ITermLabel}s are also unmodifiable.
  * </p>
  * <p>
- * During proof it is the responsibility of {@link ITermLabelWorker} instances to
+ * During proof it is the responsibility of {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instances to
  * maintain or remove existing term labels or to add new one.
  * </p>
  * <p>
@@ -48,7 +45,9 @@ import de.uka.ilkd.key.rule.label.ITermLabelWorker;
  * <ol>
  *    <li>Create a subclass of {@link ITermLabel}.</li>
  *    <li>Modify {@link LabelFactory#createLabel(String, java.util.List)} to ensure that instances of the new {@link ITermLabel} sub class are created when a {@link String} is parsed into a {@link Term}.</li>
- *    <li>If required implement an {@link ITermLabelWorker} which maintains the new term labels during proof. Ensure that this {@link ITermLabelWorker} instance is registered in {@link Profile#getLabelInstantiators()}. Typically this is achieved by adding the new {@link ITermLabelWorker} instance in {@link AbstractProfile#computeLabelInstantiators()}.</li>
+ *    <li>If required implement an {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} which maintains the new term labels during proof. Ensure that this {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instance is registered in {@link de.uka.ilkd.key.proof.init.Profile#getLabelInstantiators()}.
+ *        Typically this is achieved by adding the new {@link de.uka.ilkd.key.rule.label.ITermLabelWorker} instance in
+ *        {@link de.uka.ilkd.key.proof.init.AbstractProfile#computeLabelInstantiators()}.</li>
  * </ol>
  * </p>
  */
