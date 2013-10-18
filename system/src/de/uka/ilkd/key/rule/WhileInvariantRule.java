@@ -465,6 +465,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                 TB.apply(inst.u, TB.and(variantNonNeg, 
                        TB.and(invTerm, reachableState)), null)),
 			         ruleApp.posInOccurrence());
+   if (TermLabelWorkerManagement.hasInstantiators(services)) {
+      TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
+   }
 
 	setupWdGoal(wdGoal, inst.inv, inst.u, inst.selfTerm, heapContext.get(0),
 	            anonHeap, localIns, ruleApp.posInOccurrence(), services);

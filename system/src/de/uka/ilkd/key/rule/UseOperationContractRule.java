@@ -832,6 +832,10 @@ public final class UseOperationContractRule implements BuiltInRule {
             nullGoal.changeFormula(new SequentFormula(TB.apply(inst.u, actualSelfNotNull, null)),
         	                   ruleApp.posInOccurrence());
         }
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, nullGoal);
+        }
+
 
         //create justification
         final RuleJustificationBySpec just
