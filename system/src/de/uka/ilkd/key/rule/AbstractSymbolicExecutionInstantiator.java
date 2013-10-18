@@ -89,6 +89,13 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
             newLabels.remove(termLabel);
          }
       }
+      if (rule instanceof WhileInvariantRule &&
+          goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
+         ITermLabel termLabel = getTermLabel(termToUpdate);
+         if (termLabel != null) {
+            newLabels.remove(termLabel);
+         }
+      }
    }
 
    /**

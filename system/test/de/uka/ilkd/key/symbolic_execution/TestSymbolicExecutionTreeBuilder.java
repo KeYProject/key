@@ -1085,6 +1085,32 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithLoopInvariantInCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithLoopInvariantInCondition() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useLoopInvariantWhileWithLoopInvariantInCondition/test/WhileWithLoopInvariantInCondition.java", 
+                "WhileWithLoopInvariantInCondition", 
+                "size", 
+                null,
+                "examples/_testcase/set/useLoopInvariantWhileWithLoopInvariantInCondition/oracle/WhileWithLoopInvariantInCondition.xml",
+                false,
+                true,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsConditionOnObject
     * </p>
     * <p>
