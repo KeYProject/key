@@ -158,12 +158,15 @@ public abstract class AbstractPO implements IPersistablePO {
      * WD(pv.<inv>) or WD(pv.m(...)).
      */
     void generateWdTaclets() {
+        if (!WellDefinednessCheck.isOn()) {
+            return;
+        }
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
         ImmutableSet<String> names = DefaultImmutableSet.<String>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
-                // WD(pv.m(...))
+                // WD(callee.m(...))
                 RewriteTaclet mwdTaclet = mwd.createOperationTaclet(services);
                 String tName = mwdTaclet.name().toString();
                 final String prefix;
@@ -188,7 +191,7 @@ public abstract class AbstractPO implements IPersistablePO {
                 names = names.add(tName);
             }
         }
-        // WD(pv.<inv>)
+        // WD(a.<inv>)
         res = res.union(ClassWellDefinedness.createInvTaclet(services));
         for (RewriteTaclet t: res) {
             register(t);

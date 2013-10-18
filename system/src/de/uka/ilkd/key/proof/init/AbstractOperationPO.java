@@ -258,7 +258,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       // add axioms
       collectClassAxioms(getCalleeKeYJavaType());
 
-      // for jml statements
+      // for jml annotation statements
       generateWdTaclets();
    }
 
