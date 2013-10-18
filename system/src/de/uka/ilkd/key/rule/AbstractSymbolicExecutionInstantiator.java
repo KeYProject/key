@@ -82,7 +82,8 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
                             List<ITermLabel> newLabels) {
       // Remove label from the pre branch of the UseOperationContractRule
       if (rule instanceof UseOperationContractRule &&
-          goal.node().getNodeInfo().getBranchLabel().startsWith("Pre")) {
+          (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || 
+           goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
          ITermLabel termLabel = getTermLabel(termToUpdate);
          if (termLabel != null) {
             newLabels.remove(termLabel);
