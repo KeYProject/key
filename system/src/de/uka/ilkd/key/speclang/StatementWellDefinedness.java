@@ -137,7 +137,12 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public final boolean isModel() {
+    public final Term getAxiom() {
+        return null;
+    }
+
+    @Override
+    public final boolean modelField() {
         return false;
     }
 

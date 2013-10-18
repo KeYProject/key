@@ -400,16 +400,27 @@ public abstract class WellDefinednessCheck implements Contract {
             sig.setLength(sig.length() - 2);
         }
         sig.append(")");
-        if(!isModel()) {
+        if(!modelField()
+                && !(type().equals(Type.OPERATION_CONTRACT)
+                        && ((MethodWellDefinedness)this).isModel())) {
             sig.append(" catch(");
             sig.append(origVars.exception);
             sig.append(")");
         }
-        final String mby = hasMby() ? LogicPrinter.quickPrintTerm(this.mby, services) : null;
+        final String printMby = hasMby() ? LogicPrinter.quickPrintTerm(this.mby, services) : null;
+        String mby = "";
+        if (printMby != null) {
+            mby = mby
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "measured-by"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printMby, false) : printMby.trim());
+        }
         String mods = "";
         final boolean isInv = type().equals(Type.CLASS_INVARIANT);
         final boolean isLoop = type().equals(Type.LOOP_INVARIANT);
-        final boolean showSig = !isInv && !isModel();
+        final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods =
                     LogicPrinter.quickPrintTerm(getAssignable(null).equals(TB.strictlyNothing()) ?
@@ -476,6 +487,22 @@ public abstract class WellDefinednessCheck implements Contract {
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
                             : printPosts.trim());
         }
+        String axioms = "";
+        if (getAxiom() != null) {
+            String printAxioms = LogicPrinter.quickPrintTerm(getAxiom(), services);
+            axioms = axioms
+                    + (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "axiom"
+                    + (includeHtmlMarkup ? "</b> " : ": ")
+                    + (includeHtmlMarkup ?
+                            LogicPrinter.escapeHTML(printAxioms, false) : printAxioms.trim());
+        }
+        String transactionApplicable = "";
+        if (transactionApplicableContract()) {
+            transactionApplicable = (includeHtmlMarkup ? "<br><b>" : "\n")
+                    + "transaction applicable"
+                    + (includeHtmlMarkup ? "</b> " : ":");
+        }
         if (includeHtmlMarkup) {
             return "<html>"
                     + (showSig ?
@@ -488,10 +515,11 @@ public abstract class WellDefinednessCheck implements Contract {
                     + deps
                     + reps
                     + posts
+                    + axioms
                     + mods
-                    + (hasMby() ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
-                    + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") +
-                    "</html>";
+                    + mby
+                    + transactionApplicable
+                    + "</html>";
         } else {
             return (showSig ? sig.toString() : "")
                     + globalUpdates
@@ -499,9 +527,10 @@ public abstract class WellDefinednessCheck implements Contract {
                     + deps
                     + reps
                     + posts
+                    + axioms
                     + mods
-                    + (hasMby() ? "\nmeasured-by: "+ mby : "")
-                    + (transactionApplicableContract() ? "\ntransaction applicable:" : "");
+                    + mby
+                    + transactionApplicable;
         }
     }
 
@@ -626,7 +655,7 @@ public abstract class WellDefinednessCheck implements Contract {
         if (!taclet) {
             result = new Term[]
                     { wellFormed, selfNotNull, selfCreated, selfExactType,
-                      paramsOK, implicitPre, invTerm };
+                      invTerm, paramsOK, implicitPre };
         } else {
             result = new Term[]
                     { wellFormed, paramsOK, implicitPre };
@@ -696,10 +725,6 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars, this);
-    }
-
-    public final Term replace(Term t, Variables vars) {
-        return replace(t, vars, this);
     }
 
     final Condition replaceSV(Condition pre, SchemaVariable self,
@@ -807,14 +832,16 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public abstract String getBehaviour();
 
-    public abstract boolean isModel();
+    public abstract boolean modelField();
+
+    public abstract Term getAxiom();
 
     public WellDefinednessCheck combine(WellDefinednessCheck wdc, Services services) {
         assert this.getName().equals(wdc.getName());
         assert this.id() == wdc.id();
         assert this.getTarget().equals(wdc.getTarget());
         assert this.type().equals(wdc.type());
-        assert this.isModel() == wdc.isModel();
+        assert this.modelField() == wdc.modelField();
         assert this.getBehaviour().equals(wdc.getBehaviour());
 
         if (this.getAccessible() != null && wdc.getAccessible() != null) {
@@ -942,6 +969,10 @@ public abstract class WellDefinednessCheck implements Contract {
         return TB.parallel(oldUpd, havocUpd);
     }
 
+    public final Term replace(Term t, Variables vars) {
+        return replace(t, vars, this);
+    }
+
     public final POTerms replace(POTerms po, Variables vars) {
         final Condition pre = replace(po.pre, vars);
         final Term mod = replace(po.mod, vars);
@@ -1059,12 +1090,12 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     public final String getDisplayName() {
         String displayName = "Well-Definedness of JML ";
-        if (isModel()) {
+        if (modelField()) {
             displayName = displayName + "model field";
         } else {
             displayName = displayName + typeString();
         }
-        if(!isModel() && !type().equals(Type.CLASS_INVARIANT)) {
+        if(!modelField() && !type().equals(Type.CLASS_INVARIANT)) {
             displayName = displayName + " " + id;
         }
         if(!getBehaviour().equals("")) {

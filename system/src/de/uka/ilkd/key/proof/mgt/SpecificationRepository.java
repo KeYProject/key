@@ -1424,7 +1424,7 @@ public final class SpecificationRepository {
         for (RepresentsAxiom rep : reps) {
             boolean dep = false;
             for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
-                if (ch.isModel() && ch.getTarget().equals(rep.getTarget())) {
+                if (ch.modelField() && ch.getTarget().equals(rep.getTarget())) {
                     dep = true;
                     unregisterContract(ch);
                     Term represents = rep.getAxiom(heap, ch.getOrigVars().self, services);

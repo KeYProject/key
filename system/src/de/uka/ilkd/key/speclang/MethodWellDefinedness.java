@@ -49,18 +49,20 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     private final Contract contract;
 
     private Term globalDefs;
-    private final boolean model;
+    private Term axiom;
+    private final boolean modelField;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                   LocationVariable heap, OriginalVariables origVars,
                                   Condition requires, Term assignable, Term accessible,
                                   Condition ensures, Term mby, Term rep, Contract contract,
-                                  Term globalDefs, boolean model) {
+                                  Term globalDefs, Term axiom, boolean model) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible,
               ensures, mby, rep);
         this.contract = contract;
         this.globalDefs = globalDefs;
-        this.model = model;
+        this.axiom = axiom;
+        this.modelField = model;
     }
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
@@ -68,9 +70,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
               Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
-        this.model = false;
+        this.modelField = false;
+        final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
+        final LocationVariable hPre = (LocationVariable) origVars.atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setAssignable(contract.hasModifiesClause(h) ? contract.getAssignable(h) : TB.strictlyNothing(),
@@ -80,6 +83,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                       services);
         setEnsures(contract.getEnsures(h));
         setMby(contract.getMby());
+        this.axiom = contract.getRepresentsAxiom(h, origVars.self, origVars.params, origVars.result,
+                                                 origVars.atPres, services);
+        assert this.axiom != null == contract.getTarget().isModel();
         this.globalDefs = contract.getGlobalDefs();
     }
 
@@ -91,7 +97,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
               Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
-        this.model = true;
+        this.modelField = true;
         final LocationVariable h = getHeap();
         final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
 
@@ -103,6 +109,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setEnsures(TB.tt());
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
+        this.axiom = null;
     }
 
     public MethodWellDefinedness(RepresentsAxiom rep, Services services) {
@@ -127,9 +134,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                            rep.getTarget().getContainerType(), pres, null, deps,
                                            rep.getOrigVars().self, rep.getOrigVars().params,
                                            rep.getOrigVars().atPres, null, 0);
-        this.model = true;
+        this.modelField = true;
+        final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
+        final LocationVariable hPre = (LocationVariable) origVars.atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setAssignable(TB.strictlyNothing(), services);
@@ -139,6 +147,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setEnsures(TB.tt());
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
+        this.axiom = null;
         addRepresents(rep.getAxiom(getHeap(), rep.getOrigVars().self, services));
     }
 
@@ -197,6 +206,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final Term globalDefs = getGlobalDefs();
         if (globalDefs != null) {
             rest = rest.append(globalDefs);
+        }
+        final Term axiom = getAxiom();
+        if (axiom != null) {
+            rest = rest.append(axiom);
         }
         return rest;
     }
@@ -285,12 +298,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     /**
-     * Used to determine if the contract of this method has normal behaviour or is a model
-     * field/contract and can thus not throw any exception.
+     * Used to determine if the contract of this method has normal behaviour or
+     * is a model field/method and can thus not throw any exception.
      * @return true for either normal behaviour or model fields
      */
     public boolean isNormal(Services services) {
-        if (isModel()) {
+        if (modelField() || isModel()) {
             return true;
         }
         final Term post = getEnsures().implicit.equals(TB.tt()) ?
@@ -313,9 +326,23 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         }
     }
 
-    @Override
+    /**
+     * Tells whether the method is a model method, i.e. has model behaviour or not.
+     * @return true for model methods
+     */
     public boolean isModel() {
-        return this.model;
+        if (getMethodContract() instanceof FunctionalOperationContract) {
+            final IProgramMethod pm = (IProgramMethod)getTarget();
+            if (pm.isModel()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean modelField() {
+        return this.modelField;
     }
 
     @Override
@@ -336,12 +363,24 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
             this.globalDefs = defs;
         }
+        if (this.getAxiom() != null && mwd.getAxiom() != null) {
+            final Term ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+            this.axiom = TB.andSC(ax, this.getAxiom());
+        } else if (mwd.getGlobalDefs() != null) {
+            final Term ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+            this.axiom = ax;
+        }
         return this;
     }
 
     @Override
     public Term getGlobalDefs() {
         return this.globalDefs;
+    }
+
+    @Override
+    public Term getAxiom() {
+        return this.axiom;
     }
 
     @Override
@@ -365,7 +404,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getRepresents(),
                                          contract,
                                          globalDefs,
-                                         isModel());
+                                         axiom,
+                                         modelField());
     }
 
     @Override
@@ -384,12 +424,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getRepresents(),
                                          contract.setTarget(newKJT, newPM),
                                          globalDefs,
-                                         isModel());
+                                         axiom,
+                                         modelField());
     }
 
     @Override
     public String getTypeName() {
-        return "Well-Definedness of " + (isModel() ? "JML model field" : contract.getTypeName());
+        return "Well-Definedness of " + (modelField() ? "JML model field" : contract.getTypeName());
     }
 
     @Override

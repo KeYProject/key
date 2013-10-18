@@ -109,7 +109,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public boolean isModel() {
+    public boolean modelField() {
         return false;
     }
 
@@ -160,6 +160,11 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public Term getGlobalDefs() {
+        return null;
+    }
+
+    @Override
+    public Term getAxiom() {
         return null;
     }
 }
