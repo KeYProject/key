@@ -408,6 +408,9 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
                                   Pair<KeYJavaType, IObserverFunction> targetPair) {
+        if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) {
+            return;
+        }
         final KeYJavaType targetKJT = targetPair.first;
         final IObserverFunction targetMethod = targetPair.second;
         contract = contract.setTarget(targetKJT, targetMethod);
