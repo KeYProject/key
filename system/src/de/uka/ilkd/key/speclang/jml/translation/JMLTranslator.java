@@ -1250,7 +1250,7 @@ final class JMLTranslator {
                 Named symbol = funcs.lookup(new Name(functName));
 
                 if (symbol != null) {
-                    // Function symbol found
+                    // Function or predicate symbol found
 
                     assert symbol instanceof Function : "Expecting a function symbol in this namespace";
                     Function function = (Function) symbol;
@@ -1304,6 +1304,8 @@ final class JMLTranslator {
                 symbol = progVars.lookup(new Name(functName));
 
                 if (symbol == null) {
+
+                    System.out.println(funcs.toString());
                     throw excManager.createException("Unknown escaped symbol "
                                                      + functName, escape);
                 }
@@ -1663,9 +1665,9 @@ final class JMLTranslator {
                     "Unknown JML-keyword or unknown translation for "
                     + "JML-keyword \"" + jmlKeyWordName
                     + "\". The keyword seems "
-                    + "not to be supported yet.");
+                    + "not to be supported yet.", e);
         } catch (TermCreationException e) {
-            throw excManager.createException(e.getMessage());
+            throw excManager.createException(e.getMessage(), e);
         }
     }
 
@@ -2281,3 +2283,9 @@ final class JMLTranslator {
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 }
+
+//if(symbol == null) {
+//  // no function -> look for predicates
+//  Namespace preds = services.getNamespaces().functions();
+//  Named symbol = funcs.lookup(new Name(functName));
+//}

@@ -349,6 +349,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |   result = decreasesclause
     |   result = respectsclause
     |   result = returnsclause
     |   result = signalsclause
@@ -408,6 +409,14 @@ dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SL
                 dep.getText(), Triple.class, lhs, rhs, mby, services); }
     ;
 
+decreasesclause returns [Term result = null] throws SLTranslationException
+{
+    Term t;
+}
+:
+    dec:DECREASES result=termexpression
+        (COMMA t=termexpression { result = TB.pair(result, t, services); } )*
+    ;
 
 requiresclause returns [Term result = null] throws SLTranslationException
 :

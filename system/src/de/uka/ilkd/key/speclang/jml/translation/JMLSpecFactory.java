@@ -629,12 +629,8 @@ public class JMLSpecFactory {
                                      ImmutableList<ProgramVariable> paramVars,
                                      ImmutableList<PositionedString> originalMeasuredBy)
             throws SLTranslationException {
-
-        Term measuredBy;
-        if (originalMeasuredBy.isEmpty()) {
-            measuredBy = null;
-        } else {
-            measuredBy = TB.zero(services);
+        Term measuredBy = null;
+        if (!originalMeasuredBy.isEmpty()) {
             for (PositionedString expr : originalMeasuredBy) {
                 Term translated = JMLTranslator.translate(expr,
                                                           pm.getContainerType(),
@@ -642,7 +638,11 @@ public class JMLSpecFactory {
                                                           null, null, null,
                                                           Term.class,
                                                           services);
-                measuredBy = TB.add(services, measuredBy, translated);
+                if(measuredBy == null) {
+                    measuredBy = translated;
+                } else {
+                    measuredBy = TB.pair(measuredBy, translated, services);
+                }
             }
         }
         return measuredBy;
