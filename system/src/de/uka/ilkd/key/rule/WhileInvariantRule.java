@@ -420,6 +420,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 		                 TB.apply(inst.u, TB.and(variantNonNeg, 
                        TB.and(invTerm, reachableState)), null)),
 			         ruleApp.posInOccurrence());
+   if (TermLabelWorkerManagement.hasInstantiators(services)) {
+      TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, initGoal);
+   }
 
 	//"Body Preserves Invariant":
         // \replacewith (==>  #atPreEqs(anon1) 
