@@ -1,4 +1,4 @@
-class A {
+class Recursion {
    int x;
 
    // this might be a user input ...
@@ -8,7 +8,7 @@ class A {
    int arbNumber();
 
    /*@ normal_behaviour
-     @  measured_by \dl_pair(1, n);
+     @  measured_by 1, n;
      @*/
    void f(int n) {
       if(n > 0) f(n-1);
@@ -16,7 +16,7 @@ class A {
    }
 
    /*@ normal_behaviour
-     @  measured_by \dl_pair(0, m);
+     @  measured_by 0, m;
      @*/
    void g(int m) {
       if(m > 0) g(m-1);
