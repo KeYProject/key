@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.pp.TermLabelPreferences;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +19,8 @@ import javax.swing.JMenu;
  */
 public class TermLabelMenu extends JMenu {
 
-    public final JCheckBoxMenuItem hideAllTermLabels;
-    public final List<JCheckBoxMenuItem> checkBoxList;
+    private final JCheckBoxMenuItem hideAllTermLabels;
+    private final List<TermLabelCheckBox> checkBoxList;
     private final KeYMediator mediator;
     private final MainWindow mainWindow;
     public final TermLabelPreferences termLabelPreferences;
@@ -32,14 +33,16 @@ public class TermLabelMenu extends JMenu {
         if (mediator.getSelectedProof() != null) {
             addSeparator();
             Set<Class> termLabels = ITermLabel.getRegisteredTermLabels();
-            List<String> stringNames = new LinkedList();
             for (Class c : termLabels) {
-                KeYMenuCheckBox checkBox = new TermLabelCheckBox(c) {
+                TermLabelCheckBox checkBox = new TermLabelCheckBox(c) {
                 };
                 checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(c));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
-                add(checkBox);
                 checkBoxList.add(checkBox);
+            }
+            Collections.sort(checkBoxList);
+            for (TermLabelCheckBox c : checkBoxList) {
+                add(c);
             }
         }
     }
@@ -91,7 +94,7 @@ public class TermLabelMenu extends JMenu {
         }
     }
 
-    private class TermLabelCheckBox extends KeYMenuCheckBox {
+    private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
 
         Class c;
 
@@ -108,6 +111,11 @@ public class TermLabelMenu extends JMenu {
                 termLabelPreferences.hiddenTermLabels.add(c);
             }
             mainWindow.makePrettyView();
+        }
+
+        @Override
+        public int compareTo(TermLabelCheckBox t) {
+            return this.mainWindowAction.getName().compareTo(t.mainWindowAction.getName());
         }
 
     }

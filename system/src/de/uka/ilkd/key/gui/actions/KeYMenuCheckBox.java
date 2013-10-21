@@ -10,7 +10,7 @@ import javax.swing.JCheckBoxMenuItem;
  */
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
-    final MainWindowAction mainWindowAction;
+    protected final MainWindowAction mainWindowAction;
 
     KeYMenuCheckBox(MainWindow mainWindow, String label) {
         super();

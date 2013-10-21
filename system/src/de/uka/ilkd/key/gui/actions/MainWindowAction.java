@@ -51,6 +51,10 @@ public abstract class MainWindowAction extends AbstractAction {
     protected void setName(String name) {
         putValue(NAME, name);
     }
+    
+    protected String getName() {
+        return (String)getValue(NAME);
+    }
 
     protected void setAcceleratorLetter(int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
