@@ -17,9 +17,6 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.label.AnonHeapTermLabel;
-import de.uka.ilkd.key.logic.label.SelectSkolemConstantTermLabel;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -42,6 +39,7 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
  *
  */
 public class JavaProfile extends AbstractProfile {
+
     public static final String NAME = "Java Profile";
     
     /**
@@ -73,6 +71,7 @@ public class JavaProfile extends AbstractProfile {
         this("standardRules.key");
     }
 
+    @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(DEFAULT);
@@ -80,6 +79,7 @@ public class JavaProfile extends AbstractProfile {
     }
 
     
+    @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {       
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         
@@ -125,6 +125,7 @@ public class JavaProfile extends AbstractProfile {
      *
      * @return justification for the given rule
      */
+    @Override
     public RuleJustification getJustification(Rule r) {
         return r == UseOperationContractRule.INSTANCE 
                || r == UseDependencyContractRule.INSTANCE
@@ -136,6 +137,7 @@ public class JavaProfile extends AbstractProfile {
     /**
      * the name of the profile
      */
+    @Override
     public String name() {
         return NAME;
     }
@@ -143,6 +145,7 @@ public class JavaProfile extends AbstractProfile {
     /**
      * the default strategy factory to be used
      */
+    @Override
     public StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
     }
@@ -175,11 +178,4 @@ public class JavaProfile extends AbstractProfile {
        return defaultInstance;
     }
 
-    @Override
-    public ImmutableList<Name> getSupportedLabelNames() {
-        ImmutableList<Name> ret = ImmutableSLList.nil();
-        ret = ret.prepend(AnonHeapTermLabel.NAME);
-        ret = ret.prepend(SelectSkolemConstantTermLabel.NAME);
-        return ret;
-    }
 }

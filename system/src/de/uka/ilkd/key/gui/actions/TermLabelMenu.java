@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.pp.TermLabelPreferences;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
@@ -32,29 +31,12 @@ public class TermLabelMenu extends JMenu {
 
         if (mediator.getSelectedProof() != null) {
             addSeparator();
-            ImmutableList<Name> termLabelNames
-                    = mediator.getSelectedProof().env().
-                    getInitConfig().getProfile().getSupportedLabelNames();
+            Set<Class> termLabels = ITermLabel.getRegisteredTermLabels();
             List<String> stringNames = new LinkedList();
-            for (Name name : termLabelNames) {
-                stringNames.add(name.toString());
-            }
-            Collections.sort(stringNames);
-            for (final String name : stringNames) {
-
-                KeYMenuCheckBox checkBox = new KeYMenuCheckBox(mainWindow, name) {
-                    @Override
-                    public void handleClickEvent() {
-                        if (isSelected()) {
-                            termLabelPreferences.hiddenTermLabels.remove(name);
-                        } else {
-                            termLabelPreferences.hiddenTermLabels.add(name);
-                        }
-                        mainWindow.makePrettyView();
-                    }
+            for (Class c : termLabels) {
+                KeYMenuCheckBox checkBox = new TermLabelCheckBox(c) {
                 };
-                checkBox.setName(name);
-                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(name));
+                checkBox.setSelected(!termLabelPreferences.hiddenTermLabels.contains(c));
                 checkBox.setEnabled(!hideAllTermLabels.isSelected());
                 add(checkBox);
                 checkBoxList.add(checkBox);
@@ -107,5 +89,26 @@ public class TermLabelMenu extends JMenu {
             }
             mainWindow.makePrettyView();
         }
+    }
+
+    private class TermLabelCheckBox extends KeYMenuCheckBox {
+
+        Class c;
+
+        TermLabelCheckBox(Class c) {
+            super(mainWindow, c.getSimpleName());
+            this.c = c;
+        }
+
+        @Override
+        public void handleClickEvent() {
+            if (isSelected()) {
+                termLabelPreferences.hiddenTermLabels.remove(c);
+            } else {
+                termLabelPreferences.hiddenTermLabels.add(c);
+            }
+            mainWindow.makePrettyView();
+        }
+
     }
 }

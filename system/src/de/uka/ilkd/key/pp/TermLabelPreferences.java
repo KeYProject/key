@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.pp;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
@@ -11,7 +11,7 @@ import java.util.TreeSet;
  */
 public abstract class TermLabelPreferences {
 
-    public final Set<String> hiddenTermLabels = new TreeSet();
+    public final Set<Class> hiddenTermLabels = new HashSet();
 
     public abstract boolean hideAllTermLabels();
 

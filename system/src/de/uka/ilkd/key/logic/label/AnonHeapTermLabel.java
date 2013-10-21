@@ -43,6 +43,7 @@ public class AnonHeapTermLabel extends ITermLabel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object o) {
         return this == o;
     }
@@ -51,6 +52,7 @@ public class AnonHeapTermLabel extends ITermLabel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return NAME.toString();
     }

@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.label.LabelFactory;
 import de.uka.ilkd.key.proof.init.Profile;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>
@@ -67,4 +69,14 @@ public abstract class ITermLabel implements Named {
      * @return the number of parameters
      */
     public abstract int getChildCount();
+    
+    private static final Set<Class> registeredTermLabels = new HashSet();
+
+    public static Set<Class> getRegisteredTermLabels() {
+        return registeredTermLabels;
+    }
+    
+    public ITermLabel(){
+        registeredTermLabels.add(this.getClass());
+    }
 }
