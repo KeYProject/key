@@ -1,6 +1,5 @@
 final class Lemmas {
 
-    // PROVED: nearly automatically. only 2 Evaluate Query
     /*@ public normal_behaviour
       @  requires sa.a != null;
       @  requires 0 <= a && a < sa.a.length;
@@ -15,8 +14,6 @@ final class Lemmas {
 	return true;
     }
 
-    // PROVED: nearly automatically. only 2 Evaluate Query
-    // modified and PROVED: automatically with Query Treatment ON
     /*@ public normal_behaviour
       @  requires sa.a != null;
       @  requires 0 <= a && a <= sa.a.length - k;
@@ -34,7 +31,6 @@ final class Lemmas {
 	return true;
     }
 
-    // PROVED: autoamtically with Standard settings
     /*@ public normal_behaviour
       @  requires \invariant_for(sa);
       @  requires 0 <= i && i < j && j < sa.a.length;

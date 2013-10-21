@@ -281,10 +281,10 @@ public abstract class SequentView extends JTextArea
 
     /**
      * Return the character index for a certain coordinate. The usual
-     * viewToModel is focussed on inter-character spaces, not characters, so it
+     * viewToModel is focused on inter-character spaces, not characters, so it
      * returns the correct index in the left half of the glyph but one too many
      * in the right half. Therefore, we get width of character before the one
-     * given by viewToModel, substract it from the given x value, and get the
+     * given by viewToModel, subtract it from the given x value, and get the
      * character at the new position. That is the correct one.
      */
     public int correctedViewToModel(Point p) {

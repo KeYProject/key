@@ -25,6 +25,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
 import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
@@ -109,7 +111,8 @@ import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.BaseHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
@@ -604,7 +607,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       // pull out select only if it can be simplified
                       // (the heap term may not be the base heap or an anon heap
                       // function symbol)
-                      add( applyTF( "h", not( or( BaseHeapTermFeature.create(heapLDT),
+                      add( applyTF( "h", not( or( PrimitiveHeapTermFeature.create(heapLDT),
                                                   AnonHeapTermFeature.INSTANCE ) ) ),
                            ifZero( applyTF(FocusFormulaProjection.INSTANCE, ff.update),
                                    longConst(-4200),
@@ -637,10 +640,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "hide_auxiliary_eq",
                       // hide auxiliary equation after the skolem constatns have
                       // been replaced by it's computed value
-                      add( applyTF("auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
-                           applyTF( "leftHandSide", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
-                                                                     not( ff.ifThenElse ) ) ) ),
+                      add( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                           applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
+                                                               not( ff.ifThenElse ) ) ) ),
+                           not( ContainsTermFeature.create( instOf("result"),
+                                                            instOf("auxiliarySK") ) ),
                            longConst(-5400) ) );
+        bindRuleSet ( d, "hide_auxiliary_eq_const",
+                      // hide auxiliary equation after the skolem constatns have
+                      // been replaced by it's computed value
+                      add( applyTF("auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                           longConst(-500) ) );
     }
 
     private void setUpStringNormalisation (RuleSetDispatchFeature d, Services services) {
@@ -2407,7 +2417,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    isInstantiated("s"),
                    applyTF("s", rec( any(),
                                      add( SimplifiedSelectTermFeature.create(heapLDT),
-                                          not( ff.ifThenElse ) ) ) ) ) );
+                                          not( ff.ifThenElse ) ) ) ),
+                   not( ContainsTermFeature.create( instOf("s"),
+                                                    instOf("t1") ) ) ) );
 
         return d;
     }
