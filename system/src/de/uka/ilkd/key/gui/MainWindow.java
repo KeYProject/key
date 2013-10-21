@@ -796,6 +796,10 @@ public final class MainWindow extends JFrame  {
         view.add(new ToolTipOptionsAction(this));
 
         view.add(new ProofDiffFrame.Action(this));
+        
+        view.addSeparator();
+        view.add(termLabelMenu);
+        
         return view;
     }
 
@@ -815,9 +819,6 @@ public final class MainWindow extends JFrame  {
 	proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
-        
-        proof.addSeparator();
-        proof.add(termLabelMenu);
 
         return proof;
     }
